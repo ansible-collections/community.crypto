@@ -1,0 +1,6 @@
+plugin_routing:
+  modules:
+    acme_account_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details

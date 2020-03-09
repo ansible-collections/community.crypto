@@ -1,0 +1,12 @@
+plugins/modules/acme_account_info.py validate-modules:return-syntax-error
+plugins/modules/acme_certificate.py validate-modules:doc-elements-mismatch
+tests/unit/mock/path.py future-import-boilerplate
+tests/unit/mock/path.py metaclass-boilerplate
+tests/unit/mock/yaml_helper.py future-import-boilerplate
+tests/unit/mock/yaml_helper.py metaclass-boilerplate
+tests/unit/module_utils/conftest.py future-import-boilerplate
+tests/unit/module_utils/conftest.py metaclass-boilerplate
+tests/unit/modules/conftest.py future-import-boilerplate
+tests/unit/modules/conftest.py metaclass-boilerplate
+tests/unit/modules/utils.py future-import-boilerplate
+tests/unit/modules/utils.py metaclass-boilerplate

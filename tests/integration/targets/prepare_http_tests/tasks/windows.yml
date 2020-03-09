@@ -1,0 +1,26 @@
+- name: Windows - make sure the port forwarder is active
+  ansible.windows.win_wait_for:
+    host: ansible.http.tests
+    port: 80
+    state: started
+    timeout: 300
+- name: Windows - Get client cert/key
+  register: win_download
+  retries: 5
+  until: win_download is successful
+  with_items:
+  - client.pem
+  - client.key
+  ansible.windows.win_get_url:
+    url: http://ansible.http.tests/{{ item }}
+    dest: '{{ remote_tmp_dir }}\{{ item }}'
+- name: Windows - Retrieve test cacert
+  ansible.windows.win_get_url:
+    url: http://ansible.http.tests/cacert.pem
+    dest: '{{ remote_tmp_dir }}\cacert.pem'
+- name: Windows - Update ca trust
+  ansible.windows.win_certificate_store:
+    path: '{{ remote_tmp_dir }}\cacert.pem'
+    state: present
+    store_location: LocalMachine
+    store_name: Root
