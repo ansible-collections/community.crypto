@@ -9,7 +9,7 @@ license_file: COPYING
 tags: null
 dependencies:
   ansible.netcommon: '>=0.1.0'
-repository: git@github.com:ansible-collection-migration/community.crypto.git
+repository: https://github.com:ansible-collections/community.crypto
 documentation: https://github.com/ansible-collection-migration/community.crypto/tree/master/docs
-homepage: https://github.com/ansible-collection-migration/community.crypto
-issues: https://github.com/ansible-collection-migration/community.crypto/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
+homepage: https://github.com:ansible-collections/community.crypto
+issues: https://github.com:ansible-collections/community.crypto/issues
