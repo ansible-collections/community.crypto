@@ -516,7 +516,7 @@ from datetime import datetime
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes, to_native
-from ansible_collections.ansible.netcommon.plugins.module_utils.compat import ipaddress as compat_ipaddress
+from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 try:
