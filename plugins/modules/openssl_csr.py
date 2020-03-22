@@ -1111,7 +1111,7 @@ def main():
             except AttributeError:
                 module.fail_json(msg='You need to have PyOpenSSL>=0.15 to generate CSRs')
 
-            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='0.0.1')
+            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='2.13')
             csr = CertificateSigningRequestPyOpenSSL(module)
         elif backend == 'cryptography':
             if not CRYPTOGRAPHY_FOUND:
