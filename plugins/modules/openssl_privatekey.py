@@ -276,7 +276,13 @@ import abc
 import base64
 import os
 import traceback
+
 from distutils.version import LooseVersion
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_native, to_bytes
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 MINIMAL_PYOPENSSL_VERSION = '0.6'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
@@ -316,10 +322,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto import (
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
-from ansible.module_utils._text import to_native, to_bytes
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class PrivateKeyError(crypto_utils.OpenSSLObjectError):

@@ -489,6 +489,21 @@ all_chains:
       returned: always
 '''
 
+import base64
+import binascii
+import hashlib
+import os
+import re
+import textwrap
+import time
+import traceback
+
+from datetime import datetime
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_bytes, to_native
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ModuleFailException,
     write_file,
@@ -503,21 +518,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme import (
     process_links,
     get_default_argspec,
 )
-
-import base64
-import binascii
-import hashlib
-import os
-import re
-import textwrap
-import time
-import traceback
-from datetime import datetime
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 try:
     import cryptography

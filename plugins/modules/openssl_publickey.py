@@ -179,7 +179,13 @@ publickey:
 
 import os
 import traceback
+
 from distutils.version import LooseVersion
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_native
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 MINIMAL_PYOPENSSL_VERSION = '16.0.0'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
@@ -207,10 +213,6 @@ except ImportError:
     CRYPTOGRAPHY_FOUND = False
 else:
     CRYPTOGRAPHY_FOUND = True
-
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class PublicKeyError(crypto_utils.OpenSSLObjectError):

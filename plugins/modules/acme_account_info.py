@@ -196,6 +196,8 @@ orders:
       returned: when certificate was issued
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ModuleFailException,
     ACMEAccount,
@@ -203,8 +205,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme import (
     process_links,
     get_default_argspec,
 )
-
-from ansible.module_utils.basic import AnsibleModule
 
 
 def get_orders_list(module, account, orders_url):

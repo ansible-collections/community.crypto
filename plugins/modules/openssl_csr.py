@@ -420,11 +420,13 @@ import abc
 import binascii
 import os
 import traceback
+
 from distutils.version import LooseVersion
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes, to_text
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -1109,7 +1111,7 @@ def main():
             except AttributeError:
                 module.fail_json(msg='You need to have PyOpenSSL>=0.15 to generate CSRs')
 
-            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='2.13')
+            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='0.0.1')
             csr = CertificateSigningRequestPyOpenSSL(module)
         elif backend == 'cryptography':
             if not CRYPTOGRAPHY_FOUND:
