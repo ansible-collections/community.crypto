@@ -30,8 +30,21 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+import abc
+import base64
+import binascii
+import datetime
+import errno
+import hashlib
+import os
+import re
 import sys
+import tempfile
+
 from distutils.version import LooseVersion
+
+from ansible.module_utils import six
+from ansible.module_utils._text import to_native, to_bytes, to_text
 
 try:
     import OpenSSL
@@ -118,20 +131,6 @@ except ImportError:
     CRYPTOGRAPHY_HAS_ED25519 = False
     CRYPTOGRAPHY_HAS_ED448 = False
     HAS_CRYPTOGRAPHY = False
-
-
-import abc
-import base64
-import binascii
-import datetime
-import errno
-import hashlib
-import os
-import re
-import tempfile
-
-from ansible.module_utils import six
-from ansible.module_utils._text import to_native, to_bytes, to_text
 
 
 class OpenSSLObjectError(Exception):

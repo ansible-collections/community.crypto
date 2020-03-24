@@ -196,18 +196,19 @@ info:
 
 '''
 
-import os
 import errno
+import os
 import re
 import tempfile
 
 from datetime import datetime
 from datetime import MINYEAR, MAXYEAR
-from shutil import copy2
-from shutil import rmtree
+from shutil import copy2, rmtree
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto import convert_relative_to_datetime
 from ansible.module_utils._text import to_native
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto import convert_relative_to_datetime
 
 
 class CertificateError(Exception):

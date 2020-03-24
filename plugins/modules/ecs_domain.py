@@ -202,17 +202,18 @@ ev_days_remaining:
 
 '''
 
+import datetime
+import time
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
+
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
     ecs_client_argument_spec,
     ECSClient,
     RestOperationException,
     SessionConfigurationException,
 )
-
-import datetime
-import time
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
 
 
 def calculate_days_remaining(expiry_date):

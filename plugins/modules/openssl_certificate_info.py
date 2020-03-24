@@ -300,13 +300,15 @@ import datetime
 import os
 import re
 import traceback
+
 from distutils.version import LooseVersion
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_text, to_bytes
-from ansible_collections.ansible.netcommon.plugins.module_utils.compat import ipaddress as compat_ipaddress
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
