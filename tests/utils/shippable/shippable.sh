@@ -33,7 +33,7 @@ pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pi
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
-TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
+TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
 mkdir -p "${TEST_DIR}"
 cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
