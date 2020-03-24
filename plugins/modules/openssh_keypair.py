@@ -153,9 +153,9 @@ comment:
     sample: test@comment
 '''
 
+import errno
 import os
 import stat
-import errno
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native

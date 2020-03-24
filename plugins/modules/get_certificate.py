@@ -150,19 +150,20 @@ EXAMPLES = '''
     expire_days: "{{ (( cert.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ')) ).days }}"
 '''
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+import atexit
+import base64
+import datetime
+import traceback
 
 from distutils.version import LooseVersion
 from os.path import isfile
 from socket import setdefaulttimeout, socket
 from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_OPTIONAL
 
-import atexit
-import base64
-import datetime
-import traceback
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_bytes
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'

@@ -136,18 +136,18 @@ regular_certificate:
   type: str
 '''
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
-    read_file,
-)
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes, to_text
-
 import base64
 import datetime
 import sys
 import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_bytes, to_text
+
+from ansible_collections.community.crypto.plugins.module_utils.acme import (
+    ModuleFailException,
+    read_file,
+)
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

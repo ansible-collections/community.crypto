@@ -180,9 +180,14 @@ pkcs12:
 '''
 
 import base64
-import stat
 import os
+import stat
 import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_bytes, to_native
+
+from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 
 PYOPENSSL_IMP_ERR = None
 try:
@@ -192,10 +197,6 @@ except ImportError:
     pyopenssl_found = False
 else:
     pyopenssl_found = True
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
-from ansible.module_utils._text import to_bytes, to_native
 
 
 class PkcsError(crypto_utils.OpenSSLObjectError):
