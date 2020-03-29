@@ -10,7 +10,6 @@ matrix:
   include:
     - env: T=sanity/1
 
-    - env: T=units/2.6/1
     - env: T=units/2.7/1
     - env: T=units/3.5/1
     - env: T=units/3.6/1
