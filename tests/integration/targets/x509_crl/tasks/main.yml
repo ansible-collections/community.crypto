@@ -42,7 +42,7 @@
   loop: "{{ certificates }}"
 
 - name: Generate CA certificates
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/{{ item.name }}.pem'
     csr_path: '{{ output_dir }}/{{ item.name }}.csr'
     privatekey_path: '{{ output_dir }}/{{ item.name }}.key'
@@ -51,7 +51,7 @@
   when: item.is_ca | default(false)
 
 - name: Generate other certificates
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/{{ item.name }}.pem'
     csr_path: '{{ output_dir }}/{{ item.name }}.csr'
     provider: ownca
@@ -61,7 +61,7 @@
   when: not (item.is_ca | default(false))
 
 - name: Get certificate infos
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ output_dir }}/{{ item }}.pem'
   loop:
   - cert-1

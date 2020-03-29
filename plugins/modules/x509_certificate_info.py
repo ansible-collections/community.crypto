@@ -14,7 +14,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 ---
-module: openssl_certificate_info
+module: x509_certificate_info
 short_description: Provide information of OpenSSL X.509 certificates
 description:
     - This module allows one to query information on OpenSSL certificates.
@@ -67,12 +67,12 @@ notes:
     - All timestamp values are provided in ASN.1 TIME format, i.e. following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
 seealso:
-- module: openssl_certificate
+- module: x509_certificate
 '''
 
 EXAMPLES = r'''
 - name: Generate a Self Signed OpenSSL certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     privatekey_path: /etc/ssl/private/ansible.com.pem
     csr_path: /etc/ssl/csr/ansible.com.csr
@@ -82,7 +82,7 @@ EXAMPLES = r'''
 # Get information on the certificate
 
 - name: Get information on generated certificate
-  community.crypto.openssl_certificate_info:
+  community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
   register: result
 
@@ -92,12 +92,12 @@ EXAMPLES = r'''
 
 
 # Check whether the certificate is valid or not valid at certain times, fail
-# if this is not the case. The first task (openssl_certificate_info) collects
+# if this is not the case. The first task (x509_certificate_info) collects
 # the information, and the second task (assert) validates the result and
 # makes the playbook fail in case something is not as expected.
 
 - name: Test whether that certificate is valid tomorrow and/or in three weeks
-  community.crypto.openssl_certificate_info:
+  community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
     valid_at:
       point_1: "+1d"

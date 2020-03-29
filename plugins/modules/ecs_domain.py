@@ -78,7 +78,7 @@ options:
             - Only allowed if C(verification_method=email)
         type: str
 seealso:
-    - module: openssl_certificate
+    - module: x509_certificate
       description: Can be used to request certificates from ECS, with C(provider=entrust).
     - module: ecs_certificate
       description: Can be used to request a Certificate from ECS using a verified domain.

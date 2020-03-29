@@ -14,7 +14,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 ---
-module: openssl_certificate
+module: x509_certificate
 short_description: Generate and/or check OpenSSL certificates
 description:
     - This module allows one to (re)generate OpenSSL certificates.
@@ -23,7 +23,7 @@ description:
     - The C(assertonly) provider is intended for use cases where one is only interested in
       checking properties of a supplied certificate. Please note that this provider has been
       deprecated in Ansible 2.9 and will be removed in Ansible 2.13. See the examples on how
-      to emulate C(assertonly) usage with M(openssl_certificate_info), M(openssl_csr_info),
+      to emulate C(assertonly) usage with M(x509_certificate_info), M(openssl_csr_info),
       M(openssl_privatekey_info) and M(assert). This also allows more flexible checks than
       the ones offered by the C(assertonly) provider.
     - The C(ownca) provider is intended for generating OpenSSL certificate signed with your own
@@ -63,7 +63,7 @@ options:
             - Name of the provider to use to generate/retrieve the OpenSSL certificate.
             - The C(assertonly) provider will not generate files and fail if the certificate file is missing.
             - The C(assertonly) provider has been deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
-              Please see the examples on how to emulate it with M(openssl_certificate_info), M(openssl_csr_info),
+              Please see the examples on how to emulate it with M(x509_certificate_info), M(openssl_csr_info),
               M(openssl_privatekey_info) and M(assert).
             - "The C(entrust) provider was added for Ansible 2.9 and requires credentials for the
                L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
@@ -576,7 +576,7 @@ extends_documentation_fragment: files
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
-    - For security reason, when you use C(ownca) provider, you should NOT run M(openssl_certificate) on
+    - For security reason, when you use C(ownca) provider, you should NOT run M(x509_certificate) on
       a target machine, but on a dedicated CA machine. It is recommended not to store the CA private key
       on the target machine. Once signed, the certificate can be moved to the target machine.
 seealso:
@@ -589,14 +589,14 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate a Self Signed OpenSSL certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     privatekey_path: /etc/ssl/private/ansible.com.pem
     csr_path: /etc/ssl/csr/ansible.com.csr
     provider: selfsigned
 
 - name: Generate an OpenSSL certificate signed with your own CA certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
     ownca_path: /etc/ssl/crt/ansible_CA.crt
@@ -604,7 +604,7 @@ EXAMPLES = r'''
     provider: ownca
 
 - name: Generate a Let's Encrypt Certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
     provider: acme
@@ -612,7 +612,7 @@ EXAMPLES = r'''
     acme_challenge_path: /etc/ssl/challenges/ansible.com/
 
 - name: Force (re-)generate a new Let's Encrypt Certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
     provider: acme
@@ -621,7 +621,7 @@ EXAMPLES = r'''
     force: yes
 
 - name: Generate an Entrust certificate via the Entrust Certificate Services (ECS) API
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
     provider: entrust
@@ -636,10 +636,10 @@ EXAMPLES = r'''
     entrust_api_specification_path: /etc/ssl/entrust/api-docs/cms-api-2.1.0.yaml
 
 # The following example shows one assertonly usage using all existing options for
-# assertonly, and shows how to emulate the behavior with the openssl_certificate_info,
+# assertonly, and shows how to emulate the behavior with the x509_certificate_info,
 # openssl_csr_info, openssl_privatekey_info and assert modules:
 
-- community.crypto.openssl_certificate:
+- community.crypto.x509_certificate:
     provider: assertonly
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
@@ -670,7 +670,7 @@ EXAMPLES = r'''
     invalid_at: 20200331202428Z
     valid_in: 10  # in ten seconds
 
-- community.crypto.openssl_certificate_info:
+- community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
     # for valid_at, invalid_at and valid_in
     valid_at:
@@ -730,7 +730,7 @@ EXAMPLES = r'''
 
 # How to use the assertonly provider to implement and trigger your own custom certificate generation workflow:
 - name: Check if a certificate is currently still valid, ignoring failures
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     has_expired: no
@@ -742,7 +742,7 @@ EXAMPLES = r'''
   when: validity_check.failed
 
 - name: Check the new certificate again for validity with the same parameters, this time failing the play if it is still invalid
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     has_expired: no
@@ -750,7 +750,7 @@ EXAMPLES = r'''
 
 # Some other checks that assertonly could be used for:
 - name: Verify that an existing certificate was issued by the Let's Encrypt CA and is currently still valid
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     issuer:
@@ -758,7 +758,7 @@ EXAMPLES = r'''
     has_expired: no
 
 - name: Ensure that a certificate uses a modern signature algorithm (no SHA1, MD5 or DSA)
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     signature_algorithms:
@@ -772,25 +772,25 @@ EXAMPLES = r'''
       - sha512WithECDSAEncryption
 
 - name: Ensure that the existing certificate belongs to the specified private key
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     privatekey_path: /etc/ssl/private/example.com.pem
     provider: assertonly
 
 - name: Ensure that the existing certificate is still valid at the winter solstice 2017
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     valid_at: 20171221162800Z
 
 - name: Ensure that the existing certificate is still valid 2 weeks (1209600 seconds) from now
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     valid_in: 1209600
 
 - name: Ensure that the existing certificate is only used for digital signatures and encrypting other keys
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     key_usage:
@@ -799,14 +799,14 @@ EXAMPLES = r'''
     key_usage_strict: true
 
 - name: Ensure that the existing certificate can be used for client authentication
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     extended_key_usage:
       - clientAuth
 
 - name: Ensure that the existing certificate can only be used for client authentication and time stamping
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     extended_key_usage:
@@ -815,7 +815,7 @@ EXAMPLES = r'''
     extended_key_usage_strict: true
 
 - name: Ensure that the existing certificate has a certain domain in its subjectAltName
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: /etc/ssl/crt/example.com.crt
     provider: assertonly
     subject_alt_name:
@@ -2622,7 +2622,7 @@ def main():
             provider = module.params['provider']
             if provider == 'assertonly':
                 module.deprecate("The 'assertonly' provider is deprecated; please see the examples of "
-                                 "the 'openssl_certificate' module on how to replace it with other modules",
+                                 "the 'x509_certificate' module on how to replace it with other modules",
                                  version='2.13')
             elif provider == 'selfsigned':
                 if module.params['privatekey_path'] is None and module.params['privatekey_content'] is None:

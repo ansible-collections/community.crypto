@@ -11,7 +11,7 @@
       commonName: www.example.com
 
 - name: (Expired, {{select_crypto_backend}}) Generate expired selfsigned certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/has_expired_cert.pem'
     csr_path: '{{ output_dir }}/has_expired_csr.csr'
     privatekey_path: '{{ output_dir }}/has_expired_privatekey.pem'
@@ -27,7 +27,7 @@
   when: select_crypto_backend == 'cryptography' # So we create it with 'command'
 
 - name: "(Expired) Check task fails because cert is expired (has_expired: false)"
-  openssl_certificate:
+  x509_certificate:
     provider: assertonly
     path: "{{ output_dir }}/has_expired_cert.pem"
     has_expired: false
@@ -40,7 +40,7 @@
     that: expired_cert_check is failed
 
 - name: "(Expired) Check expired cert check is ignored (has_expired: true)"
-  openssl_certificate:
+  x509_certificate:
     provider: assertonly
     path: "{{ output_dir }}/has_expired_cert.pem"
     has_expired: true

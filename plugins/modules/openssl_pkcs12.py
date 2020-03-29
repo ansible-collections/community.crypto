@@ -101,7 +101,7 @@ options:
 extends_documentation_fragment:
     - files
 seealso:
-- module: openssl_certificate
+- module: x509_certificate
 - module: openssl_csr
 - module: openssl_dhparam
 - module: openssl_privatekey

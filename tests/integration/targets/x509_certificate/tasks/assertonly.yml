@@ -31,7 +31,7 @@
     useCommonNameForSAN: no
 
 - name: (Assertonly, {{select_crypto_backend}}) - Generate selfsigned certificate (no extensions)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     csr_path: '{{ output_dir }}/csr_noext.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -40,7 +40,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Assertonly, {{select_crypto_backend}}) - Generate selfsigned certificate (with SANs)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_sans.pem'
     csr_path: '{{ output_dir }}/csr_sans.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -49,7 +49,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Assertonly, {{select_crypto_backend}}) - Assert that subject_alt_name is there (should fail)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     provider: assertonly
     subject_alt_name:
@@ -59,7 +59,7 @@
   register: extension_missing_san
 
 - name: (Assertonly, {{select_crypto_backend}}) - Assert that subject_alt_name is there
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_sans.pem'
     provider: assertonly
     subject_alt_name:
@@ -70,7 +70,7 @@
   register: extension_san
 
 - name: (Assertonly, {{select_crypto_backend}}) - Assert that subject_alt_name is there (strict)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_sans.pem'
     provider: assertonly
     subject_alt_name:
@@ -82,7 +82,7 @@
   register: extension_san_strict
 
 - name: (Assertonly, {{select_crypto_backend}}) - Assert that key_usage is there (should fail)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     provider: assertonly
     key_usage:
@@ -92,7 +92,7 @@
   register: extension_missing_ku
 
 - name: (Assertonly, {{select_crypto_backend}}) - Assert that extended_key_usage is there (should fail)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     provider: assertonly
     extended_key_usage:
@@ -113,7 +113,7 @@
       - "'Found no extendedKeyUsage extension' in extension_missing_eku.msg"
 
 - name: (Assertonly, {{select_crypto_backend}}) - Check private key passphrase fail 1
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
     privatekey_passphrase: hunter2
@@ -123,7 +123,7 @@
   register: passphrase_error_1
 
 - name: (Assertonly, {{select_crypto_backend}}) - Check private key passphrase fail 2
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     privatekey_path: '{{ output_dir }}/privatekeypw.pem'
     privatekey_passphrase: wrong_password
@@ -133,7 +133,7 @@
   register: passphrase_error_2
 
 - name: (Assertonly, {{select_crypto_backend}}) - Check private key passphrase fail 3
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
     privatekey_path: '{{ output_dir }}/privatekeypw.pem'
     provider: assertonly
