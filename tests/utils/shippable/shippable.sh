@@ -26,10 +26,24 @@ fi
 command -v python
 python -V
 
+function retry
+{
+    for repetition in 1 2 3; do
+        "$@"
+        result=$?
+        if [ ${result} == 0 ]; then
+            return ${result}
+        fi
+        echo "$@ -> ${result}"
+    done
+    echo "Command '$@' failed 3 times!"
+    exit -1
+}
+
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
@@ -37,6 +51,11 @@ TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
 mkdir -p "${TEST_DIR}"
 cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
+
+# STAR: HACK install integration test dependencies
+retry ansible-galaxy -vvv collection install community.general
+# END: HACK
+
 
 export PYTHONIOENCODING='utf-8'
 
