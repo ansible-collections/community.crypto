@@ -53,7 +53,9 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install integration test dependencies
-retry ansible-galaxy -vvv collection install community.general
+if [ "${script}" != "units" ] && [ "${script}" != "sanity" ]; then
+    retry ansible-galaxy -vvv collection install community.general
+fi
 # END: HACK
 
 
