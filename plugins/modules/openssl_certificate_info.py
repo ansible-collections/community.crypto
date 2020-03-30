@@ -72,7 +72,7 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate a Self Signed OpenSSL certificate
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     privatekey_path: /etc/ssl/private/ansible.com.pem
     csr_path: /etc/ssl/csr/ansible.com.csr
@@ -82,7 +82,7 @@ EXAMPLES = r'''
 # Get information on the certificate
 
 - name: Get information on generated certificate
-  openssl_certificate_info:
+  community.crypto.openssl_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
   register: result
 
@@ -97,7 +97,7 @@ EXAMPLES = r'''
 # makes the playbook fail in case something is not as expected.
 
 - name: Test whether that certificate is valid tomorrow and/or in three weeks
-  openssl_certificate_info:
+  community.crypto.openssl_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
     valid_at:
       point_1: "+1d"

@@ -84,16 +84,16 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate Diffie-Hellman parameters with the default size (4096 bits)
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: /etc/ssl/dhparams.pem
 
 - name: Generate DH Parameters with a different size (2048 bits)
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: /etc/ssl/dhparams.pem
     size: 2048
 
 - name: Force regenerate an DH parameters if they already exist
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: /etc/ssl/dhparams.pem
     force: yes
 '''

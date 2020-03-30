@@ -286,26 +286,26 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate an OpenSSL Certificate Signing Request
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
 
 - name: Generate an OpenSSL Certificate Signing Request with an inline key
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_content: "{{ private_key_content }}"
     common_name: www.ansible.com
 
 - name: Generate an OpenSSL Certificate Signing Request with a passphrase protected private key
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     privatekey_passphrase: ansible
     common_name: www.ansible.com
 
 - name: Generate an OpenSSL Certificate Signing Request with Subject information
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     country_name: FR
@@ -314,13 +314,13 @@ EXAMPLES = r'''
     common_name: www.ansible.com
 
 - name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     subject_alt_name: 'DNS:www.ansible.com,DNS:m.ansible.com'
 
 - name: Generate an OpenSSL CSR with subjectAltName extension with dynamic list
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     subject_alt_name: "{{ item.value | map('regex_replace', '^', 'DNS:') | list }}"
@@ -330,14 +330,14 @@ EXAMPLES = r'''
     - m.ansible.com
 
 - name: Force regenerate an OpenSSL Certificate Signing Request
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     force: yes
     common_name: www.ansible.com
 
 - name: Generate an OpenSSL Certificate Signing Request with special key usages
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
@@ -348,7 +348,7 @@ EXAMPLES = r'''
       - clientAuth
 
 - name: Generate an OpenSSL Certificate Signing Request with OCSP Must Staple
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com

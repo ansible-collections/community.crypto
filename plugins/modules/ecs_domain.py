@@ -89,7 +89,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Request domain validation using email validation for client ID of 2.
-  ecs_domain:
+  community.crypto.ecs_domain:
     domain_name: ansible.com
     client_id: 2
     verification_method: email
@@ -101,7 +101,7 @@ EXAMPLES = r'''
 
 - name: Request domain validation using DNS. If domain is already valid,
         request revalidation if expires within 90 days
-  ecs_domain:
+  community.crypto.ecs_domain:
     domain_name: ansible.com
     verification_method: dns
     entrust_api_user: apiusername
@@ -111,7 +111,7 @@ EXAMPLES = r'''
 
 - name: Request domain validation using web server validation, and revalidate
         if fewer than 60 days remaining of EV eligibility.
-  ecs_domain:
+  community.crypto.ecs_domain:
     domain_name: ansible.com
     verification_method: web_server
     entrust_api_user: apiusername
@@ -120,7 +120,7 @@ EXAMPLES = r'''
     entrust_api_client_cert_key_path: /etc/ssl/entrust/ecs-client.key
 
 - name: Request domain validation using manual validation.
-  ecs_domain:
+  community.crypto.ecs_domain:
     domain_name: ansible.com
     verification_method: manual
     entrust_api_user: apiusername

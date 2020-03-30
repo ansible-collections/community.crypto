@@ -230,7 +230,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Generate a CRL
-  x509_crl:
+  community.crypto.x509_crl:
     path: /etc/ssl/my-ca.crl
     privatekey_path: /etc/ssl/private/my-ca.pem
     issuer:

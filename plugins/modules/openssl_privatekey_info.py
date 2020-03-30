@@ -73,11 +73,11 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
 
 - name: Get information on generated key
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: /etc/ssl/private/ansible.com.pem
   register: result
 

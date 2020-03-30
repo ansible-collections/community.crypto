@@ -128,7 +128,7 @@ version:
 
 EXAMPLES = '''
 - name: Get the cert from an RDP port
-  get_certificate:
+  community.crypto.get_certificate:
     host: "1.2.3.4"
     port: 3389
   delegate_to: localhost
@@ -136,7 +136,7 @@ EXAMPLES = '''
   register: cert
 
 - name: Get a cert from an https port
-  get_certificate:
+  community.crypto.get_certificate:
     host: "www.google.com"
     port: 443
   delegate_to: localhost

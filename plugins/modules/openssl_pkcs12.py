@@ -110,7 +110,7 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate PKCS#12 file
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: export
     path: /opt/certs/ansible.p12
     friendly_name: raclette
@@ -120,7 +120,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Change PKCS#12 file permission
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: export
     path: /opt/certs/ansible.p12
     friendly_name: raclette
@@ -131,7 +131,7 @@ EXAMPLES = r'''
     mode: '0600'
 
 - name: Regen PKCS#12 file
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: export
     src: /opt/certs/ansible.p12
     path: /opt/certs/ansible.p12
@@ -144,14 +144,14 @@ EXAMPLES = r'''
     force: yes
 
 - name: Dump/Parse PKCS#12 file
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: parse
     src: /opt/certs/ansible.p12
     path: /opt/certs/ansible.pem
     state: present
 
 - name: Remove PKCS#12 file
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     path: /opt/certs/ansible.p12
     state: absent
 '''

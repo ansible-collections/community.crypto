@@ -101,21 +101,21 @@ extends_documentation_fragment: files
 
 EXAMPLES = '''
 # Generate an OpenSSH keypair with the default values (4096 bits, rsa)
-- openssh_keypair:
+- community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
 
 # Generate an OpenSSH rsa keypair with a different size (2048 bits)
-- openssh_keypair:
+- community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
     size: 2048
 
 # Force regenerate an OpenSSH keypair if it already exists
-- openssh_keypair:
+- community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
     force: True
 
 # Generate an OpenSSH keypair with a different algorithm (dsa)
-- openssh_keypair:
+- community.crypto.openssh_keypair:
     path: /tmp/id_ssh_dsa
     type: dsa
 '''

@@ -51,7 +51,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Check whether an account with the given account key exists
-  acme_account_info:
+  community.crypto.acme_account_info:
     account_key_src: /etc/pki/cert/private/account.key
     register: account_data
 - name: Verify that account exists

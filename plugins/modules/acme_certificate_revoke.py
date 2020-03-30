@@ -109,12 +109,12 @@ options:
 
 EXAMPLES = '''
 - name: Revoke certificate with account key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     account_key_src: /etc/pki/cert/private/account.key
     certificate: /etc/httpd/ssl/sample.com.crt
 
 - name: Revoke certificate with certificate's private key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     private_key_src: /etc/httpd/ssl/sample.com.key
     certificate: /etc/httpd/ssl/sample.com.crt
 '''

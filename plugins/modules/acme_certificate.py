@@ -262,7 +262,7 @@ EXAMPLES = r'''
 ### Example with HTTP challenge ###
 
 - name: Create a challenge for sample.com using a account key from a variable.
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_content: "{{ account_private_key }}"
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
@@ -270,7 +270,7 @@ EXAMPLES = r'''
 
 # Alternative first step:
 - name: Create a challenge for sample.com using a account key from hashi vault.
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_content: "{{ lookup('hashi_vault', 'secret=secret/account_private_key:value') }}"
     csr: /etc/pki/cert/csr/sample.com.csr
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
@@ -278,7 +278,7 @@ EXAMPLES = r'''
 
 # Alternative first step:
 - name: Create a challenge for sample.com using a account key file.
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
@@ -294,7 +294,7 @@ EXAMPLES = r'''
 #     when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
@@ -305,7 +305,7 @@ EXAMPLES = r'''
 ### Example with DNS challenge against production ACME server ###
 
 - name: Create a challenge for sample.com using a account key file.
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     account_email: myself@sample.com
     src: /etc/pki/cert/csr/sample.com.csr
@@ -319,7 +319,7 @@ EXAMPLES = r'''
 # perform the necessary steps to fulfill the challenge
 # for example:
 #
-# - route53:
+# - community.aws.route53:
 #     zone: sample.com
 #     record: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].record }}"
 #     type: TXT
@@ -332,7 +332,7 @@ EXAMPLES = r'''
 #
 # Alternative way:
 #
-# - route53:
+# - community.aws.route53:
 #     zone: sample.com
 #     record: "{{ item.key }}"
 #     type: TXT
@@ -346,7 +346,7 @@ EXAMPLES = r'''
 #   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     account_email: myself@sample.com
     src: /etc/pki/cert/csr/sample.com.csr
@@ -361,7 +361,7 @@ EXAMPLES = r'''
 
 # Alternative second step:
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     account_email: myself@sample.com
     src: /etc/pki/cert/csr/sample.com.csr

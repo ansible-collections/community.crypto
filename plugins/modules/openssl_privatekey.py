@@ -199,27 +199,27 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
 
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA) and a passphrase
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     passphrase: ansible
     cipher: aes256
 
 - name: Generate an OpenSSL private key with a different size (2048 bits)
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     size: 2048
 
 - name: Force regenerate an OpenSSL private key if it already exists
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     force: yes
 
 - name: Generate an OpenSSL private key with a different algorithm (DSA)
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     type: DSA
 '''

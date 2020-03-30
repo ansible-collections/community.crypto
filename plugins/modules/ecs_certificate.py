@@ -349,7 +349,7 @@ EXAMPLES = r'''
 - name: Request a new certificate from Entrust with bare minimum parameters.
         Will request a new certificate if current one is valid but within 30
         days of expiry. If replacing an existing file in path, will back it up.
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     backup: true
     path: /etc/ssl/crt/ansible.com.crt
     full_chain_path: /etc/ssl/crt/ansible.com.chain.crt
@@ -367,7 +367,7 @@ EXAMPLES = r'''
         of type EV_SSL. Otherwise, if there is an Entrust managed certificate
         in path and it is within 63 days of expiration, request a renew of that
         certificate.
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr: /etc/ssl/csr/ansible.com.csr
     cert_type: EV_SSL
@@ -387,7 +387,7 @@ EXAMPLES = r'''
         certificate is within 79 days of expiration, request a renew of that
         certificate and save it in path. This can be used to "migrate" a
         certificate to be Ansible managed.
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr: /etc/ssl/csr/ansible.com.csr
     tracking_id: 2378915
@@ -399,7 +399,7 @@ EXAMPLES = r'''
     entrust_api_client_cert_key_path: /etc/ssl/entrust/ecs-client.key
 
 - name: Force a reissue of the certificate specified by tracking_id.
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     force: true
     tracking_id: 2378915
@@ -413,7 +413,7 @@ EXAMPLES = r'''
         issued certificate will have it's Subject Distinguished Name use the
         organization details associated with that client, rather than what is
         in the CSR.
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     csr: /etc/ssl/csr/ansible.com.csr
     client_id: 2
@@ -427,7 +427,7 @@ EXAMPLES = r'''
 
 - name: Request a new certificate with a number of CSR parameters overridden
         and tracking information
-  ecs_certificate:
+  community.crypto.ecs_certificate:
     path: /etc/ssl/crt/ansible.com.crt
     full_chain_path: /etc/ssl/crt/ansible.com.chain.crt
     csr: /etc/ssl/csr/ansible.com.csr
