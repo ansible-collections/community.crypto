@@ -329,6 +329,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
     pyopenssl_get_extensions_from_cert,
     pyopenssl_normalize_name,
+    pyopenssl_normalize_name_attribute,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
@@ -741,19 +742,11 @@ class CertificateInfoPyOpenSSL(CertificateInfo):
         else:
             return None, False
 
-    def _normalize_san(self, san):
-        if san.startswith('IP Address:'):
-            san = 'IP:' + san[len('IP Address:'):]
-        if san.startswith('IP:'):
-            ip = compat_ipaddress.ip_address(san[3:])
-            san = 'IP:{0}'.format(ip.compressed)
-        return san
-
     def _get_subject_alt_name(self):
         for extension_idx in range(0, self.cert.get_extension_count()):
             extension = self.cert.get_extension(extension_idx)
             if extension.get_short_name() == b'subjectAltName':
-                result = [self._normalize_san(altname.strip()) for altname in
+                result = [pyopenssl_normalize_name_attribute(altname.strip()) for altname in
                           to_text(extension, errors='surrogate_or_strict').split(', ')]
                 return result, bool(extension.get_critical())
         return None, False
