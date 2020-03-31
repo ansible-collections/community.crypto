@@ -60,7 +60,7 @@ options:
 
 EXAMPLES = '''
 - name: Create challenges for a given CRT for sample.com
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     challenge: tls-alpn-01
     csr: /etc/pki/cert/csr/sample.com.csr
@@ -68,7 +68,7 @@ EXAMPLES = '''
   register: sample_com_challenge
 
 - name: Create certificates for challenges
-  acme_challenge_cert_helper:
+  community.crypto.acme_challenge_cert_helper:
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: /etc/pki/cert/key/sample.com.key
@@ -92,7 +92,7 @@ EXAMPLES = '''
   loop: "{{ sample_com_challenge_certs.results }}"
 
 - name: Create certificate for a given CSR for sample.com
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
     challenge: tls-alpn-01
     csr: /etc/pki/cert/csr/sample.com.csr

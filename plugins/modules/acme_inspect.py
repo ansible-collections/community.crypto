@@ -85,14 +85,14 @@ options:
 
 EXAMPLES = r'''
 - name: Get directory
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     method: directory-only
   register: directory
 
 - name: Create an account
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -104,7 +104,7 @@ EXAMPLES = r'''
   # if creation was successful
 
 - name: Get account information
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -113,7 +113,7 @@ EXAMPLES = r'''
     method: get
 
 - name: Update account contacts
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -129,7 +129,7 @@ EXAMPLES = r'''
       - mailto:me@example.com
 
 - name: Create certificate order
-  acme_certificate:
+  community.crypto.acme_certificate:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -143,7 +143,7 @@ EXAMPLES = r'''
 # the order URI.
 
 - name: Get order information
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -153,7 +153,7 @@ EXAMPLES = r'''
   register: order
 
 - name: Get first authz for order
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -163,7 +163,7 @@ EXAMPLES = r'''
   register: authz
 
 - name: Get HTTP-01 challenge for authz
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
@@ -173,7 +173,7 @@ EXAMPLES = r'''
   register: http01challenge
 
 - name: Activate HTTP-01 challenge manually
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
     acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key

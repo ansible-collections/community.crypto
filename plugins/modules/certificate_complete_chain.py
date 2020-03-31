@@ -70,7 +70,7 @@ EXAMPLES = '''
 # Given a leaf certificate for www.ansible.com and one or more intermediate
 # certificates, finds the associated root certificate.
 - name: Find root certificate
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com-fullchain.pem') }}"
     root_certificates:
     - /etc/ca-certificates/
@@ -83,7 +83,7 @@ EXAMPLES = '''
 # Given a leaf certificate for www.ansible.com, and a list of intermediate
 # certificates, finds the associated root certificate.
 - name: Find root certificate
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.pem') }}"
     intermediate_certificates:
     - /etc/ssl/csr/www.ansible.com-chain.pem

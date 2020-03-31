@@ -95,7 +95,7 @@ options:
 
 EXAMPLES = '''
 - name: Make sure account exists and has given contacts. We agree to TOS.
-  acme_account:
+  community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present
     terms_agreed: yes
@@ -104,7 +104,7 @@ EXAMPLES = '''
     - mailto:myself@example.org
 
 - name: Make sure account has given email address. Don't create account if it doesn't exist
-  acme_account:
+  community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present
     allow_creation: no
@@ -112,13 +112,13 @@ EXAMPLES = '''
     - mailto:me@example.com
 
 - name: Change account's key to the one stored in the variable new_account_key
-  acme_account:
+  community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     new_account_key_content: '{{ new_account_key }}'
     state: changed_key
 
 - name: Delete account (we have to use the new key)
-  acme_account:
+  community.crypto.acme_account:
     account_key_content: '{{ new_account_key }}'
     state: absent
 '''

@@ -123,7 +123,7 @@ extends_documentation_fragment: files
 
 EXAMPLES = '''
 # Generate an OpenSSH user certificate that is valid forever and for all users
-- openssh_cert:
+- community.crypto.openssh_cert:
     type: user
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -133,7 +133,7 @@ EXAMPLES = '''
 
 # Generate an OpenSSH host certificate that is valid for 32 weeks from now and will be regenerated
 # if it is valid for less than 2 weeks from the time the module is being run
-- openssh_cert:
+- community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -143,7 +143,7 @@ EXAMPLES = '''
     valid_at: +2w
 
 # Generate an OpenSSH host certificate that is valid forever and only for example.com and examplehost
-- openssh_cert:
+- community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -155,7 +155,7 @@ EXAMPLES = '''
         - examplehost
 
 # Generate an OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019
-- openssh_cert:
+- community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -164,7 +164,7 @@ EXAMPLES = '''
     valid_to: "2019-01-21"
 
 # Generate an OpenSSH user Certificate with clear and force-command option:
-- openssh_cert:
+- community.crypto.openssh_cert:
     type: user
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub

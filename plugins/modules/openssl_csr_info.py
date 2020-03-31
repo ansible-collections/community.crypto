@@ -59,13 +59,13 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate an OpenSSL Certificate Signing Request
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
 
 - name: Get information on the CSR
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: /etc/ssl/csr/www.ansible.com.csr
   register: result
 

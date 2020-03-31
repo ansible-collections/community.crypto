@@ -42,7 +42,7 @@ seealso:
 
 EXAMPLES = r'''
 - name: Get information on CRL
-  x509_crl_info:
+  community.crypto.x509_crl_info:
     path: /etc/ssl/my-ca.crl
   register: result
 

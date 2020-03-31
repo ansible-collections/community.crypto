@@ -101,35 +101,35 @@ seealso:
 
 EXAMPLES = r'''
 - name: Generate an OpenSSL public key in PEM format
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_path: /etc/ssl/private/ansible.com.pem
 
 - name: Generate an OpenSSL public key in PEM format from an inline key
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_content: "{{ private_key_content }}"
 
 - name: Generate an OpenSSL public key in OpenSSH v2 format
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_path: /etc/ssl/private/ansible.com.pem
     format: OpenSSH
 
 - name: Generate an OpenSSL public key with a passphrase protected private key
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_path: /etc/ssl/private/ansible.com.pem
     privatekey_passphrase: ansible
 
 - name: Force regenerate an OpenSSL public key if it already exists
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_path: /etc/ssl/private/ansible.com.pem
     force: yes
 
 - name: Remove an OpenSSL public key
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     state: absent
 '''
