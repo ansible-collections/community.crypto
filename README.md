@@ -14,7 +14,8 @@ Tested with the current development version of Ansible.
 
 ## External requirements
 
-The exact requirements for every module is listed in the module documentation. Many modules require a recent enough version of [the Python cryptography library](https://pypi.org/project/cryptography/). See the module documentations for the minimal version supported for each module.
+The exact requirements for every module are listed in the module documentation. 
+Most modules require a recent enough version of [the Python cryptography library](https://pypi.org/project/cryptography/). See the module documentations for the minimal version supported for each module.
 
 ## Included content
 
