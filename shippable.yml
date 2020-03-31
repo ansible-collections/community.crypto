@@ -36,7 +36,7 @@ matrix:
     - env: T=devel/cloud/3.6/1
 
     - env: T=2.9/sanity/1
-    - env: T=2.9/units/3.9/1
+    - env: T=2.9/units/3.8/1
     - env: T=2.9/linux/ubuntu1804/1
     - env: T=2.9/cloud/3.6/1
 
