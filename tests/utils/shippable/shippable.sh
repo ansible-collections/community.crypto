@@ -58,7 +58,7 @@ if [ "${ansible_version}" == "devel" ]; then
 else
     retry pip install ansible==${ansible_version} --disable-pip-version-check
     # force complete CI run for Ansible 2.9: 2.9's ansible-test's change detection for collections is broken
-    CHANGED=all
+    COMPLETE=yes
 fi
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
