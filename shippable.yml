@@ -10,33 +10,36 @@ matrix:
   include:
     - env: T=devel/sanity/1
 
-    #- env: T=devel/units/2.7/1
-    #- env: T=devel/units/3.5/1
-    #- env: T=devel/units/3.6/1
-    #- env: T=devel/units/3.7/1
-    #- env: T=devel/units/3.8/1
+    - env: T=devel/units/2.7/1
+    - env: T=devel/units/3.5/1
+    - env: T=devel/units/3.6/1
+    - env: T=devel/units/3.7/1
+    - env: T=devel/units/3.8/1
     - env: T=devel/units/3.9/1
 
-    #- env: T=devel/osx/10.11/1
-    #- env: T=devel/rhel/7.6/1
-    #- env: T=devel/rhel/8.1/1
-    #- env: T=devel/freebsd/11.1/1
-    #- env: T=devel/freebsd/12.1/1
-    #- env: T=devel/linux/centos6/1
-    #- env: T=devel/linux/centos7/1
-    #- env: T=devel/linux/centos8/1
-    #- env: T=devel/linux/fedora30/1
-    #- env: T=devel/linux/fedora31/1
-    #- env: T=devel/linux/opensuse15py2/1
-    #- env: T=devel/linux/opensuse15/1
-    #- env: T=devel/linux/ubuntu1604/1
+    - env: T=devel/osx/10.11/1
+    - env: T=devel/rhel/7.6/1
+    - env: T=devel/rhel/8.1/1
+    - env: T=devel/freebsd/11.1/1
+    - env: T=devel/freebsd/12.1/1
+    - env: T=devel/linux/centos6/1
+    - env: T=devel/linux/centos7/1
+    - env: T=devel/linux/centos8/1
+    - env: T=devel/linux/fedora30/1
+    - env: T=devel/linux/fedora31/1
+    - env: T=devel/linux/opensuse15py2/1
+    - env: T=devel/linux/opensuse15/1
+    - env: T=devel/linux/ubuntu1604/1
     - env: T=devel/linux/ubuntu1804/1
 
-    #- env: T=devel/cloud/2.7/1
+    - env: T=devel/cloud/2.7/1
     - env: T=devel/cloud/3.6/1
 
+    # For Ansible 2.9, use a combination of different targets
     - env: T=2.9/sanity/1
+    - env: T=2.9/units/2.7/1
     - env: T=2.9/units/3.8/1
+    - env: T=2.9/rhel/7.6/1
     - env: T=2.9/linux/ubuntu1804/1
     - env: T=2.9/cloud/3.6/1
 
