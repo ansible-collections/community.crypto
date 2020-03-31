@@ -1,4 +1,4 @@
-# Foo Collection
+# Ansible Community Crypto Collection
 [![Shippable build status](https://api.shippable.com/projects/5e66776ca27f990007073a42/badge?branch=master)](https://app.shippable.com/projects/5e66776ca27f990007073a42)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 
