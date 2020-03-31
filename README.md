@@ -8,7 +8,7 @@ Provides modules for [Ansible](https://www.ansible.com/community) for various cr
 
 ## Tested with Ansible
 
-Tested with the currently development version of Ansible.
+Tested with the current development version of Ansible.
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
 
