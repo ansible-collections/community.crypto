@@ -35,6 +35,11 @@ matrix:
     - env: T=cloud/2.7/1
     - env: T=cloud/3.6/1
 
+    - env: T=sanity/2
+    - env: T=units/3.9/2
+    - env: T=linux/ubuntu1804/2
+    - env: T=cloud/3.6/2
+
 branches:
   except:
     - "*-patch-*"
