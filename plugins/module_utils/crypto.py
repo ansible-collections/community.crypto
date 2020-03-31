@@ -424,7 +424,7 @@ def write_file(module, content, default_mode=None, path=None):
         # The path argument is only supported in Ansible 2.10+. Fall back to
         # pre-2.10 behavior of module_utils/crypto.py for older Ansible versions.
         file_args = module.load_file_common_arguments(module.params)
-        file_args['path'] = path
+        file_args['path'] = to_bytes(path)
     if file_args['mode'] is None:
         file_args['mode'] = default_mode
     # Create tempfile name
