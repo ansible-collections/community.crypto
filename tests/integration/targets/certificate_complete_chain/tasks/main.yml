@@ -2,6 +2,11 @@
   command: '{{ ansible_python.executable }} -c ''import cryptography; print(cryptography.__version__)'''
   register: cryptography_version
 - block:
+  - name: Make sure testhost directory exists
+    file:
+      path: '{{ remote_tmp_dir }}/files/'
+      state: directory
+    when: ansible_version.string is version('2.10', '<')
   - name: Copy test files to testhost
     copy:
       src: '{{ role_path }}/files/'
