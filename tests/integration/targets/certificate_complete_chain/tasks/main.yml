@@ -2,18 +2,16 @@
   command: '{{ ansible_python.executable }} -c ''import cryptography; print(cryptography.__version__)'''
   register: cryptography_version
 - block:
-  - name: Archive test files
-    community.general.archive:
-      path: '{{ role_path }}/files/'
-      dest: '{{ output_dir }}/files.tgz'
-  - name: Create temporary directory to store files
+  - name: Make sure testhost directory exists
     file:
-      state: directory
       path: '{{ remote_tmp_dir }}/files/'
-  - name: Unarchive test files on testhost
-    unarchive:
-      src: '{{ output_dir }}/files.tgz'
+      state: directory
+    when: ansible_version.string is version('2.10', '<')
+  - name: Copy test files to testhost
+    copy:
+      src: '{{ role_path }}/files/'
       dest: '{{ remote_tmp_dir }}/files/'
+      remote_src: yes
   - name: Find root for cert 1
     certificate_complete_chain:
       input_chain: '{{ lookup(''file'', ''cert1-fullchain.pem'', rstrip=False) }}'

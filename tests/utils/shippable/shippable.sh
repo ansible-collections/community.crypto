@@ -5,9 +5,16 @@ set -o pipefail -eux
 declare -a args
 IFS='/:' read -ra args <<< "$1"
 
-script="${args[0]}"
+ansible_version="${args[0]}"
+script="${args[1]}"
 
-test="$1"
+function join {
+    local IFS="$1";
+    shift;
+    echo "$*";
+}
+
+test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
 docker images quay.io/ansible/*
@@ -45,7 +52,14 @@ function retry
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+if [ "${ansible_version}" == "devel" ]; then
+    retry pip install https://github.com/felixfontein/ansible/archive/changelogs-docs-collections.tar.gz --disable-pip-version-check
+    # retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+else
+    retry pip install ansible==${ansible_version} --disable-pip-version-check
+    # force complete CI run for Ansible 2.9: 2.9's ansible-test's change detection for collections is broken
+    COMPLETE=yes
+fi
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
@@ -55,7 +69,7 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install integration test dependencies
-if [ "${script}" != "units" ] && [ "${script}" != "sanity" ]; then
+if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_version}" != "2.9" ]; then
     retry ansible-galaxy -vvv collection install community.general
 fi
 # END: HACK
