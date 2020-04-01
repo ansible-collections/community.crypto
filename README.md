@@ -20,8 +20,6 @@ Most modules require a recent enough version of [the Python cryptography library
 ## Included content
 
 - OpenSSL / PKI modules:
-  - openssl_certificate_info
-  - openssl_certificate
   - openssl_csr_info
   - openssl_csr
   - openssl_dhparam
@@ -29,6 +27,8 @@ Most modules require a recent enough version of [the Python cryptography library
   - openssl_privatekey_info
   - openssl_privatekey
   - openssl_publickey
+  - x509_certificate_info
+  - x509_certificate
   - x509_crl_info
   - x509_crl
   - certificate_complete_chain
