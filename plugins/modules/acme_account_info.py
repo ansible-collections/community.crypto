@@ -259,7 +259,7 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if module._name == 'acme_account_facts':
+    if module._name in ('acme_account_facts', 'community.crypto.acme_account_facts'):
         module.deprecate("The 'acme_account_facts' module has been renamed to 'acme_account_info'", version='2.12')
     handle_standard_module_arguments(module, needs_acme_v2=True)
 
