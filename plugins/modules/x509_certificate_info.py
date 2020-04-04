@@ -807,6 +807,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+    if module._name == 'community.crypto.openssl_certificate_info':
+        module.deprecate("The 'community.crypto.openssl_certificate_info' module has been renamed to 'community.crypto.x509_certificate_info'", version='2.14')
 
     try:
         if module.params['path'] is not None:

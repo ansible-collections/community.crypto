@@ -2603,6 +2603,8 @@ def main():
             ['ownca_privatekey_path', 'ownca_privatekey_content'],
         ],
     )
+    if module._name == 'community.crypto.openssl_certificate':
+        module.deprecate("The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'", version='2.14')
 
     try:
         if module.params['state'] == 'absent':
