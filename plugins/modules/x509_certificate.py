@@ -38,6 +38,12 @@ description:
     - If both the cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with C(select_crypto_backend)).
       Please note that the PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
+    - Note that this module was called C(openssl_certificate) when included directly in Ansible up to version 2.9.
+      When moved to the collection C(community.crypto), it was renamed to M(x509_certificate). From Ansible 2.10 on, it can
+      still be used by the old short name (or by C(ansible.builtin.openssl_certificate)), which redirects to
+      C(community.crypto.x509_certificate). When using FQCNs or when using the
+      L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
+      keyword, the new name M(x509_certificate) should be used to avoid a deprecation warning.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 1.6 (if using C(selfsigned) or C(assertonly) provider)
     - acme-tiny >= 4.0.0 (if using the C(acme) provider)
