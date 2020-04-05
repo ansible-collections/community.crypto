@@ -21,11 +21,19 @@
     name: '{{ pyopenssl_package_name }}'
   when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
 
+- command: pip list
+  register: result
+- debug: var=result.stdout_lines
+
 - name: Install pyOpenSSL (Darwin)
   become: True
   pip:
     name: pyOpenSSL
   when: ansible_os_family == 'Darwin'
+
+- command: pip list
+  register: result
+- debug: var=result.stdout_lines
 
 - name: register pyOpenSSL version
   command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
