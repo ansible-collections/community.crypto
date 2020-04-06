@@ -25,7 +25,7 @@
       commonName: www.example.org
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert.pem'
     csr_path: '{{ output_dir }}/csr.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -36,7 +36,7 @@
   register: selfsigned_certificate
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert.pem'
     csr_path: '{{ output_dir }}/csr.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -47,7 +47,7 @@
   register: selfsigned_certificate_idempotence
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert.pem'
     csr_path: '{{ output_dir }}/csr.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -57,7 +57,7 @@
   check_mode: yes
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode, other CSR)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert.pem'
     csr_path: '{{ output_dir }}/csr_minimal_change.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -68,7 +68,7 @@
   register: selfsigned_certificate_csr_minimal_change
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert.pem'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
     provider: assertonly
@@ -82,7 +82,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned v2 certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_v2.pem'
     csr_path: '{{ output_dir }}/csr.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -117,7 +117,7 @@
       - biometricInfo
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate2
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert2.pem'
     csr_path: '{{ output_dir }}/csr2.csr'
     privatekey_path: '{{ output_dir }}/privatekey2.pem'
@@ -126,7 +126,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate2
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert2.pem'
     privatekey_path: '{{ output_dir }}/privatekey2.pem'
     provider: assertonly
@@ -163,7 +163,7 @@
     path: "{{ output_dir }}/csr3.pem"
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create certificate3 with notBefore and notAfter
-  openssl_certificate:
+  x509_certificate:
     provider: selfsigned
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
@@ -187,7 +187,7 @@
       commonName: www.example.com
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_ecc.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -205,7 +205,7 @@
       commonName: www.example.com
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (privatekey passphrase)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_pass.pem'
     csr_path: '{{ output_dir }}/csr_pass.csr'
     privatekey_path: '{{ output_dir }}/privatekeypw.pem'
@@ -216,7 +216,7 @@
   register: selfsigned_certificate_passphrase
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 1)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_pw1.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -228,7 +228,7 @@
   register: passphrase_error_1
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 2)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_pw2.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekeypw.pem'
@@ -240,7 +240,7 @@
   register: passphrase_error_2
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 3)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_pw3.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekeypw.pem'
@@ -255,7 +255,7 @@
     dest: "{{ output_dir }}/cert_broken.pem"
     content: "broken"
 - name: Regenerate broken cert
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/cert_broken.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -264,7 +264,7 @@
   register: selfsigned_broken
 
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -274,7 +274,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_1
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (idempotent)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -284,7 +284,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_2
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (change)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ output_dir }}/csr.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
@@ -294,7 +294,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_3
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
@@ -302,7 +302,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_4
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove, idempotent)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
@@ -311,7 +311,7 @@
   register: selfsigned_backup_5
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -323,7 +323,7 @@
   register: selfsigned_subject_key_identifier_1
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (idempotency)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -335,7 +335,7 @@
   register: selfsigned_subject_key_identifier_2
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -347,7 +347,7 @@
   register: selfsigned_subject_key_identifier_3
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove idempotency)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -359,7 +359,7 @@
   register: selfsigned_subject_key_identifier_4
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (re-enable)
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
     privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
@@ -399,7 +399,7 @@
           ignore_errors: yes
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
-          openssl_certificate:
+          x509_certificate:
             path: '{{ output_dir }}/cert_{{ item }}.pem'
             csr_path: '{{ output_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ output_dir }}/privatekey_{{ item }}.pem'
@@ -413,7 +413,7 @@
           ignore_errors: yes
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
-          openssl_certificate:
+          x509_certificate:
             path: '{{ output_dir }}/cert_{{ item }}.pem'
             csr_path: '{{ output_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ output_dir }}/privatekey_{{ item }}.pem'

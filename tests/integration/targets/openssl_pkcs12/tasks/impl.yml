@@ -24,7 +24,7 @@
       privatekey_path: '{{ output_dir }}/ansible_pkey3.pem'
       commonName: www3.ansible.com
   - name: Generate certificate
-    openssl_certificate:
+    x509_certificate:
       path: '{{ output_dir }}/{{ item.name }}.crt'
       privatekey_path: '{{ output_dir }}/{{ item.pkey }}'
       csr_path: '{{ output_dir }}/{{ item.name }}.csr'

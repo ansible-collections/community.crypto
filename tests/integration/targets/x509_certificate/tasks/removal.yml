@@ -9,7 +9,7 @@
     privatekey_path: '{{ output_dir }}/removal_privatekey.pem'
 
 - name: (Removal, {{select_crypto_backend}}) Generate selfsigned certificate
-  openssl_certificate:
+  x509_certificate:
     path: '{{ output_dir }}/removal_cert.pem'
     csr_path: '{{ output_dir }}/removal_csr.csr'
     privatekey_path: '{{ output_dir }}/removal_privatekey.pem'
@@ -23,7 +23,7 @@
   register: removal_1_prestat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate"
-  openssl_certificate:
+  x509_certificate:
     path: "{{ output_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -36,7 +36,7 @@
   register: removal_1_poststat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate (idempotent)"
-  openssl_certificate:
+  x509_certificate:
     path: "{{ output_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'

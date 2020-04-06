@@ -3,7 +3,7 @@
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ output_dir }}/cert_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -36,7 +36,7 @@
     info_results: "{{ info_results + [result] }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info directly
-  openssl_certificate_info:
+  x509_certificate_info:
     content: '{{ lookup("file", output_dir ~ "/cert_1.pem") }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
@@ -47,7 +47,7 @@
       - result == result_direct
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ output_dir }}/cert_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     valid_at:
@@ -66,7 +66,7 @@
     info_results: "{{ info_results + [result] }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ output_dir }}/cert_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -88,7 +88,7 @@
     info_results: "{{ info_results + [result] }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ output_dir }}/cert_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -106,7 +106,7 @@
     info_results: "{{ info_results + [result] }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info for packaged cert 1
-  openssl_certificate_info:
+  x509_certificate_info:
     path: '{{ role_path }}/files/cert1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result

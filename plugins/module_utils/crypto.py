@@ -67,7 +67,7 @@ try:
     # general name objects (DNSName, IPAddress, ...), while providing overloaded
     # equality and string representation operations. This makes it impossible to
     # use them in hash-based data structures such as set or dict. Since we are
-    # actually doing that in openssl_certificate, and potentially in other code,
+    # actually doing that in x509_certificate, and potentially in other code,
     # we need to monkey-patch __hash__ for these classes to make sure our code
     # works fine.
     if LooseVersion(cryptography.__version__) < LooseVersion('2.1'):
