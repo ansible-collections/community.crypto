@@ -2,15 +2,6 @@ plugins/module_utils/compat/ipaddress.py future-import-boilerplate
 plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
-plugins/modules/acme_certificate.py validate-modules:return-syntax-error
-plugins/modules/certificate_complete_chain.py validate-modules:return-syntax-error
-plugins/modules/get_certificate.py validate-modules:return-syntax-error
-plugins/modules/openssh_cert.py validate-modules:return-syntax-error
-plugins/modules/openssl_csr.py validate-modules:return-syntax-error
-plugins/modules/openssl_csr_info.py validate-modules:return-syntax-error
-plugins/modules/x509_certificate_info.py validate-modules:return-syntax-error
-plugins/modules/x509_crl.py validate-modules:return-syntax-error
-plugins/modules/x509_crl_info.py validate-modules:return-syntax-error
 tests/unit/mock/path.py future-import-boilerplate
 tests/unit/mock/path.py metaclass-boilerplate
 tests/unit/mock/yaml_helper.py future-import-boilerplate
