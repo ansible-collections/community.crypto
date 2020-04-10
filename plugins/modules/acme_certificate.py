@@ -511,7 +511,14 @@ from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes, to_native
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    parse_name_field,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_name_to_oid,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ModuleFailException,
     write_file,
@@ -1010,8 +1017,8 @@ class ACMEClient(object):
                 x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
                 matches = True
                 if criterium['subject']:
-                    for k, v in crypto_utils.parse_name_field(criterium['subject']):
-                        oid = crypto_utils.cryptography_name_to_oid(k)
+                    for k, v in parse_name_field(criterium['subject']):
+                        oid = cryptography_name_to_oid(k)
                         value = to_native(v)
                         found = False
                         for attribute in x509.subject:
@@ -1022,8 +1029,8 @@ class ACMEClient(object):
                             matches = False
                             break
                 if criterium['issuer']:
-                    for k, v in crypto_utils.parse_name_field(criterium['issuer']):
-                        oid = crypto_utils.cryptography_name_to_oid(k)
+                    for k, v in parse_name_field(criterium['issuer']):
+                        oid = cryptography_name_to_oid(k)
                         value = to_native(v)
                         found = False
                         for attribute in x509.issuer:

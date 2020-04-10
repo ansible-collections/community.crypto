@@ -187,7 +187,18 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes, to_native
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+    load_file_if_exists,
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    load_certificate,
+)
 
 PYOPENSSL_IMP_ERR = None
 try:
@@ -199,11 +210,11 @@ else:
     pyopenssl_found = True
 
 
-class PkcsError(crypto_utils.OpenSSLObjectError):
+class PkcsError(OpenSSLObjectError):
     pass
 
 
-class Pkcs(crypto_utils.OpenSSLObject):
+class Pkcs(OpenSSLObject):
 
     def __init__(self, module):
         super(Pkcs, self).__init__(
@@ -240,11 +251,10 @@ class Pkcs(crypto_utils.OpenSSLObject):
         def _check_pkey_passphrase():
             if self.privatekey_passphrase:
                 try:
-                    crypto_utils.load_privatekey(self.privatekey_path,
-                                                 self.privatekey_passphrase)
+                    load_privatekey(self.privatekey_path, self.privatekey_passphrase)
                 except crypto.Error:
                     return False
-                except crypto_utils.OpenSSLBadPassphraseError:
+                except OpenSSLBadPassphraseError:
                     return False
             return True
 
@@ -308,7 +318,7 @@ class Pkcs(crypto_utils.OpenSSLObject):
             result['backup_file'] = self.backup_file
         if self.return_content:
             if self.pkcs12_bytes is None:
-                self.pkcs12_bytes = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+                self.pkcs12_bytes = load_file_if_exists(self.path, ignore_errors=True)
             result['pkcs12'] = base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
 
         return result
@@ -318,24 +328,20 @@ class Pkcs(crypto_utils.OpenSSLObject):
         self.pkcs12 = crypto.PKCS12()
 
         if self.other_certificates:
-            other_certs = [crypto_utils.load_certificate(other_cert) for other_cert
+            other_certs = [load_certificate(other_cert) for other_cert
                            in self.other_certificates]
             self.pkcs12.set_ca_certificates(other_certs)
 
         if self.certificate_path:
-            self.pkcs12.set_certificate(crypto_utils.load_certificate(
-                                        self.certificate_path))
+            self.pkcs12.set_certificate(load_certificate(self.certificate_path))
 
         if self.friendly_name:
             self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
 
         if self.privatekey_path:
             try:
-                self.pkcs12.set_privatekey(crypto_utils.load_privatekey(
-                                           self.privatekey_path,
-                                           self.privatekey_passphrase)
-                                           )
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+                self.pkcs12.set_privatekey(load_privatekey(self.privatekey_path, self.privatekey_passphrase))
+            except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
         return self.pkcs12.export(self.passphrase, self.iter_size, self.maciter_size)
@@ -373,7 +379,7 @@ class Pkcs(crypto_utils.OpenSSLObject):
         """Write the PKCS#12 file."""
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        crypto_utils.write_file(module, content, mode)
+        write_file(module, content, mode)
         if self.return_content:
             self.pkcs12_bytes = content
 
@@ -460,7 +466,7 @@ def main():
             result['mode'] = file_mode
 
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

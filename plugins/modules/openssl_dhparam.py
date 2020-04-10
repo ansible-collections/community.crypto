@@ -132,8 +132,14 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    load_file_if_exists,
+    write_file,
+)
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    count_bits,
+)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '2.0'
 
@@ -229,7 +235,7 @@ class DHParameterBase(object):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['dhparams'] = content.decode('utf-8') if content else None
 
         return result
@@ -318,7 +324,7 @@ class DHParameterCryptography(DHParameterBase):
         # Write result
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        crypto_utils.write_file(module, result)
+        write_file(module, result)
 
     def _check_params_valid(self, module):
         """Check if the params are in the correct state"""
@@ -330,7 +336,7 @@ class DHParameterCryptography(DHParameterBase):
         except Exception as dummy:
             return False
         # Check parameters
-        bits = crypto_utils.count_bits(params.parameter_numbers().p)
+        bits = count_bits(params.parameter_numbers().p)
         return bits == self.size
 
 

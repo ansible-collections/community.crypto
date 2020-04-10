@@ -185,7 +185,18 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+    write_file,
+    load_file_if_exists,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    get_fingerprint,
+)
 
 MINIMAL_PYOPENSSL_VERSION = '16.0.0'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
@@ -215,11 +226,11 @@ else:
     CRYPTOGRAPHY_FOUND = True
 
 
-class PublicKeyError(crypto_utils.OpenSSLObjectError):
+class PublicKeyError(OpenSSLObjectError):
     pass
 
 
-class PublicKey(crypto_utils.OpenSSLObject):
+class PublicKey(OpenSSLObject):
 
     def __init__(self, module, backend):
         super(PublicKey, self).__init__(
@@ -244,7 +255,7 @@ class PublicKey(crypto_utils.OpenSSLObject):
         self.backup_file = None
 
     def _create_publickey(self, module):
-        self.privatekey = crypto_utils.load_privatekey(
+        self.privatekey = load_privatekey(
             path=self.privatekey_path,
             content=self.privatekey_content,
             passphrase=self.privatekey_passphrase,
@@ -283,15 +294,15 @@ class PublicKey(crypto_utils.OpenSSLObject):
 
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                crypto_utils.write_file(module, publickey_content)
+                write_file(module, publickey_content)
 
                 self.changed = True
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+            except OpenSSLBadPassphraseError as exc:
                 raise PublicKeyError(exc)
             except (IOError, OSError) as exc:
                 raise PublicKeyError(exc)
 
-        self.fingerprint = crypto_utils.get_fingerprint(
+        self.fingerprint = get_fingerprint(
             path=self.privatekey_path,
             content=self.privatekey_content,
             passphrase=self.privatekey_passphrase,
@@ -339,7 +350,7 @@ class PublicKey(crypto_utils.OpenSSLObject):
 
             try:
                 desired_publickey = self._create_publickey(module)
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+            except OpenSSLBadPassphraseError as exc:
                 raise PublicKeyError(exc)
 
             return publickey_content == desired_publickey
@@ -368,7 +379,7 @@ class PublicKey(crypto_utils.OpenSSLObject):
             result['backup_file'] = self.backup_file
         if self.return_content:
             if self.publickey_bytes is None:
-                self.publickey_bytes = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+                self.publickey_bytes = load_file_if_exists(self.path, ignore_errors=True)
             result['publickey'] = self.publickey_bytes.decode('utf-8') if self.publickey_bytes else None
 
         return result
@@ -465,7 +476,7 @@ def main():
 
         result = public_key.dump()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

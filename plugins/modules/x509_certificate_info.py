@@ -313,8 +313,29 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_text, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    get_relative_time_option,
+    load_certificate,
+    get_fingerprint_of_bytes,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_decode_name,
+    cryptography_get_extensions_from_cert,
+    cryptography_oid_to_name,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
+    pyopenssl_get_extensions_from_cert,
+    pyopenssl_normalize_name,
+)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -354,7 +375,7 @@ else:
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
-class CertificateInfo(crypto_utils.OpenSSLObject):
+class CertificateInfo(OpenSSLObject):
     def __init__(self, module, backend):
         super(CertificateInfo, self).__init__(
             module.params['path'] or '',
@@ -375,14 +396,14 @@ class CertificateInfo(crypto_utils.OpenSSLObject):
                     self.module.fail_json(
                         msg='The value for valid_at.{0} must be of type string (got {1})'.format(k, type(v))
                     )
-                self.valid_at[k] = crypto_utils.get_relative_time_option(v, 'valid_at.{0}'.format(k))
+                self.valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k))
 
     def generate(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
     def dump(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
     @abc.abstractmethod
@@ -455,7 +476,7 @@ class CertificateInfo(crypto_utils.OpenSSLObject):
 
     def get_info(self):
         result = dict()
-        self.cert = crypto_utils.load_certificate(self.path, content=self.content, backend=self.backend)
+        self.cert = load_certificate(self.path, content=self.content, backend=self.backend)
 
         result['signature_algorithm'] = self._get_signature_algorithm()
         subject = self._get_subject_ordered()
@@ -488,7 +509,7 @@ class CertificateInfo(crypto_utils.OpenSSLObject):
 
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = crypto_utils.get_fingerprint_of_bytes(pk) if pk is not None else dict()
+        result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
 
         if self.backend != 'pyopenssl':
             ski = self._get_subject_key_identifier()
@@ -518,18 +539,18 @@ class CertificateInfoCryptography(CertificateInfo):
         super(CertificateInfoCryptography, self).__init__(module, 'cryptography')
 
     def _get_signature_algorithm(self):
-        return crypto_utils.cryptography_oid_to_name(self.cert.signature_algorithm_oid)
+        return cryptography_oid_to_name(self.cert.signature_algorithm_oid)
 
     def _get_subject_ordered(self):
         result = []
         for attribute in self.cert.subject:
-            result.append([crypto_utils.cryptography_oid_to_name(attribute.oid), attribute.value])
+            result.append([cryptography_oid_to_name(attribute.oid), attribute.value])
         return result
 
     def _get_issuer_ordered(self):
         result = []
         for attribute in self.cert.issuer:
-            result.append([crypto_utils.cryptography_oid_to_name(attribute.oid), attribute.value])
+            result.append([cryptography_oid_to_name(attribute.oid), attribute.value])
         return result
 
     def _get_version(self):
@@ -581,7 +602,7 @@ class CertificateInfoCryptography(CertificateInfo):
         try:
             ext_keyusage_ext = self.cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage)
             return sorted([
-                crypto_utils.cryptography_oid_to_name(eku) for eku in ext_keyusage_ext.value
+                cryptography_oid_to_name(eku) for eku in ext_keyusage_ext.value
             ]), ext_keyusage_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -615,7 +636,7 @@ class CertificateInfoCryptography(CertificateInfo):
     def _get_subject_alt_name(self):
         try:
             san_ext = self.cert.extensions.get_extension_for_class(x509.SubjectAlternativeName)
-            result = [crypto_utils.cryptography_decode_name(san) for san in san_ext.value]
+            result = [cryptography_decode_name(san) for san in san_ext.value]
             return result, san_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -644,7 +665,7 @@ class CertificateInfoCryptography(CertificateInfo):
             ext = self.cert.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
             issuer = None
             if ext.value.authority_cert_issuer is not None:
-                issuer = [crypto_utils.cryptography_decode_name(san) for san in ext.value.authority_cert_issuer]
+                issuer = [cryptography_decode_name(san) for san in ext.value.authority_cert_issuer]
             return ext.value.key_identifier, issuer, ext.value.authority_cert_serial_number
         except cryptography.x509.ExtensionNotFound:
             return None, None, None
@@ -653,7 +674,7 @@ class CertificateInfoCryptography(CertificateInfo):
         return self.cert.serial_number
 
     def _get_all_extensions(self):
-        return crypto_utils.cryptography_get_extensions_from_cert(self.cert)
+        return cryptography_get_extensions_from_cert(self.cert)
 
     def _get_ocsp_uri(self):
         try:
@@ -679,7 +700,7 @@ class CertificateInfoPyOpenSSL(CertificateInfo):
     def __get_name(self, name):
         result = []
         for sub in name.get_components():
-            result.append([crypto_utils.pyopenssl_normalize_name(sub[0]), to_text(sub[1])])
+            result.append([pyopenssl_normalize_name(sub[0]), to_text(sub[1])])
         return result
 
     def _get_subject_ordered(self):
@@ -698,7 +719,7 @@ class CertificateInfoPyOpenSSL(CertificateInfo):
             extension = self.cert.get_extension(extension_idx)
             if extension.get_short_name() == short_name:
                 result = [
-                    crypto_utils.pyopenssl_normalize_name(usage.strip()) for usage in to_text(extension, errors='surrogate_or_strict').split(',')
+                    pyopenssl_normalize_name(usage.strip()) for usage in to_text(extension, errors='surrogate_or_strict').split(',')
                 ]
                 return sorted(result), bool(extension.get_critical())
         return None, False
@@ -784,7 +805,7 @@ class CertificateInfoPyOpenSSL(CertificateInfo):
         return self.cert.get_serial_number()
 
     def _get_all_extensions(self):
-        return crypto_utils.pyopenssl_get_extensions_from_cert(self.cert)
+        return pyopenssl_get_extensions_from_cert(self.cert)
 
     def _get_ocsp_uri(self):
         for i in range(self.cert.get_extension_count()):
@@ -863,7 +884,7 @@ def main():
 
         result = certificate.get_info()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

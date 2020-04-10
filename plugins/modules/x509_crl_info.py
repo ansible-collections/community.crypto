@@ -134,7 +134,29 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_decode_name,
+    cryptography_oid_to_name,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    REVOCATION_REASON_MAP_INVERSE,
+    cryptography_decode_revoked_certificate,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto._obj2txt import (
+    obj2txt
+)
+
+# crypto_utils
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'
 
@@ -154,11 +176,11 @@ else:
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
-class CRLError(crypto_utils.OpenSSLObjectError):
+class CRLError(OpenSSLObjectError):
     pass
 
 
-class CRLInfo(crypto_utils.OpenSSLObject):
+class CRLInfo(OpenSSLObject):
     """The main module implementation."""
 
     def __init__(self, module):
@@ -193,10 +215,10 @@ class CRLInfo(crypto_utils.OpenSSLObject):
             'serial_number': entry['serial_number'],
             'revocation_date': entry['revocation_date'].strftime(TIMESTAMP_FORMAT),
             'issuer':
-                [crypto_utils.cryptography_decode_name(issuer) for issuer in entry['issuer']]
+                [cryptography_decode_name(issuer) for issuer in entry['issuer']]
                 if entry['issuer'] is not None else None,
             'issuer_critical': entry['issuer_critical'],
-            'reason': crypto_utils.REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,
+            'reason': REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,
             'reason_critical': entry['reason_critical'],
             'invalidity_date':
                 entry['invalidity_date'].strftime(TIMESTAMP_FORMAT)
@@ -218,36 +240,36 @@ class CRLInfo(crypto_utils.OpenSSLObject):
         result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
         result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
         try:
-            result['digest'] = crypto_utils.cryptography_oid_to_name(self.crl.signature_algorithm_oid)
+            result['digest'] = cryptography_oid_to_name(self.crl.signature_algorithm_oid)
         except AttributeError:
             # Older cryptography versions don't have signature_algorithm_oid yet
-            dotted = crypto_utils._obj2txt(
+            dotted = obj2txt(
                 self.crl._backend._lib,
                 self.crl._backend._ffi,
                 self.crl._x509_crl.sig_alg.algorithm
             )
             oid = x509.oid.ObjectIdentifier(dotted)
-            result['digest'] = crypto_utils.cryptography_oid_to_name(oid)
+            result['digest'] = cryptography_oid_to_name(oid)
         issuer = []
         for attribute in self.crl.issuer:
-            issuer.append([crypto_utils.cryptography_oid_to_name(attribute.oid), attribute.value])
+            issuer.append([cryptography_oid_to_name(attribute.oid), attribute.value])
         result['issuer_ordered'] = issuer
         result['issuer'] = {}
         for k, v in issuer:
             result['issuer'][k] = v
         result['revoked_certificates'] = []
         for cert in self.crl:
-            entry = crypto_utils.cryptography_decode_revoked_certificate(cert)
+            entry = cryptography_decode_revoked_certificate(cert)
             result['revoked_certificates'].append(self._dump_revoked(entry))
 
         return result
 
     def generate(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
     def dump(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
 
@@ -274,7 +296,7 @@ def main():
         crl = CRLInfo(module)
         result = crl.get_info()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as e:
+    except OpenSSLObjectError as e:
         module.fail_json(msg=to_native(e))
 
 
