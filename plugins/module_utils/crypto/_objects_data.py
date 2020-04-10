@@ -7,6 +7,10 @@
 # Licensed under the Apache License 2.0
 # https://github.com/openssl/openssl/blob/master/LICENSE
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+
 OID_MAP = {
     '0': ('itu-t', 'ITU-T', 'ccitt'),
     '0.3.4401.5': ('ntt-ds', ),

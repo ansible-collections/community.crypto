@@ -16,6 +16,9 @@
 #    pyca/cryptography@3057f91ea9a05fb593825006d87a391286a4d828
 #    pyca/cryptography@d607dd7e5bc5c08854ec0c9baff70ba4a35be36f
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 
 def obj2txt(openssl_lib, openssl_ffi, obj):
     # Set to 80 on the recommendation of

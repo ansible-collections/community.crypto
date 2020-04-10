@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+
 try:
     from cryptography import x509
 except ImportError:
@@ -42,6 +46,10 @@ if HAS_CRYPTOGRAPHY:
     REVOCATION_REASON_MAP_INVERSE = dict()
     for k, v in REVOCATION_REASON_MAP.items():
         REVOCATION_REASON_MAP_INVERSE[v] = k
+
+else:
+    REVOCATION_REASON_MAP = dict()
+    REVOCATION_REASON_MAP_INVERSE = dict()
 
 
 def cryptography_decode_revoked_certificate(cert):
