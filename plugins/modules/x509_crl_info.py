@@ -143,13 +143,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_decode_name,
     cryptography_oid_to_name,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
-    REVOCATION_REASON_MAP_INVERSE,
+    TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
+    cryptography_dump_revoked,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto._obj2txt import (
@@ -171,9 +171,6 @@ except ImportError:
     CRYPTOGRAPHY_FOUND = False
 else:
     CRYPTOGRAPHY_FOUND = True
-
-
-TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CRLError(OpenSSLObjectError):
@@ -210,22 +207,6 @@ class CRLInfo(OpenSSLObject):
         except Exception as e:
             self.module.fail_json(msg='Error while decoding CRL: {0}'.format(e))
 
-    def _dump_revoked(self, entry):
-        return {
-            'serial_number': entry['serial_number'],
-            'revocation_date': entry['revocation_date'].strftime(TIMESTAMP_FORMAT),
-            'issuer':
-                [cryptography_decode_name(issuer) for issuer in entry['issuer']]
-                if entry['issuer'] is not None else None,
-            'issuer_critical': entry['issuer_critical'],
-            'reason': REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,
-            'reason_critical': entry['reason_critical'],
-            'invalidity_date':
-                entry['invalidity_date'].strftime(TIMESTAMP_FORMAT)
-                if entry['invalidity_date'] is not None else None,
-            'invalidity_date_critical': entry['invalidity_date_critical'],
-        }
-
     def get_info(self):
         result = {
             'changed': False,
@@ -260,7 +241,7 @@ class CRLInfo(OpenSSLObject):
         result['revoked_certificates'] = []
         for cert in self.crl:
             entry = cryptography_decode_revoked_certificate(cert)
-            result['revoked_certificates'].append(self._dump_revoked(entry))
+            result['revoked_certificates'].append(cryptography_dump_revoked(entry))
 
         return result
 

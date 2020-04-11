@@ -370,7 +370,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_decode_name,
     cryptography_get_name,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
@@ -378,8 +377,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
     REVOCATION_REASON_MAP,
-    REVOCATION_REASON_MAP_INVERSE,
+    TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
+    cryptography_dump_revoked,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto._obj2txt import (
@@ -406,9 +406,6 @@ except ImportError:
     CRYPTOGRAPHY_FOUND = False
 else:
     CRYPTOGRAPHY_FOUND = True
-
-
-TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CRLError(OpenSSLObjectError):
@@ -653,22 +650,6 @@ class CRL(OpenSSLObject):
         if self.module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
-    def _dump_revoked(self, entry):
-        return {
-            'serial_number': entry['serial_number'],
-            'revocation_date': entry['revocation_date'].strftime(TIMESTAMP_FORMAT),
-            'issuer':
-                [cryptography_decode_name(issuer) for issuer in entry['issuer']]
-                if entry['issuer'] is not None else None,
-            'issuer_critical': entry['issuer_critical'],
-            'reason': REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,
-            'reason_critical': entry['reason_critical'],
-            'invalidity_date':
-                entry['invalidity_date'].strftime(TIMESTAMP_FORMAT)
-                if entry['invalidity_date'] is not None else None,
-            'invalidity_date_critical': entry['invalidity_date_critical'],
-        }
-
     def dump(self, check_mode=False):
         result = {
             'changed': self.changed,
@@ -695,7 +676,7 @@ class CRL(OpenSSLObject):
                 result['issuer'][k] = v
             result['revoked_certificates'] = []
             for entry in self.revoked_certificates:
-                result['revoked_certificates'].append(self._dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
         elif self.crl:
             result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
             result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
@@ -720,7 +701,7 @@ class CRL(OpenSSLObject):
             result['revoked_certificates'] = []
             for cert in self.crl:
                 entry = cryptography_decode_revoked_certificate(cert)
-                result['revoked_certificates'].append(self._dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
 
         if self.return_content:
             result['crl'] = self.crl_content
