@@ -1,0 +1,87 @@
+---
+- name: Check certificate 1 against CRL
+  x509_certificate_revocation_info:
+    path: '{{ output_dir }}/cert-1.pem'
+    crl_path: '{{ output_dir }}/ca-crl1.crl'
+  register: cert_1_crl
+- debug: var=cert_1_crl
+
+- name: Validate
+  assert:
+    that:
+      - cert_1_crl.revoked == true
+      - cert_1_crl.crl_contained == true
+      - cert_1_crl.crl_record.serial_number == certificate_infos.results[0].serial_number
+      - cert_1_crl.crl_record.revocation_date == '20191013000000Z'
+      - cert_1_crl.crl_source == '{{ output_dir }}/ca-crl1.crl'
+
+- name: Check certificate 2's serial number against CRL
+  x509_certificate_revocation_info:
+    serial_number: '{{ certificate_infos.results[1].serial_number }}'
+    crl_path: '{{ output_dir }}/ca-crl1.crl'
+  register: cert_2_crl
+- debug: var=cert_2_crl
+
+- name: Validate
+  assert:
+    that:
+      - cert_2_crl.revoked == true
+      - cert_2_crl.crl_contained == true
+      - cert_2_crl.crl_record.serial_number == certificate_infos.results[1].serial_number
+      - cert_2_crl.crl_record.revocation_date == '20191013000000Z'
+      - cert_2_crl.crl_record.invalidity_date == '20191012000000Z'
+      - cert_2_crl.crl_source == '{{ output_dir }}/ca-crl1.crl'
+
+- name: Check certificate 3 against CRL
+  x509_certificate_revocation_info:
+    path: '{{ output_dir }}/cert-3.pem'
+    crl_path: '{{ output_dir }}/ca-crl1.crl'
+  register: cert_3_crl
+- debug: var=cert_3_crl
+
+- name: Validate
+  assert:
+    that:
+      - cert_3_crl.revoked == false
+      - cert_3_crl.crl_contained == false
+      - cert_3_crl.crl_record is none
+
+- name: Check certificate against CRL with URL
+  x509_certificate_revocation_info:
+    serial_number: '{{ item }}'
+    crl_url: http://{{ httpbin_host }}/base64/{{ lookup('file', output_dir ~ '/ca-crl2.crl') | b64encode | replace('+', '-') | replace('/', '_') }}
+  register: url_crl
+  loop:
+    - 4321
+    - 1234
+  when: httpbin_host is defined
+- debug: var=url_crl
+
+- name: Validate
+  assert:
+    that:
+      - url_crl.results[0].revoked == false
+      - url_crl.results[0].crl_contained == false
+      - url_crl.results[0].crl_record is none
+      - url_crl.results[1].revoked == true
+      - url_crl.results[1].crl_contained == true
+      - url_crl.results[1].crl_record is not none
+      - url_crl.results[1].crl_source.startswith('http://' + httpbin_host)
+  when: httpbin_host is defined
+
+- name: Check certificate against CRL with included URL
+  x509_certificate_revocation_info:
+    path: '{{ output_dir }}/cert-0.pem'
+    crl_from_cert: check
+  register: crl_from_cert
+  when: httpbin_host is defined
+- debug: var=crl_from_cert
+
+- name: Validate
+  assert:
+    that:
+      - crl_from_cert.revoked == true
+      - crl_from_cert.crl_contained == true
+      - crl_from_cert.crl_record is not none
+      - crl_from_cert.crl_source.startswith('http://' + httpbin_host)
+  when: httpbin_host is defined
