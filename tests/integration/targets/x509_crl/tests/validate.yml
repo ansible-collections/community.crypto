@@ -12,7 +12,7 @@
 - name: Validate CRL 1 info
   assert:
     that:
-      - crl_1_info_1 == crl_1_info_2
+      - crl_1_info_1.format == 'pem'
       - crl_1_info_1.digest == 'ecdsa-with-SHA256'
       - crl_1_info_1.issuer | length == 1
       - crl_1_info_1.issuer.commonName == 'Ansible'
@@ -44,6 +44,27 @@
       - crl_1_info_1.revoked_certificates[2].reason_critical == false
       - crl_1_info_1.revoked_certificates[2].revocation_date == '20191001000000Z'
       - crl_1_info_1.revoked_certificates[2].serial_number == 1234
+      - crl_1_info_1 == crl_1_info_2
+      - crl_1_info_1 == crl_1_info_3
+
+- name: Validate CRL 1
+  assert:
+    that:
+      - crl_1_format_check is changed
+      - crl_1_format is changed
+      - crl_1_format_idem_check is not changed
+      - crl_1_format_idem is not changed
+      - crl_1_info_4.format == 'der'
+      - crl_1_info_5.format == 'der'
+
+- name: Read ca-crl1.crl
+  slurp:
+    src: "{{ output_dir }}/ca-crl1.crl"
+  register: content
+- name: Validate CRL 1 Base64 content
+  assert:
+    that:
+      - crl_1_format_idem.crl | b64decode == content.content | b64decode
 
 - name: Validate CRL 2
   assert:

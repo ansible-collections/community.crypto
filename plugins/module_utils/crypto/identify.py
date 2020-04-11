@@ -25,6 +25,17 @@ PKCS8_PRIVATEKEY_NAMES = ('PRIVATE KEY', 'ENCRYPTED PRIVATE KEY')
 PKCS1_PRIVATEKEY_SUFFIX = ' PRIVATE KEY'
 
 
+def identify_pem_format(content):
+    '''Given the contents of a binary file, tests whether this could be a PEM file.'''
+    try:
+        lines = content.decode('utf-8').splitlines(False)
+        if lines[0].startswith(PEM_START) and lines[0].endswith(PEM_END) and len(lines[0]) > len(PEM_START) + len(PEM_END):
+            return True
+    except UnicodeDecodeError:
+        pass
+    return False
+
+
 def identify_private_key_format(content):
     '''Given the contents of a private key file, identifies its format.'''
     # See https://github.com/openssl/openssl/blob/master/crypto/pem/pem_pkey.c#L40-L85
