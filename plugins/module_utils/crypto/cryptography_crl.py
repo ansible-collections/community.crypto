@@ -33,6 +33,10 @@ from .cryptography_support import (
     cryptography_decode_name,
 )
 
+from ._obj2txt import (
+    obj2txt,
+)
+
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
@@ -106,3 +110,16 @@ def cryptography_dump_revoked(entry):
             if entry['invalidity_date'] is not None else None,
         'invalidity_date_critical': entry['invalidity_date_critical'],
     }
+
+
+def cryptography_get_signature_algorithm_oid_from_crl(crl):
+    try:
+        return crl.signature_algorithm_oid
+    except AttributeError:
+        # Older cryptography versions don't have signature_algorithm_oid yet
+        dotted = obj2txt(
+            crl._backend._lib,
+            crl._backend._ffi,
+            crl._x509_crl.sig_alg.algorithm
+        )
+        return x509.oid.ObjectIdentifier(dotted)

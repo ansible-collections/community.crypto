@@ -150,10 +150,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
     cryptography_dump_revoked,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto._obj2txt import (
-    obj2txt
+    cryptography_get_signature_algorithm_oid_from_crl,
 )
 
 # crypto_utils
@@ -220,17 +217,7 @@ class CRLInfo(OpenSSLObject):
 
         result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
         result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
-        try:
-            result['digest'] = cryptography_oid_to_name(self.crl.signature_algorithm_oid)
-        except AttributeError:
-            # Older cryptography versions don't have signature_algorithm_oid yet
-            dotted = obj2txt(
-                self.crl._backend._lib,
-                self.crl._backend._ffi,
-                self.crl._x509_crl.sig_alg.algorithm
-            )
-            oid = x509.oid.ObjectIdentifier(dotted)
-            result['digest'] = cryptography_oid_to_name(oid)
+        result['digest'] = cryptography_oid_to_name(cryptography_get_signature_algorithm_oid_from_crl(self.crl))
         issuer = []
         for attribute in self.crl.issuer:
             issuer.append([cryptography_oid_to_name(attribute.oid), attribute.value])
