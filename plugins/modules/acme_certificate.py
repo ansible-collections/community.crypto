@@ -420,7 +420,6 @@ challenge_data:
       returned: changed and challenge is C(tls-alpn-01)
       type: str
       sample: DNS:example.com
-      version_added: "2.8"
     resource_value:
       description:
         - The value the resource has to produce for the validation.
@@ -439,14 +438,12 @@ challenge_data:
       returned: changed and challenge is C(dns-01)
       type: str
       sample: _acme-challenge.example.com
-      version_added: "2.5"
 challenge_data_dns:
   description:
     - List of TXT values per DNS record, in case challenge is C(dns-01).
     - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
   returned: changed
   type: dict
-  version_added: "2.5"
 authorizations:
   description:
     - ACME authorization data.
@@ -458,17 +455,14 @@ order_uri:
   description: ACME order URI.
   returned: changed
   type: str
-  version_added: "2.5"
 finalization_uri:
   description: ACME finalization URI.
   returned: changed
   type: str
-  version_added: "2.5"
 account_uri:
   description: ACME account URI.
   returned: changed
   type: str
-  version_added: "2.5"
 all_chains:
   description:
     - When I(retrieve_all_alternates) is set to C(yes), the module will query the ACME server

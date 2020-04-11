@@ -197,7 +197,6 @@ issuer_ordered:
     type: list
     elements: list
     sample: '[["organizationName", "Ansible"], ["commonName": "ca.example.com"]]'
-    version_added: "2.9"
 subject:
     description:
         - The certificate's subject as a dictionary.
@@ -211,7 +210,6 @@ subject_ordered:
     type: list
     elements: list
     sample: '[["commonName", "www.example.com"], ["emailAddress": "test@example.com"]]'
-    version_added: "2.9"
 not_after:
     description: C(notAfter) date as ASN.1 TIME
     returned: success
@@ -264,7 +262,6 @@ subject_key_identifier:
     returned: success and if the pyOpenSSL backend is I(not) used
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
-    version_added: "2.9"
 authority_key_identifier:
     description:
         - The certificate's authority key identifier.
@@ -273,7 +270,6 @@ authority_key_identifier:
     returned: success and if the pyOpenSSL backend is I(not) used
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
-    version_added: "2.9"
 authority_cert_issuer:
     description:
         - The certificate's authority cert issuer as a list of general names.
@@ -282,7 +278,6 @@ authority_cert_issuer:
     type: list
     elements: str
     sample: "[DNS:www.ansible.com, IP:1.2.3.4]"
-    version_added: "2.9"
 authority_cert_serial_number:
     description:
         - The certificate's authority cert serial number.
@@ -290,13 +285,11 @@ authority_cert_serial_number:
     returned: success and if the pyOpenSSL backend is I(not) used
     type: int
     sample: '12345'
-    version_added: "2.9"
 ocsp_uri:
     description: The OCSP responder URI, if included in the certificate. Will be
                  C(none) if no OCSP responder URI is included.
     returned: success
     type: str
-    version_added: "2.9"
 '''
 
 

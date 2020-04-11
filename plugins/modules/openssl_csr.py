@@ -413,7 +413,6 @@ csr:
     description: The (current or generated) CSR's content.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
-    version_added: "2.10"
 '''
 
 import abc

@@ -269,7 +269,6 @@ privatekey:
         - Will be Base64-encoded if the key is in raw format.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
-    version_added: "2.10"
 '''
 
 import abc
