@@ -330,6 +330,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_decode_name,
     cryptography_get_extensions_from_cert,
     cryptography_oid_to_name,
+    cryptography_serial_number_of_cert,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
@@ -671,7 +672,7 @@ class CertificateInfoCryptography(CertificateInfo):
             return None, None, None
 
     def _get_serial_number(self):
-        return self.cert.serial_number
+        return cryptography_serial_number_of_cert(self.cert)
 
     def _get_all_extensions(self):
         return cryptography_get_extensions_from_cert(self.cert)

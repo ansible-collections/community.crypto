@@ -890,6 +890,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
     cryptography_key_needs_digest_for_signing,
     cryptography_parse_key_usage_params,
+    cryptography_serial_number_of_cert,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
@@ -1241,7 +1242,7 @@ class SelfSignedCertificateCryptography(Certificate):
             result.update({
                 'notBefore': self.cert.not_valid_before.strftime("%Y%m%d%H%M%SZ"),
                 'notAfter': self.cert.not_valid_after.strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': self.cert.serial_number,
+                'serial_number': cryptography_serial_number_of_cert(self.cert),
             })
 
         return result
@@ -1538,7 +1539,7 @@ class OwnCACertificateCryptography(Certificate):
             result.update({
                 'notBefore': self.cert.not_valid_before.strftime("%Y%m%d%H%M%SZ"),
                 'notAfter': self.cert.not_valid_after.strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': self.cert.serial_number,
+                'serial_number': cryptography_serial_number_of_cert(self.cert),
             })
 
         return result
@@ -2402,7 +2403,7 @@ class EntrustCertificate(Certificate):
                 time_string = to_native(self.cert.get_notAfter())
                 expiry = datetime.datetime.strptime(time_string, "%Y%m%d%H%M%SZ")
             elif self.backend == 'cryptography':
-                serial_number = "{0:X}".format(self.cert.serial_number)
+                serial_number = "{0:X}".format(cryptography_serial_number_of_cert(self.cert))
                 expiry = self.cert.not_valid_after
 
             # get some information about the expiry of this certificate

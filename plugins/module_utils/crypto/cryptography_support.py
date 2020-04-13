@@ -288,3 +288,15 @@ def cryptography_compare_public_keys(key1, key2):
             b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
             return a == b
     return key1.public_numbers() == key2.public_numbers()
+
+
+def cryptography_serial_number_of_cert(cert):
+    '''Returns cert.serial_number.
+
+    Also works for old versions of cryptography.
+    '''
+    try:
+        return cert.serial_number
+    except AttributeError:
+        # The property was called "serial" before cryptography 1.4
+        return cert.serial

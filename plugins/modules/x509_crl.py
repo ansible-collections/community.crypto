@@ -376,6 +376,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_get_name,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
+    cryptography_serial_number_of_cert,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
@@ -462,11 +463,7 @@ class CRL(OpenSSLObject):
                     if rc['content'] is not None:
                         rc['content'] = rc['content'].encode('utf-8')
                     cert = load_certificate(rc['path'], content=rc['content'], backend='cryptography')
-                    try:
-                        result['serial_number'] = cert.serial_number
-                    except AttributeError:
-                        # The property was called "serial" before cryptography 1.4
-                        result['serial_number'] = cert.serial
+                    result['serial_number'] = cryptography_serial_number_of_cert(cert)
                 except OpenSSLObjectError as e:
                     if rc['content'] is not None:
                         module.fail_json(
