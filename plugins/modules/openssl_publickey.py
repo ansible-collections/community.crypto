@@ -185,11 +185,14 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
     OpenSSLBadPassphraseError,
-    write_file,
-    load_file_if_exists,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (

@@ -428,11 +428,14 @@ from ansible.module_utils._text import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
     OpenSSLBadPassphraseError,
-    write_file,
-    load_file_if_exists,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
