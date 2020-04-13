@@ -113,14 +113,12 @@ identifier_type:
        or C(ip)."
   returned: always
   type: str
-  version_added: "2.8"
 identifier:
   description:
     - "The identifier for the actual resource. Will be a domain name if the
        type is C(dns), or an IP address if the type is C(ip)."
   returned: always
   type: str
-  version_added: "2.8"
 challenge_certificate:
   description:
     - "The challenge certificate in PEM format."

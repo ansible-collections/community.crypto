@@ -176,7 +176,6 @@ pkcs12:
     description: The (current or generated) PKCS#12's content Base64 encoded.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
-    version_added: "2.10"
 '''
 
 import base64
