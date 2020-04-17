@@ -8,7 +8,7 @@ description: null
 license: GPL-3.0-or-later
 license_file: COPYING
 tags: null
-repository: https://github.com:ansible-collections/community.crypto
+repository: https://github.com/ansible-collections/community.crypto
 documentation: https://github.com/ansible-collection-migration/community.crypto/tree/master/docs
-homepage: https://github.com:ansible-collections/community.crypto
-issues: https://github.com:ansible-collections/community.crypto/issues
+homepage: https://github.com/ansible-collections/community.crypto
+issues: https://github.com/ansible-collections/community.crypto/issues
