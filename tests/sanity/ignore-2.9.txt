@@ -2,6 +2,7 @@ plugins/module_utils/compat/ipaddress.py future-import-boilerplate
 plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
+plugins/module_utils/crypto/__init__.py empty-init
 tests/unit/mock/path.py future-import-boilerplate
 tests/unit/mock/path.py metaclass-boilerplate
 tests/unit/mock/yaml_helper.py future-import-boilerplate

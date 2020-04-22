@@ -2,6 +2,7 @@ plugins/module_utils/compat/ipaddress.py future-import-boilerplate
 plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
+plugins/module_utils/crypto/__init__.py empty-init
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
 plugins/modules/acme_certificate.py validate-modules:doc-elements-mismatch
 tests/unit/mock/path.py future-import-boilerplate

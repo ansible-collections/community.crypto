@@ -93,7 +93,7 @@ from .support import (
     OpenSSLObject,
 )
 
-from ..io(
-    load_file_if_exists
-    write_file
+from ..io import (
+    load_file_if_exists,
+    write_file,
 )
