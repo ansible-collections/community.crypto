@@ -61,6 +61,14 @@ else
     COMPLETE=yes
 fi
 
+# START: HACK
+if [ "${script}" == "osx" ]; then
+    # Make sure that the latest versions of pyOpenSSL and cryptography are installed on macOS.
+    # This is necessary until https://github.com/ansible/ansible/issues/68701 has been fixed.
+    retry pip install --upgrade pyOpenSSL cryptography
+fi
+# END: HACK
+
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
 TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
@@ -68,7 +76,7 @@ mkdir -p "${TEST_DIR}"
 cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
-# STAR: HACK install integration test dependencies
+# START: HACK install integration test dependencies
 if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_version}" != "2.9" ]; then
     retry ansible-galaxy -vvv collection install community.general
 fi
