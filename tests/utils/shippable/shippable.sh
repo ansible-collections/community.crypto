@@ -63,16 +63,6 @@ else
     # COMPLETE=yes  -- should no longer necessary with the backports
 fi
 
-# START: HACK
-if [ "${script}" == "osx" ]; then
-    # Make sure that the latest versions of pyOpenSSL and cryptography will be installed on macOS before
-    # ansible-playbook is started. This is necessary until https://github.com/ansible/ansible/issues/68701
-    # has been fixed.
-    sed -i -e 's/cryptography.*/cryptography >= 2.9.2/g' /root/venv/lib/python2.7/site-packages/ansible_test/_data/requirements/integration.txt
-    echo 'pyOpenSSL >= 19.1.0' >> /root/venv/lib/python2.7/site-packages/ansible_test/_data/requirements/integration.txt
-fi
-# END: HACK
-
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
 TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
