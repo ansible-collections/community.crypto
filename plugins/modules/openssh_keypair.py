@@ -87,6 +87,7 @@ options:
             - full_idempotence
             - always
         default: partial_idempotence
+        version_added: '1.0.0'
 notes:
     - In case the ssh key is broken or password protected, the module will fail.
       Set the I(force) option to C(yes) if you want to regenerate the keypair.

@@ -69,10 +69,12 @@ options:
               I(keyfile) is needed for most of the operations. Parameter
               value is a string with the passphrase."
         type: str
+        version_added: '1.0.0'
     keysize:
         description:
             - "Sets the key size only if LUKS container does not exist."
         type: int
+        version_added: '1.0.0'
     new_keyfile:
         description:
             - "Adds additional key to given container on I(device).
@@ -95,6 +97,7 @@ options:
               new keyslot will be used even if another keyslot already exists
               for this passphrase."
         type: str
+        version_added: '1.0.0'
     remove_keyfile:
         description:
             - "Removes given key from the container on I(device). Does not
@@ -118,6 +121,7 @@ options:
               container, the I(force_remove_last_key) option must be set
               to C(yes)."
         type: str
+        version_added: '1.0.0'
     force_remove_last_key:
         description:
             - "If set to C(yes), allows removing the last key from a container."
@@ -134,19 +138,20 @@ options:
               not specified."
             - "This cannot be specified if I(type) is set to C(luks1)."
         type: str
+        version_added: '1.0.0'
     uuid:
         description:
             - "With this option user can identify the LUKS container by UUID."
             - "Will only be used when I(device) and I(label) are not specified."
         type: str
+        version_added: '1.0.0'
     type:
         description:
             - "This option allow the user explicit define the format of LUKS
               container that wants to work with. Options are C(luks1) or C(luks2)"
         type: str
         choices: [luks1, luks2]
-
-
+        version_added: '1.0.0'
 
 requirements:
     - "cryptsetup"

@@ -64,11 +64,13 @@ options:
         type: str
         default: auto
         choices: [ auto, cryptography, openssl ]
+        version_added: "1.0.0"
     return_content:
         description:
             - If set to C(yes), will return the (current or generated) DH params' content as I(dhparams).
         type: bool
         default: no
+        version_added: "1.0.0"
 extends_documentation_fragment:
 - files
 seealso:
@@ -115,6 +117,7 @@ dhparams:
     description: The (current or generated) DH params' content.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: "1.0.0"
 '''
 
 import abc

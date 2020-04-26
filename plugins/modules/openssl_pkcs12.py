@@ -95,6 +95,7 @@ options:
             - If set to C(yes), will return the (current or generated) PKCS#12's content as I(pkcs12).
         type: bool
         default: no
+        version_added: "1.0.0"
 extends_documentation_fragment:
     - files
 seealso:
@@ -173,6 +174,7 @@ pkcs12:
     description: The (current or generated) PKCS#12's content Base64 encoded.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: "1.0.0"
 '''
 
 import base64

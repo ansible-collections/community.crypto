@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: x509_crl
+version_added: '1.0.0'
 short_description: Generate Certificate Revocation Lists (CRLs)
 description:
     - This module allows one to (re)generate or update Certificate Revocation Lists (CRLs).

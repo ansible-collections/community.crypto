@@ -39,6 +39,7 @@ options:
             - Content of the private key file.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
+        version_added: '1.0.0'
     passphrase:
         description:
             - The passphrase for the private key.

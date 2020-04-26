@@ -38,6 +38,7 @@ options:
             - Content of the CSR file.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
+        version_added: "1.0.0"
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.

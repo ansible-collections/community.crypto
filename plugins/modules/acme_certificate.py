@@ -212,6 +212,7 @@ options:
          to the same certificate in the chain."
       - "This option can only be used with the C(cryptography) backend."
     type: list
+    version_added: '1.0.0'
     suboptions:
       test_certificates:
         description:
