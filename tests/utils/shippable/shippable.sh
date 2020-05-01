@@ -35,6 +35,7 @@ python -V
 
 function retry
 {
+    # shellcheck disable=SC2034
     for repetition in 1 2 3; do
         set +e
         "$@"
@@ -43,9 +44,9 @@ function retry
         if [ ${result} == 0 ]; then
             return ${result}
         fi
-        echo "$@ -> ${result}"
+        echo "@* -> ${result}"
     done
-    echo "Command '$@' failed 3 times!"
+    echo "Command '@*' failed 3 times!"
     exit -1
 }
 

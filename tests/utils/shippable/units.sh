@@ -6,7 +6,6 @@ declare -a args
 IFS='/:' read -ra args <<< "$1"
 
 version="${args[1]}"
-group="${args[2]}"
 
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=90
