@@ -25,3 +25,6 @@ repository: https://github.com/ansible-collections/community.crypto
 documentation: https://github.com/ansible-collection-migration/community.crypto/tree/master/docs
 homepage: https://github.com/ansible-collections/community.crypto
 issues: https://github.com/ansible-collections/community.crypto/issues
+build_ignore:
+  - 'community-crypto-*.tar.gz'
+  - .gitignore
