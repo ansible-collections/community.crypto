@@ -14,6 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
+    pip install https://github.com/felixfontein/ansible-changelog/archive/master.tar.gz --disable-pip-version-check
     tests/sanity/run.py
     exit
 fi
