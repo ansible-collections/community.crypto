@@ -34,12 +34,13 @@ def run(failed_tests, errors, test, command):
         print(SEPARATOR)
         print('Test "{0}" failed with the following {1} errors:'.format(test, len(new_errors)))
         failed_tests.append(test)
-        for _, line in new_errors:
+        for dummy, line in new_errors:
             print(line)
         errors.extend(new_errors)
     else:
         print(SEPARATOR)
         print('Test "{0}" succeeded.'.format(test))
+
 
 def main():
     errors = []
