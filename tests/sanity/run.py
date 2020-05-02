@@ -45,8 +45,8 @@ def main():
     errors = []
     failed_tests = []
 
-    run(errors, failed_tests, 'changelog', ['ansible-changelog', 'lint'])
-    run(errors, failed_tests, 'bundled', ['tests/sanity/code-smell/update-bundled.py', 'plugins/module_utils/compat/ipaddress.py'])
+    run(failed_tests, errors, 'changelog', ['ansible-changelog', 'lint'])
+    run(failed_tests, errors, 'bundled', ['tests/sanity/code-smell/update-bundled.py', 'plugins/module_utils/compat/ipaddress.py'])
 
     if not errors:
         print(SEPARATOR)
