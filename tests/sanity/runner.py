@@ -64,8 +64,10 @@ def main(argv):
     errors = []
     failed_tests = []
 
-    run(failed_tests, errors, 'changelog', ['ansible-changelog', 'lint'])
-    run(failed_tests, errors, 'bundled', ['python{0}'.format(python_version), 'tests/sanity/code-smell/update-bundled.py', 'plugins/module_utils/compat/ipaddress.py'])
+    run(failed_tests, errors, 'changelog',
+        ['ansible-changelog', 'lint'])
+    run(failed_tests, errors, 'bundled',
+        ['python{0}'.format(python_version), 'tests/sanity/code-smell/update-bundled.py', 'plugins/module_utils/compat/ipaddress.py'])
 
     if not errors:
         print(SEPARATOR)
