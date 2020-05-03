@@ -12,18 +12,22 @@ import subprocess
 import sys
 
 
+CONTAINER = 'quay.io/ansible/default-test-container:1.12'
+
+
 def main():
-    root = os.environ['HOME']
+    root = os.path.abspath(os.environ['HOME'])
 
     command = ['docker', 'run', '--rm', '-t']
     command.extend(['-v', '{0}:{1}'.format(root, root)])
-    command.extend(['-w', '/{0}'.format(os.getcwd())])
+    command.extend(['-w', os.path.abspath(os.getcwd())])
     command.extend(['-u', '{0}:{1}'.format(os.getuid(), os.getgid())])
-    command.extend(['quay.io/ansible/default-test-container:{0}'.format('1.12')])
+    command.extend([CONTAINER])
     # command.extend(['/bin/sh', '-c', 'ls -lah ; pwd'])
     command.extend(['python3.7', 'tests/sanity/runner.py'])
     command.extend(sys.argv[1:])
-    print('[RUN] {0}'.format(' '.join(command)))
+    sys.stdout.write('[RUN] {0}\n'.format(' '.join(command)))
+    sys.stdout.flush()
     rc = subprocess.call(command)
     sys.exit(rc)
 
