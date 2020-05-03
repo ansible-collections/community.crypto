@@ -18,6 +18,25 @@ import subprocess
 SEPARATOR = '=========================================================================='
 DEFAULT_PYTHON = '3.7'
 
+COLORS = {
+    'emph': 1,
+    'gray': 37,
+    'black': 30,
+    'white': 97,
+    'green': 32,
+    'red': 31,
+    'yellow': 33,
+}
+
+
+def colorize(text, color, use_color=True):
+    if not use_color:
+        return text
+    color_id = COLORS.get(color)
+    if color_id is None:
+        return text
+    return '\x1b[{0}m{1}\x1b[0m'.format(color_id, text)
+
 
 # Copied from test/lib/_internal/util.py in ansible/ansible
 def is_subdir(candidate_path, path):  # type: (str, str) -> bool
@@ -171,7 +190,7 @@ class Test:
         return errors
 
 
-def collect_tests(path='tests/sanity/extra'):
+def collect_tests(path='tests/sanity/extra', use_color=True):
     tests = []
     for filepath in glob.glob(os.path.join(path, '*.json')):
         dir, filename = os.path.split(filepath)
@@ -193,19 +212,19 @@ def join_command(command):
     return ' '.join([shlex.quote(part) for part in command])
 
 
-def run(result, test, targets, skip=False):
+def run(result, test, targets, skip=False, use_color=True):
     print(SEPARATOR)
     result_record = result[test.name] = dict(
         skipped=True,
     )
 
     if skip:
-        print('Test "{0}" skipped.'.format(test.name))
+        print(colorize('Test "{0}" skipped.'.format(test.name), 'emph', use_color))
         return
 
     command = test.compose_command(targets)
     if not command:
-        print('Test "{0}" skipped.'.format(test.name))
+        print(colorize('Test "{0}" skipped.'.format(test.name), 'emph', use_color))
         return
 
     del result_record['skipped']
@@ -214,7 +233,7 @@ def run(result, test, targets, skip=False):
     errors = []
     failed = False
     try:
-        print('Running {0}: {1}'.format(test.name, join_command(command)))
+        print(colorize('Running {0}: {1}'.format(test.name, join_command(command)), 'emph', use_color))
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
 
@@ -226,11 +245,11 @@ def run(result, test, targets, skip=False):
         if stderr:
             stderr = stderr.decode('utf-8').splitlines()
             for line in stderr:
-                print('[stderr] {0}'.format(line))
+                print(colorize('[stderr] {0}'.format(line), 'red', use_color))
             failed = True
         if int(p.returncode) != 0:
             failed = True
-            print('[command returned {0}]'.format(p.returncode))
+            print(colorize('[command returned {0}]'.format(p.returncode), 'red', use_color))
     except Exception as e:
         errors.append(('', 0, 0, '[internal error] {0}'.format(e)))
         failed = True
@@ -238,17 +257,17 @@ def run(result, test, targets, skip=False):
     if failed:
         if errors:
             result_record['errors'] = errors
-            print('Test "{0}" failed with the following {1} errors:'.format(test.name, len(errors)))
+            print(colorize('Test "{0}" failed with the following {1} errors:'.format(test.name, len(errors)), 'red', use_color))
             for path, line, col, message in errors:
-                print('{0}:{1}:{2}:{3}'.format(path, line, col, message))
+                print(colorize('{0}:{1}:{2}:{3}'.format(path, line, col, message), 'red', use_color))
         else:
-            print('Test "{0}" failed.'.format(test.name))
+            print(colorize('Test "{0}" failed.'.format(test.name), 'red', use_color))
     else:
         result_record['success'] = True
-        print('Test "{0}" succeeded.'.format(test.name))
+        print(colorize('Test "{0}" succeeded.'.format(test.name), 'green', use_color))
 
 
-def setup(tests):
+def setup(tests, use_color=True):
     requirements = dict()
     for test in tests:
         if test.requirements:
@@ -258,14 +277,14 @@ def setup(tests):
                 requirements[test.python] = reqs
             reqs.extend(test.requirements)
     if requirements:
-        print('Installing requirements')
+        print(colorize('Installing requirements', 'emph', use_color))
     for python_version, reqs in sorted(requirements.items()):
         command = [
             'pip{0}'.format(python_version),
             'install',
             '--disable-pip-version-check'
         ] + reqs
-        print('Running {0}'.format(join_command(command)))
+        print(colorize('Running {0}'.format(join_command(command)), 'emph', use_color))
         subprocess.check_call(command)
 
 
@@ -280,6 +299,9 @@ def main():
     parser.add_argument('--cleanup',
                         action='store_true',
                         help='cleanup before running tests')
+    parser.add_argument('--color',
+                        action='store_true',
+                        help='use ANSI colors')
     parser.add_argument('targets',
                         metavar='TARGET',
                         nargs='*',
@@ -287,7 +309,7 @@ def main():
 
     args = parser.parse_args()
 
-    tests = collect_tests()
+    tests = collect_tests(use_color=args.color)
     tests = sorted(tests, key=lambda test: test.name)
 
     # Cleanup
@@ -303,7 +325,7 @@ def main():
     # Collect targets
     targets = list(args.targets)
     if not targets:
-        print('No targets provided; scanning for targets...')
+        print(colorize('No targets provided; scanning for targets...', 'emph', args.color))
         for dirpath, dirnames, filenames in os.walk('.'):
             dirpath = os.path.relpath(dirpath, '.')
             if dirpath == '.git' or dirpath.startswith('.git/'):
@@ -311,24 +333,24 @@ def main():
             for filename in filenames:
                 targets.append(os.path.join(dirpath, filename))
     else:
-        print('Considering the following targets:')
+        print(colorize('Considering the following targets:', 'emph', args.color))
         for target in targets:
             print(' - {0}'.format(target))
-    print('Considering {0} targets'.format(len(targets)))
+    print(colorize('Considering {0} targets'.format(len(targets)), 'emph', args.color))
 
     # Restrict tests for these targets
     tests_to_run = [test for test in tests if test.should_run(targets)]
 
     # Setup tests
     if args.install_requirements:
-        setup(tests_to_run)
+        setup(tests_to_run, use_color=args.color)
 
     # Run tests
     result = dict()
     for test in tests:
-        run(result, test, targets, skip=test not in tests_to_run)
+        run(result, test, targets, skip=test not in tests_to_run, use_color=args.color)
 
-    print(SEPARATOR)
+    print(colorize(SEPARATOR, 'emph', args.color))
     print('Writing results to {0}'.format(args.output))
     with open(args.output, 'wb') as output_f:
         output_f.write(json.dumps(result, sort_keys=True, indent=2).encode('utf-8'))
