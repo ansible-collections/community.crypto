@@ -106,7 +106,7 @@ def is_binary_file(path):
     if ext in assume_binary:
         return True
 
-    with open_binary_file(path) as path_fd:
+    with open(path, 'rb') as path_fd:
         # noinspection PyTypeChecker
         return b'\0' in path_fd.read(1024)
 

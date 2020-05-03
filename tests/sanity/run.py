@@ -89,7 +89,13 @@ def main():
     output_filename = 'output-{0}.json'.format(random.getrandbits(32))
 
     result = None
-    run(['docker', 'run', '--detach', '--workdir', os.path.abspath(cwd), '--name', container_name, CONTAINER, '/bin/sh', '-c', 'sleep 50m'], use_color=use_color)
+    run([
+        'docker', 'run', '--detach',
+        '--workdir', os.path.abspath(cwd),
+        '--name', container_name,
+        CONTAINER,
+        '/bin/sh', '-c', 'sleep 50m',
+    ], use_color=use_color)
     try:
         run(['docker', 'cp', root, '{0}:{1}'.format(container_name, os.path.dirname(root))], use_color=use_color)
         # run(['docker', 'exec', container_name, '/bin/sh', '-c', 'ls -lah ; pwd'])
