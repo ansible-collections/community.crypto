@@ -6,13 +6,13 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
+import argparse
 import glob
 import json
 import os
 import shlex
 import shutil
 import subprocess
-import sys
 
 
 SEPARATOR = '=========================================================================='
@@ -114,11 +114,9 @@ class Test:
         self.include_symlinks = data.get('include_symlinks')  # type: bool
 
     # Copied in parts from test/lib/_internal/sanity/__init__.py in ansible/ansible
-    def _filter_targets(self, paths):
+    def _filter_targets(self, targets):
         if self.no_targets:
             return []
-
-        targets = paths
 
         if self.text is not None:
             if self.text:
@@ -142,14 +140,14 @@ class Test:
 
         return targets
 
-    def should_run(self, paths):
+    def should_run(self, targets):
         if self.no_targets:
             return True
-        targets = self._filter_targets(paths)
+        targets = self._filter_targets(targets)
         return bool(targets)
 
-    def compose_command(self, paths):
-        targets = self._filter_targets(paths)
+    def compose_command(self, targets):
+        targets = self._filter_targets(targets)
         return ['python{0}'.format(self.python), self.executable] + targets
 
     def _parse_output_line(self, line):
@@ -195,7 +193,7 @@ def join_command(command):
     return ' '.join([shlex.quote(part) for part in command])
 
 
-def run(result, test, paths, skip=False):
+def run(result, test, targets, skip=False):
     print(SEPARATOR)
     result_record = result[test.name] = dict(
         skipped=True,
@@ -205,7 +203,7 @@ def run(result, test, paths, skip=False):
         print('Test "{0}" skipped.'.format(test.name))
         return
 
-    command = test.compose_command(paths)
+    command = test.compose_command(targets)
     if not command:
         print('Test "{0}" skipped.'.format(test.name))
         return
@@ -271,29 +269,29 @@ def setup(tests):
         subprocess.check_call(command)
 
 
-def main(argv):
-    python_version = '3.7'
-    output = 'output.json'
-    install_requirements = False
-    cleanup = False
-    if '--output' in argv:
-        i = argv.index('--output')
-        output = argv[i + 1]
-        argv = argv[:i] + argv[i + 2:]
-    if '--install-requirements' in argv:
-        i = argv.index('--install-requirements')
-        install_requirements = True
-        argv = argv[:i] + argv[i + 1:]
-    if '--cleanup' in argv:
-        i = argv.index('--cleanup')
-        cleanup = True
-        argv = argv[:i] + argv[i + 1:]
+def main():
+    parser = argparse.ArgumentParser(description='Extra sanity test runner.')
+    parser.add_argument('--output',
+                        default='output.json',
+                        help='output file name')
+    parser.add_argument('--install-requirements',
+                        action='store_true',
+                        help='install necessary requirements')
+    parser.add_argument('--cleanup',
+                        action='store_true',
+                        help='cleanup before running tests')
+    parser.add_argument('targets',
+                        metavar='TARGET',
+                        nargs='*',
+                        help='targets')
+
+    args = parser.parse_args()
 
     tests = collect_tests()
     tests = sorted(tests, key=lambda test: test.name)
 
     # Cleanup
-    if cleanup:
+    if args.cleanup:
         for dirpath, dirnames, filenames in os.walk('.'):
             for dirname in dirnames:
                 if dirname == '__pycache__':
@@ -302,35 +300,39 @@ def main(argv):
                 if filename.endswith('.pyc'):
                     shutil.rmdir(os.path.join(dirpath, filename))
 
-    # Collect paths
-    paths = list(argv)
-    if not paths:
-        print('No changed paths provided, scanning directories')
+    # Collect targets
+    targets = list(args.targets)
+    if not targets:
+        print('No targets provided; scanning for targets...')
         for dirpath, dirnames, filenames in os.walk('.'):
             dirpath = os.path.relpath(dirpath, '.')
             if dirpath == '.git' or dirpath.startswith('.git/'):
                 continue
             for filename in filenames:
-                paths.append(os.path.join(dirpath, filename))
-    print('Considering {0} paths'.format(len(paths)))
+                targets.append(os.path.join(dirpath, filename))
+    else:
+        print('Considering the following targets:')
+        for target in targets:
+            print(' - {0}'.format(target))
+    print('Considering {0} targets'.format(len(targets)))
 
-    # Restrict tests for these paths
-    tests_to_run = [test for test in tests if test.should_run(paths)]
+    # Restrict tests for these targets
+    tests_to_run = [test for test in tests if test.should_run(targets)]
 
     # Setup tests
-    if install_requirements:
+    if args.install_requirements:
         setup(tests_to_run)
 
     # Run tests
     result = dict()
     for test in tests:
-        run(result, test, paths, skip=test not in tests_to_run)
+        run(result, test, targets, skip=test not in tests_to_run)
 
     print(SEPARATOR)
-    print('Writing results to {0}'.format(output))
-    with open(output, 'wb') as output_f:
+    print('Writing results to {0}'.format(args.output))
+    with open(args.output, 'wb') as output_f:
         output_f.write(json.dumps(result, sort_keys=True, indent=2).encode('utf-8'))
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
