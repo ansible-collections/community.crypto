@@ -14,6 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
+    ls -lah
     tests/sanity/run.py --python 3.7 --install-requirements
     exit
 fi
