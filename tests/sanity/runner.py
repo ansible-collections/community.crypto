@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
+import json
 import subprocess
 import sys
 
@@ -23,8 +24,12 @@ def setup(python_version):
     ])
 
 
-def run(failed_tests, errors, test, command):
-    new_errors = []
+def run(result, test, command):
+    print(SEPARATOR)
+    print('Running {0}'.format(' '.join(command)))
+
+    errors = []
+    failed = False
     try:
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
@@ -32,54 +37,61 @@ def run(failed_tests, errors, test, command):
         if stdout:
             stdout = stdout.decode('utf-8').splitlines()
             for line in stdout:
-                new_errors.append((test, '{0}'.format(line)))
+                errors.append(('', 0, 0, '{0}'.format(line)))
+                failed = True
         if stderr:
             stderr = stderr.decode('utf-8').splitlines()
             for line in stderr:
-                new_errors.append((test, '[stderr] {0}'.format(line)))
+                print('[stderr] {0}'.format(line))
+            failed = True
         if int(p.returncode) != 0:
-            new_errors.append((test, '[command returned {0}]'.format(p.returncode)))
+            failed = True
+            print('[command returned {0}]'.format(p.returncode))
     except Exception as e:
-        new_errors.append((test, '[internal error] {0}'.format(e)))
+        errors.append((test, '[internal error] {0}'.format(e)))
 
-    if new_errors:
-        print(SEPARATOR)
-        print('Test "{0}" failed with the following {1} errors:'.format(test, len(new_errors)))
-        failed_tests.append(test)
-        for dummy, line in new_errors:
-            print(line)
-        errors.extend(new_errors)
+    if failed:
+        if errors:
+            print('Test "{0}" failed with the following {1} errors:'.format(test, len(errors)))
+            for path, line, col, message in errors:
+                print('{0}:{1}:{2}:{3}'.format(path, line, col, message))
+        else:
+            print('Test "{0}" failed.')
+        result[test] = dict(
+            success=False,
+            errors=errors,
+        )
     else:
-        print(SEPARATOR)
         print('Test "{0}" succeeded.'.format(test))
+        result[test] = dict(
+            success=True,
+        )
 
 
 def main(argv):
+    print(argv)
     python_version = '3.7'
-    if '--python' in argv:
-        python_version = argv[argv.index('--python') + 1]
-    if '--install-requirements' in argv:
-        setup(python_version)
+    output = 'output.json'
+    if '--output' in argv:
+        i = argv.index('--output')
+        output = argv[i + 1]
+        argv = argv[:i] + argv[i + 1:]
 
-    errors = []
-    failed_tests = []
+    setup(python_version)
 
-    run(failed_tests, errors, 'changelog',
+    result = dict()
+
+    run(result, 'changelog',
         ['ansible-changelog', 'lint'])
-    run(failed_tests, errors, 'bundled',
+    run(result, 'bundled',
         ['python{0}'.format(python_version), 'tests/sanity/code-smell/update-bundled.py', 'plugins/module_utils/compat/ipaddress.py'])
 
-    if not errors:
-        print(SEPARATOR)
-        sys.exit(0)
+    print(SEPARATOR)
 
-    print(SEPARATOR)
-    print('Total of {0} errors in the following tests:'.format(len(errors)))
-    for test in failed_tests:
-        print(test)
-    print(SEPARATOR)
-    sys.exit(-1)
+    print('Writing results to {0}'.format(output))
+    with open(output, 'wb') as output_f:
+        output_f.write(json.dumps(result, sort_keys=True, indent=2).encode('utf-8'))
 
 
 if __name__ == '__main__':
-    main(sys.argv[2:])
+    main(sys.argv[1:])

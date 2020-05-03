@@ -14,14 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
-    ls -lah /root
-    ls -lah /root/.ansible
-    ls -lah /root/.ansible/ansible_collections
-    ls -lah /root/.ansible/ansible_collections/community
-    ls -lah /root/.ansible/ansible_collections/community/crypto
-    ls -lah
-    pwd
-    tests/sanity/run.py --python 3.7 --install-requirements
+    tests/sanity/run.py ${CHANGED:+"$CHANGED"}
     exit
 fi
 
