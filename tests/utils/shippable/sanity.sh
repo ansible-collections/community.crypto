@@ -14,7 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
-    tests/sanity/run.py
+    tests/sanity/run.py --color
     exit
 fi
 

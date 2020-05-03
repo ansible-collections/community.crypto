@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
+import argparse
 import json
 import os
 import random
@@ -58,7 +59,16 @@ def get_common_parent(*directories):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Extra sanity test runner.')
+    parser.add_argument('--color',
+                        action='store_true',
+                        help='use ANSI colors')
+
+    args = parser.parse_args()
+
     use_color = sys.stdout.isatty()
+    if args.color:
+        use_color = True
 
     cwd = os.getcwd()
     root = cwd
