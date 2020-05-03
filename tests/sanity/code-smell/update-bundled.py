@@ -25,7 +25,6 @@ a newer upstream release.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import fnmatch
 import json
 import re
 import sys
@@ -48,9 +47,6 @@ def get_bundled_libs(paths):
         library consists of multiple files, this should be the file which has metadata included.
     """
     bundled_libs = set()
-    for filename in fnmatch.filter(paths, 'lib/ansible/compat/*/__init__.py'):
-        bundled_libs.add(filename)
-
     bundled_libs.add('plugins/module_utils/compat/ipaddress.py')
 
     return bundled_libs
