@@ -8,6 +8,7 @@ __metaclass__ = type
 
 
 import os
+import random
 import subprocess
 import sys
 
@@ -21,25 +22,34 @@ def run(command):
     return subprocess.call(command)
 
 
+def get_common_parent(*directories):
+    parent = directories[0]
+    for dir in directories[1:]:
+        while os.path.relpath(dir, parent).startswith('..'):
+            old_parent, parent = parent, os.path.dirname(parent)
+            if old_parent == parent:
+                break
+    return parent
+
+
 def main():
-    root = os.path.abspath(os.environ['HOME'])
+    root = os.getcwd()
+    try:
+        root = get_common_parent(root, __file__)
+    except Exception as e:
+        pass
 
-    base_command = ['docker', 'run', '--rm', '-t']
-    base_command.extend(['-v', '{0}:{1}'.format(root, root)])
-    base_command.extend(['-w', os.path.abspath(os.getcwd())])
-    base_command.extend(['-u', '{0}:{1}'.format(os.getuid(), os.getgid())])
-    base_command.extend([CONTAINER])
+    container_name = 'ansible-test-{0}'.format(random.getrandbits(64))
 
-    run(base_command + ['/bin/sh', '-c', 'ls -lah ; pwd'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah /root'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections/community'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections/community/crypto'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah tests/'])
-    run(base_command + ['/bin/sh', '-c', 'ls -lah tests/sanity/'])
-
-    sys.exit(run(base_command + ['python3.7', 'tests/sanity/runner.py'] + sys.argv[1:]))
+    result = -1
+    run(['docker', 'run', '--detach', '--workdir', os.path.abspath(os.getcwd()), '--user', '{0}:{1}'.format(os.getuid(), os.getgid()), '--name', container_name, CONTAINER, '/bin/sh', '-c', 'sleep 50m'])
+    try:
+        run(['docker', 'cp', root, '{0}:{1}'.format(container_name, os.path.dirname(root))])
+        run(['docker', 'exec', container_name, '/bin/sh', '-c', 'ls -lah ; pwd'])
+        run(['docker', 'exec', container_name, 'python3.7', 'tests/sanity/runner.py'] + sys.argv[1:])
+    finally:
+        run(['docker', 'rm', '-f', container_name])
+    sys.exit(result)
 
 
 if __name__ == '__main__':
