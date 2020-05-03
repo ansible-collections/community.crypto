@@ -15,21 +15,26 @@ import sys
 CONTAINER = 'quay.io/ansible/default-test-container:1.12'
 
 
+def run(command):
+    sys.stdout.write('[RUN] {0}\n'.format(' '.join(command)))
+    sys.stdout.flush()
+    return subprocess.call(command)
+
+
 def main():
     root = os.path.abspath(os.environ['HOME'])
 
-    command = ['docker', 'run', '--rm', '-t']
-    command.extend(['-v', '{0}:{1}'.format(root, root)])
-    command.extend(['-w', os.path.abspath(os.getcwd())])
-    command.extend(['-u', '{0}:{1}'.format(os.getuid(), os.getgid())])
-    command.extend([CONTAINER])
-    # command.extend(['/bin/sh', '-c', 'ls -lah ; pwd'])
-    command.extend(['python3.7', 'tests/sanity/runner.py'])
-    command.extend(sys.argv[1:])
-    sys.stdout.write('[RUN] {0}\n'.format(' '.join(command)))
-    sys.stdout.flush()
-    rc = subprocess.call(command)
-    sys.exit(rc)
+    base_command = ['docker', 'run', '--rm', '-t']
+    base_command.extend(['-v', '{0}:{1}'.format(root, root)])
+    base_command.extend(['-w', os.path.abspath(os.getcwd())])
+    base_command.extend(['-u', '{0}:{1}'.format(os.getuid(), os.getgid())])
+    base_command.extend([CONTAINER])
+
+    run(base_command + ['/bin/sh', '-c', 'ls -lah ; pwd'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah tests/'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah tests/sanity/'])
+
+    sys.exit(run(base_command + ['python3.7', 'tests/sanity/runner.py'] + sys.argv[1:]))
 
 
 if __name__ == '__main__':
