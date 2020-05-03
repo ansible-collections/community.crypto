@@ -32,7 +32,7 @@ from distutils.version import LooseVersion
 
 import packaging.specifiers
 
-from ansible.module_utils.urls import open_url
+import requests
 
 
 BUNDLED_RE = re.compile(b'\\b_BUNDLED_METADATA\\b')
@@ -138,8 +138,8 @@ def main():
                       ' or moved and the bundled library test needs to be modified as'
                       ' well?'.format(filename, e))
 
-        pypi_fh = open_url('https://pypi.org/pypi/{0}/json'.format(metadata['pypi_name']))
-        pypi_data = json.loads(pypi_fh.read().decode('utf-8'))
+        pypi_r = requests.get('https://pypi.org/pypi/{0}/json'.format(metadata['pypi_name']))
+        pypi_data = pypi_r.json()
 
         constraints = metadata.get('version_constraints', None)
         latest_version = get_latest_applicable_version(pypi_data, constraints)

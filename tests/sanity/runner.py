@@ -17,8 +17,9 @@ def setup(python_version):
     subprocess.check_call([
         'pip{0}'.format(python_version),
         'install',
-        'https://github.com/felixfontein/ansible-changelog/archive/master.tar.gz',
         '--disable-pip-version-check',
+        'https://github.com/felixfontein/ansible-changelog/archive/master.tar.gz',
+        'requests',
     ])
 
 
