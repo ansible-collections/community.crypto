@@ -56,7 +56,7 @@ def main():
     try:
         run(['docker', 'cp', root, '{0}:{1}'.format(container_name, os.path.dirname(root))])
         # run(['docker', 'exec', container_name, '/bin/sh', '-c', 'ls -lah ; pwd'])
-        run(['docker', 'exec', container_name, 'python', os.path.relpath(os.path.join(my_dir, 'runner.py'), cwd), '--output', output_filename] + sys.argv[1:])
+        run(['docker', 'exec', container_name, 'python3.7', os.path.relpath(os.path.join(my_dir, 'runner.py'), cwd), '--cleanup', '--install-requirements', '--output', output_filename] + sys.argv[1:])
         dummy, result, stderr = run(['docker', 'exec', container_name, 'cat', output_filename], catch_output=True)
         if stderr:
             print('WARNING: {0}'.format(stderr.decode('utf-8').strip()))
@@ -79,11 +79,14 @@ def main():
     failed_tests = []
     total_errors = 0
     for test, data in result.items():
+        if data.get('skipped'):
+            continue
         if not data['success']:
             failed_tests.append(test)
-            total_errors += len(data['errors'])
+            if 'errors' in data:
+                total_errors += len(data['errors'])
     if total_errors or failed_tests:
-        print('Total of {0} errors in the following tests:'.format(total_errors))
+        print('Total of {0} errors in the following {1} tests (out of {2}):'.format(total_errors, len(failed_tests), len(result)))
         for test in sorted(failed_tests):
             print(test)
         sys.exit(-1)
