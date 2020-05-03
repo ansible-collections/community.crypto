@@ -63,6 +63,10 @@ def main():
     parser.add_argument('--color',
                         action='store_true',
                         help='use ANSI colors')
+    parser.add_argument('targets',
+                        metavar='TARGET',
+                        nargs='*',
+                        help='targets')
 
     args = parser.parse_args()
 
@@ -79,6 +83,8 @@ def main():
     except Exception as e:
         pass
 
+    targets = list(args.targets)
+
     container_name = 'ansible-test-{0}'.format(random.getrandbits(64))
     output_filename = 'output-{0}.json'.format(random.getrandbits(32))
 
@@ -92,7 +98,8 @@ def main():
         command.extend(['--cleanup', '--install-requirements', '--output', output_filename])
         if use_color:
             command.extend(['--color'])
-        run(command + sys.argv[1:], use_color=use_color)
+        command.extend(targets)
+        run(command, use_color=use_color)
         dummy, result, stderr = run(['docker', 'exec', container_name, 'cat', output_filename], catch_output=True, use_color=use_color)
         if stderr:
             print(colorize('WARNING: {0}'.format(stderr.decode('utf-8').strip()), 'emph', use_color))
