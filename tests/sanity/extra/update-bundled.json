@@ -1,4 +1,5 @@
 {
+    "disabled": true,
     "all_targets": true,
     "ignore_self": true,
     "extensions": [

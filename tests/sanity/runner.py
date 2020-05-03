@@ -120,6 +120,7 @@ class Test:
         self.python = data.get('python', DEFAULT_PYTHON)
         self.output_format = data.get('output', 'path-line-column-message').split('-')
         self.requirements = data.get('requirements', [])
+        self.disabled = data.get('disabled')
 
         self.extensions = data.get('extensions')  # type: t.List[str]
         self.prefixes = data.get('prefixes')  # type: t.List[str]
@@ -160,6 +161,8 @@ class Test:
         return targets
 
     def should_run(self, targets):
+        if self.disabled:
+            return False
         if self.no_targets:
             return True
         targets = self._filter_targets(targets)
