@@ -31,6 +31,11 @@ def main():
     base_command.extend([CONTAINER])
 
     run(base_command + ['/bin/sh', '-c', 'ls -lah ; pwd'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah /root'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections/community'])
+    run(base_command + ['/bin/sh', '-c', 'ls -lah /root/.ansible/ansible_collections/community/crypto'])
     run(base_command + ['/bin/sh', '-c', 'ls -lah tests/'])
     run(base_command + ['/bin/sh', '-c', 'ls -lah tests/sanity/'])
 
