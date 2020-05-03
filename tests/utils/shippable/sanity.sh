@@ -14,7 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
-    tests/sanity/run.py ${CHANGED:+"$CHANGED"}
+    tests/sanity/run.py
     exit
 fi
 
