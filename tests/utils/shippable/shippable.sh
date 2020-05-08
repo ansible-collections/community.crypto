@@ -54,7 +54,8 @@ command -v pip
 pip --version
 pip list --disable-pip-version-check
 if [ "${ansible_version}" == "devel" ]; then
-    retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+    retry pip install https://github.com/nitzmahone/ansible/archive/collection_redirection.tar.gz --disable-pip-version-check
+    # retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 else
     retry pip install https://github.com/felixfontein/ansible/archive/backport/2.9/ansible-test.tar.gz --disable-pip-version-check
     # retry pip install https://github.com/ansible/ansible/archive/stable-2.9.tar.gz --disable-pip-version-check
