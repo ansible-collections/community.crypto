@@ -27,6 +27,7 @@ matrix:
     - env: T=devel/linux/centos8/1
     - env: T=devel/linux/fedora30/1
     - env: T=devel/linux/fedora31/1
+    - env: T=devel/linux/fedora32/1
     - env: T=devel/linux/opensuse15py2/1
     - env: T=devel/linux/opensuse15/1
     - env: T=devel/linux/ubuntu1604/1
