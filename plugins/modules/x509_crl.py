@@ -354,7 +354,38 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    load_certificate,
+    parse_name_field,
+    get_relative_time_option,
+    select_message_digest,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_get_name,
+    cryptography_name_to_oid,
+    cryptography_oid_to_name,
+    cryptography_serial_number_of_cert,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    REVOCATION_REASON_MAP,
+    TIMESTAMP_FORMAT,
+    cryptography_decode_revoked_certificate,
+    cryptography_dump_revoked,
+    cryptography_get_signature_algorithm_oid_from_crl,
+)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'
 
@@ -378,14 +409,11 @@ else:
     CRYPTOGRAPHY_FOUND = True
 
 
-TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
-
-
-class CRLError(crypto_utils.OpenSSLObjectError):
+class CRLError(OpenSSLObjectError):
     pass
 
 
-class CRL(crypto_utils.OpenSSLObject):
+class CRL(OpenSSLObject):
 
     def __init__(self, module):
         super(CRL, self).__init__(
@@ -406,13 +434,13 @@ class CRL(crypto_utils.OpenSSLObject):
             self.privatekey_content = self.privatekey_content.encode('utf-8')
         self.privatekey_passphrase = module.params['privatekey_passphrase']
 
-        self.issuer = crypto_utils.parse_name_field(module.params['issuer'])
+        self.issuer = parse_name_field(module.params['issuer'])
         self.issuer = [(entry[0], entry[1]) for entry in self.issuer if entry[1]]
 
-        self.last_update = crypto_utils.get_relative_time_option(module.params['last_update'], 'last_update')
-        self.next_update = crypto_utils.get_relative_time_option(module.params['next_update'], 'next_update')
+        self.last_update = get_relative_time_option(module.params['last_update'], 'last_update')
+        self.next_update = get_relative_time_option(module.params['next_update'], 'next_update')
 
-        self.digest = crypto_utils.select_message_digest(module.params['digest'])
+        self.digest = select_message_digest(module.params['digest'])
         if self.digest is None:
             raise CRLError('The digest "{0}" is not supported'.format(module.params['digest']))
 
@@ -434,13 +462,9 @@ class CRL(crypto_utils.OpenSSLObject):
                 try:
                     if rc['content'] is not None:
                         rc['content'] = rc['content'].encode('utf-8')
-                    cert = crypto_utils.load_certificate(rc['path'], content=rc['content'], backend='cryptography')
-                    try:
-                        result['serial_number'] = cert.serial_number
-                    except AttributeError:
-                        # The property was called "serial" before cryptography 1.4
-                        result['serial_number'] = cert.serial
-                except crypto_utils.OpenSSLObjectError as e:
+                    cert = load_certificate(rc['path'], content=rc['content'], backend='cryptography')
+                    result['serial_number'] = cryptography_serial_number_of_cert(cert)
+                except OpenSSLObjectError as e:
                     if rc['content'] is not None:
                         module.fail_json(
                             msg='Cannot parse certificate from {0}content: {1}'.format(path_prefix, to_native(e))
@@ -454,17 +478,17 @@ class CRL(crypto_utils.OpenSSLObject):
                 result['serial_number'] = rc['serial_number']
             # All other options
             if rc['issuer']:
-                result['issuer'] = [crypto_utils.cryptography_get_name(issuer) for issuer in rc['issuer']]
+                result['issuer'] = [cryptography_get_name(issuer) for issuer in rc['issuer']]
                 result['issuer_critical'] = rc['issuer_critical']
-            result['revocation_date'] = crypto_utils.get_relative_time_option(
+            result['revocation_date'] = get_relative_time_option(
                 rc['revocation_date'],
                 path_prefix + 'revocation_date'
             )
             if rc['reason']:
-                result['reason'] = crypto_utils.REVOCATION_REASON_MAP[rc['reason']]
+                result['reason'] = REVOCATION_REASON_MAP[rc['reason']]
                 result['reason_critical'] = rc['reason_critical']
             if rc['invalidity_date']:
-                result['invalidity_date'] = crypto_utils.get_relative_time_option(
+                result['invalidity_date'] = get_relative_time_option(
                     rc['invalidity_date'],
                     path_prefix + 'invalidity_date'
                 )
@@ -477,13 +501,13 @@ class CRL(crypto_utils.OpenSSLObject):
         self.backup_file = None
 
         try:
-            self.privatekey = crypto_utils.load_privatekey(
+            self.privatekey = load_privatekey(
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
                 backend='cryptography'
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             raise CRLError(exc)
 
         self.crl = None
@@ -543,11 +567,11 @@ class CRL(crypto_utils.OpenSSLObject):
         if self.digest.name != self.crl.signature_hash_algorithm.name:
             return False
 
-        want_issuer = [(crypto_utils.cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.issuer]
+        want_issuer = [(cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.issuer]
         if want_issuer != [(sub.oid, sub.value) for sub in self.crl.issuer]:
             return False
 
-        old_entries = [self._compress_entry(crypto_utils.cryptography_decode_revoked_certificate(cert)) for cert in self.crl]
+        old_entries = [self._compress_entry(cryptography_decode_revoked_certificate(cert)) for cert in self.crl]
         new_entries = [self._compress_entry(cert) for cert in self.revoked_certificates]
         if self.update:
             # We don't simply use a set so that duplicate entries are treated correctly
@@ -568,7 +592,7 @@ class CRL(crypto_utils.OpenSSLObject):
 
         try:
             crl = crl.issuer_name(Name([
-                NameAttribute(crypto_utils.cryptography_name_to_oid(entry[0]), to_text(entry[1]))
+                NameAttribute(cryptography_name_to_oid(entry[0]), to_text(entry[1]))
                 for entry in self.issuer
             ]))
         except ValueError as e:
@@ -580,7 +604,7 @@ class CRL(crypto_utils.OpenSSLObject):
         if self.update and self.crl:
             new_entries = set([self._compress_entry(entry) for entry in self.revoked_certificates])
             for entry in self.crl:
-                decoded_entry = self._compress_entry(crypto_utils.cryptography_decode_revoked_certificate(entry))
+                decoded_entry = self._compress_entry(cryptography_decode_revoked_certificate(entry))
                 if decoded_entry not in new_entries:
                     crl = crl.add_revoked_certificate(entry)
         for entry in self.revoked_certificates:
@@ -590,7 +614,7 @@ class CRL(crypto_utils.OpenSSLObject):
             if entry['issuer'] is not None:
                 revoked_cert = revoked_cert.add_extension(
                     x509.CertificateIssuer([
-                        crypto_utils.cryptography_get_name(name) for name in self.entry['issuer']
+                        cryptography_get_name(name) for name in entry['issuer']
                     ]),
                     entry['issuer_critical']
                 )
@@ -616,28 +640,12 @@ class CRL(crypto_utils.OpenSSLObject):
                 self.crl_content = result
             if self.backup:
                 self.backup_file = self.module.backup_local(self.path)
-            crypto_utils.write_file(self.module, result)
+            write_file(self.module, result)
             self.changed = True
 
         file_args = self.module.load_file_common_arguments(self.module.params)
         if self.module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
-
-    def _dump_revoked(self, entry):
-        return {
-            'serial_number': entry['serial_number'],
-            'revocation_date': entry['revocation_date'].strftime(TIMESTAMP_FORMAT),
-            'issuer':
-                [crypto_utils.cryptography_decode_name(issuer) for issuer in entry['issuer']]
-                if entry['issuer'] is not None else None,
-            'issuer_critical': entry['issuer_critical'],
-            'reason': crypto_utils.REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,
-            'reason_critical': entry['reason_critical'],
-            'invalidity_date':
-                entry['invalidity_date'].strftime(TIMESTAMP_FORMAT)
-                if entry['invalidity_date'] is not None else None,
-            'invalidity_date_critical': entry['invalidity_date_critical'],
-        }
 
     def dump(self, check_mode=False):
         result = {
@@ -657,7 +665,7 @@ class CRL(crypto_utils.OpenSSLObject):
         if check_mode:
             result['last_update'] = self.last_update.strftime(TIMESTAMP_FORMAT)
             result['next_update'] = self.next_update.strftime(TIMESTAMP_FORMAT)
-            # result['digest'] = crypto_utils.cryptography_oid_to_name(self.crl.signature_algorithm_oid)
+            # result['digest'] = cryptography_oid_to_name(self.crl.signature_algorithm_oid)
             result['digest'] = self.module.params['digest']
             result['issuer_ordered'] = self.issuer
             result['issuer'] = {}
@@ -665,32 +673,22 @@ class CRL(crypto_utils.OpenSSLObject):
                 result['issuer'][k] = v
             result['revoked_certificates'] = []
             for entry in self.revoked_certificates:
-                result['revoked_certificates'].append(self._dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
         elif self.crl:
             result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
             result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
-            try:
-                result['digest'] = crypto_utils.cryptography_oid_to_name(self.crl.signature_algorithm_oid)
-            except AttributeError:
-                # Older cryptography versions don't have signature_algorithm_oid yet
-                dotted = crypto_utils._obj2txt(
-                    self.crl._backend._lib,
-                    self.crl._backend._ffi,
-                    self.crl._x509_crl.sig_alg.algorithm
-                )
-                oid = x509.oid.ObjectIdentifier(dotted)
-                result['digest'] = crypto_utils.cryptography_oid_to_name(oid)
+            result['digest'] = cryptography_oid_to_name(cryptography_get_signature_algorithm_oid_from_crl(self.crl))
             issuer = []
             for attribute in self.crl.issuer:
-                issuer.append([crypto_utils.cryptography_oid_to_name(attribute.oid), attribute.value])
+                issuer.append([cryptography_oid_to_name(attribute.oid), attribute.value])
             result['issuer_ordered'] = issuer
             result['issuer'] = {}
             for k, v in issuer:
                 result['issuer'][k] = v
             result['revoked_certificates'] = []
             for cert in self.crl:
-                entry = crypto_utils.cryptography_decode_revoked_certificate(cert)
-                result['revoked_certificates'].append(self._dump_revoked(entry))
+                entry = cryptography_decode_revoked_certificate(cert)
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
 
         if self.return_content:
             result['crl'] = self.crl_content
@@ -776,7 +774,7 @@ def main():
 
         result = crl.dump()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

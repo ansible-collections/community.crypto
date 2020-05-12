@@ -281,7 +281,31 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    CRYPTOGRAPHY_HAS_X25519,
+    CRYPTOGRAPHY_HAS_X25519_FULL,
+    CRYPTOGRAPHY_HAS_X448,
+    CRYPTOGRAPHY_HAS_ED25519,
+    CRYPTOGRAPHY_HAS_ED448,
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    get_fingerprint,
+    get_fingerprint_of_bytes,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.identify import (
+    identify_private_key_format,
+)
 
 MINIMAL_PYOPENSSL_VERSION = '0.6'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
@@ -314,20 +338,12 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto import (
-    CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X25519_FULL,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED448,
-)
 
-
-class PrivateKeyError(crypto_utils.OpenSSLObjectError):
+class PrivateKeyError(OpenSSLObjectError):
     pass
 
 
-class PrivateKeyBase(crypto_utils.OpenSSLObject):
+class PrivateKeyBase(OpenSSLObject):
 
     def __init__(self, module):
         super(PrivateKeyBase, self).__init__(
@@ -385,7 +401,7 @@ class PrivateKeyBase(crypto_utils.OpenSSLObject):
             privatekey_data = self._get_private_key_data()
             if self.return_content:
                 self.privatekey_bytes = privatekey_data
-            crypto_utils.write_file(module, privatekey_data, 0o600)
+            write_file(module, privatekey_data, 0o600)
             self.changed = True
         elif not self.check(module, perms_required=False, ignore_conversion=False):
             # Convert
@@ -395,7 +411,7 @@ class PrivateKeyBase(crypto_utils.OpenSSLObject):
             privatekey_data = self._get_private_key_data()
             if self.return_content:
                 self.privatekey_bytes = privatekey_data
-            crypto_utils.write_file(module, privatekey_data, 0o600)
+            write_file(module, privatekey_data, 0o600)
             self.changed = True
 
         self.fingerprint = self._get_fingerprint()
@@ -473,9 +489,9 @@ class PrivateKeyBase(crypto_utils.OpenSSLObject):
             result['backup_file'] = self.backup_file
         if self.return_content:
             if self.privatekey_bytes is None:
-                self.privatekey_bytes = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+                self.privatekey_bytes = load_file_if_exists(self.path, ignore_errors=True)
             if self.privatekey_bytes:
-                if crypto_utils.identify_private_key_format(self.privatekey_bytes) == 'raw':
+                if identify_private_key_format(self.privatekey_bytes) == 'raw':
                     result['privatekey'] = base64.b64encode(self.privatekey_bytes)
                 else:
                     result['privatekey'] = self.privatekey_bytes.decode('utf-8')
@@ -513,8 +529,8 @@ class PrivateKeyPyOpenSSL(PrivateKeyBase):
         """Make sure that the private key has been loaded."""
         if self.privatekey is None:
             try:
-                self.privatekey = privatekey = crypto_utils.load_privatekey(self.path, self.passphrase)
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+                self.privatekey = privatekey = load_privatekey(self.path, self.passphrase)
+            except OpenSSLBadPassphraseError as exc:
                 raise PrivateKeyError(exc)
 
     def _get_private_key_data(self):
@@ -526,11 +542,11 @@ class PrivateKeyPyOpenSSL(PrivateKeyBase):
             return crypto.dump_privatekey(crypto.FILETYPE_PEM, self.privatekey)
 
     def _get_fingerprint(self):
-        return crypto_utils.get_fingerprint(self.path, self.passphrase)
+        return get_fingerprint(self.path, self.passphrase)
 
     def _check_passphrase(self):
         try:
-            crypto_utils.load_privatekey(self.path, self.passphrase)
+            load_privatekey(self.path, self.passphrase)
             return True
         except Exception as dummy:
             return False
@@ -719,7 +735,7 @@ class PrivateKeyCryptography(PrivateKeyBase):
             with open(self.path, 'rb') as f:
                 data = f.read()
             # Interpret bytes depending on format.
-            format = crypto_utils.identify_private_key_format(data)
+            format = identify_private_key_format(data)
             if format == 'raw':
                 if len(data) == 56 and CRYPTOGRAPHY_HAS_X448:
                     return cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(data)
@@ -754,13 +770,13 @@ class PrivateKeyCryptography(PrivateKeyBase):
             cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
         )
         # Get fingerprints of public_key_bytes
-        return crypto_utils.get_fingerprint_of_bytes(public_key_bytes)
+        return get_fingerprint_of_bytes(public_key_bytes)
 
     def _check_passphrase(self):
         try:
             with open(self.path, 'rb') as f:
                 data = f.read()
-            format = crypto_utils.identify_private_key_format(data)
+            format = identify_private_key_format(data)
             if format == 'raw':
                 # Raw keys cannot be encrypted. To avoid incompatibilities, we try to
                 # actually load the key (and return False when this fails).
@@ -807,7 +823,7 @@ class PrivateKeyCryptography(PrivateKeyBase):
         try:
             with open(self.path, 'rb') as f:
                 content = f.read()
-            format = crypto_utils.identify_private_key_format(content)
+            format = identify_private_key_format(content)
             return format == self._get_wanted_format()
         except Exception as dummy:
             return False
@@ -926,7 +942,7 @@ def main():
 
         result = private_key.dump()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

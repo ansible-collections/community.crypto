@@ -145,7 +145,25 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    CRYPTOGRAPHY_HAS_X25519,
+    CRYPTOGRAPHY_HAS_X448,
+    CRYPTOGRAPHY_HAS_ED25519,
+    CRYPTOGRAPHY_HAS_ED448,
+    OpenSSLObjectError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    get_fingerprint_of_bytes,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    binary_exp_mod,
+    quick_is_not_prime,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -166,26 +184,6 @@ try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
-    try:
-        import cryptography.hazmat.primitives.asymmetric.x25519
-        CRYPTOGRAPHY_HAS_X25519 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_X25519 = False
-    try:
-        import cryptography.hazmat.primitives.asymmetric.x448
-        CRYPTOGRAPHY_HAS_X448 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_X448 = False
-    try:
-        import cryptography.hazmat.primitives.asymmetric.ed25519
-        CRYPTOGRAPHY_HAS_ED25519 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_ED25519 = False
-    try:
-        import cryptography.hazmat.primitives.asymmetric.ed448
-        CRYPTOGRAPHY_HAS_ED448 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_ED448 = False
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -254,13 +252,13 @@ def _check_dsa_consistency(key_public_data, key_private_data):
     if (p - 1) % q != 0:
         return False
     # Check that g**q mod p == 1
-    if crypto_utils.binary_exp_mod(g, q, p) != 1:
+    if binary_exp_mod(g, q, p) != 1:
         return False
     # Check whether g**x mod p == y
-    if crypto_utils.binary_exp_mod(g, x, p) != y:
+    if binary_exp_mod(g, x, p) != y:
         return False
     # Check (quickly) whether p or q are not primes
-    if crypto_utils.quick_is_not_prime(q) or crypto_utils.quick_is_not_prime(p):
+    if quick_is_not_prime(q) or quick_is_not_prime(p):
         return False
     return True
 
@@ -320,7 +318,7 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data):
     return None
 
 
-class PrivateKeyInfo(crypto_utils.OpenSSLObject):
+class PrivateKeyInfo(OpenSSLObject):
     def __init__(self, module, backend):
         super(PrivateKeyInfo, self).__init__(
             module.params['path'] or '',
@@ -336,11 +334,11 @@ class PrivateKeyInfo(crypto_utils.OpenSSLObject):
         self.return_private_key_data = module.params['return_private_key_data']
 
     def generate(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
     def dump(self):
-        # Empty method because crypto_utils.OpenSSLObject wants this
+        # Empty method because OpenSSLObject wants this
         pass
 
     @abc.abstractmethod
@@ -372,19 +370,19 @@ class PrivateKeyInfo(crypto_utils.OpenSSLObject):
             except (IOError, OSError) as exc:
                 self.module.fail_json(msg=to_native(exc), **result)
         try:
-            self.key = crypto_utils.load_privatekey(
+            self.key = load_privatekey(
                 path=None,
                 content=priv_key_detail,
                 passphrase=to_bytes(self.passphrase) if self.passphrase is not None else self.passphrase,
                 backend=self.backend
             )
             result['can_parse_key'] = True
-        except crypto_utils.OpenSSLObjectError as exc:
+        except OpenSSLObjectError as exc:
             self.module.fail_json(msg=to_native(exc), **result)
 
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = crypto_utils.get_fingerprint_of_bytes(pk) if pk is not None else dict()
+        result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
 
         key_type, key_public_data, key_private_data = self._get_key_info()
         result['type'] = key_type
@@ -643,7 +641,7 @@ def main():
 
         result = privatekey.get_info()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

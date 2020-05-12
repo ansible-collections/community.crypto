@@ -860,9 +860,37 @@ from random import randint
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import ECSClient, RestOperationException, SessionConfigurationException
+
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    load_certificate,
+    load_certificate_request,
+    parse_name_field,
+    get_relative_time_option,
+    select_message_digest,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_compare_public_keys,
+    cryptography_get_name,
+    cryptography_name_to_oid,
+    cryptography_key_needs_digest_for_signing,
+    cryptography_parse_key_usage_params,
+    cryptography_serial_number_of_cert,
+)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -894,11 +922,11 @@ else:
     CRYPTOGRAPHY_FOUND = True
 
 
-class CertificateError(crypto_utils.OpenSSLObjectError):
+class CertificateError(OpenSSLObjectError):
     pass
 
 
-class Certificate(crypto_utils.OpenSSLObject):
+class Certificate(OpenSSLObject):
 
     def __init__(self, module, backend):
         super(Certificate, self).__init__(
@@ -944,7 +972,7 @@ class Certificate(crypto_utils.OpenSSLObject):
             except OpenSSL.SSL.Error:
                 return False
         elif self.backend == 'cryptography':
-            return crypto_utils.cryptography_compare_public_keys(self.cert.public_key(), self.privatekey.public_key())
+            return cryptography_compare_public_keys(self.cert.public_key(), self.privatekey.public_key())
 
     def _validate_csr(self):
         if self.backend == 'pyopenssl':
@@ -971,7 +999,7 @@ class Certificate(crypto_utils.OpenSSLObject):
             # Verify that CSR is signed by certificate's private key
             if not self.csr.is_signature_valid:
                 return False
-            if not crypto_utils.cryptography_compare_public_keys(self.csr.public_key(), self.cert.public_key()):
+            if not cryptography_compare_public_keys(self.csr.public_key(), self.cert.public_key()):
                 return False
             # Check subject
             if self.csr.subject != self.cert.subject:
@@ -1012,25 +1040,25 @@ class Certificate(crypto_utils.OpenSSLObject):
             return False
 
         try:
-            self.cert = crypto_utils.load_certificate(self.path, backend=self.backend)
+            self.cert = load_certificate(self.path, backend=self.backend)
         except Exception as dummy:
             return False
 
         if self.privatekey_path or self.privatekey_content:
             try:
-                self.privatekey = crypto_utils.load_privatekey(
+                self.privatekey = load_privatekey(
                     path=self.privatekey_path,
                     content=self.privatekey_content,
                     passphrase=self.privatekey_passphrase,
                     backend=self.backend
                 )
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+            except OpenSSLBadPassphraseError as exc:
                 raise CertificateError(exc)
             if not self._validate_privatekey():
                 return False
 
         if self.csr_path or self.csr_content:
-            self.csr = crypto_utils.load_certificate_request(
+            self.csr = load_certificate_request(
                 path=self.csr_path,
                 content=self.csr_content,
                 backend=self.backend
@@ -1093,9 +1121,9 @@ class SelfSignedCertificateCryptography(Certificate):
     def __init__(self, module):
         super(SelfSignedCertificateCryptography, self).__init__(module, 'cryptography')
         self.create_subject_key_identifier = module.params['selfsigned_create_subject_key_identifier']
-        self.notBefore = crypto_utils.get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
-        self.notAfter = crypto_utils.get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
-        self.digest = crypto_utils.select_message_digest(module.params['selfsigned_digest'])
+        self.notBefore = get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
+        self.notAfter = get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
+        self.digest = select_message_digest(module.params['selfsigned_digest'])
         self.version = module.params['selfsigned_version']
         self.serial_number = x509.random_serial_number()
 
@@ -1108,7 +1136,7 @@ class SelfSignedCertificateCryptography(Certificate):
                 'The private key file {0} does not exist'.format(self.privatekey_path)
             )
 
-        self.csr = crypto_utils.load_certificate_request(
+        self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
             backend=self.backend
@@ -1116,16 +1144,16 @@ class SelfSignedCertificateCryptography(Certificate):
         self._module = module
 
         try:
-            self.privatekey = crypto_utils.load_privatekey(
+            self.privatekey = load_privatekey(
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
                 backend=self.backend
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=to_native(exc))
 
-        if crypto_utils.cryptography_key_needs_digest_for_signing(self.privatekey):
+        if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest is None:
                 raise CertificateError(
                     'The digest %s is not supported with the cryptography backend' % module.params['selfsigned_digest']
@@ -1180,10 +1208,10 @@ class SelfSignedCertificateCryptography(Certificate):
 
             if self.backup:
                 self.backup_file = module.backup_local(self.path)
-            crypto_utils.write_file(module, certificate.public_bytes(Encoding.PEM))
+            write_file(module, certificate.public_bytes(Encoding.PEM))
             self.changed = True
         else:
-            self.cert = crypto_utils.load_certificate(self.path, backend=self.backend)
+            self.cert = load_certificate(self.path, backend=self.backend)
 
         file_args = module.load_file_common_arguments(module.params)
         if module.set_fs_attributes_if_different(file_args, False):
@@ -1200,7 +1228,7 @@ class SelfSignedCertificateCryptography(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         if check_mode:
@@ -1213,7 +1241,7 @@ class SelfSignedCertificateCryptography(Certificate):
             result.update({
                 'notBefore': self.cert.not_valid_before.strftime("%Y%m%d%H%M%SZ"),
                 'notAfter': self.cert.not_valid_after.strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': self.cert.serial_number,
+                'serial_number': cryptography_serial_number_of_cert(self.cert),
             })
 
         return result
@@ -1226,8 +1254,8 @@ class SelfSignedCertificate(Certificate):
         super(SelfSignedCertificate, self).__init__(module, 'pyopenssl')
         if module.params['selfsigned_create_subject_key_identifier'] != 'create_if_not_provided':
             module.fail_json(msg='selfsigned_create_subject_key_identifier cannot be used with the pyOpenSSL backend!')
-        self.notBefore = crypto_utils.get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
-        self.notAfter = crypto_utils.get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
+        self.notBefore = get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
+        self.notAfter = get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
         self.digest = module.params['selfsigned_digest']
         self.version = module.params['selfsigned_version']
         self.serial_number = randint(1000, 99999)
@@ -1241,17 +1269,17 @@ class SelfSignedCertificate(Certificate):
                 'The private key file {0} does not exist'.format(self.privatekey_path)
             )
 
-        self.csr = crypto_utils.load_certificate_request(
+        self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
         )
         try:
-            self.privatekey = crypto_utils.load_privatekey(
+            self.privatekey = load_privatekey(
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
     def generate(self, module):
@@ -1282,7 +1310,7 @@ class SelfSignedCertificate(Certificate):
 
             if self.backup:
                 self.backup_file = module.backup_local(self.path)
-            crypto_utils.write_file(module, crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert))
+            write_file(module, crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert))
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -1300,7 +1328,7 @@ class SelfSignedCertificate(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         if check_mode:
@@ -1325,9 +1353,9 @@ class OwnCACertificateCryptography(Certificate):
         super(OwnCACertificateCryptography, self).__init__(module, 'cryptography')
         self.create_subject_key_identifier = module.params['ownca_create_subject_key_identifier']
         self.create_authority_key_identifier = module.params['ownca_create_authority_key_identifier']
-        self.notBefore = crypto_utils.get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
-        self.notAfter = crypto_utils.get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
-        self.digest = crypto_utils.select_message_digest(module.params['ownca_digest'])
+        self.notBefore = get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
+        self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
+        self.digest = select_message_digest(module.params['ownca_digest'])
         self.version = module.params['ownca_version']
         self.serial_number = x509.random_serial_number()
         self.ca_cert_path = module.params['ownca_path']
@@ -1353,27 +1381,27 @@ class OwnCACertificateCryptography(Certificate):
                 'The CA private key file {0} does not exist'.format(self.ca_privatekey_path)
             )
 
-        self.csr = crypto_utils.load_certificate_request(
+        self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
             backend=self.backend
         )
-        self.ca_cert = crypto_utils.load_certificate(
+        self.ca_cert = load_certificate(
             path=self.ca_cert_path,
             content=self.ca_cert_content,
             backend=self.backend
         )
         try:
-            self.ca_private_key = crypto_utils.load_privatekey(
+            self.ca_private_key = load_privatekey(
                 path=self.ca_privatekey_path,
                 content=self.ca_privatekey_content,
                 passphrase=self.ca_privatekey_passphrase,
                 backend=self.backend
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
-        if crypto_utils.cryptography_key_needs_digest_for_signing(self.ca_private_key):
+        if cryptography_key_needs_digest_for_signing(self.ca_private_key):
             if self.digest is None:
                 raise CertificateError(
                     'The digest %s is not supported with the cryptography backend' % module.params['ownca_digest']
@@ -1449,10 +1477,10 @@ class OwnCACertificateCryptography(Certificate):
 
             if self.backup:
                 self.backup_file = module.backup_local(self.path)
-            crypto_utils.write_file(module, certificate.public_bytes(Encoding.PEM))
+            write_file(module, certificate.public_bytes(Encoding.PEM))
             self.changed = True
         else:
-            self.cert = crypto_utils.load_certificate(self.path, backend=self.backend)
+            self.cert = load_certificate(self.path, backend=self.backend)
 
         file_args = module.load_file_common_arguments(module.params)
         if module.set_fs_attributes_if_different(file_args, False):
@@ -1497,7 +1525,7 @@ class OwnCACertificateCryptography(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         if check_mode:
@@ -1510,7 +1538,7 @@ class OwnCACertificateCryptography(Certificate):
             result.update({
                 'notBefore': self.cert.not_valid_before.strftime("%Y%m%d%H%M%SZ"),
                 'notAfter': self.cert.not_valid_after.strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': self.cert.serial_number,
+                'serial_number': cryptography_serial_number_of_cert(self.cert),
             })
 
         return result
@@ -1521,8 +1549,8 @@ class OwnCACertificate(Certificate):
 
     def __init__(self, module):
         super(OwnCACertificate, self).__init__(module, 'pyopenssl')
-        self.notBefore = crypto_utils.get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
-        self.notAfter = crypto_utils.get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
+        self.notBefore = get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
+        self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
         self.digest = module.params['ownca_digest']
         self.version = module.params['ownca_version']
         self.serial_number = randint(1000, 99999)
@@ -1553,21 +1581,21 @@ class OwnCACertificate(Certificate):
                 'The CA private key file {0} does not exist'.format(self.ca_privatekey_path)
             )
 
-        self.csr = crypto_utils.load_certificate_request(
+        self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
         )
-        self.ca_cert = crypto_utils.load_certificate(
+        self.ca_cert = load_certificate(
             path=self.ca_cert_path,
             content=self.ca_cert_content,
         )
         try:
-            self.ca_privatekey = crypto_utils.load_privatekey(
+            self.ca_privatekey = load_privatekey(
                 path=self.ca_privatekey_path,
                 content=self.ca_privatekey_content,
                 passphrase=self.ca_privatekey_passphrase
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
     def generate(self, module):
@@ -1603,7 +1631,7 @@ class OwnCACertificate(Certificate):
 
             if self.backup:
                 self.backup_file = module.backup_local(self.path)
-            crypto_utils.write_file(module, crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert))
+            write_file(module, crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert))
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -1623,7 +1651,7 @@ class OwnCACertificate(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         if check_mode:
@@ -1666,12 +1694,12 @@ class AssertOnlyCertificateBase(Certificate):
 
         self.signature_algorithms = module.params['signature_algorithms']
         if module.params['subject']:
-            self.subject = crypto_utils.parse_name_field(module.params['subject'])
+            self.subject = parse_name_field(module.params['subject'])
         else:
             self.subject = []
         self.subject_strict = module.params['subject_strict']
         if module.params['issuer']:
-            self.issuer = crypto_utils.parse_name_field(module.params['issuer'])
+            self.issuer = parse_name_field(module.params['issuer'])
         else:
             self.issuer = []
         self.issuer_strict = module.params['issuer_strict']
@@ -1696,19 +1724,19 @@ class AssertOnlyCertificateBase(Certificate):
             self.valid_in = "+" + self.valid_in + "s"
 
         # Load objects
-        self.cert = crypto_utils.load_certificate(self.path, backend=self.backend)
+        self.cert = load_certificate(self.path, backend=self.backend)
         if self.privatekey_path is not None or self.privatekey_content is not None:
             try:
-                self.privatekey = crypto_utils.load_privatekey(
+                self.privatekey = load_privatekey(
                     path=self.privatekey_path,
                     content=self.privatekey_content,
                     passphrase=self.privatekey_passphrase,
                     backend=self.backend
                 )
-            except crypto_utils.OpenSSLBadPassphraseError as exc:
+            except OpenSSLBadPassphraseError as exc:
                 raise CertificateError(exc)
         if self.csr_path is not None or self.csr_content is not None:
-            self.csr = crypto_utils.load_certificate_request(
+            self.csr = load_certificate_request(
                 path=self.csr_path,
                 content=self.csr_content,
                 backend=self.backend
@@ -1883,7 +1911,7 @@ class AssertOnlyCertificateBase(Certificate):
 
         if self.not_before is not None:
             cert_not_valid_before = self._validate_not_before()
-            if cert_not_valid_before != crypto_utils.get_relative_time_option(self.not_before, 'not_before', backend=self.backend):
+            if cert_not_valid_before != get_relative_time_option(self.not_before, 'not_before', backend=self.backend):
                 messages.append(
                     'Invalid not_before component (got %s, expected %s to be present)' %
                     (cert_not_valid_before, self.not_before)
@@ -1891,7 +1919,7 @@ class AssertOnlyCertificateBase(Certificate):
 
         if self.not_after is not None:
             cert_not_valid_after = self._validate_not_after()
-            if cert_not_valid_after != crypto_utils.get_relative_time_option(self.not_after, 'not_after', backend=self.backend):
+            if cert_not_valid_after != get_relative_time_option(self.not_after, 'not_after', backend=self.backend):
                 messages.append(
                     'Invalid not_after component (got %s, expected %s to be present)' %
                     (cert_not_valid_after, self.not_after)
@@ -1941,7 +1969,7 @@ class AssertOnlyCertificateBase(Certificate):
             'csr': self.csr_path,
         }
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
         return result
 
@@ -1952,12 +1980,12 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
         super(AssertOnlyCertificateCryptography, self).__init__(module, 'cryptography')
 
     def _validate_privatekey(self):
-        return crypto_utils.cryptography_compare_public_keys(self.cert.public_key(), self.privatekey.public_key())
+        return cryptography_compare_public_keys(self.cert.public_key(), self.privatekey.public_key())
 
     def _validate_csr_signature(self):
         if not self.csr.is_signature_valid:
             return False
-        return crypto_utils.cryptography_compare_public_keys(self.csr.public_key(), self.cert.public_key())
+        return cryptography_compare_public_keys(self.csr.public_key(), self.cert.public_key())
 
     def _validate_csr_subject(self):
         return self.csr.subject == self.cert.subject
@@ -1981,14 +2009,14 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
             return self.cert.signature_algorithm_oid._name
 
     def _validate_subject(self):
-        expected_subject = Name([NameAttribute(oid=crypto_utils.cryptography_name_to_oid(sub[0]), value=to_text(sub[1]))
+        expected_subject = Name([NameAttribute(oid=cryptography_name_to_oid(sub[0]), value=to_text(sub[1]))
                                  for sub in self.subject])
         cert_subject = self.cert.subject
         if not compare_sets(expected_subject, cert_subject, self.subject_strict):
             return expected_subject, cert_subject
 
     def _validate_issuer(self):
-        expected_issuer = Name([NameAttribute(oid=crypto_utils.cryptography_name_to_oid(iss[0]), value=to_text(iss[1]))
+        expected_issuer = Name([NameAttribute(oid=cryptography_name_to_oid(iss[0]), value=to_text(iss[1]))
                                 for iss in self.issuer])
         cert_issuer = self.cert.issuer
         if not compare_sets(expected_issuer, cert_issuer, self.issuer_strict):
@@ -2026,7 +2054,7 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
                     decipher_only=current_key_usage.decipher_only
                 ))
 
-            key_usages = crypto_utils.cryptography_parse_key_usage_params(self.key_usage)
+            key_usages = cryptography_parse_key_usage_params(self.key_usage)
             if not compare_dicts(key_usages, test_key_usage, self.key_usage_strict):
                 return self.key_usage, [k for k, v in test_key_usage.items() if v is True]
 
@@ -2038,7 +2066,7 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
     def _validate_extended_key_usage(self):
         try:
             current_ext_keyusage = self.cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
-            usages = [crypto_utils.cryptography_name_to_oid(usage) for usage in self.extended_key_usage]
+            usages = [cryptography_name_to_oid(usage) for usage in self.extended_key_usage]
             expected_ext_keyusage = x509.ExtendedKeyUsage(usages)
             if not compare_sets(expected_ext_keyusage, current_ext_keyusage, self.extended_key_usage_strict):
                 return [eku.value for eku in expected_ext_keyusage], [eku.value for eku in current_ext_keyusage]
@@ -2051,7 +2079,7 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
     def _validate_subject_alt_name(self):
         try:
             current_san = self.cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
-            expected_san = [crypto_utils.cryptography_get_name(san) for san in self.subject_alt_name]
+            expected_san = [cryptography_get_name(san) for san in self.subject_alt_name]
             if not compare_sets(expected_san, current_san, self.subject_alt_name_strict):
                 return self.subject_alt_name, current_san
         except cryptography.x509.ExtensionNotFound:
@@ -2066,15 +2094,15 @@ class AssertOnlyCertificateCryptography(AssertOnlyCertificateBase):
         return self.cert.not_valid_after
 
     def _validate_valid_at(self):
-        rt = crypto_utils.get_relative_time_option(self.valid_at, 'valid_at', backend=self.backend)
+        rt = get_relative_time_option(self.valid_at, 'valid_at', backend=self.backend)
         return self.cert.not_valid_before, rt, self.cert.not_valid_after
 
     def _validate_invalid_at(self):
-        rt = crypto_utils.get_relative_time_option(self.invalid_at, 'invalid_at', backend=self.backend)
+        rt = get_relative_time_option(self.invalid_at, 'invalid_at', backend=self.backend)
         return self.cert.not_valid_before, rt, self.cert.not_valid_after
 
     def _validate_valid_in(self):
-        valid_in_date = crypto_utils.get_relative_time_option(self.valid_in, "valid_in", backend=self.backend)
+        valid_in_date = get_relative_time_option(self.valid_in, "valid_in", backend=self.backend)
         return self.cert.not_valid_before, valid_in_date, self.cert.not_valid_after
 
 
@@ -2231,17 +2259,17 @@ class AssertOnlyCertificate(AssertOnlyCertificateBase):
         return self.cert.get_notAfter()
 
     def _validate_valid_at(self):
-        rt = crypto_utils.get_relative_time_option(self.valid_at, "valid_at", backend=self.backend)
+        rt = get_relative_time_option(self.valid_at, "valid_at", backend=self.backend)
         rt = to_bytes(rt, errors='surrogate_or_strict')
         return self.cert.get_notBefore(), rt, self.cert.get_notAfter()
 
     def _validate_invalid_at(self):
-        rt = crypto_utils.get_relative_time_option(self.invalid_at, "invalid_at", backend=self.backend)
+        rt = get_relative_time_option(self.invalid_at, "invalid_at", backend=self.backend)
         rt = to_bytes(rt, errors='surrogate_or_strict')
         return self.cert.get_notBefore(), rt, self.cert.get_notAfter()
 
     def _validate_valid_in(self):
-        valid_in_asn1 = crypto_utils.get_relative_time_option(self.valid_in, "valid_in", backend=self.backend)
+        valid_in_asn1 = get_relative_time_option(self.valid_in, "valid_in", backend=self.backend)
         valid_in_date = to_bytes(valid_in_asn1, errors='surrogate_or_strict')
         return self.cert.get_notBefore(), valid_in_date, self.cert.get_notAfter()
 
@@ -2252,14 +2280,14 @@ class EntrustCertificate(Certificate):
     def __init__(self, module, backend):
         super(EntrustCertificate, self).__init__(module, backend)
         self.trackingId = None
-        self.notAfter = crypto_utils.get_relative_time_option(module.params['entrust_not_after'], 'entrust_not_after', backend=self.backend)
+        self.notAfter = get_relative_time_option(module.params['entrust_not_after'], 'entrust_not_after', backend=self.backend)
 
         if self.csr_content is None or not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file {0} does not exist'.format(self.csr_path)
             )
 
-        self.csr = crypto_utils.load_certificate_request(
+        self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
             backend=self.backend,
@@ -2339,8 +2367,8 @@ class EntrustCertificate(Certificate):
 
             if self.backup:
                 self.backup_file = module.backup_local(self.path)
-            crypto_utils.write_file(module, to_bytes(result.get('endEntityCert')))
-            self.cert = crypto_utils.load_certificate(self.path, backend=self.backend)
+            write_file(module, to_bytes(result.get('endEntityCert')))
+            self.cert = load_certificate(self.path, backend=self.backend)
             self.changed = True
 
     def check(self, module, perms_required=True):
@@ -2374,7 +2402,7 @@ class EntrustCertificate(Certificate):
                 time_string = to_native(self.cert.get_notAfter())
                 expiry = datetime.datetime.strptime(time_string, "%Y%m%d%H%M%SZ")
             elif self.backend == 'cryptography':
-                serial_number = "{0:X}".format(self.cert.serial_number)
+                serial_number = "{0:X}".format(cryptography_serial_number_of_cert(self.cert))
                 expiry = self.cert.not_valid_after
 
             # get some information about the expiry of this certificate
@@ -2409,7 +2437,7 @@ class EntrustCertificate(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         result.update(self._get_cert_details())
@@ -2480,7 +2508,7 @@ class AcmeCertificate(Certificate):
                 crt = module.run_command(command, check_rc=True)[1]
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                crypto_utils.write_file(module, to_bytes(crt))
+                write_file(module, to_bytes(crt))
                 self.changed = True
             except OSError as exc:
                 raise CertificateError(exc)
@@ -2501,7 +2529,7 @@ class AcmeCertificate(Certificate):
         if self.backup_file:
             result['backup_file'] = self.backup_file
         if self.return_content:
-            content = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(self.path, ignore_errors=True)
             result['certificate'] = content.decode('utf-8') if content else None
 
         return result
@@ -2724,7 +2752,7 @@ def main():
 
         result = certificate.dump()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

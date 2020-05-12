@@ -425,8 +425,32 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
+
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+    OpenSSLBadPassphraseError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_privatekey,
+    load_certificate_request,
+    parse_name_field,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_get_basic_constraints,
+    cryptography_get_name,
+    cryptography_name_to_oid,
+    cryptography_key_needs_digest_for_signing,
+    cryptography_parse_key_usage_params,
+)
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
@@ -469,11 +493,11 @@ else:
     CRYPTOGRAPHY_MUST_STAPLE_VALUE = b"\x30\x03\x02\x01\x05"
 
 
-class CertificateSigningRequestError(crypto_utils.OpenSSLObjectError):
+class CertificateSigningRequestError(OpenSSLObjectError):
     pass
 
 
-class CertificateSigningRequestBase(crypto_utils.OpenSSLObject):
+class CertificateSigningRequestBase(OpenSSLObject):
 
     def __init__(self, module):
         super(CertificateSigningRequestBase, self).__init__(
@@ -526,7 +550,7 @@ class CertificateSigningRequestBase(crypto_utils.OpenSSLObject):
         ]
 
         if module.params['subject']:
-            self.subject = self.subject + crypto_utils.parse_name_field(module.params['subject'])
+            self.subject = self.subject + parse_name_field(module.params['subject'])
         self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
 
         if not self.subjectAltName and module.params['use_common_name_for_san']:
@@ -559,7 +583,7 @@ class CertificateSigningRequestBase(crypto_utils.OpenSSLObject):
                 self.backup_file = module.backup_local(self.path)
             if self.return_content:
                 self.csr_bytes = result
-            crypto_utils.write_file(module, result)
+            write_file(module, result)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -608,7 +632,7 @@ class CertificateSigningRequestBase(crypto_utils.OpenSSLObject):
             result['backup_file'] = self.backup_file
         if self.return_content:
             if self.csr_bytes is None:
-                self.csr_bytes = crypto_utils.load_file_if_exists(self.path, ignore_errors=True)
+                self.csr_bytes = load_file_if_exists(self.path, ignore_errors=True)
             result['csr'] = self.csr_bytes.decode('utf-8') if self.csr_bytes else None
 
         return result
@@ -676,12 +700,12 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
 
     def _load_private_key(self):
         try:
-            self.privatekey = crypto_utils.load_privatekey(
+            self.privatekey = load_privatekey(
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase
             )
-        except crypto_utils.OpenSSLBadPassphraseError as exc:
+        except OpenSSLBadPassphraseError as exc:
             raise CertificateSigningRequestError(exc)
 
     def _normalize_san(self, san):
@@ -771,7 +795,7 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
                 return False
 
         try:
-            csr = crypto_utils.load_certificate_request(self.path, backend='pyopenssl')
+            csr = load_certificate_request(self.path, backend='pyopenssl')
         except Exception as dummy:
             return False
 
@@ -791,27 +815,27 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
         csr = cryptography.x509.CertificateSigningRequestBuilder()
         try:
             csr = csr.subject_name(cryptography.x509.Name([
-                cryptography.x509.NameAttribute(crypto_utils.cryptography_name_to_oid(entry[0]), to_text(entry[1])) for entry in self.subject
+                cryptography.x509.NameAttribute(cryptography_name_to_oid(entry[0]), to_text(entry[1])) for entry in self.subject
             ]))
         except ValueError as e:
             raise CertificateSigningRequestError(e)
 
         if self.subjectAltName:
             csr = csr.add_extension(cryptography.x509.SubjectAlternativeName([
-                crypto_utils.cryptography_get_name(name) for name in self.subjectAltName
+                cryptography_get_name(name) for name in self.subjectAltName
             ]), critical=self.subjectAltName_critical)
 
         if self.keyUsage:
-            params = crypto_utils.cryptography_parse_key_usage_params(self.keyUsage)
+            params = cryptography_parse_key_usage_params(self.keyUsage)
             csr = csr.add_extension(cryptography.x509.KeyUsage(**params), critical=self.keyUsage_critical)
 
         if self.extendedKeyUsage:
-            usages = [crypto_utils.cryptography_name_to_oid(usage) for usage in self.extendedKeyUsage]
+            usages = [cryptography_name_to_oid(usage) for usage in self.extendedKeyUsage]
             csr = csr.add_extension(cryptography.x509.ExtendedKeyUsage(usages), critical=self.extendedKeyUsage_critical)
 
         if self.basicConstraints:
             params = {}
-            ca, path_length = crypto_utils.cryptography_get_basic_constraints(self.basicConstraints)
+            ca, path_length = cryptography_get_basic_constraints(self.basicConstraints)
             csr = csr.add_extension(cryptography.x509.BasicConstraints(ca, path_length), critical=self.basicConstraints_critical)
 
         if self.ocspMustStaple:
@@ -835,14 +859,14 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
         if self.authority_key_identifier is not None or self.authority_cert_issuer is not None or self.authority_cert_serial_number is not None:
             issuers = None
             if self.authority_cert_issuer is not None:
-                issuers = [crypto_utils.cryptography_get_name(n) for n in self.authority_cert_issuer]
+                issuers = [cryptography_get_name(n) for n in self.authority_cert_issuer]
             csr = csr.add_extension(
                 cryptography.x509.AuthorityKeyIdentifier(self.authority_key_identifier, issuers, self.authority_cert_serial_number),
                 critical=False
             )
 
         digest = None
-        if crypto_utils.cryptography_key_needs_digest_for_signing(self.privatekey):
+        if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest == 'sha256':
                 digest = cryptography.hazmat.primitives.hashes.SHA256()
             elif self.digest == 'sha384':
@@ -882,7 +906,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
 
     def _check_csr(self):
         def _check_subject(csr):
-            subject = [(crypto_utils.cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.subject]
+            subject = [(cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.subject]
             current_subject = [(sub.oid, sub.value) for sub in csr.subject]
             return set(subject) == set(current_subject)
 
@@ -895,7 +919,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
         def _check_subjectAltName(extensions):
             current_altnames_ext = _find_extension(extensions, cryptography.x509.SubjectAlternativeName)
             current_altnames = [str(altname) for altname in current_altnames_ext.value] if current_altnames_ext else []
-            altnames = [str(crypto_utils.cryptography_get_name(altname)) for altname in self.subjectAltName] if self.subjectAltName else []
+            altnames = [str(cryptography_get_name(altname)) for altname in self.subjectAltName] if self.subjectAltName else []
             if set(altnames) != set(current_altnames):
                 return False
             if altnames:
@@ -909,7 +933,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
                 return current_keyusage_ext is None
             elif current_keyusage_ext is None:
                 return False
-            params = crypto_utils.cryptography_parse_key_usage_params(self.keyUsage)
+            params = cryptography_parse_key_usage_params(self.keyUsage)
             for param in params:
                 if getattr(current_keyusage_ext.value, '_' + param) != params[param]:
                     return False
@@ -920,7 +944,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
         def _check_extenededKeyUsage(extensions):
             current_usages_ext = _find_extension(extensions, cryptography.x509.ExtendedKeyUsage)
             current_usages = [str(usage) for usage in current_usages_ext.value] if current_usages_ext else []
-            usages = [str(crypto_utils.cryptography_name_to_oid(usage)) for usage in self.extendedKeyUsage] if self.extendedKeyUsage else []
+            usages = [str(cryptography_name_to_oid(usage)) for usage in self.extendedKeyUsage] if self.extendedKeyUsage else []
             if set(current_usages) != set(usages):
                 return False
             if usages:
@@ -932,7 +956,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
             bc_ext = _find_extension(extensions, cryptography.x509.BasicConstraints)
             current_ca = bc_ext.value.ca if bc_ext else False
             current_path_length = bc_ext.value.path_length if bc_ext else None
-            ca, path_length = crypto_utils.cryptography_get_basic_constraints(self.basicConstraints)
+            ca, path_length = cryptography_get_basic_constraints(self.basicConstraints)
             # Check CA flag
             if ca != current_ca:
                 return False
@@ -987,7 +1011,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
                 aci = None
                 csr_aci = None
                 if self.authority_cert_issuer is not None:
-                    aci = [str(crypto_utils.cryptography_get_name(n)) for n in self.authority_cert_issuer]
+                    aci = [str(cryptography_get_name(n)) for n in self.authority_cert_issuer]
                 if ext.value.authority_cert_issuer is not None:
                     csr_aci = [str(n) for n in ext.value.authority_cert_issuer]
                 return (ext.value.key_identifier == self.authority_key_identifier
@@ -1019,7 +1043,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
             return key_a == key_b
 
         try:
-            csr = crypto_utils.load_certificate_request(self.path, backend='cryptography')
+            csr = load_certificate_request(self.path, backend='cryptography')
         except Exception as dummy:
             return False
 
@@ -1136,7 +1160,7 @@ def main():
 
         result = csr.dump()
         module.exit_json(**result)
-    except crypto_utils.OpenSSLObjectError as exc:
+    except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 

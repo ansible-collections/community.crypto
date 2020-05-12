@@ -163,7 +163,10 @@ from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_OP
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_oid_to_name,
+    cryptography_get_extensions_from_cert,
+)
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
@@ -330,28 +333,28 @@ def main():
         x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography_backend())
         result['subject'] = {}
         for attribute in x509.subject:
-            result['subject'][crypto_utils.cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
+            result['subject'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
 
         result['expired'] = x509.not_valid_after < datetime.datetime.utcnow()
 
         result['extensions'] = []
-        for dotted_number, entry in crypto_utils.cryptography_get_extensions_from_cert(x509).items():
+        for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
             oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
             result['extensions'].append({
                 'critical': entry['critical'],
                 'asn1_data': base64.b64decode(entry['value']),
-                'name': crypto_utils.cryptography_oid_to_name(oid, short=True),
+                'name': cryptography_oid_to_name(oid, short=True),
             })
 
         result['issuer'] = {}
         for attribute in x509.issuer:
-            result['issuer'][crypto_utils.cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
+            result['issuer'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
 
         result['not_after'] = x509.not_valid_after.strftime('%Y%m%d%H%M%SZ')
         result['not_before'] = x509.not_valid_before.strftime('%Y%m%d%H%M%SZ')
 
         result['serial_number'] = x509.serial_number
-        result['signature_algorithm'] = crypto_utils.cryptography_oid_to_name(x509.signature_algorithm_oid)
+        result['signature_algorithm'] = cryptography_oid_to_name(x509.signature_algorithm_oid)
 
         # We need the -1 offset to get the same values as pyOpenSSL
         if x509.version == cryptography.x509.Version.v1:

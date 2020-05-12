@@ -518,7 +518,6 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
 )
 
 import datetime
-import json
 import os
 import re
 import time
@@ -529,7 +528,13 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils import crypto as crypto_utils
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate,
+)
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -602,7 +607,7 @@ class EcsCertificate(object):
         self.ecs_client = None
         if self.path and os.path.exists(self.path):
             try:
-                self.cert = crypto_utils.load_certificate(self.path, backend='cryptography')
+                self.cert = load_certificate(self.path, backend='cryptography')
             except Exception as dummy:
                 self.cert = None
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
@@ -774,20 +779,20 @@ class EcsCertificate(object):
                 if self.request_type != 'validate_only':
                     if self.backup:
                         self.backup_file = module.backup_local(self.path)
-                    crypto_utils.write_file(module, to_bytes(self.cert_details.get('endEntityCert')))
+                    write_file(module, to_bytes(self.cert_details.get('endEntityCert')))
                     if self.full_chain_path and self.cert_details.get('chainCerts'):
                         if self.backup:
                             self.backup_full_chain_file = module.backup_local(self.full_chain_path)
                         chain_string = '\n'.join(self.cert_details.get('chainCerts')) + '\n'
-                        crypto_utils.write_file(module, to_bytes(chain_string), path=self.full_chain_path)
+                        write_file(module, to_bytes(chain_string), path=self.full_chain_path)
                     self.changed = True
         # If there is no certificate present in path but a tracking ID was specified, save it to disk
         elif not os.path.exists(self.path) and self.tracking_id:
             if not module.check_mode:
-                crypto_utils.write_file(module, to_bytes(self.cert_details.get('endEntityCert')))
+                write_file(module, to_bytes(self.cert_details.get('endEntityCert')))
                 if self.full_chain_path and self.cert_details.get('chainCerts'):
                     chain_string = '\n'.join(self.cert_details.get('chainCerts')) + '\n'
-                    crypto_utils.write_file(module, to_bytes(chain_string), path=self.full_chain_path)
+                    write_file(module, to_bytes(chain_string), path=self.full_chain_path)
             self.changed = True
 
     def dump(self):

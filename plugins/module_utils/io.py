@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*-
+#
+# (c) 2016, Yanis Guenane <yanis+ansible@guenane.org>
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+
+import errno
+import os
+import tempfile
+
+
+def load_file_if_exists(path, module=None, ignore_errors=False):
+    '''
+    Load the file as a bytes string. If the file does not exist, ``None`` is returned.
+
+    If ``ignore_errors`` is ``True``, will ignore errors. Otherwise, errors are
+    raised as exceptions if ``module`` is not specified, and result in ``module.fail_json``
+    being called when ``module`` is specified.
+    '''
+    try:
+        with open(path, 'rb') as f:
+            return f.read()
+    except EnvironmentError as exc:
+        if exc.errno == errno.ENOENT:
+            return None
+        if ignore_errors:
+            return None
+        if module is None:
+            raise
+        module.fail_json('Error while loading {0} - {1}'.format(path, str(exc)))
+    except Exception as exc:
+        if ignore_errors:
+            return None
+        if module is None:
+            raise
+        module.fail_json('Error while loading {0} - {1}'.format(path, str(exc)))
+
+
+def write_file(module, content, default_mode=None, path=None):
+    '''
+    Writes content into destination file as securely as possible.
+    Uses file arguments from module.
+    '''
+    # Find out parameters for file
+    try:
+        file_args = module.load_file_common_arguments(module.params, path=path)
+    except TypeError:
+        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # pre-2.10 behavior of module_utils/crypto.py for older Ansible versions.
+        file_args = module.load_file_common_arguments(module.params)
+        if path is not None:
+            file_args['path'] = path
+    if file_args['mode'] is None:
+        file_args['mode'] = default_mode
+    # Create tempfile name
+    tmp_fd, tmp_name = tempfile.mkstemp(prefix=b'.ansible_tmp')
+    try:
+        os.close(tmp_fd)
+    except Exception:
+        pass
+    module.add_cleanup_file(tmp_name)  # if we fail, let Ansible try to remove the file
+    try:
+        try:
+            # Create tempfile
+            file = os.open(tmp_name, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            os.write(file, content)
+            os.close(file)
+        except Exception as e:
+            try:
+                os.remove(tmp_name)
+            except Exception:
+                pass
+            module.fail_json(msg='Error while writing result into temporary file: {0}'.format(e))
+        # Update destination to wanted permissions
+        if os.path.exists(file_args['path']):
+            module.set_fs_attributes_if_different(file_args, False)
+        # Move tempfile to final destination
+        module.atomic_move(tmp_name, file_args['path'])
+        # Try to update permissions again
+        module.set_fs_attributes_if_different(file_args, False)
+    except Exception as e:
+        try:
+            os.remove(tmp_name)
+        except Exception:
+            pass
+        module.fail_json(msg='Error while writing result: {0}'.format(e))
