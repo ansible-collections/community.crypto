@@ -19,7 +19,7 @@ def main():
         if ext not in allowed_extensions:
             print('%s:%d:%d: extension must be one of: %s' % (path, 0, 0, ', '.join(allowed_extensions)))
 
-    cmd = ['ansible-changelog', 'lint'] + paths
+    cmd = ['ansibulled-changelog', 'lint'] + paths
     subprocess.check_call(cmd)
 
 
