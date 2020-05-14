@@ -14,7 +14,10 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
-    tests/sanity/run.py --color
+    # ansible-galaxy -vvv collection install community.internal_test_tools
+    git clone --single-branch --depth 1 https://github.com/felixfontein/community.internal_test_tools.git -b add-extra-sanity-runner ../internal_test_tools
+
+    ../internal_test_tools/tools/run.py --color
     exit
 fi
 
