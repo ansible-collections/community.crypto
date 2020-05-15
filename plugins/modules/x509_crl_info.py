@@ -26,7 +26,7 @@ options:
         type: path
     content:
         description:
-            - Content of the X.509 certificate in PEM format.
+            - Content of the X.509 CRL in PEM format, or Base64-encoded X.509 CRL.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
 
@@ -48,6 +48,12 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
+format:
+    description:
+        - Whether the CRL is in PEM format (C(pem)) or in DER format (C(der)).
+    returned: success
+    type: str
+    sample: pem
 issuer:
     description:
         - The CRL's issuer.
@@ -124,6 +130,7 @@ revoked_certificates:
 '''
 
 
+import base64
 import traceback
 
 from distutils.version import LooseVersion
@@ -148,6 +155,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_decode_revoked_certificate,
     cryptography_dump_revoked,
     cryptography_get_signature_algorithm_oid_from_crl,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.identify import (
+    identify_pem_format,
 )
 
 # crypto_utils
@@ -195,15 +206,22 @@ class CRLInfo(OpenSSLObject):
                 self.module.fail_json(msg='Error while reading CRL file from disk: {0}'.format(e))
         else:
             data = self.content.encode('utf-8')
+            if not identify_pem_format(data):
+                data = base64.b64decode(self.content)
 
+        self.crl_pem = identify_pem_format(data)
         try:
-            self.crl = x509.load_pem_x509_crl(data, default_backend())
+            if self.crl_pem:
+                self.crl = x509.load_pem_x509_crl(data, default_backend())
+            else:
+                self.crl = x509.load_der_x509_crl(data, default_backend())
         except Exception as e:
             self.module.fail_json(msg='Error while decoding CRL: {0}'.format(e))
 
     def get_info(self):
         result = {
             'changed': False,
+            'format': 'pem' if self.crl_pem else 'der',
             'last_update': None,
             'next_update': None,
             'digest': None,

@@ -60,6 +60,15 @@ options:
         type: path
         required: yes
 
+    format:
+        description:
+            - Whether the CRL file should be in PEM or DER format.
+            - If an existing CRL file does match everything but I(format), it will be converted to the correct format
+              instead of regenerated.
+        type: str
+        choices: [pem, der]
+        default: pem
+
     privatekey_path:
         description:
             - Path to the CA's private key to use when signing the CRL.
@@ -263,6 +272,12 @@ privatekey:
     returned: changed or success
     type: str
     sample: /path/to/my-ca.pem
+format:
+    description:
+        - Whether the CRL is in PEM format (C(pem)) or in DER format (C(der)).
+    returned: success
+    type: str
+    sample: pem
 issuer:
     description:
         - The CRL's issuer.
@@ -337,12 +352,16 @@ revoked_certificates:
             type: bool
             sample: no
 crl:
-    description: The (current or generated) CRL's content.
+    description:
+        - The (current or generated) CRL's content.
+        - Will be the CRL itself if I(format) is C(pem), and Base64 of the
+          CRL if I(format) is C(der).
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
 '''
 
 
+import base64
 import os
 import traceback
 
@@ -384,6 +403,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_get_signature_algorithm_oid_from_crl,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.identify import (
+    identify_pem_format,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'
 
 CRYPTOGRAPHY_IMP_ERR = None
@@ -419,6 +442,8 @@ class CRL(OpenSSLObject):
             module.params['force'],
             module.check_mode
         )
+
+        self.format = module.params['format']
 
         self.update = module.params['mode'] == 'update'
         self.ignore_timestamps = module.params['ignore_timestamps']
@@ -511,11 +536,18 @@ class CRL(OpenSSLObject):
         try:
             with open(self.path, 'rb') as f:
                 data = f.read()
-            self.crl = x509.load_pem_x509_crl(data, default_backend())
-            if self.return_content:
-                self.crl_content = data
+            self.actual_format = 'pem' if identify_pem_format(data) else 'der'
+            if self.actual_format == 'pem':
+                self.crl = x509.load_pem_x509_crl(data, default_backend())
+                if self.return_content:
+                    self.crl_content = data
+            else:
+                self.crl = x509.load_der_x509_crl(data, default_backend())
+                if self.return_content:
+                    self.crl_content = base64.b64encode(data)
         except Exception as dummy:
             self.crl_content = None
+            self.actual_format = self.format
 
     def remove(self):
         if self.backup:
@@ -546,7 +578,7 @@ class CRL(OpenSSLObject):
                 entry['invalidity_date_critical'],
             )
 
-    def check(self, perms_required=True):
+    def check(self, perms_required=True, ignore_conversion=True):
         """Ensure the resource is in its desired state."""
 
         state_and_perms = super(CRL, self).check(self.module, perms_required)
@@ -580,6 +612,9 @@ class CRL(OpenSSLObject):
         else:
             if old_entries != new_entries:
                 return False
+
+        if self.format != self.actual_format and not ignore_conversion:
+            return False
 
         return True
 
@@ -628,13 +663,27 @@ class CRL(OpenSSLObject):
             crl = crl.add_revoked_certificate(revoked_cert.build(backend))
 
         self.crl = crl.sign(self.privatekey, self.digest, backend=backend)
-        return self.crl.public_bytes(Encoding.PEM)
+        if self.format == 'pem':
+            return self.crl.public_bytes(Encoding.PEM)
+        else:
+            return self.crl.public_bytes(Encoding.DER)
 
     def generate(self):
-        if not self.check(perms_required=False) or self.force:
+        result = None
+        if not self.check(perms_required=False, ignore_conversion=True) or self.force:
             result = self._generate_crl()
+        elif not self.check(perms_required=False, ignore_conversion=False) and self.crl:
+            if self.format == 'pem':
+                result = self.crl.public_bytes(Encoding.PEM)
+            else:
+                result = self.crl.public_bytes(Encoding.DER)
+
+        if result is not None:
             if self.return_content:
-                self.crl_content = result
+                if self.format == 'pem':
+                    self.crl_content = result
+                else:
+                    self.crl_content = base64.b64encode(result)
             if self.backup:
                 self.backup_file = self.module.backup_local(self.path)
             write_file(self.module, result)
@@ -649,6 +698,7 @@ class CRL(OpenSSLObject):
             'changed': self.changed,
             'filename': self.path,
             'privatekey': self.privatekey_path,
+            'format': self.format,
             'last_update': None,
             'next_update': None,
             'digest': None,
@@ -701,6 +751,7 @@ def main():
             force=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             path=dict(type='path', required=True),
+            format=dict(type='str', default='pem', choices=['pem', 'der']),
             privatekey_path=dict(type='path'),
             privatekey_content=dict(type='str'),
             privatekey_passphrase=dict(type='str', no_log=True),
@@ -757,7 +808,7 @@ def main():
         if module.params['state'] == 'present':
             if module.check_mode:
                 result = crl.dump(check_mode=True)
-                result['changed'] = module.params['force'] or not crl.check()
+                result['changed'] = module.params['force'] or not crl.check() or not crl.check(ignore_conversion=False)
                 module.exit_json(**result)
 
             crl.generate()
