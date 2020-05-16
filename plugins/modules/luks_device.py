@@ -159,91 +159,91 @@ author: Jan Pokorny (@japokorn)
 
 EXAMPLES = '''
 
-- name: create LUKS container (remains unchanged if it already exists)
+- name: Create LUKS container (remains unchanged if it already exists)
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "present"
     keyfile: "/vault/keyfile"
 
-- name: create LUKS container with a passphrase
+- name: Create LUKS container with a passphrase
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "present"
     passphrase: "foo"
 
-- name: (create and) open the LUKS container; name it "mycrypt"
+- name: (Create and) open the LUKS container; name it "mycrypt"
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "opened"
     name: "mycrypt"
     keyfile: "/vault/keyfile"
 
-- name: close the existing LUKS container "mycrypt"
+- name: Close the existing LUKS container "mycrypt"
   community.crypto.luks_device:
     state: "closed"
     name: "mycrypt"
 
-- name: make sure LUKS container exists and is closed
+- name: Make sure LUKS container exists and is closed
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "closed"
     keyfile: "/vault/keyfile"
 
-- name: create container if it does not exist and add new key to it
+- name: Create container if it does not exist and add new key to it
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "present"
     keyfile: "/vault/keyfile"
     new_keyfile: "/vault/keyfile2"
 
-- name: add new key to the LUKS container (container has to exist)
+- name: Add new key to the LUKS container (container has to exist)
   community.crypto.luks_device:
     device: "/dev/loop0"
     keyfile: "/vault/keyfile"
     new_keyfile: "/vault/keyfile2"
 
-- name: add new passphrase to the LUKS container
+- name: Add new passphrase to the LUKS container
   community.crypto.luks_device:
     device: "/dev/loop0"
     keyfile: "/vault/keyfile"
     new_passphrase: "foo"
 
-- name: remove existing keyfile from the LUKS container
+- name: Remove existing keyfile from the LUKS container
   community.crypto.luks_device:
     device: "/dev/loop0"
     remove_keyfile: "/vault/keyfile2"
 
-- name: remove existing passphrase from the LUKS container
+- name: Remove existing passphrase from the LUKS container
   community.crypto.luks_device:
     device: "/dev/loop0"
     remove_passphrase: "foo"
 
-- name: completely remove the LUKS container and its contents
+- name: Completely remove the LUKS container and its contents
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "absent"
 
-- name: create a container with label
+- name: Create a container with label
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "present"
     keyfile: "/vault/keyfile"
     label: personalLabelName
 
-- name: open the LUKS container based on label without device; name it "mycrypt"
+- name: Open the LUKS container based on label without device; name it "mycrypt"
   community.crypto.luks_device:
     label: "personalLabelName"
     state: "opened"
     name: "mycrypt"
     keyfile: "/vault/keyfile"
 
-- name: close container based on UUID
+- name: Close container based on UUID
   community.crypto.luks_device:
     uuid: 03ecd578-fad4-4e6c-9348-842e3e8fa340
     state: "closed"
     name: "mycrypt"
 
-- name: create a container using luks2 format
+- name: Create a container using luks2 format
   community.crypto.luks_device:
     device: "/dev/loop0"
     state: "present"

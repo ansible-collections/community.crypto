@@ -88,28 +88,29 @@ options:
             - always
         default: partial_idempotence
 notes:
-    - In case the ssh key is broken or password protected, the module will fail. Set the I(force) option to C(yes) if you want to regenerate the keypair.
+    - In case the ssh key is broken or password protected, the module will fail.
+      Set the I(force) option to C(yes) if you want to regenerate the keypair.
 
 extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''
-# Generate an OpenSSH keypair with the default values (4096 bits, rsa)
-- community.crypto.openssh_keypair:
+- name: Generate an OpenSSH keypair with the default values (4096 bits, rsa)
+  community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
 
-# Generate an OpenSSH rsa keypair with a different size (2048 bits)
-- community.crypto.openssh_keypair:
+- name: Generate an OpenSSH rsa keypair with a different size (2048 bits)
+  community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
     size: 2048
 
-# Force regenerate an OpenSSH keypair if it already exists
-- community.crypto.openssh_keypair:
+- name: Force regenerate an OpenSSH keypair if it already exists
+  community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
     force: True
 
-# Generate an OpenSSH keypair with a different algorithm (dsa)
-- community.crypto.openssh_keypair:
+- name: Generate an OpenSSH keypair with a different algorithm (dsa)
+  community.crypto.openssh_keypair:
     path: /tmp/id_ssh_dsa
     type: dsa
 '''
