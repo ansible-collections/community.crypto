@@ -116,8 +116,8 @@ extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''
-# Generate an OpenSSH user certificate that is valid forever and for all users
-- community.crypto.openssh_cert:
+- name: Generate an OpenSSH user certificate that is valid forever and for all users
+  community.crypto.openssh_cert:
     type: user
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -127,7 +127,8 @@ EXAMPLES = '''
 
 # Generate an OpenSSH host certificate that is valid for 32 weeks from now and will be regenerated
 # if it is valid for less than 2 weeks from the time the module is being run
-- community.crypto.openssh_cert:
+- name: Generate an OpenSSH host certificate with valid_from, valid_to and valid_at parameters
+  community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -136,8 +137,8 @@ EXAMPLES = '''
     valid_to: +32w
     valid_at: +2w
 
-# Generate an OpenSSH host certificate that is valid forever and only for example.com and examplehost
-- community.crypto.openssh_cert:
+- name: Generate an OpenSSH host certificate that is valid forever and only for example.com and examplehost
+  community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -148,8 +149,8 @@ EXAMPLES = '''
         - example.com
         - examplehost
 
-# Generate an OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019
-- community.crypto.openssh_cert:
+- name: Generate an OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019
+  community.crypto.openssh_cert:
     type: host
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
@@ -157,8 +158,8 @@ EXAMPLES = '''
     valid_from: "2001-01-21"
     valid_to: "2019-01-21"
 
-# Generate an OpenSSH user Certificate with clear and force-command option:
-- community.crypto.openssh_cert:
+- name: Generate an OpenSSH user Certificate with clear and force-command option
+  community.crypto.openssh_cert:
     type: user
     signing_key: /path/to/private_key
     public_key: /path/to/public_key.pub
