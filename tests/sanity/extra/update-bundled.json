@@ -1,0 +1,15 @@
+{
+    "disabled": true,
+    "all_targets": true,
+    "ignore_self": true,
+    "extensions": [
+        ".py"
+    ],
+    "prefixes": [
+        "plugins/module_utils/compat/"
+    ],
+    "output": "path-message",
+    "requirements": [
+        "requests"
+    ]
+}

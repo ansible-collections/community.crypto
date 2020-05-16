@@ -9,6 +9,7 @@ matrix:
     - env: T=none
   include:
     - env: T=devel/sanity/1
+    - env: T=devel/sanity/extra
 
     - env: T=devel/units/2.7/1
     - env: T=devel/units/3.5/1

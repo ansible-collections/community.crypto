@@ -1,0 +1,10 @@
+{
+    "python": "3.7",
+    "output": "path-line-column-message",
+    "prefixes": [
+        "changelogs/fragments/"
+    ],
+    "requirements": [
+        "git+git://github.com/ansible-community/ansibulled.git@pip-installable#egg=ansibulled"
+    ]
+}
