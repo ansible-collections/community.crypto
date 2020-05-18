@@ -242,7 +242,7 @@ class CertificateRevocationInfo(OpenSSLObject):
         except Exception as e:
             self.module.fail_json(msg='Error while decoding CRL from {1}: {0}'.format(e, crl_source))
 
-        # Check revoced certificates
+        # Check revoked certificates
         if 'crl_contained' not in result:
             result['crl_contained'] = False
             result['crl_record'] = None
