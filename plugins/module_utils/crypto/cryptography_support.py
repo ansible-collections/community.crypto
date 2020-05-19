@@ -24,6 +24,7 @@ import binascii
 import re
 
 from ansible.module_utils._text import to_text
+from ._asn1 import deserialze_asn1_string
 
 try:
     import cryptography
@@ -205,10 +206,22 @@ def cryptography_get_name(name):
                 raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}"'.format(name))
             return x509.RegisteredID(x509.oid.ObjectIdentifier(m.group(1)))
         if name.startswith('otherName:'):
+            # otherName can either be a raw ASN.1 hex string or in the format that OpenSSL works with.
             m = re.match(r'^([0-9]+(?:\.[0-9]+)*);([0-9a-fA-F]{1,2}(?::[0-9a-fA-F]{1,2})*)$', to_text(name[10:]))
-            if not m:
-                raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}"'.format(name))
-            return x509.OtherName(x509.oid.ObjectIdentifier(m.group(1)), _parse_hex(m.group(2)))
+            if m:
+                return x509.OtherName(x509.oid.ObjectIdentifier(m.group(1)), _parse_hex(m.group(2)))
+
+            # See https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html - Subject Alternative Name for more
+            # defailts on the format expected.
+            name = to_text(name[10:], errors='surrogate_or_strict')
+            if ';' not in name:
+                raise OpenSSLObjectError('Cannot parse Subject Alternative Name otherName "{0}", must be in the '
+                                         'format "otherName:<OID>;<ASN.1 OpenSSL Encoded String>" or '
+                                         '"otherName:<OID>;<hex string>"'.format(name))
+
+            oid, value = name.split(';', 1)
+            b_value = deserialze_asn1_string(value)
+            return x509.OtherName(x509.ObjectIdentifier(oid), b_value)
         if name.startswith('dirName:'):
             return x509.DirectoryName(x509.Name(_parse_dn(to_text(name[8:]))))
     except Exception as e:

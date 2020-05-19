@@ -119,7 +119,10 @@ options:
             - SAN extension to attach to the certificate signing request.
             - This can either be a 'comma separated string' or a YAML list.
             - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
-              C(otherName) and the ones specific to your CA)
+              C(otherName) and the ones specific to your CA).
+            - Only C(DNS), C(IP), C(email), C(URI), and C(otherName) is supported.
+            - C(otherName) only supports the C(UTF8) type and must be in the format
+              C(otherName:<OID>;UTF8:value).
             - Note that if no SAN is specified, but a common name, the common
               name will be added as a SAN except if C(useCommonNameForSAN) is
               set to I(false).
@@ -350,6 +353,15 @@ EXAMPLES = r'''
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
     ocsp_must_staple: yes
+
+- name: Generate an OpenSSL Certificate Signing Request for WinRM Certificate authentication
+  community.crypto.openssl_csr:
+    path: /etc/ssl/csr/winrm.auth.csr
+    privatekey_path: /etc/ssl/private/winrm.auth.pem
+    common_name: username
+    extended_key_usage:
+    - clientAuth
+    subject_alt_name: otherName:1.3.6.1.4.1.311.20.2.3;UTF8:username@localhost
 '''
 
 RETURN = r'''
