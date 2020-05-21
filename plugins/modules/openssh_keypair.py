@@ -53,7 +53,7 @@ options:
         required: true
     comment:
         description:
-            - Provides a new comment to the public key. When checking if the key is in the correct state this will be ignored.
+            - Provides a new comment to the public key.
         type: str
     regenerate:
         description:
