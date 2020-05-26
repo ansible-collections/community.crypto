@@ -64,10 +64,10 @@ else
 fi
 
 # START: HACK
-if [ "${script}" == "osx" ]; then
+if [ "${script}" == "osx" ] && [ "${ansible_version}" == "2.9" ]; then
     # Make sure that the latest versions of pyOpenSSL and cryptography will be installed on macOS before
-    # ansible-playbook is started. This is necessary until https://github.com/ansible/ansible/issues/68701
-    # has been fixed.
+    # ansible-playbook is started. This is no longer necessary for devel (https://github.com/ansible/ansible/issues/68701
+    # is fixed), but 2.9 still needs this since the new collection loader probably won't get backported to stable-2.9.
     sed -i -e 's/cryptography.*/cryptography >= 2.9.2/g' /root/venv/lib/python2.7/site-packages/ansible_test/_data/requirements/integration.txt
     echo 'pyOpenSSL >= 19.1.0' >> /root/venv/lib/python2.7/site-packages/ansible_test/_data/requirements/integration.txt
 fi
