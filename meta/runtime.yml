@@ -1,3 +1,16 @@
+action_groups:
+  acme:
+  - acme_inspect
+  - acme_certificate_revoke
+  - acme_certificate
+  - acme_account
+  - acme_account_facts
+  - acme_account_info
+
+action_groups_redirection:
+  acme:
+    redirect: acme
+
 plugin_routing:
   modules:
     acme_account_facts:
