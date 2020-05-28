@@ -1,17 +1,27 @@
+action_groups:
+  acme:
+  - acme_inspect
+  - acme_certificate_revoke
+  - acme_certificate
+  - acme_account
+  - acme_account_facts
+  - acme_account_info
+
+action_groups_redirection:
+  acme:
+    redirect: acme
+
 plugin_routing:
   modules:
     acme_account_facts:
       deprecation:
-        removal_date: TBD
         removal_version: '2.12'
         warning_text: The 'community.crypto.acme_account_facts' module has been renamed to 'community.crypto.acme_account_info'.
     openssl_certificate:
       deprecation:
-        removal_date: TBD
         removal_version: '2.14'
         warning_text: The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'
     openssl_certificate_info:
       deprecation:
-        removal_date: TBD
         removal_version: '2.14'
         warning_text: The 'community.crypto.openssl_certificate_info' module has been renamed to 'community.crypto.x509_certificate_info'
