@@ -5,6 +5,6 @@
         "changelogs/fragments/"
     ],
     "requirements": [
-        "antsibull"
+        "antsibull-changelog"
     ]
 }
