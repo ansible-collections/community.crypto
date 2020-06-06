@@ -1,0 +1,108 @@
+---
+# Test matrix:
+# * pyopenssl or cryptography
+# * DSA or ECC or ...
+# * password protected private key or not
+
+- name: Set up test combinations
+  set_fact:
+    all_tests: []
+    backends: []
+    key_types: []
+    key_password:
+      - passwd: nopasswd
+      - passwd: passwd
+        privatekey_passphrase: hunter2
+        privatekey_cipher: auto
+
+- name: Add cryptography backend
+  set_fact:
+    backends: "{{ backends + [ { 'backend': 'cryptography' } ] }}"
+  when: cryptography_version.stdout is version('1.4', '>=')
+
+- name: Add pyopenssl backend
+  set_fact:
+    backends: "{{ backends + [ { 'backend': 'pyopenssl' } ] }}"
+  when: pyopenssl_version.stdout is version('0.11', '>=')
+
+- name: Add RSA tests
+  set_fact:
+    key_types: "{{ key_types + [ { 'type': 'RSA' } ] }}"
+  when: cryptography_version.stdout is version('1.4', '>=')
+
+- name: Add DSA + ECDSA tests
+  set_fact:
+    key_types: "{{ key_types + [ { 'type': 'DSA', 'size': 2048 }, { 'type': 'ECC', 'curve': 'secp256r1' } ] }}"
+  when:
+    - cryptography_version.stdout is version('1.5', '>=')
+    # FreeBSD 11 fails on secp256r1 keys
+    - not ansible_os_family == 'FreeBSD'
+
+- name: Add Ed25519 + Ed448 tests
+  set_fact:
+    key_types: "{{ key_types + [ { 'type': 'Ed25519' }, { 'type': 'Ed448' } ] }}"
+  when:
+    # The module under tests works with >= 2.6, but we also need to be able to create a certificate which requires 2.8
+    - cryptography_version.stdout is version('2.8', '>=')
+    # FreeBSD doesn't have support for Ed448/25519
+    - not ansible_os_family == 'FreeBSD'
+
+- name: Create all test combinations
+  set_fact:
+    # Explanation: see https://serverfault.com/a/1004124
+    all_tests: >-
+      [
+      {% for b in backends %}
+      {% for kt in key_types %}
+      {% for kp in key_password %}
+      {# Exclude Ed25519 and Ed448 tests on pyopenssl #}
+      {% if not (b.backend == 'pyopenssl' and (kt.type == 'Ed25519' or kt.type == 'Ed448')) %}
+      {{ b | combine (kt) | combine(kp) }},
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+      {% endfor %}
+      ]
+
+- name: Generate private keys
+  openssl_privatekey:
+    path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    type: '{{ item.type }}'
+    curve: '{{ item.curve | default(omit) }}'
+    size: '{{ item.size | default(omit) }}'
+    passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
+    cipher: '{{ item.privatekey_cipher | default(omit) }}'
+    select_crypto_backend: cryptography
+  loop: '{{ all_tests }}'
+
+- name: Generate public keys
+  openssl_publickey:
+    path: '{{ output_dir }}/{{item.backend}}_publickey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
+  loop: '{{ all_tests }}'
+
+- name: Generate CSRs
+  openssl_csr:
+    path: '{{ output_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
+    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
+  loop: '{{ all_tests }}'
+
+- name: Generate selfsigned certificates
+  x509_certificate:
+    provider: selfsigned
+    path: '{{ output_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
+    csr_path: '{{ output_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
+  loop: '{{ all_tests }}'
+
+- name: Create statement to be signed
+  copy:
+    content: "Erst wenn der Subwoofer die Katze inhaliert, fickt der Bass richtig übel. -- W.A. Mozart"
+    dest: '{{ output_dir }}/statement.txt'
+
+- name: Loop over all variants
+  include_tasks: loop.yml
+  loop: '{{ all_tests }}'
