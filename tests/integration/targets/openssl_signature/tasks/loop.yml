@@ -1,0 +1,28 @@
+---
+# This file is intended to be included in a loop statement
+- name: Sign statement with {{ item.type }} key - {{ item.passwd }} using {{ item.backend }}
+  openssl_signature:
+    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
+    path: '{{ output_dir }}/statement.txt'
+    select_crypto_backend: '{{ item.backend }}'
+  register: sign_result
+
+- debug:
+    var: sign_result
+
+- name: Verify {{ item.type }} signature - {{ item.passwd }} using {{ item.backend }}
+  openssl_signature_info:
+    certificate_path: '{{ output_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
+    path: '{{ output_dir }}/statement.txt'
+    signature: '{{ sign_result.signature }}'
+    select_crypto_backend: '{{ item.backend }}'
+  register: verify_result
+
+- name: Make sure the signature is valid
+  assert:
+    that:
+      - verify_result.valid
+
+- debug:
+    var: verify_result

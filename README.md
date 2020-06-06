@@ -24,6 +24,8 @@ Most modules require a recent enough version of [the Python cryptography library
   - openssl_privatekey_info
   - openssl_privatekey
   - openssl_publickey
+  - openssl_signature_info
+  - openssl_signature
   - x509_certificate_info
   - x509_certificate
   - x509_crl_info

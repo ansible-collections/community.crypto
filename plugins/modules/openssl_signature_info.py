@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: openssl_signature
+module: openssl_signature_info
 version_added: 1.1.0
-short_description: Sign data with openssl
+short_description: Verify signatures with openssl
 description:
-    - This module allows one to sign data using a private key.
+    - This module allows one to verify a signature for a file via a certificate.
     - The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL backend
@@ -26,26 +26,25 @@ author:
     - Patrick Pichler (@aveexy)
     - Markus Teufelberger (@MarkusTeufelberger)
 options:
-    privatekey_path:
-        description:
-            - The path to the private key to use when signing.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
-        type: path
-    privatekey_content:
-        description:
-            - The content of the private key to use when signing the certificate signing request.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
-        type: str
-    privatekey_passphrase:
-        description:
-            - The passphrase for the private key.
-            - This is required if the private key is password protected.
-        type: str
     path:
         description:
-            - The file to sign.
+            - The signed file to verify.
             - This file will only be read and not modified.
         type: path
+        required: true
+    certificate_path:
+        description:
+            - The path to the certificate used to verify the signature.
+            - Either I(certificate_path) or I(certificate_content) must be specified, but not both.
+        type: path
+    certificate_content:
+        description:
+            - The content of the certificate used to verify the signature.
+            - Either I(certificate_path) or I(certificate_content) must be specified, but not both.
+        type: str
+    signature:
+        description: Base64 encoded signature.
+        type: str
         required: true
     select_crypto_backend:
         description:
@@ -63,8 +62,8 @@ notes:
       DSA and ECDSA keys: C(cryptography) >= 1.5
       ed448 and ed25519 keys: C(cryptography) >= 2.6
 seealso:
-    - module: community.crypto.openssl_signature_info
-    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_signature
+    - module: community.crypto.x509_certificate
 '''
 
 EXAMPLES = r'''
@@ -88,10 +87,10 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-signature:
-    description: Base64 encoded signature.
+valid:
+    description: C(true) means the signature was valid for the given file, C(false) means it wasn't.
     returned: success
-    type: str
+    type: bool
 '''
 
 import os
@@ -136,17 +135,17 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
-    load_privatekey,
+    load_certificate,
 )
 
 from ansible.module_utils._text import to_native, to_bytes
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
-class SignatureBase(OpenSSLObject):
+class SignatureInfoBase(OpenSSLObject):
 
     def __init__(self, module, backend):
-        super(SignatureBase, self).__init__(
+        super(SignatureInfoBase, self).__init__(
             path=module.params['path'],
             state='present',
             force=False,
@@ -155,11 +154,11 @@ class SignatureBase(OpenSSLObject):
 
         self.backend = backend
 
-        self.privatekey_path = module.params['privatekey_path']
-        self.privatekey_content = module.params['privatekey_content']
-        if self.privatekey_content is not None:
-            self.privatekey_content = self.privatekey_content.encode('utf-8')
-        self.privatekey_passphrase = module.params['privatekey_passphrase']
+        self.signature = module.params['signature']
+        self.certificate_path = module.params['certificate_path']
+        self.certificate_content = module.params['certificate_content']
+        if self.certificate_content is not None:
+            self.certificate_content = self.certificate_content.encode('utf-8')
 
     def generate(self):
         # Empty method because OpenSSLObject wants this
@@ -171,10 +170,10 @@ class SignatureBase(OpenSSLObject):
 
 
 # Implementation with using pyOpenSSL
-class SignaturePyOpenSSL(SignatureBase):
+class SignatureInfoPyOpenSSL(SignatureInfoBase):
 
     def __init__(self, module, backend):
-        super(SignaturePyOpenSSL, self).__init__(module, backend)
+        super(SignatureInfoPyOpenSSL, self).__init__(module, backend)
 
     def run(self):
 
@@ -184,25 +183,28 @@ class SignaturePyOpenSSL(SignatureBase):
             with open(self.path, "rb") as f:
                 _in = f.read()
 
-            private_key = load_privatekey(
-                path=self.privatekey_path,
-                content=self.privatekey_content,
-                passphrase=self.privatekey_passphrase,
+            _signature = base64.b64decode(self.signature)
+            certificate = load_certificate(
+                path=self.certificate_path,
+                content=self.certificate_content,
                 backend=self.backend,
             )
 
-            signature = OpenSSL.crypto.sign(private_key, _in, "sha256")
-            result['signature'] = base64.b64encode(signature)
+            try:
+                OpenSSL.crypto.verify(certificate, _signature, _in, 'sha256')
+                result['valid'] = True
+            except Exception:
+                result['valid'] = False
             return result
         except Exception as e:
             raise OpenSSLObjectError(e)
 
 
 # Implementation with using cryptography
-class SignatureCryptography(SignatureBase):
+class SignatureInfoCryptography(SignatureInfoBase):
 
     def __init__(self, module, backend):
-        super(SignatureCryptography, self).__init__(module, backend)
+        super(SignatureInfoCryptography, self).__init__(module, backend)
 
     def run(self):
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
@@ -214,41 +216,71 @@ class SignatureCryptography(SignatureBase):
             with open(self.path, "rb") as f:
                 _in = f.read()
 
-            private_key = load_privatekey(
-                path=self.privatekey_path,
-                content=self.privatekey_content,
-                passphrase=self.privatekey_passphrase,
+            _signature = base64.b64decode(self.signature)
+            certificate = load_certificate(
+                path=self.certificate_path,
+                content=self.certificate_content,
                 backend=self.backend,
             )
-
-            signature = None
+            public_key = certificate.public_key()
+            verified = False
+            valid = False
 
             if CRYPTOGRAPHY_HAS_DSA_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
-                    signature = private_key.sign(_in, _hash)
+                try:
+                    if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey):
+                        public_key.verify(_signature, _in, _hash)
+                        verified = True
+                        valid = True
+                except cryptography.exceptions.InvalidSignature:
+                    verified = True
+                    valid = False
 
             if CRYPTOGRAPHY_HAS_EC_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
-                    signature = private_key.sign(_in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash))
+                try:
+                    if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey):
+                        public_key.verify(_signature, _in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash))
+                        verified = True
+                        valid = True
+                except cryptography.exceptions.InvalidSignature:
+                    verified = True
+                    valid = False
 
             if CRYPTOGRAPHY_HAS_ED25519_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey):
-                    signature = private_key.sign(_in)
+                try:
+                    if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey):
+                        public_key.verify(_signature, _in)
+                        verified = True
+                        valid = True
+                except cryptography.exceptions.InvalidSignature:
+                    verified = True
+                    valid = False
 
             if CRYPTOGRAPHY_HAS_ED448_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
-                    signature = private_key.sign(_in)
+                try:
+                    if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey):
+                        public_key.verify(_signature, _in)
+                        verified = True
+                        valid = True
+                except cryptography.exceptions.InvalidSignature:
+                    verified = True
+                    valid = False
 
             if CRYPTOGRAPHY_HAS_RSA_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-                    signature = private_key.sign(_in, _padding, _hash)
+                try:
+                    if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
+                        public_key.verify(_signature, _in, _padding, _hash)
+                        verified = True
+                        valid = True
+                except cryptography.exceptions.InvalidSignature:
+                    verified = True
+                    valid = False
 
-            if signature is None:
+            if not verified:
                 self.module.fail_json(
                     msg="Unsupported key type. Your cryptography version is {0}".format(CRYPTOGRAPHY_VERSION)
                 )
-
-            result['signature'] = base64.b64encode(signature)
+            result['valid'] = valid
             return result
 
         except Exception as e:
@@ -258,17 +290,17 @@ class SignatureCryptography(SignatureBase):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            privatekey_path=dict(type='path'),
-            privatekey_content=dict(type='str'),
-            privatekey_passphrase=dict(type='str', no_log=True),
+            certificate_path=dict(type='path'),
+            certificate_content=dict(type='str'),
             path=dict(type='path', required=True),
+            signature=dict(type='str', required=True),
             select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
         ),
         mutually_exclusive=(
-            ['privatekey_path', 'privatekey_content'],
+            ['certificate_path', 'certificate_content'],
         ),
         required_one_of=(
-            ['privatekey_path', 'privatekey_content'],
+            ['certificate_path', 'certificate_content'],
         ),
         supports_check_mode=True,
     )
@@ -304,12 +336,12 @@ def main():
                                  exception=PYOPENSSL_IMP_ERR)
             module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
                              version='2.0.0', collection_name='community.crypto')
-            _sign = SignaturePyOpenSSL(module, backend)
+            _sign = SignatureInfoPyOpenSSL(module, backend)
         elif backend == 'cryptography':
             if not CRYPTOGRAPHY_FOUND:
                 module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                                  exception=CRYPTOGRAPHY_IMP_ERR)
-            _sign = SignatureCryptography(module, backend)
+            _sign = SignatureInfoCryptography(module, backend)
 
         result = _sign.run()
 

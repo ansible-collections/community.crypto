@@ -65,11 +65,78 @@ try:
             x509.RFC822Name.__hash__ = simple_hash
             x509.UniformResourceIdentifier.__hash__ = simple_hash
 
-    # Test whether we have support for X25519, X448, Ed25519 and/or Ed448
+    # Test whether we have support for DSA, EC, Ed25519, Ed448, RSA, X25519 and/or X448
     try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/dsa/
+        import cryptography.hazmat.primitives.asymmetric.dsa
+        CRYPTOGRAPHY_HAS_DSA = True
+        try:
+            # added later in 1.5
+            cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey.sign
+            CRYPTOGRAPHY_HAS_DSA_SIGN = True
+        except AttributeError:
+            CRYPTOGRAPHY_HAS_DSA_SIGN = False
+    except ImportError:
+        CRYPTOGRAPHY_HAS_DSA = False
+        CRYPTOGRAPHY_HAS_DSA_SIGN = False
+    try:
+        # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/
+        import cryptography.hazmat.primitives.asymmetric.ed25519
+        CRYPTOGRAPHY_HAS_ED25519 = True
+        try:
+            # added with the primitive in 2.6
+            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.sign
+            CRYPTOGRAPHY_HAS_ED25519_SIGN = True
+        except AttributeError:
+            CRYPTOGRAPHY_HAS_ED25519_SIGN = False
+    except ImportError:
+        CRYPTOGRAPHY_HAS_ED25519 = False
+        CRYPTOGRAPHY_HAS_ED25519_SIGN = False
+    try:
+        # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed448/
+        import cryptography.hazmat.primitives.asymmetric.ed448
+        CRYPTOGRAPHY_HAS_ED448 = True
+        try:
+            # added with the primitive in 2.6
+            cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.sign
+            CRYPTOGRAPHY_HAS_ED448_SIGN = True
+        except AttributeError:
+            CRYPTOGRAPHY_HAS_ED448_SIGN = False
+    except ImportError:
+        CRYPTOGRAPHY_HAS_ED448 = False
+        CRYPTOGRAPHY_HAS_ED448_SIGN = False
+    try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ec/
+        import cryptography.hazmat.primitives.asymmetric.ec
+        CRYPTOGRAPHY_HAS_EC = True
+        try:
+            # added later in 1.5
+            cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey.sign
+            CRYPTOGRAPHY_HAS_EC_SIGN = True
+        except AttributeError:
+            CRYPTOGRAPHY_HAS_EC_SIGN = False
+    except ImportError:
+        CRYPTOGRAPHY_HAS_EC = False
+        CRYPTOGRAPHY_HAS_EC_SIGN = False
+    try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
+        import cryptography.hazmat.primitives.asymmetric.rsa
+        CRYPTOGRAPHY_HAS_RSA = True
+        try:
+            # added later in 1.4
+            cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey.sign
+            CRYPTOGRAPHY_HAS_RSA_SIGN = True
+        except AttributeError:
+            CRYPTOGRAPHY_HAS_RSA_SIGN = False
+    except ImportError:
+        CRYPTOGRAPHY_HAS_RSA = False
+        CRYPTOGRAPHY_HAS_RSA_SIGN = False
+    try:
+        # added in 2.0 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/
         import cryptography.hazmat.primitives.asymmetric.x25519
         CRYPTOGRAPHY_HAS_X25519 = True
         try:
+            # added later in 2.5
             cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.private_bytes
             CRYPTOGRAPHY_HAS_X25519_FULL = True
         except AttributeError:
@@ -78,29 +145,28 @@ try:
         CRYPTOGRAPHY_HAS_X25519 = False
         CRYPTOGRAPHY_HAS_X25519_FULL = False
     try:
+        # added in 2.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x448/
         import cryptography.hazmat.primitives.asymmetric.x448
         CRYPTOGRAPHY_HAS_X448 = True
     except ImportError:
         CRYPTOGRAPHY_HAS_X448 = False
-    try:
-        import cryptography.hazmat.primitives.asymmetric.ed25519
-        CRYPTOGRAPHY_HAS_ED25519 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_ED25519 = False
-    try:
-        import cryptography.hazmat.primitives.asymmetric.ed448
-        CRYPTOGRAPHY_HAS_ED448 = True
-    except ImportError:
-        CRYPTOGRAPHY_HAS_ED448 = False
 
     HAS_CRYPTOGRAPHY = True
 except ImportError:
     # Error handled in the calling module.
+    CRYPTOGRAPHY_HAS_EC = False
+    CRYPTOGRAPHY_HAS_EC_SIGN = False
+    CRYPTOGRAPHY_HAS_ED25519 = False
+    CRYPTOGRAPHY_HAS_ED25519_SIGN = False
+    CRYPTOGRAPHY_HAS_ED448 = False
+    CRYPTOGRAPHY_HAS_ED448_SIGN = False
+    CRYPTOGRAPHY_HAS_DSA = False
+    CRYPTOGRAPHY_HAS_DSA_SIGN = False
+    CRYPTOGRAPHY_HAS_RSA = False
+    CRYPTOGRAPHY_HAS_RSA_SIGN = False
     CRYPTOGRAPHY_HAS_X25519 = False
     CRYPTOGRAPHY_HAS_X25519_FULL = False
     CRYPTOGRAPHY_HAS_X448 = False
-    CRYPTOGRAPHY_HAS_ED25519 = False
-    CRYPTOGRAPHY_HAS_ED448 = False
     HAS_CRYPTOGRAPHY = False
 
 
