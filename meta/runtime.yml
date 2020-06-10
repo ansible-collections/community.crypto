@@ -7,10 +7,6 @@ action_groups:
   - acme_account_facts
   - acme_account_info
 
-action_groups_redirection:
-  acme:
-    redirect: acme
-
 plugin_routing:
   modules:
     acme_account_facts:
