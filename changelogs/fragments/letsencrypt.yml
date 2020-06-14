@@ -1,0 +1,2 @@
+removed_features:
+- "The ``letsencrypt`` module has been removed. Use ``acme_certificate`` instead."
