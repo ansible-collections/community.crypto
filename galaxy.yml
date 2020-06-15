@@ -27,3 +27,4 @@ issues: https://github.com/ansible-collections/community.crypto/issues
 build_ignore:
   - 'community-crypto-*.tar.gz'
   - .gitignore
+  - changelogs/.plugin-cache.yaml
