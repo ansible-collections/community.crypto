@@ -55,12 +55,11 @@ pip --version
 pip list --disable-pip-version-check
 if [ "${ansible_version}" == "devel" ]; then
     retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
-else
+elif [ "${ansible_version}" == "2.9" ]; then
+    # Needed until all relevant backports have been merged
     retry pip install https://github.com/felixfontein/ansible/archive/backport/2.9/ansible-test.tar.gz --disable-pip-version-check
-    # retry pip install https://github.com/ansible/ansible/archive/stable-2.9.tar.gz --disable-pip-version-check
-    # retry pip install ansible==${ansible_version} --disable-pip-version-check
-    # force complete CI run for Ansible 2.9: 2.9's ansible-test's change detection for collections is broken
-    # COMPLETE=yes  -- should no longer necessary with the backports
+else
+    retry pip install https://github.com/ansible/ansible/archive/stable-${ansible_version}.tar.gz --disable-pip-version-check
 fi
 
 # START: HACK
