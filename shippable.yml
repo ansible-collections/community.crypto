@@ -37,6 +37,14 @@ matrix:
     - env: T=devel/cloud/2.7/1
     - env: T=devel/cloud/3.6/1
 
+    # For Ansible 2.10, use a combination of different targets
+    - env: T=2.10/sanity/1
+    - env: T=2.10/units/2.7/1
+    - env: T=2.10/units/3.8/1
+    - env: T=2.10/rhel/7.8/1
+    - env: T=2.10/linux/ubuntu1804/1
+    - env: T=2.10/cloud/3.6/1
+
     # For Ansible 2.9, use a combination of different targets
     - env: T=2.9/sanity/1
     - env: T=2.9/units/2.7/1
