@@ -73,9 +73,9 @@ options:
             - Only allowed if C(verification_method=email)
         type: str
 seealso:
-    - module: x509_certificate
+    - module: community.crypto.x509_certificate
       description: Can be used to request certificates from ECS, with C(provider=entrust).
-    - module: ecs_certificate
+    - module: community.crypto.ecs_certificate
       description: Can be used to request a Certificate from ECS using a verified domain.
 extends_documentation_fragment:
 - community.crypto.ecs_credential

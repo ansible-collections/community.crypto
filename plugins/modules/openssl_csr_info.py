@@ -51,7 +51,7 @@ options:
         choices: [ auto, cryptography, pyopenssl ]
 
 seealso:
-- module: openssl_csr
+- module: community.crypto.openssl_csr
 '''
 
 EXAMPLES = r'''

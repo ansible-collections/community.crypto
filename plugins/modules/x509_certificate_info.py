@@ -20,12 +20,14 @@ description:
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
       C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
       and will be removed in Ansible 2.13.
-    - Note that this module was called C(openssl_certificate_info) when included directly in Ansible up to version 2.9.
-      When moved to the collection C(community.crypto), it was renamed to M(x509_certificate_info). From Ansible 2.10 on, it can
-      still be used by the old short name (or by C(ansible.builtin.openssl_certificate_info)), which redirects to
+    - Note that this module was called C(openssl_certificate_info) when included directly in Ansible
+      up to version 2.9.  When moved to the collection C(community.crypto), it was renamed to
+      M(community.crypto.x509_certificate_info). From Ansible 2.10 on, it can still be used by the
+      old short name (or by C(ansible.builtin.openssl_certificate_info)), which redirects to
       C(community.crypto.x509_certificate_info). When using FQCNs or when using the
       L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
-      keyword, the new name M(x509_certificate_info) should be used to avoid a deprecation warning.
+      keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid
+      a deprecation warning.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 1.6
 author:
@@ -70,7 +72,7 @@ notes:
     - All timestamp values are provided in ASN.1 TIME format, i.e. following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
 seealso:
-- module: x509_certificate
+- module: community.crypto.x509_certificate
 '''
 
 EXAMPLES = r'''

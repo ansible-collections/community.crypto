@@ -332,9 +332,9 @@ options:
         type: str
         choices: [ P1Y, P2Y, P3Y ]
 seealso:
-    - module: openssl_privatekey
+    - module: community.crypto.openssl_privatekey
       description: Can be used to create private keys (both for certificates and accounts).
-    - module: openssl_csr
+    - module: community.crypto.openssl_csr
       description: Can be used to create a Certificate Signing Request (CSR).
 extends_documentation_fragment:
 - community.crypto.ecs_credential

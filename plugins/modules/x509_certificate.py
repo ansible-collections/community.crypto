@@ -20,8 +20,9 @@ description:
     - The C(assertonly) provider is intended for use cases where one is only interested in
       checking properties of a supplied certificate. Please note that this provider has been
       deprecated in Ansible 2.9 and will be removed in Ansible 2.13. See the examples on how
-      to emulate C(assertonly) usage with M(x509_certificate_info), M(openssl_csr_info),
-      M(openssl_privatekey_info) and M(assert). This also allows more flexible checks than
+      to emulate C(assertonly) usage with M(community.crypto.x509_certificate_info),
+      M(community.crypto.openssl_csr_info), M(community.crypto.openssl_privatekey_info) and
+      M(ansible.builtin.assert). This also allows more flexible checks than
       the ones offered by the C(assertonly) provider.
     - The C(ownca) provider is intended for generating OpenSSL certificate signed with your own
       CA (Certificate Authority) certificate (self-signed certificate).
@@ -36,11 +37,13 @@ description:
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with C(select_crypto_backend)).
       Please note that the PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
     - Note that this module was called C(openssl_certificate) when included directly in Ansible up to version 2.9.
-      When moved to the collection C(community.crypto), it was renamed to M(x509_certificate). From Ansible 2.10 on, it can
-      still be used by the old short name (or by C(ansible.builtin.openssl_certificate)), which redirects to
+      When moved to the collection C(community.crypto), it was renamed to
+      M(community.crypto.x509_certificate). From Ansible 2.10 on, it can still be used by the
+      old short name (or by C(ansible.builtin.openssl_certificate)), which redirects to
       C(community.crypto.x509_certificate). When using FQCNs or when using the
       L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
-      keyword, the new name M(x509_certificate) should be used to avoid a deprecation warning.
+      keyword, the new name M(community.crypto.x509_certificate) should be used to avoid
+      a deprecation warning.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 1.6 (if using C(selfsigned) or C(assertonly) provider)
     - acme-tiny >= 4.0.0 (if using the C(acme) provider)
@@ -66,8 +69,9 @@ options:
             - Name of the provider to use to generate/retrieve the OpenSSL certificate.
             - The C(assertonly) provider will not generate files and fail if the certificate file is missing.
             - The C(assertonly) provider has been deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
-              Please see the examples on how to emulate it with M(x509_certificate_info), M(openssl_csr_info),
-              M(openssl_privatekey_info) and M(assert).
+              Please see the examples on how to emulate it with
+              M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info),
+              M(community.crypto.openssl_privatekey_info) and M(ansible.builtin.assert).
             - "The C(entrust) provider was added for Ansible 2.9 and requires credentials for the
                L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
             - Required if I(state) is C(present).
@@ -579,15 +583,16 @@ extends_documentation_fragment: files
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
-    - For security reason, when you use C(ownca) provider, you should NOT run M(x509_certificate) on
-      a target machine, but on a dedicated CA machine. It is recommended not to store the CA private key
-      on the target machine. Once signed, the certificate can be moved to the target machine.
+    - For security reason, when you use C(ownca) provider, you should NOT run
+      M(community.general.x509_certificate) on a target machine, but on a dedicated CA machine. It
+      is recommended not to store the CA private key on the target machine. Once signed, the
+      certificate can be moved to the target machine.
 seealso:
-- module: openssl_csr
-- module: openssl_dhparam
-- module: openssl_pkcs12
-- module: openssl_privatekey
-- module: openssl_publickey
+- module: community.crypto.openssl_csr
+- module: community.crypto.openssl_dhparam
+- module: community.crypto.openssl_pkcs12
+- module: community.crypto.openssl_privatekey
+- module: community.crypto.openssl_publickey
 '''
 
 EXAMPLES = r'''

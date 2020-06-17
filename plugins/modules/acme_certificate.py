@@ -38,9 +38,9 @@ description:
 notes:
    - "At least one of C(dest) and C(fullchain_dest) must be specified."
    - "This module includes basic account management functionality.
-      If you want to have more control over your ACME account, use the M(acme_account)
-      module and disable account management for this module using the C(modify_account)
-      option."
+      If you want to have more control over your ACME account, use the
+      M(community.crypto.acme_account) module and disable account management
+      for this module using the C(modify_account) option."
    - "This module was called C(letsencrypt) before Ansible 2.6. The usage
       did not change."
 seealso:
@@ -58,19 +58,19 @@ seealso:
   - name: ACME TLS ALPN Challenge Extension
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html-05
-  - module: acme_challenge_cert_helper
+  - module: community.crypto.acme_challenge_cert_helper
     description: Helps preparing C(tls-alpn-01) challenges.
-  - module: openssl_privatekey
+  - module: community.crypto.openssl_privatekey
     description: Can be used to create private keys (both for certificates and accounts).
-  - module: openssl_csr
+  - module: commuinty.crypto.openssl_csr
     description: Can be used to create a Certificate Signing Request (CSR).
-  - module: certificate_complete_chain
+  - module: comunity.crypto.certificate_complete_chain
     description: Allows to find the root certificate for the returned fullchain.
-  - module: acme_certificate_revoke
+  - module: community.crypto.acme_certificate_revoke
     description: Allows to revoke certificates.
-  - module: acme_account
+  - module: community.crypto.acme_account
     description: Allows to create, modify or delete an ACME account.
-  - module: acme_inspect
+  - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
 - community.crypto.acme
@@ -81,7 +81,7 @@ options:
       - "The email address associated with this account."
       - "It will be used for certificate expiration warnings."
       - "Note that when C(modify_account) is not set to C(no) and you also
-         used the M(acme_account) module to specify more than one contact
+         used the M(community.crypto.acme_account) module to specify more than one contact
          for your account, this module will update your account and restrict
          it to the (at most one) contact email address specified here."
     type: str
@@ -103,9 +103,9 @@ options:
     description:
       - "Boolean indicating whether the module should create the account if
          necessary, and update its contact data."
-      - "Set to C(no) if you want to use the M(acme_account) module to manage
+      - "Set to C(no) if you want to use the M(community.crypto.acme_account) module to manage
          your account instead, and to avoid accidental creation of a new account
-         using an old key if you changed the account key with M(acme_account)."
+         using an old key if you changed the account key with M(community.crypto.acme_account)."
       - "If set to C(no), C(terms_agreed) and C(account_email) are ignored."
     type: bool
     default: yes

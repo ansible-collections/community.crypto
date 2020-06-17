@@ -33,7 +33,7 @@ seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
     link: https://tools.ietf.org/html/rfc8555
-  - module: acme_inspect
+  - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
 - community.crypto.acme

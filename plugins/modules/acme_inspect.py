@@ -18,14 +18,14 @@ description:
       L(ACME protocol,https://tools.ietf.org/html/rfc8555),
       which is supported by CAs such as L(Let's Encrypt,https://letsencrypt.org/)."
    - "This module can be used to debug failed certificate request attempts,
-      for example when M(acme_certificate) fails or encounters a problem which
+      for example when M(community.crypto.acme_certificate) fails or encounters a problem which
       you wish to investigate."
    - "The module can also be used to directly access features of an ACME servers
       which are not yet supported by the Ansible ACME modules."
 notes:
    - "The I(account_uri) option must be specified for properly authenticated
       ACME v2 requests (except a C(new-account) request)."
-   - "Using the C(ansible) tool, M(acme_inspect) can be used to directly execute
+   - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute
       ACME requests without the need of writing a playbook. For example, the
       following command retrieves the ACME account with ID 1 from Let's Encrypt
       (assuming C(/path/to/key) is the correct private account key):

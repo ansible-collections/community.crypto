@@ -98,11 +98,11 @@ options:
 extends_documentation_fragment:
     - files
 seealso:
-- module: x509_certificate
-- module: openssl_csr
-- module: openssl_dhparam
-- module: openssl_privatekey
-- module: openssl_publickey
+- module: community.crypto.x509_certificate
+- module: community.crypto.openssl_csr
+- module: community.crypto.openssl_dhparam
+- module: community.crypto.openssl_privatekey
+- module: community.crypto.openssl_publickey
 '''
 
 EXAMPLES = r'''

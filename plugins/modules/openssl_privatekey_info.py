@@ -65,7 +65,7 @@ options:
         choices: [ auto, cryptography, pyopenssl ]
 
 seealso:
-- module: openssl_privatekey
+- module: community.crypto.openssl_privatekey
 '''
 
 EXAMPLES = r'''
