@@ -18,7 +18,7 @@ description:
        intermediate certificates from a given set of certificates, until it finds a root
        certificate in another given set of certificates."
     - "This can for example be used to find the root certificate for a certificate chain
-       returned by M(acme_certificate)."
+       returned by M(community.crypto.acme_certificate)."
     - "Note that this module does I(not) check for validity of the chains. It only
        checks that issuer and subject match, and that the signature is correct. It
        ignores validity dates and key usage completely. If you need to verify that a

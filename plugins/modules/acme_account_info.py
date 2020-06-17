@@ -19,7 +19,8 @@ description:
       such as L(Let's Encrypt,https://letsencrypt.org/)."
    - "This module only works with the ACME v2 protocol."
 notes:
-   - "The M(acme_account) module allows to modify, create and delete ACME accounts."
+   - "The M(community.crypto.acme_account) module allows to modify, create and delete ACME
+      accounts."
    - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
       did not change."
 options:
@@ -37,7 +38,7 @@ options:
       - object_list
     default: ignore
 seealso:
-  - module: acme_account
+  - module: community.crypto.acme_account
     description: Allows to create, modify or delete an ACME account.
 extends_documentation_fragment:
 - community.crypto.acme

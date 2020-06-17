@@ -15,7 +15,7 @@ author: "Felix Fontein (@felixfontein)"
 short_description: Prepare certificates required for ACME challenges such as C(tls-alpn-01)
 description:
    - "Prepares certificates for ACME challenges such as C(tls-alpn-01)."
-   - "The raw data is provided by the M(acme_certificate) module, and needs to be
+   - "The raw data is provided by the M(community.crypto.acme_certificate) module, and needs to be
       converted to a certificate to be used for challenge validation. This module
       provides a simple way to generate the required certificates."
 seealso:
@@ -37,7 +37,8 @@ options:
     - tls-alpn-01
   challenge_data:
     description:
-      - "The C(challenge_data) entry provided by M(acme_certificate) for the challenge."
+      - "The C(challenge_data) entry provided by M(community.crypto.acme_certificate) for the
+         challenge."
     type: dict
     required: yes
   private_key_src:

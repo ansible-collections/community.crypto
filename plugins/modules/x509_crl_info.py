@@ -34,7 +34,7 @@ notes:
     - All timestamp values are provided in ASN.1 TIME format, i.e. following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
 seealso:
-    - module: x509_crl
+    - module: community.crypto.x509_crl
 '''
 
 EXAMPLES = r'''

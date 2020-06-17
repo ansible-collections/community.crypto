@@ -19,19 +19,19 @@ description:
       such as L(Let's Encrypt,https://letsencrypt.org/)."
    - "This module only works with the ACME v2 protocol."
 notes:
-   - "The M(acme_certificate) module also allows to do basic account management.
+   - "The M(community.crypto.acme_certificate) module also allows to do basic account management.
       When using both modules, it is recommended to disable account management
-      for M(acme_certificate). For that, use the C(modify_account) option of
-      M(acme_certificate)."
+      for M(community.crypto.acme_certificate). For that, use the C(modify_account) option of
+      M(community.crypto.acme_certificate)."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
     link: https://tools.ietf.org/html/rfc8555
-  - module: acme_account_info
+  - module: community.crypto.acme_account_info
     description: Retrieves facts about an ACME account.
-  - module: openssl_privatekey
+  - module: community.crypto.openssl_privatekey
     description: Can be used to create a private account key.
-  - module: acme_inspect
+  - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
 - community.crypto.acme

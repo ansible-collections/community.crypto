@@ -274,11 +274,11 @@ notes:
       keyUsage, extendedKeyUsage and basicConstraints only contain the requested values, whether
       OCSP Must Staple is as requested, and if the request was signed by the given private key.
 seealso:
-- module: x509_certificate
-- module: openssl_dhparam
-- module: openssl_pkcs12
-- module: openssl_privatekey
-- module: openssl_publickey
+- module: community.crypto.x509_certificate
+- module: community.crypto.openssl_dhparam
+- module: community.crypto.openssl_pkcs12
+- module: community.crypto.openssl_privatekey
+- module: community.crypto.openssl_publickey
 '''
 
 EXAMPLES = r'''
