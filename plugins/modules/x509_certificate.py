@@ -19,7 +19,7 @@ description:
       for your certificate.
     - The C(assertonly) provider is intended for use cases where one is only interested in
       checking properties of a supplied certificate. Please note that this provider has been
-      deprecated in Ansible 2.9 and will be removed in Ansible 2.13. See the examples on how
+      deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0. See the examples on how
       to emulate C(assertonly) usage with M(community.crypto.x509_certificate_info),
       M(community.crypto.openssl_csr_info), M(community.crypto.openssl_privatekey_info) and
       M(ansible.builtin.assert). This also allows more flexible checks than
@@ -35,7 +35,7 @@ description:
     - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL.
     - If both the cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with C(select_crypto_backend)).
-      Please note that the PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
+      Please note that the PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0.
     - Note that this module was called C(openssl_certificate) when included directly in Ansible up to version 2.9.
       When moved to the collection C(community.crypto), it was renamed to
       M(community.crypto.x509_certificate). From Ansible 2.10 on, it can still be used by the
@@ -68,7 +68,7 @@ options:
         description:
             - Name of the provider to use to generate/retrieve the OpenSSL certificate.
             - The C(assertonly) provider will not generate files and fail if the certificate file is missing.
-            - The C(assertonly) provider has been deprecated in Ansible 2.9 and will be removed in Ansible 2.13.
+            - The C(assertonly) provider has been deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0.
               Please see the examples on how to emulate it with
               M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info),
               M(community.crypto.openssl_privatekey_info) and M(ansible.builtin.assert).
@@ -302,7 +302,7 @@ options:
             - A list of algorithms that you would accept the certificate to be signed with
               (e.g. ['sha256WithRSAEncryption', 'sha512WithRSAEncryption']).
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: list
         elements: str
@@ -312,7 +312,7 @@ options:
             - The key/value pairs that must be present in the issuer name field of the certificate.
             - If you need to specify more than one value with the same key, use a list as value.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: dict
 
@@ -320,7 +320,7 @@ options:
         description:
             - If set to C(yes), the I(issuer) field must contain only these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -330,7 +330,7 @@ options:
             - The key/value pairs that must be present in the subject name field of the certificate.
             - If you need to specify more than one value with the same key, use a list as value.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: dict
 
@@ -338,7 +338,7 @@ options:
         description:
             - If set to C(yes), the I(subject) field must contain only these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -347,7 +347,7 @@ options:
         description:
             - Checks if the certificate is expired/not expired at the time the module is executed.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -357,7 +357,7 @@ options:
             - The version of the certificate.
             - Nowadays it should almost always be 3.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: int
 
@@ -366,7 +366,7 @@ options:
             - The certificate must be valid at this point in time.
             - The timestamp is formatted as an ASN.1 TIME.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: str
 
@@ -375,7 +375,7 @@ options:
             - The certificate must be invalid at this point in time.
             - The timestamp is formatted as an ASN.1 TIME.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: str
 
@@ -384,7 +384,7 @@ options:
             - The certificate must start to become valid at this point in time.
             - The timestamp is formatted as an ASN.1 TIME.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: str
         aliases: [ notBefore ]
@@ -394,7 +394,7 @@ options:
             - The certificate must expire at this point in time.
             - The timestamp is formatted as an ASN.1 TIME.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: str
         aliases: [ notAfter ]
@@ -406,7 +406,7 @@ options:
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - Note that if using this parameter, this module is NOT idempotent.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: str
 
@@ -414,7 +414,7 @@ options:
         description:
             - The I(key_usage) extension field must contain all these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: list
         elements: str
@@ -424,7 +424,7 @@ options:
         description:
             - If set to C(yes), the I(key_usage) extension field must contain only these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -434,7 +434,7 @@ options:
         description:
             - The I(extended_key_usage) extension field must contain all these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: list
         elements: str
@@ -444,7 +444,7 @@ options:
         description:
             - If set to C(yes), the I(extended_key_usage) extension field must contain only these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -454,7 +454,7 @@ options:
         description:
             - The I(subject_alt_name) extension field must contain these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: list
         elements: str
@@ -464,7 +464,7 @@ options:
         description:
             - If set to C(yes), the I(subject_alt_name) extension field must contain only these values.
             - This is only used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -476,7 +476,7 @@ options:
             - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
             - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in Ansible 2.13.
+            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
               From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
@@ -487,7 +487,7 @@ options:
             - Create a backup file including a timestamp so you can get the original
               certificate back if you overwrote it with a new one by accident.
             - This is not used by the C(assertonly) provider.
-            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in Ansible 2.13.
+            - This option is deprecated since Ansible 2.9 and will be removed with the C(assertonly) provider in community.crypto 2.0.0.
               For alternatives, see the example on replacing C(assertonly).
         type: bool
         default: no
@@ -2556,24 +2556,24 @@ def main():
             privatekey_passphrase=dict(type='str', no_log=True),
 
             # provider: assertonly
-            signature_algorithms=dict(type='list', elements='str', removed_in_version='2.13'),
-            subject=dict(type='dict', removed_in_version='2.13'),
-            subject_strict=dict(type='bool', default=False, removed_in_version='2.13'),
-            issuer=dict(type='dict', removed_in_version='2.13'),
-            issuer_strict=dict(type='bool', default=False, removed_in_version='2.13'),
-            has_expired=dict(type='bool', default=False, removed_in_version='2.13'),
-            version=dict(type='int', removed_in_version='2.13'),
-            key_usage=dict(type='list', elements='str', aliases=['keyUsage'], removed_in_version='2.13'),
-            key_usage_strict=dict(type='bool', default=False, aliases=['keyUsage_strict'], removed_in_version='2.13'),
-            extended_key_usage=dict(type='list', elements='str', aliases=['extendedKeyUsage'], removed_in_version='2.13'),
-            extended_key_usage_strict=dict(type='bool', default=False, aliases=['extendedKeyUsage_strict'], removed_in_version='2.13'),
-            subject_alt_name=dict(type='list', elements='str', aliases=['subjectAltName'], removed_in_version='2.13'),
-            subject_alt_name_strict=dict(type='bool', default=False, aliases=['subjectAltName_strict'], removed_in_version='2.13'),
-            not_before=dict(type='str', aliases=['notBefore'], removed_in_version='2.13'),
-            not_after=dict(type='str', aliases=['notAfter'], removed_in_version='2.13'),
-            valid_at=dict(type='str', removed_in_version='2.13'),
-            invalid_at=dict(type='str', removed_in_version='2.13'),
-            valid_in=dict(type='str', removed_in_version='2.13'),
+            signature_algorithms=dict(type='list', elements='str', removed_in_version='2.0.0', collection_name='community.crypto'),
+            subject=dict(type='dict', removed_in_version='2.0.0', collection_name='community.crypto'),
+            subject_strict=dict(type='bool', default=False, removed_in_version='2.0.0', collection_name='community.crypto'),
+            issuer=dict(type='dict', removed_in_version='2.0.0', collection_name='community.crypto'),
+            issuer_strict=dict(type='bool', default=False, removed_in_version='2.0.0', collection_name='community.crypto'),
+            has_expired=dict(type='bool', default=False, removed_in_version='2.0.0', collection_name='community.crypto'),
+            version=dict(type='int', removed_in_version='2.0.0', collection_name='community.crypto'),
+            key_usage=dict(type='list', elements='str', aliases=['keyUsage'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            key_usage_strict=dict(type='bool', default=False, aliases=['keyUsage_strict'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            extended_key_usage=dict(type='list', elements='str', aliases=['extendedKeyUsage'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            extended_key_usage_strict=dict(type='bool', default=False, aliases=['extendedKeyUsage_strict'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            subject_alt_name=dict(type='list', elements='str', aliases=['subjectAltName'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            subject_alt_name_strict=dict(type='bool', default=False, aliases=['subjectAltName_strict'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            not_before=dict(type='str', aliases=['notBefore'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            not_after=dict(type='str', aliases=['notAfter'], removed_in_version='2.0.0', collection_name='community.crypto'),
+            valid_at=dict(type='str', removed_in_version='2.0.0', collection_name='community.crypto'),
+            invalid_at=dict(type='str', removed_in_version='2.0.0', collection_name='community.crypto'),
+            valid_in=dict(type='str', removed_in_version='2.0.0', collection_name='community.crypto'),
 
             # provider: selfsigned
             selfsigned_version=dict(type='int', default=3),
@@ -2639,7 +2639,8 @@ def main():
         ],
     )
     if module._name == 'community.crypto.openssl_certificate':
-        module.deprecate("The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'", version='2.14')
+        module.deprecate("The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'",
+                         version='2.0.0', collection_name='community.crypto')
 
     try:
         if module.params['state'] == 'absent':
@@ -2660,7 +2661,7 @@ def main():
             if provider == 'assertonly':
                 module.deprecate("The 'assertonly' provider is deprecated; please see the examples of "
                                  "the 'x509_certificate' module on how to replace it with other modules",
-                                 version='2.13')
+                                 version='2.0.0', collection_name='community.crypto')
             elif provider == 'selfsigned':
                 if module.params['privatekey_path'] is None and module.params['privatekey_content'] is None:
                     module.fail_json(msg='One of privatekey_path and privatekey_content must be specified for the selfsigned provider.')
@@ -2708,7 +2709,8 @@ def main():
                     except AttributeError:
                         module.fail_json(msg='You need to have PyOpenSSL>=0.15')
 
-                module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='2.13')
+                module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+                                 version='2.0.0', collection_name='community.crypto')
                 if provider == 'selfsigned':
                     certificate = SelfSignedCertificate(module)
                 elif provider == 'acme':
