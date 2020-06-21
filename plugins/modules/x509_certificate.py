@@ -894,6 +894,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_serial_number_of_cert,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
+    pyopenssl_normalize_name_attribute,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 
@@ -2228,25 +2232,15 @@ class AssertOnlyCertificate(AssertOnlyCertificateBase):
             if self.extended_key_usage:
                 return NO_EXTENSION
 
-    def _normalize_san(self, san):
-        # Apparently OpenSSL returns 'IP address' not 'IP' as specifier when converting the subjectAltName to string
-        # although it won't accept this specifier when generating the CSR. (https://github.com/openssl/openssl/issues/4004)
-        if san.startswith('IP Address:'):
-            san = 'IP:' + san[len('IP Address:'):]
-        if san.startswith('IP:'):
-            ip = compat_ipaddress.ip_address(san[3:])
-            san = 'IP:{0}'.format(ip.compressed)
-        return san
-
     def _validate_subject_alt_name(self):
         found = False
         for extension_idx in range(0, self.cert.get_extension_count()):
             extension = self.cert.get_extension(extension_idx)
             if extension.get_short_name() == b'subjectAltName':
                 found = True
-                l_altnames = [self._normalize_san(altname.strip()) for altname in
+                l_altnames = [pyopenssl_normalize_name_attribute(altname.strip()) for altname in
                               to_text(extension, errors='surrogate_or_strict').split(', ')]
-                sans = [self._normalize_san(to_text(san, errors='surrogate_or_strict')) for san in self.subject_alt_name]
+                sans = [pyopenssl_normalize_name_attribute(to_text(san, errors='surrogate_or_strict')) for san in self.subject_alt_name]
                 if not compare_sets(sans, l_altnames, self.subject_alt_name_strict):
                     return self.subject_alt_name, l_altnames
         if not found:

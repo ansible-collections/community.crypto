@@ -23,6 +23,8 @@ import base64
 
 from ansible.module_utils._text import to_bytes, to_text
 
+from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
+
 try:
     import OpenSSL
 except ImportError:
@@ -46,6 +48,23 @@ def pyopenssl_normalize_name(name, short=False):
         return NORMALIZE_NAMES_SHORT.get(name, name)
     else:
         return NORMALIZE_NAMES.get(name, name)
+
+
+def pyopenssl_normalize_name_attribute(san):
+    # apparently openssl returns 'IP address' not 'IP' as specifier when converting the subjectAltName to string
+    # although it won't accept this specifier when generating the CSR. (https://github.com/openssl/openssl/issues/4004)
+    if san.startswith('IP Address:'):
+        san = 'IP:' + san[len('IP Address:'):]
+    if san.startswith('IP:'):
+        ip = compat_ipaddress.ip_address(san[3:])
+        san = 'IP:{0}'.format(ip.compressed)
+
+    if san.startswith('Registered ID:'):
+        san = 'RID:' + san[len('Registered ID:'):]
+    # Some versions of OpenSSL apparently forgot the colon. Happens in CI with Ubuntu 16.04 and FreeBSD 11.1
+    if san.startswith('Registered ID'):
+        san = 'RID:' + san[len('Registered ID'):]
+    return san
 
 
 def pyopenssl_get_extensions_from_cert(cert):

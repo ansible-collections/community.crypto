@@ -422,8 +422,6 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
-
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
@@ -447,6 +445,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
     cryptography_key_needs_digest_for_signing,
     cryptography_parse_key_usage_params,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
+    pyopenssl_normalize_name_attribute,
 )
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -705,16 +707,6 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
         except OpenSSLBadPassphraseError as exc:
             raise CertificateSigningRequestError(exc)
 
-    def _normalize_san(self, san):
-        # Apparently OpenSSL returns 'IP address' not 'IP' as specifier when converting the subjectAltName to string
-        # although it won't accept this specifier when generating the CSR. (https://github.com/openssl/openssl/issues/4004)
-        if san.startswith('IP Address:'):
-            san = 'IP:' + san[len('IP Address:'):]
-        if san.startswith('IP:'):
-            ip = compat_ipaddress.ip_address(san[3:])
-            san = 'IP:{0}'.format(ip.compressed)
-        return san
-
     def _check_csr(self):
         def _check_subject(csr):
             subject = [(OpenSSL._util.lib.OBJ_txt2nid(to_bytes(sub[0])), to_bytes(sub[1])) for sub in self.subject]
@@ -726,10 +718,10 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
 
         def _check_subjectAltName(extensions):
             altnames_ext = next((ext for ext in extensions if ext.get_short_name() == b'subjectAltName'), '')
-            altnames = [self._normalize_san(altname.strip()) for altname in
+            altnames = [pyopenssl_normalize_name_attribute(altname.strip()) for altname in
                         to_text(altnames_ext, errors='surrogate_or_strict').split(',') if altname.strip()]
             if self.subjectAltName:
-                if (set(altnames) != set([self._normalize_san(to_text(name)) for name in self.subjectAltName]) or
+                if (set(altnames) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.subjectAltName]) or
                         altnames_ext.get_critical() != self.subjectAltName_critical):
                     return False
             else:
