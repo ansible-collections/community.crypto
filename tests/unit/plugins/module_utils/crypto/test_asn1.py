@@ -3,6 +3,9 @@
 # (c) 2020, Jordan Borean <jborean93@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import base64
 import re
 import subprocess
@@ -81,7 +84,7 @@ def test_test_cases(value, expected, tmp_path):
         b_data = fd.read()
 
     hex_str = base64.b16encode(b_data).decode().lower()
-    print("%s | \\x%s" % (value, "\\x".join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])))
+    print("%s | \\x%s" % (value, "\\x".join([hex_str[i:i + 2] for i in range(0, len(hex_str), 2)])))
 
     # This is a know edge case where openssl asn1parse does not work properly.
     if value != u'UTF8:café':

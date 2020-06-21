@@ -268,6 +268,7 @@
             "URI:https://example.org/test/index.html",
             "RID:1.2.3.4",
             "otherName:1.2.3.4;0c:07:63:65:72:74:72:65:71",
+            "otherName:1.3.6.1.4.1.311.20.2.3;0c:0d:62:6f:62:40:6c:6f:63:61:6c:68:6f:73:74",
             "dirName:/O=Example Net/CN=example.net",
             "dirName:/O=Example Com/CN=example.com"
         ]
