@@ -120,9 +120,6 @@ options:
             - This can either be a 'comma separated string' or a YAML list.
             - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName) and the ones specific to your CA).
-            - Only C(DNS), C(IP), C(email), C(URI), and C(otherName) is supported.
-            - C(otherName) only supports the C(UTF8) type and must be in the format
-              C(otherName:<OID>;UTF8:value).
             - Note that if no SAN is specified, but a common name, the common
               name will be added as a SAN except if C(useCommonNameForSAN) is
               set to I(false).
