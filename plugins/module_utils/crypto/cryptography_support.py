@@ -24,7 +24,7 @@ import binascii
 import re
 
 from ansible.module_utils._text import to_text
-from ._asn1 import deserialze_asn1_string
+from ._asn1 import serialize_asn1_string_as_der
 
 try:
     import cryptography
@@ -220,7 +220,7 @@ def cryptography_get_name(name):
                                          '"otherName:<OID>;<hex string>"'.format(name))
 
             oid, value = name.split(';', 1)
-            b_value = deserialze_asn1_string(value)
+            b_value = serialize_asn1_string_as_der(value)
             return x509.OtherName(x509.ObjectIdentifier(oid), b_value)
         if name.startswith('dirName:'):
             return x509.DirectoryName(x509.Name(_parse_dn(to_text(name[8:]))))

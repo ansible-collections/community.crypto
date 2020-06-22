@@ -66,7 +66,7 @@ def _pack_octet_integer(value):
     return bytes(octets)
 
 
-def deserialze_asn1_string(value):
+def serialize_asn1_string_as_der(value):
     """ Deserializes an ASN.1 string to a DER encoded byte string. """
     asn1_match = ASN1_STRING_REGEX.match(value)
     if not asn1_match:

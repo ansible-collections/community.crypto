@@ -13,7 +13,7 @@ import subprocess
 import pytest
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto._asn1 import (
-    deserialze_asn1_string,
+    serialize_asn1_string_as_der,
     pack_asn1,
 )
 
@@ -47,8 +47,8 @@ TEST_CASES = [
 
 
 @pytest.mark.parametrize('value, expected', TEST_CASES)
-def test_deserialize_asn1_string(value, expected):
-    actual = deserialze_asn1_string(value)
+def test_serialize_asn1_string_as_der(value, expected):
+    actual = serialize_asn1_string_as_der(value)
     print("%s | %s" % (value, base64.b16encode(actual).decode()))
     assert actual == expected
 
@@ -57,16 +57,16 @@ def test_deserialize_asn1_string(value, expected):
     'invalid',
     'EXPLICIT,UTF:value',
 ])
-def test_deserialize_asn1_string_invalid_format(value):
+def test_serialize_asn1_string_as_der_invalid_format(value):
     expected = "The ASN.1 serialized string must be in the format [modifier,]type[:value]"
     with pytest.raises(ValueError, match=re.escape(expected)):
-        deserialze_asn1_string(value)
+        serialize_asn1_string_as_der(value)
 
 
-def test_deserialize_asn1_string_invalid_type():
+def test_serialize_asn1_string_as_der_invalid_type():
     expected = "The ASN.1 serialized string is not a known type \"OID\", only UTF8 types are supported"
     with pytest.raises(ValueError, match=re.escape(expected)):
-        deserialze_asn1_string("OID:1.2.3.4")
+        serialize_asn1_string_as_der("OID:1.2.3.4")
 
 
 def test_pack_asn_invalid_class():
