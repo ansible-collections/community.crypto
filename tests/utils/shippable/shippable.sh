@@ -55,9 +55,6 @@ pip --version
 pip list --disable-pip-version-check
 if [ "${ansible_version}" == "devel" ]; then
     retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
-elif [ "${ansible_version}" == "2.9" ]; then
-    # Needed until all relevant backports have been merged
-    retry pip install https://github.com/felixfontein/ansible/archive/backport/2.9/ansible-test.tar.gz --disable-pip-version-check
 else
     retry pip install "https://github.com/ansible/ansible/archive/stable-${ansible_version}.tar.gz" --disable-pip-version-check
 fi
