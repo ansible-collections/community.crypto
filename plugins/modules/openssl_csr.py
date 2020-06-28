@@ -20,7 +20,7 @@ description:
     - "Please note that the module regenerates existing CSR if it doesn't match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing CSR, consider using the I(backup) option."
-    - The module can use the cryptography Python library, or the pyOpenSSL Python
+    - "The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the
       PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."

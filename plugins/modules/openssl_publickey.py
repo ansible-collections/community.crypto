@@ -15,7 +15,7 @@ short_description: Generate an OpenSSL public key from its private key.
 description:
     - This module allows one to (re)generate OpenSSL public keys from their private keys.
     - Keys are generated in PEM or OpenSSH format.
-    - The module can use the cryptography Python library, or the pyOpenSSL Python
+    - "The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. When I(format) is C(OpenSSH),
       the C(cryptography) backend has to be used. Please note that the PyOpenSSL backend
