@@ -14,8 +14,9 @@ tags:
   - cryptography
   - csr
   - dhparam
-  - Entrust
-  - Let's Encrypt
+  - entrust
+  - lets-encrypt
+  - letsencrypt
   - luks
   - openssl
   - openssh
