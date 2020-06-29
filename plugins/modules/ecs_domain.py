@@ -13,6 +13,7 @@ DOCUMENTATION = '''
 module: ecs_domain
 author:
     - Chris Trufan (@ctrufan)
+version_added: '1.0.0'
 short_description: Request validation of a domain with the Entrust Certificate Services (ECS) API
 description:
     - Request validation or re-validation of a domain with the Entrust Certificate Services (ECS) API.

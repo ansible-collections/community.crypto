@@ -129,6 +129,7 @@ options:
         type: str
         default: auto_ignore
         choices: [ pkcs1, pkcs8, raw, auto, auto_ignore ]
+        version_added: '1.0.0'
     format_mismatch:
         description:
             - Determines behavior of the module if the format of a private key does not match the expected format, but all
@@ -139,6 +140,7 @@ options:
         type: str
         default: regenerate
         choices: [ regenerate, convert ]
+        version_added: '1.0.0'
     backup:
         description:
             - Create a backup file including a timestamp so you can get
@@ -152,6 +154,7 @@ options:
               value is treated appropriately and not accidentally written to logs etc.! Use with care!
         type: bool
         default: no
+        version_added: '1.0.0'
     regenerate:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.
@@ -184,6 +187,7 @@ options:
             - full_idempotence
             - always
         default: full_idempotence
+        version_added: '1.0.0'
 extends_documentation_fragment:
 - files
 seealso:
@@ -266,6 +270,7 @@ privatekey:
         - Will be Base64-encoded if the key is in raw format.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: '1.0.0'
 '''
 
 import abc

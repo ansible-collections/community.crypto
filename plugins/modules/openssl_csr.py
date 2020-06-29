@@ -51,6 +51,7 @@ options:
             - The content of the private key to use when signing the certificate signing request.
             - Either I(privatekey_path) or I(privatekey_content) must be specified if I(state) is C(present), but not both.
         type: str
+        version_added: "1.0.0"
     privatekey_passphrase:
         description:
             - The passphrase for the private key.
@@ -267,6 +268,7 @@ options:
             - If set to C(yes), will return the (current or generated) CSR's content as I(csr).
         type: bool
         default: no
+        version_added: "1.0.0"
 extends_documentation_fragment:
 - files
 notes:
@@ -419,6 +421,7 @@ csr:
     description: The (current or generated) CSR's content.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: "1.0.0"
 '''
 
 import abc

@@ -62,6 +62,7 @@ options:
             - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
               If I(state) is C(present), one of them is required.
         type: str
+        version_added: '1.0.0'
     privatekey_passphrase:
         description:
             - The passphrase for the private key.
@@ -86,6 +87,7 @@ options:
             - If set to C(yes), will return the (current or generated) public key's content as I(publickey).
         type: bool
         default: no
+        version_added: '1.0.0'
 extends_documentation_fragment:
 - files
 seealso:
@@ -171,6 +173,7 @@ publickey:
     description: The (current or generated) public key's content.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: '1.0.0'
 '''
 
 import os

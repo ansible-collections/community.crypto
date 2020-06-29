@@ -45,6 +45,7 @@ options:
             - Content of the X.509 certificate in PEM format.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
+        version_added: '1.0.0'
     valid_at:
         description:
             - A dict of names mapping to time specifications. Every time specified here

@@ -96,6 +96,7 @@ options:
             - This is not required in C(assertonly) mode.
             - This is mutually exclusive with I(csr_path).
         type: str
+        version_added: '1.0.0'
 
     privatekey_path:
         description:
@@ -107,6 +108,7 @@ options:
             - Path to the private key to use when signing the certificate.
             - This is mutually exclusive with I(privatekey_path).
         type: str
+        version_added: '1.0.0'
 
     privatekey_passphrase:
         description:
@@ -183,6 +185,7 @@ options:
             - This is only used by the C(ownca) provider.
             - This is mutually exclusive with I(ownca_path).
         type: str
+        version_added: '1.0.0'
 
     ownca_privatekey_path:
         description:
@@ -196,6 +199,7 @@ options:
             - This is only used by the C(ownca) provider.
             - This is mutually exclusive with I(ownca_privatekey_path).
         type: str
+        version_added: '1.0.0'
 
     ownca_privatekey_passphrase:
         description:
@@ -296,6 +300,7 @@ options:
             - "Let's Encrypt recommends using their staging server while developing jobs. U(https://letsencrypt.org/docs/staging-environment/)."
         type: str
         default: https://acme-v02.api.letsencrypt.org/directory
+        version_added: '1.0.0'
 
     signature_algorithms:
         description:
@@ -578,6 +583,7 @@ options:
             - If set to C(yes), will return the (current or generated) certificate's content as I(certificate).
         type: bool
         default: no
+        version_added: '1.0.0'
 
 extends_documentation_fragment: files
 notes:
@@ -846,6 +852,7 @@ certificate:
     description: The (current or generated) certificate's content.
     returned: if I(state) is C(present) and I(return_content) is C(yes)
     type: str
+    version_added: '1.0.0'
 '''
 
 

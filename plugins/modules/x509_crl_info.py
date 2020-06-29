@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: x509_crl_info
+version_added: '1.0.0'
 short_description: Retrieve information on Certificate Revocation Lists (CRLs)
 description:
     - This module allows one to retrieve information on Certificate Revocation Lists (CRLs).
