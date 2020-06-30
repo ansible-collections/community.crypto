@@ -4,17 +4,14 @@
 
 Provides modules for [Ansible](https://www.ansible.com/community) for various cryptographic operations.
 
-<!-- Describe the collection and why a user would want to use it. What does the collection do? -->
-
 ## Tested with Ansible
 
-Tested with both the current Ansible 2.9 release and the current development version of Ansible.
-
-<!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
+Tested with both the current Ansible 2.9 and 2.10 releases and the current development version of Ansible. Ansible versions before 2.9.10 are not supported.
 
 ## External requirements
 
 The exact requirements for every module are listed in the module documentation. 
+
 Most modules require a recent enough version of [the Python cryptography library](https://pypi.org/project/cryptography/). See the module documentations for the minimal version supported for each module.
 
 ## Included content
@@ -51,8 +48,6 @@ Most modules require a recent enough version of [the Python cryptography library
 
 ## Using this collection
 
-<!--Include some quick examples that cover the most common use cases for your collection content. -->
-
 See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Contributing to this collection
@@ -64,11 +59,13 @@ We're following the general Ansible contributor guidelines; see [Ansible Communi
 If you want to clone this repositority (or a fork of it) to improve it, you can proceed as follows:
 1. Create a directory `ansible_collections/community`;
 2. In there, checkout this repository (or a fork) as `crypto`;
-3. Add the directory containing `ansible_collections` to your [ANSIBLE_COLLECTIONS_PATHS](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths).
+3. Add the directory containing `ansible_collections` to your [ANSIBLE_COLLECTIONS_PATH](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths).
+
+See [Ansible's dev guide](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections) for more information.
 
 ## Release notes
 
-<!--Add a link to a changelog.md file or an external docsite to cover this information. -->
+See the [changelog](https://github.com/ansible-collections/collection_template/blob/master/CHANGELOG.rst).
 
 ## Roadmap
 
