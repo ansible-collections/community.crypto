@@ -48,6 +48,17 @@ Most modules require a recent enough version of [the Python cryptography library
 
 ## Using this collection
 
+Before using the crypto community collection, you need to install the collection with the `ansible-galaxy` CLI:
+
+    ansible-galaxy collection install community.crypto
+
+You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml` using the format:
+
+```yaml
+collections:
+- name: community.crypto
+```
+
 See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Contributing to this collection
