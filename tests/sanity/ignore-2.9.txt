@@ -3,15 +3,5 @@ plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/crypto/__init__.py empty-init
-tests/unit/mock/path.py future-import-boilerplate
-tests/unit/mock/path.py metaclass-boilerplate
-tests/unit/mock/yaml_helper.py future-import-boilerplate
-tests/unit/mock/yaml_helper.py metaclass-boilerplate
-tests/unit/plugins/module_utils/conftest.py future-import-boilerplate
-tests/unit/plugins/module_utils/conftest.py metaclass-boilerplate
-tests/unit/plugins/modules/conftest.py future-import-boilerplate
-tests/unit/plugins/modules/conftest.py metaclass-boilerplate
-tests/unit/plugins/modules/utils.py future-import-boilerplate
-tests/unit/plugins/modules/utils.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
