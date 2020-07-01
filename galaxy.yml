@@ -1,6 +1,6 @@
 namespace: community
 name: crypto
-version: 0.1.0
+version: 1.0.0
 readme: README.md
 authors:
   - Ansible (github.com/ansible)
@@ -14,14 +14,14 @@ tags:
   - cryptography
   - csr
   - dhparam
-  - Entrust
-  - Let's Encrypt
+  - entrust
+  - letsencrypt
   - luks
   - openssl
   - openssh
   - pkcs12
 repository: https://github.com/ansible-collections/community.crypto
-documentation: https://github.com/ansible-collection-migration/community.crypto/tree/master/docs
+#documentation: https://github.com/ansible-collection-migration/community.crypto/tree/master/docs
 homepage: https://github.com/ansible-collections/community.crypto
 issues: https://github.com/ansible-collections/community.crypto/issues
 build_ignore:

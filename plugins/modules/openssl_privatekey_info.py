@@ -23,7 +23,7 @@ description:
       cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
       C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
-      and will be removed in Ansible 2.13.
+      and will be removed in community.crypto 2.0.0.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 1.2.3
 author:
@@ -59,7 +59,7 @@ options:
             - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
             - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in Ansible 2.13.
+            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
               From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
@@ -629,7 +629,8 @@ def main():
             if not PYOPENSSL_FOUND:
                 module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
                                  exception=PYOPENSSL_IMP_ERR)
-            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='2.13')
+            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+                             version='2.0.0', collection_name='community.crypto')
             privatekey = PrivateKeyInfoPyOpenSSL(module)
         elif backend == 'cryptography':
             if not CRYPTOGRAPHY_FOUND:

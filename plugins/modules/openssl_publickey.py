@@ -15,11 +15,11 @@ short_description: Generate an OpenSSL public key from its private key.
 description:
     - This module allows one to (re)generate OpenSSL public keys from their private keys.
     - Keys are generated in PEM or OpenSSH format.
-    - The module can use the cryptography Python library, or the pyOpenSSL Python
+    - "The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. When I(format) is C(OpenSSH),
       the C(cryptography) backend has to be used. Please note that the PyOpenSSL backend
-      was deprecated in Ansible 2.9 and will be removed in Ansible 2.13."
+      was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
 requirements:
     - Either cryptography >= 1.2.3 (older versions might work as well)
     - Or pyOpenSSL >= 16.0.0
@@ -445,7 +445,8 @@ def main():
         if not PYOPENSSL_FOUND:
             module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
                              exception=PYOPENSSL_IMP_ERR)
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated', version='2.13')
+        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+                         version='2.0.0', collection_name='community.crypto')
     elif backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(minimal_cryptography_version)),

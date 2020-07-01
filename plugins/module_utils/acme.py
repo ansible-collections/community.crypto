@@ -1013,11 +1013,13 @@ def handle_standard_module_arguments(module, needs_acme_v2=False):
 
     if module.params['acme_version'] is None:
         module.params['acme_version'] = 1
-        module.deprecate("The option 'acme_version' will be required from Ansible 2.14 on", version='2.14')
+        module.deprecate("The option 'acme_version' will be required from community.crypto 2.0.0 on",
+                         version='2.0.0', collection_name='community.crypto')
 
     if module.params['acme_directory'] is None:
         module.params['acme_directory'] = 'https://acme-staging.api.letsencrypt.org/directory'
-        module.deprecate("The option 'acme_directory' will be required from Ansible 2.14 on", version='2.14')
+        module.deprecate("The option 'acme_directory' will be required from community.crypto 2.0.0 on",
+                         version='2.0.0', collection_name='community.crypto')
 
     if needs_acme_v2 and module.params['acme_version'] < 2:
         module.fail_json(msg='The {0} module requires the ACME v2 protocol!'.format(module._name))
