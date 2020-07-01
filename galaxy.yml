@@ -15,7 +15,6 @@ tags:
   - csr
   - dhparam
   - entrust
-  - lets-encrypt
   - letsencrypt
   - luks
   - openssl
