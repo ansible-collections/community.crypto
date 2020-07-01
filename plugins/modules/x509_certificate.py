@@ -155,6 +155,8 @@ options:
             - Note that if using relative time this module is NOT idempotent.
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - This is only used by the C(selfsigned) provider.
+            - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
+              Please see U(https://support.apple.com/en-us/HT210176) for more details.
         type: str
         default: +3650d
         aliases: [ selfsigned_notAfter ]
@@ -245,6 +247,8 @@ options:
             - Note that if using relative time this module is NOT idempotent.
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - This is only used by the C(ownca) provider.
+            - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
+              Please see U(https://support.apple.com/en-us/HT210176) for more details.
         type: str
         default: +3650d
 
