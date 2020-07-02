@@ -1,5 +1,5 @@
 # Ansible Community Crypto Collection
-[![Shippable build status](https://api.shippable.com/projects/5e66776ca27f990007073a42/badge?branch=master)](https://app.shippable.com/projects/5e66776ca27f990007073a42)
+[![Shippable build status](https://api.shippable.com/projects/5e66776ca27f990007073a42/badge?branch=main)](https://app.shippable.com/projects/5e66776ca27f990007073a42)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 
 Provides modules for [Ansible](https://www.ansible.com/community) for various cryptographic operations.
@@ -76,7 +76,7 @@ See [Ansible's dev guide](https://docs.ansible.com/ansible/devel/dev_guide/devel
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.crypto/blob/master/CHANGELOG.rst).
+See the [changelog](https://github.com/ansible-collections/community.crypto/blob/main/CHANGELOG.rst).
 
 ## Roadmap
 
