@@ -15,6 +15,7 @@ DOCUMENTATION = r'''
 ---
 module: x509_certificate_revocation_info
 short_description: Query revocation information for X.509 certificates
+version_added: 1.1.0
 description:
     - This module allows one to query revocation information for X.509 certificates.
 requirements:
