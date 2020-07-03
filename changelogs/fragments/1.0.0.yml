@@ -1,2 +1,0 @@
-release_summary: |
-  This is the first proper release of the ``community.crypto`` collection. This changelog contains all changes to the modules in this collection that were added after the release of Ansible 2.9.0.
