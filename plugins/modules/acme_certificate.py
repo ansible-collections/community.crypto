@@ -62,9 +62,9 @@ seealso:
     description: Helps preparing C(tls-alpn-01) challenges.
   - module: community.crypto.openssl_privatekey
     description: Can be used to create private keys (both for certificates and accounts).
-  - module: commuinty.crypto.openssl_csr
+  - module: community.crypto.openssl_csr
     description: Can be used to create a Certificate Signing Request (CSR).
-  - module: comunity.crypto.certificate_complete_chain
+  - module: community.crypto.certificate_complete_chain
     description: Allows to find the root certificate for the returned fullchain.
   - module: community.crypto.acme_certificate_revoke
     description: Allows to revoke certificates.
