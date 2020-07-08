@@ -594,7 +594,7 @@ notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
     - For security reason, when you use C(ownca) provider, you should NOT run
-      M(community.general.x509_certificate) on a target machine, but on a dedicated CA machine. It
+      M(community.crypto.x509_certificate) on a target machine, but on a dedicated CA machine. It
       is recommended not to store the CA private key on the target machine. Once signed, the
       certificate can be moved to the target machine.
 seealso:
