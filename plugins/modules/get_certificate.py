@@ -18,6 +18,7 @@ description:
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL
       backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
+    - Support SNI only with python >= 2.7
 options:
     host:
       description:
@@ -154,7 +155,7 @@ import traceback
 
 from distutils.version import LooseVersion
 from os.path import isfile
-from socket import setdefaulttimeout, socket
+from socket import create_connection, setdefaulttimeout, socket
 from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_OPTIONAL
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -287,13 +288,35 @@ def main():
             cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
-            module.fail_json(msg="Failed to get cert from port with error: {0}".format(e))
+            module.fail_json(msg="Failed to get cert from proxy {0}:{1} from {2}:{3}, error:{4}".format(proxy_host,
+                                                                                                        proxy_port,
+                                                                                                        host, port,
+                                                                                                        e))
 
     else:
-        try:
-            cert = get_server_certificate((host, port), ca_certs=ca_cert)
-        except Exception as e:
-            module.fail_json(msg="Failed to get cert from port with error: {0}".format(e))
+        # for python < 2.7.9
+        if not HAS_CREATE_DEFAULT_CONTEXT:
+            try:
+                cert = get_server_certificate((host, port), ca_certs=ca_cert)
+            except Exception as e:
+                module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
+        else:
+            try:
+                sock = create_connection((host, port))
+                atexit.register(sock.close)
+
+                ctx = create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = CERT_NONE
+
+                if ca_cert:
+                    ctx.verify_mode = CERT_OPTIONAL
+                    ctx.load_verify_locations(cafile=ca_cert)
+
+                cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
+                cert = DER_cert_to_PEM_cert(cert)
+            except Exception as e:
+                module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
 
     result['cert'] = cert
 
