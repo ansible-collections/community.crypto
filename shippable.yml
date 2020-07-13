@@ -37,7 +37,7 @@ matrix:
 
     - env: T=devel/cloud/2.6/1
     - env: T=devel/cloud/2.7/1
-    # - env: T=devel/cloud/3.5/1
+    - env: T=devel/cloud/3.5/1
     - env: T=devel/cloud/3.6/1
     - env: T=devel/cloud/3.7/1
     - env: T=devel/cloud/3.8/1

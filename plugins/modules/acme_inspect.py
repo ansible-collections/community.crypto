@@ -243,7 +243,7 @@ output_json:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native, to_bytes
+from ansible.module_utils._text import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ModuleFailException,
@@ -299,7 +299,8 @@ def main():
             ))
             # See if we can parse the result as JSON
             try:
-                result['output_json'] = json.loads(data)
+                # to_text() is needed only for Python 3.5 (and potentially 3.0 to 3.4 as well)
+                result['output_json'] = json.loads(to_text(data))
             except Exception as dummy:
                 pass
             # Fail if error was returned

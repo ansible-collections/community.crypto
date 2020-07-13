@@ -1,0 +1,2 @@
+bugfixes:
+- "acme_inspect - fix problem with Python 3.5 that JSON was not decoded (https://github.com/ansible-collections/community.crypto/issues/86)."
