@@ -264,18 +264,29 @@ def main():
         if not isfile(ca_cert):
             module.fail_json(msg="ca_cert file does not exist")
 
-    if proxy_host:
-        if not HAS_CREATE_DEFAULT_CONTEXT:
+    if not HAS_CREATE_DEFAULT_CONTEXT:
+        # Python < 2.7.9
+        if proxy_host:
             module.fail_json(msg='To use proxy_host, you must run the get_certificate module with Python 2.7 or newer.',
                              exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
-
         try:
-            connect = "CONNECT %s:%s HTTP/1.0\r\n\r\n" % (host, port)
-            sock = socket()
-            atexit.register(sock.close)
-            sock.connect((proxy_host, proxy_port))
-            sock.send(connect.encode())
-            sock.recv(8192)
+            # Note: get_server_certificate does not support SNI!
+            cert = get_server_certificate((host, port), ca_certs=ca_cert)
+        except Exception as e:
+            module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
+    else:
+        # Python >= 2.7.9
+        try:
+            if proxy_host:
+                connect = "CONNECT %s:%s HTTP/1.0\r\n\r\n" % (host, port)
+                sock = socket()
+                atexit.register(sock.close)
+                sock.connect((proxy_host, proxy_port))
+                sock.send(connect.encode())
+                sock.recv(8192)
+            else:
+                sock = create_connection((host, port))
+                atexit.register(sock.close)
 
             if ca_cert:
                 ctx = create_default_context(cafile=ca_cert)
@@ -289,35 +300,10 @@ def main():
             cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
-            module.fail_json(msg="Failed to get cert from proxy {0}:{1} from {2}:{3}, error:{4}".format(proxy_host,
-                                                                                                        proxy_port,
-                                                                                                        host, port,
-                                                                                                        e))
-
-    else:
-        # for python < 2.7.9
-        if not HAS_CREATE_DEFAULT_CONTEXT:
-            try:
-                cert = get_server_certificate((host, port), ca_certs=ca_cert)
-            except Exception as e:
-                module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
-        else:
-            try:
-                sock = create_connection((host, port))
-                atexit.register(sock.close)
-
-                if ca_cert:
-                    ctx = create_default_context(cafile=ca_cert)
-                    ctx.check_hostname = False
-                    ctx.verify_mode = CERT_REQUIRED
-                else:
-                    ctx = create_default_context()
-                    ctx.check_hostname = False
-                    ctx.verify_mode = CERT_NONE
-
-                cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
-                cert = DER_cert_to_PEM_cert(cert)
-            except Exception as e:
+            if proxy_host:
+                module.fail_json(msg="Failed to get cert via proxy {0}:{1} from {2}:{3}, error: {4}".format(
+                    proxy_host, proxy_port, host, port, e))
+            else:
                 module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
 
     result['cert'] = cert
