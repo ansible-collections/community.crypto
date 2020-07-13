@@ -156,7 +156,7 @@ import traceback
 from distutils.version import LooseVersion
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
-from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_OPTIONAL
+from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_REQUIRED
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes
@@ -277,13 +277,14 @@ def main():
             sock.send(connect.encode())
             sock.recv(8192)
 
-            ctx = create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = CERT_NONE
-
             if ca_cert:
-                ctx.verify_mode = CERT_OPTIONAL
-                ctx.load_verify_locations(cafile=ca_cert)
+                ctx = create_default_context(cafile=ca_cert)
+                ctx.check_hostname = False
+                ctx.verify_mode = CERT_REQUIRED
+            else:
+                ctx = create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = CERT_NONE
 
             cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
@@ -305,13 +306,14 @@ def main():
                 sock = create_connection((host, port))
                 atexit.register(sock.close)
 
-                ctx = create_default_context()
-                ctx.check_hostname = False
-                ctx.verify_mode = CERT_NONE
-
                 if ca_cert:
-                    ctx.verify_mode = CERT_OPTIONAL
-                    ctx.load_verify_locations(cafile=ca_cert)
+                    ctx = create_default_context(cafile=ca_cert)
+                    ctx.check_hostname = False
+                    ctx.verify_mode = CERT_REQUIRED
+                else:
+                    ctx = create_default_context()
+                    ctx.check_hostname = False
+                    ctx.verify_mode = CERT_NONE
 
                 cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
                 cert = DER_cert_to_PEM_cert(cert)
