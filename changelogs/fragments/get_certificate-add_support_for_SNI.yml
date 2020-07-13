@@ -1,2 +1,4 @@
 minor_changes:
-  - get_certificate - Add support of SNI
+  - get_certificate - add support for SNI (https://github.com/ansible-collections/community.crypto/issues/69).
+bugfixes:
+  - get_certificate - fix ``ca_cert`` option handling when ``proxy_host`` is used (https://github.com/ansible-collections/community.crypto/pull/84).
