@@ -31,8 +31,12 @@ options:
     description:
       - "Path to a file containing the ACME account RSA or Elliptic Curve
          key."
-      - "RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys can
-         be created with C(openssl ecparam -genkey ...). Any other tool creating
+      - "Private keys can be created with the
+         M(community.crypto.openssl_privatekey) module. If the requisites
+         (pyOpenSSL or cryptography) are not available, keys can also be
+         created directly with the C(openssl) command line tool: RSA keys
+         can be created with C(openssl genrsa ...). Elliptic curve keys can be
+         created with C(openssl ecparam -genkey ...). Any other tool creating
          private keys in PEM format can be used as well."
       - "Mutually exclusive with C(account_key_content)."
       - "Required if C(account_key_content) is not used."
