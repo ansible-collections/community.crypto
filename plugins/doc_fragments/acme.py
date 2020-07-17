@@ -33,7 +33,8 @@ options:
          key."
       - "RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys can
          be created with C(openssl ecparam -genkey ...). Any other tool creating
-         private keys in PEM format can be used as well."
+         private keys in PEM format can be used as well - e.g. L(openssl_privatekey
+         module,https://docs.ansible.com/ansible/latest/modules/openssl_privatekey_module.html)."
       - "Mutually exclusive with C(account_key_content)."
       - "Required if C(account_key_content) is not used."
     type: path
