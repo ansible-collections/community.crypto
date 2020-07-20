@@ -556,8 +556,7 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted:
-      - "DNS:www.example.com"
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
     name_constraints_excluded:
       - "DNS:.example.com"
       - "DNS:.org"
@@ -617,6 +616,13 @@
       - "otherName:1.3.6.1.4.1.311.20.2.3;UTF8:bob@localhost"
       - "dirName:O = Example Net, CN = example.net"
       - "dirName:/O=Example Com/CN=example.com"
+    value_for_name_constraints_permitted:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/24"
+      - "IP:::1:0:0/112"
+    value_for_name_constraints_permitted_pyopenssl:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
   register: everything_1
 
 - name: Generate CSR with everything (idempotent, check mode)
@@ -658,8 +664,7 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted:
-      - "DNS:www.example.com"
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
     name_constraints_excluded:
       - "DNS:.org"
       - "DNS:.example.com"
@@ -719,6 +724,13 @@
       - "otherName:1.3.6.1.4.1.311.20.2.3;UTF8:bob@localhost"
       - "dirName:O=Example Net,CN=example.net"
       - "dirName:/O = Example Com/CN = example.com"
+    value_for_name_constraints_permitted:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
+      - "IP:0::0:1:0:0/112"
+    value_for_name_constraints_permitted_pyopenssl:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
   check_mode: yes
   register: everything_2
 
@@ -761,8 +773,7 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted:
-      - "DNS:www.example.com"
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
     name_constraints_excluded:
       - "DNS:.org"
       - "DNS:.example.com"
@@ -822,6 +833,13 @@
       - "otherName:1.3.6.1.4.1.311.20.2.3;UTF8:bob@localhost"
       - "dirName:O  =Example Net,    CN= example.net"
       - "dirName:/O  =Example Com/CN=  example.com"
+    value_for_name_constraints_permitted:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
+      - "IP:0::0:1:0:0/112"
+    value_for_name_constraints_permitted_pyopenssl:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
   register: everything_3
 
 - name: Get info from CSR with everything

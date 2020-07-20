@@ -205,7 +205,10 @@ def cryptography_get_name(name):
         if name.startswith('DNS:'):
             return x509.DNSName(to_text(name[4:]))
         if name.startswith('IP:'):
-            return x509.IPAddress(ipaddress.ip_address(to_text(name[3:])))
+            address = to_text(name[3:])
+            if '/' in address:
+                return x509.IPAddress(ipaddress.ip_network(address))
+            return x509.IPAddress(ipaddress.ip_address(address))
         if name.startswith('email:'):
             return x509.RFC822Name(to_text(name[6:]))
         if name.startswith('URI:'):
@@ -261,6 +264,8 @@ def cryptography_decode_name(name):
     if isinstance(name, x509.DNSName):
         return 'DNS:{0}'.format(name.value)
     if isinstance(name, x509.IPAddress):
+        if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
+            return 'IP:{0}/{1}'.format(name.value.network_address.compressed, name.value.prefixlen)
         return 'IP:{0}'.format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
         return 'email:{0}'.format(name.value)

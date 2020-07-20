@@ -223,9 +223,6 @@
       - everything_info.subject.userId == "asdf"
       - everything_info.subject | length == 16
       - everything_info.subject_alt_name_critical == false
-      - everything_info.name_constraints_permitted == [
-          "DNS:www.example.com",
-        ]
       - everything_info.name_constraints_excluded == [
           "DNS:.example.com",
           "DNS:.org",
@@ -256,6 +253,10 @@
             "Time Stamping",
             "dvcs",
             "qcStatements",
+        ]
+      - everything_info.name_constraints_permitted == [
+          "DNS:www.example.com",
+          "IP:1.2.3.0/24",
         ]
   when: select_crypto_backend == 'pyopenssl'
 
@@ -295,6 +296,11 @@
             "Time Stamping",
             "dvcs",
             "qcStatements",
+        ]
+      - everything_info.name_constraints_permitted == [
+          "DNS:www.example.com",
+          "IP:1.2.3.0/24",
+          "IP:::1:0:0/112",
         ]
   when: select_crypto_backend != 'pyopenssl'
 

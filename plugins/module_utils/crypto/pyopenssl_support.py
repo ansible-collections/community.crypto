@@ -60,9 +60,13 @@ def pyopenssl_normalize_name_attribute(san):
     if san.startswith('IP Address:'):
         san = 'IP:' + san[len('IP Address:'):]
     if san.startswith('IP:'):
-        ip = compat_ipaddress.ip_address(san[3:])
-        san = 'IP:{0}'.format(ip.compressed)
-
+        address = san[3:]
+        if '/' in address:
+            ip = compat_ipaddress.ip_network(address)
+            san = 'IP:{0}/{1}'.format(ip.network_address.compressed, ip.prefixlen)
+        else:
+            ip = compat_ipaddress.ip_address(address)
+            san = 'IP:{0}'.format(ip.compressed)
     if san.startswith('Registered ID:'):
         san = 'RID:' + san[len('Registered ID:'):]
     # Some versions of OpenSSL apparently forgot the colon. Happens in CI with Ubuntu 16.04 and FreeBSD 11.1
