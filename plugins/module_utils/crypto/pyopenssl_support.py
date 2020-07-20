@@ -38,6 +38,10 @@ from ._objects import (
 
 from ._obj2txt import obj2txt
 
+from .basic import (
+    OpenSSLObjectError,
+)
+
 
 def pyopenssl_normalize_name(name, short=False):
     nid = OpenSSL._util.lib.OBJ_txt2nid(to_bytes(name))

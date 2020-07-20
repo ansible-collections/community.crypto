@@ -440,14 +440,14 @@ name_constraints_permitted:
     returned: changed or success
     type: list
     elements: str
-    sample: [email:.somedomain.com]
+    sample: ['email:.somedomain.com']
     version_added: 1.1.0
 name_constraints_excluded:
     description: List of excluded subtrees the CA cannot sign certificates for.
     returned: changed or success
     type: list
     elements: str
-    sample: [email:.com]
+    sample: ['email:.com']
     version_added: 1.1.0
 backup_file:
     description: Name of backup file created.

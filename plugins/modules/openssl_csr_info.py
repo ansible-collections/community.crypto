@@ -146,7 +146,7 @@ name_constraints_permitted:
     returned: success
     type: list
     elements: str
-    sample: [email:.somedomain.com]
+    sample: ['email:.somedomain.com']
     version_added: 1.1.0
 name_constraints_excluded:
     description:
@@ -155,7 +155,7 @@ name_constraints_excluded:
     returned: success
     type: list
     elements: str
-    sample: [email:.com]
+    sample: ['email:.com']
     version_added: 1.1.0
 name_constraints_critical:
     description:
