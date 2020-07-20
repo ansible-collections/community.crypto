@@ -550,7 +550,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_san if value_for_extended_key_usage != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
@@ -646,7 +646,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_san if value_for_extended_key_usage != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
@@ -743,7 +743,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_san if value_for_extended_key_usage != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
