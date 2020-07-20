@@ -556,6 +556,12 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
+    name_constraints_permitted:
+      - "DNS:www.example.com"
+    name_constraints_excluded:
+      - "DNS:.example.com"
+      - "DNS:.org"
+    name_constraints_critical: yes
     ocsp_must_staple: yes
     subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
     authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'
@@ -652,6 +658,12 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
+    name_constraints_permitted:
+      - "DNS:www.example.com"
+    name_constraints_excluded:
+      - "DNS:.org"
+      - "DNS:.example.com"
+    name_constraints_critical: yes
     ocsp_must_staple: yes
     subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
     authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'
@@ -749,6 +761,12 @@
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
+    name_constraints_permitted:
+      - "DNS:www.example.com"
+    name_constraints_excluded:
+      - "DNS:.org"
+      - "DNS:.example.com"
+    name_constraints_critical: yes
     ocsp_must_staple: yes
     subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
     authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'

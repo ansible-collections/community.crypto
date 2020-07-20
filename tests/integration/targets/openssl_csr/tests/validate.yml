@@ -200,7 +200,7 @@
             "Key Agreement",
             "Key Encipherment",
             "Non Repudiation"
-        ],
+        ]
       - everything_info.key_usage_critical == true
       - everything_info.ocsp_must_staple == true
       - everything_info.ocsp_must_staple_critical == false
@@ -223,6 +223,14 @@
       - everything_info.subject.userId == "asdf"
       - everything_info.subject | length == 16
       - everything_info.subject_alt_name_critical == false
+      - everything_info.name_constraints_permitted == [
+          "DNS:www.example.com",
+        ]
+      - everything_info.name_constraints_excluded == [
+          "DNS:.example.com",
+          "DNS:.org",
+        ]
+      - everything_info.name_constraints_critical == true
 
 - name: Check CSR with everything (pyOpenSSL specific)
   assert:
