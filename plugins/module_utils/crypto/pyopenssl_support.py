@@ -119,3 +119,28 @@ def pyopenssl_get_extensions_from_csr(csr):
         # similarly to how cryptography does it.
         result[oid] = entry
     return result
+
+
+def pyopenssl_parse_name_constraints(name_constraints_extension):
+    lines = to_text(name_constraints_extension, errors='surrogate_or_strict').splitlines()
+    exclude = None
+    excluded = []
+    permitted = []
+    for line in lines:
+        if line.startswith(' ') or line.startswith('\t'):
+            name = pyopenssl_normalize_name_attribute(line.strip())
+            if exclude is True:
+                excluded.append(name)
+            elif exclude is False:
+                permitted.append(name)
+            else:
+                raise OpenSSLObjectError('Unexpected nameConstraint line: "{0}"'.format(line))
+        else:
+            line_lc = line.lower()
+            if line_lc.startswith('exclud'):
+                exclude = True
+            elif line_lc.startswith('includ') or line_lc.startswith('permitt'):
+                exclude = False
+            else:
+                raise OpenSSLObjectError('Cannot parse nameConstraint line: "{0}"'.format(line))
+    return permitted, excluded

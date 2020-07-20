@@ -183,13 +183,36 @@ options:
         aliases: [ ocspMustStaple ]
     ocsp_must_staple_critical:
         description:
-            - Should the OCSP Must Staple extension be considered as critical
+            - Should the OCSP Must Staple extension be considered as critical.
             - Note that according to the RFC, this extension should not be marked
               as critical, as old clients not knowing about OCSP Must Staple
               are required to reject such certificates
               (see U(https://tools.ietf.org/html/rfc7633#section-4)).
         type: bool
         aliases: [ ocspMustStaple_critical ]
+    name_constraints_permitted:
+        description:
+            - For CA certificates, this specifies a list of identifiers which describe
+              subtrees of names that this CA is allowed to issue certificates for.
+            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName) and the ones specific to your CA).
+        type: list
+        elements: str
+        version_added: 1.1.0
+    name_constraints_excluded:
+        description:
+            - For CA certificates, this specifies a list of identifiers which describe
+              subtrees of names that this CA is *not* allowed to issue certificates for.
+            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName) and the ones specific to your CA).
+        type: list
+        elements: str
+        version_added: 1.1.0
+    name_constraints_critical:
+        description:
+            - Should the Name Constraints extension be considered as critical.
+        type: bool
+        version_added: 1.1.0
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
@@ -412,6 +435,20 @@ ocsp_must_staple:
     returned: changed or success
     type: bool
     sample: false
+name_constraints_permitted:
+    description: List of permitted subtrees to sign certificates for.
+    returned: changed or success
+    type: list
+    elements: str
+    sample: [email:.somedomain.com]
+    version_added: 1.1.0
+name_constraints_excluded:
+    description: List of excluded subtrees the CA cannot sign certificates for.
+    returned: changed or success
+    type: list
+    elements: str
+    sample: [email:.com]
+    version_added: 1.1.0
 backup_file:
     description: Name of backup file created.
     returned: changed and if I(backup) is C(yes)
@@ -461,6 +498,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
     pyopenssl_normalize_name_attribute,
+    pyopenssl_parse_name_constraints,
 )
 
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -534,6 +572,9 @@ class CertificateSigningRequestBase(OpenSSLObject):
         self.basicConstraints_critical = module.params['basic_constraints_critical']
         self.ocspMustStaple = module.params['ocsp_must_staple']
         self.ocspMustStaple_critical = module.params['ocsp_must_staple_critical']
+        self.name_constraints_permitted = module.params['name_constraints_permitted'] or []
+        self.name_constraints_excluded = module.params['name_constraints_excluded'] or []
+        self.name_constraints_critical = module.params['name_constraints_critical']
         self.create_subject_key_identifier = module.params['create_subject_key_identifier']
         self.subject_key_identifier = module.params['subject_key_identifier']
         self.authority_key_identifier = module.params['authority_key_identifier']
@@ -637,7 +678,9 @@ class CertificateSigningRequestBase(OpenSSLObject):
             'extendedKeyUsage': self.extendedKeyUsage,
             'basicConstraints': self.basicConstraints,
             'ocspMustStaple': self.ocspMustStaple,
-            'changed': self.changed
+            'changed': self.changed,
+            'name_constraints_permitted': self.name_constraints_permitted,
+            'name_constraints_excluded': self.name_constraints_excluded,
         }
         if self.backup_file:
             result['backup_file'] = self.backup_file
@@ -696,6 +739,13 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
         if self.basicConstraints:
             usages = ', '.join(self.basicConstraints)
             extensions.append(crypto.X509Extension(b"basicConstraints", self.basicConstraints_critical, usages.encode('ascii')))
+
+        if self.name_constraints_permitted or self.name_constraints_excluded:
+            usages = ', '.join(
+                ['permitted;{0}'.format(name) for name in self.name_constraints_permitted] +
+                ['excluded;{0}'.format(name) for name in self.name_constraints_excluded]
+            )
+            extensions.append(crypto.X509Extension(b"nameConstraints", self.name_constraints_critical, usages.encode('ascii')))
 
         if self.ocspMustStaple:
             extensions.append(crypto.X509Extension(OPENSSL_MUST_STAPLE_NAME, self.ocspMustStaple_critical, OPENSSL_MUST_STAPLE_VALUE))
@@ -773,6 +823,22 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
         def _check_basicConstraints(extensions):
             return _check_keyUsage_(extensions, b'basicConstraints', self.basicConstraints, self.basicConstraints_critical)
 
+        def _check_nameConstraints(extensions):
+            nc_ext = next((ext for ext in extensions if ext.get_short_name() == b'nameConstraints'), '')
+            permitted, excluded = pyopenssl_parse_name_constraints(nc_ext)
+            if self.name_constraints_permitted or self.name_constraints_excluded:
+                if set(permitted) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.name_constraints_permitted]):
+                    return False
+                if set(excluded) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.name_constraints_excluded]):
+                    return False
+                if nc_ext.get_critical() != self.name_constraints_critical:
+                    return False
+            else:
+                if permitted or excluded:
+                    return False
+
+            return True
+
         def _check_ocspMustStaple(extensions):
             oms_ext = [ext for ext in extensions if to_bytes(ext.get_short_name()) == OPENSSL_MUST_STAPLE_NAME and to_bytes(ext) == OPENSSL_MUST_STAPLE_VALUE]
             if OpenSSL.SSL.OPENSSL_VERSION_NUMBER < 0x10100000:
@@ -787,7 +853,7 @@ class CertificateSigningRequestPyOpenSSL(CertificateSigningRequestBase):
             extensions = csr.get_extensions()
             return (_check_subjectAltName(extensions) and _check_keyUsage(extensions) and
                     _check_extenededKeyUsage(extensions) and _check_basicConstraints(extensions) and
-                    _check_ocspMustStaple(extensions))
+                    _check_ocspMustStaple(extensions) and _check_nameConstraints(extensions))
 
         def _check_signature(csr):
             try:
@@ -848,6 +914,15 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
                     cryptography.x509.UnrecognizedExtension(CRYPTOGRAPHY_MUST_STAPLE_NAME, CRYPTOGRAPHY_MUST_STAPLE_VALUE),
                     critical=self.ocspMustStaple_critical
                 )
+
+        if self.name_constraints_permitted or self.name_constraints_excluded:
+            try:
+                csr = csr.add_extension(cryptography.x509.NameConstraints(
+                    [cryptography_get_name(name) for name in self.name_constraints_permitted],
+                    [cryptography_get_name(name) for name in self.name_constraints_excluded],
+                ), critical=self.name_constraints_critical)
+            except TypeError as e:
+                raise OpenSSLObjectError('Error while parsing name constraint: {0}'.format(e))
 
         if self.create_subject_key_identifier:
             csr = csr.add_extension(
@@ -991,6 +1066,19 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
             else:
                 return tlsfeature_ext is None
 
+        def _check_nameConstraints(extensions):
+            current_nc_ext = _find_extension(extensions, cryptography.x509.NameConstraints)
+            current_nc_perm = [str(altname) for altname in current_nc_ext.value.permitted_subtrees] if current_nc_ext else []
+            current_nc_excl = [str(altname) for altname in current_nc_ext.value.excluded_subtrees] if current_nc_ext else []
+            nc_perm = [str(cryptography_get_name(altname)) for altname in self.name_constraints_permitted]
+            nc_excl = [str(cryptography_get_name(altname)) for altname in self.name_constraints_excluded]
+            if set(nc_perm) != set(current_nc_perm) or set(nc_excl) != set(current_nc_excl):
+                return False
+            if nc_perm or nc_excl:
+                if current_nc_ext.critical != self.name_constraints_critical:
+                    return False
+            return True
+
         def _check_subject_key_identifier(extensions):
             ext = _find_extension(extensions, cryptography.x509.SubjectKeyIdentifier)
             if self.create_subject_key_identifier or self.subject_key_identifier is not None:
@@ -1026,7 +1114,7 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
             return (_check_subjectAltName(extensions) and _check_keyUsage(extensions) and
                     _check_extenededKeyUsage(extensions) and _check_basicConstraints(extensions) and
                     _check_ocspMustStaple(extensions) and _check_subject_key_identifier(extensions) and
-                    _check_authority_key_identifier(extensions))
+                    _check_authority_key_identifier(extensions) and _check_nameConstraints(extensions))
 
         def _check_signature(csr):
             if not csr.is_signature_valid:
@@ -1081,6 +1169,9 @@ def main():
             basic_constraints_critical=dict(type='bool', default=False, aliases=['basicConstraints_critical']),
             ocsp_must_staple=dict(type='bool', default=False, aliases=['ocspMustStaple']),
             ocsp_must_staple_critical=dict(type='bool', default=False, aliases=['ocspMustStaple_critical']),
+            name_constraints_permitted=dict(type='list', elements='str'),
+            name_constraints_excluded=dict(type='list', elements='str'),
+            name_constraints_critical=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             create_subject_key_identifier=dict(type='bool', default=False),
             subject_key_identifier=dict(type='str'),
