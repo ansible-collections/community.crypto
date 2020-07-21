@@ -189,20 +189,6 @@
           "pathlen:23",
         ]
       - everything_info.basic_constraints_critical == true
-      - everything_info.extended_key_usage == [
-            "Any Extended Key Usage",
-            "Biometric Info",
-            "Code Signing",
-            "E-mail Protection",
-            "IPSec User",
-            "OCSP Signing",
-            "TLS Web Client Authentication",
-            "TLS Web Server Authentication",
-            "TLS Web Server Authentication",
-            "Time Stamping",
-            "dvcs",
-            "qcStatements",
-        ]
       - everything_info.extended_key_usage_critical == false
       - everything_info.key_usage == [
             "CRL Sign",
@@ -249,6 +235,20 @@
             "URI:https://example.org/test/index.html",
             "RID:1.2.3.4",
         ]
+      - everything_info.extended_key_usage == [
+            "Any Extended Key Usage",
+            "Biometric Info",
+            "Code Signing",
+            "E-mail Protection",
+            "IPSec User",
+            "OCSP Signing",
+            "TLS Web Client Authentication",
+            "TLS Web Server Authentication",
+            "TLS Web Server Authentication",
+            "Time Stamping",
+            "dvcs",
+            "qcStatements",
+        ]
   when: select_crypto_backend == 'pyopenssl'
 
 - name: Check CSR with everything (non-pyOpenSSL specific)
@@ -273,6 +273,21 @@
             "dirName:/O=Example Com/CN=example.com"
         ]
       - everything_info.subject_key_identifier == "00:11:22:33"
+      - everything_info.extended_key_usage == [
+            "1.2.3.4.5.6",
+            "Any Extended Key Usage",
+            "Biometric Info",
+            "Code Signing",
+            "E-mail Protection",
+            "IPSec User",
+            "OCSP Signing",
+            "TLS Web Client Authentication",
+            "TLS Web Server Authentication",
+            "TLS Web Server Authentication",
+            "Time Stamping",
+            "dvcs",
+            "qcStatements",
+        ]
   when: select_crypto_backend != 'pyopenssl'
 
 - name: Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)

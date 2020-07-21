@@ -51,6 +51,9 @@ from ._objects import (
 from ._obj2txt import obj2txt
 
 
+DOTTED_OID = re.compile(r'^\d+(?:\.\d+)+$')
+
+
 def cryptography_get_extensions_from_cert(cert):
     # Since cryptography won't give us the DER value for an extension
     # (that is only stored for unrecognized extensions), we have to re-do
@@ -112,6 +115,8 @@ def cryptography_get_extensions_from_csr(csr):
 def cryptography_name_to_oid(name):
     dotted = OID_LOOKUP.get(name)
     if dotted is None:
+        if DOTTED_OID.match(name):
+            return x509.oid.ObjectIdentifier(name)
         raise OpenSSLObjectError('Cannot find OID for "{0}"'.format(name))
     return x509.oid.ObjectIdentifier(dotted)
 
@@ -119,7 +124,12 @@ def cryptography_name_to_oid(name):
 def cryptography_oid_to_name(oid, short=False):
     dotted_string = oid.dotted_string
     names = OID_MAP.get(dotted_string)
-    name = names[0] if names else oid._name
+    if names:
+        name = names[0]
+    else:
+        name = oid._name
+        if name == 'Unknown OID':
+            name = dotted_string
     if short:
         return NORMALIZE_NAMES_SHORT.get(name, name)
     else:

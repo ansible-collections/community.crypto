@@ -550,19 +550,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
@@ -575,6 +563,33 @@
     authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
+    value_for_extended_key_usage_pyopenssl:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+    value_for_extended_key_usage:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+      - 1.2.3.4.5.6
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
@@ -631,19 +646,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
@@ -656,6 +659,33 @@
     authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
+    value_for_extended_key_usage_pyopenssl:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+    value_for_extended_key_usage:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+      - 1.2.3.4.5.6
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
@@ -713,19 +743,7 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
+    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
     subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
     basic_constraints:
       - "CA:TRUE"
@@ -738,6 +756,33 @@
     authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
+    value_for_extended_key_usage_pyopenssl:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+    value_for_extended_key_usage:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+      - 1.2.3.4.5.6
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
