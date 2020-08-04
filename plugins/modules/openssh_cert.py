@@ -43,8 +43,16 @@ options:
     signing_key:
         description:
             - The path to the private openssh key that is used for signing the public key in order to generate the certificate.
+            - If the private key is on a PKCS#11 token (I(pkcs11_provider)), set this to the path to the public key instead.
             - Required if I(state) is C(present).
         type: path
+    pkcs11_provider:
+        description:
+            - To use a signing key that resides on a PKCS#11 token, set this to the name (or full path) of the shared library to use with the token.
+              Usually C(libpkcs11.so).
+            - If this is set, I(signing_key) needs to point to a file containing the public key of the CA.
+        type: str
+        version_added: 1.1.0
     public_key:
         description:
             - The path to the public key that will be signed with the signing key in order to generate the certificate.
@@ -170,6 +178,16 @@ EXAMPLES = '''
         - "clear"
         - "force-command=/tmp/bla/foo"
 
+- name: Generate an OpenSSH user certificate using a PKCS#11 token
+  community.crypto.openssh_cert:
+    type: user
+    signing_key: /path/to/ca_public_key.pub
+    pkcs11_provider: libpkcs11.so
+    public_key: /path/to/public_key.pub
+    path: /path/to/certificate
+    valid_from: always
+    valid_to: forever
+
 '''
 
 RETURN = '''
@@ -217,6 +235,7 @@ class Certificate(object):
         self.force = module.params['force']
         self.type = module.params['type']
         self.signing_key = module.params['signing_key']
+        self.pkcs11_provider = module.params['pkcs11_provider']
         self.public_key = module.params['public_key']
         self.path = module.params['path']
         self.identifier = module.params['identifier']
@@ -250,6 +269,9 @@ class Certificate(object):
                 self.ssh_keygen,
                 '-s', self.signing_key
             ]
+
+            if self.pkcs11_provider:
+                args.extend(['-D', self.pkcs11_provider])
 
             validity = ""
 
@@ -525,6 +547,7 @@ def main():
             force=dict(type='bool', default=False),
             type=dict(type='str', choices=['host', 'user']),
             signing_key=dict(type='path'),
+            pkcs11_provider=dict(type='str'),
             public_key=dict(type='path'),
             path=dict(type='path', required=True),
             identifier=dict(type='str'),
