@@ -86,6 +86,31 @@ options:
       - "Mutually exclusive with C(new_account_key_src)."
       - "Required if C(new_account_key_src) is not used and state is C(changed_key)."
     type: str
+  external_account_binding:
+    description:
+      - Allows to provide external account binding data during account creation.
+      - This is used by CAs like Sectigo to bind a new ACME account to an existing CA-specific
+        account, to be able to properly identify a customer.
+      - Only used when creating a new account. Can not be specified for ACME v1.
+    type: dict
+    suboptions:
+      kid:
+        description:
+          - The key identifier provided by the CA.
+        type: str
+        required: true
+      alg:
+        description:
+          - The MAC algorithm provided by the CA.
+        type: str
+        required: true
+        choices: [ HS256, HS384, HS512 ]
+      key:
+        description:
+          - The MAC key provided by the CA.
+        type: str
+        required: true
+    version_added: 1.1.0
 '''
 
 EXAMPLES = '''
@@ -144,6 +169,11 @@ def main():
         contact=dict(type='list', elements='str', default=[]),
         new_account_key_src=dict(type='path'),
         new_account_key_content=dict(type='str', no_log=True),
+        external_account_binding=dict(type='dict', options=dict(
+            kid=dict(type='str', required=True),
+            alg=dict(type='str', required=True, choices=['HS256', 'HS384', 'HS512']),
+            key=dict(type='str', required=True, no_log=True),
+        ))
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -189,13 +219,14 @@ def main():
                 changed = True
         elif state == 'present':
             allow_creation = module.params.get('allow_creation')
-            # Make sure contact is a list of strings (unfortunately, Ansible doesn't do that for us)
             contact = [str(v) for v in module.params.get('contact')]
             terms_agreed = module.params.get('terms_agreed')
+            external_account_binding = module.params.get('external_account_binding')
             created, account_data = account.setup_account(
                 contact,
                 terms_agreed=terms_agreed,
                 allow_creation=allow_creation,
+                external_account_binding=external_account_binding,
             )
             if account_data is None:
                 raise ModuleFailException(msg='Account does not exist or is deactivated.')
