@@ -152,6 +152,22 @@ options:
         type: str
         choices: [luks1, luks2]
         version_added: '1.0.0'
+    cipher:
+        description:
+            - "This option allows the user to define the cipher specification
+              string for the LUKS container."
+            - "Will only be used on container creation."
+            - "For pre-2.6.10 kernels, use C(aes-plain) as they don't understand
+              the new cipher spec strings. To use ESSIV, use C(aes-cbc-essiv:sha256)."
+        type: str
+        version_added: '1.1.0'
+    hash:
+        description:
+            - "This option allows the user to specify the hash function used in LUKS
+              key setup scheme and volume key digest."
+            - "Will only be used on container creation."
+        type: str
+        version_added: '1.1.0'
 
 requirements:
     - "cryptsetup"
@@ -175,6 +191,13 @@ EXAMPLES = '''
     device: "/dev/loop0"
     state: "present"
     passphrase: "foo"
+
+- name: Create LUKS container with specific encryption
+  community.crypto.luks_device:
+    device: "/dev/loop0"
+    state: "present"
+    cipher: "aes"
+    hash: "sha256"
 
 - name: (Create and) open the LUKS container; name it "mycrypt"
   community.crypto.luks_device:
@@ -374,7 +397,7 @@ class CryptHandler(Handler):
         result = self._run_command([self._cryptsetup_bin, 'isLuks', device])
         return result[RETURN_CODE] == 0
 
-    def run_luks_create(self, device, keyfile, passphrase, keysize):
+    def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_):
         # create a new luks container; use batch mode to auto confirm
         luks_type = self._module.params['type']
         label = self._module.params['label']
@@ -387,6 +410,10 @@ class CryptHandler(Handler):
             luks_type = 'luks2'
         if luks_type is not None:
             options.extend(['--type', luks_type])
+        if cipher is not None:
+            options.extend(['--cipher', cipher])
+        if hash_ is not None:
+            options.extend(['--hash', hash_])
 
         args = [self._cryptsetup_bin, 'luksFormat']
         args.extend(options)
@@ -638,6 +665,8 @@ def run_module():
         label=dict(type='str'),
         uuid=dict(type='str'),
         type=dict(type='str', choices=['luks1', 'luks2']),
+        cipher=dict(type='str'),
+        hash=dict(type='str'),
     )
 
     mutually_exclusive = [
@@ -682,7 +711,10 @@ def run_module():
                 crypt.run_luks_create(conditions.device,
                                       module.params['keyfile'],
                                       module.params['passphrase'],
-                                      module.params['keysize'])
+                                      module.params['keysize'],
+                                      module.params['cipher'],
+                                      module.params['hash'],
+                                      )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['changed'] = True

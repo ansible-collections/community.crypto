@@ -64,24 +64,27 @@ def test_run_luks_remove(monkeypatch):
 
 # ===== ConditionsHandler methods data and tests =====
 
-# device, key, passphrase, state, is_luks, label, expected
+# device, key, passphrase, state, is_luks, label, cipher, hash, expected
 LUKS_CREATE_DATA = (
-    ("dummy", "key", None, "present", False, None, True),
-    (None, "key", None, "present", False, None, False),
-    (None, "key", None, "present", False, "labelName", True),
-    ("dummy", None, None, "present", False, None, False),
-    ("dummy", "key", None, "absent", False, None, False),
-    ("dummy", "key", None, "opened", True, None, False),
-    ("dummy", "key", None, "closed", True, None, False),
-    ("dummy", "key", None, "present", True, None, False),
-    ("dummy", None, "foo", "present", False, None, True),
-    (None, None, "bar", "present", False, None, False),
-    (None, None, "baz", "present", False, "labelName", True),
-    ("dummy", None, None, "present", False, None, False),
-    ("dummy", None, "quz", "absent", False, None, False),
-    ("dummy", None, "qux", "opened", True, None, False),
-    ("dummy", None, "quux", "closed", True, None, False),
-    ("dummy", None, "corge", "present", True, None, False))
+    ("dummy", "key", None, "present", False, None, "dummy", "dummy", True),
+    (None, "key", None, "present", False, None, "dummy", "dummy", False),
+    (None, "key", None, "present", False, "labelName", "dummy", "dummy", True),
+    ("dummy", None, None, "present", False, None, "dummy", "dummy", False),
+    ("dummy", "key", None, "absent", False, None, "dummy", "dummy", False),
+    ("dummy", "key", None, "opened", True, None, "dummy", "dummy", False),
+    ("dummy", "key", None, "closed", True, None, "dummy", "dummy", False),
+    ("dummy", "key", None, "present", True, None, "dummy", "dummy", False),
+    ("dummy", None, "foo", "present", False, None, "dummy", "dummy", True),
+    (None, None, "bar", "present", False, None, "dummy", "dummy", False),
+    (None, None, "baz", "present", False, "labelName", "dummy", "dummy", True),
+    ("dummy", None, None, "present", False, None, "dummy", "dummy", False),
+    ("dummy", None, "quz", "absent", False, None, "dummy", "dummy", False),
+    ("dummy", None, "qux", "opened", True, None, "dummy", "dummy", False),
+    ("dummy", None, "quux", "closed", True, None, "dummy", "dummy", False),
+    ("dummy", None, "corge", "present", True, None, "dummy", "dummy", False),
+    ("dummy", "key", None, "present", False, None, None, None, True),
+    ("dummy", "key", None, "present", False, None, None, "dummy", True),
+    ("dummy", "key", None, "present", False, None, "dummy", None, True))
 
 # device, state, is_luks, expected
 LUKS_REMOVE_DATA = (
@@ -153,10 +156,10 @@ LUKS_REMOVE_KEY_DATA = (
 
 
 @pytest.mark.parametrize("device, keyfile, passphrase, state, is_luks, " +
-                         "label, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6])
+                         "label, cipher, hash_, expected",
+                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
                           for d in LUKS_CREATE_DATA))
-def test_luks_create(device, keyfile, passphrase, state, is_luks, label,
+def test_luks_create(device, keyfile, passphrase, state, is_luks, label, cipher, hash_,
                      expected, monkeypatch):
     module = DummyModule()
 
@@ -165,6 +168,8 @@ def test_luks_create(device, keyfile, passphrase, state, is_luks, label,
     module.params["passphrase"] = passphrase
     module.params["state"] = state
     module.params["label"] = label
+    module.params["cipher"] = cipher
+    module.params["hash"] = hash_
 
     monkeypatch.setattr(luks_device.CryptHandler, "is_luks",
                         lambda x, y: is_luks)
