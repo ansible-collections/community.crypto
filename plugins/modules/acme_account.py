@@ -150,6 +150,8 @@ account_uri:
   type: str
 '''
 
+import base64
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
@@ -192,6 +194,13 @@ def main():
         supports_check_mode=True,
     )
     handle_standard_module_arguments(module, needs_acme_v2=True)
+
+    if module.params['external_account_binding']:
+        # Make sure key is Base64 encoded
+        try:
+            base64.urlsafe_b64decode(module.params['external_account_binding']['key'])
+        except Exception as e:
+            module.fail_json(msg='Key for external_account_binding must be Base64 URL encoded (%s)' % e)
 
     try:
         account = ACMEAccount(module)
