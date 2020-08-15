@@ -220,11 +220,13 @@ options:
           - "Determines which certificates in the chain will be tested."
           - "I(all) tests all certificates in the chain (excluding the leaf, which is
              identical in all chains)."
+          - "I(first) only tests the first certificate in the chain, i.e. the one which
+             signed the leaf."
           - "I(last) only tests the last certificate in the chain, i.e. the one furthest
              away from the leaf. Its issuer is the root certificate of this chain."
         type: str
         default: all
-        choices: [last, all]
+        choices: [first, last, all]
       issuer:
         description:
           - "Allows to specify parts of the issuer of a certificate in the chain must
@@ -1003,6 +1005,8 @@ class ACMEClient(object):
         '''
         if criterium['test_certificates'] == 'last':
             chain = chain[-1:]
+        elif criterium['test_certificates'] == 'first':
+            chain = chain[:1]
         for cert in chain:
             try:
                 x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
@@ -1183,7 +1187,7 @@ def main():
         force=dict(type='bool', default=False),
         retrieve_all_alternates=dict(type='bool', default=False),
         select_chain=dict(type='list', elements='dict', options=dict(
-            test_certificates=dict(type='str', default='all', choices=['last', 'all']),
+            test_certificates=dict(type='str', default='all', choices=['first', 'last', 'all']),
             issuer=dict(type='dict'),
             subject=dict(type='dict'),
             subject_key_identifier=dict(type='str'),
