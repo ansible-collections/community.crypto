@@ -788,6 +788,19 @@ class ACMEAccount(object):
                 raise ModuleFailException('External account binding is not supported for ACME v1')
             url = self.directory['new-reg']
         else:
+            if (external_account_binding is not None or self.directory['meta'].get('externalAccountRequired')) and allow_creation:
+                # Some ACME servers such as ZeroSSL do not like it when you try to register an existing account
+                # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
+                # to see whether the account already exists.
+
+                # Note that we pass contact here: ZeroSSL does not accept regisration calls without contacts, even
+                # if onlyReturnExisting is set to true.
+                created, data = self._new_reg(contact=contact, allow_creation=False)
+                if data:
+                    # An account already exists! Return data
+                    return created, data
+                # An account does not yet exist. Try to create one next.
+
             new_reg = {
                 'contact': contact
             }
@@ -807,7 +820,7 @@ class ACMEAccount(object):
                     self.jwk,
                     self._create_mac_key(external_account_binding['alg'], external_account_binding['key'])
                 )
-            elif self.directory['meta'].get('externalAccountRequired'):
+            elif self.directory['meta'].get('externalAccountRequired') and allow_creation:
                 raise ModuleFailException(
                     'To create an account, an external account binding must be specified. '
                     'Use the acme_account module with the external_account_binding option.'
