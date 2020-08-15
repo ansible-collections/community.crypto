@@ -102,12 +102,13 @@ options:
       alg:
         description:
           - The MAC algorithm provided by the CA.
+          - If not specified by the CA, this is probably C(HS256).
         type: str
         required: true
         choices: [ HS256, HS384, HS512 ]
       key:
         description:
-          - The MAC key provided by the CA.
+          - Base64 URL encoded value of the MAC key provided by the CA.
         type: str
         required: true
     version_added: 1.1.0
