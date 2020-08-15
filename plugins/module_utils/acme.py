@@ -807,6 +807,11 @@ class ACMEAccount(object):
                     self.jwk,
                     self._create_mac_key(external_account_binding['alg'], external_account_binding['key'])
                 )
+            elif self.directory['meta'].get('externalAccountRequired'):
+                raise ModuleFailException(
+                    'To create an account, an external account binding must be specified. '
+                    'Use the acme_account module with the external_account_binding option.'
+                )
 
         result, info = self.send_signed_request(url, new_reg)
 
