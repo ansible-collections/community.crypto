@@ -251,7 +251,7 @@
       # the first chain will be found, and we need a second condition to
       # make sure that the first condition actually works. (The second
       # condition has been tested above.)
-      - test_certificates: last
+      - test_certificates: first
         subject_key_identifier: "{{ acme_intermediates[0].subject_key_identifier }}"
       - test_certificates: last
         issuer: "{{ acme_roots[1].subject }}"
