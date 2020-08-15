@@ -109,6 +109,7 @@ options:
       key:
         description:
           - Base64 URL encoded value of the MAC key provided by the CA.
+          - Padding (C(=) symbols at the end) can be omitted.
         type: str
         required: true
     version_added: 1.1.0
@@ -197,11 +198,16 @@ def main():
     handle_standard_module_arguments(module, needs_acme_v2=True)
 
     if module.params['external_account_binding']:
+        # Make sure padding is there
+        key = module.params['external_account_binding']['key']
+        if len(key) % 4 != 0:
+            key = key + ('=' * (4 - (len(key) % 4)))
         # Make sure key is Base64 encoded
         try:
-            base64.urlsafe_b64decode(module.params['external_account_binding']['key'])
+            base64.urlsafe_b64decode(key)
         except Exception as e:
             module.fail_json(msg='Key for external_account_binding must be Base64 URL encoded (%s)' % e)
+        module.params['external_account_binding']['key'] = key
 
     try:
         account = ACMEAccount(module)
