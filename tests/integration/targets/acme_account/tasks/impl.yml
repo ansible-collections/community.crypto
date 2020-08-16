@@ -1,8 +1,20 @@
-- name: Generate account key
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey.pem
+- name: Generate account keys
+  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ item }}.pem
+  loop:
+    - accountkey
+    - accountkey2
+    - accountkey3
+    - accountkey4
+    - accountkey5
 
-- name: Parse account key (to ease debugging some test failures)
-  command: openssl ec -in {{ output_dir }}/accountkey.pem -noout -text
+- name: Parse account keys (to ease debugging some test failures)
+  command: openssl ec -in {{ output_dir }}/{{ item }}.pem -noout -text
+  loop:
+    - accountkey
+    - accountkey2
+    - accountkey3
+    - accountkey4
+    - accountkey5
 
 - name: Do not try to create account
   acme_account:
@@ -153,12 +165,6 @@
     contact: []
   register: account_modified_2_idempotent
 
-- name: Generate new account key
-  command: openssl ecparam -name secp384r1 -genkey -out {{ output_dir }}/accountkey2.pem
-
-- name: Parse account key (to ease debugging some test failures)
-  command: openssl ec -in {{ output_dir }}/accountkey2.pem -noout -text
-
 - name: Change account key (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -242,3 +248,36 @@
     allow_creation: no
   ignore_errors: yes
   register: account_not_created_3
+
+- name: Create account with External Account Binding
+  acme_account:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    account_key_src: "{{ output_dir }}/{{ item.account }}.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: no
+    state: present
+    allow_creation: yes
+    terms_agreed: yes
+    contact:
+    - mailto:example@example.org
+    external_account_binding:
+      kid: "{{ item.kid }}"
+      alg: "{{ item.alg }}"
+      key: "{{ item.key }}"
+  register: account_created_eab
+  ignore_errors: yes
+  loop:
+    - account: accountkey3
+      kid: kid-1
+      alg: HS256
+      key: zWNDZM6eQGHWpSRTPal5eIUYFTu7EajVIoguysqZ9wG44nMEtx3MUAsUDkMTQ12W
+    - account: accountkey4
+      kid: kid-2
+      alg: HS384
+      key: b10lLJs8l1GPIzsLP0s6pMt8O0XVGnfTaCeROxQM0BIt2XrJMDHJZBM5NuQmQJQH
+    - account: accountkey5
+      kid: kid-3
+      alg: HS512
+      key: zWNDZM6eQGHWpSRTPal5eIUYFTu7EajVIoguysqZ9wG44nMEtx3MUAsUDkMTQ12W
+- debug: var=account_created_eab

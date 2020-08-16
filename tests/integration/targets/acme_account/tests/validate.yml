@@ -127,3 +127,11 @@
     that:
       - account_not_created_3 is failed
       - account_not_created_3.msg == 'Account does not exist or is deactivated.'
+
+- name: Validate that the account with External Account Binding has been created
+  assert:
+    that:
+      - account_created_eab.results[0] is changed
+      - account_created_eab.results[1] is changed
+      - account_created_eab.results[2] is failed
+      - "'HS512 key must be at least 64 bytes long' in account_created_eab.results[2].msg"

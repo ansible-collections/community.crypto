@@ -38,12 +38,13 @@ from ansible_collections.community.crypto.plugins.module_utils.compat import ipa
 try:
     import cryptography
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.serialization
-    import cryptography.hazmat.primitives.asymmetric.rsa
+    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.hmac
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
-    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
     from distutils.version import LooseVersion
@@ -271,9 +272,42 @@ def _parse_key_openssl(openssl_binary, module, key_file=None, key_content=None):
         }
 
 
+def _create_mac_key_openssl(openssl_bin, module, alg, key):
+    if alg == 'HS256':
+        hashalg = 'sha256'
+        hashbytes = 32
+    elif alg == 'HS384':
+        hashalg = 'sha384'
+        hashbytes = 48
+    elif alg == 'HS512':
+        hashalg = 'sha512'
+        hashbytes = 64
+    else:
+        raise ModuleFailException('Unsupported MAC key algorithm for OpenSSL backend: {0}'.format(alg))
+    key_bytes = base64.urlsafe_b64decode(key)
+    if len(key_bytes) < hashbytes:
+        raise ModuleFailException(
+            '{0} key must be at least {1} bytes long (after Base64 decoding)'.format(alg, hashbytes))
+    return {
+        'type': 'hmac',
+        'alg': alg,
+        'jwk': {
+            'kty': 'oct',
+            'k': key,
+        },
+        'hash': hashalg,
+    }
+
+
 def _sign_request_openssl(openssl_binary, module, payload64, protected64, key_data):
-    openssl_sign_cmd = [openssl_binary, "dgst", "-{0}".format(key_data['hash']), "-sign", key_data['key_file']]
     sign_payload = "{0}.{1}".format(protected64, payload64).encode('utf8')
+    if key_data['type'] == 'hmac':
+        hex_key = to_native(binascii.hexlify(base64.urlsafe_b64decode(key_data['jwk']['k'])))
+        cmd_postfix = ["-mac", "hmac", "-macopt", "hexkey:{0}".format(hex_key), "-binary"]
+    else:
+        cmd_postfix = ["-sign", key_data['key_file']]
+    openssl_sign_cmd = [openssl_binary, "dgst", "-{0}".format(key_data['hash'])] + cmd_postfix
+
     dummy, out, dummy = module.run_command(openssl_sign_cmd, data=sign_payload, check_rc=True, binary_data=True)
 
     if key_data['type'] == 'ec':
@@ -403,9 +437,43 @@ def _parse_key_cryptography(module, key_file=None, key_content=None):
         return 'unknown key type "{0}"'.format(type(key)), {}
 
 
+def _create_mac_key_cryptography(module, alg, key):
+    if alg == 'HS256':
+        hashalg = cryptography.hazmat.primitives.hashes.SHA256
+        hashbytes = 32
+    elif alg == 'HS384':
+        hashalg = cryptography.hazmat.primitives.hashes.SHA384
+        hashbytes = 48
+    elif alg == 'HS512':
+        hashalg = cryptography.hazmat.primitives.hashes.SHA512
+        hashbytes = 64
+    else:
+        raise ModuleFailException('Unsupported MAC key algorithm for cryptography backend: {0}'.format(alg))
+    key_bytes = base64.urlsafe_b64decode(key)
+    if len(key_bytes) < hashbytes:
+        raise ModuleFailException(
+            '{0} key must be at least {1} bytes long (after Base64 decoding)'.format(alg, hashbytes))
+    return {
+        'mac_obj': lambda: cryptography.hazmat.primitives.hmac.HMAC(
+            key_bytes,
+            hashalg(),
+            _cryptography_backend),
+        'type': 'hmac',
+        'alg': alg,
+        'jwk': {
+            'kty': 'oct',
+            'k': key,
+        },
+    }
+
+
 def _sign_request_cryptography(module, payload64, protected64, key_data):
     sign_payload = "{0}.{1}".format(protected64, payload64).encode('utf8')
-    if isinstance(key_data['key_obj'], cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
+    if 'mac_obj' in key_data:
+        mac = key_data['mac_obj']()
+        mac.update(sign_payload)
+        signature = mac.finalize()
+    elif isinstance(key_data['key_obj'], cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
         padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
         hashalg = cryptography.hazmat.primitives.hashes.SHA256
         signature = key_data['key_obj'].sign(sign_payload, padding, hashalg())
@@ -556,6 +624,13 @@ class ACMEAccount(object):
         else:
             return _sign_request_openssl(self._openssl_bin, self.module, payload64, protected64, key_data)
 
+    def _create_mac_key(self, alg, key):
+        '''Create a MAC key.'''
+        if HAS_CURRENT_CRYPTOGRAPHY:
+            return _create_mac_key_cryptography(self.module, alg, key)
+        else:
+            return _create_mac_key_openssl(self._openssl_bin, self.module, alg, key)
+
     def _log(self, msg, data=None):
         '''
         Write arguments to acme.log when logging is enabled.
@@ -683,13 +758,19 @@ class ACMEAccount(object):
             self.jws_header.pop('jwk')
             self.jws_header['kid'] = self.uri
 
-    def _new_reg(self, contact=None, agreement=None, terms_agreed=False, allow_creation=True):
+    def _new_reg(self, contact=None, agreement=None, terms_agreed=False, allow_creation=True,
+                 external_account_binding=None):
         '''
         Registers a new ACME account. Returns a pair ``(created, data)``.
         Here, ``created`` is ``True`` if the account was created and
         ``False`` if it already existed (e.g. it was not newly created),
         or does not exist. In case the account was created or exists,
         ``data`` contains the account data; otherwise, it is ``None``.
+
+        If specified, ``external_account_binding`` should be a dictionary
+        with keys ``kid``, ``alg`` and ``key``
+        (https://tools.ietf.org/html/rfc8555#section-7.3.4).
+
         https://tools.ietf.org/html/rfc8555#section-7.3
         '''
         contact = contact or []
@@ -703,8 +784,23 @@ class ACMEAccount(object):
                 new_reg['agreement'] = agreement
             else:
                 new_reg['agreement'] = self.directory['meta']['terms-of-service']
+            if external_account_binding is not None:
+                raise ModuleFailException('External account binding is not supported for ACME v1')
             url = self.directory['new-reg']
         else:
+            if (external_account_binding is not None or self.directory['meta'].get('externalAccountRequired')) and allow_creation:
+                # Some ACME servers such as ZeroSSL do not like it when you try to register an existing account
+                # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
+                # to see whether the account already exists.
+
+                # Note that we pass contact here: ZeroSSL does not accept regisration calls without contacts, even
+                # if onlyReturnExisting is set to true.
+                created, data = self._new_reg(contact=contact, allow_creation=False)
+                if data:
+                    # An account already exists! Return data
+                    return created, data
+                # An account does not yet exist. Try to create one next.
+
             new_reg = {
                 'contact': contact
             }
@@ -714,6 +810,21 @@ class ACMEAccount(object):
             if terms_agreed:
                 new_reg['termsOfServiceAgreed'] = True
             url = self.directory['newAccount']
+            if external_account_binding is not None:
+                new_reg['externalAccountBinding'] = self.sign_request(
+                    {
+                        'alg': external_account_binding['alg'],
+                        'kid': external_account_binding['kid'],
+                        'url': url,
+                    },
+                    self.jwk,
+                    self._create_mac_key(external_account_binding['alg'], external_account_binding['key'])
+                )
+            elif self.directory['meta'].get('externalAccountRequired') and allow_creation:
+                raise ModuleFailException(
+                    'To create an account, an external account binding must be specified. '
+                    'Use the acme_account module with the external_account_binding option.'
+                )
 
         result, info = self.send_signed_request(url, new_reg)
 
@@ -783,7 +894,9 @@ class ACMEAccount(object):
             raise ModuleFailException("Error getting account data from {2}: {0} {1}".format(info['status'], result, self.uri))
         return result
 
-    def setup_account(self, contact=None, agreement=None, terms_agreed=False, allow_creation=True, remove_account_uri_if_not_exists=False):
+    def setup_account(self, contact=None, agreement=None, terms_agreed=False,
+                      allow_creation=True, remove_account_uri_if_not_exists=False,
+                      external_account_binding=None):
         '''
         Detect or create an account on the ACME server. For ACME v1,
         as the only way (without knowing an account URI) to test if an
@@ -803,6 +916,10 @@ class ACMEAccount(object):
         The account URI will be stored in ``self.uri``; if it is ``None``,
         the account does not exist.
 
+        If specified, ``external_account_binding`` should be a dictionary
+        with keys ``kid``, ``alg`` and ``key``
+        (https://tools.ietf.org/html/rfc8555#section-7.3.4).
+
         https://tools.ietf.org/html/rfc8555#section-7.3
         '''
 
@@ -821,7 +938,8 @@ class ACMEAccount(object):
                 contact,
                 agreement=agreement,
                 terms_agreed=terms_agreed,
-                allow_creation=allow_creation and not self.module.check_mode
+                allow_creation=allow_creation and not self.module.check_mode,
+                external_account_binding=external_account_binding,
             )
             if self.module.check_mode and self.uri is None and allow_creation:
                 created = True
