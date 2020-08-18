@@ -868,7 +868,7 @@ import tempfile
 import traceback
 
 from distutils.version import LooseVersion
-from random import randint
+from random import randrange
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes, to_text
@@ -1264,6 +1264,14 @@ class SelfSignedCertificateCryptography(Certificate):
         return result
 
 
+def generate_serial_number():
+    """Generate a serial number for a certificate"""
+    while True:
+        result = randrange(0, 1 << 160)
+        if result >= 1000:
+            return result
+
+
 class SelfSignedCertificate(Certificate):
     """Generate the self-signed certificate."""
 
@@ -1275,7 +1283,7 @@ class SelfSignedCertificate(Certificate):
         self.notAfter = get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
         self.digest = module.params['selfsigned_digest']
         self.version = module.params['selfsigned_version']
-        self.serial_number = randint(1000, 99999)
+        self.serial_number = generate_serial_number()
 
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
@@ -1570,7 +1578,7 @@ class OwnCACertificate(Certificate):
         self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
         self.digest = module.params['ownca_digest']
         self.version = module.params['ownca_version']
-        self.serial_number = randint(1000, 99999)
+        self.serial_number = generate_serial_number()
         if module.params['ownca_create_subject_key_identifier'] != 'create_if_not_provided':
             module.fail_json(msg='ownca_create_subject_key_identifier cannot be used with the pyOpenSSL backend!')
         if module.params['ownca_create_authority_key_identifier']:
