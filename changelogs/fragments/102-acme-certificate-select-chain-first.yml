@@ -1,2 +1,0 @@
-minor_changes:
-- "acme_certificate - allow new selector ``test_certificates: first`` for ``select_chain`` parameter (https://github.com/ansible-collections/community.crypto/pull/102)."

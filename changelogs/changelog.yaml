@@ -140,3 +140,48 @@ releases:
       name: x509_crl_info
       namespace: ''
     release_date: '2020-07-03'
+  1.1.0:
+    changes:
+      bugfixes:
+      - acme_inspect - fix problem with Python 3.5 that JSON was not decoded (https://github.com/ansible-collections/community.crypto/issues/86).
+      - get_certificate - fix ``ca_cert`` option handling when ``proxy_host`` is used
+        (https://github.com/ansible-collections/community.crypto/pull/84).
+      - openssl_*, x509_* modules - fix handling of general names which refer to IP
+        networks and not IP addresses (https://github.com/ansible-collections/community.crypto/pull/92).
+      minor_changes:
+      - acme_account - add ``external_account_binding`` option to allow creation of
+        ACME accounts with External Account Binding (https://github.com/ansible-collections/community.crypto/issues/89).
+      - 'acme_certificate - allow new selector ``test_certificates: first`` for ``select_chain``
+        parameter (https://github.com/ansible-collections/community.crypto/pull/102).'
+      - cryptography backends - support arbitrary dotted OIDs (https://github.com/ansible-collections/community.crypto/issues/39).
+      - get_certificate - add support for SNI (https://github.com/ansible-collections/community.crypto/issues/69).
+      - luks_device - add support for encryption options on container creation (https://github.com/ansible-collections/community.crypto/pull/97).
+      - openssh_cert - add support for PKCS#11 tokens (https://github.com/ansible-collections/community.crypto/pull/95).
+      - openssl_certificate - the PyOpenSSL backend now uses 160 bits of randomness
+        for serial numbers, instead of a random number between 1000 and 99999. Please
+        note that this is not a high quality random number (https://github.com/ansible-collections/community.crypto/issues/76).
+      - openssl_csr - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46).
+      - openssl_csr_info - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46).
+      release_summary: 'Release for Ansible 2.10.0.
+
+        '
+    fragments:
+    - 1.1.0.yml
+    - 100-acme-account-external-account-binding.yml
+    - 102-acme-certificate-select-chain-first.yml
+    - 87-acme_inspect-python-3.5.yml
+    - 90-cryptography-oids.yml
+    - 90-openssl_certificate-pyopenssl-serial.yml
+    - 92-ip-networks.yml
+    - 92-openssl_csr-name-constraints.yml
+    - get_certificate-add_support_for_SNI.yml
+    - luks_device-add_encryption_option_on_create.yml
+    - openssh_cert-pkcs11.yml
+    modules:
+    - description: Sign data with openssl
+      name: openssl_signature
+      namespace: ''
+    - description: Verify signatures with openssl
+      name: openssl_signature_info
+      namespace: ''
+    release_date: '2020-08-18'

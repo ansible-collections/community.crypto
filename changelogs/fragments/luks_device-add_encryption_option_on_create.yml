@@ -1,2 +1,0 @@
-minor_changes:
-  - "luks_device - add support for encryption options on container creation (https://github.com/ansible-collections/community.crypto/pull/97)."

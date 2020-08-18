@@ -5,6 +5,41 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.1.0
+======
+
+Release Summary
+---------------
+
+Release for Ansible 2.10.0.
+
+
+Minor Changes
+-------------
+
+- acme_account - add ``external_account_binding`` option to allow creation of ACME accounts with External Account Binding (https://github.com/ansible-collections/community.crypto/issues/89).
+- acme_certificate - allow new selector ``test_certificates: first`` for ``select_chain`` parameter (https://github.com/ansible-collections/community.crypto/pull/102).
+- cryptography backends - support arbitrary dotted OIDs (https://github.com/ansible-collections/community.crypto/issues/39).
+- get_certificate - add support for SNI (https://github.com/ansible-collections/community.crypto/issues/69).
+- luks_device - add support for encryption options on container creation (https://github.com/ansible-collections/community.crypto/pull/97).
+- openssh_cert - add support for PKCS#11 tokens (https://github.com/ansible-collections/community.crypto/pull/95).
+- openssl_certificate - the PyOpenSSL backend now uses 160 bits of randomness for serial numbers, instead of a random number between 1000 and 99999. Please note that this is not a high quality random number (https://github.com/ansible-collections/community.crypto/issues/76).
+- openssl_csr - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46).
+- openssl_csr_info - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46).
+
+Bugfixes
+--------
+
+- acme_inspect - fix problem with Python 3.5 that JSON was not decoded (https://github.com/ansible-collections/community.crypto/issues/86).
+- get_certificate - fix ``ca_cert`` option handling when ``proxy_host`` is used (https://github.com/ansible-collections/community.crypto/pull/84).
+- openssl_*, x509_* modules - fix handling of general names which refer to IP networks and not IP addresses (https://github.com/ansible-collections/community.crypto/pull/92).
+
+New Modules
+-----------
+
+- openssl_signature - Sign data with openssl
+- openssl_signature_info - Verify signatures with openssl
+
 v1.0.0
 ======
 

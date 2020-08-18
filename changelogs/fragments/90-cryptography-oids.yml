@@ -1,2 +1,0 @@
-minor_changes:
-- "cryptography backends - support arbitrary dotted OIDs (https://github.com/ansible-collections/community.crypto/issues/39)."

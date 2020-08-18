@@ -1,2 +1,0 @@
-minor_changes:
-- "acme_account - add ``external_account_binding`` option to allow creation of ACME accounts with External Account Binding (https://github.com/ansible-collections/community.crypto/issues/89)."

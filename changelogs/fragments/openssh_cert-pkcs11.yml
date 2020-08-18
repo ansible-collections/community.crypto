@@ -1,2 +1,0 @@
-minor_changes:
-  - "openssh_cert - add support for PKCS#11 tokens (https://github.com/ansible-collections/community.crypto/pull/95)."
