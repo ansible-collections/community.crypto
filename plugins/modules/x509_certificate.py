@@ -1266,8 +1266,10 @@ class SelfSignedCertificateCryptography(Certificate):
 
 def generate_serial_number():
     """Generate a serial number for a certificate"""
-    highest_bit = 1 << 160
-    return randrange(0, highest_bit) | highest_bit
+    while True:
+        result = randrange(0, 1 << 160)
+        if result >= 1000:
+            return result
 
 
 class SelfSignedCertificate(Certificate):
