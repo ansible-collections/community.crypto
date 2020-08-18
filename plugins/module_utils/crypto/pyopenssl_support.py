@@ -38,6 +38,10 @@ from ._objects import (
 
 from ._obj2txt import obj2txt
 
+from .basic import (
+    OpenSSLObjectError,
+)
+
 
 def pyopenssl_normalize_name(name, short=False):
     nid = OpenSSL._util.lib.OBJ_txt2nid(to_bytes(name))
@@ -56,9 +60,13 @@ def pyopenssl_normalize_name_attribute(san):
     if san.startswith('IP Address:'):
         san = 'IP:' + san[len('IP Address:'):]
     if san.startswith('IP:'):
-        ip = compat_ipaddress.ip_address(san[3:])
-        san = 'IP:{0}'.format(ip.compressed)
-
+        address = san[3:]
+        if '/' in address:
+            ip = compat_ipaddress.ip_network(address)
+            san = 'IP:{0}/{1}'.format(ip.network_address.compressed, ip.prefixlen)
+        else:
+            ip = compat_ipaddress.ip_address(address)
+            san = 'IP:{0}'.format(ip.compressed)
     if san.startswith('Registered ID:'):
         san = 'RID:' + san[len('Registered ID:'):]
     # Some versions of OpenSSL apparently forgot the colon. Happens in CI with Ubuntu 16.04 and FreeBSD 11.1
@@ -119,3 +127,28 @@ def pyopenssl_get_extensions_from_csr(csr):
         # similarly to how cryptography does it.
         result[oid] = entry
     return result
+
+
+def pyopenssl_parse_name_constraints(name_constraints_extension):
+    lines = to_text(name_constraints_extension, errors='surrogate_or_strict').splitlines()
+    exclude = None
+    excluded = []
+    permitted = []
+    for line in lines:
+        if line.startswith(' ') or line.startswith('\t'):
+            name = pyopenssl_normalize_name_attribute(line.strip())
+            if exclude is True:
+                excluded.append(name)
+            elif exclude is False:
+                permitted.append(name)
+            else:
+                raise OpenSSLObjectError('Unexpected nameConstraint line: "{0}"'.format(line))
+        else:
+            line_lc = line.lower()
+            if line_lc.startswith('exclud'):
+                exclude = True
+            elif line_lc.startswith('includ') or line_lc.startswith('permitt'):
+                exclude = False
+            else:
+                raise OpenSSLObjectError('Cannot parse nameConstraint line: "{0}"'.format(line))
+    return permitted, excluded

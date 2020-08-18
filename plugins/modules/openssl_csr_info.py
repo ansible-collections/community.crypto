@@ -141,6 +141,29 @@ ocsp_must_staple_critical:
     description: Whether the C(ocsp_must_staple) extension is critical.
     returned: success
     type: bool
+name_constraints_permitted:
+    description: List of permitted subtrees to sign certificates for.
+    returned: success
+    type: list
+    elements: str
+    sample: ['email:.somedomain.com']
+    version_added: 1.1.0
+name_constraints_excluded:
+    description:
+        - List of excluded subtrees the CA cannot sign certificates for.
+        - Is C(none) if extension is not present.
+    returned: success
+    type: list
+    elements: str
+    sample: ['email:.com']
+    version_added: 1.1.0
+name_constraints_critical:
+    description:
+        - Whether the C(name_constraints) extension is critical.
+        - Is C(none) if extension is not present.
+    returned: success
+    type: bool
+    version_added: 1.1.0
 subject:
     description:
         - The CSR's subject as a dictionary.
@@ -231,6 +254,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_get_extensions_from_csr,
     pyopenssl_normalize_name,
     pyopenssl_normalize_name_attribute,
+    pyopenssl_parse_name_constraints,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
@@ -318,6 +342,10 @@ class CertificateSigningRequestInfo(OpenSSLObject):
         pass
 
     @abc.abstractmethod
+    def _get_name_constraints(self):
+        pass
+
+    @abc.abstractmethod
     def _get_public_key(self, binary):
         pass
 
@@ -351,6 +379,11 @@ class CertificateSigningRequestInfo(OpenSSLObject):
         result['basic_constraints'], result['basic_constraints_critical'] = self._get_basic_constraints()
         result['ocsp_must_staple'], result['ocsp_must_staple_critical'] = self._get_ocsp_must_staple()
         result['subject_alt_name'], result['subject_alt_name_critical'] = self._get_subject_alt_name()
+        (
+            result['name_constraints_permitted'],
+            result['name_constraints_excluded'],
+            result['name_constraints_critical'],
+        ) = self._get_name_constraints()
 
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
@@ -474,6 +507,15 @@ class CertificateSigningRequestInfoCryptography(CertificateSigningRequestInfo):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
+    def _get_name_constraints(self):
+        try:
+            nc_ext = self.csr.extensions.get_extension_for_class(x509.NameConstraints)
+            permitted = [cryptography_decode_name(san) for san in nc_ext.value.permitted_subtrees or []]
+            excluded = [cryptography_decode_name(san) for san in nc_ext.value.excluded_subtrees or []]
+            return permitted, excluded, nc_ext.critical
+        except cryptography.x509.ExtensionNotFound:
+            return None, None, False
+
     def _get_public_key(self, binary):
         return self.csr.public_key().public_bytes(
             serialization.Encoding.DER if binary else serialization.Encoding.PEM,
@@ -558,6 +600,13 @@ class CertificateSigningRequestInfoPyOpenSSL(CertificateSigningRequestInfo):
                           to_text(extension, errors='surrogate_or_strict').split(', ')]
                 return result, bool(extension.get_critical())
         return None, False
+
+    def _get_name_constraints(self):
+        for extension in self.csr.get_extensions():
+            if extension.get_short_name() == b'nameConstraints':
+                permitted, excluded = pyopenssl_parse_name_constraints(extension)
+                return permitted, excluded, bool(extension.get_critical())
+        return None, None, False
 
     def _get_public_key(self, binary):
         try:

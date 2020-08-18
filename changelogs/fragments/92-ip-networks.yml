@@ -1,0 +1,2 @@
+bugfixes:
+- "openssl_*, x509_* modules - fix handling of general names which refer to IP networks and not IP addresses (https://github.com/ansible-collections/community.crypto/pull/92)."

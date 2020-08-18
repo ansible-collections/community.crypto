@@ -1,0 +1,3 @@
+minor_changes:
+- "openssl_csr - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46)."
+- "openssl_csr_info - add support for name constraints extension (https://github.com/ansible-collections/community.crypto/issues/46)."
