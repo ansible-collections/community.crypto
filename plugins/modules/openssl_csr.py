@@ -605,10 +605,12 @@ class CertificateSigningRequestBase(OpenSSLObject):
             self.subject = self.subject + parse_name_field(module.params['subject'])
         self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
 
+        self.using_common_name_for_san = False
         if not self.subjectAltName and module.params['use_common_name_for_san']:
             for sub in self.subject:
                 if sub[0] in ('commonName', 'CN'):
                     self.subjectAltName = ['DNS:%s' % sub[1]]
+                    self.using_common_name_for_san = True
                     break
 
         if self.subject_key_identifier is not None:
@@ -962,6 +964,22 @@ class CertificateSigningRequestCryptography(CertificateSigningRequestBase):
             if str(e) == 'Algorithm must be a registered hash algorithm.' and digest is None:
                 self.module.fail_json(msg='Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer.')
             raise
+        except UnicodeError as e:
+            # This catches IDNAErrors, which happens when a bad name is passed as a SAN
+            # (https://github.com/ansible-collections/community.crypto/issues/105).
+            # For older cryptography versions, this is handled by idna, which raises
+            # an idna.core.IDNAError. Later versions of cryptography deprecated and stopped
+            # requiring idna, whence we cannot easily handle this error. Fortunately, in
+            # most versions of idna, IDNAError extends UnicodeError. There is only version
+            # 2.3 where it extends Exception instead (see
+            # https://github.com/kjd/idna/commit/ebefacd3134d0f5da4745878620a6a1cba86d130
+            # and then
+            # https://github.com/kjd/idna/commit/ea03c7b5db7d2a99af082e0239da2b68aeea702a).
+            msg = 'Error while creating CSR: {0}\n'.format(e)
+            if self.using_common_name_for_san:
+                self.module.fail_json(msg=msg + 'This is probably caused because the Common Name is used as a SAN.'
+                                      ' Specifying use_common_name_for_san=false might fix this.')
+            self.module.fail_json(msg=msg + 'This is probably caused by an invalid Subject Alternative DNS Name.')
 
         return self.request.public_bytes(cryptography.hazmat.primitives.serialization.Encoding.PEM)
 

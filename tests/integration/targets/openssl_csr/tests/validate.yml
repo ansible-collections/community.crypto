@@ -62,11 +62,19 @@
       - csr_oldapi_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - csr_oldapi_modulus.stdout == privatekey_modulus.stdout
 
-- name: Validate invalid SAN
+- name: Validate invalid SAN (1/2)
   assert:
     that:
       - generate_csr_invalid_san is failed
       - "'Subject Alternative Name' in generate_csr_invalid_san.msg"
+
+- name: Validate invalid SAN (2/2)
+  # Note that pyOpenSSL simply accepts this name, and modern cryptography versions do so as well
+  assert:
+    that:
+      - generate_csr_invalid_san_2 is failed
+      - "'Subject Alternative Name' in generate_csr_invalid_san_2.msg"
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.5', '<')
 
 - name: Validate OCSP Must Staple CSR (test - everything)
   shell: "openssl req -noout -in {{ output_dir }}/csr_ocsp.csr -text"
