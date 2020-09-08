@@ -162,13 +162,22 @@
     commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- name: Generate CSR with invalid SAN
+- name: Generate CSR with invalid SAN (1/2)
   openssl_csr:
     path: '{{ output_dir }}/csrinvsan.csr'
     privatekey_path: '{{ output_dir }}/privatekey.pem'
     subject_alt_name: invalid-san.example.com
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: generate_csr_invalid_san
+  ignore_errors: yes
+
+- name: Generate CSR with invalid SAN (2/2)
+  openssl_csr:
+    path: '{{ output_dir }}/csrinvsan2.csr'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    subject_alt_name: "DNS:system:kube-controller-manager"
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: generate_csr_invalid_san_2
   ignore_errors: yes
 
 - name: Generate CSR with OCSP Must Staple
