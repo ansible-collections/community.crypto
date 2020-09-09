@@ -1,0 +1,2 @@
+bugfixes:
+- "openssl_pkcs12 - do not crash when reading PKCS#12 file which has no private key and/or no main certificate (https://github.com/ansible-collections/community.crypto/issues/103)."
