@@ -13,13 +13,13 @@ plugin_routing:
   modules:
     acme_account_facts:
       deprecation:
-        removal_version: '2.12'
+        removal_version: 2.0.0
         warning_text: The 'community.crypto.acme_account_facts' module has been renamed to 'community.crypto.acme_account_info'.
     openssl_certificate:
       deprecation:
-        removal_version: '2.14'
+        removal_version: 2.0.0
         warning_text: The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'
     openssl_certificate_info:
       deprecation:
-        removal_version: '2.14'
+        removal_version: 2.0.0
         warning_text: The 'community.crypto.openssl_certificate_info' module has been renamed to 'community.crypto.x509_certificate_info'
