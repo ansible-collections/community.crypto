@@ -360,10 +360,14 @@ class Pkcs(OpenSSLObject):
                 pkcs12_content = pkcs12_fh.read()
             p12 = crypto.load_pkcs12(pkcs12_content,
                                      self.passphrase)
-            pkey = crypto.dump_privatekey(crypto.FILETYPE_PEM,
-                                          p12.get_privatekey())
-            crt = crypto.dump_certificate(crypto.FILETYPE_PEM,
-                                          p12.get_certificate())
+            pkey = None
+            if p12.get_privatekey():
+                pkey = crypto.dump_privatekey(crypto.FILETYPE_PEM,
+                                              p12.get_privatekey())
+            crt = None
+            if p12.get_certificate():
+                crt = crypto.dump_certificate(crypto.FILETYPE_PEM,
+                                              p12.get_certificate())
             other_certs = []
             if p12.get_ca_certificates() is not None:
                 other_certs = [crypto.dump_certificate(crypto.FILETYPE_PEM,
