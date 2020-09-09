@@ -1,0 +1,2 @@
+bugfixes:
+- "meta/runtime.yml - convert Ansible version numbers for old names of modules to collection version numbers (https://github.com/ansible-collections/community.crypto/pull/108)."
