@@ -1,2 +1,0 @@
-bugfixes:
-- "openssl_csr - improve handling of IDNA errors (https://github.com/ansible-collections/community.crypto/issues/105)."

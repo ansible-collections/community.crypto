@@ -185,3 +185,15 @@ releases:
       name: openssl_signature_info
       namespace: ''
     release_date: '2020-08-18'
+  1.1.1:
+    changes:
+      bugfixes:
+      - meta/runtime.yml - convert Ansible version numbers for old names of modules
+        to collection version numbers (https://github.com/ansible-collections/community.crypto/pull/108).
+      - openssl_csr - improve handling of IDNA errors (https://github.com/ansible-collections/community.crypto/issues/105).
+      release_summary: Bugfixes for Ansible 2.10.0.
+    fragments:
+    - 1.1.1.yml
+    - 106-openssl_csr-idna-errors.yml
+    - 108-meta-runtime-versions.yml
+    release_date: '2020-09-14'

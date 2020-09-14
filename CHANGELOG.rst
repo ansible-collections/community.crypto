@@ -5,6 +5,20 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.1.1
+======
+
+Release Summary
+---------------
+
+Bugfixes for Ansible 2.10.0.
+
+Bugfixes
+--------
+
+- meta/runtime.yml - convert Ansible version numbers for old names of modules to collection version numbers (https://github.com/ansible-collections/community.crypto/pull/108).
+- openssl_csr - improve handling of IDNA errors (https://github.com/ansible-collections/community.crypto/issues/105).
+
 v1.1.0
 ======
 
