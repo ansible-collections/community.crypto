@@ -55,3 +55,9 @@
       - p12_backup_5 is not changed
       - p12_backup_5.backup_file is undefined
       - p12_backup_4.pkcs12 is none
+
+- name: Check 'empty' file
+  assert:
+    that:
+      - p12_empty is changed
+      - p12_empty_idem is not changed

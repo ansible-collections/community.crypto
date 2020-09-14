@@ -213,6 +213,26 @@
       state: absent
       backup: true
     register: p12_backup_5
+  - name: Generate 'empty' PKCS#12 file
+    openssl_pkcs12:
+      path: '{{ output_dir }}/ansible_empty.p12'
+      friendly_name: abracadabra
+      ca_certificates:
+      - '{{ output_dir }}/ansible2.crt'
+      - '{{ output_dir }}/ansible3.crt'
+      state: present
+      return_content: true
+    register: p12_empty
+  - name: Generate 'empty' PKCS#12 file (idempotent)
+    openssl_pkcs12:
+      path: '{{ output_dir }}/ansible_empty.p12'
+      friendly_name: abracadabra
+      ca_certificates:
+      - '{{ output_dir }}/ansible2.crt'
+      - '{{ output_dir }}/ansible3.crt'
+      state: present
+      return_content: true
+    register: p12_empty_idem
   - import_tasks: ../tests/validate.yml
   always:
   - name: Delete PKCS#12 file
@@ -226,3 +246,4 @@
     - ansible_pw1
     - ansible_pw2
     - ansible_pw3
+    - ansible_empty
