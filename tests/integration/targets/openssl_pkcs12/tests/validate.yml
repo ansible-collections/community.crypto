@@ -61,3 +61,4 @@
     that:
       - p12_empty is changed
       - p12_empty_idem is not changed
+      - "lookup('file', output_dir ~ '/ansible_empty.pem') == lookup('file', output_dir ~ '/ansible3.crt') ~ '\n' ~ lookup('file', output_dir ~ '/ansible2.crt')"

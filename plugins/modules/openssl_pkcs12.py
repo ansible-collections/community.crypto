@@ -446,7 +446,7 @@ def main():
                     changed = True
                 else:
                     pkey, cert, other_certs, friendly_name = pkcs12.parse()
-                    dump_content = '%s%s%s' % (to_native(pkey), to_native(cert), to_native(b''.join(other_certs)))
+                    dump_content = ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
                     pkcs12.write(module, to_bytes(dump_content))
 
             file_args = module.load_file_common_arguments(module.params)

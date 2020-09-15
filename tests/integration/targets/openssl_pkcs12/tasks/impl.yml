@@ -221,7 +221,6 @@
       - '{{ output_dir }}/ansible2.crt'
       - '{{ output_dir }}/ansible3.crt'
       state: present
-      return_content: true
     register: p12_empty
   - name: Generate 'empty' PKCS#12 file (idempotent)
     openssl_pkcs12:
@@ -231,8 +230,12 @@
       - '{{ output_dir }}/ansible2.crt'
       - '{{ output_dir }}/ansible3.crt'
       state: present
-      return_content: true
     register: p12_empty_idem
+  - name: Generate 'empty' PKCS#12 file (parse)
+    openssl_pkcs12:
+      src: '{{ output_dir }}/ansible_empty.p12'
+      path: '{{ output_dir }}/ansible_empty.pem'
+      action: parse
   - import_tasks: ../tests/validate.yml
   always:
   - name: Delete PKCS#12 file
