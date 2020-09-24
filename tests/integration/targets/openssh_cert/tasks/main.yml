@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: openssh_cert integration tests
   when: not (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6")
   block:
