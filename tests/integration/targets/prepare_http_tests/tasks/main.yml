@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # The docker --link functionality gives us an ENV var we can key off of to see if we have access to
 # the httptester container
 - set_fact:

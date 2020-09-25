@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # The tests for this module generate unsafe parameters for testing purposes;
 # otherwise tests would be too slow. Use sizes of at least 2048 in production!
 
