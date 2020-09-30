@@ -37,6 +37,14 @@
   command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
   register: pyopenssl_version
 
+- name: register pyOpenSSL debug details
+  command: "{{ ansible_python.executable }} -m OpenSSL.debug"
+  register: pyopenssl_debug_version
+
+- name: show pyOpenSSL debug details
+  debug:
+    var: pyopenssl_debug_version.stdout_lines
+
 - name: register openssl version (full)
   shell: "openssl version"
   register: openssl_version_full
