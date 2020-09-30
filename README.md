@@ -1,8 +1,11 @@
 # Ansible Community Crypto Collection
+
 [![Shippable build status](https://api.shippable.com/projects/5e66776ca27f990007073a42/badge?branch=main)](https://app.shippable.com/projects/5e66776ca27f990007073a42)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 
 Provides modules for [Ansible](https://www.ansible.com/community) for various cryptographic operations.
+
+You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/).
 
 ## Tested with Ansible
 
@@ -47,6 +50,8 @@ Most modules require a recent enough version of [the Python cryptography library
 - Miscellaneous modules:
   - get_certificate
   - luks_device
+
+You can also find a list of all modules with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/).
 
 ## Using this collection
 
