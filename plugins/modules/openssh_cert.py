@@ -53,6 +53,12 @@ options:
             - If this is set, I(signing_key) needs to point to a file containing the public key of the CA.
         type: str
         version_added: 1.1.0
+    use_agent:
+        description:
+            - Should the ssh-keygen use a CA key residing in a ssh-agent.
+        type: bool
+        default: false
+        version_added: 1.3.0
     public_key:
         description:
             - The path to the public key that will be signed with the signing key in order to generate the certificate.
@@ -216,12 +222,14 @@ import tempfile
 
 from datetime import datetime
 from datetime import MINYEAR, MAXYEAR
+from distutils.version import LooseVersion
 from shutil import copy2, rmtree
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import convert_relative_to_datetime
+from ansible_collections.community.crypto.plugins.module_utils.crypto.openssh import parse_openssh_version
 
 
 class CertificateError(Exception):
@@ -235,6 +243,7 @@ class Certificate(object):
         self.force = module.params['force']
         self.type = module.params['type']
         self.signing_key = module.params['signing_key']
+        self.use_agent = module.params['use_agent']
         self.pkcs11_provider = module.params['pkcs11_provider']
         self.public_key = module.params['public_key']
         self.path = module.params['path']
@@ -272,6 +281,9 @@ class Certificate(object):
 
             if self.pkcs11_provider:
                 args.extend(['-D', self.pkcs11_provider])
+
+            if self.use_agent:
+                args.extend(['-U'])
 
             validity = ""
 
@@ -547,6 +559,7 @@ def main():
             force=dict(type='bool', default=False),
             type=dict(type='str', choices=['host', 'user']),
             signing_key=dict(type='path'),
+            use_agent=dict(type='bool', default=False),
             pkcs11_provider=dict(type='str'),
             public_key=dict(type='path'),
             path=dict(type='path', required=True),
@@ -562,6 +575,21 @@ def main():
         add_file_common_args=True,
         required_if=[('state', 'present', ['type', 'signing_key', 'public_key', 'valid_from', 'valid_to'])],
     )
+
+    if module.params['use_agent']:
+        ssh = module.get_bin_path('ssh', True)
+        proc = module.run_command([ssh, '-Vq'])
+        ssh_version_string = proc[2].strip()
+        ssh_version = parse_openssh_version(ssh_version_string)
+        if ssh_version is None:
+            module.fail_json(msg="Failed to parse ssh version")
+        elif LooseVersion(ssh_version) < LooseVersion("7.6"):
+            module.fail_json(
+                msg=(
+                    "Signing with CA key in ssh agent requires ssh 7.6 or newer."
+                    " Your version is: %s"
+                ) % ssh_version_string
+            )
 
     def isBaseDir(path):
         base_dir = os.path.dirname(path) or '.'
