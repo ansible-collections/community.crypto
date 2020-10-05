@@ -19,6 +19,8 @@
     privatekey_path: "{{ output_dir }}/{{ certificate_name }}.key"
     subject_alt_name: "{{ subject_alt_name }}"
     subject_alt_name_critical: "{{ subject_alt_name_critical }}"
+    return_content: true
+  register: csr_result
 ## ACME STEP 1 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 1
   acme_certificate:
@@ -29,7 +31,8 @@
     account_key: "{{ (output_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
     modify_account: "{{ modify_account }}"
-    csr: "{{ output_dir }}/{{ certificate_name }}.csr"
+    csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"
+    csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
     dest: "{{ output_dir }}/{{ certificate_name }}.pem"
     fullchain_dest: "{{ output_dir }}/{{ certificate_name }}-fullchain.pem"
     chain_dest: "{{ output_dir }}/{{ certificate_name }}-chain.pem"
@@ -100,7 +103,8 @@
     account_key_content: "{{ account_key_content | default(omit) }}"
     account_uri: "{{ challenge_data.account_uri }}"
     modify_account: "{{ modify_account }}"
-    csr: "{{ output_dir }}/{{ certificate_name }}.csr"
+    csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"
+    csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
     dest: "{{ output_dir }}/{{ certificate_name }}.pem"
     fullchain_dest: "{{ output_dir }}/{{ certificate_name }}-fullchain.pem"
     chain_dest: "{{ output_dir }}/{{ certificate_name }}-chain.pem"
