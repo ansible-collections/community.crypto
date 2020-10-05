@@ -1045,6 +1045,8 @@ def cryptography_get_csr_identifiers(module, csr_filename, csr_content=None):
     identifiers = set([])
     if csr_content is None:
         csr_content = read_file(csr_filename)
+    else:
+        csr_content = to_bytes(csr_content)
     csr = cryptography.x509.load_pem_x509_csr(csr_content, _cryptography_backend)
     for sub in csr.subject:
         if sub.oid == cryptography.x509.oid.NameOID.COMMON_NAME:
