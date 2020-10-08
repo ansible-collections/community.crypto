@@ -2,7 +2,7 @@
 - debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Get CSR info"
+- name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
     path: '{{ output_dir }}/csr_1.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -32,18 +32,18 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Get CSR info directly"
+- name: "({{ select_crypto_backend }}) Get CSR info directly"
   openssl_csr_info:
     content: '{{ lookup("file", output_dir ~ "/csr_1.csr") }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Compare output of direct and loaded info"
+- name: "({{ select_crypto_backend }}) Compare output of direct and loaded info"
   assert:
     that:
       - result == result_direct
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Get CSR info"
+- name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
     path: '{{ output_dir }}/csr_2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -53,7 +53,7 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Get CSR info"
+- name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
     path: '{{ output_dir }}/csr_3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -75,7 +75,7 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
-- name: "({{ select_crypto_backend }}) ({{select_crypto_backend}}) Get CSR info"
+- name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
     path: '{{ output_dir }}/csr_4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
