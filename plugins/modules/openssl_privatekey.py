@@ -31,7 +31,8 @@ options:
         default: no
     path:
         description:
-            - Name of the file in which the generated TLS/SSL private key will be written. It will have 0600 mode.
+            - Name of the file in which the generated TLS/SSL private key will be written. It will have C(0600) mode
+              if I(mode) is not explicitly set.
         type: path
         required: true
     format:
@@ -59,6 +60,8 @@ options:
 extends_documentation_fragment:
 - ansible.builtin.files
 - community.crypto.module_privatekey
+seealso:
+- module: community.crypto.openssl_privatekey_info
 '''
 
 EXAMPLES = r'''
