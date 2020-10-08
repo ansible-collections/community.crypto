@@ -16,8 +16,12 @@
       - result_info.type == 'RSA'
       - result_info.public_data.size == 4096
       - result_info.public_data.exponent >= 5
-      - result_info.public_key_fingerprints.sha512 | length > 10
-      - result.fingerprint.sha512 == result_info.public_key_fingerprints.sha512
+
+- assert:
+    that:
+      - result_info.public_key_fingerprints.sha256 | length > 10
+      - result.fingerprint.sha256 == result_info.public_key_fingerprints.sha256
+  when: result.fingerprint is not none
 
 - name: ({{select_crypto_backend}}) Update key (check mode)
   openssl_privatekey_pipe:
