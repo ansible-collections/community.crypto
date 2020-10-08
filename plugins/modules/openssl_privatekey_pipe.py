@@ -169,6 +169,12 @@ def main():
         required_together=required_together + [],
         required_if=required_if + [],
     )
+    # This could also be passed to the AnsibleModule() construction, but will be
+    # overwritten when the module's options are processed (Ansible always passes
+    # _ansible_no_log which overwrites it). We later have to remove the value of
+    # content from the `module.no_log_values` set, and we want to avoid accidental
+    # logging later on.
+    module.no_log = True
 
     backend, module_backend = select_backend(
         module=module,
@@ -179,6 +185,15 @@ def main():
         private_key = PrivateKeyModule(module, module_backend)
         private_key.generate(module)
         result = private_key.dump()
+        # In case changed=False, the module's input (`content`) is returned as `privatekey`.
+        # Since `content` is no_log=True, `privatekey`'s value will get replaced by
+        # ANSIBLE_NO_LOG_VALUE. To avoid this, we remove the value of `content` from
+        # module.no_log_values. Since we explicitly set `module.no_log = True` above, this
+        # should be safe.
+        try:
+            module.no_log_values.remove(module.params['content'])
+        except KeyError:
+            pass
         module.exit_json(**result)
     except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))

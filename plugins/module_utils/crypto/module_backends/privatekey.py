@@ -73,6 +73,13 @@ class PrivateKeyError(OpenSSLObjectError):
     pass
 
 
+# From the object called `module`, only the following properties are used:
+#
+#  - module.params[]
+#  - module.warn(msg: str)
+#  - module.fail_json(msg: str, **kwargs)
+
+
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyBackend:
     def __init__(self, module, backend):
