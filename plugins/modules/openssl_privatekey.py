@@ -61,6 +61,7 @@ extends_documentation_fragment:
 - ansible.builtin.files
 - community.crypto.module_privatekey
 seealso:
+- module: community.crypto.openssl_privatekey_pipe
 - module: community.crypto.openssl_privatekey_info
 '''
 

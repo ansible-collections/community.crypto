@@ -67,6 +67,7 @@ options:
 
 seealso:
 - module: community.crypto.openssl_privatekey
+- module: community.crypto.openssl_privatekey_pipe
 '''
 
 EXAMPLES = r'''
