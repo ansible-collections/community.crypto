@@ -140,27 +140,31 @@ def write_file(module, dest, content):
     return changed
 
 
-def pem_to_der(pem_filename):
+def pem_to_der(pem_filename, pem_content=None):
     '''
-    Load PEM file, and convert to DER.
+    Load PEM file, or use PEM file's content, and convert to DER.
 
     If PEM contains multiple entities, the first entity will be used.
     '''
     certificate_lines = []
-    try:
-        with open(pem_filename, "rt") as f:
-            header_line_count = 0
-            for line in f:
-                if line.startswith('-----'):
-                    header_line_count += 1
-                    if header_line_count == 2:
-                        # If certificate file contains other certs appended
-                        # (like intermediate certificates), ignore these.
-                        break
-                    continue
-                certificate_lines.append(line.strip())
-    except Exception as err:
-        raise ModuleFailException("cannot load PEM file {0}: {1}".format(pem_filename, to_native(err)), exception=traceback.format_exc())
+    if pem_content is not None:
+        lines = pem_content.splitlines()
+    else:
+        try:
+            with open(pem_filename, "rt") as f:
+                lines = list(f)
+        except Exception as err:
+            raise ModuleFailException("cannot load PEM file {0}: {1}".format(pem_filename, to_native(err)), exception=traceback.format_exc())
+    header_line_count = 0
+    for line in lines:
+        if line.startswith('-----'):
+            header_line_count += 1
+            if header_line_count == 2:
+                # If certificate file contains other certs appended
+                # (like intermediate certificates), ignore these.
+                break
+            continue
+        certificate_lines.append(line.strip())
     return base64.b64decode(''.join(certificate_lines))
 
 
@@ -989,14 +993,20 @@ def _normalize_ip(ip):
         return ip
 
 
-def openssl_get_csr_identifiers(openssl_binary, module, csr_filename):
+def openssl_get_csr_identifiers(openssl_binary, module, csr_filename, csr_content=None):
     '''
     Return a set of requested identifiers (CN and SANs) for the CSR.
     Each identifier is a pair (type, identifier), where type is either
     'dns' or 'ip'.
     '''
-    openssl_csr_cmd = [openssl_binary, "req", "-in", csr_filename, "-noout", "-text"]
-    dummy, out, dummy = module.run_command(openssl_csr_cmd, check_rc=True)
+    filename = csr_filename
+    data = None
+    if csr_content is not None:
+        filename = '-'
+        data = csr_content.encode('utf-8')
+
+    openssl_csr_cmd = [openssl_binary, "req", "-in", filename, "-noout", "-text"]
+    dummy, out, dummy = module.run_command(openssl_csr_cmd, data=data, check_rc=True)
 
     identifiers = set([])
     common_name = re.search(r"Subject:.* CN\s?=\s?([^\s,;/]+)", to_text(out, errors='surrogate_or_strict'))
@@ -1018,14 +1028,18 @@ def openssl_get_csr_identifiers(openssl_binary, module, csr_filename):
     return identifiers
 
 
-def cryptography_get_csr_identifiers(module, csr_filename):
+def cryptography_get_csr_identifiers(module, csr_filename, csr_content=None):
     '''
     Return a set of requested identifiers (CN and SANs) for the CSR.
     Each identifier is a pair (type, identifier), where type is either
     'dns' or 'ip'.
     '''
     identifiers = set([])
-    csr = cryptography.x509.load_pem_x509_csr(read_file(csr_filename), _cryptography_backend)
+    if csr_content is None:
+        csr_content = read_file(csr_filename)
+    else:
+        csr_content = to_bytes(csr_content)
+    csr = cryptography.x509.load_pem_x509_csr(csr_content, _cryptography_backend)
     for sub in csr.subject:
         if sub.oid == cryptography.x509.oid.NameOID.COMMON_NAME:
             identifiers.add(('dns', sub.value))

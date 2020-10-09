@@ -125,9 +125,23 @@ options:
          account key. This is a bad idea from a security point of view, and
          the CA should not accept the CSR. The ACME server should return an
          error in this case."
+      - Precisely one of I(csr) or I(csr_content) must be specified.
     type: path
-    required: true
     aliases: ['src']
+  csr_content:
+    description:
+      - "Content of the CSR for the new certificate."
+      - "Can be created with C(openssl req ...)."
+      - "The CSR may contain multiple Subject Alternate Names, but each one
+         will lead to an individual challenge that must be fulfilled for the
+         CSR to be signed."
+      - "I(Note): the private key used to create the CSR I(must not) be the
+         account key. This is a bad idea from a security point of view, and
+         the CA should not accept the CSR. The ACME server should return an
+         error in this case."
+      - Precisely one of I(csr) or I(csr_content) must be specified.
+    type: str
+    version_added: 1.2.0
   data:
     description:
       - "The data to validate ongoing challenges. This must be specified for
@@ -279,7 +293,7 @@ EXAMPLES = r'''
 - name: Create a challenge for sample.com using a account key file.
   community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
-    csr: /etc/pki/cert/csr/sample.com.csr
+    csr_content: "{{ lookup('file', '/etc/pki/cert/csr/sample.com.csr') }}"
     dest: /etc/httpd/ssl/sample.com.crt
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
   register: sample_com_challenge
@@ -576,6 +590,7 @@ class ACMEClient(object):
         self.version = module.params['acme_version']
         self.challenge = module.params['challenge']
         self.csr = module.params['csr']
+        self.csr_content = module.params['csr_content']
         self.dest = module.params.get('dest')
         self.fullchain_dest = module.params.get('fullchain_dest')
         self.chain_dest = module.params.get('chain_dest')
@@ -613,7 +628,7 @@ class ACMEClient(object):
             # signed ACME request.
             pass
 
-        if not os.path.exists(self.csr):
+        if self.csr is not None and not os.path.exists(self.csr):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
         self._openssl_bin = module.get_bin_path('openssl', True)
@@ -626,9 +641,9 @@ class ACMEClient(object):
         Parse the CSR and return the list of requested identifiers
         '''
         if HAS_CURRENT_CRYPTOGRAPHY:
-            return cryptography_get_csr_identifiers(self.module, self.csr)
+            return cryptography_get_csr_identifiers(self.module, self.csr, self.csr_content)
         else:
-            return openssl_get_csr_identifiers(self._openssl_bin, self.module, self.csr)
+            return openssl_get_csr_identifiers(self._openssl_bin, self.module, self.csr, self.csr_content)
 
     def _add_or_update_auth(self, identifier_type, identifier, auth):
         '''
@@ -767,7 +782,7 @@ class ACMEClient(object):
         Return the certificate object as dict
         https://tools.ietf.org/html/rfc8555#section-7.4
         '''
-        csr = pem_to_der(self.csr)
+        csr = pem_to_der(self.csr, self.csr_content)
         new_cert = {
             "csr": nopad_b64(csr),
         }
@@ -844,7 +859,7 @@ class ACMEClient(object):
         Return the certificate object as dict
         https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.5
         '''
-        csr = pem_to_der(self.csr)
+        csr = pem_to_der(self.csr, self.csr_content)
         new_cert = {
             "resource": "new-cert",
             "csr": nopad_b64(csr),
@@ -1177,7 +1192,8 @@ def main():
         agreement=dict(type='str'),
         terms_agreed=dict(type='bool', default=False),
         challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01']),
-        csr=dict(type='path', required=True, aliases=['src']),
+        csr=dict(type='path', aliases=['src']),
+        csr_content=dict(type='str'),
         data=dict(type='dict'),
         dest=dict(type='path', aliases=['cert']),
         fullchain_dest=dict(type='path', aliases=['fullchain']),
@@ -1199,9 +1215,11 @@ def main():
         required_one_of=(
             ['account_key_src', 'account_key_content'],
             ['dest', 'fullchain_dest'],
+            ['csr', 'csr_content'],
         ),
         mutually_exclusive=(
             ['account_key_src', 'account_key_content'],
+            ['csr', 'csr_content'],
         ),
         supports_check_mode=True,
     )
