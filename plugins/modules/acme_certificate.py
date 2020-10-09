@@ -141,6 +141,7 @@ options:
          error in this case."
       - Precisely one of I(csr) or I(csr_content) must be specified.
     type: str
+    version_added: 1.2.0
   data:
     description:
       - "The data to validate ongoing challenges. This must be specified for
