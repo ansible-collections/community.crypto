@@ -999,22 +999,14 @@ def openssl_get_csr_identifiers(openssl_binary, module, csr_filename, csr_conten
     Each identifier is a pair (type, identifier), where type is either
     'dns' or 'ip'.
     '''
+    filename = csr_filename
+    data = None
     if csr_content is not None:
-        fd, csr_filename = tempfile.mkstemp()
-        module.add_cleanup_file(csr_filename)  # Ansible will delete the file on exit
-        f = os.fdopen(fd, 'wb')
-        try:
-            f.write(csr_content.encode('utf-8'))
-        except Exception as err:
-            try:
-                f.close()
-            except Exception as dummy:
-                pass
-            raise ModuleFailException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
-        f.close()
+        filename = '-'
+        data = csr_content.encode('utf-8')
 
-    openssl_csr_cmd = [openssl_binary, "req", "-in", csr_filename, "-noout", "-text"]
-    dummy, out, dummy = module.run_command(openssl_csr_cmd, check_rc=True)
+    openssl_csr_cmd = [openssl_binary, "req", "-in", filename, "-noout", "-text"]
+    dummy, out, dummy = module.run_command(openssl_csr_cmd, data=data, check_rc=True)
 
     identifiers = set([])
     common_name = re.search(r"Subject:.* CN\s?=\s?([^\s,;/]+)", to_text(out, errors='surrogate_or_strict'))
