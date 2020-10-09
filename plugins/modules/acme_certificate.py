@@ -130,7 +130,7 @@ options:
     aliases: ['src']
   csr_content:
     description:
-      - "File containing the CSR for the new certificate."
+      - "Content of the CSR for the new certificate."
       - "Can be created with C(openssl req ...)."
       - "The CSR may contain multiple Subject Alternate Names, but each one
          will lead to an individual challenge that must be fulfilled for the
