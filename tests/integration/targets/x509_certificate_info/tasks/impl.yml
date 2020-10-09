@@ -114,6 +114,11 @@
     that:
       - "'ocsp_uri' in result"
       - "result.ocsp_uri == 'http://ocsp.int-x3.letsencrypt.org'"
+- name: Check fingerprints
+  assert:
+    that:
+      - (result.fingerprints.sha256 == '57:7c:f1:f5:dd:cc:6e:e9:f3:17:28:73:17:e4:25:c7:69:74:3e:f7:9a:df:58:20:7a:5a:e4:aa:de:bf:24:5b' if result.fingerprints.sha256 is defined else true)
+      - (result.fingerprints.sha1 == 'b7:79:64:f4:2b:e0:ae:45:74:d4:f3:08:f6:53:cb:39:26:fa:52:6b' if result.fingerprints.sha1 is defined else true)
 
 - name: Update result list
   set_fact:

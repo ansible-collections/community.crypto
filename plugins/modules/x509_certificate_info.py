@@ -233,6 +233,15 @@ public_key_fingerprints:
     type: dict
     sample: "{'sha256': 'd4:b3:aa:6d:c8:04:ce:4e:ba:f6:29:4d:92:a3:94:b0:c2:ff:bd:bf:33:63:11:43:34:0f:51:b0:95:09:2f:63',
               'sha512': 'f7:07:4a:f0:b0:f0:e6:8b:95:5f:f9:e6:61:0a:32:68:f1..."
+fingerprints:
+    description:
+        - Fingerprints of the certificate.
+        - For every hash algorithm available, the fingerprint is computed.
+    returned: success
+    type: dict
+    sample: "{'sha256': 'd4:b3:aa:6d:c8:04:ce:4e:ba:f6:29:4d:92:a3:94:b0:c2:ff:bd:bf:33:63:11:43:34:0f:51:b0:95:09:2f:63',
+              'sha512': 'f7:07:4a:f0:b0:f0:e6:8b:95:5f:f9:e6:61:0a:32:68:f1..."
+    version_added: 1.2.0
 signature_algorithm:
     description: The signature algorithm used to sign the certificate.
     returned: success
@@ -402,6 +411,10 @@ class CertificateInfo(OpenSSLObject):
         pass
 
     @abc.abstractmethod
+    def _get_der_bytes(self):
+        pass
+
+    @abc.abstractmethod
     def _get_signature_algorithm(self):
         pass
 
@@ -506,6 +519,8 @@ class CertificateInfo(OpenSSLObject):
         pk = self._get_public_key(binary=True)
         result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
 
+        result['fingerprints'] = get_fingerprint_of_bytes(self._get_der_bytes())
+
         if self.backend != 'pyopenssl':
             ski = self._get_subject_key_identifier()
             if ski is not None:
@@ -532,6 +547,9 @@ class CertificateInfoCryptography(CertificateInfo):
     """Validate the supplied cert, using the cryptography backend"""
     def __init__(self, module):
         super(CertificateInfoCryptography, self).__init__(module, 'cryptography')
+
+    def _get_der_bytes(self):
+        return self.cert.public_bytes(serialization.Encoding.DER)
 
     def _get_signature_algorithm(self):
         return cryptography_oid_to_name(self.cert.signature_algorithm_oid)
@@ -688,6 +706,9 @@ class CertificateInfoPyOpenSSL(CertificateInfo):
 
     def __init__(self, module):
         super(CertificateInfoPyOpenSSL, self).__init__(module, 'pyopenssl')
+
+    def _get_der_bytes(self):
+        return crypto.dump_certificate(crypto.FILETYPE_ASN1, self.cert)
 
     def _get_signature_algorithm(self):
         return to_text(self.cert.get_signature_algorithm())
