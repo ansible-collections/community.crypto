@@ -33,7 +33,6 @@ options:
         type: bool
         default: false
 extends_documentation_fragment:
-- ansible.builtin.files
 - community.crypto.module_privatekey
 seealso:
 - module: community.crypto.openssl_privatekey
@@ -166,7 +165,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        add_file_common_args=True,
         required_together=required_together + [],
         required_if=required_if + [],
     )
