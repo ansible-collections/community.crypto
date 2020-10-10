@@ -17,7 +17,8 @@ description:
     - This module allows one to (re)generate OpenSSL private keys without disk access.
     - This allows to read and write keys to vaults without having to write intermediate versions to disk.
     - Make sure to not write the result of this module into logs or to the console, as it contains private key data! Use the I(no_log) task option to be sure.
-    - Note that this module is implemented as an L(action plugin,https://docs.ansible.com/ansible/latest/plugins/action.html) and will always be executed on the controller.
+    - Note that this module is implemented as an L(action plugin,https://docs.ansible.com/ansible/latest/plugins/action.html)
+      and will always be executed on the controller.
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
