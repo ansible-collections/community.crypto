@@ -754,7 +754,7 @@ def main():
             path=dict(type='path', required=True),
             format=dict(type='str', default='pem', choices=['pem', 'der']),
             privatekey_path=dict(type='path'),
-            privatekey_content=dict(type='str'),
+            privatekey_content=dict(type='str', no_log=True),
             privatekey_passphrase=dict(type='str', no_log=True),
             issuer=dict(type='dict'),
             last_update=dict(type='str', default='+0s'),

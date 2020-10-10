@@ -2565,7 +2565,7 @@ def main():
 
             # General properties of a certificate
             privatekey_path=dict(type='path'),
-            privatekey_content=dict(type='str'),
+            privatekey_content=dict(type='str', no_log=True),
             privatekey_passphrase=dict(type='str', no_log=True),
 
             # provider: assertonly
@@ -2609,7 +2609,7 @@ def main():
             ownca_path=dict(type='path'),
             ownca_content=dict(type='str'),
             ownca_privatekey_path=dict(type='path'),
-            ownca_privatekey_content=dict(type='str'),
+            ownca_privatekey_content=dict(type='str', no_log=True),
             ownca_privatekey_passphrase=dict(type='str', no_log=True),
             ownca_digest=dict(type='str', default='sha256'),
             ownca_version=dict(type='int', default=3),
