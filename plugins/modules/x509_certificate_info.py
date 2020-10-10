@@ -235,7 +235,7 @@ public_key_fingerprints:
               'sha512': 'f7:07:4a:f0:b0:f0:e6:8b:95:5f:f9:e6:61:0a:32:68:f1..."
 fingerprints:
     description:
-        - Fingerprints of the certificate.
+        - Fingerprints of the DER-encoded form of the whole certificate.
         - For every hash algorithm available, the fingerprint is computed.
     returned: success
     type: dict
