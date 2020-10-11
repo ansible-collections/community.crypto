@@ -60,6 +60,8 @@ options:
 extends_documentation_fragment:
 - ansible.builtin.files
 - community.crypto.module_csr
+seealso:
+- module: community.crypto.openssl_csr_pipe
 '''
 
 EXAMPLES = r'''

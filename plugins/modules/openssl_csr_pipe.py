@@ -27,6 +27,8 @@ options:
         type: str
 extends_documentation_fragment:
 - community.crypto.module_csr
+seealso:
+- module: community.crypto.openssl_csr
 '''
 
 EXAMPLES = r'''
