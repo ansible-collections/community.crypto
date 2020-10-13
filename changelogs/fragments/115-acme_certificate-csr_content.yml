@@ -1,2 +1,0 @@
-minor_changes:
-- acme_certificate - allow to pass CSR file as content with new option ``csr_content`` (https://github.com/ansible-collections/community.crypto/pull/115).

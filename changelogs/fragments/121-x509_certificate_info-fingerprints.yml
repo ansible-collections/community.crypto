@@ -1,2 +1,0 @@
-minor_changes:
-- "x509_certificate_info - add ``fingerprints`` return value which returns certificate fingerprints (https://github.com/ansible-collections/community.crypto/pull/121)."

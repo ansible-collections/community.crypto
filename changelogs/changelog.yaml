@@ -197,3 +197,41 @@ releases:
     - 106-openssl_csr-idna-errors.yml
     - 108-meta-runtime-versions.yml
     release_date: '2020-09-14'
+  1.2.0:
+    changes:
+      bugfixes:
+      - openssl_pkcs12 - do not crash when reading PKCS#12 file which has no private
+        key and/or no main certificate (https://github.com/ansible-collections/community.crypto/issues/103).
+      minor_changes:
+      - acme_certificate - allow to pass CSR file as content with new option ``csr_content``
+        (https://github.com/ansible-collections/community.crypto/pull/115).
+      - x509_certificate_info - add ``fingerprints`` return value which returns certificate
+        fingerprints (https://github.com/ansible-collections/community.crypto/pull/121).
+      release_summary: Please note that this release fixes a security issue (CVE-2020-25646).
+      security_fixes:
+      - openssl_csr - the option ``privatekey_content`` was not marked as ``no_log``,
+        resulting in it being dumped into the system log by default, and returned
+        in the registered results in the ``invocation`` field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+      - openssl_privatekey_info - the option ``content`` was not marked as ``no_log``,
+        resulting in it being dumped into the system log by default, and returned
+        in the registered results in the ``invocation`` field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+      - openssl_publickey - the option ``privatekey_content`` was not marked as ``no_log``,
+        resulting in it being dumped into the system log by default, and returned
+        in the registered results in the ``invocation`` field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+      - openssl_signature - the option ``privatekey_content`` was not marked as ``no_log``,
+        resulting in it being dumped into the system log by default, and returned
+        in the registered results in the ``invocation`` field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+      - x509_certificate - the options ``privatekey_content`` and ``ownca_privatekey_content``
+        were not marked as ``no_log``, resulting in it being dumped into the system
+        log by default, and returned in the registered results in the ``invocation``
+        field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+      - x509_crl - the option ``privatekey_content`` was not marked as ``no_log``,
+        resulting in it being dumped into the system log by default, and returned
+        in the registered results in the ``invocation`` field (CVE-2020-25646, https://github.com/ansible-collections/community.crypto/pull/125).
+    fragments:
+    - 1.2.0.yml
+    - 109-openssl_pkcs12-crash-no-cert-key.yml
+    - 115-acme_certificate-csr_content.yml
+    - 121-x509_certificate_info-fingerprints.yml
+    - cve-2020-25646.yml
+    release_date: '2020-10-13'
