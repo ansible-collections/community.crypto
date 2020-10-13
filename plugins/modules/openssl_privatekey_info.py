@@ -583,7 +583,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type='path'),
-            content=dict(type='str'),
+            content=dict(type='str', no_log=True),
             passphrase=dict(type='str', no_log=True),
             return_private_key_data=dict(type='bool', default=False),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
