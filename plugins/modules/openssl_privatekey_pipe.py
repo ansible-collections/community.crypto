@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: openssl_privatekey_pipe
 short_description: Generate OpenSSL private keys without disk access
-version_added: 1.2.0
+version_added: 1.3.0
 description:
     - This module allows one to (re)generate OpenSSL private keys without disk access.
     - This allows to read and write keys to vaults without having to write intermediate versions to disk.
