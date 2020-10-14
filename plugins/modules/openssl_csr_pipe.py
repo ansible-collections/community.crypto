@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 ---
 module: openssl_csr_pipe
 short_description: Generate OpenSSL Certificate Signing Request (CSR)
-version_added: 1.2.0
+version_added: 1.3.0
 description:
     - "Please note that the module regenerates existing CSR if it doesn't match the module's
       options, or if it seems to be corrupt."
