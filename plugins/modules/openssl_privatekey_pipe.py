@@ -53,6 +53,7 @@ EXAMPLES = r'''
   community.crypto.openssl_privatekey_pipe:
     path: /etc/ssl/private/ansible.com.pem
   register: output
+  no_log: true  # make sure that private key data is not accidentally revealed in logs!
 - name: Show generated key
   debug:
     msg: "{{ output.privatekey }}"
@@ -63,6 +64,7 @@ EXAMPLES = r'''
     content: "{{ lookup('community.sops.sops', 'private_key.pem.sops') }}"
     size: 2048
   register: output
+  no_log: true  # make sure that private key data is not accidentally revealed in logs!
 - name: Update encrypted key when openssl_privatekey_pipe reported a change
   community.sops.encrypt_sops:
     path: private_key.pem.sops
