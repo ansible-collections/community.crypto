@@ -27,6 +27,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_privatekey,
     load_certificate_request,
     parse_name_field,
+    select_message_digest,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -481,18 +482,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
         digest = None
         if cryptography_key_needs_digest_for_signing(self.privatekey):
-            if self.digest == 'sha256':
-                digest = cryptography.hazmat.primitives.hashes.SHA256()
-            elif self.digest == 'sha384':
-                digest = cryptography.hazmat.primitives.hashes.SHA384()
-            elif self.digest == 'sha512':
-                digest = cryptography.hazmat.primitives.hashes.SHA512()
-            elif self.digest == 'sha1':
-                digest = cryptography.hazmat.primitives.hashes.SHA1()
-            elif self.digest == 'md5':
-                digest = cryptography.hazmat.primitives.hashes.MD5()
-            # FIXME
-            else:
+            digest = select_message_digest(self.digest)
+            if digest is None:
                 raise CertificateSigningRequestError('Unsupported digest "{0}"'.format(self.digest))
         try:
             self.csr = csr.sign(self.privatekey, digest, self.cryptography_backend)
