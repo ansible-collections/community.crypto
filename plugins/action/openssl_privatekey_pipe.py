@@ -29,6 +29,7 @@ class PrivateKeyModule(object):
         self.module_backend = module_backend
         self.check_mode = module.check_mode
         self.changed = False
+        self.return_current_key = module.params['return_current_key']
 
         if module.params['content'] is not None:
             if module.params['content_base64']:
@@ -60,7 +61,7 @@ class PrivateKeyModule(object):
 
     def dump(self):
         """Serialize the object into a dictionary."""
-        result = self.module_backend.dump(include_key=True)
+        result = self.module_backend.dump(include_key=self.changed or self.return_current_key)
         result['changed'] = self.changed
         return result
 
@@ -72,6 +73,7 @@ class ActionModule(ActionModuleBase):
         argument_spec.update(dict(
             content=dict(type='str', no_log=True),
             content_base64=dict(type='bool', default=False),
+            return_current_key=dict(type='bool', default=False),
         ))
         return dict(
             argument_spec=argument_spec,
@@ -91,16 +93,18 @@ class ActionModule(ActionModuleBase):
             private_key = PrivateKeyModule(module, module_backend)
             private_key.generate(module)
             result = private_key.dump()
-            # In case changed=False, the module's input (`content`) is returned as `privatekey`.
-            # Since `content` is no_log=True, `privatekey`'s value will get replaced by
-            # ANSIBLE_NO_LOG_VALUE. To avoid this, we remove the value of `content` from
-            # module.no_log_values. Since we explicitly set `module.no_log = True` above, this
-            # should be safe.
-            try:
-                module.no_log_values.remove(module.params['content'])
-            except KeyError:
-                pass
-            module.params['content'] = 'ANSIBLE_NO_LOG_VALUE'
+            if private_key.return_current_key:
+                # In case the module's input (`content`) is returned as `privatekey`:
+                # Since `content` is no_log=True, `privatekey`'s value will get replaced by
+                # VALUE_SPECIFIED_IN_NO_LOG_PARAMETER. To avoid this, we remove the value of
+                # `content` from module.no_log_values. Since we explicitly set
+                # `module.no_log = True`, this should be safe.
+                module.no_log = True
+                try:
+                    module.no_log_values.remove(module.params['content'])
+                except KeyError:
+                    pass
+                module.params['content'] = 'ANSIBLE_NO_LOG_VALUE'
             module.exit_json(**result)
         except OpenSSLObjectError as exc:
             module.fail_json(msg=to_native(exc))

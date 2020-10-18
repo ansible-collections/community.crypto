@@ -34,6 +34,13 @@ options:
             - Set to C(true) if the content is base64 encoded.
         type: bool
         default: false
+    return_current_key:
+        description:
+            - Set to C(true) to return the current private key when the module did not generate a new one.
+            - Note that in case of check mode, when this option is not set to C(true), the module always returns the
+              current key (if it was provided) and Ansible will replace it by C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
+        type: bool
+        default: false
 extends_documentation_fragment:
 - community.crypto.module_privatekey
 seealso:
@@ -94,8 +101,10 @@ fingerprint:
       sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 privatekey:
     description:
-        - The (current or generated) private key's content.
+        - The generated private key's content.
+        - Please note that if the result is not changed, the current private key will only be returned
+          if the I(return_current_key) option is set to C(true).
         - Will be Base64-encoded if the key is in raw format.
-    returned: always
+    returned: changed, or I(return_current_key) is C(true)
     type: str
 '''
