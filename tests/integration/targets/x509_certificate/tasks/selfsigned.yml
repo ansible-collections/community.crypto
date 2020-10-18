@@ -280,11 +280,11 @@
   ignore_errors: yes
   register: passphrase_error_3
 
-- name: Create broken certificate
+- name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
   copy:
     dest: "{{ output_dir }}/cert_broken.pem"
     content: "broken"
-- name: Regenerate broken cert
+- name: (Selfsigned, {{select_crypto_backend}}) Regenerate broken cert
   x509_certificate:
     path: '{{ output_dir }}/cert_broken.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'
