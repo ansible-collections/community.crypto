@@ -1,0 +1,43 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Start an ssh agent to use for tests
+  shell: eval $(ssh-agent)>/dev/null&&echo "${SSH_AGENT_PID};${SSH_AUTH_SOCK}"
+  register: openssh_agent_env_vars
+
+- name: Register ssh agent facts
+  set_fact:
+    openssh_agent_pid: "{{ openssh_agent_env_vars.stdout.split(';')[0] }}"
+    openssh_agent_sock: "{{ openssh_agent_env_vars.stdout.split(';')[1] }}"
+
+- name: stat agent socket
+  stat:
+    path: "{{ openssh_agent_sock }}"
+  register: openssh_agent_socket_stat
+
+- name: Assert agent socket file is a socket
+  assert:
+    that: 
+      - openssh_agent_socket_stat.stat.issock is defined
+      - openssh_agent_socket_stat.stat.issock
+    fail_msg: "{{ openssh_agent_sock }} is not a socket"
+
+- name: Verify agent responds
+  command: ssh-add -l
+  register: rc_openssh_agent_ssh_add_check
+  environment:
+    SSH_AUTH_SOCK: "{{ openssh_agent_sock }}"
+  when: openssh_agent_socket_stat.stat.issock
+  failed_when: rc_openssh_agent_ssh_add_check.rc == 2
+
+- name: Get ssh version
+  shell: ssh -Vq 2>&1|sed 's/^.*OpenSSH_\([0-9]\{1,\}\.[0-9]\{1,\}\).*$/\1/'
+  register:
+    rc_openssh_version_output
+
+- name: Set ssh version facts
+  set_fact:
+    openssh_version: "{{ rc_openssh_version_output.stdout.strip() }}"
