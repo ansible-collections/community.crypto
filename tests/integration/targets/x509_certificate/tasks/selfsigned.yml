@@ -10,6 +10,36 @@
     cipher: auto
     select_crypto_backend: cryptography
 
+- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR
+  x509_certificate:
+    path: '{{ output_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    provider: selfsigned
+    selfsigned_digest: sha256
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  register: selfsigned_certificate_no_csr
+
+- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR - idempotency
+  x509_certificate:
+    path: '{{ output_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    provider: selfsigned
+    selfsigned_digest: sha256
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  register: selfsigned_certificate_no_csr_idempotence
+
+- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR (check mode)
+  x509_certificate:
+    path: '{{ output_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    provider: selfsigned
+    selfsigned_digest: sha256
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  check_mode: yes
+  register: selfsigned_certificate_no_csr_idempotence_check
+
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
   openssl_csr:
     path: '{{ output_dir }}/csr.csr'
@@ -250,11 +280,11 @@
   ignore_errors: yes
   register: passphrase_error_3
 
-- name: Create broken certificate
+- name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
   copy:
     dest: "{{ output_dir }}/cert_broken.pem"
     content: "broken"
-- name: Regenerate broken cert
+- name: (Selfsigned, {{select_crypto_backend}}) Regenerate broken cert
   x509_certificate:
     path: '{{ output_dir }}/cert_broken.pem'
     csr_path: '{{ output_dir }}/csr_ecc.csr'

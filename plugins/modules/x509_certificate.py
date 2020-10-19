@@ -87,13 +87,13 @@ options:
     csr_path:
         description:
             - Path to the Certificate Signing Request (CSR) used to generate this certificate.
-            - This is not required in C(assertonly) mode.
+            - This is not required in C(assertonly) or C(selfsigned) mode.
             - This is mutually exclusive with I(csr_content).
         type: path
     csr_content:
         description:
             - Content of the Certificate Signing Request (CSR) used to generate this certificate.
-            - This is not required in C(assertonly) mode.
+            - This is not required in C(assertonly) or C(selfsigned) mode.
             - This is mutually exclusive with I(csr_path).
         type: str
         version_added: '1.0.0'
@@ -1144,7 +1144,7 @@ class SelfSignedCertificateCryptography(Certificate):
         self.version = module.params['selfsigned_version']
         self.serial_number = x509.random_serial_number()
 
-        if self.csr_content is None and not os.path.exists(self.csr_path):
+        if self.csr_path is not None and not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file {0} does not exist'.format(self.csr_path)
             )
@@ -1153,11 +1153,6 @@ class SelfSignedCertificateCryptography(Certificate):
                 'The private key file {0} does not exist'.format(self.privatekey_path)
             )
 
-        self.csr = load_certificate_request(
-            path=self.csr_path,
-            content=self.csr_content,
-            backend=self.backend
-        )
         self._module = module
 
         try:
@@ -1170,6 +1165,28 @@ class SelfSignedCertificateCryptography(Certificate):
         except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=to_native(exc))
 
+        if self.csr_path is not None or self.csr_content is not None:
+            self.csr = load_certificate_request(
+                path=self.csr_path,
+                content=self.csr_content,
+                backend=self.backend
+            )
+        else:
+            # Create empty CSR on the fly
+            csr = cryptography.x509.CertificateSigningRequestBuilder()
+            csr = csr.subject_name(cryptography.x509.Name([]))
+            digest = None
+            if cryptography_key_needs_digest_for_signing(self.privatekey):
+                digest = self.digest
+                if digest is None:
+                    self.module.fail_json(msg='Unsupported digest "{0}"'.format(module.params['selfsigned_digest']))
+            try:
+                self.csr = csr.sign(self.privatekey, digest, default_backend())
+            except TypeError as e:
+                if str(e) == 'Algorithm must be a registered hash algorithm.' and digest is None:
+                    self.module.fail_json(msg='Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer.')
+                raise
+
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest is None:
                 raise CertificateError(
@@ -1179,14 +1196,6 @@ class SelfSignedCertificateCryptography(Certificate):
             self.digest = None
 
     def generate(self, module):
-        if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
-            raise CertificateError(
-                'The private key %s does not exist' % self.privatekey_path
-            )
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                'The certificate signing request file %s does not exist' % self.csr_path
-            )
         if not self.check(module, perms_required=False) or self.force:
             try:
                 cert_builder = x509.CertificateBuilder()
@@ -1285,7 +1294,7 @@ class SelfSignedCertificate(Certificate):
         self.version = module.params['selfsigned_version']
         self.serial_number = generate_serial_number()
 
-        if self.csr_content is None and not os.path.exists(self.csr_path):
+        if self.csr_path is not None and not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file {0} does not exist'.format(self.csr_path)
             )
@@ -1294,10 +1303,6 @@ class SelfSignedCertificate(Certificate):
                 'The private key file {0} does not exist'.format(self.privatekey_path)
             )
 
-        self.csr = load_certificate_request(
-            path=self.csr_path,
-            content=self.csr_content,
-        )
         try:
             self.privatekey = load_privatekey(
                 path=self.privatekey_path,
@@ -1307,18 +1312,18 @@ class SelfSignedCertificate(Certificate):
         except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
+        if self.csr_path is not None or self.csr_content is not None:
+            self.csr = load_certificate_request(
+                path=self.csr_path,
+                content=self.csr_content,
+            )
+        else:
+            # Create empty CSR on the fly
+            self.csr = crypto.X509Req()
+            self.csr.set_pubkey(self.privatekey)
+            self.csr.sign(self.privatekey, self.digest)
+
     def generate(self, module):
-
-        if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
-            raise CertificateError(
-                'The private key %s does not exist' % self.privatekey_path
-            )
-
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                'The certificate signing request file %s does not exist' % self.csr_path
-            )
-
         if not self.check(module, perms_required=False) or self.force:
             cert = crypto.X509()
             cert.set_serial_number(self.serial_number)
@@ -2666,8 +2671,8 @@ def main():
             certificate = CertificateAbsent(module)
 
         else:
-            if module.params['provider'] != 'assertonly' and module.params['csr_path'] is None and module.params['csr_content'] is None:
-                module.fail_json(msg='csr_path or csr_content is required when provider is not assertonly')
+            if module.params['provider'] not in ('assertonly', 'selfsigned') and module.params['csr_path'] is None and module.params['csr_content'] is None:
+                module.fail_json(msg='csr_path or csr_content is required when provider is not assertonly or selfsigned')
 
             base_dir = os.path.dirname(module.params['path']) or '.'
             if not os.path.isdir(base_dir):
