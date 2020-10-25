@@ -115,7 +115,6 @@ csr:
     type: str
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
@@ -153,16 +152,11 @@ class CertificateSigningRequestModule(object):
 
 
 def main():
-    argument_spec, required_together, required_if, mutually_exclusive, required_one_of = get_csr_argument_spec()
-    argument_spec.update(dict(
+    argument_spec = get_csr_argument_spec()
+    argument_spec.argument_spec.update(dict(
         content=dict(type='str'),
     ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        required_together=[] + required_together,
-        required_if=[] + required_if,
-        required_one_of=[] + required_one_of,
-        mutually_exclusive=[] + mutually_exclusive,
+    module = argument_spec.create_ansible_module(
         supports_check_mode=True,
     )
 

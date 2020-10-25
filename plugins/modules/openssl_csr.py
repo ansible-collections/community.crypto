@@ -221,7 +221,6 @@ csr:
 
 import os
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
@@ -293,19 +292,17 @@ class CertificateSigningRequestModule(OpenSSLObject):
 
 
 def main():
-    argument_spec, required_together, required_if, mutually_exclusive, required_one_of = get_csr_argument_spec()
-    argument_spec.update(dict(
+    argument_spec = get_csr_argument_spec()
+    argument_spec.argument_spec.update(dict(
         state=dict(type='str', default='present', choices=['absent', 'present']),
         force=dict(type='bool', default=False),
         path=dict(type='path', required=True),
         backup=dict(type='bool', default=False),
         return_content=dict(type='bool', default=False),
     ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        required_together=[] + required_together,
-        required_if=[('state', 'present', rof, True) for rof in required_one_of] + required_if,
-        mutually_exclusive=[] + mutually_exclusive,
+    argument_spec.required_if.extend([('state', 'present', rof, True) for rof in argument_spec.required_one_of])
+    argument_spec.required_one_of = []
+    module = argument_spec.create_ansible_module(
         add_file_common_args=True,
         supports_check_mode=True,
     )

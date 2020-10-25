@@ -43,6 +43,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_parse_name_constraints,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
+
+
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
 
@@ -713,9 +716,8 @@ def select_backend(module, backend):
 
 
 def get_csr_argument_spec():
-    return (
-        # argument_spec
-        dict(
+    return ArgumentSpec(
+        argument_spec=dict(
             digest=dict(type='str', default='sha256'),
             privatekey_path=dict(type='path'),
             privatekey_content=dict(type='str', no_log=True),
@@ -750,19 +752,13 @@ def get_csr_argument_spec():
             authority_cert_serial_number=dict(type='int'),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
         ),
-        # required_together
-        [
+        required_together=[
             ['authority_cert_issuer', 'authority_cert_serial_number'],
         ],
-        # required_if
-        [
-        ],
-        # mutually_exclusive
-        [
+        mutually_exclusive=[
             ['privatekey_path', 'privatekey_content'],
         ],
-        # required_one_of
-        [
+        required_one_of=[
             ['privatekey_path', 'privatekey_content'],
         ],
     )
