@@ -25,7 +25,7 @@ description:
     - "The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the
-      PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in Ansible 2.13."
+      PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
 requirements:
     - Either cryptography >= 1.2.3 (older versions might work as well)
     - Or pyOpenSSL
