@@ -247,8 +247,8 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
         add_file_common_args=True,
-        required_together=required_together + [],
-        required_if=required_if + [],
+        required_together=required_together,
+        required_if=required_if,
     )
 
     base_dir = os.path.dirname(module.params['path']) or '.'

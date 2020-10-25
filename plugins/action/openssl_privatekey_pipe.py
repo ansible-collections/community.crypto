@@ -78,8 +78,8 @@ class ActionModule(ActionModuleBase):
         return dict(
             argument_spec=argument_spec,
             supports_check_mode=True,
-            required_together=required_together + [],
-            required_if=required_if + [],
+            required_together=required_together,
+            required_if=required_if,
         )
 
     @staticmethod
