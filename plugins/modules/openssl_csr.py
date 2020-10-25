@@ -14,7 +14,7 @@ DOCUMENTATION = r'''
 module: openssl_csr
 short_description: Generate OpenSSL Certificate Signing Request (CSR)
 description:
-    - "Please note that the module regenerates existing CSR if it doesn't match the module's
+    - "Please note that the module regenerates an existing CSR if it doesn't match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing CSR, consider using the I(backup) option."
 author:

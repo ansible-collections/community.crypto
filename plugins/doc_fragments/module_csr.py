@@ -93,7 +93,7 @@ options:
         aliases: [ E, emailAddress ]
     subject_alt_name:
         description:
-            - SAN extension to attach to the certificate signing request.
+            - Subject Alternative Name (SAN) extension to attach to the certificate signing request.
             - This can either be a 'comma separated string' or a YAML list.
             - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName) and the ones specific to your CA).
