@@ -68,8 +68,8 @@ options:
       - "The ACME version of the endpoint."
       - "Must be 1 for the classic Let's Encrypt and Buypass ACME endpoints,
          or 2 for standardized ACME v2 endpoints."
-      - "The default value is 1. Note that in Ansible 2.14, this option *will
-         be required* and will no longer have a default."
+      - "The default value is 1. Note that in community.crypto 2.0.0, this
+         option *will be required* and will no longer have a default."
       - "Please also note that we will deprecate ACME v1 support eventually."
     type: int
     choices: [ 1, 2 ]
@@ -81,8 +81,8 @@ options:
          server (for the ACME v1 protocol). This will create technically correct,
          but untrusted certificates."
       - "The default value is U(https://acme-staging.api.letsencrypt.org/directory).
-         Note that in Ansible 2.14, this option *will be required* and will no longer
-         have a default."
+         Note that in community.crypto 2.0.0, this option *will be required* and
+         will no longer have a default."
       - "For Let's Encrypt, all staging endpoints can be found here:
          U(https://letsencrypt.org/docs/staging-environment/). For Buypass, all
          endpoints can be found here:
