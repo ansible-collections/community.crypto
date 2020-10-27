@@ -235,20 +235,17 @@ class PrivateKeyModule(OpenSSLObject):
 
 def main():
 
-    argument_spec, required_together, required_if = get_privatekey_argument_spec()
-    argument_spec.update(dict(
+    argument_spec = get_privatekey_argument_spec()
+    argument_spec.argument_spec.update(dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         force=dict(type='bool', default=False),
         path=dict(type='path', required=True),
         backup=dict(type='bool', default=False),
         return_content=dict(type='bool', default=False),
     ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
+    module = argument_spec.create_ansible_module(
         supports_check_mode=True,
         add_file_common_args=True,
-        required_together=required_together,
-        required_if=required_if,
     )
 
     base_dir = os.path.dirname(module.params['path']) or '.'

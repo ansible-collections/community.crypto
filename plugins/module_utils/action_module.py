@@ -704,7 +704,7 @@ class AnsibleActionModule(object):
 class ActionModuleBase(ActionBase):
     @abc.abstractmethod
     def setup_module(self):
-        """Return parameters for AnsibleActionModule, like argument_spec."""
+        """Return pair (ArgumentSpec, kwargs)."""
         pass
 
     @abc.abstractmethod
@@ -720,7 +720,8 @@ class ActionModuleBase(ActionBase):
         del tmp  # tmp no longer has any effect
 
         try:
-            module = AnsibleActionModule(self, **self.setup_module())
+            argument_spec, kwargs = self.setup_module()
+            module = argument_spec.create_ansible_module_helper(AnsibleActionModule, (self, ), **kwargs)
             self.run_module(module)
             raise AnsibleError('Internal error: action module did not call module.exit_json()')
         except _ModuleExitException as mee:

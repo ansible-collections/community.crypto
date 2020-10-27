@@ -69,17 +69,14 @@ class PrivateKeyModule(object):
 class ActionModule(ActionModuleBase):
     @staticmethod
     def setup_module():
-        argument_spec, required_together, required_if = get_privatekey_argument_spec()
-        argument_spec.update(dict(
+        argument_spec = get_privatekey_argument_spec()
+        argument_spec.argument_spec.update(dict(
             content=dict(type='str', no_log=True),
             content_base64=dict(type='bool', default=False),
             return_current_key=dict(type='bool', default=False),
         ))
-        return dict(
-            argument_spec=argument_spec,
+        return argument_spec, dict(
             supports_check_mode=True,
-            required_together=required_together,
-            required_if=required_if,
         )
 
     @staticmethod

@@ -37,6 +37,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.identify i
     identify_private_key_format,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
+
+
 MINIMAL_PYOPENSSL_VERSION = '0.6'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
 
@@ -555,9 +558,8 @@ def select_backend(module, backend):
 
 
 def get_privatekey_argument_spec():
-    return (
-        # argument_spec
-        dict(
+    return ArgumentSpec(
+        argument_spec=dict(
             size=dict(type='int', default=4096),
             type=dict(type='str', default='RSA', choices=[
                 'DSA', 'ECC', 'Ed25519', 'Ed448', 'RSA', 'X25519', 'X448'
@@ -579,12 +581,10 @@ def get_privatekey_argument_spec():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
         ),
-        # required_together
-        [
+        required_together=[
             ['cipher', 'passphrase']
         ],
-        # required_if
-        [
+        required_if=[
             ['type', 'ECC', ['curve']],
         ],
     )
