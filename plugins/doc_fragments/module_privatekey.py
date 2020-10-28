@@ -51,6 +51,8 @@ options:
             - For maximal interoperability, C(secp384r1) or C(secp256r1) should be used.
             - We use the curve names as defined in the
               L(IANA registry for TLS,https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8).
+            - Please note that all curves except C(secp224r1), C(secp256k1), C(secp256r1), C(secp384r1) and C(secp521r1)
+              are discouraged for new private keys.
         type: str
         choices:
             - secp384r1
