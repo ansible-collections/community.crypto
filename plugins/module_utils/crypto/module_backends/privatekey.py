@@ -315,25 +315,25 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         super(PrivateKeyCryptographyBackend, self).__init__(module=module, backend='cryptography')
 
         self.curves = dict()
+        self._add_curve('secp224r1', 'SECP224R1')
+        self._add_curve('secp256k1', 'SECP256K1')
+        self._add_curve('secp256r1', 'SECP256R1')
         self._add_curve('secp384r1', 'SECP384R1')
         self._add_curve('secp521r1', 'SECP521R1')
-        self._add_curve('secp224r1', 'SECP224R1')
         self._add_curve('secp192r1', 'SECP192R1', deprecated=True)
-        self._add_curve('secp256r1', 'SECP256R1')
-        self._add_curve('secp256k1', 'SECP256K1')
+        self._add_curve('sect163k1', 'SECT163K1', deprecated=True)
+        self._add_curve('sect163r2', 'SECT163R2', deprecated=True)
+        self._add_curve('sect233k1', 'SECT233K1', deprecated=True)
+        self._add_curve('sect233r1', 'SECT233R1', deprecated=True)
+        self._add_curve('sect283k1', 'SECT283K1', deprecated=True)
+        self._add_curve('sect283r1', 'SECT283R1', deprecated=True)
+        self._add_curve('sect409k1', 'SECT409K1', deprecated=True)
+        self._add_curve('sect409r1', 'SECT409R1', deprecated=True)
+        self._add_curve('sect571k1', 'SECT571K1', deprecated=True)
+        self._add_curve('sect571r1', 'SECT571R1', deprecated=True)
         self._add_curve('brainpoolP256r1', 'BrainpoolP256R1', deprecated=True)
         self._add_curve('brainpoolP384r1', 'BrainpoolP384R1', deprecated=True)
         self._add_curve('brainpoolP512r1', 'BrainpoolP512R1', deprecated=True)
-        self._add_curve('sect571k1', 'SECT571K1', deprecated=True)
-        self._add_curve('sect409k1', 'SECT409K1', deprecated=True)
-        self._add_curve('sect283k1', 'SECT283K1', deprecated=True)
-        self._add_curve('sect233k1', 'SECT233K1', deprecated=True)
-        self._add_curve('sect163k1', 'SECT163K1', deprecated=True)
-        self._add_curve('sect571r1', 'SECT571R1', deprecated=True)
-        self._add_curve('sect409r1', 'SECT409R1', deprecated=True)
-        self._add_curve('sect283r1', 'SECT283R1', deprecated=True)
-        self._add_curve('sect233r1', 'SECT233R1', deprecated=True)
-        self._add_curve('sect163r2', 'SECT163R2', deprecated=True)
 
         self.cryptography_backend = cryptography.hazmat.backends.default_backend()
 
@@ -565,10 +565,10 @@ def get_privatekey_argument_spec():
                 'DSA', 'ECC', 'Ed25519', 'Ed448', 'RSA', 'X25519', 'X448'
             ]),
             curve=dict(type='str', choices=[
-                'secp384r1', 'secp521r1', 'secp224r1', 'secp192r1', 'secp256r1',
-                'secp256k1', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1',
-                'sect571k1', 'sect409k1', 'sect283k1', 'sect233k1', 'sect163k1',
-                'sect571r1', 'sect409r1', 'sect283r1', 'sect233r1', 'sect163r2',
+                'secp224r1', 'secp256k1', 'secp256r1', 'secp384r1', 'secp521r1',
+                'secp192r1', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1',
+                'sect163k1', 'sect163r2', 'sect233k1', 'sect233r1', 'sect283k1',
+                'sect283r1', 'sect409k1', 'sect409r1', 'sect571k1', 'sect571r1',
             ]),
             passphrase=dict(type='str', no_log=True),
             cipher=dict(type='str'),

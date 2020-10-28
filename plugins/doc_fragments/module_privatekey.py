@@ -55,25 +55,25 @@ options:
               are discouraged for new private keys.
         type: str
         choices:
+            - secp224r1
+            - secp256k1
+            - secp256r1
             - secp384r1
             - secp521r1
-            - secp224r1
             - secp192r1
-            - secp256r1
-            - secp256k1
             - brainpoolP256r1
             - brainpoolP384r1
             - brainpoolP512r1
-            - sect571k1
-            - sect409k1
-            - sect283k1
-            - sect233k1
             - sect163k1
-            - sect571r1
-            - sect409r1
-            - sect283r1
-            - sect233r1
             - sect163r2
+            - sect233k1
+            - sect233r1
+            - sect283k1
+            - sect283r1
+            - sect409k1
+            - sect409r1
+            - sect571k1
+            - sect571r1
     passphrase:
         description:
             - The passphrase for the private key.
