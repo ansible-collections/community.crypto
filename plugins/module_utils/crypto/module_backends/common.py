@@ -19,8 +19,9 @@ class ArgumentSpec:
         self.required_if = required_if or []
         self.required_by = required_by or {}
 
-    def create_ansible_module(self, **kwargs):
-        return AnsibleModule(
+    def create_ansible_module_helper(self, clazz, args, **kwargs):
+        return clazz(
+            *args,
             argument_spec=self.argument_spec,
             mutually_exclusive=self.mutually_exclusive,
             required_together=self.required_together,
@@ -28,3 +29,6 @@ class ArgumentSpec:
             required_if=self.required_if,
             required_by=self.required_by,
             **kwargs)
+
+    def create_ansible_module(self, **kwargs):
+        return self.create_ansible_module_helper(AnsibleModule, (), **kwargs)

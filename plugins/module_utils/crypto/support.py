@@ -83,10 +83,8 @@ def get_fingerprint_of_bytes(source):
     return fingerprint
 
 
-def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl'):
+def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl'):
     """Generate the fingerprint of the public key. """
-
-    privatekey = load_privatekey(path, passphrase=passphrase, content=content, check_passphrase=False, backend=backend)
 
     if backend == 'pyopenssl':
         try:
@@ -110,6 +108,14 @@ def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl'):
         )
 
     return get_fingerprint_of_bytes(publickey)
+
+
+def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl'):
+    """Generate the fingerprint of the public key. """
+
+    privatekey = load_privatekey(path, passphrase=passphrase, content=content, check_passphrase=False, backend=backend)
+
+    return get_fingerprint_of_privatekey(privatekey, backend=backend)
 
 
 def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, backend='pyopenssl'):
@@ -343,6 +349,10 @@ class OpenSSLObject(object):
 
     def remove(self, module):
         """Remove the resource from the filesystem."""
+        if self.check_mode:
+            if os.path.exists(self.path):
+                self.changed = True
+            return
 
         try:
             os.remove(self.path)

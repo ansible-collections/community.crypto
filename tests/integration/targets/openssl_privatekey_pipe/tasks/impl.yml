@@ -1,0 +1,103 @@
+---
+- name: ({{select_crypto_backend}}) Create key
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: ({{select_crypto_backend}}) Get key info
+  openssl_privatekey_info:
+    content: "{{ result.privatekey }}"
+  register: result_info
+
+- assert:
+    that:
+      - result is changed
+      - result.privatekey.startswith('----')
+      - result_info.type == 'RSA'
+      - result_info.public_data.size == 4096
+      - result_info.public_data.exponent >= 5
+
+- assert:
+    that:
+      - result_info.public_key_fingerprints.sha256 | length > 10
+      - result.fingerprint.sha256 == result_info.public_key_fingerprints.sha256
+  when: result.fingerprint is not none
+
+- name: ({{select_crypto_backend}}) Update key (check mode)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ result.privatekey }}"
+    size: 2048
+  register: update_check
+  check_mode: true
+
+- name: ({{select_crypto_backend}}) Update key (check mode, with return_current_key=true)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ result.privatekey }}"
+    size: 2048
+    return_current_key: true
+  register: update_check_return
+  check_mode: true
+
+- name: ({{select_crypto_backend}}) Update key
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ result.privatekey }}"
+    size: 2048
+  register: update
+
+- name: ({{select_crypto_backend}}) Update key (idempotent, check mode)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ update.privatekey }}"
+    size: 2048
+  register: update_idempotent_check
+  check_mode: true
+
+- name: ({{select_crypto_backend}}) Update key (idempotent)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ update.privatekey }}"
+    size: 2048
+  register: update_idempotent
+
+- name: ({{select_crypto_backend}}) Update key (idempotent, check mode, with return_current_key=true)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ update.privatekey }}"
+    size: 2048
+    return_current_key: true
+  register: update_idempotent_return_check
+  check_mode: true
+
+- name: ({{select_crypto_backend}}) Update key (idempotent, with return_current_key=true)
+  openssl_privatekey_pipe:
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    content: "{{ update.privatekey }}"
+    size: 2048
+    return_current_key: true
+  register: update_idempotent_return
+
+- name: ({{select_crypto_backend}}) Get key info
+  openssl_privatekey_info:
+    content: "{{ update.privatekey }}"
+  register: update_info
+
+- assert:
+    that:
+      - update_check is changed
+      - update_check.privatekey == 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+      - update_check_return is changed
+      - update_check_return.privatekey == result.privatekey
+      - update is changed
+      - update.privatekey != result.privatekey
+      - update_info.public_data.size == 2048
+      - update_idempotent_check is not changed
+      - update_idempotent_check.privatekey is undefined
+      - update_idempotent is not changed
+      - update_idempotent.privatekey is undefined
+      - update_idempotent_return_check is not changed
+      - update_idempotent_return_check.privatekey == update.privatekey
+      - update_idempotent_return is not changed
+      - update_idempotent_return.privatekey == update.privatekey
