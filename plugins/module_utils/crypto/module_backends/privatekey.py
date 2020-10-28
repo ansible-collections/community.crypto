@@ -318,7 +318,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self._add_curve('secp384r1', 'SECP384R1')
         self._add_curve('secp521r1', 'SECP521R1')
         self._add_curve('secp224r1', 'SECP224R1')
-        self._add_curve('secp192r1', 'SECP192R1')
+        self._add_curve('secp192r1', 'SECP192R1', deprecated=True)
         self._add_curve('secp256r1', 'SECP256R1')
         self._add_curve('secp256k1', 'SECP256K1')
         self._add_curve('brainpoolP256r1', 'BrainpoolP256R1', deprecated=True)
