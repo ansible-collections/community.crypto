@@ -2,11 +2,6 @@
 
 set -o pipefail -eux
 
-declare -a args
-IFS='/:' read -ra args <<< "$1"
-
-version="${args[1]}"
-
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=90
 else
@@ -16,4 +11,4 @@ fi
 ansible-test env --timeout "${timeout}" --color -v
 
 # shellcheck disable=SC2086
-ansible-test units --color -v --docker default --python "${version}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} \
+ansible-test units --color -v --docker default ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} \
