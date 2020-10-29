@@ -51,27 +51,29 @@ options:
             - For maximal interoperability, C(secp384r1) or C(secp256r1) should be used.
             - We use the curve names as defined in the
               L(IANA registry for TLS,https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8).
+            - Please note that all curves except C(secp224r1), C(secp256k1), C(secp256r1), C(secp384r1) and C(secp521r1)
+              are discouraged for new private keys.
         type: str
         choices:
+            - secp224r1
+            - secp256k1
+            - secp256r1
             - secp384r1
             - secp521r1
-            - secp224r1
             - secp192r1
-            - secp256r1
-            - secp256k1
             - brainpoolP256r1
             - brainpoolP384r1
             - brainpoolP512r1
-            - sect571k1
-            - sect409k1
-            - sect283k1
-            - sect233k1
             - sect163k1
-            - sect571r1
-            - sect409r1
-            - sect283r1
-            - sect233r1
             - sect163r2
+            - sect233k1
+            - sect233r1
+            - sect283k1
+            - sect283r1
+            - sect409k1
+            - sect409r1
+            - sect571k1
+            - sect571r1
     passphrase:
         description:
             - The passphrase for the private key.
