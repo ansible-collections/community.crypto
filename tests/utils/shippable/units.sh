@@ -2,9 +2,6 @@
 
 set -o pipefail -eux
 
-declare -a args
-IFS='/:' read -ra args <<< "$1"
-
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=90
 else
