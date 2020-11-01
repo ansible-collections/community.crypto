@@ -9,7 +9,7 @@
     openssl_binary: openssl
 
 - name: register openssl version (full)
-  shell: "openssl version"
+  shell: "{{ openssl_binary }} version"
   register: openssl_version_full
 
 - name: show openssl version (full)
@@ -44,7 +44,7 @@
         openssl_binary: "{{ brew_openssl_prefix.stdout }}/bin/openssl"
 
     - name: MACOS | Register openssl version (full)
-      shell: "openssl version"
+      shell: "{{ openssl_binary }} version"
       register: openssl_version_full_again
       # We must use a different variable to prevent the 'when' condition of the surrounding block to fail
 
