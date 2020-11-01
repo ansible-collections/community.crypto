@@ -4,7 +4,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Point to OpenSSL binary
+- name: Default value for OpenSSL binary path
   set_fact:
     openssl_binary: openssl
 
@@ -18,11 +18,11 @@
     name: '{{ openssl_package_name }}'
   when: not ansible_os_family == 'Darwin'
 
-- name: register openssl version (full)
+- name: Register openssl version (full)
   shell: "{{ openssl_binary }} version"
   register: openssl_version_full
 
-- name: show openssl version (full)
+- name: Show openssl version (full)
   debug:
     var: openssl_version_full.stdout_lines
 
@@ -39,7 +39,7 @@
       register: brew_stat
 
     - name: MACOS | Install openssl
-      community.general.homebrew:
+      homebrew:
         name: openssl
         state: present
       become: yes
@@ -62,42 +62,29 @@
       debug:
         var: openssl_version_full_again.stdout_lines
 
-- name: Install pyOpenSSL (Python 3)
-  become: true
-  package:
-    name: '{{ pyopenssl_package_name_python3 }}'
-  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
-
-- name: Install pyOpenSSL (Python 2)
-  become: true
-  package:
-    name: '{{ pyopenssl_package_name }}'
-  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
-
-- name: Install pyOpenSSL (Darwin)
-  become: true
-  pip:
-    name: pyOpenSSL
-    extra_args: "-c {{ remote_constraints }}"
-  when: ansible_os_family == 'Darwin'
-
-- name: register pyOpenSSL version
-  command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
-  register: pyopenssl_version
-
-- name: register pyOpenSSL debug details
-  command: "{{ ansible_python.executable }} -m OpenSSL.debug"
-  register: pyopenssl_debug_version
-  ignore_errors: yes
-
-- name: show pyOpenSSL debug details
-  debug:
-    var: pyopenssl_debug_version.stdout_lines | default([])
-
-- name: register openssl version
+- name: Register openssl version
   shell: "openssl version | cut -d' ' -f2"
   register: openssl_version
 
-- name: register cryptography version
+- name: Install cryptography (Python 3)
+  become: true
+  package:
+    name: '{{ cryptography_package_name_python3 }}'
+  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
+
+- name: Install cryptography (Python 2)
+  become: true
+  package:
+    name: '{{ cryptography_package_name }}'
+  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
+
+- name: Install cryptography (Darwin)
+  become: true
+  pip:
+    name: cryptography
+    extra_args: "-c {{ remote_constraints }}"
+  when: ansible_os_family == 'Darwin'
+
+- name: Register cryptography version
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: cryptography_version

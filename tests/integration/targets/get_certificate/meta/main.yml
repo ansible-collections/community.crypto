@@ -1,3 +1,4 @@
 dependencies:
   - setup_openssl
+  - setup_pyopenssl
   - prepare_http_tests
