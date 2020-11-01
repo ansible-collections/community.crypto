@@ -4,5 +4,19 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# BEGIN HACK: remove whenever we know how to properly detect 'default' docker container !!!!!!!!!!!!!!!!!!!!!
+- name: Default value for OpenSSL binary path
+  set_fact:
+    openssl_binary: openssl
+
+- name: Register openssl version
+  shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
+  register: openssl_version
+
+- name: Register cryptography version
+  command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  register: cryptography_version
+# END HACK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 - debug:
     msg: "ACME test container IP is {{ acme_host }}; OpenSSL version is {{ openssl_version.stdout }}; cryptography version is {{ cryptography_version.stdout }}"

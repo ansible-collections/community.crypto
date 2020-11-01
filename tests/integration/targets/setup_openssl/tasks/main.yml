@@ -69,7 +69,7 @@
         var: openssl_version_full_again.stdout_lines
 
 - name: Register openssl version
-  shell: "openssl version | cut -d' ' -f2"
+  shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
   register: openssl_version
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
