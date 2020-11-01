@@ -4,30 +4,34 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Find OpenSSL binary
+  set_fact:
+    openssl_binary: openssl
+
 - name: Include OS-specific variables
   include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"
 
 - name: Install OpenSSL
-  become: True
+  become: true
   package:
     name: '{{ openssl_package_name }}'
   when: not ansible_os_family == 'Darwin'
 
 - name: Install pyOpenSSL (Python 3)
-  become: True
+  become: true
   package:
     name: '{{ pyopenssl_package_name_python3 }}'
   when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
 
 - name: Install pyOpenSSL (Python 2)
-  become: True
+  become: true
   package:
     name: '{{ pyopenssl_package_name }}'
   when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
 
 - name: Install pyOpenSSL (Darwin)
-  become: True
+  become: true
   pip:
     name: pyOpenSSL
     extra_args: "-c {{ remote_constraints }}"

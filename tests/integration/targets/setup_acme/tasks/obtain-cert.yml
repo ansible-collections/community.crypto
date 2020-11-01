@@ -1,16 +1,16 @@
 ---
 ## PRIVATE KEY ################################################################################
 - name: ({{ certgen_title }}) Create cert private key (RSA)
-  command: "openssl genrsa -out {{ output_dir }}/{{ certificate_name }}.key {{ rsa_bits if key_type == 'rsa' else 2048 }}"
+  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/{{ certificate_name }}.key {{ rsa_bits if key_type == 'rsa' else 2048 }}"
   when: "key_type == 'rsa'"
 - name: ({{ certgen_title }}) Create cert private key (ECC 256)
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key
+  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
   when: "key_type == 'ec256'"
 - name: ({{ certgen_title }}) Create cert private key (ECC 384)
-  command: openssl ecparam -name secp384r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key
+  command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
   when: "key_type == 'ec384'"
 - name: ({{ certgen_title }}) Create cert private key (ECC 512)
-  command: openssl ecparam -name secp521r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key
+  command: "{{ openssl_binary }} ecparam -name secp521r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
   when: "key_type == 'ec521'"
 ## CSR ########################################################################################
 - name: ({{ certgen_title }}) Create cert CSR

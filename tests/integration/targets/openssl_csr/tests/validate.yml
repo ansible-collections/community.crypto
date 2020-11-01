@@ -1,14 +1,14 @@
 ---
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"
-  shell: 'openssl rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - Common Name)"
-  shell: "openssl req -noout -subject -in {{ output_dir }}/csr.csr -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} req -noout -subject -in {{ output_dir }}/csr.csr -nameopt oneline,-space_eq"
   register: csr_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - csr modulus)"
-  shell: 'openssl req -noout -modulus -in {{ output_dir }}/csr.csr'
+  shell: '{{ openssl_binary }} req -noout -modulus -in {{ output_dir }}/csr.csr'
   register: csr_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (assert)"
@@ -49,11 +49,11 @@
       - csr_ku_xku_change_2 is changed
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (test - Common Name)"
-  shell: "openssl req -noout -subject -in {{ output_dir }}/csr_oldapi.csr -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} req -noout -subject -in {{ output_dir }}/csr_oldapi.csr -nameopt oneline,-space_eq"
   register: csr_oldapi_cn
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (test - csr modulus)"
-  shell: 'openssl req -noout -modulus -in {{ output_dir }}/csr_oldapi.csr'
+  shell: '{{ openssl_binary }} req -noout -modulus -in {{ output_dir }}/csr_oldapi.csr'
   register: csr_oldapi_modulus
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (assert)"
@@ -78,7 +78,7 @@
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.0', '<')
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (test - everything)"
-  shell: "openssl req -noout -in {{ output_dir }}/csr_ocsp.csr -text"
+  shell: "{{ openssl_binary }} req -noout -in {{ output_dir }}/csr_ocsp.csr -text"
   register: csr_ocsp
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (assert)"
@@ -93,15 +93,15 @@
       - csr_ocsp_idempotency is not changed
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - privatekey's public key)"
-  shell: 'openssl ec -pubout -in {{ output_dir }}/privatekey2.pem'
+  shell: '{{ openssl_binary }} ec -pubout -in {{ output_dir }}/privatekey2.pem'
   register: privatekey_ecc_key
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - Common Name)"
-  shell: "openssl req -noout -subject -in {{ output_dir }}/csr2.csr -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} req -noout -subject -in {{ output_dir }}/csr2.csr -nameopt oneline,-space_eq"
   register: csr_ecc_cn
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - CSR pubkey)"
-  shell: 'openssl req -noout -pubkey -in {{ output_dir }}/csr2.csr'
+  shell: '{{ openssl_binary }} req -noout -pubkey -in {{ output_dir }}/csr2.csr'
   register: csr_ecc_pubkey
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (assert)"
@@ -111,7 +111,7 @@
       - csr_ecc_pubkey.stdout == privatekey_ecc_key.stdout
 
 - name: "({{ select_crypto_backend }}) Validate CSR (text common name - Common Name)"
-  shell: "openssl req -noout -subject -in {{ output_dir }}/csr3.csr -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} req -noout -subject -in {{ output_dir }}/csr3.csr -nameopt oneline,-space_eq"
   register: csr3_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (assert)"

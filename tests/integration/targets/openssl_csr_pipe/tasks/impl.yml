@@ -59,17 +59,17 @@
   register: generate_csr_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"
-  shell: 'openssl rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - Common Name)"
-  shell: "openssl req -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} req -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_csr.csr }}"
   register: csr_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - csr modulus)"
-  shell: 'openssl req -noout -modulus -in /dev/stdin'
+  shell: '{{ openssl_binary }} req -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_csr.csr }}"
   register: csr_modulus

@@ -6,7 +6,7 @@
 
 - block:
   - name: Create ECC256 account key
-    command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem
+    command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
   - name: Obtain cert 1
     include_tasks: obtain-cert.yml
     vars:

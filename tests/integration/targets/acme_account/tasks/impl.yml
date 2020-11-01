@@ -1,5 +1,5 @@
 - name: Generate account keys
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ item }}.pem
+  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ item }}.pem"
   loop:
     - accountkey
     - accountkey2
@@ -8,7 +8,7 @@
     - accountkey5
 
 - name: Parse account keys (to ease debugging some test failures)
-  command: openssl ec -in {{ output_dir }}/{{ item }}.pem -noout -text
+  command: "{{ openssl_binary }} ec -in {{ output_dir }}/{{ item }}.pem -noout -text"
   loop:
     - accountkey
     - accountkey2
