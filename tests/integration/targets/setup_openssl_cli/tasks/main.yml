@@ -45,8 +45,9 @@
 
     - name: MACOS | Register openssl version (full)
       shell: "openssl version"
-      register: openssl_version_full
+      register: openssl_version_full_again
+      # We must use a different variable to prevent the 'when' condition of the surrounding block to fail
 
     - name: MACOS | Show openssl version (full)
       debug:
-        var: openssl_version_full.stdout_lines
+        var: openssl_version_full_again.stdout_lines
