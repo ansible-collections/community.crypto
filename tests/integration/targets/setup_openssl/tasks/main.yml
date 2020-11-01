@@ -40,10 +40,11 @@
 - name: register pyOpenSSL debug details
   command: "{{ ansible_python.executable }} -m OpenSSL.debug"
   register: pyopenssl_debug_version
+  ignore_errors: yes
 
 - name: show pyOpenSSL debug details
   debug:
-    var: pyopenssl_debug_version.stdout_lines
+    var: pyopenssl_debug_version.stdout_lines | default([])
 
 - name: register openssl version
   shell: "openssl version | cut -d' ' -f2"
