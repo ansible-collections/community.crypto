@@ -1,4 +1,3 @@
 dependencies:
-  - setup_openssl_cli
   - setup_remote_constraints
   - setup_pkg_mgr

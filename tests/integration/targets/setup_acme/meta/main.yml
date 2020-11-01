@@ -1,2 +1,2 @@
 dependencies:
-  - setup_openssl_cli
+  - setup_openssl
