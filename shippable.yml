@@ -8,8 +8,49 @@ matrix:
   exclude:
     - env: T=none
   include:
+    - env: T=devel/sanity/1
+    - env: T=devel/sanity/extra
+
+    - env: T=devel/units/1
+
     - env: T=devel/osx/10.11/1
     - env: T=devel/macos/10.15/1
+    - env: T=devel/rhel/7.8/1
+    - env: T=devel/rhel/8.2/1
+    - env: T=devel/freebsd/11.1/1
+    - env: T=devel/freebsd/12.1/1
+    - env: T=devel/linux/centos6/1
+    - env: T=devel/linux/centos7/1
+    - env: T=devel/linux/centos8/1
+    - env: T=devel/linux/fedora30/1
+    - env: T=devel/linux/fedora31/1
+    - env: T=devel/linux/fedora32/1
+    - env: T=devel/linux/opensuse15py2/1
+    - env: T=devel/linux/opensuse15/1
+    - env: T=devel/linux/ubuntu1604/1
+    - env: T=devel/linux/ubuntu1804/1
+
+    - env: T=devel/cloud/2.6/1
+    - env: T=devel/cloud/2.7/1
+    - env: T=devel/cloud/3.5/1
+    - env: T=devel/cloud/3.6/1
+    - env: T=devel/cloud/3.7/1
+    - env: T=devel/cloud/3.8/1
+    - env: T=devel/cloud/3.9/1
+
+    # For Ansible 2.10, use a combination of different targets
+    - env: T=2.10/sanity/1
+    - env: T=2.10/units/1
+    - env: T=2.10/rhel/7.8/1
+    - env: T=2.10/linux/ubuntu1804/1
+    - env: T=2.10/cloud/3.6/1
+
+    # For Ansible 2.9, use a combination of different targets
+    - env: T=2.9/sanity/1
+    - env: T=2.9/units/1
+    - env: T=2.9/rhel/7.8/1
+    - env: T=2.9/linux/ubuntu1804/1
+    - env: T=2.9/cloud/3.5/1
 
 branches:
   except:
