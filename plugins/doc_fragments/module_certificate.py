@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>

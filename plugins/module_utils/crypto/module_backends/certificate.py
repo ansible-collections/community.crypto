@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
@@ -15,7 +14,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 def get_certificate_argument_spec():
     return ArgumentSpec(
         argument_spec=dict(
-            provider=dict(type='str', choices=['acme', 'assertonly', 'entrust', 'ownca', 'selfsigned']),
+            provider=dict(type='str', choices=[]),
             force=dict(type='bool', default=False,),
             csr_path=dict(type='path'),
             csr_content=dict(type='str'),
