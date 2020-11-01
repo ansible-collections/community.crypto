@@ -4,10 +4,6 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Find OpenSSL binary
-  set_fact:
-    openssl_binary: openssl
-
 - name: Include OS-specific variables
   include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"
@@ -48,14 +44,6 @@
 - name: show pyOpenSSL debug details
   debug:
     var: pyopenssl_debug_version.stdout_lines
-
-- name: register openssl version (full)
-  shell: "openssl version"
-  register: openssl_version_full
-
-- name: show openssl version (full)
-  debug:
-    var: openssl_version_full.stdout_lines
 
 - name: register openssl version
   shell: "openssl version | cut -d' ' -f2"

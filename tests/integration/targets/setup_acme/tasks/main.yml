@@ -4,10 +4,6 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Find OpenSSL binary
-  set_fact:
-    openssl_binary: openssl
-
 - name: Register openssl version
   shell: "{{ openssl_binary }} version | cut -d' ' -f2"
   register: openssl_version
