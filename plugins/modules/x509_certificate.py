@@ -367,6 +367,30 @@ from ansible.module_utils._text import to_native, to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import ECSClient, RestOperationException, SessionConfigurationException
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+    get_certificate_argument_spec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_acme import (
+    add_acme_provider_to_argument_spec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_assertonly import (
+    add_assertonly_provider_to_argument_spec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_entrust import (
+    add_entrust_provider_to_argument_spec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_ownca import (
+    add_ownca_provider_to_argument_spec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_selfsigned import (
+    add_selfsigned_provider_to_argument_spec,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
@@ -2047,112 +2071,24 @@ class AcmeCertificate(Certificate):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            path=dict(type='path', required=True),
-            provider=dict(type='str', choices=['acme', 'assertonly', 'entrust', 'ownca', 'selfsigned']),
-            force=dict(type='bool', default=False,),
-            csr_path=dict(type='path'),
-            csr_content=dict(type='str'),
-            backup=dict(type='bool', default=False),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
-            return_content=dict(type='bool', default=False),
-
-            # General properties of a certificate
-            privatekey_path=dict(type='path'),
-            privatekey_content=dict(type='str', no_log=True),
-            privatekey_passphrase=dict(type='str', no_log=True),
-
-            # provider: assertonly
-            signature_algorithms=dict(type='list', elements='str', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            subject=dict(type='dict', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            subject_strict=dict(type='bool', default=False, removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            issuer=dict(type='dict', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            issuer_strict=dict(type='bool', default=False, removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            has_expired=dict(type='bool', default=False, removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            version=dict(type='int', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            key_usage=dict(type='list', elements='str', aliases=['keyUsage'],
-                           removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            key_usage_strict=dict(type='bool', default=False, aliases=['keyUsage_strict'],
-                                  removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            extended_key_usage=dict(type='list', elements='str', aliases=['extendedKeyUsage'],
-                                    removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            extended_key_usage_strict=dict(type='bool', default=False, aliases=['extendedKeyUsage_strict'],
-                                           removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            subject_alt_name=dict(type='list', elements='str', aliases=['subjectAltName'],
-                                  removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            subject_alt_name_strict=dict(type='bool', default=False, aliases=['subjectAltName_strict'],
-                                         removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            not_before=dict(type='str', aliases=['notBefore'], removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            not_after=dict(type='str', aliases=['notAfter'], removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            valid_at=dict(type='str', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            invalid_at=dict(type='str', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-            valid_in=dict(type='str', removed_in_version='2.0.0', removed_from_collection='community.crypto'),
-
-            # provider: selfsigned
-            selfsigned_version=dict(type='int', default=3),
-            selfsigned_digest=dict(type='str', default='sha256'),
-            selfsigned_not_before=dict(type='str', default='+0s', aliases=['selfsigned_notBefore']),
-            selfsigned_not_after=dict(type='str', default='+3650d', aliases=['selfsigned_notAfter']),
-            selfsigned_create_subject_key_identifier=dict(
-                type='str',
-                default='create_if_not_provided',
-                choices=['create_if_not_provided', 'always_create', 'never_create']
-            ),
-
-            # provider: ownca
-            ownca_path=dict(type='path'),
-            ownca_content=dict(type='str'),
-            ownca_privatekey_path=dict(type='path'),
-            ownca_privatekey_content=dict(type='str', no_log=True),
-            ownca_privatekey_passphrase=dict(type='str', no_log=True),
-            ownca_digest=dict(type='str', default='sha256'),
-            ownca_version=dict(type='int', default=3),
-            ownca_not_before=dict(type='str', default='+0s'),
-            ownca_not_after=dict(type='str', default='+3650d'),
-            ownca_create_subject_key_identifier=dict(
-                type='str',
-                default='create_if_not_provided',
-                choices=['create_if_not_provided', 'always_create', 'never_create']
-            ),
-            ownca_create_authority_key_identifier=dict(type='bool', default=True),
-
-            # provider: acme
-            acme_accountkey_path=dict(type='path'),
-            acme_challenge_path=dict(type='path'),
-            acme_chain=dict(type='bool', default=False),
-            acme_directory=dict(type='str', default="https://acme-v02.api.letsencrypt.org/directory"),
-
-            # provider: entrust
-            entrust_cert_type=dict(type='str', default='STANDARD_SSL',
-                                   choices=['STANDARD_SSL', 'ADVANTAGE_SSL', 'UC_SSL', 'EV_SSL', 'WILDCARD_SSL',
-                                            'PRIVATE_SSL', 'PD_SSL', 'CDS_ENT_LITE', 'CDS_ENT_PRO', 'SMIME_ENT']),
-            entrust_requester_email=dict(type='str'),
-            entrust_requester_name=dict(type='str'),
-            entrust_requester_phone=dict(type='str'),
-            entrust_api_user=dict(type='str'),
-            entrust_api_key=dict(type='str', no_log=True),
-            entrust_api_client_cert_path=dict(type='path'),
-            entrust_api_client_cert_key_path=dict(type='path', no_log=True),
-            entrust_api_specification_path=dict(type='path', default='https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml'),
-            entrust_not_after=dict(type='str', default='+365d'),
-        ),
-        supports_check_mode=True,
+    argument_spec = get_certificate_argument_spec()
+    add_acme_provider_to_argument_spec(argument_spec)
+    add_assertonly_provider_to_argument_spec(argument_spec)
+    add_entrust_provider_to_argument_spec(argument_spec)
+    add_ownca_provider_to_argument_spec(argument_spec)
+    add_selfsigned_provider_to_argument_spec(argument_spec)
+    argument_spec.argument_spec.update(dict(
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        path=dict(type='path', required=True),
+        backup=dict(type='bool', default=False),
+        return_content=dict(type='bool', default=False),
+    ))
+    argument_spec.required_if.append(['state', 'present', ['provider']])
+    module = argument_spec.create_ansible_module(
         add_file_common_args=True,
-        required_if=[
-            ['state', 'present', ['provider']],
-            ['provider', 'entrust', ['entrust_requester_email', 'entrust_requester_name', 'entrust_requester_phone',
-                                     'entrust_api_user', 'entrust_api_key', 'entrust_api_client_cert_path',
-                                     'entrust_api_client_cert_key_path']],
-        ],
-        mutually_exclusive=[
-            ['csr_path', 'csr_content'],
-            ['privatekey_path', 'privatekey_content'],
-            ['ownca_path', 'ownca_content'],
-            ['ownca_privatekey_path', 'ownca_privatekey_content'],
-        ],
+        supports_check_mode=True,
     )
+
     if module._name == 'community.crypto.openssl_certificate':
         module.deprecate("The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'",
                          version='2.0.0', collection_name='community.crypto')
