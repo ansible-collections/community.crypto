@@ -111,7 +111,7 @@ name_constraints_excluded:
     sample: ['email:.com']
 csr:
     description: The (current or generated) CSR's content.
-    returned: if I(state) is C(present)
+    returned: changed or success
     type: str
 '''
 
