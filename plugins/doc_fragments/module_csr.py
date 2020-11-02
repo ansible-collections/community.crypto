@@ -259,9 +259,11 @@ notes:
       OCSP Must Staple is as requested, and if the request was signed by the given private key.
 seealso:
 - module: community.crypto.x509_certificate
+- module: community.crypto.x509_certificate_pipe
 - module: community.crypto.openssl_dhparam
 - module: community.crypto.openssl_pkcs12
 - module: community.crypto.openssl_privatekey
+- module: community.crypto.openssl_privatekey_pipe
 - module: community.crypto.openssl_publickey
 - module: community.crypto.openssl_csr_info
 '''

@@ -53,6 +53,7 @@ options:
 
 seealso:
 - module: community.crypto.openssl_csr
+- module: community.crypto.openssl_csr_pipe
 '''
 
 EXAMPLES = r'''

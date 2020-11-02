@@ -154,7 +154,9 @@ options:
         default: full_idempotence
 seealso:
 - module: community.crypto.x509_certificate
+- module: community.crypto.x509_certificate_pipe
 - module: community.crypto.openssl_csr
+- module: community.crypto.openssl_csr_pipe
 - module: community.crypto.openssl_dhparam
 - module: community.crypto.openssl_pkcs12
 - module: community.crypto.openssl_publickey

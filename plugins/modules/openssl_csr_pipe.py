@@ -40,7 +40,7 @@ EXAMPLES = r'''
 - debug:
     var: result.csr
 
-- name: Generate an OpenSSL Certificate Signing Request with an inline key
+- name: Generate an OpenSSL Certificate Signing Request with an inline CSR
   community.crypto.openssl_csr:
     content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.csr') }}"
     privatekey_content: "{{ private_key_content }}"
