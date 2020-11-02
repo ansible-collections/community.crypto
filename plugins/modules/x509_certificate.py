@@ -515,9 +515,6 @@ def main():
             certificate.remove(module)
 
         else:
-            if module.params['provider'] not in ('assertonly', 'selfsigned') and module.params['csr_path'] is None and module.params['csr_content'] is None:
-                module.fail_json(msg='csr_path or csr_content is required when provider is not assertonly or selfsigned')
-
             base_dir = os.path.dirname(module.params['path']) or '.'
             if not os.path.isdir(base_dir):
                 module.fail_json(

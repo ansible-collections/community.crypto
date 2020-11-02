@@ -73,6 +73,10 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             self.ca_privatekey_content = self.ca_privatekey_content.encode('utf-8')
         self.ca_privatekey_passphrase = module.params['ownca_privatekey_passphrase']
 
+        if self.csr_content is None and self.csr_path is None:
+            raise CertificateError(
+                'csr_path or csr_content is required for ownca provider'
+            )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file {0} does not exist'.format(self.csr_path)

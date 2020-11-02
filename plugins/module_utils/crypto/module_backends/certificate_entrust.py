@@ -43,6 +43,10 @@ class EntrustCertificateBackend(CertificateBackend):
         self.trackingId = None
         self.notAfter = get_relative_time_option(module.params['entrust_not_after'], 'entrust_not_after', backend=self.backend)
 
+        if self.csr_content is None and self.csr_path is None:
+            raise CertificateError(
+                'csr_path or csr_content is required for entrust provider'
+            )
         if self.csr_content is None or not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file {0} does not exist'.format(self.csr_path)

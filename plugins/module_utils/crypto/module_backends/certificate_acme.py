@@ -29,6 +29,10 @@ class AcmeCertificateBackend(CertificateBackend):
         self.use_chain = module.params['acme_chain']
         self.acme_directory = module.params['acme_directory']
 
+        if self.csr_content is None and self.csr_path is None:
+            raise CertificateError(
+                'csr_path or csr_content is required for ownca provider'
+            )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
                 'The certificate signing request file %s does not exist' % self.csr_path
