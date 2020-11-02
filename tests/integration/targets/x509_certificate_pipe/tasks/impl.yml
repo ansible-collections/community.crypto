@@ -1,0 +1,104 @@
+---
+- name: "({{ select_crypto_backend }}) Generate privatekey"
+  openssl_privatekey:
+    path: '{{ output_dir }}/privatekey.pem'
+
+- name: "({{ select_crypto_backend }}) Generate CSRs"
+  openssl_csr:
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ output_dir }}/{{ item.name }}.csr'
+    subject:
+      commonName: '{{ item.cn }}'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  loop:
+  - name: cert
+    cn: www.ansible.com
+  - name: cert-2
+    cn: ansible.com
+
+- name: "({{ select_crypto_backend }}) Generate certificate (check mode)"
+  x509_certificate_pipe:
+    provider: selfsigned
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  check_mode: yes
+  register: generate_certificate_check
+
+- name: "({{ select_crypto_backend }}) Generate certificate"
+  x509_certificate_pipe:
+    provider: selfsigned
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: generate_certificate
+
+- name: "({{ select_crypto_backend }}) Generate certificate (idempotent)"
+  x509_certificate_pipe:
+    provider: selfsigned
+    content: "{{ generate_certificate.certificate }}"
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: generate_certificate_idempotent
+
+- name: "({{ select_crypto_backend }}) Generate certificate (idempotent, check mode)"
+  x509_certificate_pipe:
+    provider: selfsigned
+    content: "{{ generate_certificate.certificate }}"
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  check_mode: yes
+  register: generate_certificate_idempotent_check
+
+- name: "({{ select_crypto_backend }}) Generate certificate (changed)"
+  x509_certificate_pipe:
+    provider: selfsigned
+    content: "{{ generate_certificate.certificate }}"
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert-2.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: generate_certificate_changed
+
+- name: "({{ select_crypto_backend }}) Generate certificate (changed, check mode)"
+  x509_certificate_pipe:
+    provider: selfsigned
+    content: "{{ generate_certificate.certificate }}"
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    csr_path: '{{ output_dir }}/cert-2.csr'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  check_mode: yes
+  register: generate_certificate_changed_check
+
+- name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
+  shell: 'openssl rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  register: privatekey_modulus
+
+- name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
+  shell: "openssl x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  args:
+    stdin: "{{ generate_certificate.certificate }}"
+  register: certificate_cn
+
+- name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
+  shell: 'openssl x509 -noout -modulus -in /dev/stdin'
+  args:
+    stdin: "{{ generate_certificate.certificate }}"
+  register: certificate_modulus
+
+- name: "({{ select_crypto_backend }}) Validate certificate (assert)"
+  assert:
+    that:
+      - certificate_cn.stdout.split('=')[-1] == 'www.ansible.com'
+      - certificate_modulus.stdout == privatekey_modulus.stdout
+
+- name: "({{ select_crypto_backend }}) Validate certificate (check mode, idempotency)"
+  assert:
+    that:
+      - generate_certificate_check is changed
+      - generate_certificate is changed
+      - generate_certificate_idempotent is not changed
+      - generate_certificate_idempotent_check is not changed
+      - generate_certificate_changed is changed
+      - generate_certificate_changed_check is changed

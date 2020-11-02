@@ -86,6 +86,9 @@ options:
     ownca_privatekey_content:
         version_added: '1.0.0'
 
+seealso:
+- module: community.crypto.x509_certificate_pipe
+
 extends_documentation_fragment:
     - ansible.builtin.files
     - community.crypto.module_certificate
