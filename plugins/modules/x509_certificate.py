@@ -537,12 +537,6 @@ def main():
             backend = module.params['select_crypto_backend']
             module_backend = select_backend(module, backend, provider_map[provider]())
             certificate = GenericCertificate(module, module_backend)
-
-            if module.check_mode:
-                result = certificate.dump(check_mode=True)
-                result['changed'] = module.params['force'] or not certificate.check(module)
-                module.exit_json(**result)
-
             certificate.generate(module)
 
         result = certificate.dump()
