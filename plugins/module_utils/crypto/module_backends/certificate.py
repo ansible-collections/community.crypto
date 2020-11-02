@@ -249,6 +249,34 @@ class CertificateBackend(object):
                     return False
             return True
 
+    def _check_subject_key_identifier(self):
+        """Check whether Subject Key Identifier matches, assuming self.existing_certificate has been populated."""
+        if self.backend != 'cryptography':
+            # We do not support SKI with pyOpenSSL backend
+            return True
+
+        # Get hold of certificate's SKI
+        try:
+            ext = self.existing_certificate.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
+        except cryptography.x509.ExtensionNotFound as dummy:
+            return False
+        # Get hold of CSR's SKI for 'create_if_not_provided'
+        csr_ext = None
+        if self.create_subject_key_identifier == 'create_if_not_provided':
+            try:
+                csr_ext = self.csr.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
+            except cryptography.x509.ExtensionNotFound as dummy:
+                pass
+        if csr_ext is None:
+            # If CSR had no SKI, or we chose to ignore it ('always_create'), compare with created SKI
+            if ext.value.digest != x509.SubjectKeyIdentifier.from_public_key(self.existing_certificate.public_key()).digest:
+                return False
+        else:
+            # If CSR had SKI and we didn't ignore it ('create_if_not_provided'), compare SKIs
+            if ext.value.digest != csr_ext.value.digest:
+                return False
+        return True
+
     def needs_regeneration(self):
         """Check whether a regeneration is necessary."""
         if self.force or self.existing_certificate_bytes is None:
@@ -267,6 +295,10 @@ class CertificateBackend(object):
         # Check whether CSR matches
         self._ensure_csr_loaded()
         if self.csr is not None and not self._check_csr():
+            return True
+
+        # Check SubjectKeyIdentifier
+        if self.create_subject_key_identifier != 'never_create' and not self._check_subject_key_identifier():
             return True
 
         return False
