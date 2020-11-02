@@ -470,7 +470,7 @@ class GenericCertificate(OpenSSLObject):
         return super(GenericCertificate, self).check(module, perms_required) and not self.module_backend.needs_regeneration()
 
     def dump(self, check_mode=False):
-        result = self.module_backend.dump(self.return_content)
+        result = self.module_backend.dump(include_certificate=self.return_content)
         result.update({
             'changed': self.changed,
             'filename': self.path,
