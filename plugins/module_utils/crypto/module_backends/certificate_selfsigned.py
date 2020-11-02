@@ -8,49 +8,20 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-import abc
-import datetime
-import time
 import os
-import tempfile
-import traceback
 
-from distutils.version import LooseVersion
 from random import randrange
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_bytes, to_text
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
-from ansible_collections.community.crypto.plugins.module_utils.ecs.api import ECSClient, RestOperationException, SessionConfigurationException
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
-)
+from ansible.module_utils._text import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    load_certificate,
-    load_certificate_request,
-    parse_name_field,
     get_relative_time_option,
     select_message_digest,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_compare_public_keys,
-    cryptography_get_name,
-    cryptography_name_to_oid,
     cryptography_key_needs_digest_for_signing,
-    cryptography_parse_key_usage_params,
     cryptography_serial_number_of_cert,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
-    pyopenssl_normalize_name_attribute,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -60,7 +31,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 try:
-    import OpenSSL
     from OpenSSL import crypto
 except ImportError:
     pass
@@ -70,8 +40,6 @@ try:
     from cryptography import x509
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives.serialization import Encoding
-    from cryptography.x509 import NameAttribute, Name
-    from cryptography.x509.oid import NameOID
 except ImportError:
     pass
 

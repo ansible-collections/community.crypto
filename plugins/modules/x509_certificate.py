@@ -351,24 +351,11 @@ certificate:
 '''
 
 
-import abc
-import datetime
-import time
 import os
-import tempfile
-import traceback
 
-from distutils.version import LooseVersion
-from random import randrange
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_bytes, to_text
-
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
-from ansible_collections.community.crypto.plugins.module_utils.ecs.api import ECSClient, RestOperationException, SessionConfigurationException
+from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    CertificateError,
     select_backend,
     get_certificate_argument_spec,
 )
@@ -405,60 +392,11 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
-    load_privatekey,
-    load_certificate,
-    load_certificate_request,
-    parse_name_field,
-    get_relative_time_option,
-    select_message_digest,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_compare_public_keys,
-    cryptography_get_name,
-    cryptography_name_to_oid,
-    cryptography_key_needs_digest_for_signing,
-    cryptography_parse_key_usage_params,
-    cryptography_serial_number_of_cert,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
-    pyopenssl_normalize_name_attribute,
-)
-
-MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
-MINIMAL_PYOPENSSL_VERSION = '0.15'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
-
-CRYPTOGRAPHY_IMP_ERR = None
-try:
-    import cryptography
-    from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives.serialization import Encoding
-    from cryptography.x509 import NameAttribute, Name
-    from cryptography.x509.oid import NameOID
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
-except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
 
 
 class CertificateAbsent(OpenSSLObject):
