@@ -44,7 +44,6 @@ seealso:
 - module: community.crypto.x509_certificate
 
 extends_documentation_fragment:
-    - ansible.builtin.files
     - community.crypto.module_certificate
     - community.crypto.module_certificate.backend_entrust_documentation
     - community.crypto.module_certificate.backend_ownca_documentation
