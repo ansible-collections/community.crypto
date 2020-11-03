@@ -1,11 +1,11 @@
 ---
 ## SET UP ACCOUNT KEYS ########################################################################
 - name: Create ECC256 account key
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem
+  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
 - name: Create ECC384 account key
-  command: openssl ecparam -name secp384r1 -genkey -out {{ output_dir }}/account-ec384.pem
+  command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/account-ec384.pem"
 - name: Create RSA-2048 account key
-  command: openssl genrsa -out {{ output_dir }}/account-rsa2048.pem 2048
+  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa2048.pem 2048"
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Obtain cert 1
   include_tasks: obtain-cert.yml

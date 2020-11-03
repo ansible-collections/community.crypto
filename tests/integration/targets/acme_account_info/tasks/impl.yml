@@ -1,12 +1,12 @@
 ---
 - name: Generate account key
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey.pem
+  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey.pem"
 
 - name: Generate second account key
-  command: openssl ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey2.pem
+  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey2.pem"
 
 - name: Parse account key (to ease debugging some test failures)
-  command: openssl ec -in {{ output_dir }}/accountkey.pem -noout -text
+  command: "{{ openssl_binary }} ec -in {{ output_dir }}/accountkey.pem -noout -text"
 
 - name: Check that account does not exist
   acme_account_info:
