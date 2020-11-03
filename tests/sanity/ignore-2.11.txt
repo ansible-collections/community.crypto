@@ -1,11 +1,3 @@
-plugins/module_utils/action_module.py import-2.6!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-2.7!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-3.5!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-3.6!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-3.7!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-3.8!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py import-3.9!skip  # This is not supposed to be included by modules, but by action plugins
-plugins/module_utils/action_module.py pylint:ansible-bad-module-import  # This is not supposed to be included by modules, but by action plugins
 plugins/module_utils/compat/ipaddress.py future-import-boilerplate
 plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py no-assert
