@@ -72,17 +72,17 @@
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: 'openssl rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  shell: "openssl x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  shell: 'openssl x509 -noout -modulus -in /dev/stdin'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_modulus
