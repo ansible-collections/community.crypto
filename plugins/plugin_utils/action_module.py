@@ -101,6 +101,7 @@ class AnsibleActionModule(object):
 
         self.aliases = {}
         self._legal_inputs = []
+        self._options_context = list()
 
         self.params = copy.deepcopy(action_plugin._task.args)
         self._set_fallbacks()
