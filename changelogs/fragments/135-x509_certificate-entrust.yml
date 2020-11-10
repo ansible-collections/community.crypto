@@ -1,0 +1,2 @@
+bugfixes:
+- "x509_certificate - fix ``entrust`` provider, which was broken since community.crypto 0.1.0 due to a feature added before the collection move (https://github.com/ansible-collections/community.crypto/pull/135)."
