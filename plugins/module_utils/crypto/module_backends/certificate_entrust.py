@@ -154,7 +154,10 @@ class EntrustCertificateBackend(CertificateBackend):
 
     def _get_cert_details(self):
         cert_details = {}
-        self._ensure_existing_certificate_loaded()
+        try:
+            self._ensure_existing_certificate_loaded()
+        except Exception as dummy:
+            return
         if self.existing_certificate:
             serial_number = None
             expiry = None
