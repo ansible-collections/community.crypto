@@ -93,7 +93,7 @@
   replace:
     path: "{{ output_dir }}/acme-tiny"
     regexp: 'with open\(wellknown_path, "w"\) as [^:]+:\n\s+[^. ]+\.write\(([^)]+)\)'
-    replace: 'urlopen(Request(url="http://{{ acme_host }}:5000/http/" + domain + "/" + token, data=\1.encode("utf8"), method="PUT", headers={"content-type": "application/octet-stream"})).close()'
+    replace: 'r = Request(url="http://{{ acme_host }}:5000/http/" + domain + "/" + token, data=\1.encode("utf8"), headers={"content-type": "application/octet-stream"}) ; r.get_method = lambda: "PUT" ; urlopen(r).close()'
 
 - name: "Monkey-patch acme-tiny: Remove file cleanup"
   replace:
