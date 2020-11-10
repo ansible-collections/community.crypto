@@ -66,6 +66,7 @@ EXAMPLES = r'''
         size: 2048
       register: output
       no_log: true  # make sure that private key data is not accidentally revealed in logs!
+
     - name: Update encrypted key when openssl_privatekey_pipe reported a change
       community.sops.encrypt_sops:
         path: private_key.pem.sops
