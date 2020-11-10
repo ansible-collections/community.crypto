@@ -59,17 +59,23 @@ EXAMPLES = r'''
     msg: "{{ output.privatekey }}"
   # DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
 
-- name: Update sops-encrypted key with the community.sops collection
-  community.crypto.openssl_privatekey_pipe:
-    content: "{{ lookup('community.sops.sops', 'private_key.pem.sops') }}"
-    size: 2048
-  register: output
-  no_log: true  # make sure that private key data is not accidentally revealed in logs!
-- name: Update encrypted key when openssl_privatekey_pipe reported a change
-  community.sops.encrypt_sops:
-    path: private_key.pem.sops
-    content_text: output.privatekey
-  when: output is changed
+- block:
+    - name: Update sops-encrypted key with the community.sops collection
+      community.crypto.openssl_privatekey_pipe:
+        content: "{{ lookup('community.sops.sops', 'private_key.pem.sops') }}"
+        size: 2048
+      register: output
+      no_log: true  # make sure that private key data is not accidentally revealed in logs!
+
+    - name: Update encrypted key when openssl_privatekey_pipe reported a change
+      community.sops.encrypt_sops:
+        path: private_key.pem.sops
+        content_text: "{{ output.privatekey }}"
+      when: output is changed
+  always:
+    - name: Make sure that output (which contains the private key) is overwritten
+      set_fact:
+        output: ''
 '''
 
 RETURN = r'''
