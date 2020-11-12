@@ -48,7 +48,7 @@ EXAMPLES = r'''
   register: result
 - name: Store CSR
   ansible.builtin.copy:
-    path: /etc/ssl/csr/www.ansible.com.csr
+    dest: /etc/ssl/csr/www.ansible.com.csr
     content: "{{ result.csr }}"
   when: result is changed
 '''
