@@ -98,7 +98,8 @@ class EntrustCertificateBackend(CertificateBackend):
 
         # Read the CSR that was generated for us
         if self.csr_content is not None:
-            body['csr'] = self.csr_content
+            # csr_content contains bytes
+            body['csr'] = to_native(self.csr_content)
         else:
             with open(self.csr_path, 'r') as csr_file:
                 body['csr'] = csr_file.read()
