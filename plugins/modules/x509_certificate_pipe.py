@@ -16,7 +16,7 @@ module: x509_certificate_pipe
 short_description: Generate and/or check OpenSSL certificates
 version_added: 1.3.0
 description:
-    - It implements a notion of provider (ie. C(selfsigned), C(ownca), C(entrust))
+    - It implements a notion of provider (ie. C(selfsigned), C(ownca))
       for your certificate.
     - "Please note that the module regenerates existing certificate if it doesn't match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
@@ -29,10 +29,8 @@ options:
     provider:
         description:
             - Name of the provider to use to generate/retrieve the OpenSSL certificate.
-            - "The C(entrust) provider requires credentials for the
-               L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
         type: str
-        choices: [ entrust, ownca, selfsigned ]
+        choices: [ ownca, selfsigned ]
         required: true
 
     content:
@@ -45,7 +43,6 @@ seealso:
 
 extends_documentation_fragment:
     - community.crypto.module_certificate
-    - community.crypto.module_certificate.backend_entrust_documentation
     - community.crypto.module_certificate.backend_ownca_documentation
     - community.crypto.module_certificate.backend_selfsigned_documentation
 '''
@@ -93,11 +90,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     get_certificate_argument_spec,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_entrust import (
-    EntrustCertificateProvider,
-    add_entrust_provider_to_argument_spec,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_ownca import (
     OwnCACertificateProvider,
     add_ownca_provider_to_argument_spec,
@@ -139,7 +131,6 @@ class GenericCertificate(object):
 def main():
     argument_spec = get_certificate_argument_spec()
     argument_spec.argument_spec['provider']['required'] = True
-    add_entrust_provider_to_argument_spec(argument_spec)
     add_ownca_provider_to_argument_spec(argument_spec)
     add_selfsigned_provider_to_argument_spec(argument_spec)
     argument_spec.argument_spec.update(dict(
@@ -152,7 +143,6 @@ def main():
     try:
         provider = module.params['provider']
         provider_map = {
-            'entrust': EntrustCertificateProvider,
             'ownca': OwnCACertificateProvider,
             'selfsigned': SelfSignedCertificateProvider,
         }
