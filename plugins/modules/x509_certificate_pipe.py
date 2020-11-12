@@ -72,7 +72,7 @@ EXAMPLES = r'''
 - name: Store certificate
   ansible.builtin.copy:
     path: /etc/ssl/csr/www.ansible.com.crt
-    content: "{{ result.certifiate }}"
+    content: "{{ result.certificate }}"
   when: result is changed
 '''
 
