@@ -58,7 +58,7 @@
 
 - name: Get certificate information
   x509_certificate_info:
-    path: '{{ output_dir }}/cert-1.pem'
+    path: '{{ output_dir }}/cert-2.pem'
   register: result
 
 - name: Validate certificate information
