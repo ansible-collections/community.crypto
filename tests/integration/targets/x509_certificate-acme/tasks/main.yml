@@ -52,8 +52,6 @@
       - subject_key_identifier
       - issuer
       - subject
-      #- serial_number
-      #- public_key_fingerprints
 
 - name: Get hold of acme-tiny executable
   get_url:

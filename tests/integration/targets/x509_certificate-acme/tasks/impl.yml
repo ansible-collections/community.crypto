@@ -1,15 +1,15 @@
 ---
-- name: "Generate account key"
+- name: Generate account key
   openssl_privatekey:
     path: '{{ output_dir }}/account.key'
     size: 2048
 
-- name: "Generate privatekey"
+- name: Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
     size: 2048
 
-- name: "Generate CSRs"
+- name: Generate CSRs
   openssl_csr:
     privatekey_path: '{{ output_dir }}/privatekey.pem'
     path: '{{ output_dir }}/{{ item.name }}.csr'
