@@ -1,0 +1,121 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: Obtain root and intermediate certificates
+    get_url:
+      url: "http://{{ acme_host }}:5000/{{ item.0 }}-certificate-for-ca/{{ item.1 }}"
+      dest: "{{ output_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
+    loop: "{{ query('nested', types, root_numbers) }}"
+
+  - name: Analyze root certificates
+    x509_certificate_info:
+      path: "{{ output_dir }}/acme-root-{{ item }}.pem"
+    loop: "{{ root_numbers }}"
+    register: acme_roots
+
+  - name: Analyze intermediate certificates
+    x509_certificate_info:
+      path: "{{ output_dir }}/acme-intermediate-{{ item }}.pem"
+    loop: "{{ root_numbers }}"
+    register: acme_intermediates
+
+  - set_fact:
+      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
+      y__: "{{ lookup('file', output_dir ~ '/acme-root-' ~ item.item ~ '.pem', rstrip=False) }}"
+    loop: "{{ acme_roots.results }}"
+    register: acme_roots_tmp
+
+  - set_fact:
+      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
+      y__: "{{ lookup('file', output_dir ~ '/acme-intermediate-' ~ item.item ~ '.pem', rstrip=False) }}"
+    loop: "{{ acme_intermediates.results }}"
+    register: acme_intermediates_tmp
+
+  - set_fact:
+      acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
+      acme_root_certs: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+      acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
+      acme_intermediate_certs: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+
+  vars:
+    types:
+      - root
+      - intermediate
+    root_numbers:
+      - 0
+    interesting_keys:
+      - authority_key_identifier
+      - subject_key_identifier
+      - issuer
+      - subject
+
+- name: Get hold of acme-tiny executable
+  get_url:
+    url: https://raw.githubusercontent.com/diafygi/acme-tiny/master/acme_tiny.py
+    dest: "{{ output_dir }}/acme-tiny"
+
+- name: Make sure acme-tiny is executable
+  file:
+    path: "{{ output_dir }}/acme-tiny"
+    mode: "0755"
+
+- name: "Monkey-patch acme-tiny: Disable certificate validation"
+  blockinfile:
+    path: "{{ output_dir }}/acme-tiny"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: DISABLE CERTIFICATE VALIDATION FOR HTTPS REQUESTS"
+    insertafter: '^#!.*'
+    block: |
+      import ssl
+      try:
+        ssl._create_default_https_context = ssl._create_unverified_context
+      except Exception:
+        # Python before 2.7.9 has no verification at all. So nothing to disable.
+        pass
+      # For later:
+      try:
+          from urllib.request import Request # Python 3
+      except ImportError:
+          from urllib2 import Request # Python 2
+
+- name: "Monkey-patch acme-tiny: Disable check that challenge file is reachable via HTTP"
+  replace:
+    path: "{{ output_dir }}/acme-tiny"
+    regexp: 'parser\.add_argument\("--disable-check", default=False,'
+    replace: 'parser.add_argument("--disable-check", default=True,'
+
+- name: "Monkey-patch acme-tiny: Instead of writing challenge files to disk, post them to challenge server"
+  replace:
+    path: "{{ output_dir }}/acme-tiny"
+    regexp: 'with open\(wellknown_path, "w"\) as [^:]+:\n\s+[^. ]+\.write\(([^)]+)\)'
+    replace: 'r = Request(url="http://{{ acme_host }}:5000/http/" + domain + "/" + token, data=\1.encode("utf8"), headers={"content-type": "application/octet-stream"}) ; r.get_method = lambda: "PUT" ; urlopen(r).close()'
+
+- name: "Monkey-patch acme-tiny: Remove file cleanup"
+  replace:
+    path: "{{ output_dir }}/acme-tiny"
+    regexp: 'os\.remove\(wellknown_path\)'
+    replace: 'pass'
+
+- name: "Monkey-patch acme-tiny: Avoid crash on already valid challenges (https://github.com/diafygi/acme-tiny/pull/254)"
+  blockinfile:
+    path: "{{ output_dir }}/acme-tiny"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: AVOID CRASH ON ALREADY VALID CHALLENGES"
+    insertbefore: '# find the http-01 challenge and write the challenge file'
+    block: |2
+              # skip if already valid
+              if authorization['status'] == "valid":
+                  log.info("{0} already verified. Skipping.".format(domain))
+                  continue
+
+- name: Create challenges directory
+  file:
+    path: '{{ output_dir }}/challenges'
+    state: directory
+
+- name: Running tests
+  include_tasks: impl.yml
+  # Make x509_certificate module happy
+  when: cryptography_version.stdout is version('1.6', '>=')
