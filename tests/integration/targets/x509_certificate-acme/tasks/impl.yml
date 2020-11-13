@@ -34,6 +34,17 @@
   environment:
     PATH: '{{ lookup("env", "PATH") }}:{{ output_dir }}'
 
+- name: Get certificate information
+  x509_certificate_info:
+    path: '{{ output_dir }}/cert-1.pem'
+  register: result
+
+- name: Validate certificate information
+  assert:
+    that:
+      - result.subject_alt_name | length == 1
+      - "'DNS:example.com' in result.subject_alt_name"
+
 - name: Retrieve certificate 2
   x509_certificate:
     provider: acme
@@ -44,3 +55,15 @@
     acme_directory: https://{{ acme_host }}:14000/dir
   environment:
     PATH: '{{ lookup("env", "PATH") }}:{{ output_dir }}'
+
+- name: Get certificate information
+  x509_certificate_info:
+    path: '{{ output_dir }}/cert-1.pem'
+  register: result
+
+- name: Validate certificate information
+  assert:
+    that:
+      - result.subject_alt_name | length == 2
+      - "'DNS:example.com' in result.subject_alt_name"
+      - "'DNS:example.org' in result.subject_alt_name"
