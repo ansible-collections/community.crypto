@@ -400,7 +400,7 @@ options:
 
     BACKEND_OWNCA_DOCUMENTATION = r'''
 description:
-    - The C(ownca) provider is intended for generating OpenSSL certificate signed with your own
+    - The C(ownca) provider is intended for generating an OpenSSL certificate signed with your own
       CA (Certificate Authority) certificate (self-signed certificate).
 options:
     ownca_path:
@@ -424,7 +424,7 @@ options:
         type: path
     ownca_privatekey_content:
         description:
-            - Path to the CA (Certificate Authority) private key to use when signing the certificate.
+            - Content of the CA (Certificate Authority) private key to use when signing the certificate.
             - This is only used by the C(ownca) provider.
             - This is mutually exclusive with I(ownca_privatekey_path).
         type: str

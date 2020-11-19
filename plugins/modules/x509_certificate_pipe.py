@@ -18,7 +18,7 @@ version_added: 1.3.0
 description:
     - It implements a notion of provider (ie. C(selfsigned), C(ownca), C(entrust))
       for your certificate.
-    - "Please note that the module regenerates existing certificate if it doesn't match the module's
+    - "Please note that the module regenerates an existing certificate if it doesn't match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing certificate, consider using the I(backup) option."
 author:
