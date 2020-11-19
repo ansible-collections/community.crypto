@@ -60,7 +60,10 @@ EXAMPLES = r'''
 - debug:
     var: result.certificate
 
-- name: Generate an OpenSSL Certificate Signing Request with an inline certificate
+- name: Generate an OpenSSL Certificate with the CSR provided inline
+  # This means that both CSR and certificate file are stored on the machine
+  # where ansible-playbook is executed, while the OwnCA data (certificate,
+  # private key) are stored on the remote machine.
   community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.crt') }}"
@@ -73,6 +76,7 @@ EXAMPLES = r'''
   ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com.crt
     content: "{{ result.certificate }}"
+  delegate_to: localhost
   when: result is changed
 '''
 
