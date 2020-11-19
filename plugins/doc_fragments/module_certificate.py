@@ -508,11 +508,15 @@ options:
 options:
     csr_path:
         description:
-            - This is not required for the C(selfsigned) provider.
+            - This is optional for the C(selfsigned) provider. If not provided, a certificate
+              without any information (Subject, Subject Alternative Names, Key Usage, etc.) is
+              created.
 
     csr_content:
         description:
-            - This is not required for the C(selfsigned) provider.
+            - This is optional for the C(selfsigned) provider. If not provided, a certificate
+              without any information (Subject, Subject Alternative Names, Key Usage, etc.) is
+              created.
 
     selfsigned_version:
         description:
