@@ -60,10 +60,11 @@ EXAMPLES = r'''
 - debug:
     var: result.certificate
 
-- name: Generate an OpenSSL Certificate with the CSR provided inline
-  # This means that both CSR and certificate file are stored on the machine
-  # where ansible-playbook is executed, while the OwnCA data (certificate,
-  # private key) are stored on the remote machine.
+# In the following example, both CSR and certificate file are stored on the
+# machine where ansible-playbook is executed, while the OwnCA data (certificate,
+# private key) are stored on the remote machine.
+
+- name: (1/2) Generate an OpenSSL Certificate with the CSR provided inline
   community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.crt') }}"
@@ -72,11 +73,41 @@ EXAMPLES = r'''
     ownca_privatekey: /path/to/ca_cert.key
     ownca_privatekey_passphrase: hunter2
   register: result
-- name: Store certificate
+
+- name: (2/2) Store certificate
   ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com.crt
     content: "{{ result.certificate }}"
   delegate_to: localhost
+  when: result is changed
+
+# In the following example, the certificate from another machine is signed by
+# our OwnCA whose private key and certificate are only available on this
+# machine (where ansible-playbook is executed), without having to write
+# the certificate file to disk on localhost. The CSR could have been
+# provided by community.crypto.openssl_csr_pipe earlier, or also have been
+# read from the remote machine.
+
+- name: (1/3) Read certificate's contents from remote machine
+  ansible.builtin.slurp:
+    src: /etc/ssl/csr/www.ansible.com.crt
+  register: certificate_content
+
+- name: (2/3) Generate an OpenSSL Certificate with the CSR provided inline
+  community.crypto.x509_certificate_pipe:
+    provider: ownca
+    content: "{{ certificate_content.content | b64decode }}"
+    csr_content: "{{ the_csr }}"
+    ownca_cert: /path/to/ca_cert.crt
+    ownca_privatekey: /path/to/ca_cert.key
+    ownca_privatekey_passphrase: hunter2
+  delegate_to: localhost
+  register: result
+
+- name: (3/3) Store certificate
+  ansible.builtin.copy:
+    dest: /etc/ssl/csr/www.ansible.com.crt
+    content: "{{ result.certificate }}"
   when: result is changed
 '''
 
