@@ -57,7 +57,7 @@ EXAMPLES = r'''
     privatekey_path: /etc/ssl/private/ansible.com.pem
     csr_path: /etc/ssl/csr/ansible.com.csr
   register: result
-- debug:
+- ansible.builtin.debug:
     var: result.certificate
 
 # In the following example, both CSR and certificate file are stored on the
