@@ -108,6 +108,7 @@ options:
         description:
             - Should the subjectAltName extension be considered as critical.
         type: bool
+        default: false
         aliases: [ subjectAltName_critical ]
     use_common_name_for_san:
         description:
@@ -127,6 +128,7 @@ options:
         description:
             - Should the keyUsage extension be considered as critical.
         type: bool
+        default: false
         aliases: [ keyUsage_critical ]
     extended_key_usage:
         description:
@@ -139,6 +141,7 @@ options:
         description:
             - Should the extkeyUsage extension be considered as critical.
         type: bool
+        default: false
         aliases: [ extKeyUsage_critical, extendedKeyUsage_critical ]
     basic_constraints:
         description:
@@ -150,12 +153,14 @@ options:
         description:
             - Should the basicConstraints extension be considered as critical.
         type: bool
+        default: false
         aliases: [ basicConstraints_critical ]
     ocsp_must_staple:
         description:
             - Indicates that the certificate should contain the OCSP Must Staple
               extension (U(https://tools.ietf.org/html/rfc7633)).
         type: bool
+        default: false
         aliases: [ ocspMustStaple ]
     ocsp_must_staple_critical:
         description:
@@ -165,6 +170,7 @@ options:
               are required to reject such certificates
               (see U(https://tools.ietf.org/html/rfc7633#section-4)).
         type: bool
+        default: false
         aliases: [ ocspMustStaple_critical ]
     name_constraints_permitted:
         description:
@@ -186,6 +192,7 @@ options:
         description:
             - Should the Name Constraints extension be considered as critical.
         type: bool
+        default: false
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
