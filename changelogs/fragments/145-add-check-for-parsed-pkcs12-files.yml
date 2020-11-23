@@ -1,3 +1,2 @@
 bugfixes:
- - openssl_pkcs12 - Add a check for parsed PKCS#12 files to prevent permanent
-   changed state in check mode (https://github.com/ansible-collections/community.crypto/issues/143).
+ - openssl_pkcs12 - report the correct state when ``action`` is ``parse`` (https://github.com/ansible-collections/community.crypto/issues/143).
