@@ -88,6 +88,14 @@
       path: '{{ output_dir }}/ansible_parse.pem'
       action: parse
       state: present
+    register: p12_dumped
+  - name: Dump PKCS#12 file again, idempotency
+    openssl_pkcs12:
+      src: '{{ output_dir }}/ansible.p12'
+      path: '{{ output_dir }}/ansible_parse.pem'
+      action: parse
+      state: present
+    register: p12_dumped_idempotency
   - name: Generate PKCS#12 file with multiple certs
     openssl_pkcs12:
       path: '{{ output_dir }}/ansible_multi_certs.p12'
