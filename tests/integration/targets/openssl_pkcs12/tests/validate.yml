@@ -20,8 +20,11 @@
       - p12_validate_no_pkey.stdout_lines[-1] == '-----END CERTIFICATE-----'
       - p12_force.changed
       - p12_force_and_mode.mode == '0644' and p12_force_and_mode.changed
+      - p12_dumped.changed
       - not p12_standard_idempotency.changed
       - not p12_multiple_certs_idempotency.changed
+      - not p12_dumped_idempotency.changed
+      - not p12_dumped_check_mode.changed
       - "'www.' in p12_validate_multi_certs.stdout"
       - "'www2.' in p12_validate_multi_certs.stdout"
       - "'www3.' in p12_validate_multi_certs.stdout"

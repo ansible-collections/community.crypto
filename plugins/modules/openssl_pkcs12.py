@@ -302,6 +302,17 @@ class Pkcs(OpenSSLObject):
                         return False
                 elif bool(self.pkcs12.get_friendlyname()) != bool(pkcs12_friendly_name):
                     return False
+        elif module.params['action'] == 'parse' and os.path.exists(self.src) and os.path.exists(self.path):
+            try:
+                pkey, cert, other_certs, friendly_name = self.parse()
+            except crypto.Error:
+                return False
+            expected_content = to_bytes(
+                ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
+            )
+            dumped_content = load_file_if_exists(self.path, ignore_errors=True)
+            if expected_content != dumped_content:
+                return False
         else:
             return False
 
@@ -448,6 +459,7 @@ def main():
                     pkey, cert, other_certs, friendly_name = pkcs12.parse()
                     dump_content = ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
                     pkcs12.write(module, to_bytes(dump_content))
+                    changed = True
 
             file_args = module.load_file_common_arguments(module.params)
             if module.set_fs_attributes_if_different(file_args, changed):
