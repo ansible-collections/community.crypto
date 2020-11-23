@@ -459,6 +459,7 @@ def main():
                     pkey, cert, other_certs, friendly_name = pkcs12.parse()
                     dump_content = ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
                     pkcs12.write(module, to_bytes(dump_content))
+                    changed = True
 
             file_args = module.load_file_common_arguments(module.params)
             if module.set_fs_attributes_if_different(file_args, changed):
