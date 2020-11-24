@@ -374,7 +374,7 @@ def select_backend(module, backend, provider):
 def get_certificate_argument_spec():
     return ArgumentSpec(
         argument_spec=dict(
-            provider=dict(type='str', choices=[]),
+            provider=dict(type='str', choices=[]),  # choices will be filled by add_XXX_provider_to_argument_spec() in certificate_xxx.py
             force=dict(type='bool', default=False,),
             csr_path=dict(type='path'),
             csr_content=dict(type='str'),
