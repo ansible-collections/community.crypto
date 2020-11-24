@@ -74,6 +74,7 @@ notes:
       They are all in UTC.
 seealso:
 - module: community.crypto.x509_certificate
+- module: community.crypto.x509_certificate_pipe
 '''
 
 EXAMPLES = r'''

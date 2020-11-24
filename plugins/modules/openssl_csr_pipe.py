@@ -40,7 +40,7 @@ EXAMPLES = r'''
 - debug:
     var: result.csr
 
-- name: Generate an OpenSSL Certificate Signing Request with an inline key
+- name: Generate an OpenSSL Certificate Signing Request with an inline CSR
   community.crypto.openssl_csr:
     content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.csr') }}"
     privatekey_content: "{{ private_key_content }}"
@@ -48,7 +48,7 @@ EXAMPLES = r'''
   register: result
 - name: Store CSR
   ansible.builtin.copy:
-    path: /etc/ssl/csr/www.ansible.com.csr
+    dest: /etc/ssl/csr/www.ansible.com.csr
     content: "{{ result.csr }}"
   when: result is changed
 '''
@@ -111,7 +111,7 @@ name_constraints_excluded:
     sample: ['email:.com']
 csr:
     description: The (current or generated) CSR's content.
-    returned: if I(state) is C(present)
+    returned: changed or success
     type: str
 '''
 

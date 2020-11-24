@@ -173,7 +173,7 @@ class CertificateSigningRequestBackend(object):
 
     @abc.abstractmethod
     def generate_csr(self):
-        """(Re-)Generate private key."""
+        """(Re-)Generate CSR."""
         pass
 
     @abc.abstractmethod
@@ -182,11 +182,11 @@ class CertificateSigningRequestBackend(object):
         pass
 
     def set_existing(self, csr_bytes):
-        """Set existing private key bytes. None indicates that the key does not exist."""
+        """Set existing CSR bytes. None indicates that the CSR does not exist."""
         self.existing_csr_bytes = csr_bytes
 
     def has_existing(self):
-        """Query whether an existing private key is/has been there."""
+        """Query whether an existing CSR is/has been there."""
         return self.existing_csr_bytes is not None
 
     def _ensure_private_key_loaded(self):
@@ -253,7 +253,7 @@ class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend
         super(CertificateSigningRequestPyOpenSSLBackend, self).__init__(module, 'pyopenssl')
 
     def generate_csr(self):
-        """(Re-)Generate private key."""
+        """(Re-)Generate CSR."""
         self._ensure_private_key_loaded()
 
         req = crypto.X509Req()
@@ -418,7 +418,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             module.warn('The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)')
 
     def generate_csr(self):
-        """(Re-)Generate private key."""
+        """(Re-)Generate CSR."""
         self._ensure_private_key_loaded()
 
         csr = cryptography.x509.CertificateSigningRequestBuilder()
