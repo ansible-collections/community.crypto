@@ -348,6 +348,9 @@ def select_backend(module, backend, provider):
                                       MINIMAL_PYOPENSSL_VERSION))
 
     if backend == 'pyopenssl':
+        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+                         version='2.0.0', collection_name='community.crypto')
+
         if not PYOPENSSL_FOUND:
             module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
                              exception=PYOPENSSL_IMP_ERR)
@@ -356,9 +359,6 @@ def select_backend(module, backend, provider):
                 getattr(crypto.X509Req, 'get_extensions')
             except AttributeError:
                 module.fail_json(msg='You need to have PyOpenSSL>=0.15')
-
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
 
     elif backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
