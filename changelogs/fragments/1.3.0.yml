@@ -1,0 +1,3 @@
+release_summary: >
+  Contains new modules ``openssl_privatekey_pipe``, ``openssl_csr_pipe`` and ``x509_certificate_pipe`` which allow
+  to create or update private keys, CSRs and X.509 certificates without having to write them to disk.
