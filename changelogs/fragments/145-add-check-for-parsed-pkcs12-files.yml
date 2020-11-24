@@ -1,2 +1,0 @@
-bugfixes:
- - openssl_pkcs12 - report the correct state when ``action`` is ``parse`` (https://github.com/ansible-collections/community.crypto/issues/143).
