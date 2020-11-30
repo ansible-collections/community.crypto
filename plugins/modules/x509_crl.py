@@ -409,6 +409,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     identify_pem_format,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
+    get_crl_info,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'
 
 CRYPTOGRAPHY_IMP_ERR = None
@@ -550,6 +554,19 @@ class CRL(OpenSSLObject):
         except Exception as dummy:
             self.crl_content = None
             self.actual_format = self.format
+            data = None
+
+        self.diff_after = self.diff_before = self._get_info(data)
+
+    def _get_info(self, data):
+        if data is None:
+            return dict()
+        try:
+            result = get_crl_info(self.module, data)
+            result['can_parse_crl'] = False
+            return result
+        except Exception as exc:
+            return dict(can_parse_crl=False)
 
     def remove(self):
         if self.backup:
@@ -681,6 +698,7 @@ class CRL(OpenSSLObject):
                 result = self.crl.public_bytes(Encoding.DER)
 
         if result is not None:
+            self.diff_after = self._get_info(result)
             if self.return_content:
                 if self.format == 'pem':
                     self.crl_content = result
@@ -742,6 +760,10 @@ class CRL(OpenSSLObject):
         if self.return_content:
             result['crl'] = self.crl_content
 
+        result['diff'] = dict(
+            before=self.diff_before,
+            after=self.diff_after,
+        )
         return result
 
 
