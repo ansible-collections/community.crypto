@@ -1,2 +1,2 @@
 ---
-default_rsa_key_size: 2048
+default_rsa_key_size: 1024

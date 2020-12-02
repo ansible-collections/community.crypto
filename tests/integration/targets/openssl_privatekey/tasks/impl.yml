@@ -520,14 +520,14 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
 - name: "({{ select_crypto_backend }}) Regenerate - setup password protected keys"
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -543,7 +543,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-c-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
@@ -565,7 +565,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-c-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
@@ -586,7 +586,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
@@ -608,7 +608,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
@@ -629,7 +629,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
@@ -647,7 +647,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
@@ -664,7 +664,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
-    size: 1048
+    size: '{{ default_rsa_key_size + 20 }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
@@ -684,7 +684,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
-    size: 1048
+    size: '{{ default_rsa_key_size + 20 }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
@@ -711,7 +711,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: DSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
@@ -731,7 +731,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
     type: DSA
-    size: 1024
+    size: '{{ default_rsa_key_size }}'
     regenerate: '{{ item }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
@@ -759,7 +759,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
       type: DSA
-      size: 1024
+      size: '{{ default_rsa_key_size }}'
       format: pkcs8
       regenerate: '{{ item }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
@@ -780,7 +780,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
       type: DSA
-      size: 1024
+      size: '{{ default_rsa_key_size }}'
       format: pkcs8
       regenerate: '{{ item }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
@@ -808,7 +808,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
       type: DSA
-      size: 1024
+      size: '{{ default_rsa_key_size }}'
       format: pkcs1
       format_mismatch: convert
       regenerate: '{{ item }}'
@@ -828,7 +828,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/regenerate-a-{{ item }}.pem'
       type: DSA
-      size: 1024
+      size: '{{ default_rsa_key_size }}'
       format: pkcs1
       format_mismatch: convert
       regenerate: '{{ item }}'
