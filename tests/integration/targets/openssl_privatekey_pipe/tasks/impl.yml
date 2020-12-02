@@ -92,7 +92,7 @@
       - update_check_return.privatekey == result.privatekey
       - update is changed
       - update.privatekey != result.privatekey
-      - update_info.public_data.size == 2048
+      - update_info.public_data.size == default_rsa_key_size
       - update_idempotent_check is not changed
       - update_idempotent_check.privatekey is undefined
       - update_idempotent is not changed
