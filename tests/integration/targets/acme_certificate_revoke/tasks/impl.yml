@@ -4,8 +4,8 @@
   command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
 - name: Create ECC384 account key
   command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/account-ec384.pem"
-- name: Create RSA-2048 account key
-  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa2048.pem 2048"
+- name: Create RSA account key
+  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa.pem {{ default_rsa_key_size }}"
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Obtain cert 1
   include_tasks: obtain-cert.yml
@@ -13,7 +13,7 @@
     certgen_title: Certificate 1 for revocation
     certificate_name: cert-1
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
     subject_alt_name_critical: no
     account_key_content: "{{ lookup('file', output_dir ~ '/account-ec256.pem') }}"
@@ -48,7 +48,7 @@
     key_type: ec384
     subject_alt_name: "DNS:t1.example.com"
     subject_alt_name_critical: no
-    account_key: account-rsa2048
+    account_key: account-rsa
     challenge: dns-01
     modify_account: yes
     deactivate_authzs: no
@@ -80,7 +80,7 @@
 - name: Revoke certificate 3 via account key (fullchain)
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa2048.pem') }}"
+    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa.pem') }}"
     certificate: "{{ output_dir }}/cert-3-fullchain.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir

@@ -29,7 +29,7 @@
 - name: "({{ select_crypto_backend }}) Generate privatekey4 - standard"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey4.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Delete privatekey4 - standard"
@@ -52,7 +52,7 @@
     path: '{{ output_dir }}/privatekey5.pem'
     passphrase: ansible
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey5 - standard - idempotence"
@@ -60,7 +60,7 @@
     path: '{{ output_dir }}/privatekey5.pem'
     passphrase: ansible
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_idempotence
 
@@ -69,7 +69,7 @@
     path: '{{ output_dir }}/privatekey6.pem'
     passphrase: ànsïblé
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - set_fact:
@@ -206,7 +206,7 @@
     path: '{{ output_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
   register: passphrase_1
@@ -216,7 +216,7 @@
     path: '{{ output_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
   register: passphrase_2
@@ -224,7 +224,7 @@
 - name: "({{ select_crypto_backend }}) Regenerate privatekey without passphrase"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekeypw.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
   register: passphrase_3
@@ -232,7 +232,7 @@
 - name: "({{ select_crypto_backend }}) Regenerate privatekey without passphrase (idempotent)"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekeypw.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
   register: passphrase_4
@@ -242,7 +242,7 @@
     path: '{{ output_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
   register: passphrase_5
@@ -254,7 +254,7 @@
 - name: "({{ select_crypto_backend }}) Regenerate broken key"
   openssl_privatekey:
     path: '{{ output_dir }}/broken.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: output_broken
 
@@ -263,7 +263,7 @@
     path: '{{ output_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
     state: absent
@@ -274,7 +274,7 @@
     path: '{{ output_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
     state: absent
@@ -284,7 +284,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_mode.pem'
     mode: '0400'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_1
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
@@ -296,7 +296,7 @@
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_mode.pem'
     mode: '0400'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_2
 
@@ -312,7 +312,7 @@
     path: '{{ output_dir }}/privatekey_mode.pem'
     mode: '0400'
     force: yes
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_3
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
@@ -325,7 +325,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: auto
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_1
 
@@ -333,7 +333,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: auto
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_2
 
@@ -341,7 +341,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: pkcs1
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_3
 
@@ -349,7 +349,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: pkcs8
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_4
 
@@ -357,7 +357,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: pkcs8
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_5
 
@@ -365,7 +365,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: auto_ignore
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_6
 
@@ -373,7 +373,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: auto
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_7
 
@@ -381,7 +381,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: raw
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     ignore_errors: yes
     register: privatekey_fmt_1_step_8
@@ -397,7 +397,7 @@
       path: '{{ output_dir }}/privatekey_fmt_1.pem'
       format: pkcs8
       format_mismatch: convert
-      size: 2048
+      size: '{{ default_rsa_key_size }}'
       select_crypto_backend: '{{ select_crypto_backend }}'
     register: privatekey_fmt_1_step_9
 

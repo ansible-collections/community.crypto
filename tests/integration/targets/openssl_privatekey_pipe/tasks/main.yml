@@ -6,7 +6,7 @@
 
 - name: Run module with backend autodetection
   openssl_privatekey_pipe:
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - block:
   - name: Running tests with pyOpenSSL backend

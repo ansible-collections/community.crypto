@@ -7,7 +7,7 @@
 - name: Prepare private key for backend autodetection test
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_backend_selection.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 - name: Run module with backend autodetection
   openssl_csr:
     path: '{{ output_dir }}/csr_backend_selection.csr'

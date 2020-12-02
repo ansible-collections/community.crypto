@@ -2,7 +2,7 @@
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format"
   openssl_publickey:
@@ -65,7 +65,7 @@
     path: '{{ output_dir }}/privatekey3.pem'
     passphrase: ansible
     cipher: aes256
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey3 - with passphrase protected privatekey"
   openssl_publickey:
@@ -98,7 +98,7 @@
     path: '{{ output_dir }}/privatekey5.pem'
     type: ECC
     curve: secp256r1
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format"
   openssl_publickey:
@@ -128,7 +128,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 1)"
   openssl_publickey:

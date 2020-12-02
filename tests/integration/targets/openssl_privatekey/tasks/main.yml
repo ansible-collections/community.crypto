@@ -34,7 +34,7 @@
 - name: Run module with backend autodetection
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_backend_selection.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - block:
   - name: Running tests with pyOpenSSL backend

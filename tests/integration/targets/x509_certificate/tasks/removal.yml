@@ -2,7 +2,7 @@
 - name: (Removal, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/removal_privatekey.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: (Removal, {{select_crypto_backend}}) Generate CSR
   openssl_csr:

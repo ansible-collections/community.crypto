@@ -2,7 +2,7 @@
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
   openssl_csr:
@@ -262,7 +262,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with privatekey passphrase"
   openssl_csr:

@@ -12,14 +12,14 @@
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_2.pem'
     type: RSA
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
 
 - name: Generate privatekey 3 (with password)
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey_3.pem'
     passphrase: hunter2
     cipher: auto
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
     select_crypto_backend: cryptography
 
 - name: Generate privatekey 4 (ECC)
