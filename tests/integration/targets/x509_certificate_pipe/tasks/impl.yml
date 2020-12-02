@@ -2,7 +2,7 @@
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
     path: '{{ output_dir }}/{{ item }}.pem'
-    size: 2048
+    size: '{{ default_rsa_key_size }}'
   loop:
     - privatekey
     - privatekey2
