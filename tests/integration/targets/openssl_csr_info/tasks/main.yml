@@ -7,6 +7,7 @@
 - name: Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
+    size: 2048
 
 - name: Generate privatekey with password
   openssl_privatekey:
@@ -14,6 +15,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
+    size: 2048
 
 - name: Generate CSR 1
   openssl_csr:

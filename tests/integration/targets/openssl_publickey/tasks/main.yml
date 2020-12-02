@@ -8,6 +8,7 @@
   - name: Generate privatekey1 - standard
     openssl_privatekey:
       path: '{{ output_dir }}/privatekey_autodetect.pem'
+      size: 2048
 
   - name: Run module with backend autodetection
     openssl_publickey:

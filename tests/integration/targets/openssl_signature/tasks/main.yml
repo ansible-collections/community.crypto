@@ -32,7 +32,7 @@
 
 - name: Add RSA tests
   set_fact:
-    key_types: "{{ key_types + [ { 'type': 'RSA' } ] }}"
+    key_types: "{{ key_types + [ { 'type': 'RSA', 'size': 2048 } ] }}"
   when: cryptography_version.stdout is version('1.4', '>=')
 
 - name: Add DSA + ECDSA tests

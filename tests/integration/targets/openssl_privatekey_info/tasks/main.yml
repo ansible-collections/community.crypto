@@ -19,6 +19,7 @@
     path: '{{ output_dir }}/privatekey_3.pem'
     passphrase: hunter2
     cipher: auto
+    size: 2048
     select_crypto_backend: cryptography
 
 - name: Generate privatekey 4 (ECC)

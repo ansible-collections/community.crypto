@@ -2,6 +2,7 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
+    size: 2048
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey with password
   openssl_privatekey:
@@ -9,6 +10,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
+    size: 2048
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR
   x509_certificate:
@@ -126,6 +128,7 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey2
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey2.pem'
+    size: 2048
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR2
   openssl_csr:
@@ -184,6 +187,7 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Create private key 3
   openssl_privatekey:
     path: "{{ output_dir }}/privatekey3.pem"
+    size: 2048
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create CSR 3
   openssl_csr:
