@@ -2,7 +2,7 @@
 - name: (Assertonly, {{select_crypto_backend}}) - Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
-    size: '{{ default_rsa_key_size }}'
+    size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Assertonly, {{select_crypto_backend}}) - Generate privatekey with password
   openssl_privatekey:
@@ -10,7 +10,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
-    size: '{{ default_rsa_key_size }}'
+    size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Assertonly, {{select_crypto_backend}}) - Generate CSR (no extensions)
   openssl_csr:

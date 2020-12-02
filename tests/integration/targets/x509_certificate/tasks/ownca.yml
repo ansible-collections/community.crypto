@@ -2,7 +2,7 @@
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/ca_privatekey.pem'
-    size: '{{ default_rsa_key_size }}'
+    size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey with passphrase
   openssl_privatekey:
@@ -10,7 +10,7 @@
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
-    size: '{{ default_rsa_key_size }}'
+    size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA CSR
   openssl_csr:

@@ -2,15 +2,15 @@
   - name: Generate privatekey
     openssl_privatekey:
       path: '{{ output_dir }}/ansible_pkey.pem'
-      size: '{{ default_rsa_key_size }}'
+      size: '{{ default_rsa_key_size_certifiates }}'
   - name: Generate privatekey2
     openssl_privatekey:
       path: '{{ output_dir }}/ansible_pkey2.pem'
-      size: '{{ default_rsa_key_size }}'
+      size: '{{ default_rsa_key_size_certifiates }}'
   - name: Generate privatekey3
     openssl_privatekey:
       path: '{{ output_dir }}/ansible_pkey3.pem'
-      size: '{{ default_rsa_key_size }}'
+      size: '{{ default_rsa_key_size_certifiates }}'
   - name: Generate CSR
     openssl_csr:
       path: '{{ output_dir }}/ansible.csr'
