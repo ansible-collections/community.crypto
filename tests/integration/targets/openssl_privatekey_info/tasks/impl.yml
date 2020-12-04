@@ -50,7 +50,7 @@
       - "'type' in result"
       - "result.type == 'RSA'"
       - "'public_data' in result"
-      - "result.public_data.size == 2048"
+      - "result.public_data.size == default_rsa_key_size"
       - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
       - "result.public_data.exponent > 5"
       - "'private_data' in result"

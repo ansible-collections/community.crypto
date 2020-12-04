@@ -68,7 +68,7 @@
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (assert - Passphrase protected key + idempotence)"
   assert:
     that:
-      - privatekey5.stdout == '4096'
+      - privatekey5.stdout == '{{ default_rsa_key_size }}'
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 idempotence (assert - Passphrase protected key + idempotence)"
@@ -85,7 +85,7 @@
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (assert - Passphrase protected key with non ascii character)"
   assert:
     that:
-      - privatekey6.stdout == '4096'
+      - privatekey6.stdout == '{{ default_rsa_key_size }}'
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (dump with OpenSSL)"

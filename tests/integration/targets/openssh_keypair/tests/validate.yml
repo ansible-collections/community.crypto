@@ -3,6 +3,14 @@
   debug:
     var: privatekey1_result
 
+- name: Validate general behavior
+  assert:
+    that:
+      - privatekey1_result_check is changed
+      - privatekey1_result is changed
+      - privatekey1_idem_result_check is not changed
+      - privatekey1_idem_result is not changed
+
 - name: Validate privatekey1 return fingerprint
   assert:
     that:
@@ -21,7 +29,7 @@
   assert:
     that:
       - privatekey1_result["size"]|type_debug == 'int'
-      - privatekey1_result["size"] == 4096
+      - privatekey1_result["size"] == 2048
 
 - name: Validate privatekey1 return key type
   assert:
@@ -29,14 +37,14 @@
       - privatekey1_result["type"] is string
       - privatekey1_result["type"] == "rsa"
 
-- name: Validate privatekey1 (test - RSA key with size 4096 bits)
+- name: Validate privatekey1 (test - RSA key with size 2048 bits)
   shell: "ssh-keygen -lf {{ output_dir }}/privatekey1 | grep -o -E '^[0-9]+'"
   register: privatekey1
 
-- name: Validate privatekey1 (assert - RSA key with size 4096 bits)
+- name: Validate privatekey1 (assert - RSA key with size 2048 bits)
   assert:
     that:
-      - privatekey1.stdout == '4096'
+      - privatekey1.stdout == '2048'
 
 - name: Validate privatekey1 idempotence
   assert:
@@ -44,14 +52,14 @@
       - privatekey1_idem_result is not changed
 
 
-- name: Validate privatekey2 (test - RSA key with size 2048 bits)
+- name: Validate privatekey2 (test - RSA key with default size 4096 bits)
   shell: "ssh-keygen -lf {{ output_dir }}/privatekey2 | grep -o -E '^[0-9]+'"
   register: privatekey2
 
-- name: Validate privatekey2 (assert - RSA key with size 2048 bits)
+- name: Validate privatekey2 (assert - RSA key with size 4096 bits)
   assert:
     that:
-      - privatekey2.stdout == '2048'
+      - privatekey2.stdout == '4096'
 
 
 - name: Validate privatekey3 (test - DSA key with size 1024 bits)

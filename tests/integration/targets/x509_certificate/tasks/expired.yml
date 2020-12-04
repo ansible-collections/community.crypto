@@ -2,6 +2,7 @@
 - name: (Expired, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ output_dir }}/has_expired_privatekey.pem'
+    size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Expired, {{select_crypto_backend}}) Generate CSR
   openssl_csr:

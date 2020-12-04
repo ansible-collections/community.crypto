@@ -4,20 +4,35 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Generate privatekey1 - standard (check mode)
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+  register: privatekey1_result_check
+  check_mode: true
+
 - name: Generate privatekey1 - standard
   openssh_keypair:
     path: '{{ output_dir }}/privatekey1'
+    size: 2048
   register: privatekey1_result
+
+- name: Generate privatekey1 - standard (check mode idempotent)
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+  register: privatekey1_idem_result_check
+  check_mode: true
 
 - name: Generate privatekey1 - standard (idempotent)
   openssh_keypair:
     path: '{{ output_dir }}/privatekey1'
+    size: 2048
   register: privatekey1_idem_result
 
-- name: Generate privatekey2 - size 2048
+- name: Generate privatekey2 - default size
   openssh_keypair:
     path: '{{ output_dir }}/privatekey2'
-    size: 2048
 
 - name: Generate privatekey3 - type dsa
   openssh_keypair:
@@ -27,6 +42,7 @@
 - name: Generate privatekey4 - standard
   openssh_keypair:
     path: '{{ output_dir }}/privatekey4'
+    size: 2048
 
 - name: Delete privatekey4 - standard
   openssh_keypair:
@@ -36,17 +52,20 @@
 - name: Generate privatekey5 - standard
   openssh_keypair:
     path: '{{ output_dir }}/privatekey5'
+    size: 2048
   register: publickey_gen
 
 - name: Generate privatekey6
   openssh_keypair:
     path: '{{ output_dir }}/privatekey6'
     type: rsa
+    size: 2048
 
 - name: Regenerate privatekey6 via force
   openssh_keypair:
     path: '{{ output_dir }}/privatekey6'
     type: rsa
+    size: 2048
     force: yes
   register: output_regenerated_via_force
 
@@ -63,6 +82,7 @@
   openssh_keypair:
     path: '{{ output_dir }}/privatekeybroken'
     type: rsa
+    size: 2048
   register: output_broken
   ignore_errors: yes
 
@@ -71,6 +91,7 @@
     path: '{{ output_dir }}/privatekeybroken'
     type: rsa
     force: yes
+    size: 2048
   register: output_broken_force
 
 - name: Generate read-only private key
@@ -78,24 +99,28 @@
     path: '{{ output_dir }}/privatekeyreadonly'
     type: rsa
     mode: '0200'
+    size: 2048
 
 - name: Regenerate read-only private key via force
   openssh_keypair:
     path: '{{ output_dir }}/privatekeyreadonly'
     type: rsa
     force: yes
+    size: 2048
   register: output_read_only
 
 - name: Generate privatekey7 - standard with comment
   openssh_keypair:
     path: '{{ output_dir }}/privatekey7'
     comment: 'test@privatekey7'
+    size: 2048
   register: privatekey7_result
 
 - name: Modify privatekey7 comment
   openssh_keypair:
     path: '{{ output_dir }}/privatekey7'
     comment: 'test_modified@privatekey7'
+    size: 2048
   register: privatekey7_modified_result
 
 - name: Generate password protected key
@@ -104,6 +129,7 @@
 - name: Try to modify the password protected key - should fail
   openssh_keypair:
     path: '{{ output_dir }}/privatekey8'
+    size: 2048
   register: privatekey8_result
   ignore_errors: yes
 
@@ -111,6 +137,7 @@
   openssh_keypair:
     path: '{{ output_dir }}/privatekey8'
     force: yes
+    size: 2048
   register: privatekey8_result_force
 
 - import_tasks: ../tests/validate.yml

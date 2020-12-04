@@ -1,7 +1,7 @@
 ---
 ## PRIVATE KEY ################################################################################
 - name: ({{ certgen_title }}) Create cert private key (RSA)
-  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/{{ certificate_name }}.key {{ rsa_bits if key_type == 'rsa' else 2048 }}"
+  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/{{ certificate_name }}.key {{ rsa_bits if key_type == 'rsa' else default_rsa_key_size }}"
   when: "key_type == 'rsa'"
 - name: ({{ certgen_title }}) Create cert private key (ECC 256)
   command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"

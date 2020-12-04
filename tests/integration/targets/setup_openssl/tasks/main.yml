@@ -96,3 +96,7 @@
 - name: Register cryptography version
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: cryptography_version
+
+- name: Print default key sizes
+  debug:
+    msg: "Default RSA key size: {{ default_rsa_key_size }} (for certificates: {{ default_rsa_key_size_certifiates }})"

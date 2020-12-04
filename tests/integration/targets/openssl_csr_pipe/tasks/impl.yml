@@ -2,6 +2,7 @@
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey.pem'
+    size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
   openssl_csr_pipe:

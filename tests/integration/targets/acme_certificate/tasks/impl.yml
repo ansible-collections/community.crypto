@@ -4,8 +4,8 @@
   command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
 - name: Create ECC384 account key
   command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/account-ec384.pem"
-- name: Create RSA-2048 account key
-  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa2048.pem 2048"
+- name: Create RSA account key
+  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa.pem {{ default_rsa_key_size }}"
 ## SET UP ACCOUNTS ############################################################################
 - name: Make sure ECC256 account hasn't been created yet
   acme_account:
@@ -28,13 +28,13 @@
     contact:
     - mailto:example@example.org
     - mailto:example@example.com
-- name: Create RSA-2048 account
+- name: Create RSA account
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key_src: "{{ output_dir }}/account-rsa2048.pem"
+    account_key_src: "{{ output_dir }}/account-rsa.pem"
     state: present
     allow_creation: yes
     terms_agreed: yes
@@ -46,7 +46,7 @@
     certgen_title: Certificate 1
     certificate_name: cert-1
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
     subject_alt_name_critical: no
     account_key: account-ec256
@@ -107,7 +107,7 @@
     key_type: ec384
     subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa2048.pem') }}"
+    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa.pem') }}"
     challenge: dns-01
     modify_account: no
     deactivate_authzs: no
@@ -131,10 +131,10 @@
     certgen_title: Certificate 4
     certificate_name: cert-4
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com,DNS:t1.example.com,DNS:test.t2.example.com,DNS:example.org,DNS:test.example.org"
     subject_alt_name_critical: no
-    account_key: account-rsa2048
+    account_key: account-rsa
     challenge: http-01
     modify_account: no
     deactivate_authzs: yes
@@ -242,7 +242,7 @@
     certgen_title: Certificate 6
     certificate_name: cert-6
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.org"
     subject_alt_name_critical: no
     account_key: account-ec256
@@ -274,7 +274,7 @@
     certgen_title: Certificate 7
     certificate_name: cert-7
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name:
     - "IP:127.0.0.1"
     # - "IP:::1"
@@ -302,7 +302,7 @@
     certgen_title: Certificate 8
     certificate_name: cert-8
     key_type: rsa
-    rsa_bits: 2048
+    rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name:
     - "IP:127.0.0.1"
     # IPv4 only since our test validation server doesn't work

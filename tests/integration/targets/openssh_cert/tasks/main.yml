@@ -6,24 +6,11 @@
 - name: openssh_cert integration tests
   when: not (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6")
   block:
-  - name: Generate keypair (check mode)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      type: rsa
-    check_mode: yes
   - name: Generate keypair
     openssh_keypair:
       path: '{{ output_dir }}/id_key'
       type: rsa
-  - name: Generate keypair (idempotent)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      type: rsa
-  - name: Generate keypair (idempotent, check mode)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      type: rsa
-    check_mode: yes
+      size: 2048
   - name: Generate always valid cert (check mode)
     openssh_cert:
       type: user
@@ -393,24 +380,10 @@
       #valid_from: "2001-01-21"
       #valid_to: "2019-01-21"
     check_mode: yes
-  - name: Remove keypair (check mode)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      state: absent
-    check_mode: yes
   - name: Remove keypair
     openssh_keypair:
       path: '{{ output_dir }}/id_key'
       state: absent
-  - name: Remove keypair (idempotent)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      state: absent
-  - name: Remove keypair (idempotent, check mode)
-    openssh_keypair:
-      path: '{{ output_dir }}/id_key'
-      state: absent
-    check_mode: yes
 
 - name: openssh_cert integration tests that require ssh-agent
   when: openssh_version is version("7.6",">=")
@@ -421,6 +394,7 @@
     openssh_keypair:
       path: '{{ output_dir }}/id_key'
       type: rsa
+      size: 2048
   - name: Generate always valid cert using agent without key in agent (should fail)
     openssh_cert:
       type: user
