@@ -14,8 +14,9 @@ function join {
     echo "$*";
 }
 
-test="$(join / "${args[@]:1}")"
+export PATH=$PATH:$HOME/.local/bin # HACK remove once azure-pipelines-test-container has been fixed
 
+test="$(join / "${args[@]:1}")"
 docker images ansible/ansible
 docker images quay.io/ansible/*
 docker ps
@@ -69,12 +70,18 @@ if [ "${script}" == "osx" ] && [ "${ansible_version}" == "2.9" ]; then
 fi
 # END: HACK
 
-export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
-SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
-TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
-mkdir -p "${TEST_DIR}"
-cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
-cd "${TEST_DIR}"
+
+if [ "${SHIPPABLE_BUILD_ID:-}" ]; then
+    export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
+    SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
+    TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
+    mkdir -p "${TEST_DIR}"
+    cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
+    cd "${TEST_DIR}"
+else
+    # AZP
+    export ANSIBLE_COLLECTIONS_PATHS="$PWD/../../../"
+fi
 
 # START: HACK install integration test dependencies
 if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_version}" != "2.9" ]; then
