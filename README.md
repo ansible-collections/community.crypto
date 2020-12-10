@@ -1,5 +1,7 @@
 # Ansible Community Crypto Collection
 
+[![Build Status](
+https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
 [![Shippable build status](https://api.shippable.com/projects/5e66776ca27f990007073a42/badge?branch=main)](https://app.shippable.com/projects/5e66776ca27f990007073a42)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 
