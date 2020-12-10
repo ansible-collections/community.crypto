@@ -14,7 +14,11 @@ function join {
     echo "$*";
 }
 
-export PATH=$PATH:$HOME/.local/bin # HACK remove once azure-pipelines-test-container has been fixed
+# HACK remove once azure-pipelines-test-container has been fixed
+export PATH=$PATH:$HOME/.local/bin
+
+# Ensure we can write other collections to this dir
+sudo chown "$(whoami)" "${PWD}/../../"
 
 test="$(join / "${args[@]:1}")"
 docker images ansible/ansible
