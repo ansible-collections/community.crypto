@@ -52,6 +52,8 @@ options:
       - "Content of the private key to use for this challenge certificate."
       - "Mutually exclusive with C(private_key_src)."
     type: str
+notes:
+  - Does not support C(check_mode).
 '''
 
 EXAMPLES = '''
