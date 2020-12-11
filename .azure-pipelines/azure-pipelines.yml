@@ -162,7 +162,7 @@ stages:
             - name: Ubuntu 16.04
               test: ubuntu1604
             - name: Ubuntu 18.04
-              test: ubuntu1804              
+              test: ubuntu1804
 
 ### Remote
   - stage: Remote_devel
