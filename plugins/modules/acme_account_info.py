@@ -56,9 +56,11 @@ EXAMPLES = '''
     that:
       - account_data.exists
 - name: Print account URI
-  ansible.builtin.debug: var=account_data.account_uri
+  ansible.builtin.debug:
+    var: account_data.account_uri
 - name: Print account contacts
-  ansible.builtin.debug: var=account_data.account.contact
+  ansible.builtin.debug:
+    var: account_data.account.contact
 
 - name: Check whether the account exists and is accessible with the given account key
   acme_account_info:
@@ -70,7 +72,8 @@ EXAMPLES = '''
     that:
       - account_data.exists
 - name: Print account contacts
-  ansible.builtin.debug: var=account_data.account.contact
+  ansible.builtin.debug:
+    var: account_data.account.contact
 '''
 
 RETURN = '''
