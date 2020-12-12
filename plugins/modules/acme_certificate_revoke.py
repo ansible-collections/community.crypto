@@ -25,6 +25,7 @@ notes:
       was different than the one specified here. Also, depending on the
       server, it can happen that some other error is returned if the
       certificate has already been revoked."
+   - Does not support C(check_mode).
 seealso:
   - name: The Let's Encrypt documentation
     description: Documentation for the Let's Encrypt Certification Authority.
@@ -98,7 +99,7 @@ options:
          C(2) (cACompromise), C(3) (affiliationChanged), C(4) (superseded),
          C(5) (cessationOfOperation), C(6) (certificateHold),
          C(8) (removeFromCRL), C(9) (privilegeWithdrawn),
-         C(10) (aACompromise)"
+         C(10) (aACompromise)."
     type: int
 '''
 
@@ -114,8 +115,7 @@ EXAMPLES = '''
     certificate: /etc/httpd/ssl/sample.com.crt
 '''
 
-RETURN = '''
-'''
+RETURN = '''#'''
 
 from ansible.module_utils.basic import AnsibleModule
 
