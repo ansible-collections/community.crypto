@@ -23,7 +23,7 @@ jobs:
         - bash: .azure-pipelines/scripts/process-results.sh
           condition: succeededOrFailed()
           displayName: Process Results
-        - bash: .azure-pipelines/scripts/aggregate-coverage.sh "$(Agent.TempDirectory)"
+        - bash: .azure-pipelines/scripts/aggregate-coverage.sh "$(Agent.TempDirectory)" "${{ job.test }}"
           condition: eq(variables.haveCoverageData, 'true')
           displayName: Aggregate Coverage Data
         - task: PublishTestResults@2
