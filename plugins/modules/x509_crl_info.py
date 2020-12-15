@@ -32,8 +32,9 @@ options:
         type: str
 
 notes:
-    - All timestamp values are provided in ASN.1 TIME format, i.e. following the C(YYYYMMDDHHMMSSZ) pattern.
+    - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
+    - Supports C(check_mode).
 seealso:
     - module: community.crypto.x509_crl
 '''
@@ -44,7 +45,8 @@ EXAMPLES = r'''
     path: /etc/ssl/my-ca.crl
   register: result
 
-- debug:
+- name: Print the information
+  ansible.builtin.debug:
     msg: "{{ result }}"
 '''
 

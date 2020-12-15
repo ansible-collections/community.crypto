@@ -15,7 +15,7 @@ version_added: '1.0.0'
 short_description: Generate Certificate Revocation Lists (CRLs)
 description:
     - This module allows one to (re)generate or update Certificate Revocation Lists (CRLs).
-    - Certificates on the revocation list can be either specified via serial number and (optionally) their issuer,
+    - Certificates on the revocation list can be either specified by serial number and (optionally) their issuer,
       or as a path to a certificate file in PEM format.
 requirements:
     - cryptography >= 1.2
@@ -231,6 +231,9 @@ extends_documentation_fragment:
     - files
 
 notes:
+    - Supports C(check_mode).
+
+notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
 '''
@@ -259,7 +262,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 filename:
-    description: Path to the generated CRL
+    description: Path to the generated CRL.
     returned: changed or success
     type: str
     sample: /path/to/my-ca.crl
@@ -269,7 +272,7 @@ backup_file:
     type: str
     sample: /path/to/my-ca.crl.2019-03-09@11:22~
 privatekey:
-    description: Path to the private CA key
+    description: Path to the private CA key.
     returned: changed or success
     type: str
     sample: /path/to/my-ca.pem

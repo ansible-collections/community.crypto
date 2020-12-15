@@ -18,7 +18,7 @@ version_added: 1.3.0
 description:
     - It implements a notion of provider (ie. C(selfsigned), C(ownca), C(entrust))
       for your certificate.
-    - "Please note that the module regenerates an existing certificate if it doesn't match the module's
+    - "Please note that the module regenerates an existing certificate if it does not match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing certificate, consider using the I(backup) option."
 author:
@@ -43,6 +43,9 @@ options:
 seealso:
 - module: community.crypto.x509_certificate
 
+notes:
+- Supports C(check_mode).
+
 extends_documentation_fragment:
     - community.crypto.module_certificate
     - community.crypto.module_certificate.backend_entrust_documentation
@@ -57,7 +60,8 @@ EXAMPLES = r'''
     privatekey_path: /etc/ssl/private/ansible.com.pem
     csr_path: /etc/ssl/csr/ansible.com.csr
   register: result
-- ansible.builtin.debug:
+- name: Print the certificate
+  ansible.builtin.debug:
     var: result.certificate
 
 # In the following example, both CSR and certificate file are stored on the

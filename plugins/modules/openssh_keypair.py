@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: openssh_keypair
 author: "David Kainz (@lolcube)"
-short_description: Generate OpenSSH private and public keys.
+short_description: Generate OpenSSH private and public keys
 description:
     - "This module allows one to (re)generate OpenSSH private and public keys. It uses
       ssh-keygen to generate keys. One can generate C(rsa), C(dsa), C(rsa1), C(ed25519)
@@ -59,7 +59,7 @@ options:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.
               The module will always generate a new key if the destination file does not exist.
-            - By default, the key will be regenerated when it doesn't match the module's options,
+            - By default, the key will be regenerated when it does not match the module's options,
               except when the key cannot be read or the passphrase does not match. Please note that
               this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if C(full_idempotence)
               is specified.
@@ -91,6 +91,7 @@ options:
 notes:
     - In case the ssh key is broken or password protected, the module will fail.
       Set the I(force) option to C(yes) if you want to regenerate the keypair.
+    - Supports C(check_mode).
 
 extends_documentation_fragment: files
 '''
@@ -118,17 +119,17 @@ EXAMPLES = '''
 
 RETURN = '''
 size:
-    description: Size (in bits) of the SSH private key
+    description: Size (in bits) of the SSH private key.
     returned: changed or success
     type: int
     sample: 4096
 type:
-    description: Algorithm used to generate the SSH private key
+    description: Algorithm used to generate the SSH private key.
     returned: changed or success
     type: str
     sample: rsa
 filename:
-    description: Path to the generated SSH private key file
+    description: Path to the generated SSH private key file.
     returned: changed or success
     type: str
     sample: /tmp/id_ssh_rsa
@@ -138,12 +139,12 @@ fingerprint:
     type: str
     sample: SHA256:r4YCZxihVjedH2OlfjVGI6Y5xAYtdCwk8VxKyzVyYfM
 public_key:
-    description: The public key of the generated SSH private key
+    description: The public key of the generated SSH private key.
     returned: changed or success
     type: str
     sample: ssh-rsa AAAAB3Nza(...omitted...)veL4E3Xcw== test_key
 comment:
-    description: The comment of the generated key
+    description: The comment of the generated key.
     returned: changed or success
     type: str
     sample: test@comment
