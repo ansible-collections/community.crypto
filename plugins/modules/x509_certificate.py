@@ -185,7 +185,7 @@ EXAMPLES = r'''
     invalid_at: 20200331202428Z
     valid_in: 10  # in ten seconds
 
-- name: Do something
+- name: Get certificate information
   community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
     # for valid_at, invalid_at and valid_in
@@ -195,13 +195,13 @@ EXAMPLES = r'''
       ten_seconds: "+10"
   register: result
 
-- name: Do something
+- name: Get CSR information
   community.crypto.openssl_csr_info:
     # Verifies that the CSR signature is valid; module will fail if not
     path: /etc/ssl/csr/ansible.com.csr
   register: result_csr
 
-- name: Do something
+- name: Get private key information
   community.crypto.openssl_privatekey_info:
     path: /etc/ssl/csr/ansible.com.key
   register: result_privatekey
