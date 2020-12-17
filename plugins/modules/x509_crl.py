@@ -231,11 +231,9 @@ extends_documentation_fragment:
     - files
 
 notes:
-    - Supports C(check_mode).
-
-notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
+    - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
