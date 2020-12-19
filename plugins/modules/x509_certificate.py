@@ -16,7 +16,7 @@ short_description: Generate and/or check OpenSSL certificates
 description:
     - It implements a notion of provider (ie. C(selfsigned), C(ownca), C(acme), C(assertonly), C(entrust))
       for your certificate.
-    - "Please note that the module regenerates existing certificate if it doesn't match the module's
+    - "Please note that the module regenerates existing certificate if it does not match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing certificate, consider using the I(backup) option."
     - Note that this module was called C(openssl_certificate) when included directly in Ansible up to version 2.9.
@@ -86,6 +86,9 @@ options:
     ownca_privatekey_content:
         version_added: '1.0.0'
 
+notes:
+- Supports C(check_mode).
+
 seealso:
 - module: community.crypto.x509_certificate_pipe
 
@@ -150,8 +153,8 @@ EXAMPLES = r'''
 # The following example shows one assertonly usage using all existing options for
 # assertonly, and shows how to emulate the behavior with the x509_certificate_info,
 # openssl_csr_info, openssl_privatekey_info and assert modules:
-
-- community.crypto.x509_certificate:
+- name: Usage of assertonly with all existing options
+  community.crypto.x509_certificate:
     provider: assertonly
     path: /etc/ssl/crt/ansible.com.crt
     csr_path: /etc/ssl/csr/ansible.com.csr
@@ -182,7 +185,8 @@ EXAMPLES = r'''
     invalid_at: 20200331202428Z
     valid_in: 10  # in ten seconds
 
-- community.crypto.x509_certificate_info:
+- name: Get certificate information
+  community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
     # for valid_at, invalid_at and valid_in
     valid_at:
@@ -191,12 +195,14 @@ EXAMPLES = r'''
       ten_seconds: "+10"
   register: result
 
-- community.crypto.openssl_csr_info:
+- name: Get CSR information
+  community.crypto.openssl_csr_info:
     # Verifies that the CSR signature is valid; module will fail if not
     path: /etc/ssl/csr/ansible.com.csr
   register: result_csr
 
-- community.crypto.openssl_privatekey_info:
+- name: Get private key information
+  community.crypto.openssl_privatekey_info:
     path: /etc/ssl/csr/ansible.com.key
   register: result_privatekey
 

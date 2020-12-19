@@ -14,7 +14,7 @@ module: openssl_signature_info
 version_added: 1.1.0
 short_description: Verify signatures with openssl
 description:
-    - This module allows one to verify a signature for a file via a certificate.
+    - This module allows one to verify a signature for a file by a certificate.
     - The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL backend
@@ -61,6 +61,7 @@ notes:
       RSA keys: C(cryptography) >= 1.4
       DSA and ECDSA keys: C(cryptography) >= 1.5
       ed448 and ed25519 keys: C(cryptography) >= 2.6
+    - Supports C(check_mode).
 seealso:
     - module: community.crypto.openssl_signature
     - module: community.crypto.x509_certificate
@@ -88,7 +89,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 valid:
-    description: C(true) means the signature was valid for the given file, C(false) means it wasn't.
+    description: C(true) means the signature was valid for the given file, C(false) means it was not.
     returned: success
     type: bool
 '''

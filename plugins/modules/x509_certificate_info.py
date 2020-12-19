@@ -54,7 +54,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h), and ASN.1 TIME (i.e. pattern C(YYYYMMDDHHMMSSZ)).
+              + C([w | d | h | m | s]) (e.g. C(+32w1d2h), and ASN.1 TIME (in other words, pattern C(YYYYMMDDHHMMSSZ)).
               Note that all timestamps will be treated as being in UTC.
         type: dict
     select_crypto_backend:
@@ -70,8 +70,9 @@ options:
         choices: [ auto, cryptography, pyopenssl ]
 
 notes:
-    - All timestamp values are provided in ASN.1 TIME format, i.e. following the C(YYYYMMDDHHMMSSZ) pattern.
+    - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
+    - Supports C(check_mode).
 seealso:
 - module: community.crypto.x509_certificate
 - module: community.crypto.x509_certificate_pipe
@@ -94,7 +95,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Dump information
-  debug:
+  ansible.builtin.debug:
     var: result
 
 
@@ -120,7 +121,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 expired:
-    description: Whether the certificate is expired (i.e. C(notAfter) is in the past)
+    description: Whether the certificate is expired (in other words, C(notAfter) is in the past).
     returned: success
     type: bool
 basic_constraints:
@@ -144,7 +145,7 @@ extended_key_usage_critical:
     returned: success
     type: bool
 extensions_by_oid:
-    description: Returns a dictionary for every extension OID
+    description: Returns a dictionary for every extension OID.
     returned: success
     type: dict
     contains:
@@ -153,7 +154,7 @@ extensions_by_oid:
             returned: success
             type: bool
         value:
-            description: The Base64 encoded value (in DER format) of the extension
+            description: The Base64 encoded value (in DER format) of the extension.
             returned: success
             type: str
             sample: "MAMCAQU="
@@ -212,17 +213,17 @@ subject_ordered:
     elements: list
     sample: '[["commonName", "www.example.com"], ["emailAddress": "test@example.com"]]'
 not_after:
-    description: C(notAfter) date as ASN.1 TIME
+    description: C(notAfter) date as ASN.1 TIME.
     returned: success
     type: str
     sample: 20190413202428Z
 not_before:
-    description: C(notBefore) date as ASN.1 TIME
+    description: C(notBefore) date as ASN.1 TIME.
     returned: success
     type: str
     sample: 20190331202428Z
 public_key:
-    description: Certificate's public key in PEM format
+    description: Certificate's public key in PEM format.
     returned: success
     type: str
     sample: "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A..."

@@ -65,6 +65,9 @@ options:
         default: auto
         choices: [ auto, cryptography, pyopenssl ]
 
+notes:
+- Supports C(check_mode).
+
 seealso:
 - module: community.crypto.openssl_privatekey
 - module: community.crypto.openssl_privatekey_pipe
@@ -81,28 +84,28 @@ EXAMPLES = r'''
   register: result
 
 - name: Dump information
-  debug:
+  ansible.builtin.debug:
     var: result
 '''
 
 RETURN = r'''
 can_load_key:
-    description: Whether the module was able to load the private key from disk
+    description: Whether the module was able to load the private key from disk.
     returned: always
     type: bool
 can_parse_key:
-    description: Whether the module was able to parse the private key
+    description: Whether the module was able to parse the private key.
     returned: always
     type: bool
 key_is_consistent:
     description:
         - Whether the key is consistent. Can also return C(none) next to C(yes) and
-          C(no), to indicate that consistency couldn't be checked.
+          C(no), to indicate that consistency could not be checked.
         - In case the check returns C(no), the module will fail.
     returned: always
     type: bool
 public_key:
-    description: Private key's public key in PEM format
+    description: Private key's public key in PEM format.
     returned: success
     type: str
     sample: "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A..."

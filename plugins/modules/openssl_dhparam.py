@@ -15,7 +15,7 @@ short_description: Generate OpenSSL Diffie-Hellman Parameters
 description:
     - This module allows one to (re)generate OpenSSL DH-params.
     - This module uses file common arguments to specify generated file permissions.
-    - "Please note that the module regenerates existing DH params if they don't
+    - "Please note that the module regenerates existing DH params if they do not
       match the module's options. If you are concerned that this could overwrite
       your existing DH params, consider using the I(backup) option."
     - The module can use the cryptography Python library, or the C(openssl) executable.
@@ -71,6 +71,8 @@ options:
         type: bool
         default: no
         version_added: "1.0.0"
+notes:
+- Supports C(check_mode).
 extends_documentation_fragment:
 - files
 seealso:
