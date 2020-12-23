@@ -209,7 +209,7 @@ class PublicKeyInfoRetrieval(object):
     def _get_key_info(self):
         pass
 
-    def get_info(self):
+    def get_info(self, prefer_one_fingerprint=False):
         result = dict()
         if self.key is None:
             try:
@@ -218,7 +218,8 @@ class PublicKeyInfoRetrieval(object):
                 raise PublicKeyParseError(to_native(e))
 
         pk = self._get_public_key(binary=True)
-        result['fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
+        result['fingerprints'] = get_fingerprint_of_bytes(
+            pk, prefer_one=prefer_one_fingerprint) if pk is not None else dict()
 
         key_type, key_public_data = self._get_key_info()
         result['type'] = key_type
@@ -276,12 +277,12 @@ class PublicKeyInfoRetrievalPyOpenSSL(PublicKeyInfoRetrieval):
         return key_type, key_public_data
 
 
-def get_publickey_info(module, backend, content=None, key=None):
+def get_publickey_info(module, backend, content=None, key=None, prefer_one_fingerprint=False):
     if backend == 'cryptography':
         info = PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
     elif backend == 'pyopenssl':
         info = PublicKeyInfoRetrievalPyOpenSSL(module, content=content, key=key)
-    return info.get_info()
+    return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(module, backend, content=None, key=None):

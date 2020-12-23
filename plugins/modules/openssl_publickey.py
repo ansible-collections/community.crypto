@@ -273,7 +273,8 @@ class PublicKey(OpenSSLObject):
             return dict()
         result = dict(can_parse_key=False)
         try:
-            result.update(get_publickey_info(self.module, self.backend, content=data))
+            result.update(get_publickey_info(
+                self.module, self.backend, content=data, prefer_one_fingerprint=True))
             result['can_parse_key'] = True
         except PublicKeyParseError as exc:
             result.update(exc.result)

@@ -106,7 +106,7 @@ class CertificateBackend(object):
         if data is None:
             return dict()
         try:
-            result = get_certificate_info(self.module, self.backend, data)
+            result = get_certificate_info(self.module, self.backend, data, prefer_one_fingerprint=True)
             result['can_parse_certificate'] = False
             return result
         except Exception as exc:

@@ -188,7 +188,8 @@ class CertificateSigningRequestBackend(object):
         if data is None:
             return dict()
         try:
-            result = get_csr_info(self.module, self.backend, data, validate_signature=False)
+            result = get_csr_info(
+                self.module, self.backend, data, validate_signature=False, prefer_one_fingerprint=True)
             result['can_parse_csr'] = False
             return result
         except Exception as exc:

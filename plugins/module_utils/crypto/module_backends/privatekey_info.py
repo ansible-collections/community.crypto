@@ -208,7 +208,7 @@ class PrivateKeyInfoRetrieval(object):
     def _is_key_consistent(self, key_public_data, key_private_data):
         pass
 
-    def get_info(self):
+    def get_info(self, prefer_one_fingerprint=False):
         result = dict(
             can_parse_key=False,
             key_is_consistent=None,
@@ -227,7 +227,8 @@ class PrivateKeyInfoRetrieval(object):
 
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
+        result['public_key_fingerprints'] = get_fingerprint_of_bytes(
+            pk, prefer_one=prefer_one_fingerprint) if pk is not None else dict()
 
         key_type, key_public_data, key_private_data = self._get_key_info()
         result['type'] = key_type
@@ -386,14 +387,14 @@ class PrivateKeyInfoRetrievalPyOpenSSL(PrivateKeyInfoRetrieval):
         return None
 
 
-def get_privatekey_info(module, backend, content, passphrase=None, return_private_key_data=False):
+def get_privatekey_info(module, backend, content, passphrase=None, return_private_key_data=False, prefer_one_fingerprint=False):
     if backend == 'cryptography':
         info = PrivateKeyInfoRetrievalCryptography(
             module, content, passphrase=passphrase, return_private_key_data=return_private_key_data)
     elif backend == 'pyopenssl':
         info = PrivateKeyInfoRetrievalPyOpenSSL(
             module, content, passphrase=passphrase, return_private_key_data=return_private_key_data)
-    return info.get_info()
+    return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(module, backend, content, passphrase=None, return_private_key_data=False):

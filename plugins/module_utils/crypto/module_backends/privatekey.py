@@ -117,7 +117,8 @@ class PrivateKeyBackend:
         result = dict(can_parse_key=False)
         try:
             result.update(get_privatekey_info(
-                self.module, self.backend, data, passphrase=self.passphrase, return_private_key_data=False))
+                self.module, self.backend, data, passphrase=self.passphrase,
+                return_private_key_data=False, prefer_one_fingerprint=True))
         except PrivateKeyConsistencyError as exc:
             result.update(exc.result)
         except PrivateKeyParseError as exc:
