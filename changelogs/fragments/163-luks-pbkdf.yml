@@ -1,0 +1,2 @@
+minor_changes:
+- "luks_device - allow to configure PBKDF (https://github.com/ansible-collections/community.crypto/pull/163)."

@@ -170,6 +170,46 @@ options:
             - "Will only be used on container creation."
         type: str
         version_added: '1.1.0'
+    pbkdf:
+        description:
+            - "This option allows the user to configure the Password-Based Key Derivation
+               Function (PBKDF) used."
+            - "Will only be used on container creation."
+        type: dict
+        version_added: '1.4.0'
+        suboptions:
+            iteration_time:
+                description:
+                    - "Specify the iteration time used for the PBKDF."
+                    - "Note that this is in B(seconds), not in milliseconds as on the
+                      command line."
+                    - Mutually exclusive with I(iteration_count).
+                type: float
+            iteration_count:
+                description:
+                    - "Specify the iteration count used for the PBKDF."
+                    - Mutually exclusive with I(iteration_time).
+                type: int
+            algorithm:
+                description:
+                    - The algorithm to use.
+                    - Only available for the LUKS 2 format.
+                choices:
+                    - argon2i
+                    - argon2id
+                    - pbkdf2
+                type: str
+            memory:
+                description:
+                    - The memory cost limit in kilobytes for the PBKDF.
+                    - This is not used for PBKDF2, but only for the Argon PBKDFs.
+                type: int
+            parallel:
+                description:
+                    - The parallel cost for the PBKDF. This is the number of threads that
+                      run in parallel.
+                    - This is not used for PBKDF2, but only for the Argon PBKDFs.
+                type: int
 
 requirements:
     - "cryptsetup"
@@ -399,7 +439,7 @@ class CryptHandler(Handler):
         result = self._run_command([self._cryptsetup_bin, 'isLuks', device])
         return result[RETURN_CODE] == 0
 
-    def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_):
+    def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_, pbkdf):
         # create a new luks container; use batch mode to auto confirm
         luks_type = self._module.params['type']
         label = self._module.params['label']
@@ -416,6 +456,17 @@ class CryptHandler(Handler):
             options.extend(['--cipher', cipher])
         if hash_ is not None:
             options.extend(['--hash', hash_])
+        if pbkdf is not None:
+            if pbkdf['iteration_time'] is not None:
+                options.extend(['--iter-time', str(int(pbkdf['iteration_time'] * 1000))])
+            if pbkdf['iteration_count'] is not None:
+                options.extend(['--pbkdf-force-iterations', str(pbkdf['iteration_count'])])
+            if pbkdf['algorithm'] is not None:
+                options.extend(['--pbkdf', pbkdf['algorithm']])
+            if pbkdf['memory'] is not None:
+                options.extend(['--pbkdf-memory', str(pbkdf['memory'])])
+            if pbkdf['parallel'] is not None:
+                options.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
 
         args = [self._cryptsetup_bin, 'luksFormat']
         args.extend(options)
@@ -691,6 +742,17 @@ def run_module():
         type=dict(type='str', choices=['luks1', 'luks2']),
         cipher=dict(type='str'),
         hash=dict(type='str'),
+        pbkdf=dict(
+            type='dict',
+            options=dict(
+                iteration_time=dict(type='float'),
+                iteration_count=dict(type='int'),
+                algorithm=dict(type='str', choices=['argon2i', 'argon2id', 'pbkdf2']),
+                memory=dict(type='int'),
+                parallel=dict(type='int'),
+            ),
+            mutually_exclusive=[('iteration_time', 'iteration_count')],
+        ),
     )
 
     mutually_exclusive = [
@@ -738,6 +800,7 @@ def run_module():
                                       module.params['keysize'],
                                       module.params['cipher'],
                                       module.params['hash'],
+                                      module.params['pbkdf'],
                                       )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)

@@ -4,6 +4,8 @@
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   become: yes
 
 # Access: keyfile1

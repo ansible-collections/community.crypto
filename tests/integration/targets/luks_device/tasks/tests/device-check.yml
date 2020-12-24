@@ -4,6 +4,8 @@
     device: /dev/asdfasdfasdf
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   check_mode: yes
   ignore_errors: yes
   become: yes
@@ -13,6 +15,8 @@
     device: /dev/asdfasdfasdf
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   ignore_errors: yes
   become: yes
   register: create
@@ -28,6 +32,8 @@
     device: /tmp/
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   check_mode: yes
   ignore_errors: yes
   become: yes
@@ -37,6 +43,8 @@
     device: /tmp/
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   ignore_errors: yes
   become: yes
   register: create
