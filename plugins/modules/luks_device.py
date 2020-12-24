@@ -440,6 +440,18 @@ class CryptHandler(Handler):
         result = self._run_command([self._cryptsetup_bin, 'isLuks', device])
         return result[RETURN_CODE] == 0
 
+    def _add_pbkdf_options(self, options, pbkdf):
+        if pbkdf['iteration_time'] is not None:
+            options.extend(['--iter-time', str(int(pbkdf['iteration_time'] * 1000))])
+        if pbkdf['iteration_count'] is not None:
+            options.extend(['--pbkdf-force-iterations', str(pbkdf['iteration_count'])])
+        if pbkdf['algorithm'] is not None:
+            options.extend(['--pbkdf', pbkdf['algorithm']])
+        if pbkdf['memory'] is not None:
+            options.extend(['--pbkdf-memory', str(pbkdf['memory'])])
+        if pbkdf['parallel'] is not None:
+            options.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
+
     def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_, pbkdf):
         # create a new luks container; use batch mode to auto confirm
         luks_type = self._module.params['type']
@@ -458,16 +470,7 @@ class CryptHandler(Handler):
         if hash_ is not None:
             options.extend(['--hash', hash_])
         if pbkdf is not None:
-            if pbkdf['iteration_time'] is not None:
-                options.extend(['--iter-time', str(int(pbkdf['iteration_time'] * 1000))])
-            if pbkdf['iteration_count'] is not None:
-                options.extend(['--pbkdf-force-iterations', str(pbkdf['iteration_count'])])
-            if pbkdf['algorithm'] is not None:
-                options.extend(['--pbkdf', pbkdf['algorithm']])
-            if pbkdf['memory'] is not None:
-                options.extend(['--pbkdf-memory', str(pbkdf['memory'])])
-            if pbkdf['parallel'] is not None:
-                options.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
+            self._add_pbkdf_options(options, pbkdf)
 
         args = [self._cryptsetup_bin, 'luksFormat']
         args.extend(options)
@@ -516,16 +519,7 @@ class CryptHandler(Handler):
         data = []
         args = [self._cryptsetup_bin, 'luksAddKey', device]
         if pbkdf is not None:
-            if pbkdf['iteration_time'] is not None:
-                args.extend(['--iter-time', str(int(pbkdf['iteration_time'] * 1000))])
-            if pbkdf['iteration_count'] is not None:
-                args.extend(['--pbkdf-force-iterations', str(pbkdf['iteration_count'])])
-            if pbkdf['algorithm'] is not None:
-                args.extend(['--pbkdf', pbkdf['algorithm']])
-            if pbkdf['memory'] is not None:
-                args.extend(['--pbkdf-memory', str(pbkdf['memory'])])
-            if pbkdf['parallel'] is not None:
-                args.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
+            self._add_pbkdf_options(args, pbkdf)
 
         if keyfile:
             args.extend(['--key-file', keyfile])
