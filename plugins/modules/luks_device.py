@@ -174,7 +174,8 @@ options:
         description:
             - "This option allows the user to configure the Password-Based Key Derivation
                Function (PBKDF) used."
-            - "Will only be used on container creation."
+            - "Will only be used on container creation, and when adding keys to an existing
+               container."
         type: dict
         version_added: '1.4.0'
         suboptions:
@@ -507,13 +508,24 @@ class CryptHandler(Handler):
                              % (device, result[STDERR]))
 
     def run_luks_add_key(self, device, keyfile, passphrase, new_keyfile,
-                         new_passphrase):
+                         new_passphrase, pbkdf):
         ''' Add new key from a keyfile or passphrase to given 'device';
             authentication done using 'keyfile' or 'passphrase'.
             Raises ValueError when command fails.
         '''
         data = []
         args = [self._cryptsetup_bin, 'luksAddKey', device]
+        if pbkdf is not None:
+            if pbkdf['iteration_time'] is not None:
+                args.extend(['--iter-time', str(int(pbkdf['iteration_time'] * 1000))])
+            if pbkdf['iteration_count'] is not None:
+                args.extend(['--pbkdf-force-iterations', str(pbkdf['iteration_count'])])
+            if pbkdf['algorithm'] is not None:
+                args.extend(['--pbkdf', pbkdf['algorithm']])
+            if pbkdf['memory'] is not None:
+                args.extend(['--pbkdf-memory', str(pbkdf['memory'])])
+            if pbkdf['parallel'] is not None:
+                args.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
 
         if keyfile:
             args.extend(['--key-file', keyfile])
@@ -862,7 +874,8 @@ def run_module():
                                        module.params['keyfile'],
                                        module.params['passphrase'],
                                        module.params['new_keyfile'],
-                                       module.params['new_passphrase'])
+                                       module.params['new_passphrase'],
+                                       module.params['pbkdf'])
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['changed'] = True

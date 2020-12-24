@@ -45,6 +45,8 @@
     state: closed
     keyfile: "{{ role_path }}/files/keyfile1"
     new_keyfile: "{{ role_path }}/files/keyfile2"
+    pbkdf:
+      iteration_time: 0.1
   become: yes
   register: result_1
 
