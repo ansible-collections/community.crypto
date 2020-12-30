@@ -100,7 +100,7 @@ options:
                command specified by the user when the certificate is used for authentication."
             - "C(no-agent-forwarding): Disable ssh-agent forwarding (permitted by default)."
             - "C(no-port-forwarding): Disable port forwarding (permitted by default)."
-            - "C(no-pty Disable): PTY allocation (permitted by default)."
+            - "C(no-pty): Disable PTY allocation (permitted by default)."
             - "C(no-user-rc): Disable execution of C(~/.ssh/rc) by sshd (permitted by default)."
             - "C(no-x11-forwarding): Disable X11 forwarding (permitted by default)"
             - "C(permit-agent-forwarding): Allows ssh-agent forwarding."
