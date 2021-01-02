@@ -251,7 +251,7 @@ class CertificateSigningRequestBackend(object):
 # Implementation with using pyOpenSSL
 class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend):
     def __init__(self, module):
-        if o in ('create_subject_key_identifier', ):
+        for o in ('create_subject_key_identifier', ):
             if module.params[o]:
                 module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
         for o in ('subject_key_identifier', 'authority_key_identifier', 'authority_cert_issuer', 'authority_cert_serial_number', 'crl_distribution_points'):
