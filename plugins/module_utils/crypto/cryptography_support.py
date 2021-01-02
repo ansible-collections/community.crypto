@@ -152,6 +152,36 @@ def _parse_hex(bytesstr):
     return data
 
 
+DN_COMPONENT_START_RE = re.compile(r'^ *([a-zA-z0-9]+) *= *')
+
+
+def _parse_dn_component(name, sep=',', sep_str='\\', decode_remainder=True):
+    m = DN_COMPONENT_START_RE.match(name)
+    if not m:
+        raise OpenSSLObjectError('cannot start part in "{0}"'.format(name))
+    oid = cryptography_name_to_oid(m.group(1))
+    idx = len(m.group(0))
+    decoded_name = []
+    if decode_remainder:
+        length = len(name)
+        while idx < length:
+            i = idx
+            while i < length and name[i] not in sep_str:
+                i += 1
+            if i > idx:
+                decoded_name.append(name[idx:i])
+                idx = i
+            while idx + 1 < length and name[idx] == '\\':
+                decoded_name.append(name[idx + 1])
+                idx += 2
+            if idx < length and name[idx] == sep:
+                break
+    else:
+        decoded_name.append(name[idx:])
+        idx = len(name)
+    return x509.NameAttribute(oid, ''.join(decoded_name)), name[idx:]
+
+
 def _parse_dn(name):
     '''
     Parse a Distinguished Name.
@@ -166,34 +196,27 @@ def _parse_dn(name):
         name = name[1:]
     sep_str = sep + '\\'
     result = []
-    start_re = re.compile(r'^ *([a-zA-z0-9]+) *= *')
     while name:
-        m = start_re.match(name)
-        if not m:
-            raise OpenSSLObjectError('Error while parsing distinguished name "{0}": cannot start part in "{1}"'.format(original_name, name))
-        oid = cryptography_name_to_oid(m.group(1))
-        idx = len(m.group(0))
-        decoded_name = []
-        length = len(name)
-        while idx < length:
-            i = idx
-            while i < length and name[i] not in sep_str:
-                i += 1
-            if i > idx:
-                decoded_name.append(name[idx:i])
-                idx = i
-            while idx + 1 < length and name[idx] == '\\':
-                decoded_name.append(name[idx + 1])
-                idx += 2
-            if idx < length and name[idx] == sep:
-                break
-        result.append(x509.NameAttribute(oid, ''.join(decoded_name)))
-        name = name[idx:]
+        try:
+            attribute, name = _parse_dn_component(name, sep=sep, sep_str=sep_str)
+        except OpenSSLObjectError as e:
+            raise OpenSSLObjectError('Error while parsing distinguished name "{0}": {1}'.format(original_name, e))
+        result.append(attribute)
         if name:
             if name[0] != sep or len(name) < 2:
                 raise OpenSSLObjectError('Error while parsing distinguished name "{0}": unexpected end of string'.format(original_name))
             name = name[1:]
     return result
+
+
+def cryptography_parse_relative_distinguished_name(rdn):
+    names = []
+    for part in rdn:
+        try:
+            names.append(_parse_dn_component(part, decode_remainder=False)[0])
+        except OpenSSLObjectError as e:
+            raise OpenSSLObjectError('Error while parsing relative distinguished name "{0}": {1}'.format(part, e))
+    return cryptography.x509.RelativeDistinguishedName(names)
 
 
 def cryptography_get_name(name, what='Subject Alternative Name'):
