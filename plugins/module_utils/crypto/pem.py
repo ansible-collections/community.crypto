@@ -54,3 +54,22 @@ def identify_private_key_format(content):
     except UnicodeDecodeError:
         pass
     return 'raw'
+
+
+def split_pem_list(text):
+    '''
+    Split concatenated PEM objects into a list of strings, where each is one PEM object.
+    '''
+    result = []
+    lines = text.splitlines(True)
+    current = None
+    for line in lines:
+        if line.strip():
+            if line.startswith('-----BEGIN '):
+                current = [line]
+            elif current is not None:
+                current.append(line)
+                if line.startswith('-----END '):
+                    result.append(''.join(current))
+                    current = None
+    return result
