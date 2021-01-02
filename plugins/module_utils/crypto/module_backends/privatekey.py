@@ -33,7 +33,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     get_fingerprint_of_privatekey,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.identify import (
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_private_key_format,
 )
 

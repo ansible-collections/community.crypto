@@ -404,7 +404,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_get_signature_algorithm_oid_from_crl,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.identify import (
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_pem_format,
 )
 
