@@ -275,9 +275,12 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
 
     monkeypatch.setattr(luks_device.Handler, "get_device_by_label",
                         lambda x, y: [0, "/dev/dummy", ""])
+    monkeypatch.setattr(luks_device.CryptHandler, "luks_test_key",
+                        lambda x, y, z, w: False)
 
+    crypt = luks_device.CryptHandler(module)
     try:
-        conditions = luks_device.ConditionsHandler(module, module)
+        conditions = luks_device.ConditionsHandler(module, crypt)
         assert conditions.luks_add_key() == expected
     except ValueError:
         assert expected == "exception"
@@ -301,6 +304,8 @@ def test_luks_remove_key(device, remove_keyfile, remove_passphrase, state,
                         lambda x, y: [0, "/dev/dummy", ""])
     monkeypatch.setattr(luks_device.Handler, "_run_command",
                         lambda x, y: [0, device, ""])
+    monkeypatch.setattr(luks_device.CryptHandler, "luks_test_key",
+                        lambda x, y, z, w: True)
 
     crypt = luks_device.CryptHandler(module)
     try:

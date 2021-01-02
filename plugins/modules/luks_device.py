@@ -522,6 +522,28 @@ class CryptHandler(Handler):
             raise ValueError('Error while removing LUKS key from %s: %s'
                              % (device, result[STDERR]))
 
+    def luks_test_key(self, device, keyfile, passphrase):
+        ''' Check whether the keyfile or passphrase works.
+            Raises ValueError when command fails.
+        '''
+        data = None
+        args = [self._cryptsetup_bin, 'luksOpen', '--test-passphrase', device]
+
+        if keyfile:
+            args.extend(['--key-file', keyfile])
+        else:
+            data = passphrase
+
+        result = self._run_command(args, data=data)
+        if result[RETURN_CODE] == 0:
+            return True
+        for output in (STDOUT, STDERR):
+            if 'No key available with this passphrase' in result[output]:
+                return False
+
+        raise ValueError('Error while testing whether keyslot exists on %s: %s'
+                         % (device, result[STDERR]))
+
 
 class ConditionsHandler(Handler):
 
@@ -629,7 +651,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "add a key to absent LUKS.")
 
-        return True
+        return not self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
 
     def luks_remove_key(self):
         if (self.device is None or
@@ -642,7 +664,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "remove a key from absent LUKS.")
 
-        return True
+        return self._crypthandler.luks_test_key(self.device, self._module.params['remove_keyfile'], self._module.params['remove_passphrase'])
 
     def luks_remove(self):
         return (self.device is not None and
