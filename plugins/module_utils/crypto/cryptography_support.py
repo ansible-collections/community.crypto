@@ -213,7 +213,7 @@ def cryptography_parse_relative_distinguished_name(rdn):
     names = []
     for part in rdn:
         try:
-            names.append(_parse_dn_component(part, decode_remainder=False)[0])
+            names.append(_parse_dn_component(to_text(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError('Error while parsing relative distinguished name "{0}": {1}'.format(part, e))
     return cryptography.x509.RelativeDistinguishedName(names)
