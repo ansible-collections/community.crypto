@@ -526,6 +526,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    split_pem_list,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ModuleFailException,
     write_file,
@@ -823,17 +827,10 @@ class ACMEClient(object):
         chain = []
 
         # Parse data
-        lines = content.decode('utf-8').splitlines(True)
-        current = []
-        for line in lines:
-            if line.strip():
-                current.append(line)
-            if line.startswith('-----END CERTIFICATE-----'):
-                if cert is None:
-                    cert = ''.join(current)
-                else:
-                    chain.append(''.join(current))
-                current = []
+        certs = split_pem_list(content.decode('utf-8'), keep_inbetween=True)
+        if certs:
+            cert = certs[0]
+            chain = certs[1:]
 
         alternates = []
 
