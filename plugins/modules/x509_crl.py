@@ -501,7 +501,7 @@ class CRL(OpenSSLObject):
                 result['serial_number'] = rc['serial_number']
             # All other options
             if rc['issuer']:
-                result['issuer'] = [cryptography_get_name(issuer) for issuer in rc['issuer']]
+                result['issuer'] = [cryptography_get_name(issuer, 'issuer') for issuer in rc['issuer']]
                 result['issuer_critical'] = rc['issuer_critical']
             result['revocation_date'] = get_relative_time_option(
                 rc['revocation_date'],
@@ -647,7 +647,7 @@ class CRL(OpenSSLObject):
             if entry['issuer'] is not None:
                 revoked_cert = revoked_cert.add_extension(
                     x509.CertificateIssuer([
-                        cryptography_get_name(name) for name in entry['issuer']
+                        cryptography_get_name(name, 'issuer') for name in entry['issuer']
                     ]),
                     entry['issuer_critical']
                 )

@@ -196,9 +196,9 @@ def _parse_dn(name):
     return result
 
 
-def cryptography_get_name(name):
+def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
-    Given a name string, returns a cryptography x509.Name object.
+    Given a name string, returns a cryptography x509.GeneralName object.
     Raises an OpenSSLObjectError if the name is unknown or cannot be parsed.
     '''
     try:
@@ -216,7 +216,7 @@ def cryptography_get_name(name):
         if name.startswith('RID:'):
             m = re.match(r'^([0-9]+(?:\.[0-9]+)*)$', to_text(name[4:]))
             if not m:
-                raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}"'.format(name))
+                raise OpenSSLObjectError('Cannot parse {what} "{name}"'.format(name=name, what=what))
             return x509.RegisteredID(x509.oid.ObjectIdentifier(m.group(1)))
         if name.startswith('otherName:'):
             # otherName can either be a raw ASN.1 hex string or in the format that OpenSSL works with.
@@ -228,9 +228,9 @@ def cryptography_get_name(name):
             # defailts on the format expected.
             name = to_text(name[10:], errors='surrogate_or_strict')
             if ';' not in name:
-                raise OpenSSLObjectError('Cannot parse Subject Alternative Name otherName "{0}", must be in the '
+                raise OpenSSLObjectError('Cannot parse {what} otherName "{name}", must be in the '
                                          'format "otherName:<OID>;<ASN.1 OpenSSL Encoded String>" or '
-                                         '"otherName:<OID>;<hex string>"'.format(name))
+                                         '"otherName:<OID>;<hex string>"'.format(name=name, what=what))
 
             oid, value = name.split(';', 1)
             b_value = serialize_asn1_string_as_der(value)
@@ -238,10 +238,10 @@ def cryptography_get_name(name):
         if name.startswith('dirName:'):
             return x509.DirectoryName(x509.Name(_parse_dn(to_text(name[8:]))))
     except Exception as e:
-        raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}": {1}'.format(name, e))
+        raise OpenSSLObjectError('Cannot parse {what} "{name}": {error}'.format(name=name, what=what, error=e))
     if ':' not in name:
-        raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}" (forgot "DNS:" prefix?)'.format(name))
-    raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}" (potentially unsupported by cryptography backend)'.format(name))
+        raise OpenSSLObjectError('Cannot parse {what} "{name}" (forgot "DNS:" prefix?)'.format(name=name, what=what))
+    raise OpenSSLObjectError('Cannot parse {what} "{name}" (potentially unsupported by cryptography backend)'.format(name=name, what=what))
 
 
 def _dn_escape_value(value):
@@ -258,7 +258,7 @@ def _dn_escape_value(value):
 
 def cryptography_decode_name(name):
     '''
-    Given a cryptography x509.Name object, returns a string.
+    Given a cryptography x509.GeneralName object, returns a string.
     Raises an OpenSSLObjectError if the name is not supported.
     '''
     if isinstance(name, x509.DNSName):

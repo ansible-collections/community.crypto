@@ -245,8 +245,9 @@ class CertificateSigningRequestBackend(object):
 # Implementation with using pyOpenSSL
 class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend):
     def __init__(self, module):
-        if module.params['create_subject_key_identifier']:
-            module.fail_json(msg='You cannot use create_subject_key_identifier with the pyOpenSSL backend!')
+        if o in ('create_subject_key_identifier', ):
+            if module.params[o]:
+                module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
         for o in ('subject_key_identifier', 'authority_key_identifier', 'authority_cert_issuer', 'authority_cert_serial_number'):
             if module.params[o] is not None:
                 module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
@@ -460,8 +461,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         if self.name_constraints_permitted or self.name_constraints_excluded:
             try:
                 csr = csr.add_extension(cryptography.x509.NameConstraints(
-                    [cryptography_get_name(name) for name in self.name_constraints_permitted],
-                    [cryptography_get_name(name) for name in self.name_constraints_excluded],
+                    [cryptography_get_name(name, 'name constraints permitted') for name in self.name_constraints_permitted],
+                    [cryptography_get_name(name, 'name constraints excluded') for name in self.name_constraints_excluded],
                 ), critical=self.name_constraints_critical)
             except TypeError as e:
                 raise OpenSSLObjectError('Error while parsing name constraint: {0}'.format(e))
@@ -477,7 +478,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         if self.authority_key_identifier is not None or self.authority_cert_issuer is not None or self.authority_cert_serial_number is not None:
             issuers = None
             if self.authority_cert_issuer is not None:
-                issuers = [cryptography_get_name(n) for n in self.authority_cert_issuer]
+                issuers = [cryptography_get_name(n, 'authority cert issuer') for n in self.authority_cert_issuer]
             csr = csr.add_extension(
                 cryptography.x509.AuthorityKeyIdentifier(self.authority_key_identifier, issuers, self.authority_cert_serial_number),
                 critical=False
@@ -606,8 +607,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             current_nc_ext = _find_extension(extensions, cryptography.x509.NameConstraints)
             current_nc_perm = [str(altname) for altname in current_nc_ext.value.permitted_subtrees] if current_nc_ext else []
             current_nc_excl = [str(altname) for altname in current_nc_ext.value.excluded_subtrees] if current_nc_ext else []
-            nc_perm = [str(cryptography_get_name(altname)) for altname in self.name_constraints_permitted]
-            nc_excl = [str(cryptography_get_name(altname)) for altname in self.name_constraints_excluded]
+            nc_perm = [str(cryptography_get_name(altname, 'name constraints permitted')) for altname in self.name_constraints_permitted]
+            nc_excl = [str(cryptography_get_name(altname, 'name constraints excluded')) for altname in self.name_constraints_excluded]
             if set(nc_perm) != set(current_nc_perm) or set(nc_excl) != set(current_nc_excl):
                 return False
             if nc_perm or nc_excl:
@@ -636,7 +637,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 aci = None
                 csr_aci = None
                 if self.authority_cert_issuer is not None:
-                    aci = [str(cryptography_get_name(n)) for n in self.authority_cert_issuer]
+                    aci = [str(cryptography_get_name(n, 'authority cert issuer')) for n in self.authority_cert_issuer]
                 if ext.value.authority_cert_issuer is not None:
                     csr_aci = [str(n) for n in ext.value.authority_cert_issuer]
                 return (ext.value.key_identifier == self.authority_key_identifier
