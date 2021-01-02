@@ -846,7 +846,7 @@ class ACMEClient(object):
 
         process_links(info, f)
 
-        if cert is None or current:
+        if cert is None:
             raise ModuleFailException("Failed to parse certificate chain download from {0}: {1} (headers: {2})".format(url, content, info))
         return {'cert': cert, 'chain': chain, 'alternates': alternates}
 
