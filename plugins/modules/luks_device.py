@@ -81,9 +81,10 @@ options:
               Needs I(keyfile) or I(passphrase) option for authorization.
               LUKS container supports up to 8 keyslots. Parameter value
               is the path to the keyfile with the passphrase."
-            - "NOTE that adding additional keys is *not idempotent*.
-              A new keyslot will be used even if another keyslot already
-              exists for this keyfile."
+            - "NOTE that adding additional keys is idempotent only since
+              community.crypto 1.4.0. For older versions, a new keyslot
+              will be used even if another keyslot already exists for this
+              keyfile."
             - "BEWARE that working with keyfiles in plaintext is dangerous.
               Make sure that they are protected."
         type: path
@@ -93,9 +94,9 @@ options:
               Needs I(keyfile) or I(passphrase) option for authorization. LUKS
               container supports up to 8 keyslots. Parameter value is a string
               with the new passphrase."
-            - "NOTE that adding additional passphrase is *not idempotent*.  A
-              new keyslot will be used even if another keyslot already exists
-              for this passphrase."
+            - "NOTE that adding additional passphrase is idempotent only since
+              community.crypto 1.4.0. For older versions, a new keyslot will
+              be used even if another keyslot already exists for this passphrase."
         type: str
         version_added: '1.0.0'
     remove_keyfile:
@@ -103,7 +104,8 @@ options:
             - "Removes given key from the container on I(device). Does not
               remove the keyfile from filesystem.
               Parameter value is the path to the keyfile with the passphrase."
-            - "NOTE that removing keys is *not idempotent*. Trying to remove
+            - "NOTE that removing keys is idempotent only since
+              community.crypto 1.4.0. For older versions, trying to remove
               a key which no longer exists results in an error."
             - "NOTE that to remove the last key from a LUKS container, the
               I(force_remove_last_key) option must be set to C(yes)."
@@ -114,9 +116,9 @@ options:
         description:
             - "Removes given passphrase from the container on I(device).
               Parameter value is a string with the passphrase to remove."
-            - "NOTE that removing passphrases is I(not
-              idempotent). Trying to remove a passphrase which no longer
-              exists results in an error."
+            - "NOTE that removing passphrases is idempotent only since
+              community.crypto 1.4.0. For older versions, trying to remove
+              a passphrase which no longer exists results in an error."
             - "NOTE that to remove the last keyslot from a LUKS
               container, the I(force_remove_last_key) option must be set
               to C(yes)."

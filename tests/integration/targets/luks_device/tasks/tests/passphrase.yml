@@ -56,6 +56,21 @@
     passphrase: "{{ cryptfile_passphrase1 }}"
     new_passphrase: "{{ cryptfile_passphrase2 }}"
   become: yes
+  register: result_1
+
+- name: Give access to passphrase2 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ cryptfile_passphrase1 }}"
+    new_passphrase: "{{ cryptfile_passphrase2 }}"
+  become: yes
+  register: result_2
+
+- assert:
+    that:
+      - result_1 is changed
+      - result_2 is not changed
 
 - name: Open with passphrase2
   luks_device:
@@ -130,6 +145,20 @@
     state: closed
     remove_passphrase: "{{ cryptfile_passphrase1 }}"
   become: yes
+  register: result_1
+
+- name: Remove access for passphrase1 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    remove_passphrase: "{{ cryptfile_passphrase1 }}"
+  become: yes
+  register: result_2
+
+- assert:
+    that:
+      - result_1 is changed
+      - result_2 is not changed
 
 - name: Try to open with passphrase1
   luks_device:
