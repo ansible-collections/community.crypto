@@ -902,3 +902,96 @@
           ignore_errors: yes
 
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')
+
+- name: "({{ select_crypto_backend }}) CRL distribution endpoints (for cryptography >= 1.6)"
+  block:
+    - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints"
+      openssl_csr:
+        path: '{{ output_dir }}/csr_crl_d_e.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: www.ansible.com
+        crl_distribution_points:
+          - full_name:
+              - "URI:https://ca.example.com/revocations.crl"
+            crl_issuer:
+              - "URI:https://ca.example.com/"
+            reasons:
+              - key_compromise
+              - ca_compromise
+              - cessation_of_operation
+          - relative_name:
+              - CN=ca.example.com
+            reasons:
+              - certificate_hold
+          - {}
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      register: crl_distribution_endpoints_1
+
+    - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (idempotence)"
+      openssl_csr:
+        path: '{{ output_dir }}/csr_crl_d_e.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: www.ansible.com
+        crl_distribution_points:
+          - full_name:
+              - "URI:https://ca.example.com/revocations.crl"
+            crl_issuer:
+              - "URI:https://ca.example.com/"
+            reasons:
+              - key_compromise
+              - ca_compromise
+              - cessation_of_operation
+          - relative_name:
+              - CN=ca.example.com
+            reasons:
+              - certificate_hold
+          - {}
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      register: crl_distribution_endpoints_2
+
+    - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (change)"
+      openssl_csr:
+        path: '{{ output_dir }}/csr_crl_d_e.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: www.ansible.com
+        crl_distribution_points:
+          - full_name:
+              - "URI:https://ca.example.com/revocations.crl"
+            crl_issuer:
+              - "URI:https://ca.example.com/"
+            reasons:
+              - key_compromise
+              - ca_compromise
+              - cessation_of_operation
+          - relative_name:
+              - CN=ca.example.com
+            reasons:
+              - certificate_hold
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      register: crl_distribution_endpoints_3
+
+    - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (no endpoints)"
+      openssl_csr:
+        path: '{{ output_dir }}/csr_crl_d_e.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: www.ansible.com
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      register: crl_distribution_endpoints_4
+
+    - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints"
+      openssl_csr:
+        path: '{{ output_dir }}/csr_crl_d_e.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: www.ansible.com
+        crl_distribution_points:
+          - full_name:
+              - "URI:https://ca.example.com/revocations.crl"
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      register: crl_distribution_endpoints_5
+
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.6', '>=')

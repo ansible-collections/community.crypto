@@ -260,6 +260,48 @@ options:
             - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: int
+    crl_distribution_points:
+        description:
+            - Allows to specify one or multiple CRL distribution points.
+            - Only supported by the C(cryptography) backend.
+        type: list
+        elements: dict
+        suboptions:
+            full_name:
+                description:
+                    - Describes how the CRL can be retrieved.
+                    - Mutually exclusive with I(relative_name).
+                    - "Example: C(URI:https://ca.example.com/revocations.crl)."
+                type: list
+                elements: str
+            relative_name:
+                description:
+                    - Describes how the CRL can be retrieved relative to the CRL issuer.
+                    - Mutually exclusive with I(full_name).
+                    - "Example: C(/CN=example.com)."
+                    - Can only be used when cryptography >= 1.6 is installed.
+                type: list
+                elements: str
+            crl_issuer:
+                description:
+                    - Information about the issuer of the CRL.
+                type: list
+                elements: str
+            reasons:
+                description:
+                    - List of reasons that this distribution point can be used for when performing revocation checks.
+                type: list
+                elements: str
+                choices:
+                    - key_compromise
+                    - ca_compromise
+                    - affiliation_changed
+                    - superseded
+                    - cessation_of_operation
+                    - certificate_hold
+                    - privilege_withdrawn
+                    - aa_compromise
+        version_added: 1.4.0
 notes:
     - If the certificate signing request already exists it will be checked whether subjectAltName,
       keyUsage, extendedKeyUsage and basicConstraints only contain the requested values, whether

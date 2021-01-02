@@ -36,6 +36,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
     cryptography_key_needs_digest_for_signing,
     cryptography_parse_key_usage_params,
+    cryptography_parse_relative_distinguished_name,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    REVOCATION_REASON_MAP,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
@@ -128,6 +133,7 @@ class CertificateSigningRequestBackend(object):
         self.authority_key_identifier = module.params['authority_key_identifier']
         self.authority_cert_issuer = module.params['authority_cert_issuer']
         self.authority_cert_serial_number = module.params['authority_cert_serial_number']
+        self.crl_distribution_points = module.params['crl_distribution_points']
         self.csr = None
         self.privatekey = None
 
@@ -248,7 +254,7 @@ class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend
         if o in ('create_subject_key_identifier', ):
             if module.params[o]:
                 module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
-        for o in ('subject_key_identifier', 'authority_key_identifier', 'authority_cert_issuer', 'authority_cert_serial_number'):
+        for o in ('subject_key_identifier', 'authority_key_identifier', 'authority_cert_issuer', 'authority_cert_serial_number', 'crl_distribution_points'):
             if module.params[o] is not None:
                 module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
         super(CertificateSigningRequestPyOpenSSLBackend, self).__init__(module, 'pyopenssl')
@@ -410,6 +416,39 @@ class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend
         return _check_subject(self.existing_csr) and _check_extensions(self.existing_csr) and _check_signature(self.existing_csr)
 
 
+def parse_crl_distribution_points(module, crl_distribution_points):
+    result = []
+    for index, parse_crl_distribution_point in enumerate(crl_distribution_points):
+        try:
+            params = dict(
+                full_name=None,
+                relative_name=None,
+                crl_issuer=None,
+                reasons=None,
+            )
+            if parse_crl_distribution_point['full_name'] is not None:
+                params['full_name'] = [cryptography_get_name(name, 'full name') for name in parse_crl_distribution_point['full_name']]
+            if parse_crl_distribution_point['relative_name'] is not None:
+                try:
+                    params['relative_name'] = cryptography_parse_relative_distinguished_name(parse_crl_distribution_point['relative_name'])
+                except Exception:
+                    # If cryptography's version is < 1.6, the error is probably caused by that
+                    if CRYPTOGRAPHY_VERSION < LooseVersion('1.6'):
+                        raise OpenSSLObjectError('Cannot specify relative_name for cryptography < 1.6')
+                    raise
+            if parse_crl_distribution_point['crl_issuer'] is not None:
+                params['crl_issuer'] = [cryptography_get_name(name, 'CRL issuer') for name in parse_crl_distribution_point['crl_issuer']]
+            if parse_crl_distribution_point['reasons'] is not None:
+                reasons = []
+                for reason in parse_crl_distribution_point['reasons']:
+                    reasons.append(REVOCATION_REASON_MAP[reason])
+                params['reasons'] = frozenset(reasons)
+            result.append(cryptography.x509.DistributionPoint(**params))
+        except OpenSSLObjectError as e:
+            raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
+    return result
+
+
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, module):
@@ -417,6 +456,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         self.cryptography_backend = cryptography.hazmat.backends.default_backend()
         if self.version != 1:
             module.warn('The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)')
+
+        if self.crl_distribution_points:
+            self.crl_distribution_points = parse_crl_distribution_points(module, self.crl_distribution_points)
 
     def generate_csr(self):
         """(Re-)Generate CSR."""
@@ -481,6 +523,12 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 issuers = [cryptography_get_name(n, 'authority cert issuer') for n in self.authority_cert_issuer]
             csr = csr.add_extension(
                 cryptography.x509.AuthorityKeyIdentifier(self.authority_key_identifier, issuers, self.authority_cert_serial_number),
+                critical=False
+            )
+
+        if self.crl_distribution_points:
+            csr = csr.add_extension(
+                cryptography.x509.CRLDistributionPoints(self.crl_distribution_points),
                 critical=False
             )
 
@@ -646,12 +694,21 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return ext is None
 
+        def _check_crl_distribution_points(extensions):
+            ext = _find_extension(extensions, cryptography.x509.CRLDistributionPoints)
+            if self.crl_distribution_points is None:
+                return ext is None
+            if not ext:
+                return False
+            return list(ext.value) == self.crl_distribution_points
+
         def _check_extensions(csr):
             extensions = csr.extensions
             return (_check_subjectAltName(extensions) and _check_keyUsage(extensions) and
                     _check_extenededKeyUsage(extensions) and _check_basicConstraints(extensions) and
                     _check_ocspMustStaple(extensions) and _check_subject_key_identifier(extensions) and
-                    _check_authority_key_identifier(extensions) and _check_nameConstraints(extensions))
+                    _check_authority_key_identifier(extensions) and _check_nameConstraints(extensions) and
+                    _check_crl_distribution_points(extensions))
 
         def _check_signature(csr):
             if not csr.is_signature_valid:
@@ -751,6 +808,26 @@ def get_csr_argument_spec():
             authority_key_identifier=dict(type='str'),
             authority_cert_issuer=dict(type='list', elements='str'),
             authority_cert_serial_number=dict(type='int'),
+            crl_distribution_points=dict(
+                type='list',
+                elements='dict',
+                options=dict(
+                    full_name=dict(type='list', elements='str'),
+                    relative_name=dict(type='list', elements='str'),
+                    crl_issuer=dict(type='list', elements='str'),
+                    reasons=dict(type='list', elements='str', choices=[
+                        'key_compromise',
+                        'ca_compromise',
+                        'affiliation_changed',
+                        'superseded',
+                        'cessation_of_operation',
+                        'certificate_hold',
+                        'privilege_withdrawn',
+                        'aa_compromise',
+                    ]),
+                ),
+                mutually_exclusive=[('full_name', 'relative_name')]
+            ),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
         ),
         required_together=[
