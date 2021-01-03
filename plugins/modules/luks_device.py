@@ -81,9 +81,10 @@ options:
               Needs I(keyfile) or I(passphrase) option for authorization.
               LUKS container supports up to 8 keyslots. Parameter value
               is the path to the keyfile with the passphrase."
-            - "NOTE that adding additional keys is *not idempotent*.
-              A new keyslot will be used even if another keyslot already
-              exists for this keyfile."
+            - "NOTE that adding additional keys is idempotent only since
+              community.crypto 1.4.0. For older versions, a new keyslot
+              will be used even if another keyslot already exists for this
+              keyfile."
             - "BEWARE that working with keyfiles in plaintext is dangerous.
               Make sure that they are protected."
         type: path
@@ -93,9 +94,9 @@ options:
               Needs I(keyfile) or I(passphrase) option for authorization. LUKS
               container supports up to 8 keyslots. Parameter value is a string
               with the new passphrase."
-            - "NOTE that adding additional passphrase is *not idempotent*.  A
-              new keyslot will be used even if another keyslot already exists
-              for this passphrase."
+            - "NOTE that adding additional passphrase is idempotent only since
+              community.crypto 1.4.0. For older versions, a new keyslot will
+              be used even if another keyslot already exists for this passphrase."
         type: str
         version_added: '1.0.0'
     remove_keyfile:
@@ -103,7 +104,8 @@ options:
             - "Removes given key from the container on I(device). Does not
               remove the keyfile from filesystem.
               Parameter value is the path to the keyfile with the passphrase."
-            - "NOTE that removing keys is *not idempotent*. Trying to remove
+            - "NOTE that removing keys is idempotent only since
+              community.crypto 1.4.0. For older versions, trying to remove
               a key which no longer exists results in an error."
             - "NOTE that to remove the last key from a LUKS container, the
               I(force_remove_last_key) option must be set to C(yes)."
@@ -114,9 +116,9 @@ options:
         description:
             - "Removes given passphrase from the container on I(device).
               Parameter value is a string with the passphrase to remove."
-            - "NOTE that removing passphrases is I(not
-              idempotent). Trying to remove a passphrase which no longer
-              exists results in an error."
+            - "NOTE that removing passphrases is idempotent only since
+              community.crypto 1.4.0. For older versions, trying to remove
+              a passphrase which no longer exists results in an error."
             - "NOTE that to remove the last keyslot from a LUKS
               container, the I(force_remove_last_key) option must be set
               to C(yes)."
@@ -520,6 +522,28 @@ class CryptHandler(Handler):
             raise ValueError('Error while removing LUKS key from %s: %s'
                              % (device, result[STDERR]))
 
+    def luks_test_key(self, device, keyfile, passphrase):
+        ''' Check whether the keyfile or passphrase works.
+            Raises ValueError when command fails.
+        '''
+        data = None
+        args = [self._cryptsetup_bin, 'luksOpen', '--test-passphrase', device]
+
+        if keyfile:
+            args.extend(['--key-file', keyfile])
+        else:
+            data = passphrase
+
+        result = self._run_command(args, data=data)
+        if result[RETURN_CODE] == 0:
+            return True
+        for output in (STDOUT, STDERR):
+            if 'No key available with this passphrase' in result[output]:
+                return False
+
+        raise ValueError('Error while testing whether keyslot exists on %s: %s'
+                         % (device, result[STDERR]))
+
 
 class ConditionsHandler(Handler):
 
@@ -627,7 +651,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "add a key to absent LUKS.")
 
-        return True
+        return not self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
 
     def luks_remove_key(self):
         if (self.device is None or
@@ -640,7 +664,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "remove a key from absent LUKS.")
 
-        return True
+        return self._crypthandler.luks_test_key(self.device, self._module.params['remove_keyfile'], self._module.params['remove_passphrase'])
 
     def luks_remove(self):
         return (self.device is not None and
