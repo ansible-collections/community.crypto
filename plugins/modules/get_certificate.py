@@ -18,7 +18,7 @@ description:
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL
       backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
-    - Support SNI only with python >= 2.7 (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication))
+    - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with python >= 2.7.
 options:
     host:
       description:
