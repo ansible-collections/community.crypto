@@ -305,9 +305,6 @@ def main():
                 ctx.check_hostname = False
                 ctx.verify_mode = CERT_NONE
 
-            if not server_name:
-                server_name = host
-
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
