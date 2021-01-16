@@ -37,7 +37,7 @@ options:
       required: true
     server_name:
       description:
-       - Server name used for SNI when hostname is an ip or is different from server name
+       - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname is an IP or is different from server name.
       type: str
       version_added: 1.4.0
     proxy_host:
