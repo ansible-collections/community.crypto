@@ -35,6 +35,10 @@ options:
         - The port to connect to
       type: int
       required: true
+    server_name:
+      description:
+       - Server name used for SNI when hostname is an ip or is different from server name
+      type: str
     proxy_host:
       description:
         - Proxy host used when get a certificate.
@@ -211,6 +215,7 @@ def main():
             port=dict(type='int', required=True),
             proxy_host=dict(type='str'),
             proxy_port=dict(type='int', default=8080),
+            server_name=dict(type='str'),
             timeout=dict(type='int', default=10),
             select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
         ),
@@ -222,6 +227,7 @@ def main():
     proxy_host = module.params.get('proxy_host')
     proxy_port = module.params.get('proxy_port')
     timeout = module.params.get('timeout')
+    server_name = module.params.get('server_name')
 
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':
@@ -297,7 +303,10 @@ def main():
                 ctx.check_hostname = False
                 ctx.verify_mode = CERT_NONE
 
-            cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
+            if not server_name:
+                server_name = host
+                         
+            cert = ctx.wrap_socket(sock, server_hostname=server_name).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
             if proxy_host:
