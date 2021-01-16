@@ -1,4 +1,38 @@
 ---
+- name: Get servers certificate for SNI test part 1
+  get_certificate:
+    host: "{{ httpbin_host }}"
+    port: 443
+    server_name: "{{ sni_host }}"
+  register: result
+
+- debug: var=result
+
+- assert:
+    that:
+      # This module should never change anything
+      - result is not changed
+      - result is not failed
+      # We got the correct ST from the cert
+      - "'{{ sni_host }}' == result.subject.CN"
+
+- name: Get servers certificate for SNI test part 2
+  get_certificate:
+    host: "{{ sni_host }}"
+    port: 443
+    server_name: "{{ httpbin_host }}"
+  register: result
+
+- debug: var=result
+
+- assert:
+    that:
+      # This module should never change anything
+      - result is not changed
+      - result is not failed
+      # We got the correct ST from the cert
+      - "'{{ httpbin_host }}' == result.subject.CN"
+
 - name: Get servers certificate
   get_certificate:
     host: "{{ httpbin_host }}"
