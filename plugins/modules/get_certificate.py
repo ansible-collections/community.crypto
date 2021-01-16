@@ -37,7 +37,8 @@ options:
       required: true
     server_name:
       description:
-       - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname is an IP or is different from server name.
+       - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
+         is an IP or is different from server name.
       type: str
       version_added: 1.4.0
     proxy_host:
@@ -306,7 +307,7 @@ def main():
 
             if not server_name:
                 server_name = host
-                         
+
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
