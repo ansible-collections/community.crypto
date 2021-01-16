@@ -39,6 +39,7 @@ options:
       description:
        - Server name used for SNI when hostname is an ip or is different from server name
       type: str
+      version_added: 1.4.0
     proxy_host:
       description:
         - Proxy host used when get a certificate.
