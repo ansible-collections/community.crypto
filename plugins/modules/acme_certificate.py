@@ -738,11 +738,13 @@ class ACMEClient(object):
         Validate the authorization provided in the auth dict. Returns True
         when the validation was successful and False when it was not.
         '''
+        found_challenge = False
         for challenge in auth['challenges']:
             if self.challenge != challenge['type']:
                 continue
 
             uri = challenge['uri'] if self.version == 1 else challenge['url']
+            found_challenge = True
 
             challenge_response = {}
             if self.version == 1:
@@ -754,6 +756,10 @@ class ACMEClient(object):
             result, info = self.account.send_signed_request(uri, challenge_response)
             if info['status'] not in [200, 202]:
                 raise ModuleFailException("Error validating challenge: CODE: {0} RESULT: {1}".format(info['status'], result))
+
+        if not found_challenge:
+            raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
+                self.challenge, identifier_type + ':' + identifier))
 
         status = ''
 
@@ -961,6 +967,9 @@ class ACMEClient(object):
                 continue
             # We drop the type from the key to preserve backwards compatibility
             data[identifier] = self._get_challenge_data(auth, identifier_type, identifier)
+            if self.challenge not in data[identifier]:
+                raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
+                    self.challenge, identifier_type))
         # Get DNS challenge data
         data_dns = {}
         if self.challenge == 'dns-01':
