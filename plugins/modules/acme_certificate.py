@@ -758,8 +758,8 @@ class ACMEClient(object):
                 raise ModuleFailException("Error validating challenge: CODE: {0} RESULT: {1}".format(info['status'], result))
 
         if not found_challenge:
-            raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
-                self.challenge, identifier_type + ':' + identifier))
+            raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}:{2}!".format(
+                self.challenge, identifier_type, identifier))
 
         status = ''
 
@@ -951,7 +951,7 @@ class ACMEClient(object):
             self._new_order_v2()
         self.changed = True
 
-    def get_challenges_data(self):
+    def get_challenges_data(self, first_step):
         '''
         Get challenge details for the chosen challenge type.
         Return a tuple of generic challenge details, and specialized DNS challenge details.
@@ -967,9 +967,9 @@ class ACMEClient(object):
                 continue
             # We drop the type from the key to preserve backwards compatibility
             data[identifier] = self._get_challenge_data(auth, identifier_type, identifier)
-            if self.challenge not in data[identifier]:
+            if first_step and self.challenge not in data[identifier]:
                 raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
-                    self.challenge, identifier_type))
+                    self.challenge, type_identifier))
         # Get DNS challenge data
         data_dns = {}
         if self.challenge == 'dns-01':
@@ -1256,7 +1256,8 @@ def main():
                 client = ACMEClient(module)
                 client.cert_days = cert_days
                 other = dict()
-                if client.is_first_step():
+                is_first_step = client.is_first_step()
+                if is_first_step:
                     # First run: start challenges / start new order
                     client.start_challenges()
                 else:
@@ -1269,7 +1270,7 @@ def main():
                     finally:
                         if module.params['deactivate_authzs']:
                             client.deactivate_authzs()
-                data, data_dns = client.get_challenges_data()
+                data, data_dns = client.get_challenges_data(first_step=is_first_step)
                 auths = dict()
                 for k, v in client.authorizations.items():
                     # Remove "type:" from key
