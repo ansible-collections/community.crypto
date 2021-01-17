@@ -18,7 +18,7 @@ description:
       library. By default, it tries to detect which one is available. This can be
       overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL
       backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
-    - Support SNI only with python >= 2.7
+    - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with python >= 2.7.
 options:
     host:
       description:
@@ -35,6 +35,12 @@ options:
         - The port to connect to
       type: int
       required: true
+    server_name:
+      description:
+       - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
+         is an IP or is different from server name.
+      type: str
+      version_added: 1.4.0
     proxy_host:
       description:
         - Proxy host used when get a certificate.
@@ -211,6 +217,7 @@ def main():
             port=dict(type='int', required=True),
             proxy_host=dict(type='str'),
             proxy_port=dict(type='int', default=8080),
+            server_name=dict(type='str'),
             timeout=dict(type='int', default=10),
             select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
         ),
@@ -222,6 +229,7 @@ def main():
     proxy_host = module.params.get('proxy_host')
     proxy_port = module.params.get('proxy_port')
     timeout = module.params.get('timeout')
+    server_name = module.params.get('server_name')
 
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':
@@ -297,7 +305,7 @@ def main():
                 ctx.check_hostname = False
                 ctx.verify_mode = CERT_NONE
 
-            cert = ctx.wrap_socket(sock, server_hostname=host).getpeercert(True)
+            cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
             if proxy_host:
