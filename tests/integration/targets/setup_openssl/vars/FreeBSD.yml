@@ -1,4 +1,4 @@
 ---
 openssl_package_name: openssl
 cryptography_package_name: py27-cryptography
-cryptography_package_name_python3: "{{ 'py37-cryptography' if ansible_python_version is version('3.7', '>=') else 'py36-cryptography' }}"
+cryptography_package_name_python3: "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-cryptography"
