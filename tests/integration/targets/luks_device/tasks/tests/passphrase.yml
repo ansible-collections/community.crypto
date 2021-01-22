@@ -10,6 +10,23 @@
       memory: 1000
       parallel: 1
   become: yes
+  ignore_errors: yes
+  register: create_passphrase_1
+
+- name: Make sure that the previous task only fails because the LUKS version used cannot handle the PBKDF parameters
+  assert:
+    that:
+      - create_passphrase_1 is not failed or 'Failed to set pbkdf parameters' in create_passphrase_1.msg
+
+- name: Create with passphrase1 (without argon2i)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ cryptfile_passphrase1 }}"
+    pbkdf:
+      iteration_time: 0.1
+  become: yes
+  when: create_passphrase_1 is failed and 'Failed to set pbkdf parameters' in create_passphrase_1.msg
 
 - name: Open with passphrase1
   luks_device:
