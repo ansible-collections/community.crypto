@@ -181,14 +181,14 @@ options:
         suboptions:
             iteration_time:
                 description:
-                    - "Specify the iteration time used for the PBKDF."
-                    - "Note that this is in B(seconds), not in milliseconds as on the
-                      command line."
+                    - Specify the iteration time used for the PBKDF.
+                    - Note that this is in B(seconds), not in milliseconds as on the
+                      command line.
                     - Mutually exclusive with I(iteration_count).
                 type: float
             iteration_count:
                 description:
-                    - "Specify the iteration count used for the PBKDF."
+                    - Specify the iteration count used for the PBKDF.
                     - Mutually exclusive with I(iteration_time).
                 type: int
             algorithm:
