@@ -311,7 +311,7 @@ EXAMPLES = r'''
 # - copy:
 #     dest: /var/www/{{ item.key }}/{{ item.value['http-01']['resource'] }}
 #     content: "{{ item.value['http-01']['resource_value'] }}"
-#   loop: "{{ sample_com_challenge.challenge_data | dictsort }}"
+#   loop: "{{ sample_com_challenge.challenge_data | dict2items }}"
 #   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
@@ -363,7 +363,7 @@ EXAMPLES = r'''
 #     # Note: item.value is a list of TXT entries, and route53
 #     # requires every entry to be enclosed in quotes
 #     value: "{{ item.value | map('regex_replace', '^(.*)$', '\"\\1\"' ) | list }}"
-#   loop: "{{ sample_com_challenge.challenge_data_dns | dictsort }}"
+#   loop: "{{ sample_com_challenge.challenge_data_dns | dict2items }}"
 #   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
