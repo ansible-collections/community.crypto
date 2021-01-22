@@ -7,7 +7,7 @@
     pbkdf:
       iteration_time: 0.1
       algorithm: argon2i
-      memory: 10
+      memory: 1000
       parallel: 1
   become: yes
 
