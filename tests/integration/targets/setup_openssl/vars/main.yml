@@ -4,6 +4,6 @@ default_rsa_key_size_certifiates: >-
   {{
       2048 if
         (ansible_os_family == "RedHat" and ansible_facts.distribution_major_version | int >= 8) or
-        (ansible_os_family == "Ubuntu" and ansible_facts.distribution_major_version | int >= 20)
+        (ansible_distribution == "Ubuntu" and ansible_facts.distribution_major_version | int >= 20)
       else 1024
   }}
