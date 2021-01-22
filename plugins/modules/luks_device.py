@@ -173,9 +173,9 @@ options:
     pbkdf:
         description:
             - This option allows the user to configure the Password-Based Key Derivation
-               Function (PBKDF) used.
+              Function (PBKDF) used.
             - Will only be used on container creation, and when adding keys to an existing
-               container.
+              container.
         type: dict
         version_added: '1.4.0'
         suboptions:
