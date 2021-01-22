@@ -6,6 +6,9 @@
     passphrase: "{{ cryptfile_passphrase1 }}"
     pbkdf:
       iteration_time: 0.1
+      algorithm: argon2i
+      memory: 10
+      parallel: 1
   become: yes
 
 - name: Open with passphrase1
