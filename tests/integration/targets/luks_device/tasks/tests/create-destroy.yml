@@ -4,6 +4,8 @@
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   check_mode: yes
   become: yes
   register: create_check
@@ -12,6 +14,8 @@
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   become: yes
   register: create
 - name: Create (idempotent)
@@ -19,6 +23,8 @@
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   become: yes
   register: create_idem
 - name: Create (idempotent, check)
@@ -26,6 +32,8 @@
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ role_path }}/files/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
   check_mode: yes
   become: yes
   register: create_idem_check
