@@ -6,7 +6,7 @@
     keyfile: "{{ role_path }}/files/keyfile1"
     keysize: 256
     pbkdf:
-      iteration_count: 10
+      iteration_count: 1000
   become: yes
   register: create_with_keysize
 - name: Create with keysize (idempotent)
@@ -16,7 +16,7 @@
     keyfile: "{{ role_path }}/files/keyfile1"
     keysize: 256
     pbkdf:
-      iteration_count: 10
+      iteration_count: 1000
   become: yes
   register: create_idem_with_keysize
 - name: Create with different keysize (idempotent since we do not update keysize)
@@ -26,7 +26,7 @@
     keyfile: "{{ role_path }}/files/keyfile1"
     keysize: 512
     pbkdf:
-      iteration_count: 10
+      iteration_count: 1000
   become: yes
   register: create_idem_with_diff_keysize
 - name: Create with ambiguous arguments
@@ -36,7 +36,7 @@
     keyfile: "{{ role_path }}/files/keyfile1"
     passphrase: "{{ cryptfile_passphrase1 }}"
     pbkdf:
-      iteration_count: 10
+      iteration_count: 1000
   ignore_errors: yes
   become: yes
   register: create_with_ambiguous
