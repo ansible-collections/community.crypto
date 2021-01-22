@@ -172,10 +172,10 @@ options:
         version_added: '1.1.0'
     pbkdf:
         description:
-            - "This option allows the user to configure the Password-Based Key Derivation
-               Function (PBKDF) used."
-            - "Will only be used on container creation, and when adding keys to an existing
-               container."
+            - This option allows the user to configure the Password-Based Key Derivation
+               Function (PBKDF) used.
+            - Will only be used on container creation, and when adding keys to an existing
+               container.
         type: dict
         version_added: '1.4.0'
         suboptions:
