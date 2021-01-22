@@ -183,10 +183,10 @@ stages:
               test: rhel/7.8
             - name: RHEL 8.2
               test: rhel/8.2
-            - name: FreeBSD 11.1
-              test: freebsd/11.1
-            - name: FreeBSD 12.1
-              test: freebsd/12.1
+            - name: FreeBSD 11.4
+              test: freebsd/11.4
+            - name: FreeBSD 12.2
+              test: freebsd/12.2
   - stage: Remote_2_10
     displayName: Remote 2.10
     dependsOn: []
@@ -197,6 +197,8 @@ stages:
           targets:
             - name: RHEL 7.8
               test: rhel/7.8
+            - name: FreeBSD 12.1
+              test: freebsd/12.1
   - stage: Remote_2_9
     displayName: Remote 2.9
     dependsOn: []
