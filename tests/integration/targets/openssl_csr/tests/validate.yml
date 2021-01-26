@@ -334,3 +334,13 @@
       - generate_csr_ed25519_ed448_idempotent.results[0] is not changed
       - generate_csr_ed25519_ed448_idempotent.results[1] is not changed
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.8', '>=') and generate_csr_ed25519_ed448_privatekey is not failed
+
+- name: "({{ select_crypto_backend }}) Verify CRL distribution endpoints (for cryptography >= 1.6)"
+  assert:
+    that:
+      - crl_distribution_endpoints_1 is changed
+      - crl_distribution_endpoints_2 is not changed
+      - crl_distribution_endpoints_3 is changed
+      - crl_distribution_endpoints_4 is changed
+      - crl_distribution_endpoints_5 is changed
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.6', '>=')

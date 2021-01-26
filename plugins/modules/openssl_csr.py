@@ -142,6 +142,21 @@ EXAMPLES = r'''
     extended_key_usage:
     - clientAuth
     subject_alt_name: otherName:1.3.6.1.4.1.311.20.2.3;UTF8:username@localhost
+
+- name: Generate an OpenSSL Certificate Signing Request with a CRL distribution point
+  community.crypto.openssl_csr:
+    path: /etc/ssl/csr/www.ansible.com.csr
+    privatekey_path: /etc/ssl/private/ansible.com.pem
+    common_name: www.ansible.com
+    crl_distribution_points:
+      - full_name:
+          - "URI:https://ca.example.com/revocations.crl"
+        crl_issuer:
+          - "URI:https://ca.example.com/"
+        reasons:
+          - key_compromise
+          - ca_compromise
+          - cessation_of_operation
 '''
 
 RETURN = r'''
