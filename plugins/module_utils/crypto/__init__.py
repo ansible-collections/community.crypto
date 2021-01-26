@@ -55,7 +55,7 @@ from .cryptography_support import (
     cryptography_compare_public_keys,
 )
 
-from .identify import (
+from .pem import (
     identify_private_key_format,
 )
 

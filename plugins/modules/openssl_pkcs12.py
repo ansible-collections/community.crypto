@@ -27,10 +27,19 @@ options:
         choices: [ export, parse ]
     other_certificates:
         description:
-            - List of other certificates to include. Pre 2.8 this parameter was called C(ca_certificates)
+            - List of other certificates to include. Pre Ansible 2.8 this parameter was called I(ca_certificates).
+            - Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates,
+              set I(other_certificates_parse_all) to C(true).
         type: list
         elements: path
         aliases: [ ca_certificates ]
+    other_certificates_parse_all:
+        description:
+            - If set to C(true), assumes that the files mentioned in I(other_certificates) can contain more than one
+              certificate per file (or even none per file).
+        type: bool
+        default: false
+        version_added: 1.4.0
     certificate_path:
         description:
             - The path to read certificates and private keys from.
@@ -115,6 +124,27 @@ EXAMPLES = r'''
     privatekey_path: /opt/certs/keys/key.pem
     certificate_path: /opt/certs/cert.pem
     other_certificates: /opt/certs/ca.pem
+    # Note that if /opt/certs/ca.pem contains multiple certificates,
+    # only the first one will be used. See the other_certificates_parse_all
+    # option for changing this behavior.
+    state: present
+
+- name: Generate PKCS#12 file
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: /opt/certs/ansible.p12
+    friendly_name: raclette
+    privatekey_path: /opt/certs/keys/key.pem
+    certificate_path: /opt/certs/cert.pem
+    other_certificates_parse_all: true
+    other_certificates:
+      - /opt/certs/ca_bundle.pem
+        # Since we set other_certificates_parse_all to true, all
+        # certificates in the CA bundle are included and not just
+        # the first one.
+      - /opt/certs/intermediate.pem
+        # In case this file has multiple certificates in it,
+        # all will be included as well.
     state: present
 
 - name: Change PKCS#12 file permission
@@ -201,6 +231,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_certificate,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    split_pem_list,
+)
+
 PYOPENSSL_IMP_ERR = None
 try:
     from OpenSSL import crypto
@@ -209,6 +243,15 @@ except ImportError:
     pyopenssl_found = False
 else:
     pyopenssl_found = True
+
+
+def load_certificate_set(filename):
+    '''
+    Load list of concatenated PEM files, and return a list of parsed certificates.
+    '''
+    with open(filename, 'rb') as f:
+        data = f.read().decode('utf-8')
+    return [load_certificate(None, content=cert) for cert in split_pem_list(data)]
 
 
 class PkcsError(OpenSSLObjectError):
@@ -226,6 +269,7 @@ class Pkcs(OpenSSLObject):
         )
         self.action = module.params['action']
         self.other_certificates = module.params['other_certificates']
+        self.other_certificates_parse_all = module.params['other_certificates_parse_all']
         self.certificate_path = module.params['certificate_path']
         self.friendly_name = module.params['friendly_name']
         self.iter_size = module.params['iter_size']
@@ -243,6 +287,17 @@ class Pkcs(OpenSSLObject):
 
         self.backup = module.params['backup']
         self.backup_file = None
+
+        if self.other_certificates:
+            if self.other_certificates_parse_all:
+                filenames = list(self.other_certificates)
+                self.other_certificates = []
+                for other_cert_bundle in filenames:
+                    self.other_certificates.extend(load_certificate_set(other_cert_bundle))
+            else:
+                self.other_certificates = [
+                    load_certificate(other_cert) for other_cert in self.other_certificates
+                ]
 
     def check(self, module, perms_required=True):
         """Ensure the resource is in its desired state."""
@@ -340,9 +395,7 @@ class Pkcs(OpenSSLObject):
         self.pkcs12 = crypto.PKCS12()
 
         if self.other_certificates:
-            other_certs = [load_certificate(other_cert) for other_cert
-                           in self.other_certificates]
-            self.pkcs12.set_ca_certificates(other_certs)
+            self.pkcs12.set_ca_certificates(self.other_certificates)
 
         if self.certificate_path:
             self.pkcs12.set_certificate(load_certificate(self.certificate_path))
@@ -402,6 +455,7 @@ def main():
     argument_spec = dict(
         action=dict(type='str', default='export', choices=['export', 'parse']),
         other_certificates=dict(type='list', elements='path', aliases=['ca_certificates']),
+        other_certificates_parse_all=dict(type='bool', default=False),
         certificate_path=dict(type='path'),
         force=dict(type='bool', default=False),
         friendly_name=dict(type='str', aliases=['name']),

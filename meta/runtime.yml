@@ -23,3 +23,9 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: The 'community.crypto.openssl_certificate_info' module has been renamed to 'community.crypto.x509_certificate_info'
+  module_utils:
+    crypto.identify:
+      redirect: community.crypto.crypto.pem
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The 'crypto/identify.py' module_utils has been renamed 'crypto/pem.py'. Please update your imports

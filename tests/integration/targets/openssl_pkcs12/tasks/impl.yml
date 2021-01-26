@@ -39,6 +39,12 @@
       pkey: ansible_pkey2.pem
     - name: ansible3
       pkey: ansible_pkey3.pem
+  - name: Generate concatenated PEM file
+    copy:
+      dest: '{{ output_dir }}/ansible23.crt'
+      content: |
+        {{ lookup("file", output_dir ~ "/ansible2.crt") }}
+        {{ lookup("file", output_dir ~ "/ansible3.crt") }}
   - name: Generate PKCS#12 file
     openssl_pkcs12:
       path: '{{ output_dir }}/ansible.p12'
@@ -113,7 +119,7 @@
       friendly_name: abracadabra
       privatekey_path: '{{ output_dir }}/ansible_pkey.pem'
       certificate_path: '{{ output_dir }}/ansible.crt'
-      ca_certificates:
+      other_certificates:
       - '{{ output_dir }}/ansible2.crt'
       - '{{ output_dir }}/ansible3.crt'
       state: present
@@ -124,7 +130,7 @@
       friendly_name: abracadabra
       privatekey_path: '{{ output_dir }}/ansible_pkey.pem'
       certificate_path: '{{ output_dir }}/ansible.crt'
-      ca_certificates:
+      other_certificates:
       - '{{ output_dir }}/ansible2.crt'
       - '{{ output_dir }}/ansible3.crt'
       state: present
@@ -237,7 +243,7 @@
     openssl_pkcs12:
       path: '{{ output_dir }}/ansible_empty.p12'
       friendly_name: abracadabra
-      ca_certificates:
+      other_certificates:
       - '{{ output_dir }}/ansible2.crt'
       - '{{ output_dir }}/ansible3.crt'
       state: present
@@ -246,11 +252,20 @@
     openssl_pkcs12:
       path: '{{ output_dir }}/ansible_empty.p12'
       friendly_name: abracadabra
-      ca_certificates:
-      - '{{ output_dir }}/ansible2.crt'
+      other_certificates:
       - '{{ output_dir }}/ansible3.crt'
+      - '{{ output_dir }}/ansible2.crt'
       state: present
     register: p12_empty_idem
+  - name: Generate 'empty' PKCS#12 file (idempotent, concatenated other certificates)
+    openssl_pkcs12:
+      path: '{{ output_dir }}/ansible_empty.p12'
+      friendly_name: abracadabra
+      other_certificates:
+      - '{{ output_dir }}/ansible23.crt'
+      other_certificates_parse_all: true
+      state: present
+    register: p12_empty_concat_idem
   - name: Generate 'empty' PKCS#12 file (parse)
     openssl_pkcs12:
       src: '{{ output_dir }}/ansible_empty.p12'
