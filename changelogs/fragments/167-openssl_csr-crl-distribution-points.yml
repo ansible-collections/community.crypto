@@ -1,2 +1,2 @@
 minor_changes:
-- "openssl_csr, openssl_csr_pipe - allow to specify CRL distribution endpoints (https://github.com/ansible-collections/community.crypto/issues/147, https://github.com/ansible-collections/community.crypto/pull/167)."
+- "openssl_csr, openssl_csr_pipe - allow to specify CRL distribution endpoints with ``crl_distribution_points`` (https://github.com/ansible-collections/community.crypto/issues/147, https://github.com/ansible-collections/community.crypto/pull/167)."
