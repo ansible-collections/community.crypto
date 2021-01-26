@@ -27,7 +27,7 @@ options:
         choices: [ export, parse ]
     other_certificates:
         description:
-            - List of other certificates to include. Pre Ansible 2.8 this parameter was called C(ca_certificates)
+            - List of other certificates to include. Pre Ansible 2.8 this parameter was called I(ca_certificates).
             - Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates,
               set I(other_certificates_parse_all) to C(true).
         type: list
