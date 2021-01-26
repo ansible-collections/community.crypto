@@ -124,6 +124,27 @@ EXAMPLES = r'''
     privatekey_path: /opt/certs/keys/key.pem
     certificate_path: /opt/certs/cert.pem
     other_certificates: /opt/certs/ca.pem
+    # Note that if /opt/certs/ca.pem contains multiple certificates,
+    # only the first one will be used. See the other_certificates_parse_all
+    # option for changing this behavior.
+    state: present
+
+- name: Generate PKCS#12 file
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: /opt/certs/ansible.p12
+    friendly_name: raclette
+    privatekey_path: /opt/certs/keys/key.pem
+    certificate_path: /opt/certs/cert.pem
+    other_certificates_parse_all: true
+    other_certificates:
+      - /opt/certs/ca_bundle.pem
+        # Since we set other_certificates_parse_all to true, all
+        # certificates in the CA bundle are included and not just
+        # the first one.
+      - /opt/certs/intermediate.pem
+        # In case this file has multiple certificates in it,
+        # all will be included as well.
     state: present
 
 - name: Change PKCS#12 file permission
