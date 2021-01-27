@@ -121,6 +121,9 @@
       - "'account' in account_orders_urls"
       - "'orders' in account_orders_urls"
       - "account_orders_urls.orders[0] is string"
+      - "'order_uris' in account_orders_urls"
+      - "account_orders_urls.order_uris[0] is string"
+      - "account_orders_urls.order_uris == account_orders_urls.orders"
 
 - name: Validate that orders were retrieved as list of URLs (2/2)
   assert:
@@ -128,6 +131,9 @@
       - "'account' in account_orders_urls2"
       - "'orders' in account_orders_urls2"
       - "account_orders_urls2.orders[0] is string"
+      - "'order_uris' in account_orders_urls2"
+      - "account_orders_urls2.order_uris[0] is string"
+      - "account_orders_urls2.order_uris == account_orders_urls2.orders"
 
 - name: Validate that orders were retrieved as list of objects (1/2)
   assert:
@@ -135,6 +141,8 @@
       - "'account' in account_orders_full"
       - "'orders' in account_orders_full"
       - "account_orders_full.orders[0].status is string"
+      - "'order_uris' in account_orders_full"
+      - "account_orders_full.order_uris[0] is string"
 
 - name: Validate that orders were retrieved as list of objects (2/2)
   assert:
@@ -142,3 +150,5 @@
       - "'account' in account_orders_full2"
       - "'orders' in account_orders_full2"
       - "account_orders_full2.orders[0].status is string"
+      - "'order_uris' in account_orders_full2"
+      - "account_orders_full2.order_uris[0] is string"
