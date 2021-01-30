@@ -76,25 +76,37 @@ options:
   acme_directory:
     description:
       - "The ACME directory to use. This is the entry point URL to access
-         CA server API."
+         the ACME CA server API."
       - "For safety reasons the default is set to the Let's Encrypt staging
          server (for the ACME v1 protocol). This will create technically correct,
          but untrusted certificates."
-      - "The default value is U(https://acme-staging.api.letsencrypt.org/directory).
+      - "The default value is C(https://acme-staging.api.letsencrypt.org/directory).
          Note that in community.crypto 2.0.0, this option B(will be required) and
-         will no longer have a default."
+         will no longer have a default. Note that the default is the Let's Encrypt
+         staging server for the ACME v1 protocol, which is deprecated and will
+         be disabled in May 2021 (see
+         L(here,https://community.letsencrypt.org/t/end-of-life-plan-for-acmev1/88430/7)
+         for details)."
       - "For Let's Encrypt, all staging endpoints can be found here:
          U(https://letsencrypt.org/docs/staging-environment/). For Buypass, all
          endpoints can be found here:
          U(https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints)"
-      - "For Let's Encrypt, the production directory URL for ACME v1 is
-         U(https://acme-v01.api.letsencrypt.org/directory), and the production
-         directory URL for ACME v2 is U(https://acme-v02.api.letsencrypt.org/directory)."
-      - "For Buypass, the production directory URL for ACME v2 and v1 is
+      - "For B(Let's Encrypt), the production directory URL for ACME v2 is
+         U(https://acme-v02.api.letsencrypt.org/directory).
+         (The production directory URL for ACME v1 is
+         U(https://acme-v01.api.letsencrypt.org/directory) and will be
+         disabled in July 2021.)"
+      - "For B(Buypass), the production directory URL for ACME v2 and v1 is
          U(https://api.buypass.com/acme/directory)."
-      - "B(Warning:) So far, the module has only been tested against Let's Encrypt
-         (staging and production), Buypass (staging and production), and
-         L(Pebble testing server,https://github.com/letsencrypt/Pebble)."
+      - "For B(ZeroSSL), the production directory URL for ACME v2 is
+         U(https://acme.zerossl.com/v2/DV90)."
+      - "B(Warning:) So far, the ACME modules have only been tested against Let's Encrypt
+         (staging and production), Buypass (staging and production), ZeroSSL (production),
+         and L(Pebble testing server,https://github.com/letsencrypt/Pebble). If you
+         experience problems with another ACME server, please
+         L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
+         to help us supporting it. Feedback that an ACME server not mentioned does work
+         is also appreciated."
     type: str
   validate_certs:
     description:
