@@ -89,7 +89,7 @@ if [ "${test}" == "sanity/extra" ]; then
 fi
 
 # START: HACK install integration test dependencies
-if [ "${test}" == "sanity/extra" ]; then
+if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # Nothing further should be added to this list.
     # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"

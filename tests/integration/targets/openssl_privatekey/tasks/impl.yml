@@ -299,10 +299,17 @@
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_1
+
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
   stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_1_stat
+
+- name: "({{ select_crypto_backend }}) Collect file information"
+  community.internal_test_tools.files_collect:
+    files:
+      - path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
+  register: privatekey_mode_1_fileinfo
 
 - name: "({{ select_crypto_backend }}) Generate privatekey_mode (mode 0400, idempotency)"
   openssl_privatekey:
@@ -312,13 +319,6 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_2
 
-- name: Make sure that mtime actually changes.
-  # The "privatekey_mode_1_stat.stat.mtime != privatekey_mode_3_stat.stat.mtime" test should be
-  # changed to compare content instead of mtime. On macOS 10.15, mtime resolution is one second,
-  # and the machine (VM) is fast enough that both modifications can happen in the same second.
-  pause:
-    seconds: 1
-
 - name: "({{ select_crypto_backend }}) Generate privatekey_mode (mode 0400, force)"
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
@@ -327,10 +327,16 @@
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey_mode_3
+
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
   stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_3_stat
+
+- name: "({{ select_crypto_backend }}) Make sure that file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ privatekey_mode_1_fileinfo }}'
+  register: privatekey_mode_3_file_change
 
 - block:
   - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - auto format"
