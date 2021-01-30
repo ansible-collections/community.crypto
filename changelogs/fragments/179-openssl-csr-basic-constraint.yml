@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "openssl_csr - fails when comparing CSR without basic constraint"
