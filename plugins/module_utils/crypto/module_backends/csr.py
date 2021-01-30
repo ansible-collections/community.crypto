@@ -626,11 +626,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 return False
             # Check criticality
             if self.basicConstraints:
-                if not bc_ext or bc_ext.critical != self.basicConstraints_critical:
-                    return False
+                return bc_ext is not None and bc_ext.critical == self.basicConstraints_critical
             else:
                 return bc_ext is None
-            return True
 
         def _check_ocspMustStaple(extensions):
             try:
