@@ -535,19 +535,27 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
-    write_file,
-    nopad_b64,
-    pem_to_der,
     ACMEAccount,
     HAS_CURRENT_CRYPTOGRAPHY,
     cryptography_get_csr_identifiers,
     openssl_get_csr_identifiers,
     cryptography_get_cert_days,
     handle_standard_module_arguments,
-    process_links,
     get_default_argspec,
 )
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    nopad_b64,
+    pem_to_der,
+    process_links,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
 try:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
+# Copyright: (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
+# Copyright: (c) 2021 Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -28,6 +29,19 @@ from ansible.module_utils._text import to_native, to_text, to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
+    read_file,
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    nopad_b64,
+    pem_to_der,
+    process_links,
+)
+
 try:
     import cryptography
     import cryptography.hazmat.backends
@@ -47,118 +61,6 @@ try:
         _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except Exception as dummy:
     HAS_CURRENT_CRYPTOGRAPHY = False
-
-
-class ModuleFailException(Exception):
-    '''
-    If raised, module.fail_json() will be called with the given parameters after cleanup.
-    '''
-    def __init__(self, msg, **args):
-        super(ModuleFailException, self).__init__(self, msg)
-        self.msg = msg
-        self.module_fail_args = args
-
-    def do_fail(self, module, **arguments):
-        module.fail_json(msg=self.msg, other=self.module_fail_args, **arguments)
-
-
-def nopad_b64(data):
-    return base64.urlsafe_b64encode(data).decode('utf8').replace("=", "")
-
-
-def read_file(fn, mode='b'):
-    try:
-        with open(fn, 'r' + mode) as f:
-            return f.read()
-    except Exception as e:
-        raise ModuleFailException('Error while reading file "{0}": {1}'.format(fn, e))
-
-
-# function source: network/basics/uri.py
-def write_file(module, dest, content):
-    '''
-    Write content to destination file dest, only if the content
-    has changed.
-    '''
-    changed = False
-    # create a tempfile
-    fd, tmpsrc = tempfile.mkstemp(text=False)
-    f = os.fdopen(fd, 'wb')
-    try:
-        f.write(content)
-    except Exception as err:
-        try:
-            f.close()
-        except Exception as dummy:
-            pass
-        os.remove(tmpsrc)
-        raise ModuleFailException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
-    f.close()
-    checksum_src = None
-    checksum_dest = None
-    # raise an error if there is no tmpsrc file
-    if not os.path.exists(tmpsrc):
-        try:
-            os.remove(tmpsrc)
-        except Exception as dummy:
-            pass
-        raise ModuleFailException("Source %s does not exist" % (tmpsrc))
-    if not os.access(tmpsrc, os.R_OK):
-        os.remove(tmpsrc)
-        raise ModuleFailException("Source %s not readable" % (tmpsrc))
-    checksum_src = module.sha1(tmpsrc)
-    # check if there is no dest file
-    if os.path.exists(dest):
-        # raise an error if copy has no permission on dest
-        if not os.access(dest, os.W_OK):
-            os.remove(tmpsrc)
-            raise ModuleFailException("Destination %s not writable" % (dest))
-        if not os.access(dest, os.R_OK):
-            os.remove(tmpsrc)
-            raise ModuleFailException("Destination %s not readable" % (dest))
-        checksum_dest = module.sha1(dest)
-    else:
-        dirname = os.path.dirname(dest) or '.'
-        if not os.access(dirname, os.W_OK):
-            os.remove(tmpsrc)
-            raise ModuleFailException("Destination dir %s not writable" % (dirname))
-    if checksum_src != checksum_dest:
-        try:
-            shutil.copyfile(tmpsrc, dest)
-            changed = True
-        except Exception as err:
-            os.remove(tmpsrc)
-            raise ModuleFailException("failed to copy %s to %s: %s" % (tmpsrc, dest, to_native(err)), exception=traceback.format_exc())
-    os.remove(tmpsrc)
-    return changed
-
-
-def pem_to_der(pem_filename, pem_content=None):
-    '''
-    Load PEM file, or use PEM file's content, and convert to DER.
-
-    If PEM contains multiple entities, the first entity will be used.
-    '''
-    certificate_lines = []
-    if pem_content is not None:
-        lines = pem_content.splitlines()
-    else:
-        try:
-            with open(pem_filename, "rt") as f:
-                lines = list(f)
-        except Exception as err:
-            raise ModuleFailException("cannot load PEM file {0}: {1}".format(pem_filename, to_native(err)), exception=traceback.format_exc())
-    header_line_count = 0
-    for line in lines:
-        if line.startswith('-----'):
-            header_line_count += 1
-            if header_line_count == 2:
-                # If certificate file contains other certs appended
-                # (like intermediate certificates), ignore these.
-                break
-            continue
-        certificate_lines.append(line.strip())
-    return base64.b64decode(''.join(certificate_lines))
 
 
 def _parse_key_openssl(openssl_binary, module, key_file=None, key_content=None):
@@ -1096,16 +998,6 @@ def set_crypto_backend(module):
     else:
         module.debug('Using OpenSSL binary backend')
         return 'openssl'
-
-
-def process_links(info, callback):
-    '''
-    Process link header, calls callback for every link header with the URL and relation as options.
-    '''
-    if 'link' in info:
-        link = info['link']
-        for url, relation in re.findall(r'<([^>]+)>;\s*rel="(\w+)"', link):
-            callback(unquote(url), relation)
 
 
 def get_default_argspec():
