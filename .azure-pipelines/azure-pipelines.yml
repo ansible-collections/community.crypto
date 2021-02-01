@@ -92,12 +92,10 @@ stages:
               test: centos7
             - name: CentOS 8
               test: centos8
-            - name: Fedora 30
-              test: fedora30
-            - name: Fedora 31
-              test: fedora31
             - name: Fedora 32
               test: fedora32
+            - name: Fedora 33
+              test: fedora33
             - name: openSUSE 15 py2
               test: opensuse15py2
             - name: openSUSE 15 py3
@@ -154,9 +152,6 @@ stages:
               test: fedora30
             - name: Fedora 31
               test: fedora31
-              # fedora32 doesn't exist in 2.9
-#            - name: Fedora 32
-#              test: fedora32
             - name: openSUSE 15 py2
               test: opensuse15py2
             - name: openSUSE 15 py3
