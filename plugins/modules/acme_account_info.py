@@ -214,11 +214,15 @@ order_uris:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
     ACMEAccount,
     handle_standard_module_arguments,
-    process_links,
     get_default_argspec,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    process_links,
 )
 
 

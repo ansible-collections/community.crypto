@@ -140,8 +140,9 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     read_file,
 )
 
