@@ -536,12 +536,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 from ansible_collections.community.crypto.plugins.module_utils.acme import (
     ACMEAccount,
-    HAS_CURRENT_CRYPTOGRAPHY,
-    cryptography_get_csr_identifiers,
-    openssl_get_csr_identifiers,
     cryptography_get_cert_days,
     handle_standard_module_arguments,
     get_default_argspec,
+    get_backend,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -575,23 +573,7 @@ def get_cert_days(module, cert_file):
     if the file was not found. If cert_file contains more than one
     certificate, only the first one will be considered.
     '''
-    if HAS_CURRENT_CRYPTOGRAPHY:
-        return cryptography_get_cert_days(module, cert_file)
-    if not os.path.exists(cert_file):
-        return -1
-
-    openssl_bin = module.get_bin_path('openssl', True)
-    openssl_cert_cmd = [openssl_bin, "x509", "-in", cert_file, "-noout", "-text"]
-    dummy, out, dummy = module.run_command(openssl_cert_cmd, check_rc=True, encoding=None)
-    try:
-        not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", out.decode('utf8')).group(1)
-        not_after = datetime.fromtimestamp(time.mktime(time.strptime(not_after_str, '%b %d %H:%M:%S %Y %Z')))
-    except AttributeError:
-        raise ModuleFailException("No 'Not after' date found in {0}".format(cert_file))
-    except ValueError:
-        raise ModuleFailException("Failed to parse 'Not after' date of {0}".format(cert_file))
-    now = datetime.utcnow()
-    return (not_after - now).days
+    get_backend(module).get_cert_days(cert_file)
 
 
 class ACMEClient(object):
@@ -647,19 +629,8 @@ class ACMEClient(object):
         if self.csr is not None and not os.path.exists(self.csr):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
-        self._openssl_bin = module.get_bin_path('openssl', True)
-
         # Extract list of identifiers from CSR
-        self.identifiers = self._get_csr_identifiers()
-
-    def _get_csr_identifiers(self):
-        '''
-        Parse the CSR and return the list of requested identifiers
-        '''
-        if HAS_CURRENT_CRYPTOGRAPHY:
-            return cryptography_get_csr_identifiers(self.module, self.csr, self.csr_content)
-        else:
-            return openssl_get_csr_identifiers(self._openssl_bin, self.module, self.csr, self.csr_content)
+        self.identifiers = self.account.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
 
     def _add_or_update_auth(self, identifier_type, identifier, auth):
         '''
@@ -1164,11 +1135,11 @@ class ACMEClient(object):
             chain = list(cert.get('chain', []))
 
             if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
-                self.cert_days = get_cert_days(self.module, self.dest)
+                self.cert_days = self.account.backend.get_cert_days(self.dest)
                 self.changed = True
 
             if self.fullchain_dest and write_file(self.module, self.fullchain_dest, (pem_cert + "\n".join(chain)).encode('utf8')):
-                self.cert_days = get_cert_days(self.module, self.fullchain_dest)
+                self.cert_days = self.account.backend.get_cert_days(self.fullchain_dest)
                 self.changed = True
 
             if self.chain_dest and write_file(self.module, self.chain_dest, ("\n".join(chain)).encode('utf8')):
