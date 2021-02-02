@@ -19,13 +19,13 @@ import traceback
 
 from ansible.module_utils._text import to_native, to_text, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CryptoBackend,
 )
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
