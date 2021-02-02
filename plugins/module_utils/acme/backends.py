@@ -9,6 +9,7 @@ __metaclass__ = type
 
 
 import abc
+
 from ansible.module_utils import six
 
 
