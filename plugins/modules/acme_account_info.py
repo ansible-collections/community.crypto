@@ -213,10 +213,10 @@ order_uris:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEAccount,
-    handle_standard_module_arguments,
     get_default_argspec,
+    create_backend,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -281,10 +281,10 @@ def main():
     if module._name in ('acme_account_facts', 'community.crypto.acme_account_facts'):
         module.deprecate("The 'acme_account_facts' module has been renamed to 'acme_account_info'",
                          version='2.0.0', collection_name='community.crypto')
-    handle_standard_module_arguments(module, needs_acme_v2=True)
+    backend = create_backend(module, True)
 
     try:
-        account = ACMEAccount(module)
+        account = ACMEAccount(module, backend)
         # Check whether account exists
         created, account_data = account.setup_account(
             [],

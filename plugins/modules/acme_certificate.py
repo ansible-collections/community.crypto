@@ -534,13 +534,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     split_pem_list,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEAccount,
-    cryptography_get_cert_days,
-    handle_standard_module_arguments,
     get_default_argspec,
-    get_backend,
+    create_backend,
 )
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
 
@@ -561,19 +561,7 @@ try:
     import cryptography.hazmat.backends
     import cryptography.x509
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
-
-
-def get_cert_days(module, cert_file):
-    '''
-    Return the days the certificate in cert_file remains valid and -1
-    if the file was not found. If cert_file contains more than one
-    certificate, only the first one will be considered.
-    '''
-    get_backend(module).get_cert_days(cert_file)
+    pass
 
 
 class ACMEClient(object):
@@ -1211,18 +1199,15 @@ def main():
         ),
         supports_check_mode=True,
     )
-    backend = handle_standard_module_arguments(module)
-    if module.params['select_chain']:
-        if backend != 'cryptography':
-            module.fail_json(msg="The 'select_chain' can only be used with the 'cryptography' backend.")
-        elif not CRYPTOGRAPHY_FOUND:
-            module.fail_json(msg=missing_required_lib('cryptography'))
+    backend = create_backend(module, False)
+    if module.params['select_chain'] and not isinstance(backend, CryptographyBackend):
+        module.fail_json(msg="The 'select_chain' can only be used with the 'cryptography' backend.")
 
     try:
         if module.params.get('dest'):
-            cert_days = get_cert_days(module, module.params['dest'])
+            cert_days = backend.get_cert_days(module.params['dest'])
         else:
-            cert_days = get_cert_days(module, module.params['fullchain_dest'])
+            cert_days = backend.get_cert_days(module.params['fullchain_dest'])
 
         if module.params['force'] or cert_days < module.params['remaining_days']:
             # If checkmode is active, base the changed state solely on the status

@@ -119,10 +119,10 @@ RETURN = '''#'''
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEAccount,
-    handle_standard_module_arguments,
     get_default_argspec,
+    create_backend,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -151,10 +151,10 @@ def main():
         ),
         supports_check_mode=False,
     )
-    handle_standard_module_arguments(module)
+    backend = create_backend(module, False)
 
     try:
-        account = ACMEAccount(module)
+        account = ACMEAccount(module, backend)
         # Load certificate
         certificate = pem_to_der(module.params.get('certificate'))
         certificate = nopad_b64(certificate)
