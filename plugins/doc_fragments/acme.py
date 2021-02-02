@@ -68,7 +68,7 @@ options:
       - "The ACME version of the endpoint."
       - "Must be C(1) for the classic Let's Encrypt and Buypass ACME endpoints,
          or C(2) for standardized ACME v2 endpoints."
-      - "The default value is 1. Note that in community.crypto 2.0.0, this
+      - "The default value is C(1). Note that in community.crypto 2.0.0, this
          option B(will be required) and will no longer have a default."
       - "Please also note that we will deprecate ACME v1 support eventually."
     type: int
