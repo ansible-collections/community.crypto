@@ -261,6 +261,8 @@ class OpenSSLCLIBackend(CryptoBackend):
             data = cert_content.encode('utf-8')
             cert_filename_suffix = ''
         else:
+            if not os.path.exists(cert_filename):
+                return -1
             cert_filename_suffix = ' in {0}'.format(cert_filename)
 
         openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
