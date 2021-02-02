@@ -42,7 +42,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
     OpenSSLCLIBackend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.compatibility import (
+from ansible_collections.community.crypto.plugins.module_utils.acme._compatibility import (
     handle_standard_module_arguments,
     set_crypto_backend,
     HAS_CURRENT_CRYPTOGRAPHY,

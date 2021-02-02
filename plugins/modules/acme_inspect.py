@@ -245,10 +245,10 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEAccount,
-    handle_standard_module_arguments,
     get_default_argspec,
+    create_backend,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -274,13 +274,13 @@ def main():
             ['method', 'post', ['account_key_src', 'account_key_content'], True],
         ),
     )
-    handle_standard_module_arguments(module)
+    backend = create_backend(module, False)
 
     result = dict()
     changed = False
     try:
         # Get hold of ACMEAccount object (includes directory)
-        account = ACMEAccount(module)
+        account = ACMEAccount(module, backend)
         method = module.params['method']
         result['directory'] = account.directory.directory
         # Do we have to do more requests?

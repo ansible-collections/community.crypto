@@ -158,10 +158,10 @@ import base64
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEAccount,
-    handle_standard_module_arguments,
     get_default_argspec,
+    create_backend,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -198,7 +198,7 @@ def main():
         ),
         supports_check_mode=True,
     )
-    handle_standard_module_arguments(module, needs_acme_v2=True)
+    backend = create_backend(module, True)
 
     if module.params['external_account_binding']:
         # Make sure padding is there
@@ -213,7 +213,7 @@ def main():
         module.params['external_account_binding']['key'] = key
 
     try:
-        account = ACMEAccount(module)
+        account = ACMEAccount(module, backend)
         changed = False
         state = module.params.get('state')
         diff_before = {}

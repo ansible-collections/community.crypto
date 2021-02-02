@@ -26,7 +26,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryp
     CRYPTOGRAPHY_VERSION,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.compatibility import (
+from ansible_collections.community.crypto.plugins.module_utils.acme._compatibility import (
     get_compatibility_backend,
     handle_standard_module_arguments,
 )
