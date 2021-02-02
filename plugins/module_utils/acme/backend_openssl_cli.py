@@ -225,7 +225,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             data = csr_content.encode('utf-8')
 
         openssl_csr_cmd = [self.openssl_binary, "req", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(openssl_csr_cmd, data=data, check_rc=True)
+        dummy, out, dummy = self.module.run_command(openssl_csr_cmd, data=data, check_rc=True, binary_data=True)
 
         identifiers = set([])
         common_name = re.search(r"Subject:.* CN\s?=\s?([^\s,;/]+)", to_text(out, errors='surrogate_or_strict'))
@@ -260,15 +260,17 @@ class OpenSSLCLIBackend(CryptoBackend):
             filename = '-'
             data = cert_content.encode('utf-8')
             cert_filename_suffix = ''
-        else:
+        elif cert_filename is not None:
             if not os.path.exists(cert_filename):
                 return -1
             cert_filename_suffix = ' in {0}'.format(cert_filename)
+        else:
+            return -1
 
         openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(openssl_cert_cmd, data=data, check_rc=True, encoding=None)
+        dummy, out, dummy = self.module.run_command(openssl_cert_cmd, data=data, check_rc=True, binary_data=True)
         try:
-            not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", out.decode('utf8')).group(1)
+            not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", to_text(out, errors='surrogate_or_strict')).group(1)
             not_after = datetime.datetime.fromtimestamp(time.mktime(time.strptime(not_after_str, '%b %d %H:%M:%S %Y %Z')))
         except AttributeError:
             raise ModuleFailException("No 'Not after' date found{0}".format(cert_filename_suffix))

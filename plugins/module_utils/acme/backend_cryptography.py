@@ -11,6 +11,7 @@ __metaclass__ = type
 import base64
 import binascii
 import datetime
+import os
 import sys
 
 from ansible.module_utils._text import to_bytes
@@ -248,7 +249,9 @@ class CryptographyBackend(CryptoBackend):
         If now is not specified, datetime.datetime.now() is used.
         '''
         if cert_filename is not None:
-            cert_content = read_file(cert_filename)
+            cert_content = None
+            if os.path.exists(cert_filename):
+                cert_content = read_file(cert_filename)
         else:
             cert_content = to_bytes(cert_content)
 
