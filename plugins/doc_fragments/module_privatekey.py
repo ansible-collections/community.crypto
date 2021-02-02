@@ -20,7 +20,7 @@ description:
     - "Please note that the module regenerates private keys if they don't match
       the module's options. In particular, if you provide another passphrase
       (or specify none), change the keysize, etc., the private key will be
-      regenerated. If you are concerned that this could **overwrite your private key**,
+      regenerated. If you are concerned that this could B(overwrite your private key),
       consider using the I(backup) option."
     - "The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available. This can be
@@ -103,7 +103,7 @@ options:
             - The value C(auto) selects a fromat based on the key format. The value C(auto_ignore) does the same,
               but for existing private key files, it will not force a regenerate when its format is not the automatically
               selected one for generation.
-            - Note that if the format for an existing private key mismatches, the key is *regenerated* by default.
+            - Note that if the format for an existing private key mismatches, the key is B(regenerated) by default.
               To change this behavior, use the I(format_mismatch) option.
             - The I(format) option is only supported by the C(cryptography) backend. The C(pyopenssl) backend will
               fail if a value different from C(auto_ignore) is used.

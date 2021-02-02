@@ -31,6 +31,8 @@ seealso:
     description: Retrieves facts about an ACME account.
   - module: community.crypto.openssl_privatekey
     description: Can be used to create a private account key.
+  - module: community.crypto.openssl_privatekey_pipe
+    description: Can be used to create a private account key without writing it to disk.
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:

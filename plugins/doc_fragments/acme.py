@@ -32,11 +32,11 @@ options:
       - "Path to a file containing the ACME account RSA or Elliptic Curve
          key."
       - "Private keys can be created with the
-         M(community.crypto.openssl_privatekey) module. If the requisites
-         (pyOpenSSL or cryptography) are not available, keys can also be
-         created directly with the C(openssl) command line tool: RSA keys
-         can be created with C(openssl genrsa ...). Elliptic curve keys can be
-         created with C(openssl ecparam -genkey ...). Any other tool creating
+         M(community.crypto.openssl_privatekey) or M(community.crypto.openssl_privatekey_pipe)
+         modules. If the requisites (pyOpenSSL or cryptography) are not available,
+         keys can also be created directly with the C(openssl) command line tool:
+         RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys
+         can be created with C(openssl ecparam -genkey ...). Any other tool creating
          private keys in PEM format can be used as well."
       - "Mutually exclusive with C(account_key_content)."
       - "Required if C(account_key_content) is not used."
@@ -47,7 +47,7 @@ options:
       - "Content of the ACME account RSA or Elliptic Curve key."
       - "Mutually exclusive with C(account_key_src)."
       - "Required if C(account_key_src) is not used."
-      - "*Warning:* the content will be written into a temporary file, which will
+      - "B(Warning:) the content will be written into a temporary file, which will
          be deleted by Ansible when the module completes. Since this is an
          important private key — it can be used to change the account key,
          or to revoke your certificates without knowing their private keys
@@ -66,40 +66,52 @@ options:
   acme_version:
     description:
       - "The ACME version of the endpoint."
-      - "Must be 1 for the classic Let's Encrypt and Buypass ACME endpoints,
-         or 2 for standardized ACME v2 endpoints."
-      - "The default value is 1. Note that in community.crypto 2.0.0, this
-         option *will be required* and will no longer have a default."
+      - "Must be C(1) for the classic Let's Encrypt and Buypass ACME endpoints,
+         or C(2) for standardized ACME v2 endpoints."
+      - "The default value is C(1). Note that in community.crypto 2.0.0, this
+         option B(will be required) and will no longer have a default."
       - "Please also note that we will deprecate ACME v1 support eventually."
     type: int
     choices: [ 1, 2 ]
   acme_directory:
     description:
       - "The ACME directory to use. This is the entry point URL to access
-         CA server API."
+         the ACME CA server API."
       - "For safety reasons the default is set to the Let's Encrypt staging
          server (for the ACME v1 protocol). This will create technically correct,
          but untrusted certificates."
-      - "The default value is U(https://acme-staging.api.letsencrypt.org/directory).
-         Note that in community.crypto 2.0.0, this option *will be required* and
-         will no longer have a default."
+      - "The default value is C(https://acme-staging.api.letsencrypt.org/directory).
+         Note that in community.crypto 2.0.0, this option B(will be required) and
+         will no longer have a default. Note that the default is the Let's Encrypt
+         staging server for the ACME v1 protocol, which is deprecated and will
+         be disabled in May 2021 (see
+         L(here,https://community.letsencrypt.org/t/end-of-life-plan-for-acmev1/88430/7)
+         for details)."
       - "For Let's Encrypt, all staging endpoints can be found here:
          U(https://letsencrypt.org/docs/staging-environment/). For Buypass, all
          endpoints can be found here:
          U(https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints)"
-      - "For Let's Encrypt, the production directory URL for ACME v1 is
-         U(https://acme-v01.api.letsencrypt.org/directory), and the production
-         directory URL for ACME v2 is U(https://acme-v02.api.letsencrypt.org/directory)."
-      - "For Buypass, the production directory URL for ACME v2 and v1 is
+      - "For B(Let's Encrypt), the production directory URL for ACME v2 is
+         U(https://acme-v02.api.letsencrypt.org/directory).
+         (The production directory URL for ACME v1 is
+         U(https://acme-v01.api.letsencrypt.org/directory) and will be
+         disabled in July 2021.)"
+      - "For B(Buypass), the production directory URL for ACME v2 and v1 is
          U(https://api.buypass.com/acme/directory)."
-      - "*Warning:* So far, the module has only been tested against Let's Encrypt
-         (staging and production), Buypass (staging and production), and
-         L(Pebble testing server,https://github.com/letsencrypt/Pebble)."
+      - "For B(ZeroSSL), the production directory URL for ACME v2 is
+         U(https://acme.zerossl.com/v2/DV90)."
+      - "B(Warning:) So far, the ACME modules have only been tested against Let's Encrypt
+         (staging and production), Buypass (staging and production), ZeroSSL (production),
+         and L(Pebble testing server,https://github.com/letsencrypt/Pebble). If you
+         experience problems with another ACME server, please
+         L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
+         to help us supporting it. Feedback that an ACME server not mentioned does work
+         is also appreciated."
     type: str
   validate_certs:
     description:
       - Whether calls to the ACME directory will validate TLS certificates.
-      - "*Warning:* Should *only ever* be set to C(no) for testing purposes,
+      - "B(Warning:) Should B(only ever) be set to C(no) for testing purposes,
          for example when testing against a local Pebble server."
     type: bool
     default: yes

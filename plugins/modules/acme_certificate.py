@@ -62,8 +62,12 @@ seealso:
     description: Helps preparing C(tls-alpn-01) challenges.
   - module: community.crypto.openssl_privatekey
     description: Can be used to create private keys (both for certificates and accounts).
+  - module: community.crypto.openssl_privatekey_pipe
+    description: Can be used to create private keys without writing it to disk (both for certificates and accounts).
   - module: community.crypto.openssl_csr
     description: Can be used to create a Certificate Signing Request (CSR).
+  - module: community.crypto.openssl_csr_pipe
+    description: Can be used to create a Certificate Signing Request (CSR) without writing it to disk.
   - module: community.crypto.certificate_complete_chain
     description: Allows to find the root certificate for the returned fullchain.
   - module: community.crypto.acme_certificate_revoke
@@ -117,7 +121,7 @@ options:
   csr:
     description:
       - "File containing the CSR for the new certificate."
-      - "Can be created with C(openssl req ...)."
+      - "Can be created with M(community.crypto.openssl_csr) or C(openssl req ...)."
       - "The CSR may contain multiple Subject Alternate Names, but each one
          will lead to an individual challenge that must be fulfilled for the
          CSR to be signed."
@@ -131,7 +135,7 @@ options:
   csr_content:
     description:
       - "Content of the CSR for the new certificate."
-      - "Can be created with C(openssl req ...)."
+      - "Can be created with M(community.crypto.openssl_csr_pipe) or C(openssl req ...)."
       - "The CSR may contain multiple Subject Alternate Names, but each one
          will lead to an individual challenge that must be fulfilled for the
          CSR to be signed."

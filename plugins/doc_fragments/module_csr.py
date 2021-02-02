@@ -183,7 +183,7 @@ options:
     name_constraints_excluded:
         description:
             - For CA certificates, this specifies a list of identifiers which describe
-              subtrees of names that this CA is *not* allowed to issue certificates for.
+              subtrees of names that this CA is B(not) allowed to issue certificates for.
             - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName) and the ones specific to your CA).
         type: list
