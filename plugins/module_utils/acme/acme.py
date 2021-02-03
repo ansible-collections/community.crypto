@@ -12,6 +12,7 @@ import copy
 import datetime
 import hashlib
 import json
+import locale
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.urls import fetch_url
@@ -24,11 +25,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     CryptographyBackend,
     CRYPTOGRAPHY_VERSION,
+    HAS_CURRENT_CRYPTOGRAPHY,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme._compatibility import (
     get_compatibility_backend,
-    handle_standard_module_arguments,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
@@ -532,5 +533,47 @@ def get_default_argspec():
 
 
 def create_backend(module, needs_acme_v2):
-    handle_standard_module_arguments(module, needs_acme_v2=needs_acme_v2)
-    return get_compatibility_backend(module)
+    backend = module.params['select_crypto_backend']
+
+    # Backend autodetect
+    if backend == 'auto':
+        backend = 'cryptography' if HAS_CURRENT_CRYPTOGRAPHY else 'openssl'
+
+    # Create backend object
+    if backend == 'cryptography':
+        if not HAS_CURRENT_CRYPTOGRAPHY:
+            module.fail_json(msg=missing_required_lib('cryptography'))
+        module.debug('Using cryptography backend (library version {0})'.format(CRYPTOGRAPHY_VERSION))
+        module_backend = CryptographyBackend(module)
+    elif backend == 'openssl':
+        module.debug('Using OpenSSL binary backend')
+        module_backend = OpenSSLCLIBackend(module)
+    else:
+        module.fail_json(msg='Unknown crypto backend "{0}"!'.format(backend))
+
+    # Check common module parameters
+    if not module.params['validate_certs']:
+        module.warn(
+            'Disabling certificate validation for communications with ACME endpoint. '
+            'This should only be done for testing against a local ACME server for '
+            'development purposes, but *never* for production purposes.'
+        )
+
+    if module.params['acme_version'] is None:
+        module.params['acme_version'] = 1
+        module.deprecate("The option 'acme_version' will be required from community.crypto 2.0.0 on",
+                         version='2.0.0', collection_name='community.crypto')
+
+    if module.params['acme_directory'] is None:
+        module.params['acme_directory'] = 'https://acme-staging.api.letsencrypt.org/directory'
+        module.deprecate("The option 'acme_directory' will be required from community.crypto 2.0.0 on",
+                         version='2.0.0', collection_name='community.crypto')
+
+    if needs_acme_v2 and module.params['acme_version'] < 2:
+        module.fail_json(msg='The {0} module requires the ACME v2 protocol!'.format(module._name))
+
+    # AnsibleModule() changes the locale, so change it back to C because we rely
+    # on datetime.datetime.strptime() when parsing certificate dates.
+    locale.setlocale(locale.LC_ALL, 'C')
+
+    return module_backend
