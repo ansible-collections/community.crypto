@@ -25,6 +25,8 @@ documentation: https://docs.ansible.com/ansible/latest/collections/community/cry
 homepage: https://github.com/ansible-collections/community.crypto
 issues: https://github.com/ansible-collections/community.crypto/issues
 build_ignore:
+  - .azure-pipelines
   - 'community-crypto-*.tar.gz'
   - .gitignore
   - changelogs/.plugin-cache.yaml
+  - tests
