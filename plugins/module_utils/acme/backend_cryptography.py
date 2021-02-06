@@ -20,7 +20,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backends imp
     CryptoBackend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import BackendException
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 
@@ -196,10 +196,10 @@ class CryptographyBackend(CryptoBackend):
             hashalg = cryptography.hazmat.primitives.hashes.SHA512
             hashbytes = 64
         else:
-            raise ModuleFailException('Unsupported MAC key algorithm for cryptography backend: {0}'.format(alg))
+            raise BackendException('Unsupported MAC key algorithm for cryptography backend: {0}'.format(alg))
         key_bytes = base64.urlsafe_b64decode(key)
         if len(key_bytes) < hashbytes:
-            raise ModuleFailException(
+            raise BackendException(
                 '{0} key must be at least {1} bytes long (after Base64 decoding)'.format(alg, hashbytes))
         return {
             'mac_obj': lambda: cryptography.hazmat.primitives.hmac.HMAC(
@@ -237,7 +237,7 @@ class CryptographyBackend(CryptoBackend):
                     elif isinstance(name, cryptography.x509.IPAddress):
                         identifiers.add(('ip', name.value.compressed))
                     else:
-                        raise ModuleFailException('Found unsupported SAN identifier {0}'.format(name))
+                        raise BackendException('Found unsupported SAN identifier {0}'.format(name))
         return identifiers
 
     def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
@@ -262,8 +262,8 @@ class CryptographyBackend(CryptoBackend):
             cert = cryptography.x509.load_pem_x509_certificate(cert_content, _cryptography_backend)
         except Exception as e:
             if cert_filename is None:
-                raise ModuleFailException('Cannot parse certificate: {0}'.format(e))
-            raise ModuleFailException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
+                raise BackendException('Cannot parse certificate: {0}'.format(e))
+            raise BackendException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
 
         if now is None:
             now = datetime.datetime.now()

@@ -22,7 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backends imp
     CryptoBackend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import BackendException
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
@@ -57,7 +57,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                     f.close()
                 except Exception as dummy:
                     pass
-                raise ModuleFailException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
+                raise BackendException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
             f.close()
         # Parse key
         account_key_type = None
@@ -168,7 +168,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 r"prim:\s+INTEGER\s+:([0-9A-F]{1,%s})\n" % expected_len,
                 to_text(der_out, errors='surrogate_or_strict'))
             if len(sig) != 2:
-                raise ModuleFailException(
+                raise BackendException(
                     "failed to generate Elliptic Curve signature; cannot parse DER output: {0}".format(
                         to_text(der_out, errors='surrogate_or_strict')))
             sig[0] = (expected_len - len(sig[0])) * '0' + sig[0]
@@ -193,10 +193,10 @@ class OpenSSLCLIBackend(CryptoBackend):
             hashalg = 'sha512'
             hashbytes = 64
         else:
-            raise ModuleFailException('Unsupported MAC key algorithm for OpenSSL backend: {0}'.format(alg))
+            raise BackendException('Unsupported MAC key algorithm for OpenSSL backend: {0}'.format(alg))
         key_bytes = base64.urlsafe_b64decode(key)
         if len(key_bytes) < hashbytes:
-            raise ModuleFailException(
+            raise BackendException(
                 '{0} key must be at least {1} bytes long (after Base64 decoding)'.format(alg, hashbytes))
         return {
             'type': 'hmac',
@@ -248,7 +248,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 elif san.lower().startswith("ip address:"):
                     identifiers.add(('ip', self._normalize_ip(san[11:])))
                 else:
-                    raise ModuleFailException('Found unsupported SAN identifier "{0}"'.format(san))
+                    raise BackendException('Found unsupported SAN identifier "{0}"'.format(san))
         return identifiers
 
     def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
@@ -279,9 +279,9 @@ class OpenSSLCLIBackend(CryptoBackend):
             not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", to_text(out, errors='surrogate_or_strict')).group(1)
             not_after = datetime.datetime.strptime(not_after_str, '%b %d %H:%M:%S %Y %Z')
         except AttributeError:
-            raise ModuleFailException("No 'Not after' date found{0}".format(cert_filename_suffix))
+            raise BackendException("No 'Not after' date found{0}".format(cert_filename_suffix))
         except ValueError:
-            raise ModuleFailException("Failed to parse 'Not after' date{0}".format(cert_filename_suffix))
+            raise BackendException("Failed to parse 'Not after' date{0}".format(cert_filename_suffix))
         if now is None:
             now = datetime.datetime.now()
         return (not_after - now).days
