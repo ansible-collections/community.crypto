@@ -32,21 +32,25 @@ from ansible_collections.community.crypto.plugins.module_utils.acme._compatibili
     get_compatibility_backend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    NetworkException,
+    ModuleFailException,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
 
 
-def _assert_fetch_url_success(response, info, allow_redirect=False, allow_client_error=True, allow_server_error=True):
+def _assert_fetch_url_success(module, response, info, allow_redirect=False, allow_client_error=True, allow_server_error=True):
     if info['status'] < 0:
-        raise ModuleFailException(msg="Failure downloading %s, %s" % (info['url'], info['msg']))
+        raise NetworkException(msg="Failure downloading %s, %s" % (info['url'], info['msg']))
 
     if (300 <= info['status'] < 400 and not allow_redirect) or \
        (400 <= info['status'] < 500 and not allow_client_error) or \
        (info['status'] >= 500 and not allow_server_error):
-        raise ModuleFailException("ACME request failed: CODE: {0} MGS: {1} RESULT: {2}".format(info['status'], info['msg'], response))
+        raise ACMEProtocolException(module, info=info, response=response)
 
 
 class ACMEDirectory(object):
@@ -84,7 +88,7 @@ class ACMEDirectory(object):
             url = resource
         dummy, info = fetch_url(self.module, url, method='HEAD')
         if info['status'] not in (200, 204):
-            raise ModuleFailException("Failed to get replay-nonce, got status {0}".format(info['status']))
+            raise NetworkException("Failed to get replay-nonce, got status {0}".format(info['status']))
         return info['replay-nonce']
 
 
@@ -202,7 +206,7 @@ class ACMEAccount(object):
             if self.version == 1:
                 data["header"] = jws_header.copy()
                 for k, v in protected.items():
-                    hv = data["header"].pop(k, None)
+                    dummy = data["header"].pop(k, None)
             self._log('signed request', data)
             data = self.module.jsonify(data)
 
@@ -210,7 +214,7 @@ class ACMEAccount(object):
                 'Content-Type': 'application/jose+json',
             }
             resp, info = fetch_url(self.module, url, data=data, headers=headers, method='POST')
-            _assert_fetch_url_success(resp, info)
+            _assert_fetch_url_success(self.module, resp, info)
             result = {}
             try:
                 content = resp.read()
@@ -224,9 +228,11 @@ class ACMEAccount(object):
                         self._log('parsed result', decoded_result)
                         # In case of badNonce error, try again (up to 5 times)
                         # (https://tools.ietf.org/html/rfc8555#section-6.7)
-                        if (400 <= info['status'] < 600 and
-                                decoded_result.get('type') == 'urn:ietf:params:acme:error:badNonce' and
-                                failed_tries <= 5):
+                        if all((
+                            400 <= info['status'] < 600,
+                            decoded_result.get('type') == 'urn:ietf:params:acme:error:badNonce',
+                            failed_tries <= 5,
+                        )):
                             failed_tries += 1
                             continue
                         if parse_json_result:
@@ -234,7 +240,7 @@ class ACMEAccount(object):
                         else:
                             result = content
                     except ValueError:
-                        raise ModuleFailException("Failed to parse the ACME response: {0} {1}".format(url, content))
+                        raise NetworkException("Failed to parse the ACME response: {0} {1}".format(url, content))
                 else:
                     result = content
 
@@ -259,7 +265,7 @@ class ACMEAccount(object):
             # Perform unauthenticated GET
             resp, info = fetch_url(self.module, uri, method='GET', headers=headers)
 
-            _assert_fetch_url_success(resp, info)
+            _assert_fetch_url_success(self.module, resp, info)
 
             try:
                 content = resp.read()
@@ -274,14 +280,15 @@ class ACMEAccount(object):
                     try:
                         result = self.module.from_json(content.decode('utf8'))
                     except ValueError:
-                        raise ModuleFailException("Failed to parse the ACME response: {0} {1}".format(uri, content))
+                        raise NetworkException("Failed to parse the ACME response: {0} {1}".format(uri, content))
                 else:
                     result = content
         else:
             result = content
 
         if fail_on_error and (info['status'] < 200 or info['status'] >= 400):
-            raise ModuleFailException("ACME request failed: CODE: {0} RESULT: {1}".format(info['status'], result))
+            raise ACMEProtocolException(
+                self.module, info=info, content=content, content_json=result if parse_json_result else None)
         return result, info
 
     def set_account_uri(self, uri):
@@ -397,7 +404,8 @@ class ACMEAccount(object):
             else:
                 raise ModuleFailException("Account is deactivated")
         else:
-            raise ModuleFailException("Error registering: {0} {1}".format(info['status'], result))
+            raise ACMEProtocolException(
+                self.module, msg='Registering ACME account failed', info=info, content_json=result)
 
     def get_account_data(self):
         '''
@@ -427,7 +435,8 @@ class ACMEAccount(object):
             # Returned when account does not exist
             return None
         if info['status'] < 200 or info['status'] >= 300:
-            raise ModuleFailException("Error getting account data from {2}: {0} {1}".format(info['status'], result, self.uri))
+            raise ACMEProtocolException(
+                self.module, msg='Error retrieving account data', info=info, content_json=result)
         return result
 
     def setup_account(self, contact=None, agreement=None, terms_agreed=False,

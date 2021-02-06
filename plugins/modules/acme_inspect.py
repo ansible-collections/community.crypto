@@ -240,8 +240,6 @@ output_json:
       - ...
 '''
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
@@ -251,7 +249,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
     create_backend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
+)
 
 
 def main():
@@ -300,13 +301,12 @@ def main():
             ))
             # See if we can parse the result as JSON
             try:
-                # to_text() is needed only for Python 3.5 (and potentially 3.0 to 3.4 as well)
-                result['output_json'] = json.loads(to_text(data))
+                result['output_json'] = module.from_json(to_text(data))
             except Exception as dummy:
                 pass
             # Fail if error was returned
             if fail_on_acme_error and info['status'] >= 400:
-                raise ModuleFailException("ACME request failed: CODE: {0} RESULT: {1}".format(info['status'], data))
+                raise ACMEProtocolException(info=info, content_json=result)
         # Done!
         module.exit_json(changed=changed, **result)
     except ModuleFailException as e:

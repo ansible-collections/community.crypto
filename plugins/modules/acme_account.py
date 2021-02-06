@@ -164,7 +164,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
     create_backend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
+)
 
 
 def main():
@@ -234,7 +237,7 @@ def main():
                     }
                     result, info = account.send_signed_request(account.uri, payload)
                     if info['status'] != 200:
-                        raise ModuleFailException('Error deactivating account: {0} {1}'.format(info['status'], result))
+                        raise ACMEProtocolException('Failed to deactivate account', info=info, content_json=result)
                 changed = True
         elif state == 'present':
             allow_creation = module.params.get('allow_creation')
@@ -295,7 +298,7 @@ def main():
                 # Send request and verify result
                 result, info = account.send_signed_request(url, data)
                 if info['status'] != 200:
-                    raise ModuleFailException('Error account key rollover: {0} {1}'.format(info['status'], result))
+                    raise ACMEProtocolException('Failed to rollover account key', info=info, content_json=result)
                 if module._diff:
                     account.key_data = new_key_data
                     account.jws_header['alg'] = new_key_data['alg']

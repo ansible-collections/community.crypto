@@ -125,7 +125,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
     create_backend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
@@ -212,7 +215,7 @@ def main():
             # but successfully terminate while indicating no change
             if already_revoked:
                 module.exit_json(changed=False)
-            raise ModuleFailException('Error revoking certificate: {0} {1}'.format(info['status'], result))
+            raise ACMEProtocolException('Failed to revoke certificate', info=info, content_json=result)
         module.exit_json(changed=True)
     except ModuleFailException as e:
         e.do_fail(module)
