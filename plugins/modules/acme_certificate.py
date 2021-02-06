@@ -539,7 +539,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    format_error_problem,
+    ACMEProtocolException,
+    ModuleFailException,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     write_file,
@@ -641,7 +645,7 @@ class ACMEClient(object):
 
         result, info = self.account.send_signed_request(self.directory['new-authz'], new_authz)
         if info['status'] not in [200, 201]:
-            raise ModuleFailException("Error requesting challenges: CODE: {0} RESULT: {1}".format(info['status'], result))
+            raise ACMEProtocolException('Failed to request challenges', info=info, content_json=result)
         else:
             result['uri'] = info['location']
             return result
@@ -693,17 +697,27 @@ class ACMEClient(object):
         '''
         Aborts with a specific error for a challenge.
         '''
-        error_details = ''
+        error_details = []
         # multiple challenges could have failed at this point, gather error
         # details for all of them before failing
         for challenge in auth['challenges']:
             if challenge['status'] == 'invalid':
-                error_details += ' CHALLENGE: {0}'.format(challenge['type'])
+                msg = 'Challenge {type}'.format(type=challenge['type'])
                 if 'error' in challenge:
-                    error_details += ' DETAILS: {0};'.format(challenge['error']['detail'])
-                else:
-                    error_details += ';'
-        raise ModuleFailException("{0}: {1}".format(error.format(identifier_type + ':' + identifier), error_details))
+                    msg = '{msg}: {problem}'.format(
+                        msg=msg,
+                        problem=format_error_problem(challenge['error'], subproblem_prefix='{0}.'.format(type)),
+                    )
+                error_details.append(msg)
+        raise ACMEProtocolException(
+            'Failed to validate challenge for {type}:{identifier}: {details}'.format(
+                type=identifier_type,
+                identifier=identifier,
+                details='; '.join(error_details),
+            ),
+            identifier='{type}:{identifier}'.format(type=identifier_type, identifier=identifier),
+            authentication=auth,
+        )
 
     def _validate_challenges(self, identifier_type, identifier, auth):
         '''
@@ -727,7 +741,7 @@ class ACMEClient(object):
                 challenge_response["type"] = self.challenge
             result, info = self.account.send_signed_request(uri, challenge_response)
             if info['status'] not in [200, 202]:
-                raise ModuleFailException("Error validating challenge: CODE: {0} RESULT: {1}".format(info['status'], result))
+                raise ACMEProtocolException('Failed to validate challenge', info=info, content_json=result)
 
         if not found_challenge:
             raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}:{2}!".format(
@@ -766,7 +780,7 @@ class ACMEClient(object):
         }
         result, info = self.account.send_signed_request(self.finalize_uri, new_cert)
         if info['status'] not in [200]:
-            raise ModuleFailException("Error new cert: CODE: {0} RESULT: {1}".format(info['status'], result))
+            raise ACMEProtocolException('Failed to finalizing order', info=info, content_json=result)
 
         status = result['status']
         while status not in ['valid', 'invalid']:
@@ -775,7 +789,7 @@ class ACMEClient(object):
             status = result['status']
 
         if status != 'valid':
-            raise ModuleFailException("Error new cert: CODE: {0} STATUS: {1} RESULT: {2}".format(info['status'], status, result))
+            raise ACMEProtocolException('Failed to wait for order to complete', info=info, content_json=result)
 
         return result['certificate']
 
@@ -849,7 +863,7 @@ class ACMEClient(object):
         process_links(info, f)
 
         if info['status'] not in [200, 201]:
-            raise ModuleFailException("Error new cert: CODE: {0} RESULT: {1}".format(info['status'], result))
+            raise ACMEProtocolException('Failed to receive certificate', info=info, content_json=result)
         else:
             return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
 
@@ -870,7 +884,7 @@ class ACMEClient(object):
         result, info = self.account.send_signed_request(self.directory['newOrder'], new_order)
 
         if info['status'] not in [201]:
-            raise ModuleFailException("Error new order: CODE: {0} RESULT: {1}".format(info['status'], result))
+            raise ACMEProtocolException('Failed to start new order', info=info, content_json=result)
 
         for auth_uri in result['authorizations']:
             auth_data, dummy = self.account.get_request(auth_uri)
@@ -965,11 +979,8 @@ class ACMEClient(object):
             # order URI, and extract the information from there.
             result, info = self.account.get_request(self.order_uri)
 
-            if not result:
-                raise ModuleFailException("Cannot download order from {0}: {1} (headers: {2})".format(self.order_uri, result, info))
-
-            if info['status'] not in [200]:
-                raise ModuleFailException("Error on downloading order: CODE: {0} RESULT: {1}".format(info['status'], result))
+            if not result or info['status'] not in [200]:
+                raise ACMEProtocolException('Failed to downloda order object', info=info, content_json=result)
 
             for auth_uri in result['authorizations']:
                 auth_data, dummy = self.account.get_request(auth_uri)
