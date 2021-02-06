@@ -19,3 +19,7 @@ class ModuleFailException(Exception):
 
     def do_fail(self, module, **arguments):
         module.fail_json(msg=self.msg, other=self.module_fail_args, **arguments)
+
+
+class BackendException(ModuleFailException):
+    pass
