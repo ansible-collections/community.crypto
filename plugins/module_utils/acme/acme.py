@@ -28,10 +28,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryp
     HAS_CURRENT_CRYPTOGRAPHY,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme._compatibility import (
-    get_compatibility_backend,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     NetworkException,
@@ -99,17 +95,9 @@ class ACMEAccount(object):
     the currently active authorizations and valid certificates
     '''
 
-    def __init__(self, module, backend=None):
+    def __init__(self, module, backend):
         # Set to true to enable logging of all signed requests
         self._debug = False
-
-        if backend is None:
-            module.deprecate(
-                'Please adjust your custom module/plugin to the ACME module_utils refactor '
-                '(https://github.com/ansible-collections/community.crypto/pull/184). The '
-                'compatibility layer will be removed in community.crypto 2.0.0, thus breaking '
-                'your code', version='2.0.0', collection_name='community.crypto')
-            backend = get_compatibility_backend(module)
 
         self.module = module
         self.backend = backend
