@@ -112,3 +112,7 @@ class BackendException(ModuleFailException):
 
 class NetworkException(ModuleFailException):
     pass
+
+
+class KeyParsingError(ModuleFailException):
+    pass

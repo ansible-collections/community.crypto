@@ -32,6 +32,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
     ACMEProtocolException,
     NetworkException,
     ModuleFailException,
+    KeyParsingError,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
@@ -88,11 +89,10 @@ class ACMEDirectory(object):
         return info['replay-nonce']
 
 
-class ACMEAccount(object):
+class ACMEClient(object):
     '''
-    ACME account object. Handles the authorized communication with the
-    ACME server. Provides access to account bound information like
-    the currently active authorizations and valid certificates
+    ACME client object. Handles the authorized communication with the
+    ACME server.
     '''
 
     def __init__(self, module, backend):
@@ -103,47 +103,55 @@ class ACMEAccount(object):
         self.backend = backend
         self.version = module.params['acme_version']
         # account_key path and content are mutually exclusive
-        self.key = module.params['account_key_src']
-        self.key_content = module.params['account_key_content']
+        self.account_key_file = module.params['account_key_src']
+        self.account_key_content = module.params['account_key_content']
 
         # Grab account URI from module parameters.
         # Make sure empty string is treated as None.
-        self.uri = module.params.get('account_uri') or None
+        self.account_uri = module.params.get('account_uri') or None
 
-        if self.key is not None or self.key_content is not None:
-            error, self.key_data = self.parse_key(self.key, self.key_content)
-            if error:
-                raise ModuleFailException("error while parsing account key: %s" % error)
-            self.jwk = self.key_data['jwk']
-            self.jws_header = {
-                "alg": self.key_data['alg'],
-                "jwk": self.jwk,
+        if self.account_key_file is not None or self.account_key_content is not None:
+            try:
+                self.account_key_data = self.parse_key(key_file=self.account_key_file, key_content=self.account_key_content)
+            except KeyParsingError as e:
+                raise ModuleFailException("Error while parsing account key: {msg}".format(msg=e.msg))
+            self.account_jwk = self.account_key_data['jwk']
+            self.account_jws_header = {
+                "alg": self.account_key_data['alg'],
+                "jwk": self.account_jwk,
             }
-            if self.uri:
-                # Make sure self.jws_header is updated
-                self.set_account_uri(self.uri)
+            if self.account_uri:
+                # Make sure self.account_jws_header is updated
+                self.set_account_uri(self.account_uri)
 
         self.directory = ACMEDirectory(module, self)
 
-    def get_keyauthorization(self, token):
+    def set_account_uri(self, uri):
         '''
-        Returns the key authorization for the given token
-        https://tools.ietf.org/html/rfc8555#section-8.1
+        Set account URI. For ACME v2, it needs to be used to sending signed
+        requests.
         '''
-        accountkey_json = json.dumps(self.jwk, sort_keys=True, separators=(',', ':'))
-        thumbprint = nopad_b64(hashlib.sha256(accountkey_json.encode('utf8')).digest())
-        return "{0}.{1}".format(token, thumbprint)
+        self.account_uri = uri
+        if self.version != 1:
+            self.account_jws_header.pop('jwk')
+            self.account_jws_header['kid'] = self.account_uri
 
     def parse_key(self, key_file=None, key_content=None):
         '''
-        Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
-        (error, key_data).
+        Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
+        In case of an error, raises KeyParsingError.
         '''
         if key_file is None and key_content is None:
             raise AssertionError('One of key_file and key_content must be specified!')
-        return self.backend.parse_key(key_file, key_content)
+        error, key_data = self.backend.parse_key(key_file, key_content)
+        if error:
+            raise KeyParsingError(error)
+        return key_data
 
     def sign_request(self, protected, payload, key_data, encode_payload=True):
+        '''
+        Signs an ACME request.
+        '''
         try:
             if payload is None:
                 # POST-as-GET
@@ -178,8 +186,8 @@ class ACMEAccount(object):
         If payload is None, a POST-as-GET is performed.
         (https://tools.ietf.org/html/rfc8555#section-6.3)
         '''
-        key_data = key_data or self.key_data
-        jws_header = jws_header or self.jws_header
+        key_data = key_data or self.account_key_data
+        jws_header = jws_header or self.account_jws_header
         failed_tries = 0
         while True:
             protected = copy.deepcopy(jws_header)
@@ -279,240 +287,6 @@ class ACMEAccount(object):
                 self.module, info=info, content=content, content_json=result if parse_json_result else None)
         return result, info
 
-    def set_account_uri(self, uri):
-        '''
-        Set account URI. For ACME v2, it needs to be used to sending signed
-        requests.
-        '''
-        self.uri = uri
-        if self.version != 1:
-            self.jws_header.pop('jwk')
-            self.jws_header['kid'] = self.uri
-
-    def _new_reg(self, contact=None, agreement=None, terms_agreed=False, allow_creation=True,
-                 external_account_binding=None):
-        '''
-        Registers a new ACME account. Returns a pair ``(created, data)``.
-        Here, ``created`` is ``True`` if the account was created and
-        ``False`` if it already existed (e.g. it was not newly created),
-        or does not exist. In case the account was created or exists,
-        ``data`` contains the account data; otherwise, it is ``None``.
-
-        If specified, ``external_account_binding`` should be a dictionary
-        with keys ``kid``, ``alg`` and ``key``
-        (https://tools.ietf.org/html/rfc8555#section-7.3.4).
-
-        https://tools.ietf.org/html/rfc8555#section-7.3
-        '''
-        contact = contact or []
-
-        if self.version == 1:
-            new_reg = {
-                'resource': 'new-reg',
-                'contact': contact
-            }
-            if agreement:
-                new_reg['agreement'] = agreement
-            else:
-                new_reg['agreement'] = self.directory['meta']['terms-of-service']
-            if external_account_binding is not None:
-                raise ModuleFailException('External account binding is not supported for ACME v1')
-            url = self.directory['new-reg']
-        else:
-            if (external_account_binding is not None or self.directory['meta'].get('externalAccountRequired')) and allow_creation:
-                # Some ACME servers such as ZeroSSL do not like it when you try to register an existing account
-                # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
-                # to see whether the account already exists.
-
-                # Note that we pass contact here: ZeroSSL does not accept regisration calls without contacts, even
-                # if onlyReturnExisting is set to true.
-                created, data = self._new_reg(contact=contact, allow_creation=False)
-                if data:
-                    # An account already exists! Return data
-                    return created, data
-                # An account does not yet exist. Try to create one next.
-
-            new_reg = {
-                'contact': contact
-            }
-            if not allow_creation:
-                # https://tools.ietf.org/html/rfc8555#section-7.3.1
-                new_reg['onlyReturnExisting'] = True
-            if terms_agreed:
-                new_reg['termsOfServiceAgreed'] = True
-            url = self.directory['newAccount']
-            if external_account_binding is not None:
-                new_reg['externalAccountBinding'] = self.sign_request(
-                    {
-                        'alg': external_account_binding['alg'],
-                        'kid': external_account_binding['kid'],
-                        'url': url,
-                    },
-                    self.jwk,
-                    self.backend.create_mac_key(external_account_binding['alg'], external_account_binding['key'])
-                )
-            elif self.directory['meta'].get('externalAccountRequired') and allow_creation:
-                raise ModuleFailException(
-                    'To create an account, an external account binding must be specified. '
-                    'Use the acme_account module with the external_account_binding option.'
-                )
-
-        result, info = self.send_signed_request(url, new_reg)
-
-        if info['status'] in ([200, 201] if self.version == 1 else [201]):
-            # Account did not exist
-            if 'location' in info:
-                self.set_account_uri(info['location'])
-            return True, result
-        elif info['status'] == (409 if self.version == 1 else 200):
-            # Account did exist
-            if result.get('status') == 'deactivated':
-                # A bug in Pebble (https://github.com/letsencrypt/pebble/issues/179) and
-                # Boulder (https://github.com/letsencrypt/boulder/issues/3971): this should
-                # not return a valid account object according to
-                # https://tools.ietf.org/html/rfc8555#section-7.3.6:
-                #     "Once an account is deactivated, the server MUST NOT accept further
-                #      requests authorized by that account's key."
-                if not allow_creation:
-                    return False, None
-                else:
-                    raise ModuleFailException("Account is deactivated")
-            if 'location' in info:
-                self.set_account_uri(info['location'])
-            return False, result
-        elif info['status'] == 400 and result['type'] == 'urn:ietf:params:acme:error:accountDoesNotExist' and not allow_creation:
-            # Account does not exist (and we didn't try to create it)
-            return False, None
-        elif info['status'] == 403 and result['type'] == 'urn:ietf:params:acme:error:unauthorized' and 'deactivated' in (result.get('detail') or ''):
-            # Account has been deactivated; currently works for Pebble; hasn't been
-            # implemented for Boulder (https://github.com/letsencrypt/boulder/issues/3971),
-            # might need adjustment in error detection.
-            if not allow_creation:
-                return False, None
-            else:
-                raise ModuleFailException("Account is deactivated")
-        else:
-            raise ACMEProtocolException(
-                self.module, msg='Registering ACME account failed', info=info, content_json=result)
-
-    def get_account_data(self):
-        '''
-        Retrieve account information. Can only be called when the account
-        URI is already known (such as after calling setup_account).
-        Return None if the account was deactivated, or a dict otherwise.
-        '''
-        if self.uri is None:
-            raise ModuleFailException("Account URI unknown")
-        if self.version == 1:
-            data = {}
-            data['resource'] = 'reg'
-            result, info = self.send_signed_request(self.uri, data)
-        else:
-            # try POST-as-GET first (draft-15 or newer)
-            data = None
-            result, info = self.send_signed_request(self.uri, data)
-            # check whether that failed with a malformed request error
-            if info['status'] >= 400 and result.get('type') == 'urn:ietf:params:acme:error:malformed':
-                # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
-                data = {}
-                result, info = self.send_signed_request(self.uri, data)
-        if info['status'] in (400, 403) and result.get('type') == 'urn:ietf:params:acme:error:unauthorized':
-            # Returned when account is deactivated
-            return None
-        if info['status'] in (400, 404) and result.get('type') == 'urn:ietf:params:acme:error:accountDoesNotExist':
-            # Returned when account does not exist
-            return None
-        if info['status'] < 200 or info['status'] >= 300:
-            raise ACMEProtocolException(
-                self.module, msg='Error retrieving account data', info=info, content_json=result)
-        return result
-
-    def setup_account(self, contact=None, agreement=None, terms_agreed=False,
-                      allow_creation=True, remove_account_uri_if_not_exists=False,
-                      external_account_binding=None):
-        '''
-        Detect or create an account on the ACME server. For ACME v1,
-        as the only way (without knowing an account URI) to test if an
-        account exists is to try and create one with the provided account
-        key, this method will always result in an account being present
-        (except on error situations). For ACME v2, a new account will
-        only be created if ``allow_creation`` is set to True.
-
-        For ACME v2, ``check_mode`` is fully respected. For ACME v1, the
-        account might be created if it does not yet exist.
-
-        Return a pair ``(created, account_data)``. Here, ``created`` will
-        be ``True`` in case the account was created or would be created
-        (check mode). ``account_data`` will be the current account data,
-        or ``None`` if the account does not exist.
-
-        The account URI will be stored in ``self.uri``; if it is ``None``,
-        the account does not exist.
-
-        If specified, ``external_account_binding`` should be a dictionary
-        with keys ``kid``, ``alg`` and ``key``
-        (https://tools.ietf.org/html/rfc8555#section-7.3.4).
-
-        https://tools.ietf.org/html/rfc8555#section-7.3
-        '''
-
-        if self.uri is not None:
-            created = False
-            # Verify that the account key belongs to the URI.
-            # (If update_contact is True, this will be done below.)
-            account_data = self.get_account_data()
-            if account_data is None:
-                if remove_account_uri_if_not_exists and not allow_creation:
-                    self.uri = None
-                else:
-                    raise ModuleFailException("Account is deactivated or does not exist!")
-        else:
-            created, account_data = self._new_reg(
-                contact,
-                agreement=agreement,
-                terms_agreed=terms_agreed,
-                allow_creation=allow_creation and not self.module.check_mode,
-                external_account_binding=external_account_binding,
-            )
-            if self.module.check_mode and self.uri is None and allow_creation:
-                created = True
-                account_data = {
-                    'contact': contact or []
-                }
-        return created, account_data
-
-    def update_account(self, account_data, contact=None):
-        '''
-        Update an account on the ACME server. Check mode is fully respected.
-
-        The current account data must be provided as ``account_data``.
-
-        Return a pair ``(updated, account_data)``, where ``updated`` is
-        ``True`` in case something changed (contact info updated) or
-        would be changed (check mode), and ``account_data`` the updated
-        account data.
-
-        https://tools.ietf.org/html/rfc8555#section-7.3.2
-        '''
-        # Create request
-        update_request = {}
-        if contact is not None and account_data.get('contact', []) != contact:
-            update_request['contact'] = list(contact)
-
-        # No change?
-        if not update_request:
-            return False, dict(account_data)
-
-        # Apply change
-        if self.module.check_mode:
-            account_data = dict(account_data)
-            account_data.update(update_request)
-        else:
-            if self.version == 1:
-                update_request['resource'] = 'reg'
-            account_data, dummy = self.send_signed_request(self.uri, update_request)
-        return True, account_data
-
 
 def get_default_argspec():
     '''
@@ -574,3 +348,13 @@ def create_backend(module, needs_acme_v2):
     locale.setlocale(locale.LC_ALL, 'C')
 
     return module_backend
+
+
+def get_keyauthorization(client, token):
+    '''
+    Returns the key authorization for the given token
+    https://tools.ietf.org/html/rfc8555#section-8.1
+    '''
+    accountkey_json = json.dumps(client.account_jwk, sort_keys=True, separators=(',', ':'))
+    thumbprint = nopad_b64(hashlib.sha256(accountkey_json.encode('utf8')).digest())
+    return "{0}.{1}".format(token, thumbprint)
