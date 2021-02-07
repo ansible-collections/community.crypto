@@ -531,6 +531,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.challenges i
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+    retrieve_acme_v1_certificate,
     CertificateChain,
     ChainMatcher,
     Criterium,
@@ -613,31 +614,6 @@ class ACMECertificateClient(object):
 
         # Extract list of identifiers from CSR
         self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
-
-    def _new_cert_v1(self):
-        '''
-        Create a new certificate based on the CSR (ACME v1 protocol).
-        Return the certificate object as dict
-        https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.5
-        '''
-        csr = pem_to_der(self.csr, self.csr_content)
-        new_cert = {
-            "resource": "new-cert",
-            "csr": nopad_b64(csr),
-        }
-        result, info = self.client.send_signed_request(
-            self.directory['new-cert'], new_cert, error_msg='Failed to receive certificate', expected_status_codes=[200, 201])
-        chain = []
-
-        def f(link, relation):
-            if relation == 'up':
-                chain_result, chain_info = self.client.get_request(link, parse_json_result=False)
-                if chain_info['status'] in [200, 201]:
-                    del chain[:]
-                    chain.append(der_to_pem(chain_result))
-
-        process_links(info, f)
-        return {'cert': der_to_pem(result), 'uri': info['location'], 'chain': chain}
 
     def is_first_step(self):
         '''
@@ -746,7 +722,7 @@ class ACMECertificateClient(object):
                 authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status))
 
         if self.version == 1:
-            cert = self._new_cert_v1()
+            cert = retrieve_acme_v1_certificate(self.client, csr = pem_to_der(self.csr, self.csr_content))
         else:
             self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
             cert = CertificateChain.download(self.client, self.order.certificate_uri)
