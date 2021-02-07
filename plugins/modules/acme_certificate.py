@@ -545,6 +545,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryp
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     combine_identifier,
+    split_identifier,
     create_key_authorization,
     Authorization,
 )
@@ -789,7 +790,7 @@ class ACMECertificateClient(object):
         # Get general challenge data
         data = {}
         for type_identifier, authz in self.authorizations.items():
-            identifier_type, identifier = type_identifier.split(':', 1)
+            identifier_type, identifier = split_identifier(type_identifier)
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
             if authz.status == 'valid':
@@ -841,7 +842,7 @@ class ACMECertificateClient(object):
         # Step 2: validate challenges
         for type_identifier, authz in self.authorizations.items():
             if authz.status == 'pending':
-                identifier_type, identifier = type_identifier.split(':', 1)
+                identifier_type, identifier = split_identifier(type_identifier)
                 authz.call_validate(self.client, self.challenge)
                 self.changed = True
 
@@ -1080,7 +1081,7 @@ def main():
                 auths = dict()
                 for k, v in client.authorizations.items():
                     # Remove "type:" from key
-                    auths[k.split(':', 1)[1]] = v.to_json()
+                    auths[split_identifier(k)[1]] = v.to_json()
                 module.exit_json(
                     changed=client.changed,
                     authorizations=auths,

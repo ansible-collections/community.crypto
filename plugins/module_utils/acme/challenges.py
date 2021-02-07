@@ -43,6 +43,14 @@ def combine_identifier(identifier_type, identifier):
     return '{type}:{identifier}'.format(type=identifier_type, identifier=identifier)
 
 
+def split_identifier(identifier):
+    parts = identifier.split(':', 1)
+    if len(parts) != 2:
+        raise ModuleFailException(
+            'Identifier "{identifier}" is not of the form <type>:<identifier>'.format(identifier=identifier))
+    return parts
+
+
 class Challenge(object):
     def __init__(self, data, url):
         self.data = data
