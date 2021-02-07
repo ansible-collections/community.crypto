@@ -17,7 +17,7 @@ def format_error_problem(problem, subproblem_prefix=''):
     else:
         msg = 'Error {type}'.format(type=problem['type'])
     if 'detail' in problem:
-        msg += ': {detail}'.format(detail=problem['detail'])
+        msg += ': "{detail}"'.format(detail=problem['detail'])
     subproblems = problem.get('subproblems')
     if subproblems is not None:
         msg = '{msg} Subproblems:'.format(msg=msg)
@@ -96,7 +96,6 @@ class ACMEProtocolException(ModuleFailException):
                 add_msg = ' The raw error result: {content}'.format(content=content.decode('utf-8'))
 
         super(ACMEProtocolException, self).__init__(
-            self,
             '{msg} for {url} with {code}.{add_msg}'.format(msg=msg, url=url, code=code, add_msg=add_msg),
             **extras
         )
