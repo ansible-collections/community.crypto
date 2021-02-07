@@ -174,7 +174,14 @@ class ACMELegacyAccount(object):
         (https://tools.ietf.org/html/rfc8555#section-6.3)
         '''
         return self.client.send_signed_request(
-            url, payload, key_data=key_data, jws_header=jws_header, parse_json_result=parse_json_result, encode_payload=encode_payload)
+            url,
+            payload,
+            key_data=key_data,
+            jws_header=jws_header,
+            parse_json_result=parse_json_result,
+            encode_payload=encode_payload,
+            fail_on_error=False,
+        )
 
     def get_request(self, uri, parse_json_result=True, headers=None, get_only=False, fail_on_error=True):
         '''
@@ -182,7 +189,12 @@ class ACMELegacyAccount(object):
         to GET if server replies with a status code of 405.
         '''
         return self.client.get_request(
-            uri, parse_json_result=parse_json_result, headers=headers, get_only=get_only, fail_on_error=fail_on_error)
+            uri,
+            parse_json_result=parse_json_result,
+            headers=headers,
+            get_only=get_only,
+            fail_on_error=fail_on_error,
+        )
 
     def set_account_uri(self, uri):
         '''

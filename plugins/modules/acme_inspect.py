@@ -293,7 +293,8 @@ def main():
                 data, info = client.get_request(url, parse_json_result=False, fail_on_error=False)
             elif method == 'post':
                 changed = True  # only POSTs can change
-                data, info = client.send_signed_request(url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False)
+                data, info = client.send_signed_request(
+                    url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False, fail_on_error=False)
             # Update results
             result.update(dict(
                 headers=info,
