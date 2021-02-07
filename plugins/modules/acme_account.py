@@ -169,7 +169,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    ACMEProtocolException,
     ModuleFailException,
     KeyParsingError,
 )

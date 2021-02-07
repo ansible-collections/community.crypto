@@ -10,7 +10,6 @@ __metaclass__ = type
 
 import copy
 import datetime
-import hashlib
 import json
 import locale
 
