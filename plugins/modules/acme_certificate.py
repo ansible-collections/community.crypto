@@ -541,14 +541,15 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
     ACMEAccount,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
-    create_key_authorization,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    combine_identifier,
+    create_key_authorization,
+    Authorization,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    format_error_problem,
     ACMEProtocolException,
     ModuleFailException,
 )
@@ -629,150 +630,6 @@ class ACMECertificateClient(object):
 
         # Extract list of identifiers from CSR
         self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
-
-    def _add_or_update_auth(self, identifier_type, identifier, auth):
-        '''
-        Add or update the given authorization in the global authorizations list.
-        Return True if the auth was updated/added and False if no change was
-        necessary.
-        '''
-        if self.authorizations.get(identifier_type + ':' + identifier) == auth:
-            return False
-        self.authorizations[identifier_type + ':' + identifier] = auth
-        return True
-
-    def _new_authz_v1(self, identifier_type, identifier):
-        '''
-        Create a new authorization for the given identifier.
-        Return the authorization object of the new authorization
-        https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.4
-        '''
-        new_authz = {
-            "resource": "new-authz",
-            "identifier": {"type": identifier_type, "value": identifier},
-        }
-
-        result, info = self.client.send_signed_request(
-            self.directory['new-authz'], new_authz, error_msg='Failed to request challenges', expected_status_codes=[200, 201])
-        result['uri'] = info['location']
-        return result
-
-    def _get_challenge_data(self, auth, identifier_type, identifier):
-        '''
-        Returns a dict with the data for all proposed (and supported) challenges
-        of the given authorization.
-        '''
-
-        data = {}
-        # no need to choose a specific challenge here as this module
-        # is not responsible for fulfilling the challenges. Calculate
-        # and return the required information for each challenge.
-        for challenge in auth['challenges']:
-            challenge_type = challenge['type']
-            token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-            keyauthorization = create_key_authorization(self.client, token)
-
-            if challenge_type == 'http-01':
-                # https://tools.ietf.org/html/rfc8555#section-8.3
-                resource = '.well-known/acme-challenge/' + token
-                data[challenge_type] = {'resource': resource, 'resource_value': keyauthorization}
-            elif challenge_type == 'dns-01':
-                if identifier_type != 'dns':
-                    continue
-                # https://tools.ietf.org/html/rfc8555#section-8.4
-                resource = '_acme-challenge'
-                value = nopad_b64(hashlib.sha256(to_bytes(keyauthorization)).digest())
-                record = (resource + identifier[1:]) if identifier.startswith('*.') else (resource + '.' + identifier)
-                data[challenge_type] = {'resource': resource, 'resource_value': value, 'record': record}
-            elif challenge_type == 'tls-alpn-01':
-                # https://www.rfc-editor.org/rfc/rfc8737.html#section-3
-                if identifier_type == 'ip':
-                    # IPv4/IPv6 address: use reverse mapping (RFC1034, RFC3596)
-                    resource = compat_ipaddress.ip_address(identifier).reverse_pointer
-                    if not resource.endswith('.'):
-                        resource += '.'
-                else:
-                    resource = identifier
-                value = base64.b64encode(hashlib.sha256(to_bytes(keyauthorization)).digest())
-                data[challenge_type] = {'resource': resource, 'resource_original': identifier_type + ':' + identifier, 'resource_value': value}
-            else:
-                continue
-
-        return data
-
-    def _fail_challenge(self, identifier_type, identifier, auth, error):
-        '''
-        Aborts with a specific error for a challenge.
-        '''
-        error_details = []
-        # multiple challenges could have failed at this point, gather error
-        # details for all of them before failing
-        for challenge in auth['challenges']:
-            if challenge['status'] == 'invalid':
-                msg = 'Challenge {type}'.format(type=challenge['type'])
-                if 'error' in challenge:
-                    msg = '{msg}: {problem}'.format(
-                        msg=msg,
-                        problem=format_error_problem(challenge['error'], subproblem_prefix='{0}.'.format(type)),
-                    )
-                error_details.append(msg)
-        raise ACMEProtocolException(
-            'Failed to validate challenge for {type}:{identifier}: {details}'.format(
-                type=identifier_type,
-                identifier=identifier,
-                details='; '.join(error_details),
-            ),
-            identifier='{type}:{identifier}'.format(type=identifier_type, identifier=identifier),
-            authentication=auth,
-        )
-
-    def _validate_challenges(self, identifier_type, identifier, auth):
-        '''
-        Validate the authorization provided in the auth dict. Returns True
-        when the validation was successful and False when it was not.
-        '''
-        found_challenge = False
-        for challenge in auth['challenges']:
-            if self.challenge != challenge['type']:
-                continue
-
-            uri = challenge['uri'] if self.version == 1 else challenge['url']
-            found_challenge = True
-
-            challenge_response = {}
-            if self.version == 1:
-                token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-                keyauthorization = create_key_authorization(self.client, token)
-                challenge_response["resource"] = "challenge"
-                challenge_response["keyAuthorization"] = keyauthorization
-                challenge_response["type"] = self.challenge
-            result, info = self.client.send_signed_request(
-                uri, challenge_response, error_msg='Failed to validate challenge', expected_status_codes=[200, 202])
-
-        if not found_challenge:
-            raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}:{2}!".format(
-                self.challenge, identifier_type, identifier))
-
-        status = ''
-
-        while status not in ['valid', 'invalid', 'revoked']:
-            result, dummy = self.client.get_request(auth['uri'])
-            result['uri'] = auth['uri']
-            if self._add_or_update_auth(identifier_type, identifier, result):
-                self.changed = True
-            # https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.1.2
-            # "status (required, string): ...
-            # If this field is missing, then the default value is "pending"."
-            if self.version == 1 and 'status' not in result:
-                status = 'pending'
-            else:
-                status = result['status']
-            time.sleep(2)
-
-        if status == 'invalid':
-            self._fail_challenge(identifier_type, identifier, result, 'Authorization for {0} returned invalid')
-
-        return status == 'valid'
 
     def _finalize_cert(self):
         '''
@@ -886,13 +743,8 @@ class ACMECertificateClient(object):
             self.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
 
         for auth_uri in result['authorizations']:
-            auth_data, dummy = self.client.get_request(auth_uri)
-            auth_data['uri'] = auth_uri
-            identifier_type = auth_data['identifier']['type']
-            identifier = auth_data['identifier']['value']
-            if auth_data.get('wildcard', False):
-                identifier = '*.{0}'.format(identifier)
-            self.authorizations[identifier_type + ':' + identifier] = auth_data
+            authz = Authorization.from_url(self.client, auth_uri)
+            self.authorizations[authz.combined_identifier] = authz
 
         self.order_uri = info['location']
         self.finalize_uri = result['finalize']
@@ -923,8 +775,8 @@ class ACMECertificateClient(object):
                 if identifier_type != 'dns':
                     raise ModuleFailException('ACME v1 only supports DNS identifiers!')
             for identifier_type, identifier in self.identifiers:
-                new_auth = self._new_authz_v1(identifier_type, identifier)
-                self._add_or_update_auth(identifier_type, identifier, new_auth)
+                authz = Authorization.create(self.client, identifier_type, identifier)
+                self.authorizations[authz.combined_identifier] = authz
         else:
             self._new_order_v2()
         self.changed = True
@@ -936,15 +788,14 @@ class ACMECertificateClient(object):
         '''
         # Get general challenge data
         data = {}
-        for type_identifier, auth in self.authorizations.items():
+        for type_identifier, authz in self.authorizations.items():
             identifier_type, identifier = type_identifier.split(':', 1)
-            auth = self.authorizations[type_identifier]
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
-            if auth['status'] == 'valid':
+            if authz.status == 'valid':
                 continue
             # We drop the type from the key to preserve backwards compatibility
-            data[identifier] = self._get_challenge_data(auth, identifier_type, identifier)
+            data[identifier] = authz.get_challenge_data(self.client)
             if first_step and self.challenge not in data[identifier]:
                 raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
                     self.challenge, type_identifier))
@@ -971,8 +822,8 @@ class ACMECertificateClient(object):
             # For ACME v1, we attempt to create new authzs. Existing ones
             # will be returned instead.
             for identifier_type, identifier in self.identifiers:
-                new_auth = self._new_authz_v1(identifier_type, identifier)
-                self._add_or_update_auth(identifier_type, identifier, new_auth)
+                authz = Authorization.create(self.client, identifier_type, identifier)
+                self.authorizations[combine_identifier(identifier_type, identifier)] = authz
         else:
             # For ACME v2, we obtain the order object by fetching the
             # order URI, and extract the information from there.
@@ -982,21 +833,17 @@ class ACMECertificateClient(object):
                 raise ACMEProtocolException('Failed to downloda order object', info=info, content_json=result)
 
             for auth_uri in result['authorizations']:
-                auth_data, dummy = self.client.get_request(auth_uri)
-                auth_data['uri'] = auth_uri
-                identifier_type = auth_data['identifier']['type']
-                identifier = auth_data['identifier']['value']
-                if auth_data.get('wildcard', False):
-                    identifier = '*.{0}'.format(identifier)
-                self.authorizations[identifier_type + ':' + identifier] = auth_data
+                authz = Authorization.from_url(self.client, auth_uri)
+                self.authorizations[authz.combined_identifier] = authz
 
             self.finalize_uri = result['finalize']
 
         # Step 2: validate challenges
-        for type_identifier, auth in self.authorizations.items():
-            if auth['status'] == 'pending':
+        for type_identifier, authz in self.authorizations.items():
+            if authz.status == 'pending':
                 identifier_type, identifier = type_identifier.split(':', 1)
-                self._validate_challenges(identifier_type, identifier, auth)
+                authz.call_validate(self.client, self.challenge)
+                self.changed = True
 
     def _chain_matches(self, chain, criterium):
         '''
@@ -1061,13 +908,12 @@ class ACMECertificateClient(object):
         with an error.
         '''
         for identifier_type, identifier in self.identifiers:
-            auth = self.authorizations.get(identifier_type + ':' + identifier)
-            if auth is None:
-                raise ModuleFailException('Found no authorization information for "{0}"!'.format(identifier_type + ':' + identifier))
-            if 'status' not in auth:
-                self._fail_challenge(identifier_type, identifier, auth, 'Authorization for {0} returned no status')
-            if auth['status'] != 'valid':
-                self._fail_challenge(identifier_type, identifier, auth, 'Authorization for {0} returned status ' + str(auth['status']))
+            authz = self.authorizations.get(combine_identifier(identifier_type, identifier))
+            if authz is None:
+                raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
+                    identifier=combine_identifier(identifier_type, identifier)))
+            if authz.status != 'valid':
+                authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status))
 
         if self.version == 1:
             cert = self._new_cert_v1()
@@ -1146,25 +992,14 @@ class ACMECertificateClient(object):
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        authz_deactivate = {
-            'status': 'deactivated'
-        }
-        if self.version == 1:
-            authz_deactivate['resource'] = 'authz'
-        if self.authorizations:
-            for identifier_type, identifier in self.identifiers:
-                auth = self.authorizations.get(identifier_type + ':' + identifier)
-                if auth is None or auth.get('status') != 'valid':
-                    continue
-                try:
-                    result, info = self.client.send_signed_request(auth['uri'], authz_deactivate, fail_on_error=False)
-                    if 200 <= info['status'] < 300 and result.get('status') == 'deactivated':
-                        auth['status'] = 'deactivated'
-                except Exception as dummy:
-                    # Ignore errors on deactivating authzs
-                    pass
-                if auth.get('status') != 'deactivated':
-                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(auth['uri']))
+        for authz in self.authorizations.values():
+            try:
+                authz.deactivate(self.client)
+            except Exception:
+                # ignore errors
+                pass
+            if authz.status != 'deactivated':
+                self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
 
 
 def main():
@@ -1245,7 +1080,7 @@ def main():
                 auths = dict()
                 for k, v in client.authorizations.items():
                     # Remove "type:" from key
-                    auths[k.split(':', 1)[1]] = v
+                    auths[k.split(':', 1)[1]] = v.to_json()
                 module.exit_json(
                     changed=client.changed,
                     authorizations=auths,
