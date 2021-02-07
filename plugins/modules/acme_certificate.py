@@ -532,9 +532,14 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
-    ACMEAccount,
-    get_default_argspec,
     create_backend,
+    get_default_argspec,
+    get_keyauthorization,
+    ACMEClient,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
+    ACMEAccount,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
@@ -565,14 +570,14 @@ except ImportError:
     pass
 
 
-class ACMEClient(object):
+class ACMECertificateClient(object):
     '''
     ACME client class. Uses an ACME account object and a CSR to
     start and validate ACME challenges and download the respective
     certificates.
     '''
 
-    def __init__(self, module):
+    def __init__(self, module, backend):
         self.module = module
         self.version = module.params['acme_version']
         self.challenge = module.params['challenge']
@@ -581,8 +586,9 @@ class ACMEClient(object):
         self.dest = module.params.get('dest')
         self.fullchain_dest = module.params.get('fullchain_dest')
         self.chain_dest = module.params.get('chain_dest')
-        self.account = ACMEAccount(module)
-        self.directory = self.account.directory
+        self.client = ACMEClient(module, backend)
+        self.account = ACMEAccount(self.client)
+        self.directory = self.client.directory
         self.data = module.params['data']
         self.authorizations = None
         self.cert_days = -1
@@ -619,7 +625,7 @@ class ACMEClient(object):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
         # Extract list of identifiers from CSR
-        self.identifiers = self.account.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
+        self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
 
     def _add_or_update_auth(self, identifier_type, identifier, auth):
         '''
@@ -643,7 +649,7 @@ class ACMEClient(object):
             "identifier": {"type": identifier_type, "value": identifier},
         }
 
-        result, info = self.account.send_signed_request(self.directory['new-authz'], new_authz)
+        result, info = self.client.send_signed_request(self.directory['new-authz'], new_authz)
         if info['status'] not in [200, 201]:
             raise ACMEProtocolException('Failed to request challenges', info=info, content_json=result)
         else:
@@ -663,7 +669,7 @@ class ACMEClient(object):
         for challenge in auth['challenges']:
             challenge_type = challenge['type']
             token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-            keyauthorization = self.account.get_keyauthorization(token)
+            keyauthorization = get_keyauthorization(self.client, token)
 
             if challenge_type == 'http-01':
                 # https://tools.ietf.org/html/rfc8555#section-8.3
@@ -735,11 +741,11 @@ class ACMEClient(object):
             challenge_response = {}
             if self.version == 1:
                 token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-                keyauthorization = self.account.get_keyauthorization(token)
+                keyauthorization = get_keyauthorization(self.client, token)
                 challenge_response["resource"] = "challenge"
                 challenge_response["keyAuthorization"] = keyauthorization
                 challenge_response["type"] = self.challenge
-            result, info = self.account.send_signed_request(uri, challenge_response)
+            result, info = self.client.send_signed_request(uri, challenge_response)
             if info['status'] not in [200, 202]:
                 raise ACMEProtocolException('Failed to validate challenge', info=info, content_json=result)
 
@@ -750,7 +756,7 @@ class ACMEClient(object):
         status = ''
 
         while status not in ['valid', 'invalid', 'revoked']:
-            result, dummy = self.account.get_request(auth['uri'])
+            result, dummy = self.client.get_request(auth['uri'])
             result['uri'] = auth['uri']
             if self._add_or_update_auth(identifier_type, identifier, result):
                 self.changed = True
@@ -778,14 +784,14 @@ class ACMEClient(object):
         new_cert = {
             "csr": nopad_b64(csr),
         }
-        result, info = self.account.send_signed_request(self.finalize_uri, new_cert)
+        result, info = self.client.send_signed_request(self.finalize_uri, new_cert)
         if info['status'] not in [200]:
             raise ACMEProtocolException('Failed to finalizing order', info=info, content_json=result)
 
         status = result['status']
         while status not in ['valid', 'invalid']:
             time.sleep(2)
-            result, dummy = self.account.get_request(self.order_uri)
+            result, dummy = self.client.get_request(self.order_uri)
             status = result['status']
 
         if status != 'valid':
@@ -806,7 +812,7 @@ class ACMEClient(object):
         Download and parse the certificate chain.
         https://tools.ietf.org/html/rfc8555#section-7.4.2
         '''
-        content, info = self.account.get_request(url, parse_json_result=False, headers={'Accept': 'application/pem-certificate-chain'})
+        content, info = self.client.get_request(url, parse_json_result=False, headers={'Accept': 'application/pem-certificate-chain'})
 
         if not content or not info['content-type'].startswith('application/pem-certificate-chain'):
             raise ModuleFailException("Cannot download certificate chain from {0}: {1} (headers: {2})".format(url, content, info))
@@ -826,7 +832,7 @@ class ACMEClient(object):
             if relation == 'up':
                 # Process link-up headers if there was no chain in reply
                 if not chain:
-                    chain_result, chain_info = self.account.get_request(link, parse_json_result=False)
+                    chain_result, chain_info = self.client.get_request(link, parse_json_result=False)
                     if chain_info['status'] in [200, 201]:
                         chain.append(self._der_to_pem(chain_result))
             elif relation == 'alternate':
@@ -849,13 +855,13 @@ class ACMEClient(object):
             "resource": "new-cert",
             "csr": nopad_b64(csr),
         }
-        result, info = self.account.send_signed_request(self.directory['new-cert'], new_cert)
+        result, info = self.client.send_signed_request(self.directory['new-cert'], new_cert)
 
         chain = []
 
         def f(link, relation):
             if relation == 'up':
-                chain_result, chain_info = self.account.get_request(link, parse_json_result=False)
+                chain_result, chain_info = self.client.get_request(link, parse_json_result=False)
                 if chain_info['status'] in [200, 201]:
                     del chain[:]
                     chain.append(self._der_to_pem(chain_result))
@@ -881,13 +887,13 @@ class ACMEClient(object):
         new_order = {
             "identifiers": identifiers
         }
-        result, info = self.account.send_signed_request(self.directory['newOrder'], new_order)
+        result, info = self.client.send_signed_request(self.directory['newOrder'], new_order)
 
         if info['status'] not in [201]:
             raise ACMEProtocolException('Failed to start new order', info=info, content_json=result)
 
         for auth_uri in result['authorizations']:
-            auth_data, dummy = self.account.get_request(auth_uri)
+            auth_data, dummy = self.client.get_request(auth_uri)
             auth_data['uri'] = auth_uri
             identifier_type = auth_data['identifier']['type']
             identifier = auth_data['identifier']['value']
@@ -977,13 +983,13 @@ class ACMEClient(object):
         else:
             # For ACME v2, we obtain the order object by fetching the
             # order URI, and extract the information from there.
-            result, info = self.account.get_request(self.order_uri)
+            result, info = self.client.get_request(self.order_uri)
 
             if not result or info['status'] not in [200]:
                 raise ACMEProtocolException('Failed to downloda order object', info=info, content_json=result)
 
             for auth_uri in result['authorizations']:
-                auth_data, dummy = self.account.get_request(auth_uri)
+                auth_data, dummy = self.client.get_request(auth_uri)
                 auth_data['uri'] = auth_uri
                 identifier_type = auth_data['identifier']['type']
                 identifier = auth_data['identifier']['value']
@@ -1131,11 +1137,11 @@ class ACMEClient(object):
             chain = list(cert.get('chain', []))
 
             if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
-                self.cert_days = self.account.backend.get_cert_days(self.dest)
+                self.cert_days = self.client.backend.get_cert_days(self.dest)
                 self.changed = True
 
             if self.fullchain_dest and write_file(self.module, self.fullchain_dest, (pem_cert + "\n".join(chain)).encode('utf8')):
-                self.cert_days = self.account.backend.get_cert_days(self.fullchain_dest)
+                self.cert_days = self.client.backend.get_cert_days(self.fullchain_dest)
                 self.changed = True
 
             if self.chain_dest and write_file(self.module, self.chain_dest, ("\n".join(chain)).encode('utf8')):
@@ -1158,7 +1164,7 @@ class ACMEClient(object):
                 if auth is None or auth.get('status') != 'valid':
                     continue
                 try:
-                    result, info = self.account.send_signed_request(auth['uri'], authz_deactivate)
+                    result, info = self.client.send_signed_request(auth['uri'], authz_deactivate)
                     if 200 <= info['status'] < 300 and result.get('status') == 'deactivated':
                         auth['status'] = 'deactivated'
                 except Exception as dummy:
@@ -1225,7 +1231,7 @@ def main():
             if module.check_mode:
                 module.exit_json(changed=True, authorizations={}, challenge_data={}, cert_days=cert_days)
             else:
-                client = ACMEClient(module)
+                client = ACMECertificateClient(module, backend)
                 client.cert_days = cert_days
                 other = dict()
                 is_first_step = client.is_first_step()
@@ -1252,7 +1258,7 @@ def main():
                     authorizations=auths,
                     finalize_uri=client.finalize_uri,
                     order_uri=client.order_uri,
-                    account_uri=client.account.uri,
+                    account_uri=client.client.account_uri,
                     challenge_data=data,
                     challenge_data_dns=data_dns,
                     cert_days=client.cert_days,

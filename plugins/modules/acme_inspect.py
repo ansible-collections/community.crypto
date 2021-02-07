@@ -244,9 +244,9 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
-    ACMEAccount,
-    get_default_argspec,
     create_backend,
+    get_default_argspec,
+    ACMEClient,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
@@ -280,20 +280,20 @@ def main():
     result = dict()
     changed = False
     try:
-        # Get hold of ACMEAccount object (includes directory)
-        account = ACMEAccount(module, backend)
+        # Get hold of ACMEClient and ACMEAccount objects (includes directory)
+        client = ACMEClient(module, backend)
         method = module.params['method']
-        result['directory'] = account.directory.directory
+        result['directory'] = client.directory.directory
         # Do we have to do more requests?
         if method != 'directory-only':
             url = module.params['url']
             fail_on_acme_error = module.params['fail_on_acme_error']
             # Do request
             if method == 'get':
-                data, info = account.get_request(url, parse_json_result=False, fail_on_error=False)
+                data, info = client.get_request(url, parse_json_result=False, fail_on_error=False)
             elif method == 'post':
                 changed = True  # only POSTs can change
-                data, info = account.send_signed_request(url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False)
+                data, info = client.send_signed_request(url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False)
             # Update results
             result.update(dict(
                 headers=info,

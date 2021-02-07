@@ -24,7 +24,16 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    get_keyauthorization,
+    ACMEClient,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    KeyParsingError,
 )
 
 
@@ -108,63 +117,49 @@ def get_compatibility_backend(module):
         return OpenSSLCLIBackend(module)
 
 
-class ACMELegacyAccount(ACMEAccount):
+class ACMELegacyAccount(object):
     '''
     ACME account object. Handles the authorized communication with the
     ACME server. Provides access to account bound information like
     the currently active authorizations and valid certificates
     '''
 
-    def __init__(self, module, backend=None):
-        if backend is None:
-            module.deprecate(
-                'Please adjust your custom module/plugin to the ACME module_utils refactor '
-                '(https://github.com/ansible-collections/community.crypto/pull/184). The '
-                'compatibility layer will be removed in community.crypto 2.0.0, thus breaking '
-                'your code', version='2.0.0', collection_name='community.crypto')
-            backend = get_compatibility_backend(module)
-
-        super(ACMELegacyAccount, self).__init__(module, backend)
-
-        # account_key path and content are mutually exclusive
-        self.key = module.params['account_key_src']
-        self.key_content = module.params['account_key_content']
-
-        # Grab account URI from module parameters.
-        # Make sure empty string is treated as None.
-        self.uri = module.params.get('account_uri') or None
-
-        if self.key is not None or self.key_content is not None:
-            error, self.key_data = self.parse_key(self.key, self.key_content)
-            if error:
-                raise ModuleFailException("error while parsing account key: %s" % error)
-            self.jwk = self.key_data['jwk']
-            self.jws_header = {
-                "alg": self.key_data['alg'],
-                "jwk": self.jwk,
-            }
-            if self.uri:
-                # Make sure self.jws_header is updated
-                self.set_account_uri(self.uri)
-
-        self.directory = ACMEDirectory(module, self)
+    def __init__(self, module):
+        module.deprecate(
+            'Please adjust your custom module/plugin to the ACME module_utils refactor '
+            '(https://github.com/ansible-collections/community.crypto/pull/184). The '
+            'compatibility layer will be removed in community.crypto 2.0.0, thus breaking '
+            'your code', version='2.0.0', collection_name='community.crypto')
+        backend = get_compatibility_backend(module)
+        self.client = ACMEClient(module, backend)
+        self.account = ACMEAccount(self.client)
+        self.key = self.client.account_key_file
+        self.key_content = self.client.account_key_content
+        self.uri = self.client.account_uri
+        self.key_data = self.client.account_key_data
+        self.jwk = self.client.account_jwk
+        self.jws_header = self.client.account_jws_header
+        self.directory = self.client.directory
 
     def get_keyauthorization(self, token):
         '''
         Returns the key authorization for the given token
         https://tools.ietf.org/html/rfc8555#section-8.1
         '''
-        return super(ACMELegacyAccount, self).get_keyauthorization(token)
+        return get_keyauthorization(self.client, token)
 
     def parse_key(self, key_file=None, key_content=None):
         '''
         Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
         (error, key_data).
         '''
-        return super(ACMELegacyAccount, self).parse_key(key_file=key_file, key_content=key_content)
+        try:
+            return None, self.client.parse_key(key_file=key_file, key_content=key_content)
+        except KeyParsingError as e:
+            return e.msg, None
 
     def sign_request(self, protected, payload, key_data, encode_payload=True):
-        return super(ACMELegacyAccount, self).sign_request(protected, payload, key_data, encode_payload=encode_payload)
+        return self.client.sign_request(protected, payload, key_data, encode_payload=encode_payload)
 
     def send_signed_request(self, url, payload, key_data=None, jws_header=None, parse_json_result=True, encode_payload=True):
         '''
@@ -175,7 +170,7 @@ class ACMELegacyAccount(ACMEAccount):
         If payload is None, a POST-as-GET is performed.
         (https://tools.ietf.org/html/rfc8555#section-6.3)
         '''
-        return super(ACMELegacyAccount, self).send_signed_request(
+        return self.client.send_signed_request(
             url, payload, key_data=key_data, jws_header=jws_header, parse_json_result=parse_json_result, encode_payload=encode_payload)
 
     def get_request(self, uri, parse_json_result=True, headers=None, get_only=False, fail_on_error=True):
@@ -183,7 +178,7 @@ class ACMELegacyAccount(ACMEAccount):
         Perform a GET-like request. Will try POST-as-GET for ACMEv2, with fallback
         to GET if server replies with a status code of 405.
         '''
-        return super(ACMELegacyAccount, self).get_request(
+        return self.client.get_request(
             uri, parse_json_result=parse_json_result, headers=headers, get_only=get_only, fail_on_error=fail_on_error)
 
     def set_account_uri(self, uri):
@@ -191,7 +186,8 @@ class ACMELegacyAccount(ACMEAccount):
         Set account URI. For ACME v2, it needs to be used to sending signed
         requests.
         '''
-        return super(ACMELegacyAccount, self).set_account_uri(uri)
+        self.client.set_account_uri(uri)
+        self.uri = self.client.account_uri
 
     def get_account_data(self):
         '''
@@ -199,7 +195,7 @@ class ACMELegacyAccount(ACMEAccount):
         URI is already known (such as after calling setup_account).
         Return None if the account was deactivated, or a dict otherwise.
         '''
-        return super(ACMELegacyAccount, self).get_account_data()
+        return self.account.get_account_data()
 
     def setup_account(self, contact=None, agreement=None, terms_agreed=False,
                       allow_creation=True, remove_account_uri_if_not_exists=False,
@@ -229,7 +225,7 @@ class ACMELegacyAccount(ACMEAccount):
 
         https://tools.ietf.org/html/rfc8555#section-7.3
         '''
-        return super(ACMELegacyAccount, self).setup_account(
+        result = self.account.setup_account(
             contact=contact,
             agreement=agreement,
             terms_agreed=terms_agreed,
@@ -237,6 +233,8 @@ class ACMELegacyAccount(ACMEAccount):
             remove_account_uri_if_not_exists=remove_account_uri_if_not_exists,
             external_account_binding=external_account_binding,
         )
+        self.uri = self.client.account_uri
+        return result
 
     def update_account(self, account_data, contact=None):
         '''
@@ -251,4 +249,4 @@ class ACMELegacyAccount(ACMEAccount):
 
         https://tools.ietf.org/html/rfc8555#section-7.3.2
         '''
-        return super(ACMELegacyAccount, self).update_account(account_data, contact=contact)
+        return self.account.update_account(account_data, contact=contact)
