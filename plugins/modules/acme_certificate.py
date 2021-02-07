@@ -550,10 +550,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.orders impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
-    der_to_pem,
-    nopad_b64,
     pem_to_der,
-    process_links,
 )
 
 
@@ -707,6 +704,26 @@ class ACMECertificateClient(object):
                 authz.call_validate(self.client, self.challenge)
                 self.changed = True
 
+    def download_alternate_chains(self, cert):
+        alternate_chains = []
+        for alternate in cert.alternates:
+            try:
+                alt_cert = CertificateChain.download(self.client, alternate)
+            except ModuleFailException as e:
+                self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
+                continue
+            alternate_chains.append(alt_cert)
+        return alternate_chains
+
+    def find_matching_chain(self, chains):
+        for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
+            matcher = ChainMatcher(Criterium(criterium, index=criterium_idx), self.client)
+            for chain in chains:
+                if matcher.match(chain):
+                    self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
+                    return chain
+        return None
+
     def get_certificate(self):
         '''
         Request a new certificate and write it to the destination file.
@@ -722,20 +739,13 @@ class ACMECertificateClient(object):
                 authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status))
 
         if self.version == 1:
-            cert = retrieve_acme_v1_certificate(self.client, csr = pem_to_der(self.csr, self.csr_content))
+            cert = retrieve_acme_v1_certificate(self.client, pem_to_der(self.csr, self.csr_content))
         else:
             self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
             cert = CertificateChain.download(self.client, self.order.certificate_uri)
             if self.module.params['retrieve_all_alternates'] or self.module.params['select_chain']:
                 # Retrieve alternate chains
-                alternate_chains = []
-                for alternate in cert.alternates:
-                    try:
-                        alt_cert = CertificateChain.download(self.client, alternate)
-                    except ModuleFailException as e:
-                        self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
-                        continue
-                    alternate_chains.append(alt_cert)
+                alternate_chains = self.download_alternate_chains(cert)
 
                 # Prepare return value for all alternate chains
                 if self.module.params['retrieve_all_alternates']:
@@ -745,17 +755,7 @@ class ACMECertificateClient(object):
 
                 # Try to select alternate chain depending on criteria
                 if self.module.params['select_chain']:
-                    matching_chain = None
-                    all_chains = [cert] + alternate_chains
-                    for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
-                        matcher = ChainMatcher(Criterium(criterium, index=criterium_idx), self.client)
-                        for alt_chain in all_chains:
-                            if matcher.match(alt_chain):
-                                self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
-                                matching_chain = alt_chain
-                                break
-                        if matching_chain:
-                            break
+                    matching_chain = self.find_matching_chain([cert] + alternate_chains)
                     if matching_chain:
                         cert = matching_chain
                     else:
