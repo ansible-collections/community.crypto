@@ -10,7 +10,6 @@ __metaclass__ = type
 
 import copy
 import datetime
-import hashlib
 import json
 import locale
 
@@ -352,13 +351,3 @@ def create_backend(module, needs_acme_v2):
     locale.setlocale(locale.LC_ALL, 'C')
 
     return module_backend
-
-
-def get_keyauthorization(client, token):
-    '''
-    Returns the key authorization for the given token
-    https://tools.ietf.org/html/rfc8555#section-8.1
-    '''
-    accountkey_json = json.dumps(client.account_jwk, sort_keys=True, separators=(',', ':'))
-    thumbprint = nopad_b64(hashlib.sha256(accountkey_json.encode('utf8')).digest())
-    return "{0}.{1}".format(token, thumbprint)

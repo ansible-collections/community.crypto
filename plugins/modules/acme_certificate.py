@@ -534,12 +534,15 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
     get_default_argspec,
-    get_keyauthorization,
     ACMEClient,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    create_key_authorization,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
@@ -669,7 +672,7 @@ class ACMECertificateClient(object):
         for challenge in auth['challenges']:
             challenge_type = challenge['type']
             token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-            keyauthorization = get_keyauthorization(self.client, token)
+            keyauthorization = create_key_authorization(self.client, token)
 
             if challenge_type == 'http-01':
                 # https://tools.ietf.org/html/rfc8555#section-8.3
@@ -741,7 +744,7 @@ class ACMECertificateClient(object):
             challenge_response = {}
             if self.version == 1:
                 token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-                keyauthorization = get_keyauthorization(self.client, token)
+                keyauthorization = create_key_authorization(self.client, token)
                 challenge_response["resource"] = "challenge"
                 challenge_response["keyAuthorization"] = keyauthorization
                 challenge_response["type"] = self.challenge
