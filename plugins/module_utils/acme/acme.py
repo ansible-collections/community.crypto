@@ -180,7 +180,8 @@ class ACMEClient(object):
     def send_signed_request(self, url, payload, key_data=None, jws_header=None, parse_json_result=True, encode_payload=True):
         '''
         Sends a JWS signed HTTP POST request to the ACME server and returns
-        the response as dictionary
+        the response as dictionary (if parse_json_result is True) or in raw form
+        (if parse_json_result is False).
         https://tools.ietf.org/html/rfc8555#section-6.2
 
         If payload is None, a POST-as-GET is performed.

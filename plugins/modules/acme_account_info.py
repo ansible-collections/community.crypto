@@ -219,7 +219,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
     ACMEClient,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme_account import (
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
 
