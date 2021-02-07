@@ -24,12 +24,15 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
-    get_keyauthorization,
     ACMEClient,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    create_key_authorization,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
@@ -146,7 +149,7 @@ class ACMELegacyAccount(object):
         Returns the key authorization for the given token
         https://tools.ietf.org/html/rfc8555#section-8.1
         '''
-        return get_keyauthorization(self.client, token)
+        return create_key_authorization(self.client, token)
 
     def parse_key(self, key_file=None, key_content=None):
         '''
