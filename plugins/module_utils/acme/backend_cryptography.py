@@ -14,10 +14,14 @@ import datetime
 import os
 import sys
 
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils._text import to_bytes, to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CryptoBackend,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+    ChainMatcher,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import BackendException
@@ -25,6 +29,14 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    parse_name_field,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_name_to_oid,
+)
 
 try:
     import cryptography
@@ -80,6 +92,87 @@ else:
         if len(h) < digits:
             h = '0' * (digits - len(h)) + h
         return h
+
+
+class CryptographyChainMatcher(ChainMatcher):
+    @staticmethod
+    def _parse_key_identifier(key_identifier, name, criterium_idx, module):
+        if key_identifier:
+            try:
+                return binascii.unhexlify(key_identifier.replace(':', ''))
+            except Exception:
+                if criterium_idx is None:
+                    module.warn('Criterium has invalid {0} value. Ignoring criterium.'.format(name))
+                else:
+                    module.warn('Criterium {0} in select_chain has invalid {1} value. '
+                                'Ignoring criterium.'.format(criterium_idx, name))
+        return None
+
+    def __init__(self, criterium, module):
+        self.criterium = criterium
+        self.test_certificates = criterium.test_certificates
+        self.subject = []
+        self.issuer = []
+        if criterium.subject:
+            self.subject = [
+                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.subject)
+            ]
+        if criterium.issuer:
+            self.issuer = [
+                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.issuer)
+            ]
+        self.subject_key_identifier = CryptographyChainMatcher._parse_key_identifier(
+            criterium.subject_key_identifier, 'subject_key_identifier', criterium.index, module)
+        self.authority_key_identifier = CryptographyChainMatcher._parse_key_identifier(
+            criterium.authority_key_identifier, 'authority_key_identifier', criterium.index, module)
+
+    def _match_subject(self, x509_subject, match_subject):
+        for oid, value in match_subject:
+            found = False
+            for attribute in x509_subject:
+                if attribute.oid == oid and value == to_native(attribute.value):
+                    found = True
+                    break
+            if not found:
+                return False
+        return True
+
+    def match(self, certificate):
+        '''
+        Check whether an alternate chain matches the specified criterium.
+        '''
+        chain = certificate.chain
+        if self.test_certificates == 'last':
+            chain = chain[-1:]
+        elif self.test_certificates == 'first':
+            chain = chain[:1]
+        for cert in chain:
+            try:
+                x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
+                matches = True
+                if not self._match_subject(x509.subject, self.subject):
+                    matches = False
+                if not self._match_subject(x509.issuer, self.issuer):
+                    matches = False
+                if self.subject_key_identifier:
+                    try:
+                        ext = x509.extensions.get_extension_for_class(cryptography.x509.SubjectKeyIdentifier)
+                        if self.subject_key_identifier != ext.value.digest:
+                            matches = False
+                    except cryptography.x509.ExtensionNotFound:
+                        matches = False
+                if self.authority_key_identifier:
+                    try:
+                        ext = x509.extensions.get_extension_for_class(cryptography.x509.AuthorityKeyIdentifier)
+                        if self.authority_key_identifier != ext.value.key_identifier:
+                            matches = False
+                    except cryptography.x509.ExtensionNotFound:
+                        matches = False
+                if matches:
+                    return True
+            except Exception as e:
+                self.module.warn('Error while loading certificate {0}: {1}'.format(cert, e))
+        return False
 
 
 class CryptographyBackend(CryptoBackend):
@@ -268,3 +361,9 @@ class CryptographyBackend(CryptoBackend):
         if now is None:
             now = datetime.datetime.now()
         return (cert.not_valid_after - now).days
+
+    def create_chain_matcher(self, criterium):
+        '''
+        Given a Criterium object, creates a ChainMatcher object.
+        '''
+        return CryptographyChainMatcher(criterium, self.module)

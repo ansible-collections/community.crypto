@@ -8,9 +8,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-import binascii
+import abc
 
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils import six
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
@@ -22,24 +22,9 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
     process_links,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    parse_name_field,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_name_to_oid,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
-
-try:
-    import cryptography
-    import cryptography.hazmat.backends
-    import cryptography.x509
-except ImportError:
-    pass
 
 
 class CertificateChain(object):
@@ -108,85 +93,13 @@ class Criterium(object):
         self.authority_key_identifier = criterium['authority_key_identifier']
 
 
+@six.add_metaclass(abc.ABCMeta)
 class ChainMatcher(object):
-    @staticmethod
-    def _parse_key_identifier(key_identifier, name, criterium_idx, client):
-        if key_identifier:
-            try:
-                return binascii.unhexlify(key_identifier.replace(':', ''))
-            except Exception:
-                if criterium_idx is None:
-                    client.module.warn('Criterium has invalid {0} value. Ignoring criterium.'.format(name))
-                else:
-                    client.module.warn('Criterium {0} in select_chain has invalid {1} value. '
-                                       'Ignoring criterium.'.format(criterium_idx, name))
-        return None
-
-    def __init__(self, criterium, client):
-        self.criterium = criterium
-        self.test_certificates = criterium.test_certificates
-        self.subject = []
-        self.issuer = []
-        if criterium.subject:
-            self.subject = [
-                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.subject)
-            ]
-        if criterium.issuer:
-            self.issuer = [
-                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.issuer)
-            ]
-        self.subject_key_identifier = ChainMatcher._parse_key_identifier(
-            criterium.subject_key_identifier, 'subject_key_identifier', criterium.index, client)
-        self.authority_key_identifier = ChainMatcher._parse_key_identifier(
-            criterium.authority_key_identifier, 'authority_key_identifier', criterium.index, client)
-
-    def _match_subject(self, x509_subject, match_subject):
-        for oid, value in match_subject:
-            found = False
-            for attribute in x509_subject:
-                if attribute.oid == oid and value == to_native(attribute.value):
-                    found = True
-                    break
-            if not found:
-                return False
-        return True
-
+    @abc.abstractmethod
     def match(self, certificate):
         '''
-        Check whether an alternate chain matches the specified criterium.
+        Check whether a certificate chain (CertificateChain instance) matches.
         '''
-        chain = certificate.chain
-        if self.test_certificates == 'last':
-            chain = chain[-1:]
-        elif self.test_certificates == 'first':
-            chain = chain[:1]
-        for cert in chain:
-            try:
-                x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
-                matches = True
-                if not self._match_subject(x509.subject, self.subject):
-                    matches = False
-                if not self._match_subject(x509.issuer, self.issuer):
-                    matches = False
-                if self.subject_key_identifier:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.SubjectKeyIdentifier)
-                        if self.subject_key_identifier != ext.value.digest:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if self.authority_key_identifier:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.AuthorityKeyIdentifier)
-                        if self.authority_key_identifier != ext.value.key_identifier:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if matches:
-                    return True
-            except Exception as e:
-                self.module.warn('Error while loading certificate {0}: {1}'.format(cert, e))
-        return False
 
 
 def retrieve_acme_v1_certificate(client, csr_der):

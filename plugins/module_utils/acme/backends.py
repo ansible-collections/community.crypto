@@ -50,3 +50,9 @@ class CryptoBackend(object):
 
         If now is not specified, datetime.datetime.now() is used.
         '''
+
+    @abc.abstractmethod
+    def create_chain_matcher(self, criterium):
+        '''
+        Given a Criterium object, creates a ChainMatcher object.
+        '''

@@ -522,8 +522,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
     ACMEAccount,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import CryptographyBackend
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     combine_identifier,
     split_identifier,
@@ -533,7 +531,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.challenges i
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
     retrieve_acme_v1_certificate,
     CertificateChain,
-    ChainMatcher,
     Criterium,
 )
 
@@ -579,6 +576,13 @@ class ACMECertificateClient(object):
         self.order = None
         self.order_uri = self.data.get('order_uri') if self.data else None
         self.all_chains = None
+        self.select_chain_matcher = []
+
+        if self.module.params['select_chain']:
+            for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
+                self.select_chain_matcher.append(
+                    self.client.backend.create_chain_matcher(
+                        Criterium(criterium, index=criterium_idx)))
 
         # Make sure account exists
         modify_account = module.params['modify_account']
@@ -716,8 +720,7 @@ class ACMECertificateClient(object):
         return alternate_chains
 
     def find_matching_chain(self, chains):
-        for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
-            matcher = ChainMatcher(Criterium(criterium, index=criterium_idx), self.client)
+        for criterium_idx, matcher in enumerate(self.select_chain_matcher):
             for chain in chains:
                 if matcher.match(chain):
                     self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
@@ -743,7 +746,7 @@ class ACMECertificateClient(object):
         else:
             self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
             cert = CertificateChain.download(self.client, self.order.certificate_uri)
-            if self.module.params['retrieve_all_alternates'] or self.module.params['select_chain']:
+            if self.module.params['retrieve_all_alternates'] or self.select_chain_matcher:
                 # Retrieve alternate chains
                 alternate_chains = self.download_alternate_chains(cert)
 
@@ -754,7 +757,7 @@ class ACMECertificateClient(object):
                         self.all_chains.append(alt_chain.to_json())
 
                 # Try to select alternate chain depending on criteria
-                if self.module.params['select_chain']:
+                if self.select_chain_matcher:
                     matching_chain = self.find_matching_chain([cert] + alternate_chains)
                     if matching_chain:
                         cert = matching_chain
@@ -832,8 +835,6 @@ def main():
         supports_check_mode=True,
     )
     backend = create_backend(module, False)
-    if module.params['select_chain'] and not isinstance(backend, CryptographyBackend):
-        module.fail_json(msg="The 'select_chain' can only be used with the 'cryptography' backend.")
 
     try:
         if module.params.get('dest'):

@@ -22,7 +22,9 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backends imp
     CryptoBackend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import BackendException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    BackendException,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
@@ -285,3 +287,9 @@ class OpenSSLCLIBackend(CryptoBackend):
         if now is None:
             now = datetime.datetime.now()
         return (not_after - now).days
+
+    def create_chain_matcher(self, criterium):
+        '''
+        Given a Criterium object, creates a ChainMatcher object.
+        '''
+        raise BackendException('Alternate chain matching can only be used with the "cryptography" backend.')
