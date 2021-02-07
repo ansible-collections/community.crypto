@@ -652,12 +652,10 @@ class ACMECertificateClient(object):
             "identifier": {"type": identifier_type, "value": identifier},
         }
 
-        result, info = self.client.send_signed_request(self.directory['new-authz'], new_authz)
-        if info['status'] not in [200, 201]:
-            raise ACMEProtocolException('Failed to request challenges', info=info, content_json=result)
-        else:
-            result['uri'] = info['location']
-            return result
+        result, info = self.client.send_signed_request(
+            self.directory['new-authz'], new_authz, error_msg='Failed to request challenges', expected_status_codes=[200, 201])
+        result['uri'] = info['location']
+        return result
 
     def _get_challenge_data(self, auth, identifier_type, identifier):
         '''
@@ -748,9 +746,8 @@ class ACMECertificateClient(object):
                 challenge_response["resource"] = "challenge"
                 challenge_response["keyAuthorization"] = keyauthorization
                 challenge_response["type"] = self.challenge
-            result, info = self.client.send_signed_request(uri, challenge_response)
-            if info['status'] not in [200, 202]:
-                raise ACMEProtocolException('Failed to validate challenge', info=info, content_json=result)
+            result, info = self.client.send_signed_request(
+                uri, challenge_response, error_msg='Failed to validate challenge', expected_status_codes=[200, 202])
 
         if not found_challenge:
             raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}:{2}!".format(
@@ -787,9 +784,8 @@ class ACMECertificateClient(object):
         new_cert = {
             "csr": nopad_b64(csr),
         }
-        result, info = self.client.send_signed_request(self.finalize_uri, new_cert)
-        if info['status'] not in [200]:
-            raise ACMEProtocolException('Failed to finalizing order', info=info, content_json=result)
+        result, info = self.client.send_signed_request(
+            self.finalize_uri, new_cert, error_msg='Failed to finalizing order', expected_status_codes=[200])
 
         status = result['status']
         while status not in ['valid', 'invalid']:
@@ -858,8 +854,8 @@ class ACMECertificateClient(object):
             "resource": "new-cert",
             "csr": nopad_b64(csr),
         }
-        result, info = self.client.send_signed_request(self.directory['new-cert'], new_cert)
-
+        result, info = self.client.send_signed_request(
+            self.directory['new-cert'], new_cert, error_msg='Failed to receive certificate', expected_status_codes=[200, 201])
         chain = []
 
         def f(link, relation):
@@ -870,11 +866,7 @@ class ACMECertificateClient(object):
                     chain.append(self._der_to_pem(chain_result))
 
         process_links(info, f)
-
-        if info['status'] not in [200, 201]:
-            raise ACMEProtocolException('Failed to receive certificate', info=info, content_json=result)
-        else:
-            return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
+        return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
 
     def _new_order_v2(self):
         '''
@@ -890,10 +882,8 @@ class ACMECertificateClient(object):
         new_order = {
             "identifiers": identifiers
         }
-        result, info = self.client.send_signed_request(self.directory['newOrder'], new_order)
-
-        if info['status'] not in [201]:
-            raise ACMEProtocolException('Failed to start new order', info=info, content_json=result)
+        result, info = self.client.send_signed_request(
+            self.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
 
         for auth_uri in result['authorizations']:
             auth_data, dummy = self.client.get_request(auth_uri)
@@ -1167,7 +1157,7 @@ class ACMECertificateClient(object):
                 if auth is None or auth.get('status') != 'valid':
                     continue
                 try:
-                    result, info = self.client.send_signed_request(auth['uri'], authz_deactivate)
+                    result, info = self.client.send_signed_request(auth['uri'], authz_deactivate, fail_on_error=False)
                     if 200 <= info['status'] < 300 and result.get('status') == 'deactivated':
                         auth['status'] = 'deactivated'
                 except Exception as dummy:

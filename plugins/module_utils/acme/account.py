@@ -94,7 +94,7 @@ class ACMEAccount(object):
                     'Use the acme_account module with the external_account_binding option.'
                 )
 
-        result, info = self.client.send_signed_request(url, new_reg)
+        result, info = self.client.send_signed_request(url, new_reg, fail_on_error=False)
 
         if info['status'] in ([200, 201] if self.client.version == 1 else [201]):
             # Account did not exist
@@ -143,16 +143,16 @@ class ACMEAccount(object):
         if self.client.version == 1:
             data = {}
             data['resource'] = 'reg'
-            result, info = self.client.send_signed_request(self.client.account_uri, data)
+            result, info = self.client.send_signed_request(self.client.account_uri, data, fail_on_error=False)
         else:
             # try POST-as-GET first (draft-15 or newer)
             data = None
-            result, info = self.client.send_signed_request(self.client.account_uri, data)
+            result, info = self.client.send_signed_request(self.client.account_uri, data, fail_on_error=False)
             # check whether that failed with a malformed request error
             if info['status'] >= 400 and result.get('type') == 'urn:ietf:params:acme:error:malformed':
                 # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
                 data = {}
-                result, info = self.client.send_signed_request(self.client.account_uri, data)
+                result, info = self.client.send_signed_request(self.client.account_uri, data, fail_on_error=False)
         if info['status'] in (400, 403) and result.get('type') == 'urn:ietf:params:acme:error:unauthorized':
             # Returned when account is deactivated
             return None

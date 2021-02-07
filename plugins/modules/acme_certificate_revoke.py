@@ -194,7 +194,8 @@ def main():
                 "alg": private_key_data['alg'],
                 "jwk": private_key_data['jwk'],
             }
-            result, info = client.send_signed_request(endpoint, payload, key_data=private_key_data, jws_header=jws_header)
+            result, info = client.send_signed_request(
+                endpoint, payload, key_data=private_key_data, jws_header=jws_header, fail_on_error=False)
         else:
             # Step 1: get hold of account URI
             created, account_data = account.setup_account(allow_creation=False)
@@ -203,7 +204,7 @@ def main():
             if account_data is None:
                 raise ModuleFailException(msg='Account does not exist or is deactivated.')
             # Step 2: sign revokation request with account key
-            result, info = client.send_signed_request(endpoint, payload)
+            result, info = client.send_signed_request(endpoint, payload, fail_on_error=False)
         if info['status'] != 200:
             already_revoked = False
             # Standardized error from draft 14 on (https://tools.ietf.org/html/rfc8555#section-7.6)

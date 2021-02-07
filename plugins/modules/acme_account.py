@@ -241,9 +241,8 @@ def main():
                     payload = {
                         'status': 'deactivated'
                     }
-                    result, info = client.send_signed_request(client.account_uri, payload)
-                    if info['status'] != 200:
-                        raise ACMEProtocolException('Failed to deactivate account', info=info, content_json=result)
+                    result, info = client.send_signed_request(
+                        client.account_uri, payload, error_msg='Failed to deactivate account', expected_status_codes=[200])
                 changed = True
         elif state == 'present':
             allow_creation = module.params.get('allow_creation')
@@ -303,9 +302,8 @@ def main():
                 }
                 data = client.sign_request(protected, payload, new_key_data)
                 # Send request and verify result
-                result, info = client.send_signed_request(url, data)
-                if info['status'] != 200:
-                    raise ACMEProtocolException('Failed to rollover account key', info=info, content_json=result)
+                result, info = client.send_signed_request(
+                    url, data, error_msg='Failed to rollover account key', expected_status_codes=[200])
                 if module._diff:
                     client.account_key_data = new_key_data
                     client.account_jws_header['alg'] = new_key_data['alg']

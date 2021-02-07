@@ -50,6 +50,14 @@ def _assert_fetch_url_success(module, response, info, allow_redirect=False, allo
         raise ACMEProtocolException(module, info=info, response=response)
 
 
+def _is_failed(info, expected_status_codes=None):
+    if info['status'] < 200 or info['status'] >= 400:
+        return True
+    if expected_status_codes is not None and info['status'] not in expected_status_codes:
+        return True
+    return False
+
+
 class ACMEDirectory(object):
     '''
     The ACME server directory. Gives access to the available resources,
@@ -177,7 +185,8 @@ class ACMEClient(object):
                 if data is not None:
                     f.write('{0}\n\n'.format(json.dumps(data, indent=2, sort_keys=True)).encode('utf-8'))
 
-    def send_signed_request(self, url, payload, key_data=None, jws_header=None, parse_json_result=True, encode_payload=True):
+    def send_signed_request(self, url, payload, key_data=None, jws_header=None, parse_json_result=True,
+                            encode_payload=True, fail_on_error=True, error_msg=None, expected_status_codes=None):
         '''
         Sends a JWS signed HTTP POST request to the ACME server and returns
         the response as dictionary (if parse_json_result is True) or in raw form
@@ -241,16 +250,20 @@ class ACMEClient(object):
                 else:
                     result = content
 
+            if fail_on_error and _is_failed(info, expected_status_codes=expected_status_codes):
+                raise ACMEProtocolException(
+                    self.module, msg=error_msg, info=info, content=content, content_json=result if parse_json_result else None)
             return result, info
 
-    def get_request(self, uri, parse_json_result=True, headers=None, get_only=False, fail_on_error=True):
+    def get_request(self, uri, parse_json_result=True, headers=None, get_only=False,
+                    fail_on_error=True, error_msg=None, expected_status_codes=None):
         '''
         Perform a GET-like request. Will try POST-as-GET for ACMEv2, with fallback
         to GET if server replies with a status code of 405.
         '''
         if not get_only and self.version != 1:
             # Try POST-as-GET
-            content, info = self.send_signed_request(uri, None, parse_json_result=False)
+            content, info = self.send_signed_request(uri, None, parse_json_result=False, fail_on_error=False)
             if info['status'] == 405:
                 # Instead, do unauthenticated GET
                 get_only = True
@@ -283,9 +296,9 @@ class ACMEClient(object):
         else:
             result = content
 
-        if fail_on_error and (info['status'] < 200 or info['status'] >= 400):
+        if fail_on_error and _is_failed(info, expected_status_codes=expected_status_codes):
             raise ACMEProtocolException(
-                self.module, info=info, content=content, content_json=result if parse_json_result else None)
+                self.module, msg=error_msg, info=info, content=content, content_json=result if parse_json_result else None)
         return result, info
 
 
