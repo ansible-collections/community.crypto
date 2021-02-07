@@ -508,25 +508,9 @@ all_chains:
       returned: always
 '''
 
-import base64
-import binascii
 import os
-import textwrap
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_bytes, to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    parse_name_field,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_name_to_oid,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    split_pem_list,
-)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
@@ -546,6 +530,12 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.challenges i
     Authorization,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+    CertificateChain,
+    ChainMatcher,
+    Criterium,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
@@ -559,17 +549,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.orders impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    der_to_pem,
     nopad_b64,
     pem_to_der,
     process_links,
 )
-
-try:
-    import cryptography
-    import cryptography.hazmat.backends
-    import cryptography.x509
-except ImportError:
-    pass
 
 
 class ACMECertificateClient(object):
@@ -596,6 +580,7 @@ class ACMECertificateClient(object):
         self.cert_days = -1
         self.order = None
         self.order_uri = self.data.get('order_uri') if self.data else None
+        self.all_chains = None
 
         # Make sure account exists
         modify_account = module.params['modify_account']
@@ -629,51 +614,6 @@ class ACMECertificateClient(object):
         # Extract list of identifiers from CSR
         self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
 
-    def _der_to_pem(self, der_cert):
-        '''
-        Convert the DER format certificate in der_cert to a PEM format
-        certificate and return it.
-        '''
-        return """-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----\n""".format(
-            "\n".join(textwrap.wrap(base64.b64encode(der_cert).decode('utf8'), 64)))
-
-    def _download_cert(self, url):
-        '''
-        Download and parse the certificate chain.
-        https://tools.ietf.org/html/rfc8555#section-7.4.2
-        '''
-        content, info = self.client.get_request(url, parse_json_result=False, headers={'Accept': 'application/pem-certificate-chain'})
-
-        if not content or not info['content-type'].startswith('application/pem-certificate-chain'):
-            raise ModuleFailException("Cannot download certificate chain from {0}: {1} (headers: {2})".format(url, content, info))
-
-        cert = None
-        chain = []
-
-        # Parse data
-        certs = split_pem_list(content.decode('utf-8'), keep_inbetween=True)
-        if certs:
-            cert = certs[0]
-            chain = certs[1:]
-
-        alternates = []
-
-        def f(link, relation):
-            if relation == 'up':
-                # Process link-up headers if there was no chain in reply
-                if not chain:
-                    chain_result, chain_info = self.client.get_request(link, parse_json_result=False)
-                    if chain_info['status'] in [200, 201]:
-                        chain.append(self._der_to_pem(chain_result))
-            elif relation == 'alternate':
-                alternates.append(link)
-
-        process_links(info, f)
-
-        if cert is None:
-            raise ModuleFailException("Failed to parse certificate chain download from {0}: {1} (headers: {2})".format(url, content, info))
-        return {'cert': cert, 'chain': chain, 'alternates': alternates}
-
     def _new_cert_v1(self):
         '''
         Create a new certificate based on the CSR (ACME v1 protocol).
@@ -694,10 +634,10 @@ class ACMECertificateClient(object):
                 chain_result, chain_info = self.client.get_request(link, parse_json_result=False)
                 if chain_info['status'] in [200, 201]:
                     del chain[:]
-                    chain.append(self._der_to_pem(chain_result))
+                    chain.append(der_to_pem(chain_result))
 
         process_links(info, f)
-        return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
+        return {'cert': der_to_pem(result), 'uri': info['location'], 'chain': chain}
 
     def is_first_step(self):
         '''
@@ -791,62 +731,6 @@ class ACMECertificateClient(object):
                 authz.call_validate(self.client, self.challenge)
                 self.changed = True
 
-    def _chain_matches(self, chain, criterium):
-        '''
-        Check whether an alternate chain matches the specified criterium.
-        '''
-        if criterium['test_certificates'] == 'last':
-            chain = chain[-1:]
-        elif criterium['test_certificates'] == 'first':
-            chain = chain[:1]
-        for cert in chain:
-            try:
-                x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
-                matches = True
-                if criterium['subject']:
-                    for k, v in parse_name_field(criterium['subject']):
-                        oid = cryptography_name_to_oid(k)
-                        value = to_native(v)
-                        found = False
-                        for attribute in x509.subject:
-                            if attribute.oid == oid and value == to_native(attribute.value):
-                                found = True
-                                break
-                        if not found:
-                            matches = False
-                            break
-                if criterium['issuer']:
-                    for k, v in parse_name_field(criterium['issuer']):
-                        oid = cryptography_name_to_oid(k)
-                        value = to_native(v)
-                        found = False
-                        for attribute in x509.issuer:
-                            if attribute.oid == oid and value == to_native(attribute.value):
-                                found = True
-                                break
-                        if not found:
-                            matches = False
-                            break
-                if criterium['subject_key_identifier']:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.SubjectKeyIdentifier)
-                        if criterium['subject_key_identifier'] != ext.value.digest:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if criterium['authority_key_identifier']:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.AuthorityKeyIdentifier)
-                        if criterium['authority_key_identifier'] != ext.value.key_identifier:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if matches:
-                    return True
-            except Exception as e:
-                self.module.warn('Error while loading certificate {0}: {1}'.format(cert, e))
-        return False
-
     def get_certificate(self):
         '''
         Request a new certificate and write it to the destination file.
@@ -865,13 +749,13 @@ class ACMECertificateClient(object):
             cert = self._new_cert_v1()
         else:
             self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
-            cert = self._download_cert(self.order.certificate_uri)
+            cert = CertificateChain.download(self.client, self.order.certificate_uri)
             if self.module.params['retrieve_all_alternates'] or self.module.params['select_chain']:
                 # Retrieve alternate chains
                 alternate_chains = []
-                for alternate in cert['alternates']:
+                for alternate in cert.alternates:
                     try:
-                        alt_cert = self._download_cert(alternate)
+                        alt_cert = CertificateChain.download(self.client, alternate)
                     except ModuleFailException as e:
                         self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
                         continue
@@ -879,47 +763,31 @@ class ACMECertificateClient(object):
 
                 # Prepare return value for all alternate chains
                 if self.module.params['retrieve_all_alternates']:
-                    self.all_chains = []
-
-                    def _append_all_chains(cert_data):
-                        self.all_chains.append(dict(
-                            cert=cert_data['cert'].encode('utf8'),
-                            chain=("\n".join(cert_data.get('chain', []))).encode('utf8'),
-                            full_chain=(cert_data['cert'] + "\n".join(cert_data.get('chain', []))).encode('utf8'),
-                        ))
-
-                    _append_all_chains(cert)
+                    self.all_chains = [cert.to_json()]
                     for alt_chain in alternate_chains:
-                        _append_all_chains(alt_chain)
+                        self.all_chains.append(alt_chain.to_json())
 
                 # Try to select alternate chain depending on criteria
                 if self.module.params['select_chain']:
                     matching_chain = None
                     all_chains = [cert] + alternate_chains
                     for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
-                        for v in ('subject_key_identifier', 'authority_key_identifier'):
-                            if criterium[v]:
-                                try:
-                                    criterium[v] = binascii.unhexlify(criterium[v].replace(':', ''))
-                                except Exception:
-                                    self.module.warn('Criterium {0} in select_chain has invalid {1} value. '
-                                                     'Ignoring criterium.'.format(criterium_idx, v))
-                                    continue
+                        matcher = ChainMatcher(Criterium(criterium, index=criterium_idx), self.client)
                         for alt_chain in all_chains:
-                            if self._chain_matches(alt_chain.get('chain', []), criterium):
+                            if matcher.match(alt_chain):
                                 self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
                                 matching_chain = alt_chain
                                 break
                         if matching_chain:
                             break
                     if matching_chain:
-                        cert.update(matching_chain)
+                        cert = matching_chain
                     else:
                         self.module.debug('Found no matching alternative chain')
 
-        if cert['cert'] is not None:
-            pem_cert = cert['cert']
-            chain = list(cert.get('chain', []))
+        if cert.cert is not None:
+            pem_cert = cert.cert
+            chain = cert.chain
 
             if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
                 self.cert_days = self.client.backend.get_cert_days(self.dest)
@@ -1017,7 +885,7 @@ def main():
                     try:
                         client.finish_challenges()
                         client.get_certificate()
-                        if module.params['retrieve_all_alternates']:
+                        if client.all_chains is not None:
                             other['all_chains'] = client.all_chains
                     finally:
                         if module.params['deactivate_authzs']:

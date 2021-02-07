@@ -10,6 +10,7 @@ __metaclass__ = type
 
 import base64
 import re
+import textwrap
 import traceback
 
 from ansible.module_utils._text import to_native
@@ -22,7 +23,15 @@ def nopad_b64(data):
     return base64.urlsafe_b64encode(data).decode('utf8').replace("=", "")
 
 
-def pem_to_der(pem_filename, pem_content=None):
+def der_to_pem(der_cert):
+    '''
+    Convert the DER format certificate in der_cert to a PEM format certificate and return it.
+    '''
+    return """-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----\n""".format(
+        "\n".join(textwrap.wrap(base64.b64encode(der_cert).decode('utf8'), 64)))
+
+
+def pem_to_der(pem_filename=None, pem_content=None):
     '''
     Load PEM file, or use PEM file's content, and convert to DER.
 
@@ -31,12 +40,14 @@ def pem_to_der(pem_filename, pem_content=None):
     certificate_lines = []
     if pem_content is not None:
         lines = pem_content.splitlines()
-    else:
+    elif pem_filename is not None:
         try:
             with open(pem_filename, "rt") as f:
                 lines = list(f)
         except Exception as err:
             raise ModuleFailException("cannot load PEM file {0}: {1}".format(pem_filename, to_native(err)), exception=traceback.format_exc())
+    else:
+        raise ModuleFailException('One of pem_filename and pem_content must be provided')
     header_line_count = 0
     for line in lines:
         if line.startswith('-----'):
