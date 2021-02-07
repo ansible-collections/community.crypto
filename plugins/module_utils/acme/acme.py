@@ -118,6 +118,9 @@ class ACMEClient(object):
         # Make sure empty string is treated as None.
         self.account_uri = module.params.get('account_uri') or None
 
+        self.account_key_data = None
+        self.account_jwk = None
+        self.account_jws_header = None
         if self.account_key_file is not None or self.account_key_content is not None:
             try:
                 self.account_key_data = self.parse_key(key_file=self.account_key_file, key_content=self.account_key_content)
