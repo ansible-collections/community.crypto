@@ -30,7 +30,6 @@ from ansible.module_utils._text import to_native, to_text, to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     get_default_argspec,
     ACMEDirectory,
-    ACMEAccount,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
@@ -47,6 +46,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme._compatibili
     set_crypto_backend,
     HAS_CURRENT_CRYPTOGRAPHY,
 )
+
+from ansible_collections.community.crypto.plugins.module_utils.acme._compatibility import ACMELegacyAccount as ACMEAccount
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
 
