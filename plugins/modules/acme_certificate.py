@@ -510,11 +510,8 @@ all_chains:
 
 import base64
 import binascii
-import hashlib
 import os
-import re
 import textwrap
-import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native
@@ -546,12 +543,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryp
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     combine_identifier,
     split_identifier,
-    create_key_authorization,
     Authorization,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    ACMEProtocolException,
     ModuleFailException,
 )
 
@@ -559,13 +554,15 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     write_file,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.orders import (
+    Order,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
     pem_to_der,
     process_links,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
 try:
     import cryptography
@@ -597,8 +594,8 @@ class ACMECertificateClient(object):
         self.data = module.params['data']
         self.authorizations = None
         self.cert_days = -1
+        self.order = None
         self.order_uri = self.data.get('order_uri') if self.data else None
-        self.finalize_uri = None
 
         # Make sure account exists
         modify_account = module.params['modify_account']
@@ -631,30 +628,6 @@ class ACMECertificateClient(object):
 
         # Extract list of identifiers from CSR
         self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
-
-    def _finalize_cert(self):
-        '''
-        Create a new certificate based on the csr.
-        Return the certificate object as dict
-        https://tools.ietf.org/html/rfc8555#section-7.4
-        '''
-        csr = pem_to_der(self.csr, self.csr_content)
-        new_cert = {
-            "csr": nopad_b64(csr),
-        }
-        result, info = self.client.send_signed_request(
-            self.finalize_uri, new_cert, error_msg='Failed to finalizing order', expected_status_codes=[200])
-
-        status = result['status']
-        while status not in ['valid', 'invalid']:
-            time.sleep(2)
-            result, dummy = self.client.get_request(self.order_uri)
-            status = result['status']
-
-        if status != 'valid':
-            raise ACMEProtocolException('Failed to wait for order to complete', info=info, content_json=result)
-
-        return result['certificate']
 
     def _der_to_pem(self, der_cert):
         '''
@@ -726,30 +699,6 @@ class ACMECertificateClient(object):
         process_links(info, f)
         return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
 
-    def _new_order_v2(self):
-        '''
-        Start a new certificate order (ACME v2 protocol).
-        https://tools.ietf.org/html/rfc8555#section-7.4
-        '''
-        identifiers = []
-        for identifier_type, identifier in self.identifiers:
-            identifiers.append({
-                'type': identifier_type,
-                'value': identifier,
-            })
-        new_order = {
-            "identifiers": identifiers
-        }
-        result, info = self.client.send_signed_request(
-            self.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
-
-        for auth_uri in result['authorizations']:
-            authz = Authorization.from_url(self.client, auth_uri)
-            self.authorizations[authz.combined_identifier] = authz
-
-        self.order_uri = info['location']
-        self.finalize_uri = result['finalize']
-
     def is_first_step(self):
         '''
         Return True if this is the first execution of this module, i.e. if a
@@ -779,7 +728,10 @@ class ACMECertificateClient(object):
                 authz = Authorization.create(self.client, identifier_type, identifier)
                 self.authorizations[authz.combined_identifier] = authz
         else:
-            self._new_order_v2()
+            self.order = Order.create(self.client, self.identifiers)
+            self.order_uri = self.order.url
+            self.order.load_authorizations(self.client)
+            self.authorizations.update(self.order.authorizations)
         self.changed = True
 
     def get_challenges_data(self, first_step):
@@ -828,18 +780,11 @@ class ACMECertificateClient(object):
         else:
             # For ACME v2, we obtain the order object by fetching the
             # order URI, and extract the information from there.
-            result, info = self.client.get_request(self.order_uri)
+            self.order = Order.from_url(self.client, self.order_uri)
+            self.order.load_authorizations(self.client)
+            self.authorizations.update(self.order.authorizations)
 
-            if not result or info['status'] not in [200]:
-                raise ACMEProtocolException('Failed to downloda order object', info=info, content_json=result)
-
-            for auth_uri in result['authorizations']:
-                authz = Authorization.from_url(self.client, auth_uri)
-                self.authorizations[authz.combined_identifier] = authz
-
-            self.finalize_uri = result['finalize']
-
-        # Step 2: validate challenges
+        # Step 2: validate pending challenges
         for type_identifier, authz in self.authorizations.items():
             if authz.status == 'pending':
                 identifier_type, identifier = split_identifier(type_identifier)
@@ -919,8 +864,8 @@ class ACMECertificateClient(object):
         if self.version == 1:
             cert = self._new_cert_v1()
         else:
-            cert_uri = self._finalize_cert()
-            cert = self._download_cert(cert_uri)
+            self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
+            cert = self._download_cert(self.order.certificate_uri)
             if self.module.params['retrieve_all_alternates'] or self.module.params['select_chain']:
                 # Retrieve alternate chains
                 alternate_chains = []
@@ -1085,7 +1030,7 @@ def main():
                 module.exit_json(
                     changed=client.changed,
                     authorizations=auths,
-                    finalize_uri=client.finalize_uri,
+                    finalize_uri=client.order.finalize_uri if client.order else None,
                     order_uri=client.order_uri,
                     account_uri=client.client.account_uri,
                     challenge_data=data,
