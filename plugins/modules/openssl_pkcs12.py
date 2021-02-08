@@ -299,6 +299,44 @@ class Pkcs(OpenSSLObject):
                     load_certificate(other_cert) for other_cert in self.other_certificates
                 ]
 
+    def generate_bytes(self, module):
+        """Generate PKCS#12 file archive."""
+        self.pkcs12 = crypto.PKCS12()
+
+        if self.other_certificates:
+            self.pkcs12.set_ca_certificates(self.other_certificates)
+
+        if self.certificate_path:
+            self.pkcs12.set_certificate(load_certificate(self.certificate_path))
+
+        if self.friendly_name:
+            self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
+
+        if self.privatekey_path:
+            try:
+                self.pkcs12.set_privatekey(load_privatekey(self.privatekey_path, self.privatekey_passphrase))
+            except OpenSSLBadPassphraseError as exc:
+                raise PkcsError(exc)
+
+        return self.pkcs12.export(self.passphrase, self.iter_size, self.maciter_size)
+
+    def parse_bytes(self, pkcs12_content):
+        p12 = crypto.load_pkcs12(pkcs12_content, self.passphrase)
+        pkey = p12.get_privatekey()
+        if pkey is not None:
+            pkey = crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey)
+        crt = p12.get_certificate()
+        if crt is not None:
+            crt = crypto.dump_certificate(crypto.FILETYPE_PEM, crt)
+        other_certs = []
+        if p12.get_ca_certificates() is not None:
+            other_certs = [crypto.dump_certificate(crypto.FILETYPE_PEM,
+                                                   other_cert) for other_cert in p12.get_ca_certificates()]
+
+        friendly_name = p12.get_friendlyname()
+
+        return (pkey, crt, other_certs, friendly_name)
+
     def check(self, module, perms_required=True):
         """Ensure the resource is in its desired state."""
 
@@ -390,27 +428,6 @@ class Pkcs(OpenSSLObject):
 
         return result
 
-    def generate(self, module):
-        """Generate PKCS#12 file archive."""
-        self.pkcs12 = crypto.PKCS12()
-
-        if self.other_certificates:
-            self.pkcs12.set_ca_certificates(self.other_certificates)
-
-        if self.certificate_path:
-            self.pkcs12.set_certificate(load_certificate(self.certificate_path))
-
-        if self.friendly_name:
-            self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
-
-        if self.privatekey_path:
-            try:
-                self.pkcs12.set_privatekey(load_privatekey(self.privatekey_path, self.privatekey_passphrase))
-            except OpenSSLBadPassphraseError as exc:
-                raise PkcsError(exc)
-
-        return self.pkcs12.export(self.passphrase, self.iter_size, self.maciter_size)
-
     def remove(self, module):
         if self.backup:
             self.backup_file = module.backup_local(self.path)
@@ -422,23 +439,7 @@ class Pkcs(OpenSSLObject):
         try:
             with open(self.src, 'rb') as pkcs12_fh:
                 pkcs12_content = pkcs12_fh.read()
-            p12 = crypto.load_pkcs12(pkcs12_content,
-                                     self.passphrase)
-            pkey = p12.get_privatekey()
-            if pkey is not None:
-                pkey = crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey)
-            crt = p12.get_certificate()
-            if crt is not None:
-                crt = crypto.dump_certificate(crypto.FILETYPE_PEM, crt)
-            other_certs = []
-            if p12.get_ca_certificates() is not None:
-                other_certs = [crypto.dump_certificate(crypto.FILETYPE_PEM,
-                                                       other_cert) for other_cert in p12.get_ca_certificates()]
-
-            friendly_name = p12.get_friendlyname()
-
-            return (pkey, crt, other_certs, friendly_name)
-
+            return self.parse_bytes(pkcs12_content)
         except IOError as exc:
             raise PkcsError(exc)
 
@@ -506,7 +507,7 @@ def main():
                 if module.params['action'] == 'export':
                     if not module.params['friendly_name']:
                         module.fail_json(msg='Friendly_name is required')
-                    pkcs12_content = pkcs12.generate(module)
+                    pkcs12_content = pkcs12.generate_bytes(module)
                     pkcs12.write(module, pkcs12_content, 0o600)
                     changed = True
                 else:
