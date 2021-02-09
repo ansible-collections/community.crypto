@@ -89,7 +89,7 @@
   - name: Install cryptography (Darwin)
     become: true
     pip:
-      name: cryptography
+      name: cryptography>=3.3
       extra_args: "-c {{ remote_constraints }}"
     when: ansible_os_family == 'Darwin'
 
