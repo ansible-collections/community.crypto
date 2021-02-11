@@ -1153,8 +1153,7 @@ class ACMEClient(object):
 
         if cert['cert'] is not None:
             pem_cert = cert['cert']
-
-            chain = [link for link in cert.get('chain', [])]
+            chain = list(cert.get('chain', []))
 
             if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
                 self.cert_days = get_cert_days(self.module, self.dest)
