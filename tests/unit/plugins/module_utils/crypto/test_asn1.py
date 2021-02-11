@@ -78,7 +78,7 @@ def test_pack_asn_invalid_class():
 @pytest.mark.parametrize('value, expected', TEST_CASES)
 def test_test_cases(value, expected, tmp_path):
     test_file = tmp_path / 'test.der'
-    subprocess.run(['openssl', 'asn1parse', '-genstr', value, '-noout', '-out', test_file])
+    subprocess.run(['openssl', 'asn1parse', '-genstr', value, '-noout', '-out', test_file], check=True)
 
     with open(test_file, mode='rb') as fd:
         b_data = fd.read()
