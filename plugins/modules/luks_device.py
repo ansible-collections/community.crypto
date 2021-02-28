@@ -211,6 +211,12 @@ options:
                       run in parallel.
                     - This is not used for PBKDF2, but only for the Argon PBKDFs.
                 type: int
+    sector_size:
+        description:
+            - "This option allows the user to specify the sector size (in bytes) used for LUKS2 containers."
+            - "Will only be used on container creation."
+        type: int
+        version_added: '1.5.0'
 
 requirements:
     - "cryptsetup"
@@ -452,7 +458,7 @@ class CryptHandler(Handler):
         if pbkdf['parallel'] is not None:
             options.extend(['--pbkdf-parallel', str(pbkdf['parallel'])])
 
-    def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_, pbkdf):
+    def run_luks_create(self, device, keyfile, passphrase, keysize, cipher, hash_, sector_size, pbkdf):
         # create a new luks container; use batch mode to auto confirm
         luks_type = self._module.params['type']
         label = self._module.params['label']
@@ -471,6 +477,8 @@ class CryptHandler(Handler):
             options.extend(['--hash', hash_])
         if pbkdf is not None:
             self._add_pbkdf_options(options, pbkdf)
+        if sector_size is not None:
+            options.extend(['--sector-size', str(sector_size)])
 
         args = [self._cryptsetup_bin, 'luksFormat']
         args.extend(options)
@@ -759,6 +767,7 @@ def run_module():
             ),
             mutually_exclusive=[('iteration_time', 'iteration_count')],
         ),
+        sector_size=dict(type='int'),
     )
 
     mutually_exclusive = [
@@ -806,6 +815,7 @@ def run_module():
                                       module.params['keysize'],
                                       module.params['cipher'],
                                       module.params['hash'],
+                                      module.params['sector_size'],
                                       module.params['pbkdf'],
                                       )
             except ValueError as e:

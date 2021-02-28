@@ -9,6 +9,7 @@
       algorithm: argon2i
       memory: 1000
       parallel: 1
+    sector_size: 1024
   become: yes
   ignore_errors: yes
   register: create_passphrase_1
