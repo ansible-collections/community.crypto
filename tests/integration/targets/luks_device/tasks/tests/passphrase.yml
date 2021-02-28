@@ -4,6 +4,7 @@
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
+    type: luks2
     pbkdf:
       iteration_time: 0.1
       algorithm: argon2i
@@ -14,10 +15,13 @@
   ignore_errors: yes
   register: create_passphrase_1
 
-- name: Make sure that the previous task only fails because the LUKS version used cannot handle the PBKDF parameters
+- name: Make sure that the previous task only fails because the LUKS version used cannot handle the PBKDF parameters or sector size
   assert:
     that:
-      - create_passphrase_1 is not failed or 'Failed to set pbkdf parameters' in create_passphrase_1.msg
+      - >
+        create_passphrase_1 is not failed
+        or 'Failed to set pbkdf parameters' in create_passphrase_1.msg
+        or 'Unsupported encryption sector size' in create_passphrase_1.msg
 
 - name: Create with passphrase1 (without argon2i)
   luks_device:
