@@ -1,0 +1,2 @@
+minor_changes:
+- "luks_device - allow to specify sector size for LUKS2 containers with new ``sector_size`` parameter (https://github.com/ansible-collections/community.crypto/pull/193)."
