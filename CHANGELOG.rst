@@ -5,6 +5,30 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.5.0
+======
+
+Release Summary
+---------------
+
+Regular feature and bugfix release. Deprecates a return value.
+
+Minor Changes
+-------------
+
+- acme_account_info - when ``retrieve_orders`` is not ``ignore`` and the ACME server allows to query orders, the new return value ``order_uris`` is always populated with a list of URIs (https://github.com/ansible-collections/community.crypto/pull/178).
+- luks_device - allow to specify sector size for LUKS2 containers with new ``sector_size`` parameter (https://github.com/ansible-collections/community.crypto/pull/193).
+
+Deprecated Features
+-------------------
+
+- acme_account_info - when ``retrieve_orders=url_list``, ``orders`` will no longer be returned in community.crypto 2.0.0. Use ``order_uris`` instead (https://github.com/ansible-collections/community.crypto/pull/178).
+
+Bugfixes
+--------
+
+- openssl_csr - no longer fails when comparing CSR without basic constraint when ``basic_constraints`` is specified (https://github.com/ansible-collections/community.crypto/issues/179, https://github.com/ansible-collections/community.crypto/pull/180).
+
 v1.4.0
 ======
 
