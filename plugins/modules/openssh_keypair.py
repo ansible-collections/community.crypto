@@ -185,7 +185,6 @@ class Keypair(object):
         self.fingerprint = {}
         self.public_key = {}
         self.regenerate = module.params['regenerate']
-
         if self.regenerate == 'always':
             self.force = True
 
