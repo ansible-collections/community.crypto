@@ -307,7 +307,7 @@ class Keypair(object):
         if self._check_pass_protected_or_broken_key(module):
             if self.regenerate in ('full_idempotence', 'always'):
                 return False
-            module.fail_json(msg='Unable to read the key. The key is protected with an unknown passphrase or broken.'
+            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
                                  ' Will not proceed. To force regeneration, call the module with `generate`'
                                  ' set to `full_idempotence` or `always`, or with `force=yes`.')
 
@@ -325,7 +325,7 @@ class Keypair(object):
 
             if self.regenerate in ('full_idempotence', 'always'):
                 return False
-            module.fail_json(msg='Unable to read the key. The key is protected with an unknown passphrase or broken.'
+            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
                                  ' Will not proceed. To force regeneration, call the module with `generate`'
                                  ' set to `full_idempotence` or `always`, or with `force=yes`.')
 
