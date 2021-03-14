@@ -41,6 +41,14 @@ options:
         type: str
         default: rsa
         choices: ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519']
+    passphrase:
+        description:
+            - An optional passphrase to secure the newly generated private key.
+            - If a passphrase has already been applied to a private key, then this parameter must be
+              provided with the same passphrase to consider the private key valid.
+            - See the C(regenerate) parameter for further clarification on when passphrase changes
+              will result in a newly generated key-pair or task failure.
+        type: str
     force:
         description:
             - Should the key be regenerated even if it already exists
@@ -177,8 +185,14 @@ class Keypair(object):
         self.fingerprint = {}
         self.public_key = {}
         self.regenerate = module.params['regenerate']
+
         if self.regenerate == 'always':
             self.force = True
+
+        if module.params['passphrase']:
+            self.passphrase = module.params['passphrase']
+        else:
+            self.passphrase = ''
 
         if self.type in ('rsa', 'rsa1'):
             self.size = 4096 if self.size is None else self.size
@@ -207,7 +221,7 @@ class Keypair(object):
             args = [
                 module.get_bin_path('ssh-keygen', True),
                 '-q',
-                '-N', '',
+                '-N', self.passphrase,
                 '-b', str(self.size),
                 '-t', self.type,
                 '-f', self.path,
@@ -228,14 +242,14 @@ class Keypair(object):
                 module.run_command(args, data=stdin_data)
                 proc = module.run_command([module.get_bin_path('ssh-keygen', True), '-lf', self.path])
                 self.fingerprint = proc[1].split()
-                pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
+                pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-P', self.passphrase, '-yf', self.path])
                 self.public_key = pubkey[1].strip('\n')
             except Exception as e:
                 self.remove()
                 module.fail_json(msg="%s" % to_native(e))
 
         elif not self.isPublicKeyValid(module, perms_required=False):
-            pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
+            pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-P', self.passphrase, '-yf', self.path])
             pubkey = pubkey[1].strip('\n')
             try:
                 self.changed = True
@@ -253,7 +267,7 @@ class Keypair(object):
                     if os.path.exists(self.path) and not os.access(self.path, os.W_OK):
                         os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
                     args = [module.get_bin_path('ssh-keygen', True),
-                            '-q', '-o', '-c', '-C', self.comment, '-f', self.path]
+                            '-P', self.passphrase, '-q', '-o', '-c', '-C', self.comment, '-f', self.path]
                     module.run_command(args)
                 except IOError:
                     module.fail_json(
@@ -268,10 +282,17 @@ class Keypair(object):
 
     def _check_pass_protected_or_broken_key(self, module):
         key_state = module.run_command([module.get_bin_path('ssh-keygen', True),
-                                        '-P', '', '-yf', self.path], check_rc=False)
+                                        '-P', self.passphrase, '-yf', self.path], check_rc=False)
         if key_state[0] == 255 or 'is not a public key file' in key_state[2]:
             return True
         if 'incorrect passphrase' in key_state[2] or 'load failed' in key_state[2]:
+            return True
+        return False
+
+    def _check_passphrase_updated_from_null(self, module):
+        key_state = module.run_command([module.get_bin_path('ssh-keygen', True),
+                                        '-P', '', '-yf', self.path], check_rc=False)
+        if self.passphrase and not key_state[0]:
             return True
         return False
 
@@ -287,7 +308,14 @@ class Keypair(object):
         if self._check_pass_protected_or_broken_key(module):
             if self.regenerate in ('full_idempotence', 'always'):
                 return False
-            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
+            module.fail_json(msg='Unable to read the key. The key is protected with an unknown passphrase or broken.'
+                                 ' Will not proceed. To force regeneration, call the module with `generate`'
+                                 ' set to `full_idempotence` or `always`, or with `force=yes`.')
+
+        if self._check_passphrase_updated_from_null(module):
+            if self.regenerate in ('full_idempotence', 'always'):
+                return False
+            module.fail_json(msg='Passphrase has been specified, but was previously null.'
                                  ' Will not proceed. To force regeneration, call the module with `generate`'
                                  ' set to `full_idempotence` or `always`, or with `force=yes`.')
 
@@ -298,7 +326,7 @@ class Keypair(object):
 
             if self.regenerate in ('full_idempotence', 'always'):
                 return False
-            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
+            module.fail_json(msg='Unable to read the key. The key is protected with an unknown passphrase or broken.'
                                  ' Will not proceed. To force regeneration, call the module with `generate`'
                                  ' set to `full_idempotence` or `always`, or with `force=yes`.')
 
@@ -365,7 +393,7 @@ class Keypair(object):
 
         pubkey_parts = _parse_pubkey(_get_pubkey_content())
 
-        pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
+        pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-P', self.passphrase, '-yf', self.path])
         pubkey = pubkey[1].strip('\n')
         if _pubkey_valid(pubkey):
             self.public_key = pubkey
@@ -438,6 +466,7 @@ def main():
                 default='partial_idempotence',
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
+            passphrase=dict(type='str', no_log=True)
         ),
         supports_check_mode=True,
         add_file_common_args=True,
