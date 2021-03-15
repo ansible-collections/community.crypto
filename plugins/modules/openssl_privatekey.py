@@ -14,6 +14,7 @@ module: openssl_privatekey
 short_description: Generate OpenSSL private keys
 description:
     - This module allows one to (re)generate OpenSSL private keys.
+    - The default mode for the private key file will be C(0600) if I(mode) is not explicitly set.
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
