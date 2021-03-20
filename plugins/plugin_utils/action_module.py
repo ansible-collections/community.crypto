@@ -72,6 +72,7 @@ try:
         ArgumentSpecValidator,
         ModuleArgumentSpecValidator,  # noqa
     )
+    from ansible.module_utils.errors import UnsupportedError
     HAS_ARGSPEC_VALIDATOR = True
 except ImportError:
     # For ansible-base 2.10 and Ansible 2.9, we need to use the 'classical' approach
