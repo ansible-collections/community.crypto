@@ -1,2 +1,3 @@
 dependencies:
   - setup_openssl
+  - setup_pyopenssl  # the x509_crl* modules don't need this, but the other modules using during the tests do in some situations
