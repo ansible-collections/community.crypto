@@ -4,11 +4,12 @@
 # Copyright (c) 2016 Toshio Kuratomi <tkuratomi@ansible.com>
 # Copyright (c) 2019 Ansible Project
 # Copyright (c) 2020 Felix Fontein <felix@fontein.de>
+# Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 # Parts taken from ansible.module_utils.basic and ansible.module_utils.common.warnings.
 
-# NOTE: THIS MUST NOT BE USED BY A MODULE! THIS IS ONLY FOR ACTION PLUGINS!
+# NOTE: THIS IS ONLY FOR ACTION PLUGINS!
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -26,9 +27,6 @@ from ansible.module_utils.common._collections_compat import (
     Mapping
 )
 from ansible.module_utils.common.parameters import (
-    handle_aliases,
-    list_deprecations,
-    list_no_log_values,
     PASS_VARS,
     PASS_BOOLS,
 )
@@ -64,6 +62,26 @@ from ansible.module_utils.six import (
 )
 from ansible.module_utils._text import to_native, to_text
 from ansible.plugins.action import ActionBase
+
+
+try:
+    # For ansible-core 2.11, we can use the ArgumentSpecValidator. We also import
+    # ModuleArgumentSpecValidator since that indicates that the 'classical' approach
+    # will no longer work.
+    from ansible.module_utils.common.arg_spec import (
+        ArgumentSpecValidator,
+        ModuleArgumentSpecValidator,  # noqa
+    )
+    from ansible.module_utils.errors import UnsupportedError
+    HAS_ARGSPEC_VALIDATOR = True
+except ImportError:
+    # For ansible-base 2.10 and Ansible 2.9, we need to use the 'classical' approach
+    from ansible.module_utils.common.parameters import (
+        handle_aliases,
+        list_deprecations,
+        list_no_log_values,
+    )
+    HAS_ARGSPEC_VALIDATOR = False
 
 
 class _ModuleExitException(Exception):
@@ -104,54 +122,91 @@ class AnsibleActionModule(object):
         self._options_context = list()
 
         self.params = copy.deepcopy(action_plugin._task.args)
-        self._set_fallbacks()
-
-        # append to legal_inputs and then possibly check against them
-        try:
-            self.aliases = self._handle_aliases()
-        except (ValueError, TypeError) as e:
-            # Use exceptions here because it isn't safe to call fail_json until no_log is processed
-            raise _ModuleExitException(dict(failed=True, msg="Module alias error: %s" % to_native(e)))
-
-        # Save parameter values that should never be logged
         self.no_log_values = set()
-        self._handle_no_log_values()
+        if HAS_ARGSPEC_VALIDATOR:
+            self._validator = ArgumentSpecValidator(
+                self.argument_spec,
+                self.mutually_exclusive,
+                self.required_together,
+                self.required_one_of,
+                self.required_if,
+                self.required_by,
+            )
+            self._validation_result = self._validator.validate(self.params)
+            self.params.update(self._validation_result.validated_parameters)
+            self.no_log_values.update(self._validation_result._no_log_values)
 
-        self._check_arguments()
+            try:
+                error = self._validation_result.errors[0]
+            except IndexError:
+                error = None
 
-        # check exclusive early
-        if not bypass_checks:
-            self._check_mutually_exclusive(mutually_exclusive)
+            # We cannot use ModuleArgumentSpecValidator directly since it uses mechanisms for reporting
+            # warnings and deprecations that do not work in plugins. This is a copy of that code adjusted
+            # for our use-case:
+            for d in self._validation_result._deprecations:
+                self.deprecate(
+                    "Alias '{name}' is deprecated. See the module docs for more information".format(name=d['name']),
+                    version=d.get('version'), date=d.get('date'), collection_name=d.get('collection_name'))
 
-        self._set_defaults(pre=True)
+            for w in self._validation_result._warnings:
+                self.warn('Both option {option} and its alias {alias} are set.'.format(option=w['option'], alias=w['alias']))
 
-        self._CHECK_ARGUMENT_TYPES_DISPATCHER = {
-            'str': self._check_type_str,
-            'list': self._check_type_list,
-            'dict': self._check_type_dict,
-            'bool': self._check_type_bool,
-            'int': self._check_type_int,
-            'float': self._check_type_float,
-            'path': self._check_type_path,
-            'raw': self._check_type_raw,
-            'jsonarg': self._check_type_jsonarg,
-            'json': self._check_type_jsonarg,
-            'bytes': self._check_type_bytes,
-            'bits': self._check_type_bits,
-        }
-        if not bypass_checks:
-            self._check_required_arguments()
-            self._check_argument_types()
-            self._check_argument_values()
-            self._check_required_together(required_together)
-            self._check_required_one_of(required_one_of)
-            self._check_required_if(required_if)
-            self._check_required_by(required_by)
+            # Fail for validation errors, even in check mode
+            if error:
+                msg = self._validation_result.errors.msg
+                if isinstance(error, UnsupportedError):
+                    msg = "Unsupported parameters for ({name}) {kind}: {msg}".format(name=self._name, kind='module', msg=msg)
 
-        self._set_defaults(pre=False)
+                self.fail_json(msg=msg)
+        else:
+            self._set_fallbacks()
 
-        # deal with options sub-spec
-        self._handle_options()
+            # append to legal_inputs and then possibly check against them
+            try:
+                self.aliases = self._handle_aliases()
+            except (ValueError, TypeError) as e:
+                # Use exceptions here because it isn't safe to call fail_json until no_log is processed
+                raise _ModuleExitException(dict(failed=True, msg="Module alias error: %s" % to_native(e)))
+
+            # Save parameter values that should never be logged
+            self._handle_no_log_values()
+
+            self._check_arguments()
+
+            # check exclusive early
+            if not bypass_checks:
+                self._check_mutually_exclusive(mutually_exclusive)
+
+            self._set_defaults(pre=True)
+
+            self._CHECK_ARGUMENT_TYPES_DISPATCHER = {
+                'str': self._check_type_str,
+                'list': check_type_list,
+                'dict': check_type_dict,
+                'bool': check_type_bool,
+                'int': check_type_int,
+                'float': check_type_float,
+                'path': check_type_path,
+                'raw': check_type_raw,
+                'jsonarg': check_type_jsonarg,
+                'json': check_type_jsonarg,
+                'bytes': check_type_bytes,
+                'bits': check_type_bits,
+            }
+            if not bypass_checks:
+                self._check_required_arguments()
+                self._check_argument_types()
+                self._check_argument_values()
+                self._check_required_together(required_together)
+                self._check_required_one_of(required_one_of)
+                self._check_required_if(required_if)
+                self._check_required_by(required_by)
+
+            self._set_defaults(pre=False)
+
+            # deal with options sub-spec
+            self._handle_options()
 
     def _handle_aliases(self, spec=None, param=None, option_prefix=''):
         if spec is None:
@@ -412,36 +467,6 @@ class AnsibleActionModule(object):
                        'If this does not look like what you expect, {3}').format(from_msg, value, to_msg, common_msg)
                 self.warn(to_native(msg))
                 return to_native(value, errors='surrogate_or_strict')
-
-    def _check_type_list(self, value):
-        return check_type_list(value)
-
-    def _check_type_dict(self, value):
-        return check_type_dict(value)
-
-    def _check_type_bool(self, value):
-        return check_type_bool(value)
-
-    def _check_type_int(self, value):
-        return check_type_int(value)
-
-    def _check_type_float(self, value):
-        return check_type_float(value)
-
-    def _check_type_path(self, value):
-        return check_type_path(value)
-
-    def _check_type_jsonarg(self, value):
-        return check_type_jsonarg(value)
-
-    def _check_type_raw(self, value):
-        return check_type_raw(value)
-
-    def _check_type_bytes(self, value):
-        return check_type_bytes(value)
-
-    def _check_type_bits(self, value):
-        return check_type_bits(value)
 
     def _handle_options(self, argument_spec=None, params=None, prefix=''):
         ''' deal with options to create sub spec '''
