@@ -124,7 +124,7 @@ class AnsibleActionModule(object):
         self.params = copy.deepcopy(action_plugin._task.args)
         self.no_log_values = set()
         if HAS_ARGSPEC_VALIDATOR:
-            self._validator = ModuleArgumentSpecValidator(
+            self._validator = ArgumentSpecValidator(
                 self.argument_spec,
                 self.mutually_exclusive,
                 self.required_together,
