@@ -19,7 +19,7 @@ class CryptoBackend(object):
         self.module = module
 
     @abc.abstractmethod
-    def parse_key(self, key_file=None, key_content=None):
+    def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
         Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
         (error, key_data).

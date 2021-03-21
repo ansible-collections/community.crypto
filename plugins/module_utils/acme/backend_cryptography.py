@@ -179,7 +179,7 @@ class CryptographyBackend(CryptoBackend):
     def __init__(self, module):
         super(CryptographyBackend, self).__init__(module)
 
-    def parse_key(self, key_file=None, key_content=None):
+    def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
         Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
         (error, key_data).
@@ -191,7 +191,10 @@ class CryptographyBackend(CryptoBackend):
             key_content = to_bytes(key_content)
         # Parse key
         try:
-            key = cryptography.hazmat.primitives.serialization.load_pem_private_key(key_content, password=None, backend=_cryptography_backend)
+            key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                key_content,
+                password=to_bytes(passphrase) if passphrase is not None else None,
+                backend=_cryptography_backend)
         except Exception as e:
             return 'error while loading key: {0}'.format(e), None
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):

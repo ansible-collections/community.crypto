@@ -88,6 +88,12 @@ options:
       - "Mutually exclusive with C(new_account_key_src)."
       - "Required if C(new_account_key_src) is not used and state is C(changed_key)."
     type: str
+  new_account_key_passphrase:
+    description:
+      - Phassphrase to use to decode the new account key.
+      - "B(Note:) this is not supported by the C(openssl) backend, only by the C(cryptography) backend."
+    type: str
+    version_added: 1.6.0
   external_account_binding:
     description:
       - Allows to provide external account binding data during account creation.
@@ -183,6 +189,7 @@ def main():
         contact=dict(type='list', elements='str', default=[]),
         new_account_key_src=dict(type='path'),
         new_account_key_content=dict(type='str', no_log=True),
+        new_account_key_passphrase=dict(type='str', no_log=True),
         external_account_binding=dict(type='dict', options=dict(
             kid=dict(type='str', required=True),
             alg=dict(type='str', required=True, choices=['HS256', 'HS384', 'HS512']),
@@ -272,7 +279,8 @@ def main():
             try:
                 new_key_data = client.parse_key(
                     module.params.get('new_account_key_src'),
-                    module.params.get('new_account_key_content')
+                    module.params.get('new_account_key_content'),
+                    passphrase=module.params.get('new_account_key_passphrase'),
                 )
             except KeyParsingError as e:
                 raise ModuleFailException("Error while parsing new account key: {msg}".format(msg=e.msg))
