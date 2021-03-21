@@ -1,20 +1,29 @@
-- name: Generate account keys
-  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ item }}.pem"
-  loop:
-    - accountkey
-    - accountkey2
-    - accountkey3
-    - accountkey4
-    - accountkey5
+- block:
+  - name: Generate account keys
+    openssl_privatekey:
+      path: "{{ output_dir }}/{{ item.name }}.pem"
+      passphrase: "{{ item.pass | default(omit, true) }}"
+      cipher: "{{ 'auto' if item.pass | default() else omit }}"
+      type: ECC
+      curve: secp256r1
+      force: true
+    loop: "{{ account_keys }}"
 
-- name: Parse account keys (to ease debugging some test failures)
-  command: "{{ openssl_binary }} ec -in {{ output_dir }}/{{ item }}.pem -noout -text"
-  loop:
-    - accountkey
-    - accountkey2
-    - accountkey3
-    - accountkey4
-    - accountkey5
+  - name: Parse account keys (to ease debugging some test failures)
+    openssl_privatekey_info:
+      path: "{{ output_dir }}/{{ item.name }}.pem"
+      passphrase: "{{ item.pass | default(omit, true) }}"
+      return_private_key_data: true
+    loop: "{{ account_keys }}"
+
+  vars:
+    account_keys:
+      - name: accountkey
+      - name: accountkey2
+        pass: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
+      - name: accountkey3
+      - name: accountkey4
+      - name: accountkey5
 
 - name: Do not try to create account
   acme_account:
@@ -173,6 +182,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
     new_account_key_src: "{{ output_dir }}/accountkey2.pem"
+    new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
     - mailto:example@example.com
@@ -188,6 +198,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
     new_account_key_src: "{{ output_dir }}/accountkey2.pem"
+    new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
     - mailto:example@example.com
@@ -197,6 +208,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -209,6 +221,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -219,6 +232,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -229,6 +243,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no

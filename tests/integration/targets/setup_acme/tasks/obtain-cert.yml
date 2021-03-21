@@ -1,22 +1,25 @@
 ---
 ## PRIVATE KEY ################################################################################
-- name: ({{ certgen_title }}) Create cert private key (RSA)
-  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/{{ certificate_name }}.key {{ rsa_bits if key_type == 'rsa' else default_rsa_key_size }}"
-  when: "key_type == 'rsa'"
-- name: ({{ certgen_title }}) Create cert private key (ECC 256)
-  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
-  when: "key_type == 'ec256'"
-- name: ({{ certgen_title }}) Create cert private key (ECC 384)
-  command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
-  when: "key_type == 'ec384'"
-- name: ({{ certgen_title }}) Create cert private key (ECC 512)
-  command: "{{ openssl_binary }} ecparam -name secp521r1 -genkey -out {{ output_dir }}/{{ certificate_name }}.key"
-  when: "key_type == 'ec521'"
+- name: ({{ certgen_title }}) Create cert private key
+  openssl_privatekey:
+    path: "{{ output_dir }}/{{ certificate_name }}.key"
+    type: "{{ 'RSA' if key_type == 'rsa' else 'ECC' }}"
+    size: "{{ rsa_bits if key_type == 'rsa' else omit }}"
+    curve: >-
+      {{ omit if key_type == 'rsa' else
+         'secp256r1' if key_type == 'ec256' else
+         'secp384r1' if key_type == 'ec384' else
+         'secp521r1' if key_type == 'ec521' else
+         'invalid value for key_type!' }}
+    passphrase: "{{ certificate_passphrase | default(omit, true) }}"
+    cipher: "{{ 'auto' if certificate_passphrase | default() else omit }}"
+    force: true
 ## CSR ########################################################################################
 - name: ({{ certgen_title }}) Create cert CSR
   openssl_csr:
     path: "{{ output_dir }}/{{ certificate_name }}.csr"
     privatekey_path: "{{ output_dir }}/{{ certificate_name }}.key"
+    privatekey_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
     subject_alt_name: "{{ subject_alt_name }}"
     subject_alt_name_critical: "{{ subject_alt_name_critical }}"
     return_content: true
@@ -30,6 +33,7 @@
     validate_certs: no
     account_key: "{{ (output_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
+    account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
     modify_account: "{{ modify_account }}"
     csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"
     csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
@@ -69,6 +73,7 @@
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: "{{ output_dir }}/{{ certificate_name }}.key"
+    private_key_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
   with_dict: "{{ challenge_data.challenge_data }}"
   register: tls_alpn_challenges
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
@@ -101,6 +106,7 @@
     validate_certs: no
     account_key: "{{ (output_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
+    account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
     account_uri: "{{ challenge_data.account_uri }}"
     modify_account: "{{ modify_account }}"
     csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"

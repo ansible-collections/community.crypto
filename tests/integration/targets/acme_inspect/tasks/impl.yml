@@ -1,9 +1,22 @@
 ---
-- name: Generate account key
-  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/accountkey.pem"
+- block:
+  - name: Generate account keys
+    openssl_privatekey:
+      path: "{{ output_dir }}/{{ item }}.pem"
+      type: ECC
+      curve: secp256r1
+      force: true
+    loop: "{{ account_keys }}"
 
-- name: Parse account key (to ease debugging some test failures)
-  command: "{{ openssl_binary }} ec -in {{ output_dir }}/accountkey.pem -noout -text"
+  - name: Parse account keys (to ease debugging some test failures)
+    openssl_privatekey_info:
+      path: "{{ output_dir }}/{{ item }}.pem"
+      return_private_key_data: true
+    loop: "{{ account_keys }}"
+
+  vars:
+    account_keys:
+      - accountkey
 
 - name: Get directory
   acme_inspect:
