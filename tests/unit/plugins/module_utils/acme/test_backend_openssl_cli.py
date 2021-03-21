@@ -37,8 +37,7 @@ def test_eckeyparse_openssl(pem, result, openssl_output, tmpdir):
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
     backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
-    error, key = backend.parse_key(key_file=str(fn))
-    assert error is None
+    key = backend.parse_key(key_file=str(fn))
     key.pop('key_file')
     assert key == result
 
