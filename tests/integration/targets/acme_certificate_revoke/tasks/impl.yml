@@ -44,6 +44,7 @@
   vars:
     certgen_title: Certificate 2 for revocation
     certificate_name: cert-2
+    certificate_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
     key_type: ec256
     subject_alt_name: "DNS:*.example.com"
     subject_alt_name_critical: yes
@@ -86,6 +87,7 @@
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     private_key_src: "{{ output_dir }}/cert-2.key"
+    private_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     certificate: "{{ output_dir }}/cert-2.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir

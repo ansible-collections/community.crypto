@@ -87,6 +87,7 @@
   vars:
     certgen_title: Certificate 2
     certificate_name: cert-2
+    certificate_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
     key_type: ec256
     subject_alt_name: "DNS:*.example.com,DNS:example.com"
     subject_alt_name_critical: yes
