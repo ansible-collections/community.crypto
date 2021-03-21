@@ -1,11 +1,26 @@
 ---
 ## SET UP ACCOUNT KEYS ########################################################################
-- name: Create ECC256 account key
-  command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
-- name: Create ECC384 account key
-  command: "{{ openssl_binary }} ecparam -name secp384r1 -genkey -out {{ output_dir }}/account-ec384.pem"
-- name: Create RSA account key
-  command: "{{ openssl_binary }} genrsa -out {{ output_dir }}/account-rsa.pem {{ default_rsa_key_size }}"
+- block:
+  - name: Generate account keys
+    openssl_privatekey:
+      path: "{{ output_dir }}/{{ item.name }}.pem"
+      type: "{{ item.type }}"
+      size: "{{ item.size | default(omit) }}"
+      curve: "{{ item.curve | default(omit) }}"
+      force: true
+    loop: "{{ account_keys }}"
+
+  vars:
+    account_keys:
+      - name: account-ec256
+        type: ECC
+        curve: secp256r1
+      - name: account-ec384
+        type: ECC
+        curve: secp384r1
+      - name: account-rsa
+        type: RSA
+        size: "{{ default_rsa_key_size }}"
 ## SET UP ACCOUNTS ############################################################################
 - name: Make sure ECC256 account hasn't been created yet
   acme_account:
@@ -72,6 +87,7 @@
   vars:
     certgen_title: Certificate 2
     certificate_name: cert-2
+    certificate_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
     key_type: ec256
     subject_alt_name: "DNS:*.example.com,DNS:example.com"
     subject_alt_name_critical: yes

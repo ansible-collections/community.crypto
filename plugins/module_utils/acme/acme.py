@@ -112,6 +112,7 @@ class ACMEClient(object):
         # account_key path and content are mutually exclusive
         self.account_key_file = module.params['account_key_src']
         self.account_key_content = module.params['account_key_content']
+        self.account_key_passphrase = module.params['account_key_passphrase']
 
         # Grab account URI from module parameters.
         # Make sure empty string is treated as None.
@@ -122,7 +123,10 @@ class ACMEClient(object):
         self.account_jws_header = None
         if self.account_key_file is not None or self.account_key_content is not None:
             try:
-                self.account_key_data = self.parse_key(key_file=self.account_key_file, key_content=self.account_key_content)
+                self.account_key_data = self.parse_key(
+                    key_file=self.account_key_file,
+                    key_content=self.account_key_content,
+                    passphrase=self.account_key_passphrase)
             except KeyParsingError as e:
                 raise ModuleFailException("Error while parsing account key: {msg}".format(msg=e.msg))
             self.account_jwk = self.account_key_data['jwk']
@@ -146,14 +150,14 @@ class ACMEClient(object):
             self.account_jws_header.pop('jwk')
             self.account_jws_header['kid'] = self.account_uri
 
-    def parse_key(self, key_file=None, key_content=None):
+    def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         In case of an error, raises KeyParsingError.
         '''
         if key_file is None and key_content is None:
             raise AssertionError('One of key_file and key_content must be specified!')
-        error, key_data = self.backend.parse_key(key_file, key_content)
+        error, key_data = self.backend.parse_key(key_file, key_content, passphrase=passphrase)
         if error:
             raise KeyParsingError(error)
         return key_data
@@ -311,6 +315,7 @@ def get_default_argspec():
     return dict(
         account_key_src=dict(type='path', aliases=['account_key']),
         account_key_content=dict(type='str', no_log=True),
+        account_key_passphrase=dict(type='str', no_log=True),
         account_uri=dict(type='str'),
         acme_directory=dict(type='str'),
         acme_version=dict(type='int', choices=[1, 2]),

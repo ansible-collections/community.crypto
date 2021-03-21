@@ -54,7 +54,6 @@ options:
          private keys in PEM format can be used as well."
       - "Mutually exclusive with C(account_key_content)."
       - "Required if C(account_key_content) is not used."
-    type: path
   account_key_content:
     description:
       - "Content of the ACME account RSA or Elliptic Curve key."
@@ -69,7 +68,6 @@ options:
          temporary file. It can still happen that it is written to disk by
          Ansible in the process of moving the module with its argument to
          the node where it is executed."
-    type: str
   private_key_src:
     description:
       - "Path to the certificate's private key."
@@ -91,6 +89,12 @@ options:
          Ansible in the process of moving the module with its argument to
          the node where it is executed."
     type: str
+  private_key_passphrase:
+    description:
+      - Phassphrase to use to decode the certificate's private key.
+      - "B(Note:) this is not supported by the C(openssl) backend, only by the C(cryptography) backend."
+    type: str
+    version_added: 1.6.0
   revoke_reason:
     description:
       - "One of the revocation reasonCodes defined in
@@ -146,6 +150,7 @@ def main():
     argument_spec.update(dict(
         private_key_src=dict(type='path'),
         private_key_content=dict(type='str', no_log=True),
+        private_key_passphrase=dict(type='str', no_log=True),
         certificate=dict(type='path', required=True),
         revoke_reason=dict(type='int'),
     ))
@@ -184,9 +189,10 @@ def main():
         private_key_content = module.params.get('private_key_content')
         # Revoke certificate
         if private_key or private_key_content:
+            passphrase = module.params['private_key_passphrase']
             # Step 1: load and parse private key
             try:
-                private_key_data = client.parse_key(private_key, private_key_content)
+                private_key_data = client.parse_key(private_key, private_key_content, passphrase=passphrase)
             except KeyParsingError as e:
                 raise ModuleFailException("Error while parsing private key: {msg}".format(msg=e.msg))
             # Step 2: sign revokation request with private key

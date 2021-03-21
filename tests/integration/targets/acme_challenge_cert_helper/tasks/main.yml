@@ -5,8 +5,12 @@
 ####################################################################
 
 - block:
-  - name: Create ECC256 account key
-    command: "{{ openssl_binary }} ecparam -name prime256v1 -genkey -out {{ output_dir }}/account-ec256.pem"
+  - name: Generate ECC256 accoun keys
+    openssl_privatekey:
+      path: "{{ output_dir }}/account-ec256.pem"
+      type: ECC
+      curve: secp256r1
+      force: true
   - name: Obtain cert 1
     include_tasks: obtain-cert.yml
     vars:

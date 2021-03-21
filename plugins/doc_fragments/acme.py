@@ -57,6 +57,12 @@ options:
          Ansible in the process of moving the module with its argument to
          the node where it is executed."
     type: str
+  account_key_passphrase:
+    description:
+      - Phassphrase to use to decode the account key.
+      - "B(Note:) this is not supported by the C(openssl) backend, only by the C(cryptography) backend."
+    type: str
+    version_added: 1.6.0
   account_uri:
     description:
       - "If specified, assumes that the account URI is as given. If the

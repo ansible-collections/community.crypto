@@ -52,6 +52,11 @@ options:
       - "Content of the private key to use for this challenge certificate."
       - "Mutually exclusive with C(private_key_src)."
     type: str
+  private_key_passphrase:
+    description:
+      - Phassphrase to use to decode the private key.
+    type: str
+    version_added: 1.6.0
 notes:
   - Does not support C(check_mode).
 '''
@@ -187,6 +192,7 @@ def main():
             challenge_data=dict(type='dict', required=True),
             private_key_src=dict(type='path'),
             private_key_content=dict(type='str', no_log=True),
+            private_key_passphrase=dict(type='str', no_log=True),
         ),
         required_one_of=(
             ['private_key_src', 'private_key_content'],
@@ -205,12 +211,16 @@ def main():
 
         # Get hold of private key
         private_key_content = module.params.get('private_key_content')
+        private_key_passphrase = module.params.get('private_key_passphrase')
         if private_key_content is None:
             private_key_content = read_file(module.params['private_key_src'])
         else:
             private_key_content = to_bytes(private_key_content)
         try:
-            private_key = cryptography.hazmat.primitives.serialization.load_pem_private_key(private_key_content, password=None, backend=_cryptography_backend)
+            private_key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                private_key_content,
+                password=to_bytes(private_key_passphrase) if private_key_passphrase is not None else None,
+                backend=_cryptography_backend)
         except Exception as e:
             raise ModuleFailException('Error while loading private key: {0}'.format(e))
 

@@ -41,11 +41,13 @@ class OpenSSLCLIBackend(CryptoBackend):
             openssl_binary = module.get_bin_path('openssl', True)
         self.openssl_binary = openssl_binary
 
-    def parse_key(self, key_file=None, key_content=None):
+    def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
         Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
         (error, key_data).
         '''
+        if passphrase is not None:
+            return 'openssl backend does not support key passphrases', {}
         # If key_file isn't given, but key_content, write that to a temporary file
         if key_file is None:
             fd, tmpsrc = tempfile.mkstemp()
