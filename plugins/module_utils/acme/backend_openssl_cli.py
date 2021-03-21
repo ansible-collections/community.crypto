@@ -24,6 +24,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backends imp
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
+    KeyParsingError,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
@@ -43,11 +44,11 @@ class OpenSSLCLIBackend(CryptoBackend):
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
-        Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
-        (error, key_data).
+        Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
+        Raises KeyParsingError in case of errors.
         '''
         if passphrase is not None:
-            return 'openssl backend does not support key passphrases', {}
+            raise KeyParsingError('openssl backend does not support key passphrases')
         # If key_file isn't given, but key_content, write that to a temporary file
         if key_file is None:
             fd, tmpsrc = tempfile.mkstemp()
@@ -61,7 +62,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                     f.close()
                 except Exception as dummy:
                     pass
-                raise BackendException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
+                raise KeyParsingError("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
             f.close()
         # Parse key
         account_key_type = None
@@ -78,7 +79,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             # FIXME: add some kind of auto-detection
             account_key_type = "rsa"
         if account_key_type not in ("rsa", "ec"):
-            return 'unknown key type "%s"' % account_key_type, {}
+            raise KeyParsingError('unknown key type "%s"' % account_key_type)
 
         openssl_keydump_cmd = [self.openssl_binary, account_key_type, "-in", key_file, "-noout", "-text"]
         dummy, out, dummy = self.module.run_command(
@@ -92,7 +93,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             if len(pub_exp) % 2:
                 pub_exp = "0{0}".format(pub_exp)
 
-            return None, {
+            return {
                 'key_file': key_file,
                 'type': 'rsa',
                 'alg': 'RS256',
@@ -108,7 +109,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
                 to_text(out, errors='surrogate_or_strict'), re.MULTILINE | re.DOTALL)
             if pub_data is None:
-                return 'cannot parse elliptic curve key', {}
+                raise KeyParsingError('cannot parse elliptic curve key')
             pub_hex = binascii.unhexlify(re.sub(r"(\s|:)", "", pub_data.group(1)).encode("utf-8"))
             asn1_oid_curve = pub_data.group(2).lower()
             nist_curve = pub_data.group(3).lower() if pub_data.group(3) else None
@@ -133,11 +134,11 @@ class OpenSSLCLIBackend(CryptoBackend):
                 point_size = 66
                 curve = 'P-521'
             else:
-                return 'unknown elliptic curve: %s / %s' % (asn1_oid_curve, nist_curve), {}
+                raise KeyParsingError('unknown elliptic curve: %s / %s' % (asn1_oid_curve, nist_curve))
             num_bytes = (bits + 7) // 8
             if len(pub_hex) != 2 * num_bytes:
-                return 'bad elliptic curve point (%s / %s)' % (asn1_oid_curve, nist_curve), {}
-            return None, {
+                raise KeyParsingError('bad elliptic curve point (%s / %s)' % (asn1_oid_curve, nist_curve))
+            return {
                 'key_file': key_file,
                 'type': 'ec',
                 'alg': alg,

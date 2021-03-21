@@ -157,10 +157,7 @@ class ACMEClient(object):
         '''
         if key_file is None and key_content is None:
             raise AssertionError('One of key_file and key_content must be specified!')
-        error, key_data = self.backend.parse_key(key_file, key_content, passphrase=passphrase)
-        if error:
-            raise KeyParsingError(error)
-        return key_data
+        return self.backend.parse_key(key_file, key_content, passphrase=passphrase)
 
     def sign_request(self, protected, payload, key_data, encode_payload=True):
         '''
