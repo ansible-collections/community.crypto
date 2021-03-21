@@ -213,23 +213,31 @@ order_uris:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
-    ACMEAccount,
-    handle_standard_module_arguments,
-    process_links,
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    create_backend,
     get_default_argspec,
+    ACMEClient,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
+    ACMEAccount,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    process_links,
 )
 
 
-def get_orders_list(module, account, orders_url):
+def get_orders_list(module, client, orders_url):
     '''
     Retrieves orders list (handles pagination).
     '''
     orders = []
     while orders_url:
         # Get part of orders list
-        res, info = account.get_request(orders_url, parse_json_result=True, fail_on_error=True)
+        res, info = client.get_request(orders_url, parse_json_result=True, fail_on_error=True)
         if not res.get('orders'):
             if orders:
                 module.warn('When retrieving orders list part {0}, got empty result list'.format(orders_url))
@@ -252,11 +260,11 @@ def get_orders_list(module, account, orders_url):
     return orders
 
 
-def get_order(account, order_url):
+def get_order(client, order_url):
     '''
     Retrieve order data.
     '''
-    return account.get_request(order_url, parse_json_result=True, fail_on_error=True)[0]
+    return client.get_request(order_url, parse_json_result=True, fail_on_error=True)[0]
 
 
 def main():
@@ -277,10 +285,11 @@ def main():
     if module._name in ('acme_account_facts', 'community.crypto.acme_account_facts'):
         module.deprecate("The 'acme_account_facts' module has been renamed to 'acme_account_info'",
                          version='2.0.0', collection_name='community.crypto')
-    handle_standard_module_arguments(module, needs_acme_v2=True)
+    backend = create_backend(module, True)
 
     try:
-        account = ACMEAccount(module)
+        client = ACMEClient(module, backend)
+        account = ACMEAccount(client)
         # Check whether account exists
         created, account_data = account.setup_account(
             [],
@@ -291,18 +300,18 @@ def main():
             raise AssertionError('Unwanted account creation')
         result = {
             'changed': False,
-            'exists': account.uri is not None,
-            'account_uri': account.uri,
+            'exists': client.account_uri is not None,
+            'account_uri': client.account_uri,
         }
-        if account.uri is not None:
+        if client.account_uri is not None:
             # Make sure promised data is there
             if 'contact' not in account_data:
                 account_data['contact'] = []
-            account_data['public_account_key'] = account.key_data['jwk']
+            account_data['public_account_key'] = client.account_key_data['jwk']
             result['account'] = account_data
             # Retrieve orders list
             if account_data.get('orders') and module.params['retrieve_orders'] != 'ignore':
-                orders = get_orders_list(module, account, account_data['orders'])
+                orders = get_orders_list(module, client, account_data['orders'])
                 result['order_uris'] = orders
                 if module.params['retrieve_orders'] == 'url_list':
                     module.deprecate(
@@ -312,7 +321,7 @@ def main():
                         version='2.0.0', collection_name='community.crypto')
                     result['orders'] = orders
                 if module.params['retrieve_orders'] == 'object_list':
-                    result['orders'] = [get_order(account, order) for order in orders]
+                    result['orders'] = [get_order(client, order) for order in orders]
         module.exit_json(**result)
     except ModuleFailException as e:
         e.do_fail(module)

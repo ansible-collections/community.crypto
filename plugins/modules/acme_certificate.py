@@ -508,92 +508,57 @@ all_chains:
       returned: always
 '''
 
-import base64
-import binascii
-import hashlib
 import os
-import re
-import textwrap
-import time
-import traceback
 
-from datetime import datetime
+from ansible.module_utils.basic import AnsibleModule
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes, to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    parse_name_field,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_name_to_oid,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    split_pem_list,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
-    write_file,
-    nopad_b64,
-    pem_to_der,
-    ACMEAccount,
-    HAS_CURRENT_CRYPTOGRAPHY,
-    cryptography_get_csr_identifiers,
-    openssl_get_csr_identifiers,
-    cryptography_get_cert_days,
-    handle_standard_module_arguments,
-    process_links,
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    create_backend,
     get_default_argspec,
+    ACMEClient,
 )
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 
-try:
-    import cryptography
-    import cryptography.hazmat.backends
-    import cryptography.x509
-except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
+    ACMEAccount,
+)
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    combine_identifier,
+    split_identifier,
+    Authorization,
+)
 
-def get_cert_days(module, cert_file):
-    '''
-    Return the days the certificate in cert_file remains valid and -1
-    if the file was not found. If cert_file contains more than one
-    certificate, only the first one will be considered.
-    '''
-    if HAS_CURRENT_CRYPTOGRAPHY:
-        return cryptography_get_cert_days(module, cert_file)
-    if not os.path.exists(cert_file):
-        return -1
+from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+    retrieve_acme_v1_certificate,
+    CertificateChain,
+    Criterium,
+)
 
-    openssl_bin = module.get_bin_path('openssl', True)
-    openssl_cert_cmd = [openssl_bin, "x509", "-in", cert_file, "-noout", "-text"]
-    dummy, out, dummy = module.run_command(openssl_cert_cmd, check_rc=True, encoding=None)
-    try:
-        not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", out.decode('utf8')).group(1)
-        not_after = datetime.fromtimestamp(time.mktime(time.strptime(not_after_str, '%b %d %H:%M:%S %Y %Z')))
-    except AttributeError:
-        raise ModuleFailException("No 'Not after' date found in {0}".format(cert_file))
-    except ValueError:
-        raise ModuleFailException("Failed to parse 'Not after' date of {0}".format(cert_file))
-    now = datetime.utcnow()
-    return (not_after - now).days
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ModuleFailException,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
+    write_file,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.orders import (
+    Order,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    pem_to_der,
+)
 
 
-class ACMEClient(object):
+class ACMECertificateClient(object):
     '''
     ACME client class. Uses an ACME account object and a CSR to
     start and validate ACME challenges and download the respective
     certificates.
     '''
 
-    def __init__(self, module):
+    def __init__(self, module, backend):
         self.module = module
         self.version = module.params['acme_version']
         self.challenge = module.params['challenge']
@@ -602,13 +567,22 @@ class ACMEClient(object):
         self.dest = module.params.get('dest')
         self.fullchain_dest = module.params.get('fullchain_dest')
         self.chain_dest = module.params.get('chain_dest')
-        self.account = ACMEAccount(module)
-        self.directory = self.account.directory
+        self.client = ACMEClient(module, backend)
+        self.account = ACMEAccount(self.client)
+        self.directory = self.client.directory
         self.data = module.params['data']
         self.authorizations = None
         self.cert_days = -1
+        self.order = None
         self.order_uri = self.data.get('order_uri') if self.data else None
-        self.finalize_uri = None
+        self.all_chains = None
+        self.select_chain_matcher = []
+
+        if self.module.params['select_chain']:
+            for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
+                self.select_chain_matcher.append(
+                    self.client.backend.create_chain_matcher(
+                        Criterium(criterium, index=criterium_idx)))
 
         # Make sure account exists
         modify_account = module.params['modify_account']
@@ -639,286 +613,8 @@ class ACMEClient(object):
         if self.csr is not None and not os.path.exists(self.csr):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
-        self._openssl_bin = module.get_bin_path('openssl', True)
-
         # Extract list of identifiers from CSR
-        self.identifiers = self._get_csr_identifiers()
-
-    def _get_csr_identifiers(self):
-        '''
-        Parse the CSR and return the list of requested identifiers
-        '''
-        if HAS_CURRENT_CRYPTOGRAPHY:
-            return cryptography_get_csr_identifiers(self.module, self.csr, self.csr_content)
-        else:
-            return openssl_get_csr_identifiers(self._openssl_bin, self.module, self.csr, self.csr_content)
-
-    def _add_or_update_auth(self, identifier_type, identifier, auth):
-        '''
-        Add or update the given authorization in the global authorizations list.
-        Return True if the auth was updated/added and False if no change was
-        necessary.
-        '''
-        if self.authorizations.get(identifier_type + ':' + identifier) == auth:
-            return False
-        self.authorizations[identifier_type + ':' + identifier] = auth
-        return True
-
-    def _new_authz_v1(self, identifier_type, identifier):
-        '''
-        Create a new authorization for the given identifier.
-        Return the authorization object of the new authorization
-        https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.4
-        '''
-        new_authz = {
-            "resource": "new-authz",
-            "identifier": {"type": identifier_type, "value": identifier},
-        }
-
-        result, info = self.account.send_signed_request(self.directory['new-authz'], new_authz)
-        if info['status'] not in [200, 201]:
-            raise ModuleFailException("Error requesting challenges: CODE: {0} RESULT: {1}".format(info['status'], result))
-        else:
-            result['uri'] = info['location']
-            return result
-
-    def _get_challenge_data(self, auth, identifier_type, identifier):
-        '''
-        Returns a dict with the data for all proposed (and supported) challenges
-        of the given authorization.
-        '''
-
-        data = {}
-        # no need to choose a specific challenge here as this module
-        # is not responsible for fulfilling the challenges. Calculate
-        # and return the required information for each challenge.
-        for challenge in auth['challenges']:
-            challenge_type = challenge['type']
-            token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-            keyauthorization = self.account.get_keyauthorization(token)
-
-            if challenge_type == 'http-01':
-                # https://tools.ietf.org/html/rfc8555#section-8.3
-                resource = '.well-known/acme-challenge/' + token
-                data[challenge_type] = {'resource': resource, 'resource_value': keyauthorization}
-            elif challenge_type == 'dns-01':
-                if identifier_type != 'dns':
-                    continue
-                # https://tools.ietf.org/html/rfc8555#section-8.4
-                resource = '_acme-challenge'
-                value = nopad_b64(hashlib.sha256(to_bytes(keyauthorization)).digest())
-                record = (resource + identifier[1:]) if identifier.startswith('*.') else (resource + '.' + identifier)
-                data[challenge_type] = {'resource': resource, 'resource_value': value, 'record': record}
-            elif challenge_type == 'tls-alpn-01':
-                # https://www.rfc-editor.org/rfc/rfc8737.html#section-3
-                if identifier_type == 'ip':
-                    # IPv4/IPv6 address: use reverse mapping (RFC1034, RFC3596)
-                    resource = compat_ipaddress.ip_address(identifier).reverse_pointer
-                    if not resource.endswith('.'):
-                        resource += '.'
-                else:
-                    resource = identifier
-                value = base64.b64encode(hashlib.sha256(to_bytes(keyauthorization)).digest())
-                data[challenge_type] = {'resource': resource, 'resource_original': identifier_type + ':' + identifier, 'resource_value': value}
-            else:
-                continue
-
-        return data
-
-    def _fail_challenge(self, identifier_type, identifier, auth, error):
-        '''
-        Aborts with a specific error for a challenge.
-        '''
-        error_details = ''
-        # multiple challenges could have failed at this point, gather error
-        # details for all of them before failing
-        for challenge in auth['challenges']:
-            if challenge['status'] == 'invalid':
-                error_details += ' CHALLENGE: {0}'.format(challenge['type'])
-                if 'error' in challenge:
-                    error_details += ' DETAILS: {0};'.format(challenge['error']['detail'])
-                else:
-                    error_details += ';'
-        raise ModuleFailException("{0}: {1}".format(error.format(identifier_type + ':' + identifier), error_details))
-
-    def _validate_challenges(self, identifier_type, identifier, auth):
-        '''
-        Validate the authorization provided in the auth dict. Returns True
-        when the validation was successful and False when it was not.
-        '''
-        found_challenge = False
-        for challenge in auth['challenges']:
-            if self.challenge != challenge['type']:
-                continue
-
-            uri = challenge['uri'] if self.version == 1 else challenge['url']
-            found_challenge = True
-
-            challenge_response = {}
-            if self.version == 1:
-                token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
-                keyauthorization = self.account.get_keyauthorization(token)
-                challenge_response["resource"] = "challenge"
-                challenge_response["keyAuthorization"] = keyauthorization
-                challenge_response["type"] = self.challenge
-            result, info = self.account.send_signed_request(uri, challenge_response)
-            if info['status'] not in [200, 202]:
-                raise ModuleFailException("Error validating challenge: CODE: {0} RESULT: {1}".format(info['status'], result))
-
-        if not found_challenge:
-            raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}:{2}!".format(
-                self.challenge, identifier_type, identifier))
-
-        status = ''
-
-        while status not in ['valid', 'invalid', 'revoked']:
-            result, dummy = self.account.get_request(auth['uri'])
-            result['uri'] = auth['uri']
-            if self._add_or_update_auth(identifier_type, identifier, result):
-                self.changed = True
-            # https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.1.2
-            # "status (required, string): ...
-            # If this field is missing, then the default value is "pending"."
-            if self.version == 1 and 'status' not in result:
-                status = 'pending'
-            else:
-                status = result['status']
-            time.sleep(2)
-
-        if status == 'invalid':
-            self._fail_challenge(identifier_type, identifier, result, 'Authorization for {0} returned invalid')
-
-        return status == 'valid'
-
-    def _finalize_cert(self):
-        '''
-        Create a new certificate based on the csr.
-        Return the certificate object as dict
-        https://tools.ietf.org/html/rfc8555#section-7.4
-        '''
-        csr = pem_to_der(self.csr, self.csr_content)
-        new_cert = {
-            "csr": nopad_b64(csr),
-        }
-        result, info = self.account.send_signed_request(self.finalize_uri, new_cert)
-        if info['status'] not in [200]:
-            raise ModuleFailException("Error new cert: CODE: {0} RESULT: {1}".format(info['status'], result))
-
-        status = result['status']
-        while status not in ['valid', 'invalid']:
-            time.sleep(2)
-            result, dummy = self.account.get_request(self.order_uri)
-            status = result['status']
-
-        if status != 'valid':
-            raise ModuleFailException("Error new cert: CODE: {0} STATUS: {1} RESULT: {2}".format(info['status'], status, result))
-
-        return result['certificate']
-
-    def _der_to_pem(self, der_cert):
-        '''
-        Convert the DER format certificate in der_cert to a PEM format
-        certificate and return it.
-        '''
-        return """-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----\n""".format(
-            "\n".join(textwrap.wrap(base64.b64encode(der_cert).decode('utf8'), 64)))
-
-    def _download_cert(self, url):
-        '''
-        Download and parse the certificate chain.
-        https://tools.ietf.org/html/rfc8555#section-7.4.2
-        '''
-        content, info = self.account.get_request(url, parse_json_result=False, headers={'Accept': 'application/pem-certificate-chain'})
-
-        if not content or not info['content-type'].startswith('application/pem-certificate-chain'):
-            raise ModuleFailException("Cannot download certificate chain from {0}: {1} (headers: {2})".format(url, content, info))
-
-        cert = None
-        chain = []
-
-        # Parse data
-        certs = split_pem_list(content.decode('utf-8'), keep_inbetween=True)
-        if certs:
-            cert = certs[0]
-            chain = certs[1:]
-
-        alternates = []
-
-        def f(link, relation):
-            if relation == 'up':
-                # Process link-up headers if there was no chain in reply
-                if not chain:
-                    chain_result, chain_info = self.account.get_request(link, parse_json_result=False)
-                    if chain_info['status'] in [200, 201]:
-                        chain.append(self._der_to_pem(chain_result))
-            elif relation == 'alternate':
-                alternates.append(link)
-
-        process_links(info, f)
-
-        if cert is None:
-            raise ModuleFailException("Failed to parse certificate chain download from {0}: {1} (headers: {2})".format(url, content, info))
-        return {'cert': cert, 'chain': chain, 'alternates': alternates}
-
-    def _new_cert_v1(self):
-        '''
-        Create a new certificate based on the CSR (ACME v1 protocol).
-        Return the certificate object as dict
-        https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.5
-        '''
-        csr = pem_to_der(self.csr, self.csr_content)
-        new_cert = {
-            "resource": "new-cert",
-            "csr": nopad_b64(csr),
-        }
-        result, info = self.account.send_signed_request(self.directory['new-cert'], new_cert)
-
-        chain = []
-
-        def f(link, relation):
-            if relation == 'up':
-                chain_result, chain_info = self.account.get_request(link, parse_json_result=False)
-                if chain_info['status'] in [200, 201]:
-                    del chain[:]
-                    chain.append(self._der_to_pem(chain_result))
-
-        process_links(info, f)
-
-        if info['status'] not in [200, 201]:
-            raise ModuleFailException("Error new cert: CODE: {0} RESULT: {1}".format(info['status'], result))
-        else:
-            return {'cert': self._der_to_pem(result), 'uri': info['location'], 'chain': chain}
-
-    def _new_order_v2(self):
-        '''
-        Start a new certificate order (ACME v2 protocol).
-        https://tools.ietf.org/html/rfc8555#section-7.4
-        '''
-        identifiers = []
-        for identifier_type, identifier in self.identifiers:
-            identifiers.append({
-                'type': identifier_type,
-                'value': identifier,
-            })
-        new_order = {
-            "identifiers": identifiers
-        }
-        result, info = self.account.send_signed_request(self.directory['newOrder'], new_order)
-
-        if info['status'] not in [201]:
-            raise ModuleFailException("Error new order: CODE: {0} RESULT: {1}".format(info['status'], result))
-
-        for auth_uri in result['authorizations']:
-            auth_data, dummy = self.account.get_request(auth_uri)
-            auth_data['uri'] = auth_uri
-            identifier_type = auth_data['identifier']['type']
-            identifier = auth_data['identifier']['value']
-            if auth_data.get('wildcard', False):
-                identifier = '*.{0}'.format(identifier)
-            self.authorizations[identifier_type + ':' + identifier] = auth_data
-
-        self.order_uri = info['location']
-        self.finalize_uri = result['finalize']
+        self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
 
     def is_first_step(self):
         '''
@@ -946,10 +642,13 @@ class ACMEClient(object):
                 if identifier_type != 'dns':
                     raise ModuleFailException('ACME v1 only supports DNS identifiers!')
             for identifier_type, identifier in self.identifiers:
-                new_auth = self._new_authz_v1(identifier_type, identifier)
-                self._add_or_update_auth(identifier_type, identifier, new_auth)
+                authz = Authorization.create(self.client, identifier_type, identifier)
+                self.authorizations[authz.combined_identifier] = authz
         else:
-            self._new_order_v2()
+            self.order = Order.create(self.client, self.identifiers)
+            self.order_uri = self.order.url
+            self.order.load_authorizations(self.client)
+            self.authorizations.update(self.order.authorizations)
         self.changed = True
 
     def get_challenges_data(self, first_step):
@@ -959,15 +658,14 @@ class ACMEClient(object):
         '''
         # Get general challenge data
         data = {}
-        for type_identifier, auth in self.authorizations.items():
-            identifier_type, identifier = type_identifier.split(':', 1)
-            auth = self.authorizations[type_identifier]
+        for type_identifier, authz in self.authorizations.items():
+            identifier_type, identifier = split_identifier(type_identifier)
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
-            if auth['status'] == 'valid':
+            if authz.status == 'valid':
                 continue
             # We drop the type from the key to preserve backwards compatibility
-            data[identifier] = self._get_challenge_data(auth, identifier_type, identifier)
+            data[identifier] = authz.get_challenge_data(self.client)
             if first_step and self.challenge not in data[identifier]:
                 raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
                     self.challenge, type_identifier))
@@ -994,91 +692,40 @@ class ACMEClient(object):
             # For ACME v1, we attempt to create new authzs. Existing ones
             # will be returned instead.
             for identifier_type, identifier in self.identifiers:
-                new_auth = self._new_authz_v1(identifier_type, identifier)
-                self._add_or_update_auth(identifier_type, identifier, new_auth)
+                authz = Authorization.create(self.client, identifier_type, identifier)
+                self.authorizations[combine_identifier(identifier_type, identifier)] = authz
         else:
             # For ACME v2, we obtain the order object by fetching the
             # order URI, and extract the information from there.
-            result, info = self.account.get_request(self.order_uri)
+            self.order = Order.from_url(self.client, self.order_uri)
+            self.order.load_authorizations(self.client)
+            self.authorizations.update(self.order.authorizations)
 
-            if not result:
-                raise ModuleFailException("Cannot download order from {0}: {1} (headers: {2})".format(self.order_uri, result, info))
+        # Step 2: validate pending challenges
+        for type_identifier, authz in self.authorizations.items():
+            if authz.status == 'pending':
+                identifier_type, identifier = split_identifier(type_identifier)
+                authz.call_validate(self.client, self.challenge)
+                self.changed = True
 
-            if info['status'] not in [200]:
-                raise ModuleFailException("Error on downloading order: CODE: {0} RESULT: {1}".format(info['status'], result))
-
-            for auth_uri in result['authorizations']:
-                auth_data, dummy = self.account.get_request(auth_uri)
-                auth_data['uri'] = auth_uri
-                identifier_type = auth_data['identifier']['type']
-                identifier = auth_data['identifier']['value']
-                if auth_data.get('wildcard', False):
-                    identifier = '*.{0}'.format(identifier)
-                self.authorizations[identifier_type + ':' + identifier] = auth_data
-
-            self.finalize_uri = result['finalize']
-
-        # Step 2: validate challenges
-        for type_identifier, auth in self.authorizations.items():
-            if auth['status'] == 'pending':
-                identifier_type, identifier = type_identifier.split(':', 1)
-                self._validate_challenges(identifier_type, identifier, auth)
-
-    def _chain_matches(self, chain, criterium):
-        '''
-        Check whether an alternate chain matches the specified criterium.
-        '''
-        if criterium['test_certificates'] == 'last':
-            chain = chain[-1:]
-        elif criterium['test_certificates'] == 'first':
-            chain = chain[:1]
-        for cert in chain:
+    def download_alternate_chains(self, cert):
+        alternate_chains = []
+        for alternate in cert.alternates:
             try:
-                x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography.hazmat.backends.default_backend())
-                matches = True
-                if criterium['subject']:
-                    for k, v in parse_name_field(criterium['subject']):
-                        oid = cryptography_name_to_oid(k)
-                        value = to_native(v)
-                        found = False
-                        for attribute in x509.subject:
-                            if attribute.oid == oid and value == to_native(attribute.value):
-                                found = True
-                                break
-                        if not found:
-                            matches = False
-                            break
-                if criterium['issuer']:
-                    for k, v in parse_name_field(criterium['issuer']):
-                        oid = cryptography_name_to_oid(k)
-                        value = to_native(v)
-                        found = False
-                        for attribute in x509.issuer:
-                            if attribute.oid == oid and value == to_native(attribute.value):
-                                found = True
-                                break
-                        if not found:
-                            matches = False
-                            break
-                if criterium['subject_key_identifier']:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.SubjectKeyIdentifier)
-                        if criterium['subject_key_identifier'] != ext.value.digest:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if criterium['authority_key_identifier']:
-                    try:
-                        ext = x509.extensions.get_extension_for_class(cryptography.x509.AuthorityKeyIdentifier)
-                        if criterium['authority_key_identifier'] != ext.value.key_identifier:
-                            matches = False
-                    except cryptography.x509.ExtensionNotFound:
-                        matches = False
-                if matches:
-                    return True
-            except Exception as e:
-                self.module.warn('Error while loading certificate {0}: {1}'.format(cert, e))
-        return False
+                alt_cert = CertificateChain.download(self.client, alternate)
+            except ModuleFailException as e:
+                self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
+                continue
+            alternate_chains.append(alt_cert)
+        return alternate_chains
+
+    def find_matching_chain(self, chains):
+        for criterium_idx, matcher in enumerate(self.select_chain_matcher):
+            for chain in chains:
+                if matcher.match(chain):
+                    self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
+                    return chain
+        return None
 
     def get_certificate(self):
         '''
@@ -1087,80 +734,46 @@ class ACMEClient(object):
         with an error.
         '''
         for identifier_type, identifier in self.identifiers:
-            auth = self.authorizations.get(identifier_type + ':' + identifier)
-            if auth is None:
-                raise ModuleFailException('Found no authorization information for "{0}"!'.format(identifier_type + ':' + identifier))
-            if 'status' not in auth:
-                self._fail_challenge(identifier_type, identifier, auth, 'Authorization for {0} returned no status')
-            if auth['status'] != 'valid':
-                self._fail_challenge(identifier_type, identifier, auth, 'Authorization for {0} returned status ' + str(auth['status']))
+            authz = self.authorizations.get(combine_identifier(identifier_type, identifier))
+            if authz is None:
+                raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
+                    identifier=combine_identifier(identifier_type, identifier)))
+            if authz.status != 'valid':
+                authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status))
 
         if self.version == 1:
-            cert = self._new_cert_v1()
+            cert = retrieve_acme_v1_certificate(self.client, pem_to_der(self.csr, self.csr_content))
         else:
-            cert_uri = self._finalize_cert()
-            cert = self._download_cert(cert_uri)
-            if self.module.params['retrieve_all_alternates'] or self.module.params['select_chain']:
+            self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
+            cert = CertificateChain.download(self.client, self.order.certificate_uri)
+            if self.module.params['retrieve_all_alternates'] or self.select_chain_matcher:
                 # Retrieve alternate chains
-                alternate_chains = []
-                for alternate in cert['alternates']:
-                    try:
-                        alt_cert = self._download_cert(alternate)
-                    except ModuleFailException as e:
-                        self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
-                        continue
-                    alternate_chains.append(alt_cert)
+                alternate_chains = self.download_alternate_chains(cert)
 
                 # Prepare return value for all alternate chains
                 if self.module.params['retrieve_all_alternates']:
-                    self.all_chains = []
-
-                    def _append_all_chains(cert_data):
-                        self.all_chains.append(dict(
-                            cert=cert_data['cert'].encode('utf8'),
-                            chain=("\n".join(cert_data.get('chain', []))).encode('utf8'),
-                            full_chain=(cert_data['cert'] + "\n".join(cert_data.get('chain', []))).encode('utf8'),
-                        ))
-
-                    _append_all_chains(cert)
+                    self.all_chains = [cert.to_json()]
                     for alt_chain in alternate_chains:
-                        _append_all_chains(alt_chain)
+                        self.all_chains.append(alt_chain.to_json())
 
                 # Try to select alternate chain depending on criteria
-                if self.module.params['select_chain']:
-                    matching_chain = None
-                    all_chains = [cert] + alternate_chains
-                    for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
-                        for v in ('subject_key_identifier', 'authority_key_identifier'):
-                            if criterium[v]:
-                                try:
-                                    criterium[v] = binascii.unhexlify(criterium[v].replace(':', ''))
-                                except Exception:
-                                    self.module.warn('Criterium {0} in select_chain has invalid {1} value. '
-                                                     'Ignoring criterium.'.format(criterium_idx, v))
-                                    continue
-                        for alt_chain in all_chains:
-                            if self._chain_matches(alt_chain.get('chain', []), criterium):
-                                self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
-                                matching_chain = alt_chain
-                                break
-                        if matching_chain:
-                            break
+                if self.select_chain_matcher:
+                    matching_chain = self.find_matching_chain([cert] + alternate_chains)
                     if matching_chain:
-                        cert.update(matching_chain)
+                        cert = matching_chain
                     else:
                         self.module.debug('Found no matching alternative chain')
 
-        if cert['cert'] is not None:
-            pem_cert = cert['cert']
-            chain = list(cert.get('chain', []))
+        if cert.cert is not None:
+            pem_cert = cert.cert
+            chain = cert.chain
 
             if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
-                self.cert_days = get_cert_days(self.module, self.dest)
+                self.cert_days = self.client.backend.get_cert_days(self.dest)
                 self.changed = True
 
             if self.fullchain_dest and write_file(self.module, self.fullchain_dest, (pem_cert + "\n".join(chain)).encode('utf8')):
-                self.cert_days = get_cert_days(self.module, self.fullchain_dest)
+                self.cert_days = self.client.backend.get_cert_days(self.fullchain_dest)
                 self.changed = True
 
             if self.chain_dest and write_file(self.module, self.chain_dest, ("\n".join(chain)).encode('utf8')):
@@ -1172,25 +785,14 @@ class ACMEClient(object):
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        authz_deactivate = {
-            'status': 'deactivated'
-        }
-        if self.version == 1:
-            authz_deactivate['resource'] = 'authz'
-        if self.authorizations:
-            for identifier_type, identifier in self.identifiers:
-                auth = self.authorizations.get(identifier_type + ':' + identifier)
-                if auth is None or auth.get('status') != 'valid':
-                    continue
-                try:
-                    result, info = self.account.send_signed_request(auth['uri'], authz_deactivate)
-                    if 200 <= info['status'] < 300 and result.get('status') == 'deactivated':
-                        auth['status'] = 'deactivated'
-                except Exception as dummy:
-                    # Ignore errors on deactivating authzs
-                    pass
-                if auth.get('status') != 'deactivated':
-                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(auth['uri']))
+        for authz in self.authorizations.values():
+            try:
+                authz.deactivate(self.client)
+            except Exception:
+                # ignore errors
+                pass
+            if authz.status != 'deactivated':
+                self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
 
 
 def main():
@@ -1232,18 +834,13 @@ def main():
         ),
         supports_check_mode=True,
     )
-    backend = handle_standard_module_arguments(module)
-    if module.params['select_chain']:
-        if backend != 'cryptography':
-            module.fail_json(msg="The 'select_chain' can only be used with the 'cryptography' backend.")
-        elif not CRYPTOGRAPHY_FOUND:
-            module.fail_json(msg=missing_required_lib('cryptography'))
+    backend = create_backend(module, False)
 
     try:
         if module.params.get('dest'):
-            cert_days = get_cert_days(module, module.params['dest'])
+            cert_days = backend.get_cert_days(module.params['dest'])
         else:
-            cert_days = get_cert_days(module, module.params['fullchain_dest'])
+            cert_days = backend.get_cert_days(module.params['fullchain_dest'])
 
         if module.params['force'] or cert_days < module.params['remaining_days']:
             # If checkmode is active, base the changed state solely on the status
@@ -1253,7 +850,7 @@ def main():
             if module.check_mode:
                 module.exit_json(changed=True, authorizations={}, challenge_data={}, cert_days=cert_days)
             else:
-                client = ACMEClient(module)
+                client = ACMECertificateClient(module, backend)
                 client.cert_days = cert_days
                 other = dict()
                 is_first_step = client.is_first_step()
@@ -1265,7 +862,7 @@ def main():
                     try:
                         client.finish_challenges()
                         client.get_certificate()
-                        if module.params['retrieve_all_alternates']:
+                        if client.all_chains is not None:
                             other['all_chains'] = client.all_chains
                     finally:
                         if module.params['deactivate_authzs']:
@@ -1274,13 +871,13 @@ def main():
                 auths = dict()
                 for k, v in client.authorizations.items():
                     # Remove "type:" from key
-                    auths[k.split(':', 1)[1]] = v
+                    auths[split_identifier(k)[1]] = v.to_json()
                 module.exit_json(
                     changed=client.changed,
                     authorizations=auths,
-                    finalize_uri=client.finalize_uri,
+                    finalize_uri=client.order.finalize_uri if client.order else None,
                     order_uri=client.order_uri,
-                    account_uri=client.account.uri,
+                    account_uri=client.client.account_uri,
                     challenge_data=data,
                     challenge_data_dns=data_dns,
                     cert_days=client.cert_days,

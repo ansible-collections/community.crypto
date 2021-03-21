@@ -240,16 +240,18 @@ output_json:
       - ...
 '''
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
-    ACMEAccount,
-    handle_standard_module_arguments,
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    create_backend,
     get_default_argspec,
+    ACMEClient,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
 )
 
 
@@ -273,25 +275,26 @@ def main():
             ['method', 'post', ['account_key_src', 'account_key_content'], True],
         ),
     )
-    handle_standard_module_arguments(module)
+    backend = create_backend(module, False)
 
     result = dict()
     changed = False
     try:
-        # Get hold of ACMEAccount object (includes directory)
-        account = ACMEAccount(module)
+        # Get hold of ACMEClient and ACMEAccount objects (includes directory)
+        client = ACMEClient(module, backend)
         method = module.params['method']
-        result['directory'] = account.directory.directory
+        result['directory'] = client.directory.directory
         # Do we have to do more requests?
         if method != 'directory-only':
             url = module.params['url']
             fail_on_acme_error = module.params['fail_on_acme_error']
             # Do request
             if method == 'get':
-                data, info = account.get_request(url, parse_json_result=False, fail_on_error=False)
+                data, info = client.get_request(url, parse_json_result=False, fail_on_error=False)
             elif method == 'post':
                 changed = True  # only POSTs can change
-                data, info = account.send_signed_request(url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False)
+                data, info = client.send_signed_request(
+                    url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False, fail_on_error=False)
             # Update results
             result.update(dict(
                 headers=info,
@@ -299,13 +302,12 @@ def main():
             ))
             # See if we can parse the result as JSON
             try:
-                # to_text() is needed only for Python 3.5 (and potentially 3.0 to 3.4 as well)
-                result['output_json'] = json.loads(to_text(data))
+                result['output_json'] = module.from_json(to_text(data))
             except Exception as dummy:
                 pass
             # Fail if error was returned
             if fail_on_acme_error and info['status'] >= 400:
-                raise ModuleFailException("ACME request failed: CODE: {0} RESULT: {1}".format(info['status'], data))
+                raise ACMEProtocolException(info=info, content_json=result)
         # Done!
         module.exit_json(changed=changed, **result)
     except ModuleFailException as e:

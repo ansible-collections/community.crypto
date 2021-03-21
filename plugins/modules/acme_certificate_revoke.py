@@ -119,13 +119,25 @@ RETURN = '''#'''
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.crypto.plugins.module_utils.acme import (
-    ModuleFailException,
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    create_backend,
+    get_default_argspec,
+    ACMEClient,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
+    KeyParsingError,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
     pem_to_der,
-    handle_standard_module_arguments,
-    get_default_argspec,
 )
 
 
@@ -147,10 +159,11 @@ def main():
         ),
         supports_check_mode=False,
     )
-    handle_standard_module_arguments(module)
+    backend = create_backend(module, False)
 
     try:
-        account = ACMEAccount(module)
+        client = ACMEClient(module, backend)
+        account = ACMEAccount(client)
         # Load certificate
         certificate = pem_to_der(module.params.get('certificate'))
         certificate = nopad_b64(certificate)
@@ -162,25 +175,27 @@ def main():
             payload['reason'] = module.params.get('revoke_reason')
         # Determine endpoint
         if module.params.get('acme_version') == 1:
-            endpoint = account.directory['revoke-cert']
+            endpoint = client.directory['revoke-cert']
             payload['resource'] = 'revoke-cert'
         else:
-            endpoint = account.directory['revokeCert']
+            endpoint = client.directory['revokeCert']
         # Get hold of private key (if available) and make sure it comes from disk
         private_key = module.params.get('private_key_src')
         private_key_content = module.params.get('private_key_content')
         # Revoke certificate
         if private_key or private_key_content:
             # Step 1: load and parse private key
-            error, private_key_data = account.parse_key(private_key, private_key_content)
-            if error:
-                raise ModuleFailException("error while parsing private key: %s" % error)
+            try:
+                private_key_data = client.parse_key(private_key, private_key_content)
+            except KeyParsingError as e:
+                raise ModuleFailException("Error while parsing private key: {msg}".format(msg=e.msg))
             # Step 2: sign revokation request with private key
             jws_header = {
                 "alg": private_key_data['alg'],
                 "jwk": private_key_data['jwk'],
             }
-            result, info = account.send_signed_request(endpoint, payload, key_data=private_key_data, jws_header=jws_header)
+            result, info = client.send_signed_request(
+                endpoint, payload, key_data=private_key_data, jws_header=jws_header, fail_on_error=False)
         else:
             # Step 1: get hold of account URI
             created, account_data = account.setup_account(allow_creation=False)
@@ -189,7 +204,7 @@ def main():
             if account_data is None:
                 raise ModuleFailException(msg='Account does not exist or is deactivated.')
             # Step 2: sign revokation request with account key
-            result, info = account.send_signed_request(endpoint, payload)
+            result, info = client.send_signed_request(endpoint, payload, fail_on_error=False)
         if info['status'] != 200:
             already_revoked = False
             # Standardized error from draft 14 on (https://tools.ietf.org/html/rfc8555#section-7.6)
@@ -208,7 +223,7 @@ def main():
             # but successfully terminate while indicating no change
             if already_revoked:
                 module.exit_json(changed=False)
-            raise ModuleFailException('Error revoking certificate: {0} {1}'.format(info['status'], result))
+            raise ACMEProtocolException('Failed to revoke certificate', info=info, content_json=result)
         module.exit_json(changed=True)
     except ModuleFailException as e:
         e.do_fail(module)
