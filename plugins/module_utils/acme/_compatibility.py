@@ -159,7 +159,7 @@ class ACMELegacyAccount(object):
         try:
             return None, self.client.parse_key(key_file=key_file, key_content=key_content)
         except KeyParsingError as e:
-            return e.msg, None
+            return e.msg, {}
 
     def sign_request(self, protected, payload, key_data, encode_payload=True):
         return self.client.sign_request(protected, payload, key_data, encode_payload=encode_payload)

@@ -24,7 +24,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.certificates
     ChainMatcher,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import BackendException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    BackendException,
+    KeyParsingError,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 
@@ -181,8 +184,8 @@ class CryptographyBackend(CryptoBackend):
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
-        Parses an RSA or Elliptic Curve key file in PEM format and returns a pair
-        (error, key_data).
+        Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
+        Raises KeyParsingError in case of errors.
         '''
         # If key_content isn't given, read key_file
         if key_content is None:
@@ -196,10 +199,10 @@ class CryptographyBackend(CryptoBackend):
                 password=to_bytes(passphrase) if passphrase is not None else None,
                 backend=_cryptography_backend)
         except Exception as e:
-            return 'error while loading key: {0}'.format(e), None
+            raise KeyParsingError('error while loading key: {0}'.format(e))
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
             pk = key.public_key().public_numbers()
-            return None, {
+            return {
                 'key_obj': key,
                 'type': 'rsa',
                 'alg': 'RS256',
@@ -233,9 +236,9 @@ class CryptographyBackend(CryptoBackend):
                 point_size = 66
                 curve = 'P-521'
             else:
-                return 'unknown elliptic curve: {0}'.format(pk.curve.name), {}
+                raise KeyParsingError('unknown elliptic curve: {0}'.format(pk.curve.name))
             num_bytes = (bits + 7) // 8
-            return None, {
+            return {
                 'key_obj': key,
                 'type': 'ec',
                 'alg': alg,
@@ -249,7 +252,7 @@ class CryptographyBackend(CryptoBackend):
                 'point_size': point_size,
             }
         else:
-            return 'unknown key type "{0}"'.format(type(key)), {}
+            raise KeyParsingError('unknown key type "{0}"'.format(type(key)))
 
     def sign(self, payload64, protected64, key_data):
         sign_payload = "{0}.{1}".format(protected64, payload64).encode('utf8')

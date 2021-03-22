@@ -30,12 +30,10 @@ def test_eckeyparse_cryptography(pem, result, dummy, tmpdir):
     fn.write(pem)
     module = MagicMock()
     backend = CryptographyBackend(module)
-    error, key = backend.parse_key(key_file=str(fn))
-    assert error is None
+    key = backend.parse_key(key_file=str(fn))
     key.pop('key_obj')
     assert key == result
-    error, key = backend.parse_key(key_content=pem)
-    assert error is None
+    key = backend.parse_key(key_content=pem)
     key.pop('key_obj')
     assert key == result
 
