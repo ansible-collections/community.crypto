@@ -1,1 +1,0 @@
-release_summary: Fixes compatibility issues with the latest ansible-core 2.11 beta, and contains a lot of internal refactoring for the ACME modules and support for private key passphrases for them.
