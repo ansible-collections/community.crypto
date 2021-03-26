@@ -86,7 +86,9 @@ fi
 
 # START: HACK install integration test dependencies
 if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_version}" != "2.9" ]; then
-    retry ansible-galaxy -vvv collection install community.general
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install community.general
 fi
 # END: HACK
 
