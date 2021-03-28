@@ -142,7 +142,7 @@ def test_default_key_params(keytype, size, passphrase, comment):
     result = True
 
     default_sizes = {
-        'rsa': 4096,
+        'rsa': 2048,
         'dsa': 1024,
         'ecdsa': 256,
         'ed25519': 256,

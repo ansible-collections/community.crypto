@@ -76,7 +76,7 @@ if HAS_CRYPTOGRAPHY and CRYPTOGRAPHY_HAS_ED25519:
 
             self.__algorithm_parameters = {
                 'rsa': {
-                    'default_size': 4096,
+                    'default_size': 2048,
                     'valid_sizes': range(1024, 16384),
                 },
                 'dsa': {
