@@ -290,7 +290,7 @@ if HAS_CRYPTOGRAPHY and CRYPTOGRAPHY_HAS_ED25519:
                     elif isinstance(privatekey, dsa.DSAPrivateKey):
                         self.__keytype = 'dsa'
                     elif isinstance(privatekey, ec.EllipticCurvePrivateKey):
-                        self.__keytype = 'dsa'
+                        self.__keytype = 'ecdsa'
                     elif isinstance(privatekey, Ed25519PrivateKey):
                         self.__keytype = 'ed25519'
             except ValueError as e:
