@@ -13,20 +13,15 @@ from os import remove, rmdir
 from socket import gethostname
 from tempfile import mkdtemp
 
-CRYPTOGRAPHY_UNAVAILABLE = False
-
-try:
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_openssh import (
-        InvalidCommentError,
-        InvalidKeyFileError,
-        InvalidKeySizeError,
-        InvalidKeyTypeError,
-        InvalidPassphraseError,
-        OpenSSH_Keypair
-    )
-except ImportError:
-    CRYPTOGRAPHY_UNAVAILABLE = True
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_openssh import (
+    HAS_OPENSSH_SUPPORT,
+    InvalidCommentError,
+    InvalidKeyFileError,
+    InvalidKeySizeError,
+    InvalidKeyTypeError,
+    InvalidPassphraseError,
+    OpenSSH_Keypair
+)
 
 DEFAULT_KEY_PARAMS = [
     (
@@ -138,7 +133,7 @@ INVALID_KEY_SIZES = [
 
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", DEFAULT_KEY_PARAMS)
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_default_key_params(keytype, size, passphrase, comment):
     result = True
 
@@ -153,7 +148,7 @@ def test_default_key_params(keytype, size, passphrase, comment):
     pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     try:
         pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
-        if pair.Size != default_sizes[pair.KeyType] or pair.Comment != default_comment:
+        if pair.size != default_sizes[pair.key_type] or pair.comment != default_comment:
             result = False
     except Exception as e:
         print(e)
@@ -163,13 +158,13 @@ def test_default_key_params(keytype, size, passphrase, comment):
 
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", VALID_USER_KEY_PARAMS)
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_user_key_params(keytype, size, passphrase, comment):
     result = True
 
     try:
         pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
-        if pair.KeyType != keytype or pair.Size != size or pair.Comment != comment:
+        if pair.key_type != keytype or pair.size != size or pair.comment != comment:
             result = False
     except Exception as e:
         print(e)
@@ -179,7 +174,7 @@ def test_valid_user_key_params(keytype, size, passphrase, comment):
 
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", INVALID_USER_KEY_PARAMS)
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_invalid_user_key_params(keytype, size, passphrase, comment):
     result = False
 
@@ -195,7 +190,7 @@ def test_invalid_user_key_params(keytype, size, passphrase, comment):
 
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", INVALID_KEY_SIZES)
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_invalid_key_sizes(keytype, size, passphrase, comment):
     result = False
 
@@ -210,35 +205,35 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
     assert result
 
 
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_comment_update():
 
     pair = OpenSSH_Keypair()
     new_comment = "comment"
     try:
-        pair.Comment = new_comment
+        pair.comment = new_comment
     except Exception as e:
         print(e)
         pass
 
-    assert pair.Comment == new_comment and pair.PublicKey.split(b' ', 2)[2].decode() == new_comment
+    assert pair.comment == new_comment and pair.public_key.split(b' ', 2)[2].decode() == new_comment
 
 
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_invalid_comment_update():
     result = False
 
     pair = OpenSSH_Keypair()
     new_comment = [1, 2, 3]
     try:
-        pair.Comment = new_comment
+        pair.comment = new_comment
     except InvalidCommentError:
         result = True
 
     assert result
 
 
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_passphrase_update():
     result = False
 
@@ -249,13 +244,13 @@ def test_valid_passphrase_update():
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
         pair1 = OpenSSH_Keypair()
-        pair1.Update_Passphrase(passphrase)
+        pair1.update_passphrase(passphrase)
 
         with open(keyfilename, "w+b") as keyfile:
-            keyfile.write(pair1.PrivateKey)
+            keyfile.write(pair1.private_key)
 
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
-            pubkeyfile.write(pair1.PublicKey)
+            pubkeyfile.write(pair1.public_key)
 
         pair2 = OpenSSH_Keypair(path=keyfilename, passphrase=passphrase)
 
@@ -272,14 +267,14 @@ def test_valid_passphrase_update():
     assert result
 
 
-@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_invalid_passphrase_update():
     result = False
 
     passphrase = [1, 2, 3]
     pair = OpenSSH_Keypair()
     try:
-        pair.Update_Passphrase(passphrase)
+        pair.update_passphrase(passphrase)
     except InvalidPassphraseError:
         result = True
 
