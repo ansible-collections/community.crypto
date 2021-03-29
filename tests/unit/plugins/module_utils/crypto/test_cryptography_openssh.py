@@ -7,6 +7,7 @@ __metaclass__ = type
 
 import pytest
 
+import os.path
 from getpass import getuser
 from os import remove, rmdir
 from socket import gethostname
@@ -232,6 +233,54 @@ def test_invalid_comment_update():
     try:
         pair.Comment = new_comment
     except InvalidCommentError:
+        result = True
+
+    assert result
+
+
+@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+def test_valid_passphrase_update():
+    result = False
+
+    passphrase = "change_me"
+
+    try:
+        tmpdir = mkdtemp()
+        keyfilename = os.path.join(tmpdir, "id_rsa")
+
+        pair1 = OpenSSH_Keypair()
+        pair1.Update_Passphrase(passphrase)
+
+        with open(keyfilename, "w+b") as keyfile:
+            keyfile.write(pair1.PrivateKey)
+
+        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
+            pubkeyfile.write(pair1.PublicKey)
+
+        pair2 = OpenSSH_Keypair(path=keyfilename, passphrase=passphrase)
+
+        if pair1 == pair2:
+            result = True
+    finally:
+        if os.path.exists(keyfilename):
+            remove(keyfilename)
+        if os.path.exists(keyfilename + '.pub'):
+            remove(keyfilename + '.pub')
+        if os.path.exists(tmpdir):
+            rmdir(tmpdir)
+
+    assert result
+
+
+@pytest.mark.skipif(CRYPTOGRAPHY_UNAVAILABLE, reason="requires cryptography")
+def test_invalid_passphrase_update():
+    result = False
+
+    passphrase = [1, 2, 3]
+    pair = OpenSSH_Keypair()
+    try:
+        pair.Update_Passphrase(passphrase)
+    except InvalidPassphraseError:
         result = True
 
     assert result
