@@ -13,7 +13,7 @@ from os import remove, rmdir
 from socket import gethostname
 from tempfile import mkdtemp
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_openssh import (
+from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography_openssh import (
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidKeyFileError,
