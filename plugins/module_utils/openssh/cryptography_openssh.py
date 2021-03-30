@@ -227,10 +227,7 @@ class Asymmetric_Keypair(object):
             'ecdsa': self.__generate_ecdsa_key,
         }
 
-        size_validation_error = self.__validate_key_size()
-
-        if size_validation_error:
-            raise InvalidKeySizeError(size_validation_error)
+        self.__validate_key_size()
 
         return generators[self.__keytype]()
 
@@ -241,11 +238,7 @@ class Asymmetric_Keypair(object):
     def __validate_key_size(self):
 
         if self.__size not in self.__algorithm_parameters[self.__keytype]['valid_sizes']:
-            err = "%s is not a valid key size for %s keys" % (self.__size, self.__keytype)
-        else:
-            err = ""
-
-        return err
+            raise InvalidKeySizeError("%s is not a valid key size for %s keys" % (self.__size, self.__keytype))
 
     def __generate_rsa_key(self):
         return rsa.generate_private_key(
@@ -317,9 +310,6 @@ class Asymmetric_Keypair(object):
                     data=content,
                     backend=backend,
                 )
-
-                pubkey_text = content.decode(encoding=_TEXT_ENCODING)
-
         except ValueError as e:
             raise InvalidKeyFileError(e)
         except UnsupportedAlgorithm as e:
@@ -353,11 +343,7 @@ class OpenSSH_Keypair(object):
             if not comment:
                 self.__comment = "%s@%s" % (getuser(), gethostname())
             else:
-                comment_validation_err = self.__validate_comment(comment)
-
-                if comment_validation_err:
-                    raise InvalidCommentError(comment_validation_err)
-
+                self.__validate_comment(comment)
                 self.__comment = comment
 
         self.__asym_keypair = Asymmetric_Keypair(path, keytype, size, passphrase)
@@ -409,10 +395,7 @@ class OpenSSH_Keypair(object):
 
            :comment: Text to update the OpenSSH public key comment
         """
-        comment_validation_err = self.__validate_comment(comment)
-
-        if comment_validation_err:
-            raise InvalidCommentError(comment_validation_err)
+        self.__validate_comment(comment)
 
         self.__comment = comment
         encoded_comment = (" %s" % self.__comment).encode(encoding=_TEXT_ENCODING)
@@ -472,15 +455,13 @@ class OpenSSH_Keypair(object):
                 fields = f.read().split(b' ', 2)
                 if len(fields) == 3:
                     comment = fields[2].decode(_TEXT_ENCODING)
+                else:
+                    comment = ""
         except OSError as e:
             raise InvalidKeyFileError(e)
 
         return comment
 
     def __validate_comment(self, comment):
-        err = ""
-
         if not hasattr(comment, 'encode'):
-            err = "%s cannot be encoded to text" % comment
-
-        return err
+            raise InvalidCommentError("%s cannot be encoded to text" % comment)
