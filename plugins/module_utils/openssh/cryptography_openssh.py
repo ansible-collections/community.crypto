@@ -33,7 +33,7 @@ else:
     HAS_OPENSSH_SUPPORT = False
 
 try:
-    from cryptography.exceptions import UnsupportedAlgorithm
+    from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
@@ -60,7 +60,11 @@ class InvalidDataError(OpenSSHError):
     pass
 
 
-class InvalidKeyFileError(OpenSSHError):
+class InvalidPrivateKeyFileError(OpenSSHError):
+    pass
+
+
+class InvalidPublicKeyFileError(OpenSSHError):
     pass
 
 
@@ -90,18 +94,32 @@ class Asymmetric_Keypair(object):
             'rsa': {
                 'default_size': 2048,
                 'valid_sizes': range(1024, 16384),
+                'signer_params': {
+                    'padding': padding.PSS(
+                        mgf=padding.MGF1(hashes.SHA256()),
+                        salt_length=padding.PSS.MAX_LENGTH,
+                    ),
+                    'algorithm': hashes.SHA256(),
+                },
             },
             'dsa': {
                 'default_size': 1024,
                 'valid_sizes': [1024],
+                'signer_params': {
+                    'algorithm': hashes.SHA256(),
+                },
             },
             'ed25519': {
                 'default_size': 256,
                 'valid_sizes': [256],
+                'signer_params': {},
             },
             'ecdsa': {
                 'default_size': 256,
                 'valid_sizes': [256, 384, 521],
+                'signer_params': {
+                    'signature_algorithm': ec.ECDSA(hashes.SHA256()),
+                },
                 'curves': {
                     256: ec.SECP256R1(),
                     384: ec.SECP384R1(),
@@ -167,36 +185,39 @@ class Asymmetric_Keypair(object):
         return self.__encryption_algorithm
 
     def sign(self, data):
-        """Returns bytes of data signed with the private key of this key pair
+        """Returns signature of data signed with the private key of this key pair
 
            :data: byteslike data to sign
         """
-        signer_params = {
-            'rsa': {
-                'padding': padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
-                ),
-                'algorithm': hashes.SHA256(),
-            },
-            'dsa': {
-                'algorithm': hashes.SHA256(),
-            },
-            'ecdsa': {
-                'signature_algorithm': ec.ECDSA(hashes.SHA256()),
-            },
-            'ed25519': {},
-        }
 
         try:
-            signed_data = self.__privatekey.sign(
+            signature = self.__privatekey.sign(
                 data,
-                **signer_params[self.__keytype]
+                **self.__algorithm_parameters[self.__keytype]['signer_params']
             )
         except TypeError as e:
             raise InvalidDataError(e)
 
-        return signed_data
+        return signature
+
+    def verify(self, signature, data):
+        """Verifies that the signature associated with the provided data was signed
+           by the private key of this key pair.
+
+           :signature: signature to verify
+           :data: byteslike data signed by the provided signature
+        """
+
+        try:
+            self.__publickey.verify(
+                signature,
+                data,
+                **self.__algorithm_parameters[self.__keytype]['signer_params']
+            )
+        except InvalidSignature:
+            return False
+
+        return True
 
     def update_passphrase(self, passphrase):
         """Updates the encryption algorithm of this key pair
@@ -216,6 +237,8 @@ class Asymmetric_Keypair(object):
 
         self.__privatekey = self.__load_privatekey(path, passphrase)
         self.__publickey = self.__load_publickey(path)
+        if not self.verify(self.sign(b'message'), b'message'):
+            raise InvalidPublicKeyFileError("%s.pub is not the correct public key for %s" % (path, path))
         self.__size = self.__privatekey.key_size
 
     def __generate_privatekey(self):
@@ -293,7 +316,7 @@ class Asymmetric_Keypair(object):
                 elif isinstance(privatekey, Ed25519PrivateKey):
                     self.__keytype = 'ed25519'
         except ValueError as e:
-            raise InvalidKeyFileError(e)
+            raise InvalidPrivateKeyFileError(e)
         except TypeError as e:
             raise InvalidPassphraseError(e)
         except UnsupportedAlgorithm as e:
@@ -311,7 +334,7 @@ class Asymmetric_Keypair(object):
                     backend=backend,
                 )
         except ValueError as e:
-            raise InvalidKeyFileError(e)
+            raise InvalidPublicKeyFileError(e)
         except UnsupportedAlgorithm as e:
             raise InvalidAlgorithmError(e)
 
@@ -458,7 +481,7 @@ class OpenSSH_Keypair(object):
                 else:
                     comment = ""
         except OSError as e:
-            raise InvalidKeyFileError(e)
+            raise InvalidPublicKeyFileError(e)
 
         return comment
 

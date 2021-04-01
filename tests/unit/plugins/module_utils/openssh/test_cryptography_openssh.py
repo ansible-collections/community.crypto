@@ -16,7 +16,8 @@ from tempfile import mkdtemp
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography_openssh import (
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
-    InvalidKeyFileError,
+    InvalidPrivateKeyFileError,
+    InvalidPublicKeyFileError,
     InvalidKeySizeError,
     InvalidKeyTypeError,
     InvalidPassphraseError,
@@ -277,5 +278,66 @@ def test_invalid_passphrase_update():
         pair.update_passphrase(passphrase)
     except InvalidPassphraseError:
         result = True
+
+    assert result
+
+
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
+def test_invalid_privatekey():
+    result = False
+
+    try:
+        tmpdir = mkdtemp()
+        keyfilename = os.path.join(tmpdir, "id_rsa")
+
+        pair = OpenSSH_Keypair()
+
+        with open(keyfilename, "w+b") as keyfile:
+            keyfile.write(pair.private_key[1:])
+
+        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
+            pubkeyfile.write(pair.public_key)
+
+        OpenSSH_Keypair(path=keyfilename)
+    except InvalidPrivateKeyFileError:
+        result = True
+    finally:
+        if os.path.exists(keyfilename):
+            remove(keyfilename)
+        if os.path.exists(keyfilename + '.pub'):
+            remove(keyfilename + '.pub')
+        if os.path.exists(tmpdir):
+            rmdir(tmpdir)
+
+    assert result
+
+
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
+def test_mismatched_keypair():
+    result = False
+
+    try:
+        tmpdir = mkdtemp()
+        keyfilename = os.path.join(tmpdir, "id_rsa")
+
+        pair1 = OpenSSH_Keypair()
+        pair2 = OpenSSH_Keypair()
+
+        with open(keyfilename, "w+b") as keyfile:
+            keyfile.write(pair1.private_key)
+
+        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
+            pubkeyfile.write(pair2.public_key)
+
+        OpenSSH_Keypair(path=keyfilename)
+    except InvalidPublicKeyFileError:
+        result = True
+    finally:
+        if os.path.exists(keyfilename):
+            remove(keyfilename)
+        if os.path.exists(keyfilename + '.pub'):
+            remove(keyfilename + '.pub')
+        if os.path.exists(tmpdir):
+            rmdir(tmpdir)
 
     assert result
