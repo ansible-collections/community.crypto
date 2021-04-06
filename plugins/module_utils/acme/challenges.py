@@ -236,8 +236,7 @@ class Authorization(object):
                 error=error_msg,
                 details='; '.join(error_details),
             ),
-            identifier=self.combined_identifier,
-            authorization=self.data,
+            content_json=self.data,
         )
 
     def find_challenge(self, challenge_type):
