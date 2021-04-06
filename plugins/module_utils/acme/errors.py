@@ -45,7 +45,7 @@ class ModuleFailException(Exception):
 
 
 class ACMEProtocolException(ModuleFailException):
-    def __init__(self, module, msg=None, info=None, response=None, content=None, content_json=None):
+    def __init__(self, module, msg=None, info=None, response=None, content=None, content_json=None, extras=None):
         # Try to get hold of content, if response is given and content is not provided
         if content is None and content_json is None and response is not None:
             try:
@@ -54,13 +54,13 @@ class ACMEProtocolException(ModuleFailException):
                 content = info.pop('body', None)
 
         # Try to get hold of JSON decoded content, when content is given and JSON not provided
-        if content_json is None and content is not None:
+        if content_json is None and content is not None and module is not None:
             try:
                 content_json = module.from_json(content.decode('utf8'))
             except Exception:
                 pass
 
-        extras = dict()
+        extras = extras or dict()
         url = info['url'] if info else None
         code = info['status'] if info else None
         extras['http_url'] = url
