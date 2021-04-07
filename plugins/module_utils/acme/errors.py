@@ -7,6 +7,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from ansible.module_utils.six import binary_type
+
 
 def format_error_problem(problem, subproblem_prefix=''):
     if 'title' in problem:
@@ -52,6 +54,12 @@ class ACMEProtocolException(ModuleFailException):
                 content = response.read()
             except AttributeError:
                 content = info.pop('body', None)
+
+        # Make sure that content_json is None or a dictionary
+        if content_json is not None and not isinstance(content_json, dict):
+            if content is None and isinstance(content_json, binary_type):
+                content = content_json
+            content_json = None
 
         # Try to get hold of JSON decoded content, when content is given and JSON not provided
         if content_json is None and content is not None and module is not None:
