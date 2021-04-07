@@ -286,12 +286,14 @@ class ACMEClient(object):
                 content = info.pop('body', None)
 
         # Process result
+        parsed_json_result = False
         if parse_json_result:
             result = {}
             if content:
                 if info['content-type'].startswith('application/json'):
                     try:
                         result = self.module.from_json(content.decode('utf8'))
+                        parsed_json_result = True
                     except ValueError:
                         raise NetworkException("Failed to parse the ACME response: {0} {1}".format(uri, content))
                 else:
@@ -301,7 +303,7 @@ class ACMEClient(object):
 
         if fail_on_error and _is_failed(info, expected_status_codes=expected_status_codes):
             raise ACMEProtocolException(
-                self.module, msg=error_msg, info=info, content=content, content_json=result if parse_json_result else None)
+                self.module, msg=error_msg, info=info, content=content, content_json=result if parsed_json_result else None)
         return result, info
 
 
