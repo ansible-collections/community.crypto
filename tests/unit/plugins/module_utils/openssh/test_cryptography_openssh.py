@@ -146,9 +146,9 @@ def test_default_key_params(keytype, size, passphrase, comment):
     }
 
     default_comment = "%s@%s" % (getuser(), gethostname())
-    pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+    pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     try:
-        pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
         if pair.size != default_sizes[pair.key_type] or pair.comment != default_comment:
             result = False
     except Exception as e:
@@ -164,7 +164,7 @@ def test_valid_user_key_params(keytype, size, passphrase, comment):
     result = True
 
     try:
-        pair = OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
         if pair.key_type != keytype or pair.size != size or pair.comment != comment:
             result = False
     except Exception as e:
@@ -180,7 +180,7 @@ def test_invalid_user_key_params(keytype, size, passphrase, comment):
     result = False
 
     try:
-        OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     except (InvalidCommentError, InvalidKeyTypeError, InvalidPassphraseError):
         result = True
     except Exception as e:
@@ -196,7 +196,7 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
     result = False
 
     try:
-        OpenSSH_Keypair(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     except InvalidKeySizeError:
         result = True
     except Exception as e:
@@ -209,7 +209,7 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_comment_update():
 
-    pair = OpenSSH_Keypair()
+    pair = OpenSSH_Keypair.generate()
     new_comment = "comment"
     try:
         pair.comment = new_comment
@@ -224,7 +224,7 @@ def test_valid_comment_update():
 def test_invalid_comment_update():
     result = False
 
-    pair = OpenSSH_Keypair()
+    pair = OpenSSH_Keypair.generate()
     new_comment = [1, 2, 3]
     try:
         pair.comment = new_comment
@@ -244,7 +244,7 @@ def test_valid_passphrase_update():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair1 = OpenSSH_Keypair()
+        pair1 = OpenSSH_Keypair.generate()
         pair1.update_passphrase(passphrase)
 
         with open(keyfilename, "w+b") as keyfile:
@@ -253,7 +253,7 @@ def test_valid_passphrase_update():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair1.public_key)
 
-        pair2 = OpenSSH_Keypair(path=keyfilename, passphrase=passphrase)
+        pair2 = OpenSSH_Keypair.load(path=keyfilename, passphrase=passphrase)
 
         if pair1 == pair2:
             result = True
@@ -273,7 +273,7 @@ def test_invalid_passphrase_update():
     result = False
 
     passphrase = [1, 2, 3]
-    pair = OpenSSH_Keypair()
+    pair = OpenSSH_Keypair.generate()
     try:
         pair.update_passphrase(passphrase)
     except InvalidPassphraseError:
@@ -290,7 +290,7 @@ def test_invalid_privatekey():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair = OpenSSH_Keypair()
+        pair = OpenSSH_Keypair.generate()
 
         with open(keyfilename, "w+b") as keyfile:
             keyfile.write(pair.private_key[1:])
@@ -298,7 +298,7 @@ def test_invalid_privatekey():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair.public_key)
 
-        OpenSSH_Keypair(path=keyfilename)
+        OpenSSH_Keypair.load(path=keyfilename)
     except InvalidPrivateKeyFileError:
         result = True
     finally:
@@ -320,8 +320,8 @@ def test_mismatched_keypair():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair1 = OpenSSH_Keypair()
-        pair2 = OpenSSH_Keypair()
+        pair1 = OpenSSH_Keypair.generate()
+        pair2 = OpenSSH_Keypair.generate()
 
         with open(keyfilename, "w+b") as keyfile:
             keyfile.write(pair1.private_key)
@@ -329,7 +329,7 @@ def test_mismatched_keypair():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair2.public_key)
 
-        OpenSSH_Keypair(path=keyfilename)
+        OpenSSH_Keypair.load(path=keyfilename)
     except InvalidPublicKeyFileError:
         result = True
     finally:

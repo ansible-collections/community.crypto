@@ -81,13 +81,15 @@ class InvalidPassphraseError(OpenSSHError):
 
 
 class Asymmetric_Keypair(object):
-    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None):
-        """Container for newly generated asymmetric keypairs or those loaded from existing files
+    """Container for newly generated asymmetric keypairs or those loaded from existing files"""
 
+    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None):
+        """
            :path: A path to an existing private key to be loaded
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt or decrypt a new or existing key respectively
+           :passphrase: Secret used to decrypt the private key being loaded
+            or encrypt the private key being generated
         """
 
         self.__algorithm_parameters = {
@@ -128,19 +130,19 @@ class Asymmetric_Keypair(object):
             }
         }
 
-        self.__privatekey = None
-        self.__publickey = None
+        self.__encryption_algorithm = serialization.NoEncryption()
 
         if passphrase:
-            self.__validate_passphrase(passphrase)
-
-            self.__encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
-        else:
-            self.__encryption_algorithm = serialization.NoEncryption()
+            self.update_passphrase(passphrase)
 
         if path:
             self.__keytype = None
-            self.__load(path, passphrase)
+            self.__privatekey = self.__load_privatekey(path, passphrase)
+            self.__publickey = self.__load_publickey(path)
+            self.__size = self.__privatekey.key_size
+
+            if not self.verify(self.sign(b'message'), b'message'):
+                raise InvalidPublicKeyFileError("%s.pub is not the correct public key for %s" % (path, path))
         else:
             if keytype not in self.__algorithm_parameters.keys():
                 raise InvalidKeyTypeError("%s is not a valid keytype. Valid keytypes are %s" % (keytype, ", ".join(self.__algorithm_parameters.keys())))
@@ -152,36 +154,37 @@ class Asymmetric_Keypair(object):
             else:
                 self.__size = self.__algorithm_parameters[self.__keytype]['default_size']
 
-            self.__generate()
+            self.__privatekey = self.__generate_privatekey()
+            self.__publickey = self.__generate_publickey()
 
     @property
     def private_key(self):
-        """Returns the openssh formatted private key of this key pair
-        """
+        """Returns the openssh formatted private key of this key pair"""
+
         return self.__privatekey
 
     @property
     def public_key(self):
-        """Returns the openssh formatted public key of this key pair
-        """
+        """Returns the openssh formatted public key of this key pair"""
+
         return self.__publickey
 
     @property
     def size(self):
-        """Returns the size of the private key of this key pair
-        """
+        """Returns the size of the private key of this key pair"""
+
         return self.__size
 
     @property
     def key_type(self):
-        """Returns the key type of this key pair
-        """
+        """Returns the key type of this key pair"""
+
         return self.__keytype
 
     @property
     def encryption_algorithm(self):
-        """Returns the key encryption algorithm of this key pair
-        """
+        """Returns the key encryption algorithm of this key pair"""
+
         return self.__encryption_algorithm
 
     def sign(self, data):
@@ -224,22 +227,30 @@ class Asymmetric_Keypair(object):
 
            :passphrase: Text secret used to encrypt this key pair
         """
-        self.__validate_passphrase(passphrase)
 
+        self.__validate_passphrase(passphrase)
         self.__encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
 
-    def __generate(self):
+    @classmethod
+    def generate(cls, keytype='rsa', size=None, passphrase=None):
+        """Returns an Asymmetric_Keypair object generated with the supplied parameters or defaults to an unencrypted RSA-2048 key
 
-        self.__privatekey = self.__generate_privatekey()
-        self.__publickey = self.__generate_publickey()
+           :keytype: One of rsa, dsa, ecdsa, ed25519
+           :size: The key length for newly generated keys
+           :passphrase: Secret used to encrypt the private key being generated
+        """
 
-    def __load(self, path, passphrase):
+        return cls(keytype=keytype, size=size, passphrase=passphrase)
 
-        self.__privatekey = self.__load_privatekey(path, passphrase)
-        self.__publickey = self.__load_publickey(path)
-        if not self.verify(self.sign(b'message'), b'message'):
-            raise InvalidPublicKeyFileError("%s.pub is not the correct public key for %s" % (path, path))
-        self.__size = self.__privatekey.key_size
+    @classmethod
+    def load(cls, path, passphrase=None):
+        """Returns an Asymmetric_Keypair object loaded from the supplied file path
+
+           :path: A path to an existing private key to be loaded
+           :passphrase: Secret used to decrypt the private key being loaded
+        """
+
+        return cls(path=path, passphrase=passphrase)
 
     def __generate_privatekey(self):
 
@@ -346,9 +357,10 @@ class Asymmetric_Keypair(object):
 
 
 class OpenSSH_Keypair(object):
-    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None, comment=None):
-        """Container for OpenSSH encoded asymmetric keypairs
+    """Container for OpenSSH encoded asymmetric keypairs"""
 
+    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None, comment=None):
+        """
            :path: A path to an existing private key to be loaded
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
@@ -356,12 +368,9 @@ class OpenSSH_Keypair(object):
            :comment: Comment for a newly generated OpenSSH public key
         """
 
-        self.__openssh_privatekey = None
-        self.__openssh_publickey = None
-        self.__fingerprint = None
-
         if path:
             self.__comment = self.__extract_comment(path)
+            self.__asym_keypair = Asymmetric_Keypair.load(path, passphrase)
         else:
             if not comment:
                 self.__comment = "%s@%s" % (getuser(), gethostname())
@@ -369,7 +378,8 @@ class OpenSSH_Keypair(object):
                 self.__validate_comment(comment)
                 self.__comment = comment
 
-        self.__asym_keypair = Asymmetric_Keypair(path, keytype, size, passphrase)
+            self.__asym_keypair = Asymmetric_Keypair.generate(keytype, size, passphrase)
+
         self.__openssh_privatekey, self.__openssh_publickey = self.__encode_openssh_keypair()
         self.__fingerprint = self.__calculate_fingerprint()
 
@@ -378,38 +388,38 @@ class OpenSSH_Keypair(object):
 
     @property
     def private_key(self):
-        """Returns the OpenSSH formatted private key of this key pair
-        """
+        """Returns the OpenSSH formatted private key of this key pair"""
+
         return self.__openssh_privatekey
 
     @property
     def public_key(self):
-        """Returns the OpenSSH formatted public key of this key pair
-        """
+        """Returns the OpenSSH formatted public key of this key pair"""
+
         return self.__openssh_publickey
 
     @property
     def size(self):
-        """Returns the size of the private key of this key pair
-        """
+        """Returns the size of the private key of this key pair"""
+
         return self.__asym_keypair.size
 
     @property
     def key_type(self):
-        """Returns the key encryption algorithm of this key pair
-        """
+        """Returns the key encryption algorithm of this key pair"""
+
         return self.__asym_keypair.key_type
 
     @property
     def fingerprint(self):
-        """Returns the fingerprint (SHA256 Hash) of the public key of this key pair
-        """
+        """Returns the fingerprint (SHA256 Hash) of the public key of this key pair"""
+
         return self.__fingerprint
 
     @property
     def comment(self):
-        """Returns the comment applied to the OpenSSH formatted public key of this key pair
-        """
+        """Returns the comment applied to the OpenSSH formatted public key of this key pair"""
+
         return self.__comment
 
     @comment.setter
@@ -418,6 +428,7 @@ class OpenSSH_Keypair(object):
 
            :comment: Text to update the OpenSSH public key comment
         """
+
         self.__validate_comment(comment)
 
         self.__comment = comment
@@ -425,11 +436,34 @@ class OpenSSH_Keypair(object):
         self.__openssh_publickey = b' '.join(self.__openssh_publickey.split(b' ', 2)[:2]) + encoded_comment
         return self.__openssh_publickey
 
+    @classmethod
+    def generate(cls, keytype='rsa', size=None, passphrase=None, comment=None):
+        """Returns an Openssh_Keypair object generated using the supplied parameters or defaults to a RSA-2048 key
+
+           :keytype: One of rsa, dsa, ecdsa, ed25519
+           :size: The key length for newly generated keys
+           :passphrase: Secret used to encrypt the newly generate private key
+           :comment: Comment for a newly generated OpenSSH public key
+        """
+
+        return cls(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+
+    @classmethod
+    def load(cls, path, passphrase=None):
+        """Returns an Openssh_Keypair object loaded from the supplied file path
+
+           :path: A path to an existing private key to be loaded
+           :passphrase: Secret used to decrypt the private key being loaded
+        """
+
+        return cls(path=path, passphrase=passphrase)
+
     def update_passphrase(self, passphrase):
         """Updates the passphrase used to encrypt the private key of this keypair
 
            :passphrase: Text secret used for encryption
         """
+
         self.__asym_keypair.update_passphrase(passphrase)
         self.__openssh_privatekey = self.__encode_openssh_privatekey()
 
