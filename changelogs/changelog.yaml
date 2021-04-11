@@ -372,3 +372,13 @@ releases:
     - 202-actionmodule-plugin-utils-ansible-core-2.11.yml
     - 207-acme-account-key-passphrase.yml
     release_date: '2021-03-22'
+  1.6.1:
+    changes:
+      bugfixes:
+      - acme_* modules - fix wrong usages of ``ACMEProtocolException`` (https://github.com/ansible-collections/community.crypto/pull/216,
+        https://github.com/ansible-collections/community.crypto/pull/217).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.6.1.yml
+    - 217-acme-exceptions.yml
+    release_date: '2021-04-11'
