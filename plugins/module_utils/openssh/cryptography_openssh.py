@@ -36,8 +36,7 @@ try:
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa
-    from cryptography.hazmat.primitives.asymmetric import padding
+    from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 except ImportError:
     pass
@@ -127,13 +126,9 @@ class Asymmetric_Keypair(object):
     }
 
     @classmethod
-    def __validate_passphrase(cls, passphrase):
-        if not hasattr(passphrase, 'encode'):
-            raise InvalidPassphraseError("%s cannot be encoded to text" % passphrase)
-
-    @classmethod
     def generate(cls, keytype='rsa', size=None, passphrase=None):
-        """Returns an Asymmetric_Keypair object generated with the supplied parameters or defaults to an unencrypted RSA-2048 key
+        """Returns an Asymmetric_Keypair object generated with the supplied parameters
+           or defaults to an unencrypted RSA-2048 key
 
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
@@ -141,17 +136,25 @@ class Asymmetric_Keypair(object):
         """
 
         if keytype not in cls.__algorithm_parameters.keys():
-            raise InvalidKeyTypeError("%s is not a valid keytype. Valid keytypes are %s" % (keytype, ", ".join(cls.__algorithm_parameters.keys())))
+            raise InvalidKeyTypeError(
+                "%s is not a valid keytype. Valid keytypes are %s" % (
+                    keytype, ", ".join(cls.__algorithm_parameters.keys())
+                )
+            )
 
         if not size:
             size = cls.__algorithm_parameters[keytype]['default_size']
         else:
             if size not in cls.__algorithm_parameters[keytype]['valid_sizes']:
-                raise InvalidKeySizeError("%s is not a valid key size for %s keys" % (size, keytype))
+                raise InvalidKeySizeError(
+                    "%s is not a valid key size for %s keys" % (size, keytype)
+                )
 
         if passphrase:
-            cls.__validate_passphrase(passphrase)
-            encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
+            validate_passphrase(passphrase)
+            encryption_algorithm = serialization.BestAvailableEncryption(
+                passphrase.encode(encoding=_TEXT_ENCODING)
+            )
         else:
             encryption_algorithm = serialization.NoEncryption()
 
@@ -196,13 +199,15 @@ class Asymmetric_Keypair(object):
         """
 
         if passphrase:
-            cls.__validate_passphrase(passphrase)
-            encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
+            validate_passphrase(passphrase)
+            encryption_algorithm = serialization.BestAvailableEncryption(
+                passphrase.encode(encoding=_TEXT_ENCODING)
+            )
         else:
             encryption_algorithm = serialization.NoEncryption()
 
-        privatekey = cls.__load_privatekey(path, passphrase, key_format)
-        publickey = cls.__load_publickey(path, key_format)
+        privatekey = load_privatekey(path, passphrase, key_format)
+        publickey = load_publickey(path, key_format)
         size = privatekey.key_size
 
         if isinstance(privatekey, rsa.RSAPrivateKey):
@@ -221,84 +226,6 @@ class Asymmetric_Keypair(object):
             publickey=publickey,
             encryption_algorithm=encryption_algorithm
         )
-
-    @classmethod
-    def __load_privatekey(cls, path, passphrase, key_format):
-        privatekey_loaders = {
-            'PEM': serialization.load_pem_private_key,
-            'DER': serialization.load_der_private_key,
-        }
-
-        # OpenSSH formatted private keys are not available in Cryptography <3.0
-        if hasattr(serialization, 'load_ssh_private_key'):
-            privatekey_loaders['SSH'] = serialization.load_ssh_private_key
-        else:
-            privatekey_loaders['SSH'] = serialization.load_pem_private_key
-
-        try:
-            privatekey_loader = privatekey_loaders[key_format]
-        except KeyError:
-            raise InvalidKeyFormatError(
-                "%s is not a valid key format (%s)" % (
-                    key_format,
-                    ','.join(privatekey_loaders.keys())
-                )
-            )
-
-        if passphrase:
-            passphrase = passphrase.encode(encoding=_TEXT_ENCODING)
-
-        try:
-            with open(path, 'rb') as f:
-                content = f.read()
-
-                privatekey = privatekey_loader(
-                    data=content,
-                    password=passphrase,
-                    backend=backend,
-                )
-
-        except ValueError as e:
-            raise InvalidPrivateKeyFileError(e)
-        except TypeError as e:
-            raise InvalidPassphraseError(e)
-        except UnsupportedAlgorithm as e:
-            raise InvalidAlgorithmError(e)
-
-        return privatekey
-
-    @classmethod
-    def __load_publickey(cls, path, key_format):
-        publickey_loaders = {
-            'PEM': serialization.load_pem_public_key,
-            'DER': serialization.load_der_public_key,
-            'SSH': serialization.load_ssh_public_key,
-        }
-
-        try:
-            publickey_loader = publickey_loaders[key_format]
-        except KeyError:
-            raise InvalidKeyFormatError(
-                "%s is not a valid key format (%s)" % (
-                    key_format,
-                    ','.join(publickey_loaders.keys())
-                )
-            )
-
-        try:
-            with open(path + '.pub', 'rb') as f:
-                content = f.read()
-
-                publickey = publickey_loader(
-                    data=content,
-                    backend=backend,
-                )
-        except ValueError as e:
-            raise InvalidPublicKeyFileError(e)
-        except UnsupportedAlgorithm as e:
-            raise InvalidAlgorithmError(e)
-
-        return publickey
 
     def __init__(self, keytype, size, privatekey, publickey, encryption_algorithm):
         """
@@ -392,7 +319,7 @@ class Asymmetric_Keypair(object):
         """
 
         if passphrase:
-            self.__validate_passphrase(passphrase)
+            validate_passphrase(passphrase)
             self.__encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
         else:
             self.__encryption_algorithm = serialization.NoEncryption()
@@ -401,29 +328,107 @@ class Asymmetric_Keypair(object):
 class OpenSSH_Keypair(object):
     """Container for OpenSSH encoded asymmetric keypairs"""
 
-    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None, comment=None):
-        """
-           :path: A path to an existing private key to be loaded
+    @classmethod
+    def generate(cls, keytype='rsa', size=None, passphrase=None, comment=None):
+        """Returns an Openssh_Keypair object generated using the supplied parameters or defaults to a RSA-2048 key
+
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt or decrypt a new or existing key respectively
+           :passphrase: Secret used to encrypt the newly generate private key
            :comment: Comment for a newly generated OpenSSH public key
         """
 
-        if path:
-            self.__comment = self.__extract_comment(path)
-            self.__asym_keypair = Asymmetric_Keypair.load(path, passphrase, 'SSH')
-        else:
-            if not comment:
-                self.__comment = "%s@%s" % (getuser(), gethostname())
-            else:
-                self.__validate_comment(comment)
-                self.__comment = comment
+        if not comment:
+            comment = "%s@%s" % (getuser(), gethostname())
 
-            self.__asym_keypair = Asymmetric_Keypair.generate(keytype, size, passphrase)
+        asym_keypair = Asymmetric_Keypair.generate(keytype, size, passphrase)
+        openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair)
+        openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
+        fingerprint = calculate_fingerprint(openssh_publickey)
 
-        self.__openssh_privatekey, self.__openssh_publickey = self.__encode_openssh_keypair()
-        self.__fingerprint = self.__calculate_fingerprint()
+        return cls(
+            asym_keypair=asym_keypair,
+            openssh_privatekey=openssh_privatekey,
+            openssh_publickey=openssh_publickey,
+            fingerprint=fingerprint,
+            comment=comment
+        )
+
+    @classmethod
+    def load(cls, path, passphrase=None):
+        """Returns an Openssh_Keypair object loaded from the supplied file path
+
+           :path: A path to an existing private key to be loaded
+           :passphrase: Secret used to decrypt the private key being loaded
+        """
+
+        comment = extract_comment(path)
+        asym_keypair = Asymmetric_Keypair.load(path, passphrase, 'SSH')
+        openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair)
+        openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
+        fingerprint = calculate_fingerprint(openssh_publickey)
+
+        return cls(
+            asym_keypair=asym_keypair,
+            openssh_privatekey=openssh_privatekey,
+            openssh_publickey=openssh_publickey,
+            fingerprint=fingerprint,
+            comment=comment
+        )
+
+    @classmethod
+    def encode_openssh_privatekey(cls, asym_keypair):
+        """Returns an OpenSSH encoded private key for a given keypair
+
+           :asym_keypair: Asymmetric_Keypair from the private key is extracted
+        """
+
+        # OpenSSH formatted private keys are not available in Cryptography <3.0
+        try:
+            privatekey_format = serialization.PrivateFormat.OpenSSH
+        except AttributeError:
+            privatekey_format = serialization.PrivateFormat.PKCS8
+
+        encoded_privatekey = asym_keypair.private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=privatekey_format,
+            encryption_algorithm=asym_keypair.encryption_algorithm
+        )
+
+        return encoded_privatekey
+
+    @classmethod
+    def encode_openssh_publickey(cls, asym_keypair, comment):
+        """Returns an OpenSSH encoded public key for a given keypair
+
+           :asym_keypair: Asymmetric_Keypair from the public key is extracted
+           :comment: Comment to apply to the end of the returned OpenSSH encoded public key
+        """
+        encoded_publickey = asym_keypair.public_key.public_bytes(
+            encoding=serialization.Encoding.OpenSSH,
+            format=serialization.PublicFormat.OpenSSH,
+        )
+
+        validate_comment(comment)
+
+        encoded_publickey += (" %s" % comment).encode(encoding=_TEXT_ENCODING)
+
+        return encoded_publickey
+
+    def __init__(self, asym_keypair, openssh_privatekey, openssh_publickey, fingerprint, comment):
+        """
+           :asym_keypair: An Asymmetric_Keypair object from which the OpenSSH encoded keypair is derived
+           :openssh_privatekey: An OpenSSH encoded private key
+           :openssh_privatekey: An OpenSSH encoded public key
+           :fingerprint: The fingerprint of the OpenSSH encoded public key of this keypair
+           :comment: Comment applied to the OpenSSH public key of this keypair
+        """
+
+        self.__asym_keypair = asym_keypair
+        self.__openssh_privatekey = openssh_privatekey
+        self.__openssh_publickey = openssh_publickey
+        self.__fingerprint = fingerprint
+        self.__comment = comment
 
     def __eq__(self, other):
         return self.fingerprint == other.fingerprint and self.comment == other.comment
@@ -471,34 +476,12 @@ class OpenSSH_Keypair(object):
            :comment: Text to update the OpenSSH public key comment
         """
 
-        self.__validate_comment(comment)
+        validate_comment(comment)
 
         self.__comment = comment
         encoded_comment = (" %s" % self.__comment).encode(encoding=_TEXT_ENCODING)
         self.__openssh_publickey = b' '.join(self.__openssh_publickey.split(b' ', 2)[:2]) + encoded_comment
         return self.__openssh_publickey
-
-    @classmethod
-    def generate(cls, keytype='rsa', size=None, passphrase=None, comment=None):
-        """Returns an Openssh_Keypair object generated using the supplied parameters or defaults to a RSA-2048 key
-
-           :keytype: One of rsa, dsa, ecdsa, ed25519
-           :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt the newly generate private key
-           :comment: Comment for a newly generated OpenSSH public key
-        """
-
-        return cls(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
-
-    @classmethod
-    def load(cls, path, passphrase=None):
-        """Returns an Openssh_Keypair object loaded from the supplied file path
-
-           :path: A path to an existing private key to be loaded
-           :passphrase: Secret used to decrypt the private key being loaded
-        """
-
-        return cls(path=path, passphrase=passphrase)
 
     def update_passphrase(self, passphrase):
         """Updates the passphrase used to encrypt the private key of this keypair
@@ -507,60 +490,114 @@ class OpenSSH_Keypair(object):
         """
 
         self.__asym_keypair.update_passphrase(passphrase)
-        self.__openssh_privatekey = self.__encode_openssh_privatekey()
+        self.__openssh_privatekey = type(self).encode_openssh_privatekey(self.__asym_keypair)
 
-    def __calculate_fingerprint(self):
 
-        digest = hashes.Hash(hashes.SHA256(), backend=backend)
+def load_privatekey(path, passphrase, key_format):
+    privatekey_loaders = {
+        'PEM': serialization.load_pem_private_key,
+        'DER': serialization.load_der_private_key,
+    }
 
-        decoded_pubkey = b64decode(self.__openssh_publickey.split(b' ')[1])
+    # OpenSSH formatted private keys are not available in Cryptography <3.0
+    if hasattr(serialization, 'load_ssh_private_key'):
+        privatekey_loaders['SSH'] = serialization.load_ssh_private_key
+    else:
+        privatekey_loaders['SSH'] = serialization.load_pem_private_key
 
-        digest.update(decoded_pubkey)
-
-        return b64encode(digest.finalize()).decode(encoding=_TEXT_ENCODING).rstrip('=')
-
-    def __encode_openssh_keypair(self):
-
-        return self.__encode_openssh_privatekey(), self.__encode_openssh_publickey()
-
-    def __encode_openssh_privatekey(self):
-        # OpenSSH formatted private keys are not available in Cryptography <3.0
-        try:
-            privatekey_format = serialization.PrivateFormat.OpenSSH
-        except AttributeError:
-            privatekey_format = serialization.PrivateFormat.PKCS8
-
-        encoded_privatekey = self.__asym_keypair.private_key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=privatekey_format,
-            encryption_algorithm=self.__asym_keypair.encryption_algorithm
+    try:
+        privatekey_loader = privatekey_loaders[key_format]
+    except KeyError:
+        raise InvalidKeyFormatError(
+            "%s is not a valid key format (%s)" % (
+                key_format,
+                ','.join(privatekey_loaders.keys())
+            )
         )
 
-        return encoded_privatekey
+    if passphrase:
+        passphrase = passphrase.encode(encoding=_TEXT_ENCODING)
 
-    def __encode_openssh_publickey(self):
-        encoded_publickey = self.__asym_keypair.public_key.public_bytes(
-            encoding=serialization.Encoding.OpenSSH,
-            format=serialization.PublicFormat.OpenSSH,
+    try:
+        with open(path, 'rb') as f:
+            content = f.read()
+
+            privatekey = privatekey_loader(
+                data=content,
+                password=passphrase,
+                backend=backend,
+            )
+
+    except ValueError as e:
+        raise InvalidPrivateKeyFileError(e)
+    except TypeError as e:
+        raise InvalidPassphraseError(e)
+    except UnsupportedAlgorithm as e:
+        raise InvalidAlgorithmError(e)
+
+    return privatekey
+
+
+def load_publickey(path, key_format):
+    publickey_loaders = {
+        'PEM': serialization.load_pem_public_key,
+        'DER': serialization.load_der_public_key,
+        'SSH': serialization.load_ssh_public_key,
+    }
+
+    try:
+        publickey_loader = publickey_loaders[key_format]
+    except KeyError:
+        raise InvalidKeyFormatError(
+            "%s is not a valid key format (%s)" % (
+                key_format,
+                ','.join(publickey_loaders.keys())
+            )
         )
 
-        encoded_publickey += (" %s" % self.__comment).encode(encoding=_TEXT_ENCODING)
+    try:
+        with open(path + '.pub', 'rb') as f:
+            content = f.read()
 
-        return encoded_publickey
+            publickey = publickey_loader(
+                data=content,
+                backend=backend,
+            )
+    except ValueError as e:
+        raise InvalidPublicKeyFileError(e)
+    except UnsupportedAlgorithm as e:
+        raise InvalidAlgorithmError(e)
 
-    def __extract_comment(self, path):
-        try:
-            with open(path + '.pub', 'rb') as f:
-                fields = f.read().split(b' ', 2)
-                if len(fields) == 3:
-                    comment = fields[2].decode(_TEXT_ENCODING)
-                else:
-                    comment = ""
-        except OSError as e:
-            raise InvalidPublicKeyFileError(e)
+    return publickey
 
-        return comment
 
-    def __validate_comment(self, comment):
-        if not hasattr(comment, 'encode'):
-            raise InvalidCommentError("%s cannot be encoded to text" % comment)
+def validate_passphrase(passphrase):
+    if not hasattr(passphrase, 'encode'):
+        raise InvalidPassphraseError("%s cannot be encoded to text" % passphrase)
+
+
+def validate_comment(comment):
+    if not hasattr(comment, 'encode'):
+        raise InvalidCommentError("%s cannot be encoded to text" % comment)
+
+
+def extract_comment(path):
+    try:
+        with open(path + '.pub', 'rb') as f:
+            fields = f.read().split(b' ', 2)
+            if len(fields) == 3:
+                comment = fields[2].decode(_TEXT_ENCODING)
+            else:
+                comment = ""
+    except OSError as e:
+        raise InvalidPublicKeyFileError(e)
+
+    return comment
+
+
+def calculate_fingerprint(openssh_publickey):
+    digest = hashes.Hash(hashes.SHA256(), backend=backend)
+    decoded_pubkey = b64decode(openssh_publickey.split(b' ')[1])
+    digest.update(decoded_pubkey)
+
+    return b64encode(digest.finalize()).decode(encoding=_TEXT_ENCODING).rstrip('=')
