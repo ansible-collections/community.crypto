@@ -104,6 +104,10 @@ class ACMEProtocolException(ModuleFailException):
                 elif content is not None:
                     add_msg = ' The raw error result: {content}'.format(content=to_text(content))
             msg = '{msg} for {url} with {code}'.format(msg=msg, url=url, code=code)
+        elif content_json is not None:
+            add_msg = ' The JSON result: {content}'.format(content=content_json)
+        elif content is not None:
+            add_msg = ' The raw result: {content}'.format(content=to_text(content))
 
         super(ACMEProtocolException, self).__init__(
             '{msg}.{add_msg}'.format(msg=msg, add_msg=add_msg),
