@@ -307,7 +307,7 @@ def main():
                 pass
             # Fail if error was returned
             if fail_on_acme_error and info['status'] >= 400:
-                raise ACMEProtocolException(info=info, content_json=result)
+                raise ACMEProtocolException(module, info=info, content=data)
         # Done!
         module.exit_json(changed=changed, **result)
     except ModuleFailException as e:

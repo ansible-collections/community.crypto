@@ -182,7 +182,7 @@ class Authorization(object):
             new_authz["resource"] = "new-authz"
         else:
             if 'newAuthz' not in client.directory.directory:
-                raise ACMEProtocolException('ACME endpoint does not support pre-authorization')
+                raise ACMEProtocolException(client.module, 'ACME endpoint does not support pre-authorization')
             url = client.directory['newAuthz']
 
         result, info = client.send_signed_request(
@@ -214,7 +214,7 @@ class Authorization(object):
                 data[challenge.type] = validation_data
         return data
 
-    def raise_error(self, error_msg):
+    def raise_error(self, error_msg, module=None):
         '''
         Aborts with a specific error for a challenge.
         '''
@@ -227,17 +227,20 @@ class Authorization(object):
                 if 'error' in challenge.data:
                     msg = '{msg}: {problem}'.format(
                         msg=msg,
-                        problem=format_error_problem(challenge.data['error'], subproblem_prefix='{0}.'.format(type)),
+                        problem=format_error_problem(challenge.data['error'], subproblem_prefix='{0}.'.format(challenge.type)),
                     )
                 error_details.append(msg)
         raise ACMEProtocolException(
+            module,
             'Failed to validate challenge for {identifier}: {error}. {details}'.format(
                 identifier=self.combined_identifier,
                 error=error_msg,
                 details='; '.join(error_details),
             ),
-            identifier=self.combined_identifier,
-            authorization=self.data,
+            extras=dict(
+                identifier=self.combined_identifier,
+                authorization=self.data,
+            ),
         )
 
     def find_challenge(self, challenge_type):
@@ -254,7 +257,7 @@ class Authorization(object):
             time.sleep(2)
 
         if self.status == 'invalid':
-            self.raise_error('Status is "invalid"')
+            self.raise_error('Status is "invalid"', module=client.module)
 
         return self.status == 'valid'
 

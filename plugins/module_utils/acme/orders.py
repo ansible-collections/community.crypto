@@ -99,7 +99,9 @@ class Order(object):
 
         if self.status != 'valid':
             raise ACMEProtocolException(
-                'Failed to wait for order to complete; got status "{status}"'.format(status=self.status), content_json=self.data)
+                client.module,
+                'Failed to wait for order to complete; got status "{status}"'.format(status=self.status),
+                content_json=self.data)
 
     def finalize(self, client, csr_der, wait=True):
         '''
@@ -121,5 +123,7 @@ class Order(object):
             self.refresh(client)
             if self.status not in ['procesing', 'valid', 'invalid']:
                 raise ACMEProtocolException(
-                    'Failed to finalize order; got status "{status}"'.format(
-                        status=self.status), info=info, content_json=result)
+                    client.module,
+                    'Failed to finalize order; got status "{status}"'.format(status=self.status),
+                    info=info,
+                    content_json=result)

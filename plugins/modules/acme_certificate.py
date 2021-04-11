@@ -739,7 +739,7 @@ class ACMECertificateClient(object):
                 raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
                     identifier=combine_identifier(identifier_type, identifier)))
             if authz.status != 'valid':
-                authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status))
+                authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status), module=self.module)
 
         if self.version == 1:
             cert = retrieve_acme_v1_certificate(self.client, pem_to_der(self.csr, self.csr_content))
