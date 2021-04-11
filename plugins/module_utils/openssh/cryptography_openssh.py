@@ -68,6 +68,10 @@ class InvalidPublicKeyFileError(OpenSSHError):
     pass
 
 
+class InvalidKeyFormatError(OpenSSHError):
+    pass
+
+
 class InvalidKeySizeError(OpenSSHError):
     pass
 
@@ -83,13 +87,14 @@ class InvalidPassphraseError(OpenSSHError):
 class Asymmetric_Keypair(object):
     """Container for newly generated asymmetric keypairs or those loaded from existing files"""
 
-    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None):
+    def __init__(self, path=None, keytype='rsa', size=None, passphrase=None, key_format='PEM'):
         """
            :path: A path to an existing private key to be loaded
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
            :passphrase: Secret used to decrypt the private key being loaded
             or encrypt the private key being generated
+           :key_format: Format of key files being loaded
         """
 
         self.__algorithm_parameters = {
@@ -137,8 +142,8 @@ class Asymmetric_Keypair(object):
 
         if path:
             self.__keytype = None
-            self.__privatekey = self.__load_privatekey(path, passphrase)
-            self.__publickey = self.__load_publickey(path)
+            self.__privatekey = self.__load_privatekey(path, passphrase, key_format)
+            self.__publickey = self.__load_publickey(path, key_format)
             self.__size = self.__privatekey.key_size
 
             if not self.verify(self.sign(b'message'), b'message'):
@@ -243,14 +248,15 @@ class Asymmetric_Keypair(object):
         return cls(keytype=keytype, size=size, passphrase=passphrase)
 
     @classmethod
-    def load(cls, path, passphrase=None):
+    def load(cls, path, passphrase=None, key_format='PEM'):
         """Returns an Asymmetric_Keypair object loaded from the supplied file path
 
            :path: A path to an existing private key to be loaded
            :passphrase: Secret used to decrypt the private key being loaded
+           :key_format: Format of key files to be loaded
         """
 
-        return cls(path=path, passphrase=passphrase)
+        return cls(path=path, passphrase=passphrase, key_format=key_format)
 
     def __generate_privatekey(self):
 
@@ -298,12 +304,27 @@ class Asymmetric_Keypair(object):
             backend=backend,
         )
 
-    def __load_privatekey(self, path, passphrase):
+    def __load_privatekey(self, path, passphrase, key_format):
+        privatekey_loaders = {
+            'PEM': serialization.load_pem_private_key,
+            'DER': serialization.load_der_private_key,
+        }
+
         # OpenSSH formatted private keys are not available in Cryptography <3.0
+        if hasattr(serialization, 'load_ssh_private_key'):
+            privatekey_loaders['SSH'] = serialization.load_ssh_private_key
+        else:
+            privatekey_loaders['SSH'] = serialization.load_pem_private_key
+
         try:
-            privatekey_loader = serialization.load_ssh_private_key
-        except AttributeError:
-            privatekey_loader = serialization.load_pem_private_key
+            privatekey_loader = privatekey_loaders[key_format]
+        except KeyError:
+            raise InvalidKeyFormatError(
+                "%s is not a valid key format (%s)" % (
+                    key_format,
+                    ','.join(privatekey_loaders.keys())
+                )
+            )
 
         if passphrase:
             passphrase = passphrase.encode(encoding=_TEXT_ENCODING)
@@ -335,12 +356,28 @@ class Asymmetric_Keypair(object):
 
         return privatekey
 
-    def __load_publickey(self, path):
+    def __load_publickey(self, path, key_format):
+        publickey_loaders = {
+            'PEM': serialization.load_pem_public_key,
+            'DER': serialization.load_der_public_key,
+            'SSH': serialization.load_ssh_public_key,
+        }
+
+        try:
+            publickey_loader = publickey_loaders[key_format]
+        except KeyError:
+            raise InvalidKeyFormatError(
+                "%s is not a valid key format (%s)" % (
+                    key_format,
+                    ','.join(publickey_loaders.keys())
+                )
+            )
+
         try:
             with open(path + '.pub', 'rb') as f:
                 content = f.read()
 
-                publickey = serialization.load_ssh_public_key(
+                publickey = publickey_loader(
                     data=content,
                     backend=backend,
                 )
@@ -370,7 +407,7 @@ class OpenSSH_Keypair(object):
 
         if path:
             self.__comment = self.__extract_comment(path)
-            self.__asym_keypair = Asymmetric_Keypair.load(path, passphrase)
+            self.__asym_keypair = Asymmetric_Keypair.load(path, passphrase, 'SSH')
         else:
             if not comment:
                 self.__comment = "%s@%s" % (getuser(), gethostname())
