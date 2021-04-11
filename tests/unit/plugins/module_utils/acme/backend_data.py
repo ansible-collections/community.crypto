@@ -6,6 +6,14 @@ import base64
 import datetime
 import os
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
+    CryptoBackend,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    BackendException,
+)
+
 
 def load_fixture(name):
     with open(os.path.join(os.path.dirname(__file__), 'fixtures', name)) as f:
@@ -74,3 +82,23 @@ TEST_CERT_DAYS = [
     (datetime.datetime(2018, 11, 25, 15, 20, 0), 1),
     (datetime.datetime(2018, 11, 25, 15, 30, 0), 0),
 ]
+
+
+class FakeBackend(CryptoBackend):
+    def parse_key(self, key_file=None, key_content=None, passphrase=None):
+        raise BackendException('Not implemented in fake backend')
+
+    def sign(self, payload64, protected64, key_data):
+        raise BackendException('Not implemented in fake backend')
+
+    def create_mac_key(self, alg, key):
+        raise BackendException('Not implemented in fake backend')
+
+    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+        raise BackendException('Not implemented in fake backend')
+
+    def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
+        raise BackendException('Not implemented in fake backend')
+
+    def create_chain_matcher(self, criterium):
+        raise BackendException('Not implemented in fake backend')
