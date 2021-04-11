@@ -334,7 +334,7 @@ class OpenSSH_Keypair(object):
 
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt the newly generate private key
+           :passphrase: Secret used to encrypt the newly generated private key
            :comment: Comment for a newly generated OpenSSH public key
         """
 
