@@ -20,7 +20,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-
 def test_combine_identifier():
     assert combine_identifier('', '') == ':'
     assert combine_identifier('a', 'b') == 'a:b'

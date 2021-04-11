@@ -17,7 +17,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-
 def test_order_from_json():
     client = MagicMock()
 
