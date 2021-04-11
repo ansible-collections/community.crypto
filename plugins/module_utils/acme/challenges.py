@@ -227,7 +227,7 @@ class Authorization(object):
                 if 'error' in challenge.data:
                     msg = '{msg}: {problem}'.format(
                         msg=msg,
-                        problem=format_error_problem(challenge.data['error'], subproblem_prefix='{0}.'.format(type)),
+                        problem=format_error_problem(challenge.data['error'], subproblem_prefix='{0}.'.format(challenge.type)),
                     )
                 error_details.append(msg)
         raise ACMEProtocolException(
