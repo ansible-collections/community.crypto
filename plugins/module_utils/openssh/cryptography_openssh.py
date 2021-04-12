@@ -27,11 +27,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     CRYPTOGRAPHY_HAS_ED25519,
 )
 
-if HAS_CRYPTOGRAPHY and CRYPTOGRAPHY_HAS_ED25519:
-    HAS_OPENSSH_SUPPORT = True
-else:
-    HAS_OPENSSH_SUPPORT = False
-
 try:
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.backends.openssl import backend
@@ -40,6 +35,50 @@ try:
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 except ImportError:
     pass
+
+if HAS_CRYPTOGRAPHY and CRYPTOGRAPHY_HAS_ED25519:
+    HAS_OPENSSH_SUPPORT = True
+
+    _ALGORITHM_PARAMETERS = {
+        'rsa': {
+            'default_size': 2048,
+            'valid_sizes': range(1024, 16384),
+            'signer_params': {
+                'padding': padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                'algorithm': hashes.SHA256(),
+            },
+        },
+        'dsa': {
+            'default_size': 1024,
+            'valid_sizes': [1024],
+            'signer_params': {
+                'algorithm': hashes.SHA256(),
+            },
+        },
+        'ed25519': {
+            'default_size': 256,
+            'valid_sizes': [256],
+            'signer_params': {},
+        },
+        'ecdsa': {
+            'default_size': 256,
+            'valid_sizes': [256, 384, 521],
+            'signer_params': {
+                'signature_algorithm': ec.ECDSA(hashes.SHA256()),
+            },
+            'curves': {
+                256: ec.SECP256R1(),
+                384: ec.SECP384R1(),
+                521: ec.SECP521R1(),
+            }
+        }
+    }
+else:
+    HAS_OPENSSH_SUPPORT = False
+    _ALGORITHM_PARAMETERS = {}
 
 _TEXT_ENCODING = 'UTF-8'
 
@@ -87,44 +126,6 @@ class InvalidPassphraseError(OpenSSHError):
 class Asymmetric_Keypair(object):
     """Container for newly generated asymmetric keypairs or those loaded from existing files"""
 
-    __algorithm_parameters = {
-        'rsa': {
-            'default_size': 2048,
-            'valid_sizes': range(1024, 16384),
-            'signer_params': {
-                'padding': padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH,
-                ),
-                'algorithm': hashes.SHA256(),
-            },
-        },
-        'dsa': {
-            'default_size': 1024,
-            'valid_sizes': [1024],
-            'signer_params': {
-                'algorithm': hashes.SHA256(),
-            },
-        },
-        'ed25519': {
-            'default_size': 256,
-            'valid_sizes': [256],
-            'signer_params': {},
-        },
-        'ecdsa': {
-            'default_size': 256,
-            'valid_sizes': [256, 384, 521],
-            'signer_params': {
-                'signature_algorithm': ec.ECDSA(hashes.SHA256()),
-            },
-            'curves': {
-                256: ec.SECP256R1(),
-                384: ec.SECP384R1(),
-                521: ec.SECP521R1(),
-            }
-        }
-    }
-
     @classmethod
     def generate(cls, keytype='rsa', size=None, passphrase=None):
         """Returns an Asymmetric_Keypair object generated with the supplied parameters
@@ -135,17 +136,17 @@ class Asymmetric_Keypair(object):
            :passphrase: Secret used to encrypt the private key being generated
         """
 
-        if keytype not in cls.__algorithm_parameters.keys():
+        if keytype not in _ALGORITHM_PARAMETERS.keys():
             raise InvalidKeyTypeError(
                 "%s is not a valid keytype. Valid keytypes are %s" % (
-                    keytype, ", ".join(cls.__algorithm_parameters.keys())
+                    keytype, ", ".join(_ALGORITHM_PARAMETERS.keys())
                 )
             )
 
         if not size:
-            size = cls.__algorithm_parameters[keytype]['default_size']
+            size = _ALGORITHM_PARAMETERS[keytype]['default_size']
         else:
-            if size not in cls.__algorithm_parameters[keytype]['valid_sizes']:
+            if size not in _ALGORITHM_PARAMETERS[keytype]['valid_sizes']:
                 raise InvalidKeySizeError(
                     "%s is not a valid key size for %s keys" % (size, keytype)
                 )
@@ -175,7 +176,7 @@ class Asymmetric_Keypair(object):
             privatekey = Ed25519PrivateKey.generate()
         elif keytype == 'ecdsa':
             privatekey = ec.generate_private_key(
-                cls.__algorithm_parameters['ecdsa']['curves'][size],
+                _ALGORITHM_PARAMETERS['ecdsa']['curves'][size],
                 backend=backend,
             )
 
@@ -286,7 +287,7 @@ class Asymmetric_Keypair(object):
         try:
             signature = self.__privatekey.sign(
                 data,
-                **type(self).__algorithm_parameters[self.__keytype]['signer_params']
+                **_ALGORITHM_PARAMETERS[self.__keytype]['signer_params']
             )
         except TypeError as e:
             raise InvalidDataError(e)
@@ -305,7 +306,7 @@ class Asymmetric_Keypair(object):
             self.__publickey.verify(
                 signature,
                 data,
-                **type(self).__algorithm_parameters[self.__keytype]['signer_params']
+                **_ALGORITHM_PARAMETERS[self.__keytype]['signer_params']
             )
         except InvalidSignature:
             return False
