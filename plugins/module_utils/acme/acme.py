@@ -82,6 +82,9 @@ class ACMEDirectory(object):
             for key in ('newNonce', 'newAccount', 'newOrder'):
                 if key not in self.directory:
                     raise ModuleFailException("ACME directory does not seem to follow protocol ACME v2")
+            # Make sure that 'meta' is always available
+            if 'meta' not in self.directory:
+                self.directory = {}
 
     def __getitem__(self, key):
         return self.directory[key]
