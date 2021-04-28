@@ -382,3 +382,15 @@ releases:
     - 1.6.1.yml
     - 217-acme-exceptions.yml
     release_date: '2021-04-11'
+  1.6.2:
+    changes:
+      bugfixes:
+      - acme_* modules - avoid crashing for ACME servers where the ``meta`` directory
+        key is not present (https://github.com/ansible-collections/community.crypto/issues/220,
+        https://github.com/ansible-collections/community.crypto/pull/221).
+      release_summary: Bugfix release. Fixes compatibility issue of ACME modules with
+        step-ca.
+    fragments:
+    - 1.6.2.yml
+    - 221-acme-meta.yml
+    release_date: '2021-04-28'

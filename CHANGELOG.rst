@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.6.2
+======
+
+Release Summary
+---------------
+
+Bugfix release. Fixes compatibility issue of ACME modules with step-ca.
+
+Bugfixes
+--------
+
+- acme_* modules - avoid crashing for ACME servers where the ``meta`` directory key is not present (https://github.com/ansible-collections/community.crypto/issues/220, https://github.com/ansible-collections/community.crypto/pull/221).
+
 v1.6.1
 ======
 
