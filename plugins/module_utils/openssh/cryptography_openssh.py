@@ -156,12 +156,7 @@ class Asymmetric_Keypair(object):
                 )
 
         if passphrase:
-            try:
-                encryption_algorithm = serialization.BestAvailableEncryption(
-                    passphrase
-                )
-            except ValueError as e:
-                raise InvalidPassphraseError(e)
+            encryption_algorithm = get_encryption_algorithm(passphrase)
         else:
             encryption_algorithm = serialization.NoEncryption()
 
@@ -206,18 +201,18 @@ class Asymmetric_Keypair(object):
         """
 
         if passphrase:
-            try:
-                encryption_algorithm = serialization.BestAvailableEncryption(
-                    passphrase
-                )
-            except ValueError as e:
-                raise InvalidPassphraseError(e)
+            encryption_algorithm = get_encryption_algorithm(passphrase)
         else:
             encryption_algorithm = serialization.NoEncryption()
 
         privatekey = load_privatekey(path, passphrase, key_format)
         publickey = load_publickey(path + '.pub', key_format)
-        size = privatekey.key_size
+
+        # Ed25519 keys are always of size 256 and do not have a key_size attribute
+        if isinstance(privatekey, Ed25519PrivateKey):
+            size = _ALGORITHM_PARAMETERS['ed25519']['default_size']
+        else:
+            size = privatekey.key_size
 
         if isinstance(privatekey, rsa.RSAPrivateKey):
             keytype = 'rsa'
@@ -228,7 +223,7 @@ class Asymmetric_Keypair(object):
         elif isinstance(privatekey, Ed25519PrivateKey):
             keytype = 'ed25519'
         else:
-            raise InvalidKeyTypeError("Key class '%s' is not supported" % privatekey)
+            raise InvalidKeyTypeError("Key type '%s' is not supported" % type(privatekey))
 
         return cls(
             keytype=keytype,
@@ -339,18 +334,13 @@ class Asymmetric_Keypair(object):
         """
 
         if passphrase:
-            try:
-                self.__encryption_algorithm = serialization.BestAvailableEncryption(
-                    passphrase
-                )
-            except ValueError as e:
-                raise InvalidPassphraseError(e)
+            self.__encryption_algorithm = get_encryption_algorithm(passphrase)
         else:
             self.__encryption_algorithm = serialization.NoEncryption()
 
 
 class OpenSSH_Keypair(object):
-    """Container for OpenSSH encoded asymmetric keypairs"""
+    """Container for OpenSSH encoded asymmetric key pairs"""
 
     @classmethod
     def generate(cls, keytype='rsa', size=None, passphrase=None, comment=None):
@@ -358,7 +348,7 @@ class OpenSSH_Keypair(object):
 
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt the newly generated private key
+           :passphrase: Secret of type Bytes used to encrypt the newly generated private key
            :comment: Comment for a newly generated OpenSSH public key
         """
 
@@ -486,7 +476,7 @@ class OpenSSH_Keypair(object):
 
     @property
     def key_type(self):
-        """Returns the key encryption algorithm of this key pair"""
+        """Returns the key type of this key pair"""
 
         return self.__asym_keypair.key_type
 
@@ -547,9 +537,6 @@ def load_privatekey(path, passphrase, key_format):
                 ','.join(privatekey_loaders.keys())
             )
         )
-
-    if passphrase:
-        passphrase = passphrase
 
     try:
         with open(path, 'rb') as f:
@@ -625,6 +612,13 @@ def compare_encryption_algorithms(ea1, ea2):
         return ea1.password == ea2.password
     else:
         return False
+
+
+def get_encryption_algorithm(passphrase):
+    try:
+        return serialization.BestAvailableEncryption(passphrase)
+    except ValueError as e:
+        raise InvalidPassphraseError(e)
 
 
 def validate_comment(comment):

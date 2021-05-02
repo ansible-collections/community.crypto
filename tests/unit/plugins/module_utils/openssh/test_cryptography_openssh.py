@@ -14,6 +14,7 @@ from socket import gethostname
 from tempfile import mkdtemp
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography_openssh import (
+    Asymmetric_Keypair,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPrivateKeyFileError,
@@ -341,3 +342,52 @@ def test_mismatched_keypair():
             rmdir(tmpdir)
 
     assert result
+
+
+@pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
+def test_keypair_comparison():
+    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate()
+    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate(keytype='dsa')
+    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate(keytype='ed25519')
+    assert OpenSSH_Keypair.generate(keytype='ed25519') != OpenSSH_Keypair.generate(keytype='ed25519')
+    try:
+        tmpdir = mkdtemp()
+        keyfilename = os.path.join(tmpdir, "id_rsa")
+
+        pair = OpenSSH_Keypair.generate()
+
+        with open(keyfilename, "w+b") as keyfile:
+            keyfile.write(pair.private_key)
+
+        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
+            pubkeyfile.write(pair.public_key)
+
+        assert pair == OpenSSH_Keypair.load(path=keyfilename)
+    finally:
+        if os.path.exists(keyfilename):
+            remove(keyfilename)
+        if os.path.exists(keyfilename + '.pub'):
+            remove(keyfilename + '.pub')
+        if os.path.exists(tmpdir):
+            rmdir(tmpdir)
+    try:
+        tmpdir = mkdtemp()
+        keyfilename = os.path.join(tmpdir, "id_ed25519")
+
+        pair = OpenSSH_Keypair.generate(keytype='ed25519')
+
+        with open(keyfilename, "w+b") as keyfile:
+            keyfile.write(pair.private_key)
+
+        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
+            pubkeyfile.write(pair.public_key)
+
+        assert pair == OpenSSH_Keypair.load(path=keyfilename)
+    finally:
+        if os.path.exists(keyfilename):
+            remove(keyfilename)
+        if os.path.exists(keyfilename + '.pub'):
+            remove(keyfilename + '.pub')
+        if os.path.exists(tmpdir):
+            rmdir(tmpdir)
+    assert OpenSSH_Keypair.generate() != []
