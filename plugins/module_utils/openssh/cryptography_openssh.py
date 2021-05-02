@@ -32,7 +32,7 @@ try:
     from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
-    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 except ImportError:
     pass
 
@@ -123,8 +123,12 @@ class InvalidPassphraseError(OpenSSHError):
     pass
 
 
+class InvalidSignatureError(OpenSSHError):
+    pass
+
+
 class Asymmetric_Keypair(object):
-    """Container for newly generated asymmetric keypairs or those loaded from existing files"""
+    """Container for newly generated asymmetric key pairs or those loaded from existing files"""
 
     @classmethod
     def generate(cls, keytype='rsa', size=None, passphrase=None):
@@ -133,7 +137,7 @@ class Asymmetric_Keypair(object):
 
            :keytype: One of rsa, dsa, ecdsa, ed25519
            :size: The key length for newly generated keys
-           :passphrase: Secret used to encrypt the private key being generated
+           :passphrase: Secret of type Bytes used to encrypt the private key being generated
         """
 
         if keytype not in _ALGORITHM_PARAMETERS.keys():
@@ -152,10 +156,12 @@ class Asymmetric_Keypair(object):
                 )
 
         if passphrase:
-            validate_passphrase(passphrase)
-            encryption_algorithm = serialization.BestAvailableEncryption(
-                passphrase.encode(encoding=_TEXT_ENCODING)
-            )
+            try:
+                encryption_algorithm = serialization.BestAvailableEncryption(
+                    passphrase
+                )
+            except ValueError as e:
+                raise InvalidPassphraseError(e)
         else:
             encryption_algorithm = serialization.NoEncryption()
 
@@ -195,20 +201,22 @@ class Asymmetric_Keypair(object):
         """Returns an Asymmetric_Keypair object loaded from the supplied file path
 
            :path: A path to an existing private key to be loaded
-           :passphrase: Secret used to decrypt the private key being loaded
+           :passphrase: Secret of type bytes used to decrypt the private key being loaded
            :key_format: Format of key files to be loaded
         """
 
         if passphrase:
-            validate_passphrase(passphrase)
-            encryption_algorithm = serialization.BestAvailableEncryption(
-                passphrase.encode(encoding=_TEXT_ENCODING)
-            )
+            try:
+                encryption_algorithm = serialization.BestAvailableEncryption(
+                    passphrase
+                )
+            except ValueError as e:
+                raise InvalidPassphraseError(e)
         else:
             encryption_algorithm = serialization.NoEncryption()
 
         privatekey = load_privatekey(path, passphrase, key_format)
-        publickey = load_publickey(path, key_format)
+        publickey = load_publickey(path + '.pub', key_format)
         size = privatekey.key_size
 
         if isinstance(privatekey, rsa.RSAPrivateKey):
@@ -219,6 +227,8 @@ class Asymmetric_Keypair(object):
             keytype = 'ecdsa'
         elif isinstance(privatekey, Ed25519PrivateKey):
             keytype = 'ed25519'
+        else:
+            raise InvalidKeyTypeError("Key class '%s' is not supported" % privatekey)
 
         return cls(
             keytype=keytype,
@@ -243,20 +253,32 @@ class Asymmetric_Keypair(object):
         self.__publickey = publickey
         self.__encryption_algorithm = encryption_algorithm
 
-        if not self.verify(self.sign(b'message'), b'message'):
+        try:
+            self.verify(self.sign(b'message'), b'message')
+        except InvalidSignatureError:
             raise InvalidPublicKeyFileError(
                 "The private key and public key of this keypair do not match"
             )
 
+    def __eq__(self, other):
+        if not isinstance(other, Asymmetric_Keypair):
+            return NotImplemented
+
+        return (compare_publickeys(self.public_key, other.public_key) and
+                compare_encryption_algorithms(self.encryption_algorithm, other.encryption_algorithm))
+
+    def __ne__(self, other):
+        return not self == other
+
     @property
     def private_key(self):
-        """Returns the openssh formatted private key of this key pair"""
+        """Returns the private key of this key pair"""
 
         return self.__privatekey
 
     @property
     def public_key(self):
-        """Returns the openssh formatted public key of this key pair"""
+        """Returns the public key of this key pair"""
 
         return self.__publickey
 
@@ -301,27 +323,28 @@ class Asymmetric_Keypair(object):
            :signature: signature to verify
            :data: byteslike data signed by the provided signature
         """
-
         try:
-            self.__publickey.verify(
+            return self.__publickey.verify(
                 signature,
                 data,
                 **_ALGORITHM_PARAMETERS[self.__keytype]['signer_params']
             )
         except InvalidSignature:
-            return False
-
-        return True
+            raise InvalidSignatureError
 
     def update_passphrase(self, passphrase=None):
         """Updates the encryption algorithm of this key pair
 
-           :passphrase: Text secret used to encrypt this key pair
+           :passphrase: Byte secret used to encrypt this key pair
         """
 
         if passphrase:
-            validate_passphrase(passphrase)
-            self.__encryption_algorithm = serialization.BestAvailableEncryption(passphrase.encode(encoding=_TEXT_ENCODING))
+            try:
+                self.__encryption_algorithm = serialization.BestAvailableEncryption(
+                    passphrase
+                )
+            except ValueError as e:
+                raise InvalidPassphraseError(e)
         else:
             self.__encryption_algorithm = serialization.NoEncryption()
 
@@ -363,7 +386,7 @@ class OpenSSH_Keypair(object):
            :passphrase: Secret used to decrypt the private key being loaded
         """
 
-        comment = extract_comment(path)
+        comment = extract_comment(path + '.pub')
         asym_keypair = Asymmetric_Keypair.load(path, passphrase, 'SSH')
         openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair)
         openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
@@ -377,8 +400,8 @@ class OpenSSH_Keypair(object):
             comment=comment
         )
 
-    @classmethod
-    def encode_openssh_privatekey(cls, asym_keypair):
+    @staticmethod
+    def encode_openssh_privatekey(asym_keypair):
         """Returns an OpenSSH encoded private key for a given keypair
 
            :asym_keypair: Asymmetric_Keypair from the private key is extracted
@@ -398,8 +421,8 @@ class OpenSSH_Keypair(object):
 
         return encoded_privatekey
 
-    @classmethod
-    def encode_openssh_publickey(cls, asym_keypair, comment):
+    @staticmethod
+    def encode_openssh_publickey(asym_keypair, comment):
         """Returns an OpenSSH encoded public key for a given keypair
 
            :asym_keypair: Asymmetric_Keypair from the public key is extracted
@@ -432,7 +455,16 @@ class OpenSSH_Keypair(object):
         self.__comment = comment
 
     def __eq__(self, other):
-        return self.fingerprint == other.fingerprint and self.comment == other.comment
+        if not isinstance(other, OpenSSH_Keypair):
+            return NotImplemented
+
+        return self.asymmetric_keypair == other.asymmetric_keypair and self.comment == other.comment
+
+    @property
+    def asymmetric_keypair(self):
+        """Returns the underlying asymmetric key pair of this OpenSSH encoded key pair"""
+
+        return self.__asym_keypair
 
     @property
     def private_key(self):
@@ -491,7 +523,7 @@ class OpenSSH_Keypair(object):
         """
 
         self.__asym_keypair.update_passphrase(passphrase)
-        self.__openssh_privatekey = type(self).encode_openssh_privatekey(self.__asym_keypair)
+        self.__openssh_privatekey = OpenSSH_Keypair.encode_openssh_privatekey(self.__asym_keypair)
 
 
 def load_privatekey(path, passphrase, key_format):
@@ -517,7 +549,7 @@ def load_privatekey(path, passphrase, key_format):
         )
 
     if passphrase:
-        passphrase = passphrase.encode(encoding=_TEXT_ENCODING)
+        passphrase = passphrase
 
     try:
         with open(path, 'rb') as f:
@@ -557,7 +589,7 @@ def load_publickey(path, key_format):
         )
 
     try:
-        with open(path + '.pub', 'rb') as f:
+        with open(path, 'rb') as f:
             content = f.read()
 
             publickey = publickey_loader(
@@ -572,9 +604,27 @@ def load_publickey(path, key_format):
     return publickey
 
 
-def validate_passphrase(passphrase):
-    if not hasattr(passphrase, 'encode'):
-        raise InvalidPassphraseError("%s cannot be encoded to text" % passphrase)
+def compare_publickeys(pk1, pk2):
+    a = isinstance(pk1, Ed25519PublicKey)
+    b = isinstance(pk2, Ed25519PublicKey)
+    if a or b:
+        if not a or not b:
+            return False
+        a = pk1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+        b = pk2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+        return a == b
+    else:
+        return pk1.public_numbers() == pk2.public_numbers()
+
+
+def compare_encryption_algorithms(ea1, ea2):
+    if isinstance(ea1, serialization.NoEncryption) and isinstance(ea2, serialization.NoEncryption):
+        return True
+    elif (isinstance(ea1, serialization.BestAvailableEncryption) and
+          isinstance(ea2, serialization.BestAvailableEncryption)):
+        return ea1.password == ea2.password
+    else:
+        return False
 
 
 def validate_comment(comment):
@@ -584,7 +634,7 @@ def validate_comment(comment):
 
 def extract_comment(path):
     try:
-        with open(path + '.pub', 'rb') as f:
+        with open(path, 'rb') as f:
             fields = f.read().split(b' ', 2)
             if len(fields) == 3:
                 comment = fields[2].decode(_TEXT_ENCODING)

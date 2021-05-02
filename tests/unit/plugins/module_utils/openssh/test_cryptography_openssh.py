@@ -55,25 +55,25 @@ VALID_USER_KEY_PARAMS = [
     (
         'rsa',
         8192,
-        'change_me',
+        'change_me'.encode('UTF-8'),
         'comment',
     ),
     (
         'dsa',
         1024,
-        'change_me',
+        'change_me'.encode('UTF-8'),
         'comment',
     ),
     (
         'ecdsa',
         521,
-        'change_me',
+        'change_me'.encode('UTF-8'),
         'comment',
     ),
     (
         'ed25519',
         256,
-        'change_me',
+        'change_me'.encode('UTF-8'),
         'comment',
     ),
 ]
@@ -238,7 +238,7 @@ def test_invalid_comment_update():
 def test_valid_passphrase_update():
     result = False
 
-    passphrase = "change_me"
+    passphrase = "change_me".encode('UTF-8')
 
     try:
         tmpdir = mkdtemp()
