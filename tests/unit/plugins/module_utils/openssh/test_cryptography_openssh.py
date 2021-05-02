@@ -352,42 +352,49 @@ def test_keypair_comparison():
     assert OpenSSH_Keypair.generate(keytype='ed25519') != OpenSSH_Keypair.generate(keytype='ed25519')
     try:
         tmpdir = mkdtemp()
-        keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair = OpenSSH_Keypair.generate()
+        keys = {
+            'rsa': {
+                'pair': OpenSSH_Keypair.generate(),
+                'filename': os.path.join(tmpdir, "id_rsa"),
+            },
+            'dsa': {
+                'pair': OpenSSH_Keypair.generate(keytype='dsa', passphrase='change_me'.encode('UTF-8')),
+                'filename': os.path.join(tmpdir, "id_dsa"),
+            },
+            'ed25519': {
+                'pair': OpenSSH_Keypair.generate(keytype='ed25519'),
+                'filename': os.path.join(tmpdir, "id_ed25519"),
+            }
+        }
 
-        with open(keyfilename, "w+b") as keyfile:
-            keyfile.write(pair.private_key)
+        for v in keys.values():
+            with open(v['filename'], "w+b") as keyfile:
+                keyfile.write(v['pair'].private_key)
+            with open(v['filename'] + '.pub', "w+b") as pubkeyfile:
+                pubkeyfile.write(v['pair'].public_key)
 
-        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
-            pubkeyfile.write(pair.public_key)
+        assert keys['rsa']['pair'] == OpenSSH_Keypair.load(path=keys['rsa']['filename'])
 
-        assert pair == OpenSSH_Keypair.load(path=keyfilename)
+        loaded_dsa_key = OpenSSH_Keypair.load(path=keys['dsa']['filename'], passphrase='change_me'.encode('UTF-8'))
+        assert keys['dsa']['pair'] == loaded_dsa_key
+
+        loaded_dsa_key.update_passphrase('change_me_again'.encode('UTF-8'))
+        assert keys['dsa']['pair'] != loaded_dsa_key
+
+        loaded_dsa_key.update_passphrase('change_me'.encode('UTF-8'))
+        assert keys['dsa']['pair'] == loaded_dsa_key
+
+        loaded_dsa_key.comment = "comment"
+        assert keys['dsa']['pair'] != loaded_dsa_key
+
+        assert keys['ed25519']['pair'] == OpenSSH_Keypair.load(path=keys['ed25519']['filename'])
     finally:
-        if os.path.exists(keyfilename):
-            remove(keyfilename)
-        if os.path.exists(keyfilename + '.pub'):
-            remove(keyfilename + '.pub')
-        if os.path.exists(tmpdir):
-            rmdir(tmpdir)
-    try:
-        tmpdir = mkdtemp()
-        keyfilename = os.path.join(tmpdir, "id_ed25519")
-
-        pair = OpenSSH_Keypair.generate(keytype='ed25519')
-
-        with open(keyfilename, "w+b") as keyfile:
-            keyfile.write(pair.private_key)
-
-        with open(keyfilename + '.pub', "w+b") as pubkeyfile:
-            pubkeyfile.write(pair.public_key)
-
-        assert pair == OpenSSH_Keypair.load(path=keyfilename)
-    finally:
-        if os.path.exists(keyfilename):
-            remove(keyfilename)
-        if os.path.exists(keyfilename + '.pub'):
-            remove(keyfilename + '.pub')
+        for v in keys.values():
+            if os.path.exists(v['filename']):
+                remove(v['filename'])
+            if os.path.exists(v['filename'] + '.pub'):
+                remove(v['filename'] + '.pub')
         if os.path.exists(tmpdir):
             rmdir(tmpdir)
     assert OpenSSH_Keypair.generate() != []
