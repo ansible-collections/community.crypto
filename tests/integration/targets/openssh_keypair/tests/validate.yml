@@ -138,3 +138,29 @@
   assert:
     that:
       - privatekey8_result_force is changed
+
+- name: Check that password protected key with passphrase was regenerated
+  assert:
+    that:
+      - privatekey9_modified_result is changed
+
+- name: Check that modifying unprotected key with passphrase fails
+  assert:
+    that:
+      - privatekey10_result is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken.' in privatekey8_result.msg"
+
+- name: Check that unprotected key was regenerated with force=yes and passphrase supplied
+  assert:
+    that:
+      - privatekey10_result_force is changed
+
+- name: Check that ssh-keygen output from passphrase protected key matches openssh_keypair
+  assert:
+    that:
+      - privatekey10_result_force.public_key == privatekey10_result_sshkeygen.stdout
+
+- name: Check that PEM encoded private keys are loaded successfully
+  assert:
+    that:
+      - privatekey11_result is success

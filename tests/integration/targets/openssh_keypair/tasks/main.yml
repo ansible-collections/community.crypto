@@ -124,7 +124,7 @@
   register: privatekey7_modified_result
 
 - name: Generate password protected key
-  command: 'ssh-keygen -f {{ output_dir }}/privatekey8 -N password'
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey8 -N {{ passphrase }}'
 
 - name: Try to modify the password protected key - should fail
   openssh_keypair:
@@ -140,6 +140,51 @@
     size: 2048
   register: privatekey8_result_force
 
+- name: Generate another password protected key
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey9 -N {{ passphrase }}'
+
+- name: Try to modify the password protected key with passphrase
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey9'
+    size: 1024
+    passphrase: "{{ passphrase }}"
+  register: privatekey9_modified_result
+
+- name: Generate another unprotected key
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+
+- name: Try to Modify unprotected key with passphrase
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+  ignore_errors: true
+  register: privatekey10_result
+
+- name: Try to force modify the password protected key with force=true
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    force: true
+  register: privatekey10_result_force
+
+- name: Ensure that ssh-keygen can read keys generated with passphrase
+  command: 'ssh-keygen -yf {{ output_dir }}/privatekey10 -P {{ passphrase }}'
+  register: privatekey10_result_sshkeygen
+
+- name: Generate PEM encoded key with passphrase
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey11 -N {{ passphrase }} -m PEM'
+
+- name: Try to verify a PEM encoded key
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey11'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+  register: privatekey11_result
+
 - import_tasks: ../tests/validate.yml
 
 
@@ -152,8 +197,9 @@
     size: 1024
   loop: "{{ regenerate_values }}"
 - name: Regenerate - setup password protected keys
-  command: 'ssh-keygen -f {{ output_dir }}/regenerate-b-{{ item }} -N password'
+  command: 'ssh-keygen -f {{ output_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
+
 - name: Regenerate - setup broken keys
   copy:
     dest: '{{ output_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
@@ -162,6 +208,10 @@
   with_nested:
     - "{{ regenerate_values }}"
     - [ '', '.pub' ]
+    -
+- name: Regenerate - setup password protected keys for passphrse test
+  command: 'ssh-keygen -f {{ output_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
+  loop: "{{ regenerate_values }}"
 
 - name: Regenerate - modify broken keys (check mode)
   openssh_keypair:
@@ -225,6 +275,26 @@
       - result.results[3] is changed
       - result.results[4] is changed
 
+- name: Regenerate - modify password protected keys with passphrase (check mode)
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    type: rsa
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    regenerate: '{{ item }}'
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+
 - name: Regenerate - modify password protected keys
   openssh_keypair:
     path: '{{ output_dir }}/regenerate-b-{{ item }}'
@@ -242,6 +312,25 @@
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[1].msg"
       - result.results[2] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[2].msg"
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: Regenerate - modify password protected keys with passphrase
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-d-{{ item }}'
+    type: rsa
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    regenerate: '{{ item }}'
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
       - result.results[3] is changed
       - result.results[4] is changed
 
