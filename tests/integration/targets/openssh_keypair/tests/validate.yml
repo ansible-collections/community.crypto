@@ -143,24 +143,29 @@
   assert:
     that:
       - privatekey9_modified_result is changed
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Check that modifying unprotected key with passphrase fails
   assert:
     that:
       - privatekey10_result is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken.' in privatekey8_result.msg"
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Check that unprotected key was regenerated with force=yes and passphrase supplied
   assert:
     that:
       - privatekey10_result_force is changed
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Check that ssh-keygen output from passphrase protected key matches openssh_keypair
   assert:
     that:
       - privatekey10_result_force.public_key == privatekey10_result_sshkeygen.stdout
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Check that PEM encoded private keys are loaded successfully
   assert:
     that:
       - privatekey11_result is success
+  when: cryptography_version.stdout is version('3.0', '>=')

@@ -4,6 +4,9 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Bumps up cryptography and bcrypt versions to be compatible with OpenSSH >= 7.8
+- import_tasks: ./setup_cryptography.yml
+
 - name: Generate privatekey1 - standard (check mode)
   openssh_keypair:
     path: '{{ output_dir }}/privatekey1'
@@ -149,6 +152,7 @@
     size: 1024
     passphrase: "{{ passphrase }}"
   register: privatekey9_modified_result
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Generate another unprotected key
   openssh_keypair:
@@ -162,6 +166,8 @@
     passphrase: "{{ passphrase }}"
   ignore_errors: true
   register: privatekey10_result
+  when: cryptography_version.stdout is version('3.0', '>=')
+
 
 - name: Try to force modify the password protected key with force=true
   openssh_keypair:
@@ -170,13 +176,16 @@
     passphrase: "{{ passphrase }}"
     force: true
   register: privatekey10_result_force
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Ensure that ssh-keygen can read keys generated with passphrase
   command: 'ssh-keygen -yf {{ output_dir }}/privatekey10 -P {{ passphrase }}'
   register: privatekey10_result_sshkeygen
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Generate PEM encoded key with passphrase
   command: 'ssh-keygen -f {{ output_dir }}/privatekey11 -N {{ passphrase }} -m PEM'
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
@@ -184,6 +193,7 @@
     size: 2048
     passphrase: "{{ passphrase }}"
   register: privatekey11_result
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - import_tasks: ../tests/validate.yml
 
@@ -286,6 +296,8 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: yes
   register: result
+  when: cryptography_version.stdout is version('3.0', '>=')
+
 - assert:
     that:
       - result.results[0] is success
@@ -294,6 +306,7 @@
       - result.results[2] is changed
       - result.results[3] is changed
       - result.results[4] is changed
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Regenerate - modify password protected keys
   openssh_keypair:
@@ -325,6 +338,8 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: yes
   register: result
+  when: cryptography_version.stdout is version('3.0', '>=')
+
 - assert:
     that:
       - result.results[0] is success
@@ -333,6 +348,7 @@
       - result.results[2] is changed
       - result.results[3] is changed
       - result.results[4] is changed
+  when: cryptography_version.stdout is version('3.0', '>=')
 
 - name: Regenerate - not modify regular keys (check mode)
   openssh_keypair:
