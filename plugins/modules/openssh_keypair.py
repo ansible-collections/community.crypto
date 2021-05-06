@@ -224,11 +224,18 @@ class Keypair(object):
                         reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8"
                     )
                 )
+            elif LooseVersion(ssh_version) < LooseVersion("7.8"):
+                # OpenSSH made SSH formatted private keys available in version 6.5, but still defaulted to PEM format
+                self.private_key_format = 'PEM'
+            else:
+                self.private_key_format = 'SSH'
 
             if self.type == 'rsa1':
                 module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
 
             self.passphrase = to_bytes(self.passphrase)
+        else:
+            self.private_key_format = None
 
         if self.type in ('rsa', 'rsa1'):
             self.size = 4096 if self.size is None else self.size
@@ -290,7 +297,12 @@ class Keypair(object):
                         comment=self.comment if self.comment else "",
                     )
                     with open(self.path, 'w+b') as f:
-                        f.write(keypair.private_key)
+                        f.write(
+                            OpenSSH_Keypair.encode_openssh_privatekey(
+                                keypair.asymmetric_keypair,
+                                self.private_key_format
+                            )
+                        )
                     os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
                     with open(self.path + '.pub', 'w+b') as f:
                         f.write(keypair.public_key)
