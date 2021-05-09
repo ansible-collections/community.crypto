@@ -18,8 +18,8 @@ description:
       or C(ecdsa) private keys."
 requirements:
     - "ssh-keygen"
-    - cryptography >= 2.6 (if using C(passphrase) and OpenSSH < 7.8 is installed)
-    - cryptography >= 3.0 (if using C(passphrase) and OpenSSH >= 7.8 is installed)
+    - cryptography >= 2.6 (if using I(passphrase) and OpenSSH < 7.8 is installed)
+    - cryptography >= 3.0 (if using I(passphrase) and OpenSSH >= 7.8 is installed)
 options:
     state:
         description:
@@ -70,6 +70,8 @@ options:
             - For OpenSSH >= 7.8 all private key types will be in the OpenSSH format.
         type: str
         default: auto
+        choices:
+            - auto
         version_added: 1.7.0
     regenerate:
         description:
@@ -222,39 +224,26 @@ class Keypair(object):
                     )
                 )
 
-            ssh = module.get_bin_path('ssh', True)
-            proc = module.run_command([ssh, '-Vq'])
-            ssh_version = parse_openssh_version(proc[2].strip())
-
             if module.params['private_key_format'] == 'auto':
-                if LooseVersion(ssh_version) >= LooseVersion("7.8") and not HAS_OPENSSH_PRIVATE_FORMAT:
+                ssh = module.get_bin_path('ssh', True)
+                proc = module.run_command([ssh, '-Vq'])
+                ssh_version = parse_openssh_version(proc[2].strip())
+
+                self.private_key_format = 'SSH'
+
+                if LooseVersion(ssh_version) < LooseVersion("7.8") and self.type != 'ed25519':
+                    # OpenSSH made SSH formatted private keys available in version 6.5,
+                    # but still defaulted to PKCS1 format with the exception of ed25519 keys
+                    self.private_key_format = 'PKCS1'
+
+                if self.private_key_format == 'SSH' and not HAS_OPENSSH_PRIVATE_FORMAT:
                     module.fail_json(
                         msg=missing_required_lib(
                             'cryptography >= 3.0',
-                            reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8"
+                            reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 " +
+                                   "or for ed25519 keys"
                         )
                     )
-                elif LooseVersion(ssh_version) < LooseVersion("7.8"):
-                    if self.type == 'ed25519':
-                        if HAS_OPENSSH_PRIVATE_FORMAT:
-                            # ed25519 keys are always formatted in the OpenSSH format by ssh-keygen
-                            # since their introduction in OpenSSH 6.5
-                            self.private_key_format = 'SSH'
-                        else:
-                            module.fail_json(
-                                msg=missing_required_lib(
-                                    'cryptography >= 3.0',
-                                    reason="to load/dump ed25519 private keys in the default OpenSSH format"
-                                )
-                            )
-                    else:
-                        # OpenSSH made SSH formatted private keys available in version 6.5,
-                        # but still defaulted to PKCS1 format
-                        self.private_key_format = 'PKCS1'
-                else:
-                    self.private_key_format = 'SSH'
-            else:
-                module.fail_json(msg="The only valid option for 'private_key_format' is 'auto'")
 
             if self.type == 'rsa1':
                 module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
@@ -582,7 +571,7 @@ def main():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
             passphrase=dict(type='str', no_log=True),
-            private_key_format=dict(type='str', default='auto', no_log=False)
+            private_key_format=dict(type='str', default='auto', no_log=False, choices=['auto'])
         ),
         supports_check_mode=True,
         add_file_common_args=True,
