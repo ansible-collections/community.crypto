@@ -6,16 +6,6 @@
 
 - name: Attempt to install dependencies for OpenSSH > 7.8
   block:
-    - name: Ensure cryptography >= 3.0 available
-      become: true
-      pip:
-        name: cryptography>=3.0
-        extra_args: "-c {{ remote_constraints }}"
-
-    - name: Register cryptography version
-      command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
-      register: cryptography_version
-
     - name: Ensure bcrypt 3.1.5 available
       become: true
       pip:
@@ -29,5 +19,6 @@
 
 - name: Ensure bcrypt_version is defined
   set_fact:
-    bcrypt_version: 0.0
+    bcrypt_version:
+      stdout: 0.0
   when: bcrypt_version is not defined

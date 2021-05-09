@@ -410,10 +410,14 @@ class OpenSSH_Keypair(object):
                 privatekey_format = serialization.PrivateFormat.PKCS8
             else:
                 privatekey_format = serialization.PrivateFormat.OpenSSH
-        elif key_format == 'PEM':
+        elif key_format == 'PKCS8':
             privatekey_format = serialization.PrivateFormat.PKCS8
+        elif key_format == 'PKCS1':
+            if asym_keypair.key_type == 'ed25519':
+                raise InvalidKeyFormatError("ed25519 keys cannot be represented in PKCS1 format")
+            privatekey_format = serialization.PrivateFormat.TraditionalOpenSSL
         else:
-            raise InvalidKeyFormatError("The accepted private key formats are SSH or PEM")
+            raise InvalidKeyFormatError("The accepted private key formats are SSH, PKCS8, and PKCS1")
 
         encoded_privatekey = asym_keypair.private_key.private_bytes(
             encoding=serialization.Encoding.PEM,

@@ -7,7 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = '''
 ---
 module: openssh_keypair
@@ -60,8 +59,17 @@ options:
     passphrase:
         description:
             - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
-            - Passphrases are not supported for I(type=rsa1)
+            - Passphrases are not supported for I(type=rsa1).
         type: str
+        version_added: 1.7.0
+    private_key_format:
+        description:
+            - Used when a value for I(passphrase) is provided to select a format for the private key at the provided I(path).
+            - The only valid option currently is C(auto) which will match the key format of the installed OpenSSH version.
+            - For OpenSSH < 7.8 private keys will be in PKCS1 format except ed25519 keys which will be in OpenSSH format.
+            - For OpenSSH >= 7.8 all private key types will be in the OpenSSH format.
+        type: str
+        default: auto
         version_added: 1.7.0
     regenerate:
         description:
@@ -217,18 +225,36 @@ class Keypair(object):
             ssh = module.get_bin_path('ssh', True)
             proc = module.run_command([ssh, '-Vq'])
             ssh_version = parse_openssh_version(proc[2].strip())
-            if LooseVersion(ssh_version) >= LooseVersion("7.8") and not HAS_OPENSSH_PRIVATE_FORMAT:
-                module.fail_json(
-                    msg=missing_required_lib(
-                        'cryptography >= 3.0',
-                        reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8"
+
+            if module.params['private_key_format'] == 'auto':
+                if LooseVersion(ssh_version) >= LooseVersion("7.8") and not HAS_OPENSSH_PRIVATE_FORMAT:
+                    module.fail_json(
+                        msg=missing_required_lib(
+                            'cryptography >= 3.0',
+                            reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8"
+                        )
                     )
-                )
-            elif LooseVersion(ssh_version) < LooseVersion("7.8"):
-                # OpenSSH made SSH formatted private keys available in version 6.5, but still defaulted to PEM format
-                self.private_key_format = 'PEM'
+                elif LooseVersion(ssh_version) < LooseVersion("7.8"):
+                    if self.type == 'ed25519':
+                        if HAS_OPENSSH_PRIVATE_FORMAT:
+                            # ed25519 keys are always formatted in the OpenSSH format by ssh-keygen
+                            # since their introduction in OpenSSH 6.5
+                            self.private_key_format = 'SSH'
+                        else:
+                            module.fail_json(
+                                msg=missing_required_lib(
+                                    'cryptography >= 3.0',
+                                    reason="to load/dump ed25519 private keys in the default OpenSSH format"
+                                )
+                            )
+                    else:
+                        # OpenSSH made SSH formatted private keys available in version 6.5,
+                        # but still defaulted to PKCS1 format
+                        self.private_key_format = 'PKCS1'
+                else:
+                    self.private_key_format = 'SSH'
             else:
-                self.private_key_format = 'SSH'
+                module.fail_json(msg="The only valid option for 'private_key_format' is 'auto'")
 
             if self.type == 'rsa1':
                 module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
@@ -555,7 +581,8 @@ def main():
                 default='partial_idempotence',
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
-            passphrase=dict(type='str', no_log=True)
+            passphrase=dict(type='str', no_log=True),
+            private_key_format=dict(type='str', default='auto')
         ),
         supports_check_mode=True,
         add_file_common_args=True,
