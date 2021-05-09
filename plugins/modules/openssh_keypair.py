@@ -62,7 +62,7 @@ options:
             - Passphrases are not supported for I(type=rsa1).
         type: str
         version_added: 1.7.0
-    private_key_format:
+    key_format:
         description:
             - Used when a value for I(passphrase) is provided to select a format for the private key at the provided I(path).
             - The only valid option currently is C(auto) which will match the key format of the installed OpenSSH version.
@@ -226,7 +226,7 @@ class Keypair(object):
             proc = module.run_command([ssh, '-Vq'])
             ssh_version = parse_openssh_version(proc[2].strip())
 
-            if module.params['private_key_format'] == 'auto':
+            if module.params['key_format'] == 'auto':
                 if LooseVersion(ssh_version) >= LooseVersion("7.8") and not HAS_OPENSSH_PRIVATE_FORMAT:
                     module.fail_json(
                         msg=missing_required_lib(
@@ -239,7 +239,7 @@ class Keypair(object):
                         if HAS_OPENSSH_PRIVATE_FORMAT:
                             # ed25519 keys are always formatted in the OpenSSH format by ssh-keygen
                             # since their introduction in OpenSSH 6.5
-                            self.private_key_format = 'SSH'
+                            self.key_format = 'SSH'
                         else:
                             module.fail_json(
                                 msg=missing_required_lib(
@@ -250,18 +250,18 @@ class Keypair(object):
                     else:
                         # OpenSSH made SSH formatted private keys available in version 6.5,
                         # but still defaulted to PKCS1 format
-                        self.private_key_format = 'PKCS1'
+                        self.key_format = 'PKCS1'
                 else:
-                    self.private_key_format = 'SSH'
+                    self.key_format = 'SSH'
             else:
-                module.fail_json(msg="The only valid option for 'private_key_format' is 'auto'")
+                module.fail_json(msg="The only valid option for 'key_format' is 'auto'")
 
             if self.type == 'rsa1':
                 module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
 
             self.passphrase = to_bytes(self.passphrase)
         else:
-            self.private_key_format = None
+            self.key_format = None
 
         if self.type in ('rsa', 'rsa1'):
             self.size = 4096 if self.size is None else self.size
@@ -326,7 +326,7 @@ class Keypair(object):
                         f.write(
                             OpenSSH_Keypair.encode_openssh_privatekey(
                                 keypair.asymmetric_keypair,
-                                self.private_key_format
+                                self.key_format
                             )
                         )
                     os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
@@ -582,7 +582,7 @@ def main():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
             passphrase=dict(type='str', no_log=True),
-            private_key_format=dict(type='str', default='auto')
+            key_format=dict(type='str', default='auto')
         ),
         supports_check_mode=True,
         add_file_common_args=True,
