@@ -1,0 +1,24 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Attempt to install dependencies for OpenSSH > 7.8
+  block:
+    - name: Ensure bcrypt 3.1.5 available
+      become: true
+      pip:
+        name: bcrypt==3.1.5
+        extra_args: "-c {{ remote_constraints }}"
+
+    - name: Register bcrypt version
+      command: "{{ ansible_python.executable }} -c 'import bcrypt; print(bcrypt.__version__)'"
+      register: bcrypt_version
+  ignore_errors: true
+
+- name: Ensure bcrypt_version is defined
+  set_fact:
+    bcrypt_version:
+      stdout: 0.0
+  when: bcrypt_version is not defined

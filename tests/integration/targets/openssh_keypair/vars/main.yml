@@ -1,4 +1,5 @@
 ---
+passphrase: password
 regenerate_values:
   - never
   - fail
