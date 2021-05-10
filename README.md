@@ -7,6 +7,8 @@ Provides modules for [Ansible](https://www.ansible.com/community) for various cr
 
 You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/).
 
+Please note that this collection does **not** support Windows targets.
+
 ## Tested with Ansible
 
 Tested with the current Ansible 2.9, ansible-base 2.10 and ansible-core 2.11 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
