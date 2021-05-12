@@ -1,2 +1,2 @@
-minor_changes:
-  - openssh_keypair - enhanced ``check_mode`` to populate return values for existing keypairs (https://github.com/ansible-collections/community.crypto/pull/230).
+bugfixes:
+  - openssh_keypair - fix ``check_mode`` to populate return values for existing keypairs (https://github.com/ansible-collections/community.crypto/issues/113, https://github.com/ansible-collections/community.crypto/pull/230).
