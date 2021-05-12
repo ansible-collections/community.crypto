@@ -58,7 +58,7 @@ class CRLInfoRetrieval(object):
                 self.crl = x509.load_pem_x509_crl(self.content, default_backend())
             else:
                 self.crl = x509.load_der_x509_crl(self.content, default_backend())
-        except Exception as e:
+        except ValueError as e:
             self.module.fail_json(msg='Error while decoding CRL: {0}'.format(e))
 
         result = {

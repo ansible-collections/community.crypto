@@ -134,27 +134,13 @@ revoked_certificates:
 
 
 import base64
+import binascii
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_oid_to_name,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
-    TIMESTAMP_FORMAT,
-    cryptography_decode_revoked_certificate,
-    cryptography_dump_revoked,
-    cryptography_get_signature_algorithm_oid_from_crl,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
@@ -185,14 +171,14 @@ def main():
         try:
             with open(module.params['path'], 'rb') as f:
                 data = f.read()
-        except Exception as e:
+        except (IOError, OSError) as e:
             module.fail_json(msg='Error while reading CRL file from disk: {0}'.format(e))
     else:
         data = module.params['content'].encode('utf-8')
         if not identify_pem_format(data):
             try:
                 data = base64.b64decode(module.params['content'])
-            except Exception as e:
+            except (binascii.Error, TypeError) as e:
                 module.fail_json(msg='Error while Base64 decoding content: {0}'.format(e))
 
     try:
