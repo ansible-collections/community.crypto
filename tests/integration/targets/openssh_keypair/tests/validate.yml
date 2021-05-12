@@ -9,6 +9,7 @@
       - privatekey1_result_check is changed
       - privatekey1_result is changed
       - privatekey1_idem_result_check is not changed
+      - privatekey1_idem_result_check.public_key.startswith("ssh-rsa")
       - privatekey1_idem_result is not changed
 
 - name: Validate privatekey1 return fingerprint

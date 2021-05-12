@@ -590,8 +590,9 @@ def main():
     if keypair.state == 'present':
 
         if module.check_mode:
+            changed = keypair.force or not keypair.isPrivateKeyValid(module) or not keypair.isPublicKeyValid(module)
             result = keypair.dump()
-            result['changed'] = keypair.force or not keypair.isPrivateKeyValid(module) or not keypair.isPublicKeyValid(module)
+            result['changed'] = changed
             module.exit_json(**result)
 
         try:
