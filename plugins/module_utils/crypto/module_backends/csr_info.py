@@ -243,8 +243,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def _get_basic_constraints(self):
         try:
             ext_keyusage_ext = self.csr.extensions.get_extension_for_class(x509.BasicConstraints)
-            result = []
-            result.append('CA:{0}'.format('TRUE' if ext_keyusage_ext.value.ca else 'FALSE'))
+            result = ['CA:{0}'.format('TRUE' if ext_keyusage_ext.value.ca else 'FALSE')]
             if ext_keyusage_ext.value.path_length is not None:
                 result.append('pathlen:{0}'.format(ext_keyusage_ext.value.path_length))
             return sorted(result), ext_keyusage_ext.critical
@@ -257,7 +256,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
                 # This only works with cryptography >= 2.1
                 tlsfeature_ext = self.csr.extensions.get_extension_for_class(x509.TLSFeature)
                 value = cryptography.x509.TLSFeatureType.status_request in tlsfeature_ext.value
-            except AttributeError as dummy:
+            except AttributeError:
                 # Fallback for cryptography < 2.1
                 oid = x509.oid.ObjectIdentifier("1.3.6.1.5.5.7.1.24")
                 tlsfeature_ext = self.csr.extensions.get_extension_for_oid(oid)
@@ -459,4 +458,4 @@ def select_backend(module, backend, content, validate_signature=True):
                              exception=CRYPTOGRAPHY_IMP_ERR)
         return backend, CSRInfoRetrievalCryptography(module, content, validate_signature=validate_signature)
     else:
-        raise Exception('Unsupported value for backend: {0}'.format(backend))
+        raise ValueError('Unsupported value for backend: {0}'.format(backend))
