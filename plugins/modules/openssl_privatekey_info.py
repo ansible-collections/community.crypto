@@ -182,7 +182,7 @@ def main():
         try:
             with open(module.params['path'], 'rb') as f:
                 data = f.read()
-        except Exception as e:
+        except (IOError, OSError) as e:
             module.fail_json(msg='Error while reading private key file from disk: {0}'.format(e), **result)
 
     result['can_load_key'] = True

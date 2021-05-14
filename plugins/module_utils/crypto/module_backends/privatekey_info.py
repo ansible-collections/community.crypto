@@ -487,4 +487,4 @@ def select_backend(module, backend, content, passphrase=None, return_private_key
         return backend, PrivateKeyInfoRetrievalCryptography(
             module, content, passphrase=passphrase, return_private_key_data=return_private_key_data)
     else:
-        raise Exception('Unsupported value for backend: {0}'.format(backend))
+        raise ValueError('Unsupported value for backend: {0}'.format(backend))
