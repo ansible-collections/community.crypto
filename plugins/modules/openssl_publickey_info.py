@@ -135,7 +135,7 @@ public_data:
         curve:
             description:
                 - The curve's name for ECC.
-            type: string
+            type: str
             returned: When C(type=ECC)
         exponent_size:
             description:
