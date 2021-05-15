@@ -31,7 +31,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
-MINIMAL_PYOPENSSL_VERSION = '0.15'
+MINIMAL_PYOPENSSL_VERSION = '16.0.0'  # when working with public key objects, the minimal required version is 0.15
 
 PYOPENSSL_IMP_ERR = None
 try:

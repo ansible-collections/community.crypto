@@ -46,7 +46,7 @@
   include_tasks: impl.yml
   vars:
     select_crypto_backend: pyopenssl
-  when: pyopenssl_version.stdout is version('0.15', '>=')
+  when: pyopenssl_version.stdout is version('16.0.0', '>=')
 
 - name: Prepare result list
   set_fact:
@@ -76,4 +76,4 @@
       - '  (pyopenssl_info_results[item] | dict2items | rejectattr("key", "equalto", "deprecations") | list | items2dict)
         == (cryptography_info_results[item] | dict2items | rejectattr("key", "equalto", "deprecations") | list | items2dict)'
     loop: "{{ pyopenssl_info_results.keys() | intersect(cryptography_info_results.keys()) | list }}"
-  when: pyopenssl_version.stdout is version('0.15', '>=') and cryptography_version.stdout is version('1.2.3', '>=')
+  when: pyopenssl_version.stdout is version('16.0.0', '>=') and cryptography_version.stdout is version('1.2.3', '>=')
