@@ -183,6 +183,28 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
     return result
 
 
+def load_publickey(path=None, content=None, backend=None):
+    if content is None:
+        if path is None:
+            raise OpenSSLObjectError('Must provide either path or content')
+        try:
+            with open(path, 'rb') as b_priv_key_fh:
+                content = b_priv_key_fh.read()
+        except (IOError, OSError) as exc:
+            raise OpenSSLObjectError(exc)
+
+    if backend == 'cryptography':
+        try:
+            return serialization.load_pem_public_key(content, backend=cryptography_backend())
+        except Exception as e:
+            raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
+    else:
+        try:
+            return crypto.load_publickey(crypto.FILETYPE_PEM, content)
+        except crypto.Error as e:
+            raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
+
+
 def load_certificate(path, content=None, backend='pyopenssl'):
     """Load the specified certificate."""
 

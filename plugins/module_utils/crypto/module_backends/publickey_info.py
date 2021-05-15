@@ -14,6 +14,7 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     CRYPTOGRAPHY_HAS_X25519,
@@ -25,6 +26,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     get_fingerprint_of_bytes,
+    load_publickey,
 )
 
 
@@ -45,7 +47,6 @@ else:
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
@@ -193,11 +194,12 @@ class PublicKeyParseError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PublicKeyInfoRetrieval(object):
-    def __init__(self, module, backend, content):
+    def __init__(self, module, backend, content=None, key=None):
         # content must be a bytes string
         self.module = module
         self.backend = backend
         self.content = content
+        self.key = key
 
     @abc.abstractmethod
     def _get_public_key(self, binary):
@@ -212,16 +214,11 @@ class PublicKeyInfoRetrieval(object):
             can_parse_key=False,
             key_is_consistent=None,
         )
-        if self.backend == 'cryptography':
+        if self.key is None:
             try:
-                self.key = serialization.load_pem_public_key(self.content, backend=default_backend())
-            except Exception as e:
-                raise PublicKeyParseError('Error while deserializing key: {0}'.format(e))
-        else:
-            try:
-                self.key = crypto.load_publickey(crypto.FILETYPE_PEM, self.content)
-            except crypto.Error as e:
-                raise PublicKeyParseError('Error while deserializing key: {0}'.format(e))
+                self.key = load_publickey(content=self.content, backend=self.backend)
+            except OpenSSLObjectError as e:
+                raise PublicKeyParseError(to_native(e))
 
         pk = self._get_public_key(binary=True)
         result['fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
@@ -234,8 +231,8 @@ class PublicKeyInfoRetrieval(object):
 
 class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
     """Validate the supplied public key, using the cryptography backend"""
-    def __init__(self, module, content, **kwargs):
-        super(PublicKeyInfoRetrievalCryptography, self).__init__(module, 'cryptography', content, **kwargs)
+    def __init__(self, module, content=None, key=None):
+        super(PublicKeyInfoRetrievalCryptography, self).__init__(module, 'cryptography', content=content, key=key)
 
     def _get_public_key(self, binary):
         return self.key.public_bytes(
@@ -250,8 +247,8 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 class PublicKeyInfoRetrievalPyOpenSSL(PublicKeyInfoRetrieval):
     """validate the supplied public key."""
 
-    def __init__(self, module, content, **kwargs):
-        super(PublicKeyInfoRetrievalPyOpenSSL, self).__init__(module, 'pyopenssl', content, **kwargs)
+    def __init__(self, module, content=None, key=None):
+        super(PublicKeyInfoRetrievalPyOpenSSL, self).__init__(module, 'pyopenssl', content=content, key=key)
 
     def _get_public_key(self, binary):
         try:
@@ -282,15 +279,15 @@ class PublicKeyInfoRetrievalPyOpenSSL(PublicKeyInfoRetrieval):
         return key_type, key_public_data
 
 
-def get_publickey_info(module, backend, content):
+def get_publickey_info(module, backend, content=None, key=None):
     if backend == 'cryptography':
-        info = PublicKeyInfoRetrievalCryptography(module, content)
+        info = PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
     elif backend == 'pyopenssl':
-        info = PublicKeyInfoRetrievalPyOpenSSL(module, content)
+        info = PublicKeyInfoRetrievalPyOpenSSL(module, content=content, key=key)
     return info.get_info()
 
 
-def select_backend(module, backend, content):
+def select_backend(module, backend, content=None, key=None):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
@@ -315,11 +312,11 @@ def select_backend(module, backend, content):
                              exception=PYOPENSSL_IMP_ERR)
         module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
                          version='2.0.0', collection_name='community.crypto')
-        return backend, PublicKeyInfoRetrievalPyOpenSSL(module, content)
+        return backend, PublicKeyInfoRetrievalPyOpenSSL(module, content=content, key=key)
     elif backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
-        return backend, PublicKeyInfoRetrievalCryptography(module, content)
+        return backend, PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
     else:
         raise ValueError('Unsupported value for backend: {0}'.format(backend))
