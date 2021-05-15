@@ -19,8 +19,6 @@ from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X448,
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
     OpenSSLObjectError,
@@ -34,6 +32,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     binary_exp_mod,
     quick_is_not_prime,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    _get_cryptography_public_key_info,
+    _bigint_to_int,
+    _get_pyopenssl_public_key_info,
 )
 
 
@@ -65,42 +69,20 @@ else:
 SIGNATURE_TEST_DATA = b'1234'
 
 
-def _get_cryptography_key_info(key):
-    key_public_data = dict()
+def _get_cryptography_private_key_info(key):
+    key_type, key_public_data = _get_cryptography_public_key_info(key.public_key())
     key_private_data = dict()
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-        key_type = 'RSA'
-        key_public_data['size'] = key.key_size
-        key_public_data['modulus'] = key.public_key().public_numbers().n
-        key_public_data['exponent'] = key.public_key().public_numbers().e
-        key_private_data['p'] = key.private_numbers().p
-        key_private_data['q'] = key.private_numbers().q
-        key_private_data['exponent'] = key.private_numbers().d
+        private_numbers = key.private_numbers()
+        key_private_data['p'] = private_numbers.p
+        key_private_data['q'] = private_numbers.q
+        key_private_data['exponent'] = private_numbers.d
     elif isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
-        key_type = 'DSA'
-        key_public_data['size'] = key.key_size
-        key_public_data['p'] = key.parameters().parameter_numbers().p
-        key_public_data['q'] = key.parameters().parameter_numbers().q
-        key_public_data['g'] = key.parameters().parameter_numbers().g
-        key_public_data['y'] = key.public_key().public_numbers().y
-        key_private_data['x'] = key.private_numbers().x
-    elif CRYPTOGRAPHY_HAS_X25519 and isinstance(key, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey):
-        key_type = 'X25519'
-    elif CRYPTOGRAPHY_HAS_X448 and isinstance(key, cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey):
-        key_type = 'X448'
-    elif CRYPTOGRAPHY_HAS_ED25519 and isinstance(key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey):
-        key_type = 'Ed25519'
-    elif CRYPTOGRAPHY_HAS_ED448 and isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
-        key_type = 'Ed448'
+        private_numbers = key.private_numbers()
+        key_private_data['x'] = private_numbers.x
     elif isinstance(key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
-        key_type = 'ECC'
-        key_public_data['curve'] = key.public_key().curve.name
-        key_public_data['x'] = key.public_key().public_numbers().x
-        key_public_data['y'] = key.public_key().public_numbers().y
-        key_public_data['exponent_size'] = key.public_key().curve.key_size
-        key_private_data['multiplier'] = key.private_numbers().private_value
-    else:
-        key_type = 'unknown ({0})'.format(type(key))
+        private_numbers = key.private_numbers()
+        key_private_data['multiplier'] = private_numbers.private_value
     return key_type, key_public_data, key_private_data
 
 
@@ -276,7 +258,7 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
         )
 
     def _get_key_info(self):
-        return _get_cryptography_key_info(self.key)
+        return _get_cryptography_private_key_info(self.key)
 
     def _is_key_consistent(self, key_public_data, key_private_data):
         return _is_cryptography_key_consistent(self.key, key_public_data, key_private_data)
@@ -309,25 +291,11 @@ class PrivateKeyInfoRetrievalPyOpenSSL(PrivateKeyInfoRetrieval):
                 self.module.warn('Your pyOpenSSL version does not support dumping public keys. '
                                  'Please upgrade to version 16.0 or newer, or use the cryptography backend.')
 
-    def bigint_to_int(self, bn):
-        '''Convert OpenSSL BIGINT to Python integer'''
-        if bn == OpenSSL._util.ffi.NULL:
-            return None
-        hexstr = OpenSSL._util.lib.BN_bn2hex(bn)
-        try:
-            return int(OpenSSL._util.ffi.string(hexstr), 16)
-        finally:
-            OpenSSL._util.lib.OPENSSL_free(hexstr)
-
     def _get_key_info(self):
-        key_public_data = dict()
+        key_type, key_public_data, try_fallback = _get_pyopenssl_public_key_info(self.key)
         key_private_data = dict()
         openssl_key_type = self.key.type()
-        try_fallback = True
         if crypto.TYPE_RSA == openssl_key_type:
-            key_type = 'RSA'
-            key_public_data['size'] = self.key.bits()
-
             try:
                 # Use OpenSSL directly to extract key data
                 key = OpenSSL._util.lib.EVP_PKEY_get1_RSA(self.key._pkey)
@@ -345,31 +313,22 @@ class PrivateKeyInfoRetrievalPyOpenSSL(PrivateKeyInfoRetrieval):
                     e = OpenSSL._util.ffi.new("BIGNUM **")
                     d = OpenSSL._util.ffi.new("BIGNUM **")
                     OpenSSL._util.lib.RSA_get0_key(key, n, e, d)
-                    key_public_data['modulus'] = self.bigint_to_int(n[0])
-                    key_public_data['exponent'] = self.bigint_to_int(e[0])
-                    key_private_data['exponent'] = self.bigint_to_int(d[0])
+                    key_private_data['exponent'] = _bigint_to_int(d[0])
                     # Get factors
                     p = OpenSSL._util.ffi.new("BIGNUM **")
                     q = OpenSSL._util.ffi.new("BIGNUM **")
                     OpenSSL._util.lib.RSA_get0_factors(key, p, q)
-                    key_private_data['p'] = self.bigint_to_int(p[0])
-                    key_private_data['q'] = self.bigint_to_int(q[0])
+                    key_private_data['p'] = _bigint_to_int(p[0])
+                    key_private_data['q'] = _bigint_to_int(q[0])
                 else:
-                    # Get modulus and exponents
-                    key_public_data['modulus'] = self.bigint_to_int(key.n)
-                    key_public_data['exponent'] = self.bigint_to_int(key.e)
-                    key_private_data['exponent'] = self.bigint_to_int(key.d)
+                    # Get private exponent
+                    key_private_data['exponent'] = _bigint_to_int(key.d)
                     # Get factors
-                    key_private_data['p'] = self.bigint_to_int(key.p)
-                    key_private_data['q'] = self.bigint_to_int(key.q)
-                try_fallback = False
+                    key_private_data['p'] = _bigint_to_int(key.p)
+                    key_private_data['q'] = _bigint_to_int(key.q)
             except AttributeError:
-                # Use fallback if available
-                pass
+                try_fallback = True
         elif crypto.TYPE_DSA == openssl_key_type:
-            key_type = 'DSA'
-            key_public_data['size'] = self.key.bits()
-
             try:
                 # Use OpenSSL directly to extract key data
                 key = OpenSSL._util.lib.EVP_PKEY_get1_DSA(self.key._pkey)
@@ -382,38 +341,22 @@ class PrivateKeyInfoRetrievalPyOpenSSL(PrivateKeyInfoRetrieval):
                 # 1.1 and later, and directly access the values for 1.0.x and
                 # earlier.
                 if OpenSSL.SSL.OPENSSL_VERSION_NUMBER >= 0x10100000:
-                    # Get public parameters (primes and group element)
-                    p = OpenSSL._util.ffi.new("BIGNUM **")
-                    q = OpenSSL._util.ffi.new("BIGNUM **")
-                    g = OpenSSL._util.ffi.new("BIGNUM **")
-                    OpenSSL._util.lib.DSA_get0_pqg(key, p, q, g)
-                    key_public_data['p'] = self.bigint_to_int(p[0])
-                    key_public_data['q'] = self.bigint_to_int(q[0])
-                    key_public_data['g'] = self.bigint_to_int(g[0])
-                    # Get public and private key exponents
+                    # Get private key exponents
                     y = OpenSSL._util.ffi.new("BIGNUM **")
                     x = OpenSSL._util.ffi.new("BIGNUM **")
                     OpenSSL._util.lib.DSA_get0_key(key, y, x)
-                    key_public_data['y'] = self.bigint_to_int(y[0])
-                    key_private_data['x'] = self.bigint_to_int(x[0])
+                    key_private_data['x'] = _bigint_to_int(x[0])
                 else:
-                    # Get public parameters (primes and group element)
-                    key_public_data['p'] = self.bigint_to_int(key.p)
-                    key_public_data['q'] = self.bigint_to_int(key.q)
-                    key_public_data['g'] = self.bigint_to_int(key.g)
-                    # Get public and private key exponents
-                    key_public_data['y'] = self.bigint_to_int(key.pub_key)
-                    key_private_data['x'] = self.bigint_to_int(key.priv_key)
-                try_fallback = False
+                    # Get private key exponents
+                    key_private_data['x'] = _bigint_to_int(key.priv_key)
             except AttributeError:
-                # Use fallback if available
-                pass
+                try_fallback = True
         else:
             # Return 'unknown'
             key_type = 'unknown ({0})'.format(self.key.type())
         # If needed and if possible, fall back to cryptography
         if try_fallback and PYOPENSSL_VERSION >= LooseVersion('16.1.0') and CRYPTOGRAPHY_FOUND:
-            return _get_cryptography_key_info(self.key.to_cryptography_key())
+            return _get_cryptography_private_key_info(self.key.to_cryptography_key())
         return key_type, key_public_data, key_private_data
 
     def _is_key_consistent(self, key_public_data, key_private_data):
