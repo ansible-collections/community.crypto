@@ -30,6 +30,15 @@ options:
             - Content of the X.509 CRL in PEM format, or Base64-encoded X.509 CRL.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
+    list_revoked_certificates:
+        description:
+            - If set to C(false), the list of revoked certificates is not included in the result.
+            - This is useful when retrieving information on large CRL files. Enumerating all revoked
+              certificates can take some time, including serializing the result as JSON, sending it to
+              the Ansible controller, and decoding it again.
+        type: bool
+        default: true
+        version_added: 1.7.0
 
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
@@ -87,7 +96,7 @@ digest:
     sample: sha256WithRSAEncryption
 revoked_certificates:
     description: List of certificates to be revoked.
-    returned: success
+    returned: success if I(list_revoked_certificates=true)
     type: list
     elements: dict
     contains:
@@ -157,6 +166,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path'),
             content=dict(type='str'),
+            list_revoked_certificates=dict(type='bool', default=True),
         ),
         required_one_of=(
             ['path', 'content'],
@@ -182,7 +192,7 @@ def main():
                 module.fail_json(msg='Error while Base64 decoding content: {0}'.format(e))
 
     try:
-        result = get_crl_info(module, data)
+        result = get_crl_info(module, data, list_revoked_certificates=module.params['list_revoked_certificates'])
         module.exit_json(**result)
     except OpenSSLObjectError as e:
         module.fail_json(msg=to_native(e))

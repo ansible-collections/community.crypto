@@ -80,3 +80,8 @@
       - crl_2_change_check is changed
       - crl_2_change is changed
       - crl_2_change.crl == lookup('file', output_dir ~ '/ca-crl2.crl', rstrip=False)
+
+- name: Validate CRL 2 info
+  assert:
+    that:
+      - "'revoked_certificates' not in crl_2_info_1"

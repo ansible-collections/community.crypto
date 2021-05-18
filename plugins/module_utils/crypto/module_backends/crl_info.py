@@ -46,10 +46,11 @@ else:
 
 
 class CRLInfoRetrieval(object):
-    def __init__(self, module, content):
+    def __init__(self, module, content, list_revoked_certificates=True):
         # content must be a bytes string
         self.module = module
         self.content = content
+        self.list_revoked_certificates = list_revoked_certificates
 
     def get_info(self):
         self.crl_pem = identify_pem_format(self.content)
@@ -82,18 +83,19 @@ class CRLInfoRetrieval(object):
         result['issuer'] = {}
         for k, v in issuer:
             result['issuer'][k] = v
-        result['revoked_certificates'] = []
-        for cert in self.crl:
-            entry = cryptography_decode_revoked_certificate(cert)
-            result['revoked_certificates'].append(cryptography_dump_revoked(entry))
+        if self.list_revoked_certificates:
+            result['revoked_certificates'] = []
+            for cert in self.crl:
+                entry = cryptography_decode_revoked_certificate(cert)
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
 
         return result
 
 
-def get_crl_info(module, content):
+def get_crl_info(module, content, list_revoked_certificates=True):
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                          exception=CRYPTOGRAPHY_IMP_ERR)
 
-    info = CRLInfoRetrieval(module, content)
+    info = CRLInfoRetrieval(module, content, list_revoked_certificates=list_revoked_certificates)
     return info.get_info()
