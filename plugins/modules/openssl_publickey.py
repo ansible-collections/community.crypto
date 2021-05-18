@@ -203,6 +203,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     get_fingerprint,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    PublicKeyParseError,
+    get_publickey_info,
+)
+
 MINIMAL_PYOPENSSL_VERSION = '16.0.0'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
 MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = '1.4'
@@ -244,6 +249,7 @@ class PublicKey(OpenSSLObject):
             module.params['force'],
             module.check_mode
         )
+        self.module = module
         self.format = module.params['format']
         self.privatekey_path = module.params['privatekey_path']
         self.privatekey_content = module.params['privatekey_content']
@@ -258,6 +264,22 @@ class PublicKey(OpenSSLObject):
 
         self.backup = module.params['backup']
         self.backup_file = None
+
+        self.diff_before = self._get_info(None)
+        self.diff_after = self._get_info(None)
+
+    def _get_info(self, data):
+        if data is None:
+            return dict()
+        result = dict(can_parse_key=False)
+        try:
+            result.update(get_publickey_info(self.module, self.backend, content=data))
+            result['can_parse_key'] = True
+        except PublicKeyParseError as exc:
+            result.update(exc.result)
+        except Exception as exc:
+            pass
+        return result
 
     def _create_publickey(self, module):
         self.privatekey = load_privatekey(
@@ -294,6 +316,7 @@ class PublicKey(OpenSSLObject):
         if not self.check(module, perms_required=False) or self.force:
             try:
                 publickey_content = self._create_publickey(module)
+                self.diff_after = self._get_info(publickey_content)
                 if self.return_content:
                     self.publickey_bytes = publickey_content
 
@@ -329,6 +352,7 @@ class PublicKey(OpenSSLObject):
             try:
                 with open(self.path, 'rb') as public_key_fh:
                     publickey_content = public_key_fh.read()
+                self.diff_before = self.diff_after = self._get_info(publickey_content)
                 if self.return_content:
                     self.publickey_bytes = publickey_content
                 if self.backend == 'cryptography':
@@ -386,6 +410,11 @@ class PublicKey(OpenSSLObject):
             if self.publickey_bytes is None:
                 self.publickey_bytes = load_file_if_exists(self.path, ignore_errors=True)
             result['publickey'] = self.publickey_bytes.decode('utf-8') if self.publickey_bytes else None
+
+        result['diff'] = dict(
+            before=self.diff_before,
+            after=self.diff_after,
+        )
 
         return result
 
