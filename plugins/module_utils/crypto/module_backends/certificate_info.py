@@ -39,6 +39,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_normalize_name_attribute,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    get_publickey_info,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 
@@ -138,6 +142,10 @@ class CertificateInfoRetrieval(object):
         pass
 
     @abc.abstractmethod
+    def _get_public_key_object(self):
+        pass
+
+    @abc.abstractmethod
     def _get_subject_key_identifier(self):
         pass
 
@@ -188,6 +196,12 @@ class CertificateInfoRetrieval(object):
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
         result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
+
+        public_key_info = get_publickey_info(self.module, self.backend, key=self._get_public_key_object())
+        result.update({
+            'public_key_type': public_key_info['type'],
+            'public_key_data': public_key_info['public_data'],
+        })
 
         result['fingerprints'] = get_fingerprint_of_bytes(self._get_der_bytes())
 
@@ -336,6 +350,9 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             serialization.PublicFormat.SubjectPublicKeyInfo
         )
 
+    def _get_public_key_object(self):
+        return self.cert.public_key()
+
     def _get_subject_key_identifier(self):
         try:
             ext = self.cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
@@ -470,6 +487,9 @@ class CertificateInfoRetrievalPyOpenSSL(CertificateInfoRetrieval):
             except AttributeError:
                 self.module.warn('Your pyOpenSSL version does not support dumping public keys. '
                                  'Please upgrade to version 16.0 or newer, or use the cryptography backend.')
+
+    def _get_public_key_object(self):
+        return self.cert.get_pubkey()
 
     def _get_subject_key_identifier(self):
         # Won't be implemented

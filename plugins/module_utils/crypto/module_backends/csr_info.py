@@ -37,6 +37,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_parse_name_constraints,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    get_publickey_info,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 
@@ -117,6 +121,10 @@ class CSRInfoRetrieval(object):
         pass
 
     @abc.abstractmethod
+    def _get_public_key_object(self):
+        pass
+
+    @abc.abstractmethod
     def _get_subject_key_identifier(self):
         pass
 
@@ -155,6 +163,12 @@ class CSRInfoRetrieval(object):
         result['public_key'] = self._get_public_key(binary=False)
         pk = self._get_public_key(binary=True)
         result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
+
+        public_key_info = get_publickey_info(self.module, self.backend, key=self._get_public_key_object())
+        result.update({
+            'public_key_type': public_key_info['type'],
+            'public_key_data': public_key_info['public_data'],
+        })
 
         if self.backend != 'pyopenssl':
             ski = self._get_subject_key_identifier()
@@ -288,6 +302,9 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
             serialization.PublicFormat.SubjectPublicKeyInfo
         )
 
+    def _get_public_key_object(self):
+        return self.csr.public_key()
+
     def _get_subject_key_identifier(self):
         try:
             ext = self.csr.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
@@ -393,6 +410,9 @@ class CSRInfoRetrievalPyOpenSSL(CSRInfoRetrieval):
             except AttributeError:
                 self.module.warn('Your pyOpenSSL version does not support dumping public keys. '
                                  'Please upgrade to version 16.0 or newer, or use the cryptography backend.')
+
+    def _get_public_key_object(self):
+        return self.csr.get_pubkey()
 
     def _get_subject_key_identifier(self):
         # Won't be implemented
