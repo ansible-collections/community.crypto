@@ -1,0 +1,110 @@
+---
+- debug:
+    msg: "Executing tests with backend {{ select_crypto_backend }}"
+
+- name: ({{select_crypto_backend}}) Get key 1 info
+  openssl_publickey_info:
+    path: '{{ output_dir }}/publickey_1.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+
+- name: Update result list
+  set_fact:
+    info_results: "{{ info_results | combine({'key1': result}) }}"
+
+- name: ({{select_crypto_backend}}) Get key 1 info directly
+  openssl_publickey_info:
+    content: '{{ lookup("file", output_dir ~ "/publickey_1.pem") }}'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_direct
+
+- name: ({{select_crypto_backend}}) Compare output of direct and loaded info
+  assert:
+    that:
+      - result == result_direct
+
+- name: ({{select_crypto_backend}}) Get key 2 info
+  openssl_publickey_info:
+    path: '{{ output_dir }}/publickey_2.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "result.public_data.size == default_rsa_key_size"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+
+- name: Update result list
+  set_fact:
+    info_results: "{{ info_results | combine({'key2': result}) }}"
+
+- name: ({{select_crypto_backend}}) Get key 3 info
+  openssl_publickey_info:
+    path: '{{ output_dir }}/publickey_3.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- block:
+  - name: Check that ECC key info is ok
+    assert:
+      that:
+        - "'fingerprints' in result"
+        - "'type' in result"
+        - "result.type == 'ECC'"
+        - "'public_data' in result"
+        - "result.public_data.curve is string"
+        - "result.public_data.x != 0"
+        - "result.public_data.y != 0"
+        - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
+
+  - name: Update result list
+    set_fact:
+      info_results: "{{ info_results | combine({'key3': result}) }}"
+  when: select_crypto_backend != 'pyopenssl' or (pyopenssl_version.stdout is version('16.1.0', '>=') and cryptography_version.stdout is version('0.0', '>'))
+
+- name: Check that ECC key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type.startswith('unknown ')"
+      - "'public_data' in result"
+  when: select_crypto_backend == 'pyopenssl' and not (pyopenssl_version.stdout is version('16.1.0', '>=') and cryptography_version.stdout is version('0.0', '>'))
+
+- name: ({{select_crypto_backend}}) Get key 4 info
+  openssl_publickey_info:
+    path: '{{ output_dir }}/publickey_4.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: Check that DSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'DSA'"
+      - "'public_data' in result"
+      - "result.public_data.p > 2"
+      - "result.public_data.q > 2"
+      - "result.public_data.g >= 2"
+      - "result.public_data.y > 2"
+
+- name: Update result list
+  set_fact:
+    info_results: "{{ info_results | combine({'key4': result}) }}"

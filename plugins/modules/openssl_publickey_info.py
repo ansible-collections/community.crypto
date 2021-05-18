@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
-# Copyright: (c) 2017, Markus Teufelberger <mteufelberger+ansible@mgit.at>
+# Copyright: (c) 2021, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -11,47 +10,30 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: openssl_privatekey_info
-short_description: Provide information for OpenSSL private keys
+module: openssl_publickey_info
+short_description: Provide information for OpenSSL public keys
 description:
-    - This module allows one to query information on OpenSSL private keys.
-    - In case the key consistency checks fail, the module will fail as this indicates a faked
-      private key. In this case, all return variables are still returned. Note that key consistency
-      checks are not available all key types; if none is available, C(none) is returned for
-      C(key_is_consistent).
+    - This module allows one to query information on OpenSSL public keys.
     - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL. If both the
       cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
       cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
       C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
       and will be removed in community.crypto 2.0.0.
+version_added: 1.7.0
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 1.2.3
 author:
-  - Felix Fontein (@felixfontein)
-  - Yanis Guenane (@Spredzy)
+    - Felix Fontein (@felixfontein)
 options:
     path:
         description:
-            - Remote absolute path where the private key file is loaded from.
+            - Remote absolute path where the public key file is loaded from.
         type: path
     content:
         description:
-            - Content of the private key file.
+            - Content of the public key file.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
-        version_added: '1.0.0'
-    passphrase:
-        description:
-            - The passphrase for the private key.
-        type: str
-    return_private_key_data:
-        description:
-            - Whether to return private key data.
-            - Only set this to C(yes) when you want private information about this key to
-              leave the remote machine.
-            - "WARNING: you have to make sure that private key data isn't accidentally logged!"
-        type: bool
-        default: no
 
     select_crypto_backend:
         description:
@@ -69,8 +51,8 @@ notes:
 - Supports C(check_mode).
 
 seealso:
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_privatekey_pipe
+- module: community.crypto.openssl_publickey
+- module: community.crypto.openssl_privatekey_info
 '''
 
 EXAMPLES = r'''
@@ -78,9 +60,14 @@ EXAMPLES = r'''
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
 
-- name: Get information on generated key
-  community.crypto.openssl_privatekey_info:
-    path: /etc/ssl/private/ansible.com.pem
+- name: Create public key from private key
+  community.crypto.openssl_privatekey:
+    privatekey_path: /etc/ssl/private/ansible.com.pem
+    path: /etc/ssl/ansible.com.pub
+
+- name: Get information on public key
+  community.crypto.openssl_publickey_info:
+    path: /etc/ssl/ansible.com.pub
   register: result
 
 - name: Dump information
@@ -89,29 +76,9 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-can_load_key:
-    description: Whether the module was able to load the private key from disk.
-    returned: always
-    type: bool
-can_parse_key:
-    description: Whether the module was able to parse the private key.
-    returned: always
-    type: bool
-key_is_consistent:
+fingerprints:
     description:
-        - Whether the key is consistent. Can also return C(none) next to C(yes) and
-          C(no), to indicate that consistency could not be checked.
-        - In case the check returns C(no), the module will fail.
-    returned: always
-    type: bool
-public_key:
-    description: Private key's public key in PEM format.
-    returned: success
-    type: str
-    sample: "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A..."
-public_key_fingerprints:
-    description:
-        - Fingerprints of private key's public key.
+        - Fingerprints of public key.
         - For every hash algorithm available, the fingerprint is computed.
     returned: success
     type: dict
@@ -186,11 +153,6 @@ public_data:
                 - For C(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
             type: int
             returned: When C(type=DSA) or C(type=ECC)
-private_data:
-    description:
-        - Private key data. Depends on key type.
-    returned: success and when I(return_private_key_data) is set to C(yes)
-    type: dict
 '''
 
 
@@ -201,9 +163,8 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     OpenSSLObjectError,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_info import (
-    PrivateKeyConsistencyError,
-    PrivateKeyParseError,
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    PublicKeyParseError,
     select_backend,
 )
 
@@ -213,8 +174,6 @@ def main():
         argument_spec=dict(
             path=dict(type='path'),
             content=dict(type='str', no_log=True),
-            passphrase=dict(type='str', no_log=True),
-            return_private_key_data=dict(type='bool', default=False),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
         ),
         required_one_of=(
@@ -239,24 +198,17 @@ def main():
             with open(module.params['path'], 'rb') as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(msg='Error while reading private key file from disk: {0}'.format(e), **result)
-
-    result['can_load_key'] = True
+            module.fail_json(msg='Error while reading public key file from disk: {0}'.format(e), **result)
 
     backend, module_backend = select_backend(
         module,
         module.params['select_crypto_backend'],
-        data,
-        passphrase=module.params['passphrase'],
-        return_private_key_data=module.params['return_private_key_data'])
+        data)
 
     try:
         result.update(module_backend.get_info())
         module.exit_json(**result)
-    except PrivateKeyParseError as exc:
-        result.update(exc.result)
-        module.fail_json(msg=exc.error_message, **result)
-    except PrivateKeyConsistencyError as exc:
+    except PublicKeyParseError as exc:
         result.update(exc.result)
         module.fail_json(msg=exc.error_message, **result)
     except OpenSSLObjectError as exc:
