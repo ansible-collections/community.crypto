@@ -70,7 +70,6 @@ class CRLInfoRetrieval(object):
             'digest': None,
             'issuer_ordered': None,
             'issuer': None,
-            'revoked_certificates': [],
         }
 
         result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
