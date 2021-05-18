@@ -207,6 +207,7 @@ pkcs12:
     version_added: "1.0.0"
 '''
 
+import abc
 import base64
 import os
 import stat
@@ -259,15 +260,14 @@ class PkcsError(OpenSSLObjectError):
 
 
 class Pkcs(OpenSSLObject):
-
-    def __init__(self, module):
+    def __init__(self, module, backend):
         super(Pkcs, self).__init__(
             module.params['path'],
             module.params['state'],
             module.params['force'],
             module.check_mode
         )
-        self.backend = 'pyopenssl'
+        self.backend = backend
         self.action = module.params['action']
         self.other_certificates = module.params['other_certificates']
         self.other_certificates_parse_all = module.params['other_certificates_parse_all']
@@ -299,6 +299,150 @@ class Pkcs(OpenSSLObject):
                 self.other_certificates = [
                     load_certificate(other_cert, backend=self.backend) for other_cert in self.other_certificates
                 ]
+
+    @abc.abstractmethod
+    def generate_bytes(self, module):
+        """Generate PKCS#12 file archive."""
+        pass
+
+    @abc.abstractmethod
+    def parse_bytes(self, pkcs12_content):
+        pass
+
+    @abc.abstractmethod
+    def _dump_privatekey(self, pkcs12):
+        pass
+
+    @abc.abstractmethod
+    def _dump_certificate(self, pkcs12):
+        pass
+
+    @abc.abstractmethod
+    def _dump_other_certificates(self, pkcs12):
+        pass
+
+    @abc.abstractmethod
+    def _get_friendly_name(self, pkcs12):
+        pass
+
+    def check(self, module, perms_required=True):
+        """Ensure the resource is in its desired state."""
+
+        state_and_perms = super(Pkcs, self).check(module, perms_required)
+
+        def _check_pkey_passphrase():
+            if self.privatekey_passphrase:
+                try:
+                    load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
+                except OpenSSLObjectError:
+                    return False
+                except OpenSSLBadPassphraseError:
+                    return False
+            return True
+
+        if not state_and_perms:
+            return state_and_perms
+
+        if os.path.exists(self.path) and module.params['action'] == 'export':
+            dummy = self.generate_bytes(module)
+            self.src = self.path
+            try:
+                pkcs12_privatekey, pkcs12_certificate, pkcs12_other_certificates, pkcs12_friendly_name = self.parse()
+            except OpenSSLObjectError:
+                return False
+            if (pkcs12_privatekey is not None) and (self.privatekey_path is not None):
+                expected_pkey = self._dump_privatekey(self.pkcs12)
+                if pkcs12_privatekey != expected_pkey:
+                    return False
+            elif bool(pkcs12_privatekey) != bool(self.privatekey_path):
+                return False
+
+            if (pkcs12_certificate is not None) and (self.certificate_path is not None):
+                expected_cert = self._dump_certificate(self.pkcs12)
+                if pkcs12_certificate != expected_cert:
+                    return False
+            elif bool(pkcs12_certificate) != bool(self.certificate_path):
+                return False
+
+            if (pkcs12_other_certificates is not None) and (self.other_certificates is not None):
+                expected_other_certs = self._dump_other_certificates(self.pkcs12)
+                if set(pkcs12_other_certificates) != set(expected_other_certs):
+                    return False
+            elif bool(pkcs12_other_certificates) != bool(self.other_certificates):
+                return False
+
+            if pkcs12_privatekey:
+                # This check is required because pyOpenSSL will not return a friendly name
+                # if the private key is not set in the file
+                friendly_name = self._get_friendly_name(self.pkcs12)
+                if ((friendly_name is not None) and (pkcs12_friendly_name is not None)):
+                    if friendly_name != pkcs12_friendly_name:
+                        return False
+                elif bool(friendly_name) != bool(pkcs12_friendly_name):
+                    return False
+        elif module.params['action'] == 'parse' and os.path.exists(self.src) and os.path.exists(self.path):
+            try:
+                pkey, cert, other_certs, friendly_name = self.parse()
+            except OpenSSLObjectError:
+                return False
+            expected_content = to_bytes(
+                ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
+            )
+            dumped_content = load_file_if_exists(self.path, ignore_errors=True)
+            if expected_content != dumped_content:
+                return False
+        else:
+            return False
+
+        return _check_pkey_passphrase()
+
+    def dump(self):
+        """Serialize the object into a dictionary."""
+
+        result = {
+            'filename': self.path,
+        }
+        if self.privatekey_path:
+            result['privatekey_path'] = self.privatekey_path
+        if self.backup_file:
+            result['backup_file'] = self.backup_file
+        if self.return_content:
+            if self.pkcs12_bytes is None:
+                self.pkcs12_bytes = load_file_if_exists(self.path, ignore_errors=True)
+            result['pkcs12'] = base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
+
+        return result
+
+    def remove(self, module):
+        if self.backup:
+            self.backup_file = module.backup_local(self.path)
+        super(Pkcs, self).remove(module)
+
+    def parse(self):
+        """Read PKCS#12 file."""
+
+        try:
+            with open(self.src, 'rb') as pkcs12_fh:
+                pkcs12_content = pkcs12_fh.read()
+            return self.parse_bytes(pkcs12_content)
+        except IOError as exc:
+            raise PkcsError(exc)
+
+    def generate(self):
+        pass
+
+    def write(self, module, content, mode=None):
+        """Write the PKCS#12 file."""
+        if self.backup:
+            self.backup_file = module.backup_local(self.path)
+        write_file(module, content, mode)
+        if self.return_content:
+            self.pkcs12_bytes = content
+
+
+class PkcsPyOpenSSL(Pkcs):
+    def __init__(self, module):
+        super(PkcsPyOpenSSL, self).__init__(module, 'pyopenssl')
 
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
@@ -357,120 +501,6 @@ class Pkcs(OpenSSLObject):
     def _get_friendly_name(self, pkcs12):
         return pkcs12.get_friendlyname()
 
-    def generate(self):
-        pass
-
-    def check(self, module, perms_required=True):
-        """Ensure the resource is in its desired state."""
-
-        state_and_perms = super(Pkcs, self).check(module, perms_required)
-
-        def _check_pkey_passphrase():
-            if self.privatekey_passphrase:
-                try:
-                    load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
-                except OpenSSLObjectError:
-                    return False
-                except OpenSSLBadPassphraseError:
-                    return False
-            return True
-
-        if not state_and_perms:
-            return state_and_perms
-
-        if os.path.exists(self.path) and module.params['action'] == 'export':
-            dummy = self.generate(module)
-            self.src = self.path
-            try:
-                pkcs12_privatekey, pkcs12_certificate, pkcs12_other_certificates, pkcs12_friendly_name = self.parse()
-            except OpenSSLObjectError:
-                return False
-            if (pkcs12_privatekey is not None) and (self.privatekey_path is not None):
-                expected_pkey = self._dump_privatekey(self.pkcs12)
-                if pkcs12_privatekey != expected_pkey:
-                    return False
-            elif bool(pkcs12_privatekey) != bool(self.privatekey_path):
-                return False
-
-            if (pkcs12_certificate is not None) and (self.certificate_path is not None):
-                expected_cert = self._dump_certificate(self.pkcs12)
-                if pkcs12_certificate != expected_cert:
-                    return False
-            elif bool(pkcs12_certificate) != bool(self.certificate_path):
-                return False
-
-            if (pkcs12_other_certificates is not None) and (self.other_certificates is not None):
-                expected_other_certs = self._dump_other_certificates(self.pkcs12)
-                if set(pkcs12_other_certificates) != set(expected_other_certs):
-                    return False
-            elif bool(pkcs12_other_certificates) != bool(self.other_certificates):
-                return False
-
-            if pkcs12_privatekey:
-                # This check is required because pyOpenSSL will not return a friendly name
-                # if the private key is not set in the file
-                friendly_name = get_friendly_name(self.pkcs12)
-                if ((friendly_name is not None) and (pkcs12_friendly_name is not None)):
-                    if friendly_name != pkcs12_friendly_name:
-                        return False
-                elif bool(friendly_name) != bool(pkcs12_friendly_name):
-                    return False
-        elif module.params['action'] == 'parse' and os.path.exists(self.src) and os.path.exists(self.path):
-            try:
-                pkey, cert, other_certs, friendly_name = self.parse()
-            except OpenSSLObjectError:
-                return False
-            expected_content = to_bytes(
-                ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
-            )
-            dumped_content = load_file_if_exists(self.path, ignore_errors=True)
-            if expected_content != dumped_content:
-                return False
-        else:
-            return False
-
-        return _check_pkey_passphrase()
-
-    def dump(self):
-        """Serialize the object into a dictionary."""
-
-        result = {
-            'filename': self.path,
-        }
-        if self.privatekey_path:
-            result['privatekey_path'] = self.privatekey_path
-        if self.backup_file:
-            result['backup_file'] = self.backup_file
-        if self.return_content:
-            if self.pkcs12_bytes is None:
-                self.pkcs12_bytes = load_file_if_exists(self.path, ignore_errors=True)
-            result['pkcs12'] = base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
-
-        return result
-
-    def remove(self, module):
-        if self.backup:
-            self.backup_file = module.backup_local(self.path)
-        super(Pkcs, self).remove(module)
-
-    def parse(self):
-        """Read PKCS#12 file."""
-
-        try:
-            with open(self.src, 'rb') as pkcs12_fh:
-                pkcs12_content = pkcs12_fh.read()
-            return self.parse_bytes(pkcs12_content)
-        except IOError as exc:
-            raise PkcsError(exc)
-
-    def write(self, module, content, mode=None):
-        """Write the PKCS#12 file."""
-        if self.backup:
-            self.backup_file = module.backup_local(self.path)
-        write_file(module, content, mode)
-        if self.return_content:
-            self.pkcs12_bytes = content
-
 
 def main():
     argument_spec = dict(
@@ -514,7 +544,7 @@ def main():
         )
 
     try:
-        pkcs12 = Pkcs(module)
+        pkcs12 = PkcsPyOpenSSL(module)
         changed = False
 
         if module.params['state'] == 'present':
