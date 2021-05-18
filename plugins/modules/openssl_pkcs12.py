@@ -17,7 +17,7 @@ short_description: Generate OpenSSL PKCS#12 archive
 description:
     - This module allows one to (re-)generate PKCS#12.
 requirements:
-    - python-pyOpenSSL
+    - PyOpenSSL >= 0.15 or cryptography >= 3.0
 options:
     action:
         description:
@@ -105,6 +105,19 @@ options:
         type: bool
         default: no
         version_added: "1.0.0"
+    select_crypto_backend:
+        description:
+            - Determines which crypto backend to use.
+            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
+            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            # - Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0, and will be
+            #   removed in community.crypto (x+1).0.0.
+            #   From that point on, only the C(cryptography) backend will be available.
+        type: str
+        default: auto
+        choices: [ auto, cryptography, pyopenssl ]
+        version_added: 1.7.0
 extends_documentation_fragment:
     - files
 seealso:
@@ -213,6 +226,8 @@ import os
 import stat
 import traceback
 
+from distutils.version import LooseVersion
+
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_bytes, to_native
 
@@ -236,14 +251,34 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     split_pem_list,
 )
 
+MINIMAL_CRYPTOGRAPHY_VERSION = '3.0'
+MINIMAL_PYOPENSSL_VERSION = '17.1.0'
+
 PYOPENSSL_IMP_ERR = None
 try:
+    import OpenSSL
     from OpenSSL import crypto
+    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
 except ImportError:
     PYOPENSSL_IMP_ERR = traceback.format_exc()
-    pyopenssl_found = False
+    PYOPENSSL_FOUND = False
 else:
-    pyopenssl_found = True
+    PYOPENSSL_FOUND = True
+
+CRYPTOGRAPHY_IMP_ERR = None
+try:
+    import cryptography
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        serialize_key_and_certificates,
+        load_key_and_certificates,
+    )
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+except ImportError:
+    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
+    CRYPTOGRAPHY_FOUND = False
+else:
+    CRYPTOGRAPHY_FOUND = True
 
 
 def load_certificate_set(filename, backend):
@@ -252,7 +287,7 @@ def load_certificate_set(filename, backend):
     '''
     with open(filename, 'rb') as f:
         data = f.read().decode('utf-8')
-    return [load_certificate(None, content=cert, backend=backend) for cert in split_pem_list(data)]
+    return [load_certificate(None, content=cert.encode('utf-8'), backend=backend) for cert in split_pem_list(data)]
 
 
 class PkcsError(OpenSSLObjectError):
@@ -452,7 +487,7 @@ class PkcsPyOpenSSL(Pkcs):
             self.pkcs12.set_ca_certificates(self.other_certificates)
 
         if self.certificate_path:
-            self.pkcs12.set_certificate(load_certificate(self.certificate_path))
+            self.pkcs12.set_certificate(load_certificate(self.certificate_path, backend=self.backend))
 
         if self.friendly_name:
             self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
@@ -487,10 +522,12 @@ class PkcsPyOpenSSL(Pkcs):
             raise PkcsError(exc)
 
     def _dump_privatekey(self, pkcs12):
-        return crypto.dump_privatekey(crypto.FILETYPE_PEM, pkcs12.get_privatekey())
+        pk = pkcs12.get_privatekey()
+        return crypto.dump_privatekey(crypto.FILETYPE_PEM, pk) if pk else None
 
     def _dump_certificate(self, pkcs12):
-        return crypto.dump_certificate(crypto.FILETYPE_PEM, pkcs12.get_certificate())
+        cert = pkcs12.get_certificate()
+        return crypto.dump_certificate(crypto.FILETYPE_PEM, cert) if cert else None
 
     def _dump_other_certificates(self, pkcs12):
         return [
@@ -500,6 +537,133 @@ class PkcsPyOpenSSL(Pkcs):
 
     def _get_friendly_name(self, pkcs12):
         return pkcs12.get_friendlyname()
+
+
+class PkcsCryptography(Pkcs):
+    def __init__(self, module):
+        super(PkcsCryptography, self).__init__(module, 'cryptography')
+
+        serialize_key_and_certificates,
+        load_key_and_certificates,
+
+    def generate_bytes(self, module):
+        """Generate PKCS#12 file archive."""
+        pkey = None
+        if self.privatekey_path:
+            try:
+                pkey = load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
+            except OpenSSLBadPassphraseError as exc:
+                raise PkcsError(exc)
+
+        cert = None
+        if self.certificate_path:
+            cert = load_certificate(self.certificate_path, backend=self.backend)
+
+        friendly_name = to_bytes(self.friendly_name) if self.friendly_name is not None else None
+
+        # Store fake object which can be used to retrieve the components back
+        self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
+
+        return serialize_key_and_certificates(
+            friendly_name,
+            pkey,
+            cert,
+            self.other_certificates,
+            serialization.BestAvailableEncryption(to_bytes(self.passphrase))
+            if self.passphrase is not None else serialization.NoEncryption(),
+        )
+
+    def parse_bytes(self, pkcs12_content):
+        try:
+            private_key, certificate, additional_certificates = load_key_and_certificates(
+                pkcs12_content, self.passphrase)
+
+            pkey = None
+            if private_key is not None:
+                pkey = private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                )
+
+            crt = None
+            if certificate is not None:
+                crt = certificate.public_bytes(serialization.Encoding.PEM)
+
+            other_certs = []
+            if additional_certificates is not None:
+                other_certs = [
+                    other_cert.public_bytes(serialization.Encoding.PEM)
+                    for other_cert in additional_certificates
+                ]
+
+            friendly_name = None
+            if certificate:
+                # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
+                friendly_name = certificate._backend._ffi.string(
+                    certificate._backend._lib.X509_alias_get0(
+                        certificate._x509, certificate._backend._ffi.new("int *")
+                    )
+                )
+
+            return (pkey, crt, other_certs, friendly_name)
+        except ValueError as exc:
+            raise PkcsError(exc)
+
+    # The following methods will get self.pkcs12 passed, which is computed as:
+    #
+    #     self.pkcs12 = (pkey, cert, self.other_certificates, self.friendly_name)
+
+    def _dump_privatekey(self, pkcs12):
+        return pkcs12[0].private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ) if pkcs12[0] else None
+
+    def _dump_certificate(self, pkcs12):
+        return pkcs12[1].public_bytes(serialization.Encoding.PEM) if pkcs12[1] else None
+
+    def _dump_other_certificates(self, pkcs12):
+        return [other_cert.public_bytes(serialization.Encoding.PEM) for other_cert in pkcs12[2]]
+
+    def _get_friendly_name(self, pkcs12):
+        return pkcs12[3]
+
+
+def select_backend(module, backend):
+    if backend == 'auto':
+        # Detection what is possible
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
+
+        # First try cryptography, then pyOpenSSL
+        if can_use_cryptography:
+            backend = 'cryptography'
+        elif can_use_pyopenssl:
+            backend = 'pyopenssl'
+
+        # Success?
+        if backend == 'auto':
+            module.fail_json(msg=("Can't detect any of the required Python libraries "
+                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
+                                      MINIMAL_CRYPTOGRAPHY_VERSION,
+                                      MINIMAL_PYOPENSSL_VERSION))
+
+    if backend == 'pyopenssl':
+        if not PYOPENSSL_FOUND:
+            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
+                             exception=PYOPENSSL_IMP_ERR)
+        # module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+        #                  version='x.0.0', collection_name='community.crypto')
+        return backend, PkcsPyOpenSSL(module)
+    elif backend == 'cryptography':
+        if not CRYPTOGRAPHY_FOUND:
+            module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
+                             exception=CRYPTOGRAPHY_IMP_ERR)
+        return backend, PkcsCryptography(module)
+    else:
+        raise ValueError('Unsupported value for backend: {0}'.format(backend))
 
 
 def main():
@@ -520,6 +684,7 @@ def main():
         src=dict(type='path'),
         backup=dict(type='bool', default=False),
         return_content=dict(type='bool', default=False),
+        select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
     )
 
     required_if = [
@@ -533,8 +698,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not pyopenssl_found:
-        module.fail_json(msg=missing_required_lib('pyOpenSSL'), exception=PYOPENSSL_IMP_ERR)
+    backend, pkcs12 = select_backend(module, module.params['select_crypto_backend'])
 
     base_dir = os.path.dirname(module.params['path']) or '.'
     if not os.path.isdir(base_dir):
@@ -544,7 +708,6 @@ def main():
         )
 
     try:
-        pkcs12 = PkcsPyOpenSSL(module)
         changed = False
 
         if module.params['state'] == 'present':
