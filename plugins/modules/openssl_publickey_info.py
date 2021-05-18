@@ -116,13 +116,13 @@ public_data:
         p:
             description:
                 - The C(p) value for DSA.
-                - This is the prime modulo which arithmetic takes place.
+                - This is the prime modulus upon which arithmetic takes place.
             type: int
             returned: When C(type=DSA)
         q:
             description:
                 - The C(q) value for DSA.
-                - This is a prime that divices C(p - 1), and at the same time the order of the subgroup of the
+                - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
                   multiplicative group of the prime field used.
             type: int
             returned: When C(type=DSA)
