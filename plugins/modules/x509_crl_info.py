@@ -57,6 +57,12 @@ EXAMPLES = r'''
 - name: Print the information
   ansible.builtin.debug:
     msg: "{{ result }}"
+
+- name: Get information on CRL without list of revoked certificates
+  community.crypto.x509_crl_info:
+    path: /etc/ssl/very-large.crl
+    list_revoked_certificates: false
+  register: result
 '''
 
 RETURN = r'''
