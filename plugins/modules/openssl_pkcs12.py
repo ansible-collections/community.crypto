@@ -16,6 +16,12 @@ author:
 short_description: Generate OpenSSL PKCS#12 archive
 description:
     - This module allows one to (re-)generate PKCS#12.
+    - The module can use the cryptography Python library, or the pyOpenSSL Python
+      library. By default, it tries to detect which one is available, assuming none of the
+      I(iter_size) and I(maciter_size) options are used. This can be overridden with the
+      I(select_crypto_backend) option.
+    # Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0,
+    # and will be removed in community.crypto (x+1).0.0.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 3.0
 options:
