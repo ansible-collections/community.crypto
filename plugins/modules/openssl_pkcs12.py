@@ -600,11 +600,11 @@ class PkcsCryptography(Pkcs):
             friendly_name = None
             if certificate:
                 # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
-                friendly_name = certificate._backend._ffi.string(
-                    certificate._backend._lib.X509_alias_get0(
-                        certificate._x509, certificate._backend._ffi.new("int *")
-                    )
+                maybe_name = certificate._backend._lib.X509_alias_get0(
+                    certificate._x509, certificate._backend._ffi.NULL
                 )
+                if maybe_name != certificate._backend._ffi.NULL:
+                     friendly_name = certificate._backend._ffi.string(maybe_name)
 
             return (pkey, crt, other_certs, friendly_name)
         except ValueError as exc:
