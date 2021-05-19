@@ -1,0 +1,2 @@
+minor_changes:
+- "x509_crl_info - add ``list_revoked_certificates`` option to avoid enumerating all revoked certificates (https://github.com/ansible-collections/community.crypto/pull/232)."
