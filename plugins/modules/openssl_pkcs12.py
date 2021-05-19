@@ -58,16 +58,21 @@ options:
     iter_size:
         description:
             - Number of times to repeat the encryption step.
+            - This is not considered during idempotency checks.
+            - This is only used by the C(pyopenssl) backend. When using it, the default is C(2048).
         type: int
-        default: 2048
     maciter_size:
         description:
             - Number of times to repeat the MAC step.
+            - This is not considered during idempotency checks.
+            - This is only used by the C(pyopenssl) backend. When using it, the default is C(1).
         type: int
-        default: 1
     passphrase:
         description:
             - The PKCS#12 password.
+            - "B(Note:) PKCS12 encryption is not secure and should not be used as a security mechanism.
+              If you need to store or send a PKCS12 file safely, you should additionally encrypt it
+              with something else."
         type: str
     path:
         description:
@@ -109,6 +114,8 @@ options:
         description:
             - Determines which crypto backend to use.
             - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
+              If one of I(iter_size) or I(maciter_size) is used, C(auto) will always result in C(pyopenssl) to be chosen
+              for backwards compatibility.
             - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
             # - Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0, and will be
@@ -308,8 +315,8 @@ class Pkcs(OpenSSLObject):
         self.other_certificates_parse_all = module.params['other_certificates_parse_all']
         self.certificate_path = module.params['certificate_path']
         self.friendly_name = module.params['friendly_name']
-        self.iter_size = module.params['iter_size']
-        self.maciter_size = module.params['maciter_size']
+        self.iter_size = module.params['iter_size'] or 2048
+        self.maciter_size = module.params['maciter_size'] or 1
         self.passphrase = module.params['passphrase']
         self.pkcs12 = None
         self.privatekey_passphrase = module.params['privatekey_passphrase']
@@ -636,8 +643,11 @@ def select_backend(module, backend):
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
         can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
-        # First try cryptography, then pyOpenSSL
-        if can_use_cryptography:
+        # If no restrictions are provided, first try cryptography, then pyOpenSSL
+        if module.params['iter_size'] is not None or module.params['maciter_size'] is not None:
+            # If iter_size or maciter_size is specified, use pyOpenSSL backend
+            backend = 'pyopenssl'
+        elif can_use_cryptography:
             backend = 'cryptography'
         elif can_use_pyopenssl:
             backend = 'pyopenssl'
@@ -673,8 +683,8 @@ def main():
         certificate_path=dict(type='path'),
         force=dict(type='bool', default=False),
         friendly_name=dict(type='str', aliases=['name']),
-        iter_size=dict(type='int', default=2048),
-        maciter_size=dict(type='int', default=1),
+        iter_size=dict(type='int'),
+        maciter_size=dict(type='int'),
         passphrase=dict(type='str', no_log=True),
         path=dict(type='path', required=True),
         privatekey_passphrase=dict(type='str', no_log=True),
