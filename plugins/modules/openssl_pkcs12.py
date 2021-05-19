@@ -581,7 +581,7 @@ class PkcsCryptography(Pkcs):
             cert,
             self.other_certificates,
             serialization.BestAvailableEncryption(to_bytes(self.passphrase))
-            if self.passphrase is not None else serialization.NoEncryption(),
+            if self.passphrase else serialization.NoEncryption(),
         )
 
     def parse_bytes(self, pkcs12_content):
