@@ -14,6 +14,8 @@
       - result.subject.organizationalUnitName == 'ACME Department'
       - "['organizationalUnitName', 'Crypto Department'] in result.subject_ordered"
       - "['organizationalUnitName', 'ACME Department'] in result.subject_ordered"
+      - result.public_key_type == 'RSA'
+      - result.public_key_data.size == default_rsa_key_size
 
 - name: "({{ select_crypto_backend }}) Check SubjectKeyIdentifier and AuthorityKeyIdentifier"
   assert:

@@ -37,6 +37,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_parse_name_constraints,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+    get_publickey_info,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 
@@ -113,7 +117,11 @@ class CSRInfoRetrieval(object):
         pass
 
     @abc.abstractmethod
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
+        pass
+
+    @abc.abstractmethod
+    def _get_public_key_object(self):
         pass
 
     @abc.abstractmethod
@@ -152,9 +160,14 @@ class CSRInfoRetrieval(object):
             result['name_constraints_critical'],
         ) = self._get_name_constraints()
 
-        result['public_key'] = self._get_public_key(binary=False)
-        pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
+        result['public_key'] = self._get_public_key_pem()
+
+        public_key_info = get_publickey_info(self.module, self.backend, key=self._get_public_key_object())
+        result.update({
+            'public_key_type': public_key_info['type'],
+            'public_key_data': public_key_info['public_data'],
+            'public_key_fingerprints': public_key_info['fingerprints'],
+        })
 
         if self.backend != 'pyopenssl':
             ski = self._get_subject_key_identifier()
@@ -282,11 +295,14 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, None, False
 
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
         return self.csr.public_key().public_bytes(
-            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
         )
+
+    def _get_public_key_object(self):
+        return self.csr.public_key()
 
     def _get_subject_key_identifier(self):
         try:
@@ -374,25 +390,25 @@ class CSRInfoRetrievalPyOpenSSL(CSRInfoRetrieval):
                 return permitted, excluded, bool(extension.get_critical())
         return None, None, False
 
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
         try:
             return crypto.dump_publickey(
-                crypto.FILETYPE_ASN1 if binary else crypto.FILETYPE_PEM,
-                self.csr.get_pubkey()
+                crypto.FILETYPE_PEM,
+                self.csr.get_pubkey(),
             )
         except AttributeError:
             try:
                 bio = crypto._new_mem_buf()
-                if binary:
-                    rc = crypto._lib.i2d_PUBKEY_bio(bio, self.csr.get_pubkey()._pkey)
-                else:
-                    rc = crypto._lib.PEM_write_bio_PUBKEY(bio, self.csr.get_pubkey()._pkey)
+                rc = crypto._lib.PEM_write_bio_PUBKEY(bio, self.csr.get_pubkey()._pkey)
                 if rc != 1:
                     crypto._raise_current_error()
                 return crypto._bio_to_string(bio)
             except AttributeError:
                 self.module.warn('Your pyOpenSSL version does not support dumping public keys. '
                                  'Please upgrade to version 16.0 or newer, or use the cryptography backend.')
+
+    def _get_public_key_object(self):
+        return self.csr.get_pubkey()
 
     def _get_subject_key_identifier(self):
         # Won't be implemented
