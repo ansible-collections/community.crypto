@@ -210,10 +210,7 @@ class PublicKeyInfoRetrieval(object):
         pass
 
     def get_info(self):
-        result = dict(
-            can_parse_key=False,
-            key_is_consistent=None,
-        )
+        result = dict()
         if self.key is None:
             try:
                 self.key = load_publickey(content=self.content, backend=self.backend)
