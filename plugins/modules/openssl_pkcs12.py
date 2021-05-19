@@ -601,10 +601,9 @@ class PkcsCryptography(Pkcs):
             if certificate:
                 # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
                 maybe_name = certificate._backend._lib.X509_alias_get0(
-                    certificate._x509, certificate._backend._ffi.NULL
-                )
+                    certificate._x509, certificate._backend._ffi.NULL)
                 if maybe_name != certificate._backend._ffi.NULL:
-                     friendly_name = certificate._backend._ffi.string(maybe_name)
+                    friendly_name = certificate._backend._ffi.string(maybe_name)
 
             return (pkey, crt, other_certs, friendly_name)
         except ValueError as exc:
