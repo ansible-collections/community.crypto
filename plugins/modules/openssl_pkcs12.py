@@ -383,8 +383,6 @@ class Pkcs(OpenSSLObject):
             if self.privatekey_passphrase:
                 try:
                     load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
-                except OpenSSLBadPassphraseError:
-                    return False
                 except OpenSSLObjectError:
                     return False
             return True
