@@ -252,7 +252,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '3.0'
-MINIMAL_PYOPENSSL_VERSION = '17.1.0'
+MINIMAL_PYOPENSSL_VERSION = '0.15'
 
 PYOPENSSL_IMP_ERR = None
 try:
