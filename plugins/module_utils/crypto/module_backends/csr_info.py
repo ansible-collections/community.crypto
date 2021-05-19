@@ -166,7 +166,7 @@ class CSRInfoRetrieval(object):
         result.update({
             'public_key_type': public_key_info['type'],
             'public_key_data': public_key_info['public_data'],
-            'public_key_fingerprints': public_key_info['fingerprints']
+            'public_key_fingerprints': public_key_info['fingerprints'],
         })
 
         if self.backend != 'pyopenssl':

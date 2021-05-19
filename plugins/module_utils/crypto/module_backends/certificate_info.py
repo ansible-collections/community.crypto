@@ -199,7 +199,7 @@ class CertificateInfoRetrieval(object):
         result.update({
             'public_key_type': public_key_info['type'],
             'public_key_data': public_key_info['public_data'],
-            'public_key_fingerprints': public_key_info['fingerprints']
+            'public_key_fingerprints': public_key_info['fingerprints'],
         })
 
         result['fingerprints'] = get_fingerprint_of_bytes(self._get_der_bytes())
