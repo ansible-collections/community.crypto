@@ -9,10 +9,7 @@
     openssl_privatekey:
       path: '{{ output_dir }}/ansible_pkey{{ item }}.pem'
       size: '{{ default_rsa_key_size_certifiates }}'
-    loop:
-      - 1
-      - 2
-      - 3
+    loop: "{{ range(1, 4) }}"
 
   - name: Generate privatekey with password
     openssl_privatekey:
@@ -26,24 +23,15 @@
       path: '{{ output_dir }}/ansible{{ item }}.csr'
       privatekey_path: '{{ output_dir }}/ansible_pkey{{ item }}.pem'
       commonName: www{{ item }}.ansible.com
-    loop:
-      - 1
-      - 2
-      - 3
+    loop: "{{ range(1, 4) }}"
 
   - name: Generate certificate
     x509_certificate:
-      path: '{{ output_dir }}/{{ item.name }}.crt'
-      privatekey_path: '{{ output_dir }}/{{ item.pkey }}'
-      csr_path: '{{ output_dir }}/{{ item.name }}.csr'
+      path: '{{ output_dir }}/ansible{{ item }}.crt'
+      privatekey_path: '{{ output_dir }}/ansible_pkey{{ item }}.pem'
+      csr_path: '{{ output_dir }}/ansible{{ item }}.csr'
       provider: selfsigned
-    loop:
-    - name: ansible1
-      pkey: ansible_pkey1.pem
-    - name: ansible2
-      pkey: ansible_pkey2.pem
-    - name: ansible3
-      pkey: ansible_pkey3.pem
+    loop: "{{ range(1, 4) }}"
 
   - name: Generate concatenated PEM file
     copy:
