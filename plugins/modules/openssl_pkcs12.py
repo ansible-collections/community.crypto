@@ -254,6 +254,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     OpenSSLBadPassphraseError,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    parse_pkcs12,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
     load_privatekey,
@@ -282,10 +286,7 @@ CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
-    from cryptography.hazmat.primitives.serialization.pkcs12 import (
-        serialize_key_and_certificates,
-        load_key_and_certificates,
-    )
+    from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -556,9 +557,6 @@ class PkcsCryptography(Pkcs):
     def __init__(self, module):
         super(PkcsCryptography, self).__init__(module, 'cryptography')
 
-        serialize_key_and_certificates,
-        load_key_and_certificates,
-
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
         pkey = None
@@ -588,7 +586,7 @@ class PkcsCryptography(Pkcs):
 
     def parse_bytes(self, pkcs12_content):
         try:
-            private_key, certificate, additional_certificates = load_key_and_certificates(
+            private_key, certificate, additional_certificates, friendly_name = parse_pkcs12(
                 pkcs12_content, self.passphrase)
 
             pkey = None
@@ -609,14 +607,6 @@ class PkcsCryptography(Pkcs):
                     other_cert.public_bytes(serialization.Encoding.PEM)
                     for other_cert in additional_certificates
                 ]
-
-            friendly_name = None
-            if certificate:
-                # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
-                maybe_name = certificate._backend._lib.X509_alias_get0(
-                    certificate._x509, certificate._backend._ffi.NULL)
-                if maybe_name != certificate._backend._ffi.NULL:
-                    friendly_name = certificate._backend._ffi.string(maybe_name)
 
             return (pkey, crt, other_certs, friendly_name)
         except ValueError as exc:

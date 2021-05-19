@@ -35,6 +35,15 @@ except ImportError:
     # Error handled in the calling module.
     pass
 
+try:
+    # This is a separate try/except since this is only present in cryptography 2.5 or newer
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        load_key_and_certificates as _load_key_and_certificates,
+    )
+except ImportError:
+    # Error handled in the calling module.
+    _load_key_and_certificates = None
+
 from .basic import (
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
@@ -428,3 +437,21 @@ def cryptography_serial_number_of_cert(cert):
     except AttributeError:
         # The property was called "serial" before cryptography 1.4
         return cert.serial
+
+
+def parse_pkcs12(pkcs12_bytes, passphrase=None):
+    '''Returns a tuple (private_key, certificate, additional_certificates, friendly_name).
+    '''
+    if _load_key_and_certificates is None:
+        raise ValueError('load_key_and_certificates() not present in the current cryptography version')
+    private_key, certificate, additional_certificates = _load_key_and_certificates(pkcs12_bytes, passphrase)
+
+    friendly_name = None
+    if certificate:
+        # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
+        maybe_name = certificate._backend._lib.X509_alias_get0(
+            certificate._x509, certificate._backend._ffi.NULL)
+        if maybe_name != certificate._backend._ffi.NULL:
+            friendly_name = certificate._backend._ffi.string(maybe_name)
+
+    return private_key, certificate, additional_certificates, friendly_name
