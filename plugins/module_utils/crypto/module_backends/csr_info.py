@@ -161,13 +161,12 @@ class CSRInfoRetrieval(object):
         ) = self._get_name_constraints()
 
         result['public_key'] = self._get_public_key(binary=False)
-        pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = get_fingerprint_of_bytes(pk) if pk is not None else dict()
 
         public_key_info = get_publickey_info(self.module, self.backend, key=self._get_public_key_object())
         result.update({
             'public_key_type': public_key_info['type'],
             'public_key_data': public_key_info['public_data'],
+            'public_key_fingerprints': public_key_info['fingerprints']
         })
 
         if self.backend != 'pyopenssl':
