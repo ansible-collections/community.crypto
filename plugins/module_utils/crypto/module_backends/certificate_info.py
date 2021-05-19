@@ -138,7 +138,7 @@ class CertificateInfoRetrieval(object):
         pass
 
     @abc.abstractmethod
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
         pass
 
     @abc.abstractmethod
@@ -193,7 +193,7 @@ class CertificateInfoRetrieval(object):
         result['not_after'] = not_after.strftime(TIMESTAMP_FORMAT)
         result['expired'] = not_after < datetime.datetime.utcnow()
 
-        result['public_key'] = self._get_public_key(binary=False)
+        result['public_key'] = self._get_public_key_pem()
 
         public_key_info = get_publickey_info(self.module, self.backend, key=self._get_public_key_object())
         result.update({
@@ -343,10 +343,10 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     def get_not_after(self):
         return self.cert.not_valid_after
 
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
         return self.cert.public_key().public_bytes(
-            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
     def _get_public_key_object(self):
@@ -466,20 +466,17 @@ class CertificateInfoRetrievalPyOpenSSL(CertificateInfoRetrieval):
         time_string = to_native(self.cert.get_notAfter())
         return datetime.datetime.strptime(time_string, "%Y%m%d%H%M%SZ")
 
-    def _get_public_key(self, binary):
+    def _get_public_key_pem(self):
         try:
             return crypto.dump_publickey(
-                crypto.FILETYPE_ASN1 if binary else crypto.FILETYPE_PEM,
-                self.cert.get_pubkey()
+                crypto.FILETYPE_PEM,
+                self.cert.get_pubkey(),
             )
         except AttributeError:
             try:
                 # pyOpenSSL < 16.0:
                 bio = crypto._new_mem_buf()
-                if binary:
-                    rc = crypto._lib.i2d_PUBKEY_bio(bio, self.cert.get_pubkey()._pkey)
-                else:
-                    rc = crypto._lib.PEM_write_bio_PUBKEY(bio, self.cert.get_pubkey()._pkey)
+                rc = crypto._lib.PEM_write_bio_PUBKEY(bio, self.cert.get_pubkey()._pkey)
                 if rc != 1:
                     crypto._raise_current_error()
                 return crypto._bio_to_string(bio)
