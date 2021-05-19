@@ -203,57 +203,57 @@ public_key_data:
             description:
                 - Bit size of modulus (RSA) or prime number (DSA).
             type: int
-            returned: When C(type=RSA) or C(type=DSA)
+            returned: When C(public_key_type=RSA) or C(public_key_type=DSA)
         modulus:
             description:
                 - The RSA key's modulus.
             type: int
-            returned: When C(type=RSA)
+            returned: When C(public_key_type=RSA)
         exponent:
             description:
                 - The RSA key's public exponent.
             type: int
-            returned: When C(type=RSA)
+            returned: When C(public_key_type=RSA)
         p:
             description:
                 - The C(p) value for DSA.
                 - This is the prime modulus upon which arithmetic takes place.
             type: int
-            returned: When C(type=DSA)
+            returned: When C(public_key_type=DSA)
         q:
             description:
                 - The C(q) value for DSA.
                 - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
                   multiplicative group of the prime field used.
             type: int
-            returned: When C(type=DSA)
+            returned: When C(public_key_type=DSA)
         g:
             description:
                 - The C(g) value for DSA.
                 - This is the element spanning the subgroup of the multiplicative group of the prime field used.
             type: int
-            returned: When C(type=DSA)
+            returned: When C(public_key_type=DSA)
         curve:
             description:
                 - The curve's name for ECC.
             type: str
-            returned: When C(type=ECC)
+            returned: When C(public_key_type=ECC)
         exponent_size:
             description:
                 - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
             type: int
-            returned: When C(type=ECC)
+            returned: When C(public_key_type=ECC)
         x:
             description:
                 - The C(x) coordinate for the public point on the elliptic curve.
             type: int
-            returned: When C(type=ECC)
+            returned: When C(public_key_type=ECC)
         y:
             description:
-                - For C(type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
-                - For C(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
+                - For C(public_key_type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
+                - For C(public_key_type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
             type: int
-            returned: When C(type=DSA) or C(type=ECC)
+            returned: When C(public_key_type=DSA) or C(public_key_type=ECC)
 public_key_fingerprints:
     description:
         - Fingerprints of CSR's public key.
