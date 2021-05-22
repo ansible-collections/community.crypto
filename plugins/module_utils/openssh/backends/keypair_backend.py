@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# Copyright: (c) 2018, David Kainz <dkainz@mgit.at> <dave.jokain@gmx.at>
 # Copyright: (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 #
 # Ansible is free software: you can redistribute it and/or modify
