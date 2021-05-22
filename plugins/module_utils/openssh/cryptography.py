@@ -18,6 +18,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import os
 from base64 import b64encode, b64decode
 from distutils.version import LooseVersion
 from getpass import getuser
@@ -559,6 +560,9 @@ def load_privatekey(path, passphrase, key_format):
             )
         )
 
+    if not os.path.exists(path):
+        raise InvalidPrivateKeyFileError("No file was found at %s" % path)
+
     try:
         with open(path, 'rb') as f:
             content = f.read()
@@ -610,6 +614,9 @@ def load_publickey(path, key_format):
                 ','.join(publickey_loaders.keys())
             )
         )
+
+    if not os.path.exists(path):
+        raise InvalidPublicKeyFileError("No file was found at %s" % path)
 
     try:
         with open(path, 'rb') as f:
@@ -663,6 +670,10 @@ def validate_comment(comment):
 
 
 def extract_comment(path):
+
+    if not os.path.exists(path):
+        raise InvalidPublicKeyFileError("No file was found at %s" % path)
+
     try:
         with open(path, 'rb') as f:
             fields = f.read().split(b' ', 2)
@@ -670,7 +681,7 @@ def extract_comment(path):
                 comment = fields[2].decode(_TEXT_ENCODING)
             else:
                 comment = ""
-    except OSError as e:
+    except (IOError, OSError) as e:
         raise InvalidPublicKeyFileError(e)
 
     return comment
