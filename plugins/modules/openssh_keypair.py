@@ -60,7 +60,7 @@ options:
         description:
             - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
             - Passphrases are not supported for I(type=rsa1).
-            - Can only be used when C(backend=cryptography) or C(backend=auto) and the OpenSSH binary is not installed
+            - Can only be used when I(backend=cryptography), or when I(backend=auto) and a required C(cryptography) version is installed.
         type: str
         version_added: 1.7.0
     private_key_format:
