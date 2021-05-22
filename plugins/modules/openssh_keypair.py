@@ -84,7 +84,7 @@ options:
             - auto
             - cryptography
             - opensshbin
-        vesion_added: 1.7.0
+        version_added: 1.7.0
     regenerate:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.

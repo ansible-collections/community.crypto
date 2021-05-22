@@ -383,7 +383,11 @@ class OpensshKeypair(object):
            :no_public_key: Set 'True' to only load a private key and automatically populate the matching public key
         """
 
-        comment = extract_comment(path + '.pub')
+        if no_public_key:
+            comment = ""
+        else:
+            comment = extract_comment(path + '.pub')
+
         asym_keypair = AsymmetricKeypair.load(path, passphrase, 'SSH', 'SSH', no_public_key)
         openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, 'SSH')
         openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)

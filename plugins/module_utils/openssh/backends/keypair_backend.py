@@ -394,7 +394,11 @@ class KeypairBackendCryptography(KeypairBackend):
         return keypair.size, keypair.key_type, keypair.fingerprint
 
     def _get_public_key(self):
-        keypair = self._load_privatekey()
+        try:
+            keypair = self._load_privatekey()
+        except OpenSSHError:
+            # Simulates the null output of ssh-keygen
+            return ""
 
         return to_text(keypair.public_key)
 
