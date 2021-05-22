@@ -1,0 +1,6 @@
+---
+sections:
+  - title: Scenario Guides
+    toctree:
+      - guide_selfsigned
+      - guide_ownca
