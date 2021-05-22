@@ -13,8 +13,8 @@ from os import remove, rmdir
 from socket import gethostname
 from tempfile import mkdtemp
 
-from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography_openssh import (
-    Asymmetric_Keypair,
+from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+    AsymmetricKeypair,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPrivateKeyFileError,
@@ -22,7 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptogra
     InvalidKeySizeError,
     InvalidKeyTypeError,
     InvalidPassphraseError,
-    OpenSSH_Keypair
+    OpensshKeypair
 )
 
 DEFAULT_KEY_PARAMS = [
@@ -147,9 +147,9 @@ def test_default_key_params(keytype, size, passphrase, comment):
     }
 
     default_comment = "%s@%s" % (getuser(), gethostname())
-    pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+    pair = OpensshKeypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     try:
-        pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        pair = OpensshKeypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
         if pair.size != default_sizes[pair.key_type] or pair.comment != default_comment:
             result = False
     except Exception as e:
@@ -165,7 +165,7 @@ def test_valid_user_key_params(keytype, size, passphrase, comment):
     result = True
 
     try:
-        pair = OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        pair = OpensshKeypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
         if pair.key_type != keytype or pair.size != size or pair.comment != comment:
             result = False
     except Exception as e:
@@ -181,7 +181,7 @@ def test_invalid_user_key_params(keytype, size, passphrase, comment):
     result = False
 
     try:
-        OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        OpensshKeypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     except (InvalidCommentError, InvalidKeyTypeError, InvalidPassphraseError):
         result = True
     except Exception as e:
@@ -197,7 +197,7 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
     result = False
 
     try:
-        OpenSSH_Keypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
+        OpensshKeypair.generate(keytype=keytype, size=size, passphrase=passphrase, comment=comment)
     except InvalidKeySizeError:
         result = True
     except Exception as e:
@@ -210,7 +210,7 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_comment_update():
 
-    pair = OpenSSH_Keypair.generate()
+    pair = OpensshKeypair.generate()
     new_comment = "comment"
     try:
         pair.comment = new_comment
@@ -225,7 +225,7 @@ def test_valid_comment_update():
 def test_invalid_comment_update():
     result = False
 
-    pair = OpenSSH_Keypair.generate()
+    pair = OpensshKeypair.generate()
     new_comment = [1, 2, 3]
     try:
         pair.comment = new_comment
@@ -245,7 +245,7 @@ def test_valid_passphrase_update():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair1 = OpenSSH_Keypair.generate()
+        pair1 = OpensshKeypair.generate()
         pair1.update_passphrase(passphrase)
 
         with open(keyfilename, "w+b") as keyfile:
@@ -254,7 +254,7 @@ def test_valid_passphrase_update():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair1.public_key)
 
-        pair2 = OpenSSH_Keypair.load(path=keyfilename, passphrase=passphrase)
+        pair2 = OpensshKeypair.load(path=keyfilename, passphrase=passphrase)
 
         if pair1 == pair2:
             result = True
@@ -274,7 +274,7 @@ def test_invalid_passphrase_update():
     result = False
 
     passphrase = [1, 2, 3]
-    pair = OpenSSH_Keypair.generate()
+    pair = OpensshKeypair.generate()
     try:
         pair.update_passphrase(passphrase)
     except InvalidPassphraseError:
@@ -291,7 +291,7 @@ def test_invalid_privatekey():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair = OpenSSH_Keypair.generate()
+        pair = OpensshKeypair.generate()
 
         with open(keyfilename, "w+b") as keyfile:
             keyfile.write(pair.private_key[1:])
@@ -299,7 +299,7 @@ def test_invalid_privatekey():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair.public_key)
 
-        OpenSSH_Keypair.load(path=keyfilename)
+        OpensshKeypair.load(path=keyfilename)
     except InvalidPrivateKeyFileError:
         result = True
     finally:
@@ -321,8 +321,8 @@ def test_mismatched_keypair():
         tmpdir = mkdtemp()
         keyfilename = os.path.join(tmpdir, "id_rsa")
 
-        pair1 = OpenSSH_Keypair.generate()
-        pair2 = OpenSSH_Keypair.generate()
+        pair1 = OpensshKeypair.generate()
+        pair2 = OpensshKeypair.generate()
 
         with open(keyfilename, "w+b") as keyfile:
             keyfile.write(pair1.private_key)
@@ -330,7 +330,7 @@ def test_mismatched_keypair():
         with open(keyfilename + '.pub', "w+b") as pubkeyfile:
             pubkeyfile.write(pair2.public_key)
 
-        OpenSSH_Keypair.load(path=keyfilename)
+        OpensshKeypair.load(path=keyfilename)
     except InvalidPublicKeyFileError:
         result = True
     finally:
@@ -346,24 +346,24 @@ def test_mismatched_keypair():
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_keypair_comparison():
-    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate()
-    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate(keytype='dsa')
-    assert OpenSSH_Keypair.generate() != OpenSSH_Keypair.generate(keytype='ed25519')
-    assert OpenSSH_Keypair.generate(keytype='ed25519') != OpenSSH_Keypair.generate(keytype='ed25519')
+    assert OpensshKeypair.generate() != OpensshKeypair.generate()
+    assert OpensshKeypair.generate() != OpensshKeypair.generate(keytype='dsa')
+    assert OpensshKeypair.generate() != OpensshKeypair.generate(keytype='ed25519')
+    assert OpensshKeypair.generate(keytype='ed25519') != OpensshKeypair.generate(keytype='ed25519')
     try:
         tmpdir = mkdtemp()
 
         keys = {
             'rsa': {
-                'pair': OpenSSH_Keypair.generate(),
+                'pair': OpensshKeypair.generate(),
                 'filename': os.path.join(tmpdir, "id_rsa"),
             },
             'dsa': {
-                'pair': OpenSSH_Keypair.generate(keytype='dsa', passphrase='change_me'.encode('UTF-8')),
+                'pair': OpensshKeypair.generate(keytype='dsa', passphrase='change_me'.encode('UTF-8')),
                 'filename': os.path.join(tmpdir, "id_dsa"),
             },
             'ed25519': {
-                'pair': OpenSSH_Keypair.generate(keytype='ed25519'),
+                'pair': OpensshKeypair.generate(keytype='ed25519'),
                 'filename': os.path.join(tmpdir, "id_ed25519"),
             }
         }
@@ -374,9 +374,9 @@ def test_keypair_comparison():
             with open(v['filename'] + '.pub', "w+b") as pubkeyfile:
                 pubkeyfile.write(v['pair'].public_key)
 
-        assert keys['rsa']['pair'] == OpenSSH_Keypair.load(path=keys['rsa']['filename'])
+        assert keys['rsa']['pair'] == OpensshKeypair.load(path=keys['rsa']['filename'])
 
-        loaded_dsa_key = OpenSSH_Keypair.load(path=keys['dsa']['filename'], passphrase='change_me'.encode('UTF-8'))
+        loaded_dsa_key = OpensshKeypair.load(path=keys['dsa']['filename'], passphrase='change_me'.encode('UTF-8'))
         assert keys['dsa']['pair'] == loaded_dsa_key
 
         loaded_dsa_key.update_passphrase('change_me_again'.encode('UTF-8'))
@@ -388,7 +388,7 @@ def test_keypair_comparison():
         loaded_dsa_key.comment = "comment"
         assert keys['dsa']['pair'] != loaded_dsa_key
 
-        assert keys['ed25519']['pair'] == OpenSSH_Keypair.load(path=keys['ed25519']['filename'])
+        assert keys['ed25519']['pair'] == OpensshKeypair.load(path=keys['ed25519']['filename'])
     finally:
         for v in keys.values():
             if os.path.exists(v['filename']):
@@ -397,4 +397,4 @@ def test_keypair_comparison():
                 remove(v['filename'] + '.pub')
         if os.path.exists(tmpdir):
             rmdir(tmpdir)
-    assert OpenSSH_Keypair.generate() != []
+    assert OpensshKeypair.generate() != []

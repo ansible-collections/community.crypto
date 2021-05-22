@@ -229,7 +229,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import convert_relative_to_datetime
-from ansible_collections.community.crypto.plugins.module_utils.crypto.openssh import parse_openssh_version
+from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import parse_openssh_version
 
 
 class CertificateError(Exception):

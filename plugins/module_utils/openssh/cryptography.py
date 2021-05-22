@@ -24,14 +24,14 @@ from getpass import getuser
 from socket import gethostname
 
 try:
-    import cryptography as c
+    from cryptography import __version__ as CRYPTOGRAPHY_VERSION
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
-    if LooseVersion(c.__version__) >= LooseVersion("3.0"):
+    if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.0"):
         HAS_OPENSSH_PRIVATE_FORMAT = True
     else:
         HAS_OPENSSH_PRIVATE_FORMAT = False
@@ -78,6 +78,7 @@ try:
 except ImportError:
     HAS_OPENSSH_PRIVATE_FORMAT = False
     HAS_OPENSSH_SUPPORT = False
+    CRYPTOGRAPHY_VERSION = "0.0"
     _ALGORITHM_PARAMETERS = {}
 
 _TEXT_ENCODING = 'UTF-8'
@@ -127,7 +128,7 @@ class InvalidSignatureError(OpenSSHError):
     pass
 
 
-class Asymmetric_Keypair(object):
+class AsymmetricKeypair(object):
     """Container for newly generated asymmetric key pairs or those loaded from existing files"""
 
     @classmethod
@@ -261,7 +262,7 @@ class Asymmetric_Keypair(object):
             )
 
     def __eq__(self, other):
-        if not isinstance(other, Asymmetric_Keypair):
+        if not isinstance(other, AsymmetricKeypair):
             return NotImplemented
 
         return (compare_publickeys(self.public_key, other.public_key) and
@@ -344,7 +345,7 @@ class Asymmetric_Keypair(object):
             self.__encryption_algorithm = serialization.NoEncryption()
 
 
-class OpenSSH_Keypair(object):
+class OpensshKeypair(object):
     """Container for OpenSSH encoded asymmetric key pairs"""
 
     @classmethod
@@ -360,7 +361,7 @@ class OpenSSH_Keypair(object):
         if comment is None:
             comment = "%s@%s" % (getuser(), gethostname())
 
-        asym_keypair = Asymmetric_Keypair.generate(keytype, size, passphrase)
+        asym_keypair = AsymmetricKeypair.generate(keytype, size, passphrase)
         openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, 'SSH')
         openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
         fingerprint = calculate_fingerprint(openssh_publickey)
@@ -383,7 +384,7 @@ class OpenSSH_Keypair(object):
         """
 
         comment = extract_comment(path + '.pub')
-        asym_keypair = Asymmetric_Keypair.load(path, passphrase, 'SSH', 'SSH', no_public_key)
+        asym_keypair = AsymmetricKeypair.load(path, passphrase, 'SSH', 'SSH', no_public_key)
         openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, 'SSH')
         openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
         fingerprint = calculate_fingerprint(openssh_publickey)
@@ -461,7 +462,7 @@ class OpenSSH_Keypair(object):
         self.__comment = comment
 
     def __eq__(self, other):
-        if not isinstance(other, OpenSSH_Keypair):
+        if not isinstance(other, OpensshKeypair):
             return NotImplemented
 
         return self.asymmetric_keypair == other.asymmetric_keypair and self.comment == other.comment
@@ -529,7 +530,7 @@ class OpenSSH_Keypair(object):
         """
 
         self.__asym_keypair.update_passphrase(passphrase)
-        self.__openssh_privatekey = OpenSSH_Keypair.encode_openssh_privatekey(self.__asym_keypair, 'SSH')
+        self.__openssh_privatekey = OpensshKeypair.encode_openssh_privatekey(self.__asym_keypair, 'SSH')
 
 
 def load_privatekey(path, passphrase, key_format):

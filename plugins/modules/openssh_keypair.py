@@ -18,8 +18,8 @@ description:
       or C(ecdsa) private keys."
 requirements:
     - "ssh-keygen"
-    - cryptography >= 2.6 (if using I(passphrase) and OpenSSH < 7.8 is installed)
-    - cryptography >= 3.0 (if using I(passphrase) and OpenSSH >= 7.8 is installed)
+    - cryptography >= 2.6 (if I(backend=cryptography) and OpenSSH < 7.8 is installed)
+    - cryptography >= 3.0 (if I(backend=opensshbin) and OpenSSH >= 7.8 is installed)
 options:
     state:
         description:
@@ -60,6 +60,7 @@ options:
         description:
             - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
             - Passphrases are not supported for I(type=rsa1).
+            - Can only be used when C(backend=cryptography) or C(backend=auto) and the OpenSSH binary is not installed
         type: str
         version_added: 1.7.0
     private_key_format:
@@ -73,6 +74,16 @@ options:
         choices:
             - auto
         version_added: 1.7.0
+    backend:
+        description:
+            - Selects between the I(cryptography) library or the OpenSSH binary I(opensshbin).
+            - Additionally use I(auto) to fallback to I(cryptography) if the OpenSSH binary is not installed.
+        type: str
+        default: auto
+        choices:
+            - auto
+            - cryptography
+            - opensshbin
     regenerate:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.
@@ -173,390 +184,19 @@ comment:
     sample: test@comment
 '''
 
-import errno
 import os
-import stat
-from distutils.version import LooseVersion
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_text, to_bytes
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.openssh import parse_openssh_version
-from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography_openssh import (
-    HAS_OPENSSH_SUPPORT,
-    HAS_OPENSSH_PRIVATE_FORMAT,
-    InvalidPassphraseError,
-    InvalidPrivateKeyFileError,
-    OpenSSH_Keypair,
+from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.keypair_backend import (
+    select_backend,
+    KeypairError
 )
-
-
-class KeypairError(Exception):
-    pass
-
-
-class Keypair(object):
-
-    def __init__(self, module):
-        self.path = module.params['path']
-        self.state = module.params['state']
-        self.force = module.params['force']
-        self.size = module.params['size']
-        self.type = module.params['type']
-        self.comment = module.params['comment']
-        self.passphrase = module.params['passphrase']
-        self.changed = False
-        self.check_mode = module.check_mode
-        self.privatekey = None
-        self.fingerprint = {}
-        self.public_key = {}
-        self.regenerate = module.params['regenerate']
-        if self.regenerate == 'always':
-            self.force = True
-
-        # The empty string is intentionally ignored so that dependency checks do not cause unnecessary failure
-        if self.passphrase:
-            if not HAS_OPENSSH_SUPPORT:
-                module.fail_json(
-                    msg=missing_required_lib(
-                        'cryptography >= 2.6',
-                        reason="to encrypt/decrypt private keys with passphrases"
-                    )
-                )
-
-            if module.params['private_key_format'] == 'auto':
-                ssh = module.get_bin_path('ssh', True)
-                proc = module.run_command([ssh, '-Vq'])
-                ssh_version = parse_openssh_version(proc[2].strip())
-
-                self.private_key_format = 'SSH'
-
-                if LooseVersion(ssh_version) < LooseVersion("7.8") and self.type != 'ed25519':
-                    # OpenSSH made SSH formatted private keys available in version 6.5,
-                    # but still defaulted to PKCS1 format with the exception of ed25519 keys
-                    self.private_key_format = 'PKCS1'
-
-                if self.private_key_format == 'SSH' and not HAS_OPENSSH_PRIVATE_FORMAT:
-                    module.fail_json(
-                        msg=missing_required_lib(
-                            'cryptography >= 3.0',
-                            reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 " +
-                                   "or for ed25519 keys"
-                        )
-                    )
-
-            if self.type == 'rsa1':
-                module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
-
-            self.passphrase = to_bytes(self.passphrase)
-        else:
-            self.private_key_format = None
-
-        if self.type in ('rsa', 'rsa1'):
-            self.size = 4096 if self.size is None else self.size
-            if self.size < 1024:
-                module.fail_json(msg=('For RSA keys, the minimum size is 1024 bits and the default is 4096 bits. '
-                                      'Attempting to use bit lengths under 1024 will cause the module to fail.'))
-
-        if self.type == 'dsa':
-            self.size = 1024 if self.size is None else self.size
-            if self.size != 1024:
-                module.fail_json(msg=('DSA keys must be exactly 1024 bits as specified by FIPS 186-2.'))
-
-        if self.type == 'ecdsa':
-            self.size = 256 if self.size is None else self.size
-            if self.size not in (256, 384, 521):
-                module.fail_json(msg=('For ECDSA keys, size determines the key length by selecting from '
-                                      'one of three elliptic curve sizes: 256, 384 or 521 bits. '
-                                      'Attempting to use bit lengths other than these three values for '
-                                      'ECDSA keys will cause this module to fail. '))
-        if self.type == 'ed25519':
-            self.size = 256
-
-    def generate(self, module):
-        # generate a keypair
-        if self.force or not self.isPrivateKeyValid(module, perms_required=False):
-            try:
-                if os.path.exists(self.path) and not os.access(self.path, os.W_OK):
-                    os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
-                self.changed = True
-
-                if not self.passphrase:
-                    args = [
-                        module.get_bin_path('ssh-keygen', True),
-                        '-q',
-                        '-N', '',
-                        '-b', str(self.size),
-                        '-t', self.type,
-                        '-f', self.path,
-                    ]
-
-                    if self.comment:
-                        args.extend(['-C', self.comment])
-                    else:
-                        args.extend(['-C', ""])
-
-                    stdin_data = None
-                    if os.path.exists(self.path):
-                        stdin_data = 'y'
-                    module.run_command(args, data=stdin_data)
-                    proc = module.run_command([module.get_bin_path('ssh-keygen', True), '-lf', self.path])
-                    self.fingerprint = proc[1].split()
-                    pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
-                    self.public_key = pubkey[1].strip('\n')
-                else:
-                    keypair = OpenSSH_Keypair.generate(
-                        keytype=self.type,
-                        size=self.size,
-                        passphrase=self.passphrase,
-                        comment=self.comment if self.comment else "",
-                    )
-                    with open(self.path, 'w+b') as f:
-                        f.write(
-                            OpenSSH_Keypair.encode_openssh_privatekey(
-                                keypair.asymmetric_keypair,
-                                self.private_key_format
-                            )
-                        )
-                    os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
-                    with open(self.path + '.pub', 'w+b') as f:
-                        f.write(keypair.public_key)
-                    os.chmod(self.path + ".pub", stat.S_IWUSR + stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH)
-                    self.fingerprint = [
-                        str(keypair.size), keypair.fingerprint, keypair.comment, "(%s)" % keypair.key_type.upper()
-                    ]
-                    self.public_key = to_text(b' '.join(keypair.public_key.split(b' ', 2)[:2]))
-            except Exception as e:
-                self.remove()
-                module.fail_json(msg="%s" % to_native(e))
-
-        elif not self.isPublicKeyValid(module, perms_required=False):
-            if not self.passphrase:
-                pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
-                pubkey = pubkey[1].strip('\n')
-            else:
-                keypair = OpenSSH_Keypair.load(
-                    path=self.path,
-                    passphrase=self.passphrase,
-                    no_public_key=True,
-                )
-                pubkey = to_text(keypair.public_key)
-            try:
-                self.changed = True
-                with open(self.path + ".pub", "w") as pubkey_f:
-                    pubkey_f.write(pubkey + '\n')
-                os.chmod(self.path + ".pub", stat.S_IWUSR + stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH)
-            except IOError:
-                module.fail_json(
-                    msg='The public key is missing or does not match the private key. '
-                        'Unable to regenerate the public key.')
-            self.public_key = pubkey
-
-            if self.comment:
-                try:
-                    if os.path.exists(self.path) and not os.access(self.path, os.W_OK):
-                        os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
-                    if not self.passphrase:
-                        args = [module.get_bin_path('ssh-keygen', True),
-                                '-q', '-o', '-c', '-C', self.comment, '-f', self.path]
-                        module.run_command(args)
-                    else:
-                        keypair.comment = self.comment
-                        with open(self.path + ".pub", "w+b") as pubkey_f:
-                            pubkey_f.write(keypair.public_key + b'\n')
-                except IOError:
-                    module.fail_json(
-                        msg='Unable to update the comment for the public key.')
-
-        file_args = module.load_file_common_arguments(module.params)
-        if module.set_fs_attributes_if_different(file_args, False):
-            self.changed = True
-        file_args['path'] = file_args['path'] + '.pub'
-        if module.set_fs_attributes_if_different(file_args, False):
-            self.changed = True
-
-    def _check_pass_protected_or_broken_key(self, module):
-        key_state = module.run_command([module.get_bin_path('ssh-keygen', True),
-                                        '-P', '', '-yf', self.path], check_rc=False)
-        if not self.passphrase:
-            if key_state[0] == 255 or 'is not a public key file' in key_state[2]:
-                return True
-            if 'incorrect passphrase' in key_state[2] or 'load failed' in key_state[2]:
-                return True
-            return False
-        else:
-            try:
-                OpenSSH_Keypair.load(
-                    path=self.path,
-                    passphrase=self.passphrase,
-                    no_public_key=True,
-                )
-            except (InvalidPrivateKeyFileError, InvalidPassphraseError) as e:
-                return True
-            # Cryptography >= 3.0 uses a SSH key loader which does not raise an exception when a passphrase is provided
-            # when loading an unencrypted key so 'ssh-keygen' is used for this check
-            if key_state[0] == 0:
-                return True
-            return False
-
-    def isPrivateKeyValid(self, module, perms_required=True):
-
-        # check if the key is correct
-        def _check_state():
-            return os.path.exists(self.path)
-
-        if not _check_state():
-            return False
-
-        if self._check_pass_protected_or_broken_key(module):
-            if self.regenerate in ('full_idempotence', 'always'):
-                return False
-            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
-                                 ' Will not proceed. To force regeneration, call the module with `generate`'
-                                 ' set to `full_idempotence` or `always`, or with `force=yes`.')
-
-        proc = module.run_command([module.get_bin_path('ssh-keygen', True), '-lf', self.path], check_rc=False)
-        if not proc[0] == 0:
-            if os.path.isdir(self.path):
-                module.fail_json(msg='%s is a directory. Please specify a path to a file.' % (self.path))
-
-            if self.regenerate in ('full_idempotence', 'always'):
-                return False
-            module.fail_json(msg='Unable to read the key. The key is protected with a passphrase or broken.'
-                                 ' Will not proceed. To force regeneration, call the module with `generate`'
-                                 ' set to `full_idempotence` or `always`, or with `force=yes`.')
-
-        fingerprint = proc[1].split()
-        keysize = int(fingerprint[0])
-        keytype = fingerprint[-1][1:-1].lower()
-
-        self.fingerprint = fingerprint
-
-        if self.regenerate == 'never':
-            return True
-
-        def _check_type():
-            return self.type == keytype
-
-        def _check_size():
-            return self.size == keysize
-
-        if not (_check_type() and _check_size()):
-            if self.regenerate in ('partial_idempotence', 'full_idempotence', 'always'):
-                return False
-            module.fail_json(msg='Key has wrong type and/or size.'
-                                 ' Will not proceed. To force regeneration, call the module with `generate`'
-                                 ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`.')
-
-        def _check_perms(module):
-            file_args = module.load_file_common_arguments(module.params)
-            return not module.set_fs_attributes_if_different(file_args, False)
-
-        return not perms_required or _check_perms(module)
-
-    def isPublicKeyValid(self, module, perms_required=True):
-
-        def _get_pubkey_content():
-            if os.path.exists(self.path + ".pub"):
-                with open(self.path + ".pub", "r") as pubkey_f:
-                    present_pubkey = pubkey_f.read().strip(' \n')
-                return present_pubkey
-            else:
-                return False
-
-        def _parse_pubkey(pubkey_content):
-            if pubkey_content:
-                parts = pubkey_content.split(' ', 2)
-                if len(parts) < 2:
-                    return False
-                return parts[0], parts[1], '' if len(parts) <= 2 else parts[2]
-            return False
-
-        def _pubkey_valid(pubkey):
-            if pubkey_parts and _parse_pubkey(pubkey):
-                return pubkey_parts[:2] == _parse_pubkey(pubkey)[:2]
-            return False
-
-        def _comment_valid():
-            if pubkey_parts:
-                return pubkey_parts[2] == self.comment
-            return False
-
-        def _check_perms(module):
-            file_args = module.load_file_common_arguments(module.params)
-            file_args['path'] = file_args['path'] + '.pub'
-            return not module.set_fs_attributes_if_different(file_args, False)
-
-        pubkey_parts = _parse_pubkey(_get_pubkey_content())
-
-        if not self.passphrase:
-            pubkey = module.run_command([module.get_bin_path('ssh-keygen', True), '-yf', self.path])
-            pubkey = pubkey[1].strip('\n')
-        else:
-            keypair = OpenSSH_Keypair.load(
-                path=self.path,
-                passphrase=self.passphrase,
-                no_public_key=True,
-            )
-            pubkey = to_text(keypair.public_key)
-        if _pubkey_valid(pubkey):
-            self.public_key = pubkey
-        else:
-            return False
-
-        if self.comment:
-            if not _comment_valid():
-                return False
-
-        if perms_required:
-            if not _check_perms(module):
-                return False
-
-        return True
-
-    def dump(self):
-        # return result as a dict
-
-        """Serialize the object into a dictionary."""
-        result = {
-            'changed': self.changed,
-            'size': self.size,
-            'type': self.type,
-            'filename': self.path,
-            # On removal this has no value
-            'fingerprint': self.fingerprint[1] if self.fingerprint else '',
-            'public_key': self.public_key,
-            'comment': self.comment if self.comment else '',
-        }
-
-        return result
-
-    def remove(self):
-        """Remove the resource from the filesystem."""
-
-        try:
-            os.remove(self.path)
-            self.changed = True
-        except OSError as exc:
-            if exc.errno != errno.ENOENT:
-                raise KeypairError(exc)
-            else:
-                pass
-
-        if os.path.exists(self.path + ".pub"):
-            try:
-                os.remove(self.path + ".pub")
-                self.changed = True
-            except OSError as exc:
-                if exc.errno != errno.ENOENT:
-                    raise KeypairError(exc)
-                else:
-                    pass
 
 
 def main():
 
-    # Define Ansible Module
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -571,13 +211,13 @@ def main():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
             passphrase=dict(type='str', no_log=True),
-            private_key_format=dict(type='str', default='auto', no_log=False, choices=['auto'])
+            private_key_format=dict(type='str', default='auto', no_log=False, choices=['auto']),
+            backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'opensshbin'])
         ),
         supports_check_mode=True,
         add_file_common_args=True,
     )
 
-    # Check if Path exists
     base_dir = os.path.dirname(module.params['path']) or '.'
     if not os.path.isdir(base_dir):
         module.fail_json(
@@ -585,20 +225,17 @@ def main():
             msg='The directory %s does not exist or the file is not a directory' % base_dir
         )
 
-    keypair = Keypair(module)
+    state = module.params['state']
+    backend, keypair = select_backend(module, module.params['backend'])
 
-    if keypair.state == 'present':
+    if state == 'present':
 
         if module.check_mode:
-            changed = keypair.force or not keypair.isPrivateKeyValid(module) or not keypair.isPublicKeyValid(module)
             result = keypair.dump()
-            result['changed'] = changed
+            result['changed'] = keypair.force or not keypair.is_private_key_valid() or not keypair.is_public_key_valid()
             module.exit_json(**result)
 
-        try:
-            keypair.generate(module)
-        except Exception as exc:
-            module.fail_json(msg=to_native(exc))
+        keypair.generate()
     else:
 
         if module.check_mode:
@@ -610,7 +247,7 @@ def main():
 
         try:
             keypair.remove()
-        except Exception as exc:
+        except KeypairError as exc:
             module.fail_json(msg=to_native(exc))
 
     result = keypair.dump()

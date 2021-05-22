@@ -166,4 +166,4 @@
       assert:
         that:
           - privatekey11_result is success
-  when: cryptography_version.stdout is version('3.0', '>=') and bcrypt_version.stdout is version('3.1.5', '>=')
+  when: backend == 'cryptography'
