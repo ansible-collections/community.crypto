@@ -41,10 +41,6 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptogra
 )
 
 
-class KeypairError(Exception):
-    pass
-
-
 @six.add_metaclass(abc.ABCMeta)
 class KeypairBackend:
 
@@ -71,62 +67,62 @@ class KeypairBackend:
             if self.size < 1024:
                 module.fail_json(msg=('For RSA keys, the minimum size is 1024 bits and the default is 4096 bits. '
                                       'Attempting to use bit lengths under 1024 will cause the module to fail.'))
-
-        if self.type == 'dsa':
+        elif self.type == 'dsa':
             self.size = 1024 if self.size is None else self.size
             if self.size != 1024:
                 module.fail_json(msg=('DSA keys must be exactly 1024 bits as specified by FIPS 186-2.'))
-
-        if self.type == 'ecdsa':
+        elif self.type == 'ecdsa':
             self.size = 256 if self.size is None else self.size
             if self.size not in (256, 384, 521):
                 module.fail_json(msg=('For ECDSA keys, size determines the key length by selecting from '
                                       'one of three elliptic curve sizes: 256, 384 or 521 bits. '
                                       'Attempting to use bit lengths other than these three values for '
                                       'ECDSA keys will cause this module to fail. '))
-        if self.type == 'ed25519':
+        elif self.type == 'ed25519':
+            # User input is ignored for `key size` when `key type` is ed25519
             self.size = 256
+        else:
+            module.fail_json(msg="%s is not a valid value for key type" % self.type)
 
     def generate(self):
         if self.force or not self.is_private_key_valid(perms_required=False):
             try:
-                if os.path.exists(self.path) and not os.access(self.path, os.W_OK):
+                if self.exists() and not os.access(self.path, os.W_OK):
                     os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
-                self.changed = True
-
                 self._generate_keypair()
-                keysize, keytype, self.fingerprint = self._get_current_key_properties()
-                self.public_key = self._get_public_key()
+                self.changed = True
             except (IOError, OSError) as e:
                 self.remove()
                 self.module.fail_json(msg="%s" % to_native(e))
+
+            self.fingerprint = self._get_current_key_properties()[2]
+            self.public_key = self._get_public_key()
         elif not self.is_public_key_valid(perms_required=False):
             pubkey = self._get_public_key()
             try:
-                self.changed = True
                 with open(self.path + ".pub", "w") as pubkey_f:
                     pubkey_f.write(pubkey + '\n')
                 os.chmod(self.path + ".pub", stat.S_IWUSR + stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH)
-            except IOError:
+            except (IOError, OSError):
                 self.module.fail_json(
                     msg='The public key is missing or does not match the private key. '
                         'Unable to regenerate the public key.')
+            self.changed = True
             self.public_key = pubkey
 
             if self.comment:
                 try:
-                    if os.path.exists(self.path) and not os.access(self.path, os.W_OK):
+                    if self.exists() and not os.access(self.path, os.W_OK):
                         os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
-                    self._update_comment()
-                except IOError:
-                    self.module.fail_json(
-                        msg='Unable to update the comment for the public key.')
+                except (IOError, OSError):
+                    self.module.fail_json(msg='Unable to update the comment for the public key.')
+                self._update_comment()
 
         if self._permissions_changed() or self._permissions_changed(public_key=True):
             self.changed = True
 
     def is_private_key_valid(self, perms_required=True):
-        if not os.path.exists(self.path):
+        if not self.exists():
             return False
 
         if self._check_pass_protected_or_broken_key():
@@ -138,7 +134,7 @@ class KeypairBackend:
 
         if not self._private_key_loadable():
             if os.path.isdir(self.path):
-                self.module.fail_json(msg='%s is a directory. Please specify a path to a file.' % (self.path))
+                self.module.fail_json(msg='%s is a directory. Please specify a path to a file.' % self.path)
 
             if self.regenerate in ('full_idempotence', 'always'):
                 return False
@@ -160,12 +156,14 @@ class KeypairBackend:
                     ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`.'
             )
 
+        # Perms required short-circuits evaluation to prevent the side-effects of running _permissions_changed
+        # when check_mode is not enabled
         return not perms_required or not self._permissions_changed()
 
     def is_public_key_valid(self, perms_required=True):
 
         def _get_pubkey_content():
-            if os.path.exists(self.path + ".pub"):
+            if self.exists(public_key=True):
                 with open(self.path + ".pub", "r") as pubkey_f:
                     present_pubkey = pubkey_f.read().strip(' \n')
                 return present_pubkey
@@ -176,9 +174,9 @@ class KeypairBackend:
             if pubkey_content:
                 parts = pubkey_content.split(' ', 2)
                 if len(parts) < 2:
-                    return False
+                    return ()
                 return parts[0], parts[1], '' if len(parts) <= 2 else parts[2]
-            return False
+            return ()
 
         def _pubkey_valid(pubkey):
             if pubkey_parts and _parse_pubkey(pubkey):
@@ -202,10 +200,9 @@ class KeypairBackend:
             if not _comment_valid():
                 return False
 
-        if perms_required and self._permissions_changed(public_key=True):
-            return False
-
-        return True
+        # Perms required short-circuits evaluation to prevent the side-effects of running _permissions_changes
+        # when check_mode is not enabled
+        return not perms_required or not self._permissions_changed(public_key=True)
 
     def _permissions_changed(self, public_key=False):
         file_args = self.module.load_file_common_arguments(self.module.params)
@@ -213,13 +210,13 @@ class KeypairBackend:
             file_args['path'] = file_args['path'] + '.pub'
         return self.module.set_fs_attributes_if_different(file_args, False)
 
-    def dump(self):
+    @property
+    def result(self):
         return {
             'changed': self.changed,
             'size': self.size,
             'type': self.type,
             'filename': self.path,
-            # On removal this has no value
             'fingerprint': self.fingerprint if self.fingerprint else '',
             'public_key': self.public_key,
             'comment': self.comment if self.comment else '',
@@ -231,21 +228,24 @@ class KeypairBackend:
         try:
             os.remove(self.path)
             self.changed = True
-        except OSError as exc:
+        except (IOError, OSError) as exc:
             if exc.errno != errno.ENOENT:
-                raise KeypairError(exc)
+                self.module.fail_json(msg=to_native(exc))
             else:
                 pass
 
-        if os.path.exists(self.path + ".pub"):
+        if self.exists(public_key=True):
             try:
                 os.remove(self.path + ".pub")
                 self.changed = True
-            except OSError as exc:
+            except (IOError, OSError) as exc:
                 if exc.errno != errno.ENOENT:
-                    raise KeypairError(exc)
+                    self.module.fail_json(msg=to_native(exc))
                 else:
                     pass
+
+    def exists(self, public_key=False):
+        return os.path.exists(self.path if not public_key else self.path + ".pub")
 
     @abc.abstractmethod
     def _generate_keypair(self):
@@ -283,6 +283,9 @@ class KeypairBackendOpensshBin(KeypairBackend):
         return self.module.run_command([self.openssh_bin, '-lf', self.path])
 
     def _get_publickey_from_privatekey(self):
+        # -P '' is always included as an option to induce the expected standard output for
+        # _check_pass_protected_or_broken_key, but introduces no side-effects when used to
+        # output a matching public key
         return self.module.run_command([self.openssh_bin, '-P', '', '-yf', self.path])
 
     def _generate_keypair(self):
@@ -293,16 +296,12 @@ class KeypairBackendOpensshBin(KeypairBackend):
             '-b', str(self.size),
             '-t', self.type,
             '-f', self.path,
+            '-C', self.comment if self.comment else ''
         ]
 
-        if self.comment:
-            args.extend(['-C', self.comment])
-        else:
-            args.extend(['-C', ""])
+        # "y" must be entered in response to the "overwrite" prompt
+        stdin_data = 'y' if self.exists() else None
 
-        stdin_data = None
-        if os.path.exists(self.path):
-            stdin_data = 'y'
         self.module.run_command(args, data=stdin_data)
 
     def _get_current_key_properties(self):
@@ -327,11 +326,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
     def _check_pass_protected_or_broken_key(self):
         rc, stdout, stderr = self._get_publickey_from_privatekey()
-        if rc == 255 or 'is not a public key file' in stderr:
-            return True
-        if 'incorrect passphrase' in stderr or 'load failed' in stderr:
-            return True
-        return False
+        return rc == 255 or any_in(stderr, 'is not a public key file', 'incorrect passphrase', 'load failed')
 
 
 class KeypairBackendCryptography(KeypairBackend):
@@ -340,9 +335,13 @@ class KeypairBackendCryptography(KeypairBackend):
         super(KeypairBackendCryptography, self).__init__(module)
 
         if module.params['private_key_format'] == 'auto':
-            ssh = module.get_bin_path('ssh', True)
-            proc = module.run_command([ssh, '-Vq'])
-            ssh_version = parse_openssh_version(proc[2].strip())
+            ssh = module.get_bin_path('ssh')
+            if ssh:
+                proc = module.run_command([ssh, '-Vq'])
+                ssh_version = parse_openssh_version(proc[2].strip())
+            else:
+                # Default to OpenSSH 7.8 compatibility when OpenSSH is not installed
+                ssh_version = "7.8"
 
             self.private_key_format = 'SSH'
 
@@ -366,11 +365,7 @@ class KeypairBackendCryptography(KeypairBackend):
         self.passphrase = to_bytes(self.passphrase) if self.passphrase else None
 
     def _load_privatekey(self):
-        return OpensshKeypair.load(
-            path=self.path,
-            passphrase=self.passphrase,
-            no_public_key=True,
-        )
+        return OpensshKeypair.load(path=self.path, passphrase=self.passphrase, no_public_key=True)
 
     def _generate_keypair(self):
         keypair = OpensshKeypair.generate(
@@ -386,9 +381,11 @@ class KeypairBackendCryptography(KeypairBackend):
                     self.private_key_format
                 )
             )
+        # ssh-keygen defaults private key permissions to 0600 octal
         os.chmod(self.path, stat.S_IWUSR + stat.S_IRUSR)
         with open(self.path + '.pub', 'w+b') as f:
             f.write(keypair.public_key)
+        # ssh-keygen defaults public key permissions to 0644 octal
         os.chmod(self.path + ".pub", stat.S_IWUSR + stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH)
 
     def _get_current_key_properties(self):
@@ -408,8 +405,8 @@ class KeypairBackendCryptography(KeypairBackend):
             with open(self.path + ".pub", "w+b") as pubkey_file:
                 pubkey_file.write(keypair.public_key + b'\n')
         except (InvalidCommentError, IOError, OSError) as e:
-            # Return values while unused are made to simulate the output of run_command()
-            return 1, "Comment was not updated successfully", to_native(e)
+            # Return values while unused currently are made to simulate the output of run_command()
+            return 1, "Comment could not be updated", to_native(e)
         return 0, "Comment updated successfully", ""
 
     def _private_key_loadable(self):
@@ -440,9 +437,14 @@ class KeypairBackendCryptography(KeypairBackend):
                 )
             except (InvalidPrivateKeyFileError, InvalidPassphraseError):
                 return False
+            else:
+                return True
 
-            return True
         return False
+
+
+def any_in(sequence, *elements):
+    return any([e in sequence for e in elements])
 
 
 def select_backend(module, backend):
@@ -451,19 +453,15 @@ def select_backend(module, backend):
 
     if backend == 'auto':
         if module.params['passphrase']:
-            if can_use_cryptography:
-                backend = 'cryptography'
-            else:
-                module.fail_json(msg=missing_required_lib("cryptography >= 2.6"))
+            backend = 'cryptography'
+        elif can_use_opensshbin:
+            backend = 'opensshbin'
+        elif can_use_cryptography:
+            backend = 'cryptography'
         else:
-            if can_use_opensshbin:
-                backend = 'opensshbin'
-            elif can_use_cryptography:
-                backend = 'cryptography'
-
-        if backend == 'auto':
             module.fail_json(msg="Cannot find either the OpenSSH binary in the PATH " +
                                  "or cryptography >= 2.6 installed on this system")
+
     if backend == 'opensshbin':
         if not can_use_opensshbin:
             module.fail_json(msg="Cannot find the OpenSSH binary in the PATH")

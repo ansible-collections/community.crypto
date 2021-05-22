@@ -17,9 +17,9 @@ description:
       ssh-keygen to generate keys. One can generate C(rsa), C(dsa), C(rsa1), C(ed25519)
       or C(ecdsa) private keys."
 requirements:
-    - "ssh-keygen"
+    - "ssh-keygen" (if I(backend=openssh))
     - cryptography >= 2.6 (if I(backend=cryptography) and OpenSSH < 7.8 is installed)
-    - cryptography >= 3.0 (if I(backend=opensshbin) and OpenSSH >= 7.8 is installed)
+    - cryptography >= 3.0 (if I(backend=cryptography) and OpenSSH >= 7.8 is installed)
 options:
     state:
         description:
@@ -65,7 +65,7 @@ options:
         version_added: 1.7.0
     private_key_format:
         description:
-            - Used when a value for I(passphrase) is provided to select a format for the private key at the provided I(path).
+            - Used when a I(backend=cryptography) to select a format for the private key at the provided I(path).
             - The only valid option currently is C(auto) which will match the key format of the installed OpenSSH version.
             - For OpenSSH < 7.8 private keys will be in PKCS1 format except ed25519 keys which will be in OpenSSH format.
             - For OpenSSH >= 7.8 all private key types will be in the OpenSSH format.
@@ -76,14 +76,15 @@ options:
         version_added: 1.7.0
     backend:
         description:
-            - Selects between the I(cryptography) library or the OpenSSH binary I(opensshbin).
-            - Additionally use I(auto) to fallback to I(cryptography) if the OpenSSH binary is not installed.
+            - Selects between the C(cryptography) library or the OpenSSH binary C(opensshbin).
+            - C(auto) will default to C(opensshbin) unless the OpenSSH binary is not installed or when using I(passphrase).
         type: str
         default: auto
         choices:
             - auto
             - cryptography
             - opensshbin
+        vesion_added: 1.7.0
     regenerate:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.
@@ -187,11 +188,9 @@ comment:
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.keypair_backend import (
-    select_backend,
-    KeypairError
+    select_backend
 )
 
 
@@ -225,33 +224,25 @@ def main():
             msg='The directory %s does not exist or the file is not a directory' % base_dir
         )
 
-    backend, keypair = select_backend(module, module.params['backend'])
+    keypair = select_backend(module, module.params['backend'])[1]
 
     if module.params['state'] == 'present':
-
         if module.check_mode:
-            result = keypair.dump()
-            result['changed'] = keypair.force or not keypair.is_private_key_valid() or not keypair.is_public_key_valid()
-            module.exit_json(**result)
-
-        keypair.generate()
+            keypair.changed = any([
+                keypair.force,
+                not keypair.is_private_key_valid(),
+                not keypair.is_public_key_valid()
+            ])
+        else:
+            keypair.generate()
     else:
-
+        # When `state=absent` no details from an existing key at the given `path` are returned in the module result
         if module.check_mode:
-            keypair.changed = os.path.exists(module.params['path'])
-            if keypair.changed:
-                keypair.fingerprint = {}
-            result = keypair.dump()
-            module.exit_json(**result)
-
-        try:
+            keypair.changed = keypair.exists()
+        else:
             keypair.remove()
-        except KeypairError as exc:
-            module.fail_json(msg=to_native(exc))
 
-    result = keypair.dump()
-
-    module.exit_json(**result)
+    module.exit_json(**keypair.result)
 
 
 if __name__ == '__main__':
