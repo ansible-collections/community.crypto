@@ -17,7 +17,7 @@ description:
       ssh-keygen to generate keys. One can generate C(rsa), C(dsa), C(rsa1), C(ed25519)
       or C(ecdsa) private keys."
 requirements:
-    - "ssh-keygen" (if I(backend=openssh))
+    - ssh-keygen (if I(backend=openssh))
     - cryptography >= 2.6 (if I(backend=cryptography) and OpenSSH < 7.8 is installed)
     - cryptography >= 3.0 (if I(backend=cryptography) and OpenSSH >= 7.8 is installed)
 options:

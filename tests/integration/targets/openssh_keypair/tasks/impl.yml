@@ -4,6 +4,13 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+  # Ensures no conflicts from previous test runs
+- name: Cleanup Output Directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob: "{{ output_dir }}/privatekey*"
+
 - name: Generate privatekey1 - standard (check mode)
   openssh_keypair:
     path: '{{ output_dir }}/privatekey1'
