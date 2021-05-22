@@ -225,10 +225,9 @@ def main():
             msg='The directory %s does not exist or the file is not a directory' % base_dir
         )
 
-    state = module.params['state']
     backend, keypair = select_backend(module, module.params['backend'])
 
-    if state == 'present':
+    if module.params['state'] == 'present':
 
         if module.check_mode:
             result = keypair.dump()

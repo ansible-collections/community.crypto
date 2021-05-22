@@ -339,35 +339,31 @@ class KeypairBackendCryptography(KeypairBackend):
     def __init__(self, module):
         super(KeypairBackendCryptography, self).__init__(module)
 
-        # The empty string is intentionally ignored so that dependency checks do not cause unnecessary failure
-        if self.passphrase:
-            if module.params['private_key_format'] == 'auto':
-                ssh = module.get_bin_path('ssh', True)
-                proc = module.run_command([ssh, '-Vq'])
-                ssh_version = parse_openssh_version(proc[2].strip())
+        if module.params['private_key_format'] == 'auto':
+            ssh = module.get_bin_path('ssh', True)
+            proc = module.run_command([ssh, '-Vq'])
+            ssh_version = parse_openssh_version(proc[2].strip())
 
-                self.private_key_format = 'SSH'
+            self.private_key_format = 'SSH'
 
-                if LooseVersion(ssh_version) < LooseVersion("7.8") and self.type != 'ed25519':
-                    # OpenSSH made SSH formatted private keys available in version 6.5,
-                    # but still defaulted to PKCS1 format with the exception of ed25519 keys
-                    self.private_key_format = 'PKCS1'
+            if LooseVersion(ssh_version) < LooseVersion("7.8") and self.type != 'ed25519':
+                # OpenSSH made SSH formatted private keys available in version 6.5,
+                # but still defaulted to PKCS1 format with the exception of ed25519 keys
+                self.private_key_format = 'PKCS1'
 
-                if self.private_key_format == 'SSH' and not HAS_OPENSSH_PRIVATE_FORMAT:
-                    module.fail_json(
-                        msg=missing_required_lib(
-                            'cryptography >= 3.0',
-                            reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 " +
-                                   "or for ed25519 keys"
-                        )
+            if self.private_key_format == 'SSH' and not HAS_OPENSSH_PRIVATE_FORMAT:
+                module.fail_json(
+                    msg=missing_required_lib(
+                        'cryptography >= 3.0',
+                        reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 " +
+                               "or for ed25519 keys"
                     )
+                )
 
-            if self.type == 'rsa1':
-                module.fail_json(msg="Passphrases are not supported for RSA1 keys.")
+        if self.type == 'rsa1':
+            module.fail_json(msg="RSA1 keys are not supported by the cryptography backend")
 
-            self.passphrase = to_bytes(self.passphrase)
-        else:
-            self.private_key_format = None
+        self.passphrase = to_bytes(self.passphrase) if self.passphrase else None
 
     def _load_privatekey(self):
         return OpensshKeypair.load(
@@ -398,7 +394,7 @@ class KeypairBackendCryptography(KeypairBackend):
     def _get_current_key_properties(self):
         keypair = self._load_privatekey()
 
-        return str(keypair.size), keypair.type, keypair.fingerprint
+        return keypair.size, keypair.key_type, keypair.fingerprint
 
     def _get_public_key(self):
         keypair = self._load_privatekey()
@@ -409,9 +405,10 @@ class KeypairBackendCryptography(KeypairBackend):
         keypair = self._load_privatekey()
         try:
             keypair.comment = self.comment
-            with open(self.path + ".pub", "w+b") as pubkey_f:
-                pubkey_f.write(keypair.public_key + b'\n')
+            with open(self.path + ".pub", "w+b") as pubkey_file:
+                pubkey_file.write(keypair.public_key + b'\n')
         except (InvalidCommentError, IOError, OSError) as e:
+            # Return values while unused are made to simulate the output of run_command()
             return 1, "Comment was not updated successfully", to_native(e)
         return 0, "Comment updated successfully", ""
 
@@ -441,7 +438,7 @@ class KeypairBackendCryptography(KeypairBackend):
                     passphrase=None,
                     no_public_key=True,
                 )
-            except InvalidPassphraseError:
+            except (InvalidPrivateKeyFileError, InvalidPassphraseError):
                 return False
 
             return True
