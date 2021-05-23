@@ -563,7 +563,7 @@ class CRL(OpenSSLObject):
             return dict()
         try:
             result = get_crl_info(self.module, data)
-            result['can_parse_crl'] = False
+            result['can_parse_crl'] = True
             return result
         except Exception as exc:
             return dict(can_parse_crl=False)

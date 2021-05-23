@@ -107,7 +107,7 @@ class CertificateBackend(object):
             return dict()
         try:
             result = get_certificate_info(self.module, self.backend, data, prefer_one_fingerprint=True)
-            result['can_parse_certificate'] = False
+            result['can_parse_certificate'] = True
             return result
         except Exception as exc:
             return dict(can_parse_certificate=False)

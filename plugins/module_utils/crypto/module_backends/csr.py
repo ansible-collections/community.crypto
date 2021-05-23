@@ -190,7 +190,7 @@ class CertificateSigningRequestBackend(object):
         try:
             result = get_csr_info(
                 self.module, self.backend, data, validate_signature=False, prefer_one_fingerprint=True)
-            result['can_parse_csr'] = False
+            result['can_parse_csr'] = True
             return result
         except Exception as exc:
             return dict(can_parse_csr=False)
