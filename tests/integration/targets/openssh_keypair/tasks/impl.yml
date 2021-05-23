@@ -1,0 +1,557 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+  # Ensures no conflicts from previous test runs
+- name: "({{ backend }}) Cleanup Output Directory"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "{{ output_dir }}/privatekey*"
+    - "{{ output_dir }}/regenerate*"
+
+- name: "({{ backend }}) Generate privatekey1 - standard (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey1_result_check
+  check_mode: true
+
+- name: "({{ backend }}) Generate privatekey1 - standard"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey1_result
+
+- name: "({{ backend }}) Generate privatekey1 - standard (check mode idempotent)"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey1_idem_result_check
+  check_mode: true
+
+- name: "({{ backend }}) Generate privatekey1 - standard (idempotent)"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey1'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey1_idem_result
+
+- name: "({{ backend }}) Generate privatekey2 - default size"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey2'
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Generate privatekey3 - type dsa"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey3'
+    type: dsa
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Generate privatekey4 - standard"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey4'
+    size: 2048
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Delete privatekey4 - standard"
+  openssh_keypair:
+    state: absent
+    path: '{{ output_dir }}/privatekey4'
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Generate privatekey5 - standard"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey5'
+    size: 2048
+    backend: "{{ backend }}"
+  register: publickey_gen
+
+- name: "({{ backend }}) Generate privatekey6"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey6'
+    type: rsa
+    size: 2048
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Regenerate privatekey6 via force"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey6'
+    type: rsa
+    size: 2048
+    force: yes
+    backend: "{{ backend }}"
+  register: output_regenerated_via_force
+
+- name: "({{ backend }}) Create broken key"
+  copy:
+    dest: '{{ item }}'
+    content: ''
+    mode: '0700'
+  loop:
+    - '{{ output_dir }}/privatekeybroken'
+    - '{{ output_dir }}/privatekeybroken.pub'
+
+- name: "({{ backend }}) Regenerate broken key - should fail"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekeybroken'
+    type: rsa
+    size: 2048
+    backend: "{{ backend }}"
+  register: output_broken
+  ignore_errors: yes
+
+- name: "({{ backend }}) Regenerate broken key with force"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekeybroken'
+    type: rsa
+    force: yes
+    size: 2048
+    backend: "{{ backend }}"
+  register: output_broken_force
+
+- name: "({{ backend }}) Generate read-only private key"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekeyreadonly'
+    type: rsa
+    mode: '0200'
+    size: 2048
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Regenerate read-only private key via force"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekeyreadonly'
+    type: rsa
+    force: yes
+    size: 2048
+    backend: "{{ backend }}"
+  register: output_read_only
+
+- name: "({{ backend }}) Generate privatekey7 - standard with comment"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey7'
+    comment: 'test@privatekey7'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey7_result
+
+- name: "({{ backend }}) Modify privatekey7 comment"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey7'
+    comment: 'test_modified@privatekey7'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey7_modified_result
+
+- name: "({{ backend }}) Generate password protected key"
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey8 -N {{ passphrase }}'
+
+- name: "({{ backend }}) Try to modify the password protected key - should fail"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey8'
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey8_result
+  ignore_errors: yes
+
+- name: "({{ backend }}) Try to modify the password protected key with force=yes"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey8'
+    force: yes
+    size: 2048
+    backend: "{{ backend }}"
+  register: privatekey8_result_force
+
+- name: "({{ backend }}) Generate another password protected key"
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey9 -N {{ passphrase }}'
+
+- name: "({{ backend }}) Try to modify the password protected key with passphrase"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey9'
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    backend: "{{ backend }}"
+  register: privatekey9_modified_result
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Generate another unprotected key"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Try to Modify unprotected key with passphrase"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    backend: "{{ backend }}"
+  ignore_errors: true
+  register: privatekey10_result
+  when: backend == 'cryptography'
+
+
+- name: "({{ backend }}) Try to force modify the password protected key with force=true"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey10'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    force: true
+    backend: "{{ backend }}"
+  register: privatekey10_result_force
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Ensure that ssh-keygen can read keys generated with passphrase"
+  command: 'ssh-keygen -yf {{ output_dir }}/privatekey10 -P {{ passphrase }}'
+  register: privatekey10_result_sshkeygen
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Generate PEM encoded key with passphrase"
+  command: 'ssh-keygen -f {{ output_dir }}/privatekey11 -N {{ passphrase }} -m PEM'
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Try to verify a PEM encoded key"
+  openssh_keypair:
+    path: '{{ output_dir }}/privatekey11'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    backend: "{{ backend }}"
+  register: privatekey11_result
+  when: backend == 'cryptography'
+
+- import_tasks: ../tests/validate.yml
+
+
+# Test regenerate option
+
+- name: "({{ backend }}) Regenerate - setup simple keys"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: rsa
+    size: 1024
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+- name: "({{ backend }}) Regenerate - setup password protected keys"
+  command: 'ssh-keygen -f {{ output_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
+  loop: "{{ regenerate_values }}"
+
+- name: "({{ backend }}) Regenerate - setup broken keys"
+  copy:
+    dest: '{{ output_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
+    content: 'broken key'
+    mode: '0700'
+  with_nested:
+    - "{{ regenerate_values }}"
+    - [ '', '.pub' ]
+    -
+- name: "({{ backend }}) Regenerate - setup password protected keys for passphrse test"
+  command: 'ssh-keygen -f {{ output_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
+  loop: "{{ regenerate_values }}"
+
+- name: "({{ backend }}) Regenerate - modify broken keys (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-c-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
+      - result.results[1] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[2].msg"
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - modify broken keys"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-c-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
+      - result.results[1] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[2].msg"
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - modify password protected keys (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
+      - result.results[1] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[2].msg"
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - modify password protected keys with passphrase (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    type: rsa
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+  when: backend == 'cryptography'
+
+- assert:
+    that:
+      - result.results[0] is success
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Regenerate - modify password protected keys"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
+      - result.results[1] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[2].msg"
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - modify password protected keys with passphrase"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-d-{{ item }}'
+    type: rsa
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+  when: backend == 'cryptography'
+
+- assert:
+    that:
+      - result.results[0] is success
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Regenerate - not modify regular keys (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  register: result
+- assert:
+    that:
+      - result.results[0] is not changed
+      - result.results[1] is not changed
+      - result.results[2] is not changed
+      - result.results[3] is not changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - not modify regular keys"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: rsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  register: result
+- assert:
+    that:
+      - result.results[0] is not changed
+      - result.results[1] is not changed
+      - result.results[2] is not changed
+      - result.results[3] is not changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - adjust key size (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: rsa
+    size: 1048
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success and result.results[0] is not changed
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - adjust key size"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: rsa
+    size: 1048
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success and result.results[0] is not changed
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - redistribute keys"
+  copy:
+    src: '{{ output_dir }}/regenerate-a-always{{ item.1 }}'
+    dest: '{{ output_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
+    remote_src: true
+  with_nested:
+    - "{{ regenerate_values }}"
+    - [ '', '.pub' ]
+  when: "item.0 != 'always'"
+
+- name: "({{ backend }}) Regenerate - adjust key type (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: dsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success and result.results[0] is not changed
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - adjust key type"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: dsa
+    size: 1024
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result.results[0] is success and result.results[0] is not changed
+      - result.results[1] is failed
+      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+      - result.results[2] is changed
+      - result.results[3] is changed
+      - result.results[4] is changed
+
+- name: "({{ backend }}) Regenerate - redistribute keys"
+  copy:
+    src: '{{ output_dir }}/regenerate-a-always{{ item.1 }}'
+    dest: '{{ output_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
+    remote_src: true
+  with_nested:
+    - "{{ regenerate_values }}"
+    - [ '', '.pub' ]
+  when: "item.0 != 'always'"
+
+- name: "({{ backend }}) Regenerate - adjust comment (check mode)"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: dsa
+    size: 1024
+    comment: test comment
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  check_mode: yes
+  loop: "{{ regenerate_values }}"
+  ignore_errors: yes
+  register: result
+- assert:
+    that:
+      - result is changed
+
+- name: "({{ backend }}) Regenerate - adjust comment"
+  openssh_keypair:
+    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    type: dsa
+    size: 1024
+    comment: test comment
+    regenerate: '{{ item }}'
+    backend: "{{ backend }}"
+  loop: "{{ regenerate_values }}"
+  register: result
+- assert:
+    that:
+      - result is changed
+      # for all values but 'always', the key should have not been regenerated.
+      # verify this by comparing fingerprints:
+      - result.results[0].fingerprint == result.results[1].fingerprint
+      - result.results[0].fingerprint == result.results[2].fingerprint
+      - result.results[0].fingerprint == result.results[3].fingerprint
+      - result.results[0].fingerprint != result.results[4].fingerprint

@@ -18,7 +18,18 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-# This import is only to maintain backwards compatibility
-from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
-    parse_openssh_version
-)
+import re
+
+
+def parse_openssh_version(version_string):
+    """Parse the version output of ssh -V and return version numbers that can be compared"""
+
+    parsed_result = re.match(
+        r"^.*openssh_(?P<version>[0-9.]+)(p?[0-9]+)[^0-9]*.*$", version_string.lower()
+    )
+    if parsed_result is not None:
+        version = parsed_result.group("version").strip()
+    else:
+        version = None
+
+    return version
