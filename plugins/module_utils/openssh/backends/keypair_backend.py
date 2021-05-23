@@ -38,12 +38,11 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptogra
     InvalidPrivateKeyFileError,
     OpenSSHError,
     OpensshKeypair,
-
 )
 
 
 @six.add_metaclass(abc.ABCMeta)
-class KeypairBackend:
+class KeypairBackend(object):
 
     def __init__(self, module):
         self.module = module

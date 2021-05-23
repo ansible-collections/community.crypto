@@ -4,6 +4,12 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Backend auto-detection test
+  openssh_keypair:
+    path: '{{ output_dir }}/auto_backend_key'
+    state: "{{ item }}"
+  loop: ['present', 'absent']
+
 - set_fact:
     backends: ['opensshbin']
 
