@@ -159,7 +159,7 @@ class KeypairBackend:
 
         # Perms required short-circuits evaluation to prevent the side-effects of running _permissions_changed
         # when check_mode is not enabled
-        return not perms_required or not self._permissions_changed()
+        return not (perms_required and self._permissions_changed())
 
     def is_public_key_valid(self, perms_required=True):
 
@@ -197,13 +197,12 @@ class KeypairBackend:
         else:
             return False
 
-        if self.comment:
-            if not _comment_valid():
-                return False
+        if self.comment and not _comment_valid():
+            return False
 
         # Perms required short-circuits evaluation to prevent the side-effects of running _permissions_changes
         # when check_mode is not enabled
-        return not perms_required or not self._permissions_changed(public_key=True)
+        return not (perms_required and self._permissions_changed(public_key=True))
 
     def _permissions_changed(self, public_key=False):
         file_args = self.module.load_file_common_arguments(self.module.params)
@@ -457,9 +456,7 @@ def select_backend(module, backend):
     can_use_opensshbin = bool(module.get_bin_path('ssh-keygen'))
 
     if backend == 'auto':
-        if module.params['passphrase']:
-            backend = 'cryptography'
-        elif can_use_opensshbin:
+        if can_use_opensshbin and not module.params['passphrase']:
             backend = 'opensshbin'
         elif can_use_cryptography:
             backend = 'cryptography'
