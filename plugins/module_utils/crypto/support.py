@@ -52,7 +52,14 @@ from .basic import (
 )
 
 
-def get_fingerprint_of_bytes(source):
+# This list of preferred fingerprints is used when prefer_one=True is supplied to the
+# fingerprinting methods.
+PREFERRED_FINGERPRINTS = (
+    'sha256', 'sha3_256', 'sha512', 'sha3_512', 'sha384', 'sha3_384', 'sha1', 'md5'
+)
+
+
+def get_fingerprint_of_bytes(source, prefer_one=False):
     """Generate the fingerprint of the given bytes."""
 
     fingerprint = {}
@@ -64,6 +71,12 @@ def get_fingerprint_of_bytes(source):
             algorithms = hashlib.algorithms_guaranteed
         except AttributeError:
             return None
+
+    if prefer_one:
+        # Sort algorithms to have the ones in PREFERRED_FINGERPRINTS at the beginning
+        prefered_algorithms = [algorithm for algorithm in PREFERRED_FINGERPRINTS if algorithm in algorithms]
+        prefered_algorithms += sorted([algorithm for algorithm in algorithms if algorithm not in PREFERRED_FINGERPRINTS])
+        algorithms = prefered_algorithms
 
     for algo in algorithms:
         f = getattr(hashlib, algo)
@@ -79,11 +92,13 @@ def get_fingerprint_of_bytes(source):
         except TypeError:
             pubkey_digest = h.hexdigest(32)
         fingerprint[algo] = ':'.join(pubkey_digest[i:i + 2] for i in range(0, len(pubkey_digest), 2))
+        if prefer_one:
+            break
 
     return fingerprint
 
 
-def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl'):
+def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl', prefer_one=False):
     """Generate the fingerprint of the public key. """
 
     if backend == 'pyopenssl':
@@ -107,15 +122,15 @@ def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl'):
             serialization.PublicFormat.SubjectPublicKeyInfo
         )
 
-    return get_fingerprint_of_bytes(publickey)
+    return get_fingerprint_of_bytes(publickey, prefer_one=prefer_one)
 
 
-def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl'):
+def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl', prefer_one=False):
     """Generate the fingerprint of the public key. """
 
     privatekey = load_privatekey(path, passphrase=passphrase, content=content, check_passphrase=False, backend=backend)
 
-    return get_fingerprint_of_privatekey(privatekey, backend=backend)
+    return get_fingerprint_of_privatekey(privatekey, backend=backend, prefer_one=prefer_one)
 
 
 def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, backend='pyopenssl'):

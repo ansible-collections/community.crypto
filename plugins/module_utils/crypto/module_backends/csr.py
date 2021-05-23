@@ -48,6 +48,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_
     pyopenssl_parse_name_constraints,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
+    get_csr_info,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
 
@@ -177,6 +181,20 @@ class CertificateSigningRequestBackend(object):
         self.existing_csr = None
         self.existing_csr_bytes = None
 
+        self.diff_before = self._get_info(None)
+        self.diff_after = self._get_info(None)
+
+    def _get_info(self, data):
+        if data is None:
+            return dict()
+        try:
+            result = get_csr_info(
+                self.module, self.backend, data, validate_signature=False, prefer_one_fingerprint=True)
+            result['can_parse_csr'] = True
+            return result
+        except Exception as exc:
+            return dict(can_parse_csr=False)
+
     @abc.abstractmethod
     def generate_csr(self):
         """(Re-)Generate CSR."""
@@ -190,6 +208,7 @@ class CertificateSigningRequestBackend(object):
     def set_existing(self, csr_bytes):
         """Set existing CSR bytes. None indicates that the CSR does not exist."""
         self.existing_csr_bytes = csr_bytes
+        self.diff_after = self.diff_before = self._get_info(self.existing_csr_bytes)
 
     def has_existing(self):
         """Query whether an existing CSR is/has been there."""
@@ -238,13 +257,19 @@ class CertificateSigningRequestBackend(object):
             'name_constraints_permitted': self.name_constraints_permitted,
             'name_constraints_excluded': self.name_constraints_excluded,
         }
+        # Get hold of CSR bytes
+        csr_bytes = self.existing_csr_bytes
+        if self.csr is not None:
+            csr_bytes = self.get_csr_data()
+        self.diff_after = self._get_info(csr_bytes)
         if include_csr:
-            # Get hold of CSR bytes
-            csr_bytes = self.existing_csr_bytes
-            if self.csr is not None:
-                csr_bytes = self.get_csr_data()
             # Store result
             result['csr'] = csr_bytes.decode('utf-8') if csr_bytes else None
+
+        result['diff'] = dict(
+            before=self.diff_before,
+            after=self.diff_after,
+        )
         return result
 
 

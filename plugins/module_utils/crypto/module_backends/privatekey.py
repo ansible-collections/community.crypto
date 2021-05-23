@@ -37,6 +37,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     identify_private_key_format,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_info import (
+    PrivateKeyConsistencyError,
+    PrivateKeyParseError,
+    get_privatekey_info,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
 
@@ -102,6 +108,25 @@ class PrivateKeyBackend:
         self.existing_private_key = None
         self.existing_private_key_bytes = None
 
+        self.diff_before = self._get_info(None)
+        self.diff_after = self._get_info(None)
+
+    def _get_info(self, data):
+        if data is None:
+            return dict()
+        result = dict(can_parse_key=False)
+        try:
+            result.update(get_privatekey_info(
+                self.module, self.backend, data, passphrase=self.passphrase,
+                return_private_key_data=False, prefer_one_fingerprint=True))
+        except PrivateKeyConsistencyError as exc:
+            result.update(exc.result)
+        except PrivateKeyParseError as exc:
+            result.update(exc.result)
+        except Exception as exc:
+            pass
+        return result
+
     @abc.abstractmethod
     def generate_private_key(self):
         """(Re-)Generate private key."""
@@ -125,6 +150,7 @@ class PrivateKeyBackend:
     def set_existing(self, privatekey_bytes):
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.existing_private_key_bytes = privatekey_bytes
+        self.diff_after = self.diff_before = self._get_info(self.existing_private_key_bytes)
 
     def has_existing(self):
         """Query whether an existing private key is/has been there."""
@@ -215,11 +241,12 @@ class PrivateKeyBackend:
         }
         if self.type == 'ECC':
             result['curve'] = self.curve
+        # Get hold of private key bytes
+        pk_bytes = self.existing_private_key_bytes
+        if self.private_key is not None:
+            pk_bytes = self.get_private_key_data()
+        self.diff_after = self._get_info(pk_bytes)
         if include_key:
-            # Get hold of private key bytes
-            pk_bytes = self.existing_private_key_bytes
-            if self.private_key is not None:
-                pk_bytes = self.get_private_key_data()
             # Store result
             if pk_bytes:
                 if identify_private_key_format(pk_bytes) == 'raw':
@@ -229,6 +256,10 @@ class PrivateKeyBackend:
             else:
                 result['privatekey'] = None
 
+        result['diff'] = dict(
+            before=self.diff_before,
+            after=self.diff_after,
+        )
         return result
 
 

@@ -33,6 +33,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_compare_public_keys,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
+    get_certificate_info,
+)
+
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
 
@@ -95,6 +99,19 @@ class CertificateBackend(object):
         self.check_csr_subject = True
         self.check_csr_extensions = True
 
+        self.diff_before = self._get_info(None)
+        self.diff_after = self._get_info(None)
+
+    def _get_info(self, data):
+        if data is None:
+            return dict()
+        try:
+            result = get_certificate_info(self.module, self.backend, data, prefer_one_fingerprint=True)
+            result['can_parse_certificate'] = True
+            return result
+        except Exception as exc:
+            return dict(can_parse_certificate=False)
+
     @abc.abstractmethod
     def generate_certificate(self):
         """(Re-)Generate certificate."""
@@ -108,6 +125,7 @@ class CertificateBackend(object):
     def set_existing(self, certificate_bytes):
         """Set existing certificate bytes. None indicates that the key does not exist."""
         self.existing_certificate_bytes = certificate_bytes
+        self.diff_after = self.diff_before = self._get_info(self.existing_certificate_bytes)
 
     def has_existing(self):
         """Query whether an existing certificate is/has been there."""
@@ -284,13 +302,19 @@ class CertificateBackend(object):
             'privatekey': self.privatekey_path,
             'csr': self.csr_path
         }
+        # Get hold of certificate bytes
+        certificate_bytes = self.existing_certificate_bytes
+        if self.cert is not None:
+            certificate_bytes = self.get_certificate_data()
+        self.diff_after = self._get_info(certificate_bytes)
         if include_certificate:
-            # Get hold of certificate bytes
-            certificate_bytes = self.existing_certificate_bytes
-            if self.cert is not None:
-                certificate_bytes = self.get_certificate_data()
             # Store result
             result['certificate'] = certificate_bytes.decode('utf-8') if certificate_bytes else None
+
+        result['diff'] = dict(
+            before=self.diff_before,
+            after=self.diff_after,
+        )
         return result
 
 
