@@ -1,4 +1,4 @@
-.. _ansible_collecions.community.crypto.docsite.guide_selfsigned:
+.. _ansible_collections.community.crypto.docsite.guide_selfsigned:
 
 How to create self-signed certificates
 ======================================
