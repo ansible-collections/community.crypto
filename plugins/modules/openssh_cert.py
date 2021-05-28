@@ -17,6 +17,7 @@ description:
     - Generate and regenerate OpenSSH host or user certificates.
 requirements:
     - "ssh-keygen"
+    - cryptography >= 2.6 (when I(passphrase) is used)
 options:
     state:
         description:
@@ -46,6 +47,12 @@ options:
             - If the private key is on a PKCS#11 token (I(pkcs11_provider)), set this to the path to the public key instead.
             - Required if I(state) is C(present).
         type: path
+    passphrase:
+        description:
+            - The passphrase used to decrypt the I(signing_key) if the key is encrypted.
+            - Requires cryptography >= 2.6 in addition to ssh-keygen.
+        type: str
+        version_added: 1.8.0
     pkcs11_provider:
         description:
             - To use a signing key that resides on a PKCS#11 token, set this to the name (or full path) of the shared library to use with the token.
@@ -225,11 +232,15 @@ from datetime import MINYEAR, MAXYEAR
 from distutils.version import LooseVersion
 from shutil import copy2, rmtree
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import convert_relative_to_datetime
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import parse_openssh_version
+from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+    HAS_OPENSSH_SUPPORT,
+    OpensshKeypair,
+)
 
 
 class CertificateError(Exception):
@@ -247,6 +258,7 @@ class Certificate(object):
         self.pkcs11_provider = module.params['pkcs11_provider']
         self.public_key = module.params['public_key']
         self.path = module.params['path']
+        self.passphrase = module.params['passphrase']
         self.identifier = module.params['identifier']
         self.serial_number = module.params['serial_number']
         self.valid_from = module.params['valid_from']
@@ -274,10 +286,7 @@ class Certificate(object):
     def generate(self, module):
 
         if not self.is_valid(module, perms_required=False) or self.force:
-            args = [
-                self.ssh_keygen,
-                '-s', self.signing_key
-            ]
+            args = [self.ssh_keygen]
 
             if self.pkcs11_provider:
                 args.extend(['-D', self.pkcs11_provider])
@@ -344,6 +353,21 @@ class Certificate(object):
 
             try:
                 temp_directory = tempfile.mkdtemp()
+
+                # Private key is decrypted and stored in a temporary file when ``passphrase`` value is given
+                if self.passphrase:
+                    keypair = OpensshKeypair.load(
+                        self.signing_key,
+                        passphrase=self.passphrase.encode('UTF-8'),
+                        no_public_key=True
+                    )
+                    keypair.update_passphrase('')
+                    temp_pkey = tempfile.mkstemp(dir=temp_directory)[1]
+                    with open(temp_pkey, 'wb') as f:
+                        f.write(keypair.private_key)
+                    self.signing_key = temp_pkey
+
+                args.extend(['-s', self.signing_key])
                 copy2(self.public_key, temp_directory)
                 args.extend([temp_directory + "/" + os.path.basename(self.public_key)])
                 module.run_command(args, environ_update=dict(TZ="UTC"), check_rc=True)
@@ -563,6 +587,7 @@ def main():
             pkcs11_provider=dict(type='str'),
             public_key=dict(type='path'),
             path=dict(type='path', required=True),
+            passphrase=dict(type='str', no_log=True),
             identifier=dict(type='str'),
             serial_number=dict(type='int'),
             valid_from=dict(type='str'),
@@ -590,6 +615,12 @@ def main():
                     " Your version is: %s"
                 ) % ssh_version_string
             )
+
+    if module.params['passphrase'] and not HAS_OPENSSH_SUPPORT:
+        module.fail_json(
+            msg=missing_required_lib("cryptography >= 2.6"),
+            reason="to decrypt password protected signing keys",
+        )
 
     def isBaseDir(path):
         base_dir = os.path.dirname(path) or '.'

@@ -342,6 +342,15 @@
       that:
         - rc_serial_number_ignored is not changed
       msg: OpenSSH certificate generation with omitted serial number is idempotent.
+  - name: Generate cert using passphrase option with unencrypted private key
+    openssh_cert:
+      type: user
+      signing_key: '{{ output_dir }}/id_key'
+      passphrase:
+      public_key: '{{ output_dir }}/id_key.pub'
+      path: '{{ output_dir }}/id_cert_unencrypted_key'
+      valid_from: always
+      valid_to: forever
   - name: Remove certificate (check mode)
     openssh_cert:
       state: absent
@@ -380,9 +389,9 @@
       #valid_from: "2001-01-21"
       #valid_to: "2019-01-21"
     check_mode: yes
-  - name: Remove keypair
+  - name: Remove keypairs
     openssh_keypair:
-      path: '{{ output_dir }}/id_key'
+      path: "{{ output_dir }}/id_key"
       state: absent
 
 - name: openssh_cert integration tests that require ssh-agent
@@ -465,3 +474,28 @@
     openssh_cert:
       state: absent
       path: '{{ output_dir }}/id_cert_with_agent'
+
+  - block:
+    - name: Generate keypair with encrypted private key
+      openssh_keypair:
+        path: '{{ private_key_path }}'
+        passphrase: '{{ passphrase }}'
+        type: rsa
+        size: 2048
+    - name: Generate cert using encrypted signing key
+      openssh_cert:
+        type: user
+        signing_key: '{{ private_key_path }}'
+        passphrase: '{{ passphrase }}'
+        public_key: '{{ private_key_path }}.pub'
+        path: '{{ output_dir }}/id_cert_encrypted_key'
+        valid_from: always
+        valid_to: forever
+    - name: Remove keypair with encrypted private key
+      openssh_keypair:
+        path: '{{ output_dir }}/id_encrypted_key'
+        state: absent
+    when: cryptography_version.stdout is version("2.6", ">=")
+    vars:
+      private_key_path: '{{ output_dir }}/id_encrypted_key'
+      passphrase: password
