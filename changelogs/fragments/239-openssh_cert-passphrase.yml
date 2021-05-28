@@ -1,0 +1,2 @@
+minor_changes:
+  - openssh_cert - added ``passphrase`` parameter for encrypting/decrypting signing keys (https://github.com/ansible-collections/community.crypto/pull/239).
