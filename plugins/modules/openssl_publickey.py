@@ -338,7 +338,9 @@ class PublicKey(OpenSSLObject):
             backend=self.backend,
         )
         file_args = module.load_file_common_arguments(module.params)
-        if module.set_fs_attributes_if_different(file_args, False):
+        if module.check_file_absent_if_check_mode(file_args['path']):
+            self.changed = True
+        elif module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
     def check(self, module, perms_required=True):

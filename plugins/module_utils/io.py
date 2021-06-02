@@ -92,7 +92,8 @@ def write_file(module, content, default_mode=None, path=None):
         # Move tempfile to final destination
         module.atomic_move(tmp_name, file_args['path'])
         # Try to update permissions again
-        module.set_fs_attributes_if_different(file_args, False)
+        if not module.check_file_absent_if_check_mode(file_args['path']):
+            module.set_fs_attributes_if_different(file_args, False)
     except Exception as e:
         try:
             os.remove(tmp_name)

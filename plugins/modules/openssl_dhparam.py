@@ -221,9 +221,9 @@ class DHParameterBase(object):
     def _check_fs_attributes(self, module):
         """Checks (and changes if not in check mode!) fs attributes"""
         file_args = module.load_file_common_arguments(module.params)
-        attrs_changed = module.set_fs_attributes_if_different(file_args, False)
-
-        return not attrs_changed
+        if module.check_file_absent_if_check_mode(file_args['path']):
+            return False
+        return not module.set_fs_attributes_if_different(file_args, False)
 
     def dump(self):
         """Serialize the object into a dictionary."""

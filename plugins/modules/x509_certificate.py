@@ -472,7 +472,10 @@ class GenericCertificate(OpenSSLObject):
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
-        self.changed = module.set_fs_attributes_if_different(file_args, self.changed)
+        if module.check_file_absent_if_check_mode(file_args['path']):
+            self.changed = True
+        else:
+            self.changed = module.set_fs_attributes_if_different(file_args, self.changed)
 
     def check(self, module, perms_required=True):
         """Ensure the resource is in its desired state."""

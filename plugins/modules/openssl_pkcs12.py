@@ -733,7 +733,9 @@ def main():
                     changed = True
 
             file_args = module.load_file_common_arguments(module.params)
-            if module.set_fs_attributes_if_different(file_args, changed):
+            if module.check_file_absent_if_check_mode(file_args['path']):
+                self.changed = True
+            elif module.set_fs_attributes_if_different(file_args, changed):
                 changed = True
         else:
             if module.check_mode:
