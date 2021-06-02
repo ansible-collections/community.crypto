@@ -114,6 +114,16 @@
       - extension_missing_eku is failed
       - "'Found no extendedKeyUsage extension' in extension_missing_eku.msg"
 
+- name: (Assertonly, {{select_crypto_backend}}) - Check wrong key fail
+  x509_certificate:
+    path: '{{ output_dir }}/cert_noext.pem'
+    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    privatekey_passphrase: hunter2
+    provider: assertonly
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  ignore_errors: yes
+  register: private_key_error
+
 - name: (Assertonly, {{select_crypto_backend}}) - Check private key passphrase fail 1
   x509_certificate:
     path: '{{ output_dir }}/cert_noext.pem'
@@ -146,6 +156,8 @@
 - name: (Assertonly, {{select_crypto_backend}}) -
   assert:
     that:
+      - private_key_error is failed
+      - "'Certificate and private key ' in private_key_error.msg and ' do not match' in private_key_error.msg"
       - passphrase_error_1 is failed
       - "'assphrase' in passphrase_error_1.msg or 'assword' in passphrase_error_1.msg"
       - passphrase_error_2 is failed
