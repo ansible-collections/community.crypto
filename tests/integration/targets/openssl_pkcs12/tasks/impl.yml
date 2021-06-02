@@ -1,4 +1,16 @@
 - block:
+  - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (check mode)"
+    openssl_pkcs12:
+      select_crypto_backend: '{{ select_crypto_backend }}'
+      path: '{{ output_dir }}/ansible.p12'
+      friendly_name: abracadabra
+      privatekey_path: '{{ output_dir }}/ansible_pkey1.pem'
+      certificate_path: '{{ output_dir }}/ansible1.crt'
+      state: present
+      return_content: true
+    check_mode: true
+    register: p12_standard_check
+
   - name: "({{ select_crypto_backend }}) Generate PKCS#12 file"
     openssl_pkcs12:
       select_crypto_backend: '{{ select_crypto_backend }}'
@@ -9,6 +21,18 @@
       state: present
       return_content: true
     register: p12_standard
+
+  - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (check mode)"
+    openssl_pkcs12:
+      select_crypto_backend: '{{ select_crypto_backend }}'
+      path: '{{ output_dir }}/ansible.p12'
+      friendly_name: abracadabra
+      privatekey_path: '{{ output_dir }}/ansible_pkey1.pem'
+      certificate_path: '{{ output_dir }}/ansible1.crt'
+      state: present
+      return_content: true
+    check_mode: true
+    register: p12_standard_idempotency_check
 
   - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency"
     openssl_pkcs12:

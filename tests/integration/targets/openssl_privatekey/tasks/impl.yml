@@ -1,10 +1,26 @@
 ---
+- name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (check mode)"
+  openssl_privatekey:
+    path: '{{ output_dir }}/privatekey1.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  check_mode: true
+  register: privatekey1_check
+
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard"
   openssl_privatekey:
     path: '{{ output_dir }}/privatekey1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: yes
   register: privatekey1
+
+- name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (idempotence, check mode)"
+  openssl_privatekey:
+    path: '{{ output_dir }}/privatekey1.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  check_mode: true
+  register: privatekey1_idempotence_check
 
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (idempotence)"
   openssl_privatekey:

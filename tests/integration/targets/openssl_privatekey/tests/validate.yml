@@ -5,6 +5,9 @@
 - name: "({{ select_crypto_backend }}) Validate privatekey1 idempotency and content returned"
   assert:
     that:
+      - privatekey1_check is changed
+      - privatekey1 is changed
+      - privatekey1_idempotence_check is not changed
       - privatekey1_idempotence is not changed
       - privatekey1.privatekey == lookup('file', output_dir ~ '/privatekey1.pem', rstrip=False)
       - privatekey1.privatekey == privatekey1_idempotence.privatekey

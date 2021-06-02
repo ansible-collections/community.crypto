@@ -35,6 +35,17 @@
     - 'CA:TRUE'
     basic_constraints_critical: yes
 
+- name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (check mode)
+  x509_certificate:
+    path: '{{ output_dir }}/ca_cert.pem'
+    csr_path: '{{ output_dir }}/ca_csr.csr'
+    privatekey_path: '{{ output_dir }}/ca_privatekey.pem'
+    provider: selfsigned
+    selfsigned_digest: sha256
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  check_mode: true
+  register: result_check_mode
+
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate
   x509_certificate:
     path: '{{ output_dir }}/ca_cert.pem'
@@ -43,6 +54,13 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: (OwnCA, {{select_crypto_backend}}) Verify changed
+  assert:
+    that:
+      - result_check_mode is changed
+      - result is changed
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (privatekey passphrase)
   x509_certificate:
