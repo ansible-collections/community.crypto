@@ -1,4 +1,0 @@
-bugfixes:
-- "various modules - prevent crashes when modules try to set attributes on not yet existing files in check mode.
-  This will be fixed in ansible-core 2.12, but it is not backported to every Ansible version we support
-  (https://github.com/ansible-collections/community.crypto/issue/242, https://github.com/ansible-collections/community.crypto/pull/243)."

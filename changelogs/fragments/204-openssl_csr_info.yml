@@ -1,2 +1,0 @@
-minor_changes:
-- "openssl_csr_info - refactor module to allow code re-use for diff mode (https://github.com/ansible-collections/community.crypto/pull/204)."

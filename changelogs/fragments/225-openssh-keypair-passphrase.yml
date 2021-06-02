@@ -1,2 +1,0 @@
-minor_changes:
-  - openssh_keypair - added ``passphrase`` parameter for encrypting/decrypting OpenSSH private keys (https://github.com/ansible-collections/community.crypto/pull/225).

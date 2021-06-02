@@ -1,4 +1,0 @@
-minor_changes:
-- "openssl_pkcs12 - added option ``select_crypto_backend`` and a ``cryptography`` backend.
-  This requires cryptography 3.0 or newer, and does not support the ``iter_size`` and ``maciter_size`` options
-  (https://github.com/ansible-collections/community.crypto/pull/234)."
