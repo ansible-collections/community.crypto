@@ -710,7 +710,7 @@ class CRL(OpenSSLObject):
             self.changed = True
 
         file_args = self.module.load_file_common_arguments(self.module.params)
-        if module.check_file_absent_if_check_mode(file_args['path']):
+        if self.module.check_file_absent_if_check_mode(file_args['path']):
             self.changed = True
         elif self.module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
