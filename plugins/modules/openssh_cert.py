@@ -364,7 +364,9 @@ class Certificate(object):
                 module.fail_json(msg="%s" % to_native(e))
 
         file_args = module.load_file_common_arguments(module.params)
-        if module.set_fs_attributes_if_different(file_args, False):
+        if module.check_file_absent_if_check_mode(file_args['path']):
+            self.changed = True
+        elif module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
     def convert_to_datetime(self, module, timestring):

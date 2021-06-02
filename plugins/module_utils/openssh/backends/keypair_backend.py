@@ -207,6 +207,8 @@ class KeypairBackend(object):
         file_args = self.module.load_file_common_arguments(self.module.params)
         if public_key:
             file_args['path'] = file_args['path'] + '.pub'
+        if self.module.check_file_absent_if_check_mode(file_args['path']):
+            return True
         return self.module.set_fs_attributes_if_different(file_args, False)
 
     @property

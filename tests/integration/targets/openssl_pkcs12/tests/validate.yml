@@ -14,17 +14,20 @@
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 (assert)'
   assert:
     that:
+      - p12_standard_check is changed
+      - p12_standard is changed
       - p12.stdout_lines[2].split(':')[-1].strip() == 'abracadabra'
       - p12_standard.mode == '0400'
-      - p12_no_pkey.changed
+      - p12_no_pkey is changed
       - p12_validate_no_pkey.stdout_lines[-1] == '-----END CERTIFICATE-----'
-      - p12_force.changed
+      - p12_force is changed
       - p12_force_and_mode.mode == '0644' and p12_force_and_mode.changed
-      - p12_dumped.changed
-      - not p12_standard_idempotency.changed
-      - not p12_multiple_certs_idempotency.changed
-      - not p12_dumped_idempotency.changed
-      - not p12_dumped_check_mode.changed
+      - p12_dumped is changed
+      - p12_standard_idempotency is not changed
+      - p12_standard_idempotency_check is not changed
+      - p12_multiple_certs_idempotency is not changed
+      - p12_dumped_idempotency is not changed
+      - p12_dumped_check_mode is not changed
       - "'www1.' in p12_validate_multi_certs.stdout"
       - "'www2.' in p12_validate_multi_certs.stdout"
       - "'www3.' in p12_validate_multi_certs.stdout"

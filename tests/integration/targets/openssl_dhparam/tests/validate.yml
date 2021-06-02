@@ -26,6 +26,9 @@
 - name: "[{{ select_crypto_backend }}] Check if changed works correctly"
   assert:
     that:
+      - dhparam_check is changed
+      - dhparam is changed
+      - dhparam_changed_check is not changed
       - dhparam_changed is not changed
       - dhparam_changed_512 is not changed
       - dhparam_changed_to_512 is changed

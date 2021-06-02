@@ -1,6 +1,15 @@
 ---
 # The tests for this module generate unsafe parameters for testing purposes;
 # otherwise tests would be too slow. Use sizes of at least 2048 in production!
+- name: "[{{ select_crypto_backend }}] Generate parameter (check mode)"
+  openssl_dhparam:
+    size: 768
+    path: '{{ output_dir }}/dh768.pem'
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    return_content: yes
+  check_mode: true
+  register: dhparam_check
+
 - name: "[{{ select_crypto_backend }}] Generate parameter"
   openssl_dhparam:
     size: 768
@@ -8,6 +17,15 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     return_content: yes
   register: dhparam
+
+- name: "[{{ select_crypto_backend }}] Don't regenerate parameters with no change (check mode)"
+  openssl_dhparam:
+    size: 768
+    path: '{{ output_dir }}/dh768.pem'
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    return_content: yes
+  check_mode: true
+  register: dhparam_changed_check
 
 - name: "[{{ select_crypto_backend }}] Don't regenerate parameters with no change"
   openssl_dhparam:

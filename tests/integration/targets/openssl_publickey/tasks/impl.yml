@@ -4,6 +4,15 @@
     path: '{{ output_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
+- name: "({{ select_crypto_backend }}) Generate publickey - PEM format (check mode)"
+  openssl_publickey:
+    path: '{{ output_dir }}/publickey.pub'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  check_mode: true
+  register: publickey_check
+
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format"
   openssl_publickey:
     path: '{{ output_dir }}/publickey.pub'
@@ -12,6 +21,15 @@
     return_content: yes
   register: publickey
 
+- name: "({{ select_crypto_backend }}) Generate publickey - PEM format (check mode, idempotence)"
+  openssl_publickey:
+    path: '{{ output_dir }}/publickey.pub'
+    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+    return_content: yes
+  check_mode: true
+  register: publickey_check2
+
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (idempotence)"
   openssl_publickey:
     path: '{{ output_dir }}/publickey.pub'
@@ -19,6 +37,14 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: yes
   register: publickey_idempotence
+
+- name: "({{ select_crypto_backend }}) Verify check mode"
+  assert:
+    that:
+      - publickey_check is changed
+      - publickey is changed
+      - publickey_check2 is not changed
+      - publickey_idempotence is not changed
 
 - name: "({{ select_crypto_backend }}) Generate publickey - OpenSSH format"
   openssl_publickey:
