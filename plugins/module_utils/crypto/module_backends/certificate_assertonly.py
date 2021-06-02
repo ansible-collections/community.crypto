@@ -177,25 +177,25 @@ class AssertOnlyCertificateBackend(CertificateBackend):
         if self.privatekey_path is not None or self.privatekey_content is not None:
             if not self._validate_privatekey():
                 messages.append(
-                    'Certificate %s and private key %s do not match' %
-                    (self.path, self.privatekey_path or '(provided in module options)')
+                    'Certificate and private key %s do not match' %
+                    (self.privatekey_path or '(provided in module options)')
                 )
 
         if self.csr_path is not None or self.csr_content is not None:
             if not self._validate_csr_signature():
                 messages.append(
-                    'Certificate %s and CSR %s do not match: private key mismatch' %
-                    (self.path, self.csr_path or '(provided in module options)')
+                    'Certificate and CSR %s do not match: private key mismatch' %
+                    (self.csr_path or '(provided in module options)')
                 )
             if not self._validate_csr_subject():
                 messages.append(
-                    'Certificate %s and CSR %s do not match: subject mismatch' %
-                    (self.path, self.csr_path or '(provided in module options)')
+                    'Certificate and CSR %s do not match: subject mismatch' %
+                    (self.csr_path or '(provided in module options)')
                 )
             if not self._validate_csr_extensions():
                 messages.append(
-                    'Certificate %s and CSR %s do not match: extensions mismatch' %
-                    (self.path, self.csr_path or '(provided in module options)')
+                    'Certificate and CSR %s do not match: extensions mismatch' %
+                    (self.csr_path or '(provided in module options)')
                 )
 
         if self.signature_algorithms is not None:
