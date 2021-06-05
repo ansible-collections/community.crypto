@@ -1,0 +1,83 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: SSH-agent test block
+  environment:
+    SSH_AUTH_SOCK: "{{ openssh_agent_sock }}"
+  block:
+    - name: Generate always valid cert using agent without key in agent (should fail)
+      openssh_cert:
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: '{{ output_dir }}/id_cert_with_agent'
+        use_agent: true
+        valid_from: always
+        valid_to: forever
+      register: rc_no_key_in_agent
+      ignore_errors: true
+
+    - name: Make sure cert creation with agent fails if key not in agent
+      assert:
+        that:
+          - rc_no_key_in_agent is failed
+          - "'agent contains no identities' in rc_no_key_in_agent.msg or 'not found in agent' in rc_no_key_in_agent.msg"
+
+    - name: Add key to agent
+      command: 'ssh-add {{ signing_key }}'
+
+    - name: Generate always valid cert with agent (check mode)
+      openssh_cert:
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: '{{ output_dir }}/id_cert_with_agent'
+        use_agent: true
+        valid_from: always
+        valid_to: forever
+      check_mode: true
+
+    - name: Generate always valid cert with agent
+      openssh_cert:
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: '{{ output_dir }}/id_cert_with_agent'
+        use_agent: true
+        valid_from: always
+        valid_to: forever
+
+    - name: Generate always valid cert with agent (idempotent)
+      openssh_cert:
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: '{{ output_dir }}/id_cert_with_agent'
+        use_agent: true
+        valid_from: always
+        valid_to: forever
+      register: rc_cert_with_agent_idempotent
+
+    - name: Check agent idempotency
+      assert:
+        that:
+          - rc_cert_with_agent_idempotent is not changed
+        msg: OpenSSH certificate generation without serial number is idempotent.
+
+    - name: Generate always valid cert with agent (idempotent, check mode)
+      openssh_cert:
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: '{{ output_dir }}/id_cert_with_agent'
+        use_agent: true
+        valid_from: always
+        valid_to: forever
+      check_mode: true
+
+    - name: Remove certificate
+      openssh_cert:
+        state: absent
+        path: '{{ output_dir }}/id_cert_with_agent'

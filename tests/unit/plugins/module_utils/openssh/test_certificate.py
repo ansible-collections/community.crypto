@@ -5,8 +5,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
-    OpensshCertificate
+    OpensshCertificate,
+    OpensshCertificateTimeParameters
 )
 
 # Type: ssh-rsa-cert-v01@openssh.com user certificate
@@ -126,6 +129,54 @@ VALID_EXTENSIONS = [
 ]
 INVALID_EXTENSIONS = [(b'test', b'')]
 
+VALID_TIME_PARAMETERS = [
+    (0, "always", "always", 0,
+     0xFFFFFFFFFFFFFFFF, "forever", "forever", 253402300800,
+     ""),
+    ("always", "always", "always", 0,
+     "forever", "forever", "forever", 253402300800,
+     ""),
+    (315532800, "1980-01-01T00:00:00", "19800101000000", 315532800,
+     631152000, "1990-01-01T00:00:00", "19900101000000", 631152000,
+     "19800101000000:19900101000000"),
+    ("1980-01-01", "1980-01-01T00:00:00", "19800101000000", 315532800,
+     "1990-01-01", "1990-01-01T00:00:00", "19900101000000", 631152000,
+     "19800101000000:19900101000000"),
+    ("1980-01-01 00:00:00", "1980-01-01T00:00:00", "19800101000000", 315532800,
+     "1990-01-01 00:00:00", "1990-01-01T00:00:00", "19900101000000", 631152000,
+     "19800101000000:19900101000000"),
+    ("1980-01-01T00:00:00", "1980-01-01T00:00:00", "19800101000000", 315532800,
+     "1990-01-01T00:00:00", "1990-01-01T00:00:00", "19900101000000", 631152000,
+     "19800101000000:19900101000000"),
+    ("always", "always", "19700101000000", 0,
+     "1990-01-01T00:00:00", "1990-01-01T00:00:00", "19900101000000", 631152000,
+     "always:19900101000000"),
+    ("1980-01-01", "1980-01-01T00:00:00", "19800101000000", 315532800,
+     "forever", "forever", "99991231235959", 253402300800,
+     "19800101000000:forever"),
+]
+
+INVALID_TIME_PARAMETERS = [
+    (-1, 0xFFFFFFFFFFFFFFFFFF),
+    ("never", "ever"),
+    ("01-01-1980", "01-01-1990"),
+    (1, 0),
+]
+
+VALID_VALIDITY_TEST = [
+    ("always", "forever", "2000-01-01"),
+    ("1999-12-31", "2000-01-02", "2000-01-01"),
+    ("1999-12-31 23:59:00", "2000-01-01 00:01:00", "2000-01-01 00:00:00"),
+    ("1999-12-31 23:59:59", "2000-01-01 00:00:01", "2000-01-01 00:00:00"),
+]
+
+INVALID_VALIDITY_TEST = [
+    ("always", "forever", "1969-12-31"),
+    ("always", "2000-01-01", "2000-01-02"),
+    ("2000-01-01", "forever", "1999-12-31"),
+    ("2000-01-01 00:00:00", "2000-01-01 00:00:01", "2000-01-01 00:00:02"),
+]
+
 
 def test_rsa_certificate(tmpdir):
     cert_file = tmpdir / 'id_rsa-cert.pub'
@@ -136,7 +187,7 @@ def test_rsa_certificate(tmpdir):
     assert cert.cert_info.serial == 0
     assert cert.cert_info.type_string == b'ssh-rsa-cert-v01@openssh.com'
     assert cert.cert_info.public_key_fingerprint() == RSA_FINGERPRINT
-    assert cert.signing_key_fingerprint() == DSA_FINGERPRINT
+    assert cert.cert_info.signing_key_fingerprint() == DSA_FINGERPRINT
 
 
 def test_dsa_certificate(tmpdir):
@@ -147,7 +198,7 @@ def test_dsa_certificate(tmpdir):
 
     assert cert.cert_info.type_string == b'ssh-dss-cert-v01@openssh.com'
     assert cert.cert_info.public_key_fingerprint() == DSA_FINGERPRINT
-    assert cert.signing_key_fingerprint() == ECDSA_FINGERPRINT
+    assert cert.cert_info.signing_key_fingerprint() == ECDSA_FINGERPRINT
     assert cert.cert_info.critical_options == []
     assert cert.cert_info.extensions == []
 
@@ -159,7 +210,7 @@ def test_ecdsa_certificate(tmpdir):
     cert = OpensshCertificate.load(str(cert_file))
     assert cert.cert_info.type_string == b'ecdsa-sha2-nistp256-cert-v01@openssh.com'
     assert cert.cert_info.public_key_fingerprint() == ECDSA_FINGERPRINT
-    assert cert.signing_key_fingerprint() == ED25519_FINGERPRINT
+    assert cert.cert_info.signing_key_fingerprint() == ED25519_FINGERPRINT
     assert cert.cert_info.critical_options == VALID_OPTS
     assert cert.cert_info.extensions == VALID_EXTENSIONS
 
@@ -171,7 +222,7 @@ def test_ed25519_certificate(tmpdir):
     cert = OpensshCertificate.load(str(cert_file))
     assert cert.cert_info.type_string == b'ssh-ed25519-cert-v01@openssh.com'
     assert cert.cert_info.public_key_fingerprint() == ED25519_FINGERPRINT
-    assert cert.signing_key_fingerprint() == RSA_FINGERPRINT
+    assert cert.cert_info.signing_key_fingerprint() == RSA_FINGERPRINT
     assert cert.cert_info.critical_options == INVALID_OPTS
     assert cert.cert_info.extensions == INVALID_EXTENSIONS
 
@@ -186,3 +237,41 @@ def test_invalid_data(tmpdir):
     except ValueError:
         result = True
     assert result
+
+
+@pytest.mark.parametrize(
+    "valid_from,valid_from_hr,valid_from_openssh,valid_from_timestamp," +
+    "valid_to,valid_to_hr,valid_to_openssh,valid_to_timestamp," +
+    "validity_string",
+    VALID_TIME_PARAMETERS
+)
+def test_valid_time_parameters(valid_from, valid_from_hr, valid_from_openssh, valid_from_timestamp,
+                               valid_to, valid_to_hr, valid_to_openssh, valid_to_timestamp,
+                               validity_string):
+    time_parameters = OpensshCertificateTimeParameters(
+        valid_from=valid_from,
+        valid_to=valid_to
+    )
+    assert time_parameters.valid_from(date_format="human_readable") == valid_from_hr
+    assert time_parameters.valid_from(date_format="openssh") == valid_from_openssh
+    assert time_parameters.valid_from(date_format="timestamp") == valid_from_timestamp
+    assert time_parameters.valid_to(date_format="human_readable") == valid_to_hr
+    assert time_parameters.valid_to(date_format="openssh") == valid_to_openssh
+    assert time_parameters.valid_to(date_format="timestamp") == valid_to_timestamp
+    assert time_parameters.validity_string == validity_string
+
+
+@pytest.mark.parametrize("valid_from,valid_to", INVALID_TIME_PARAMETERS)
+def test_valid_time_parameters(valid_from, valid_to):
+    with pytest.raises(ValueError):
+        OpensshCertificateTimeParameters(valid_from, valid_to)
+
+
+@pytest.mark.parametrize("valid_from,valid_to,valid_at", VALID_VALIDITY_TEST)
+def test_valid_validity_test(valid_from, valid_to, valid_at):
+    assert OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)
+
+
+@pytest.mark.parametrize("valid_from,valid_to,valid_at", INVALID_VALIDITY_TEST)
+def test_invalid_validity_test(valid_from, valid_to, valid_at):
+    assert not OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)

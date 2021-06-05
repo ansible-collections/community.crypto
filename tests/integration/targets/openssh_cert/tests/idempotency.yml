@@ -1,0 +1,272 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- set_fact:
+    test_cases:
+      - test_name: Generate cert - force option (check_mode)
+        force: true
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: true
+      - test_name: Generate cert - force option
+        force: true
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: true
+      - test_name: Generate cert - force option (idempotent)
+        force: true
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: true
+      - test_name: Generate cert - force option (idemopotent, check mode)
+        force: true
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: true
+      - test_name: Generate always valid cert (check mode)
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: true
+      - test_name: Generate always valid cert
+        type: user
+        valid_from: always
+        valid_to: forever
+        changed: true
+      - test_name: Generate always valid cert (idempotent)
+        type: user
+        valid_from: always
+        valid_to: forever
+        changed: false
+      - test_name: Generate always valid cert (idempotent, check mode)
+        type: user
+        valid_from: always
+        valid_to: forever
+        check_mode: true
+        changed: false
+      - test_name: Generate restricted validity cert with valid_at (check mode)
+        type: host
+        valid_from: +0s
+        valid_to: +32w
+        valid_at: +2w
+        check_mode: true
+        changed: true
+      - test_name: Generate restricted validity cert with valid_at
+        type: host
+        valid_from: +0s
+        valid_to: +32w
+        valid_at: +2w
+        changed: true
+      # Relative date time is based on current time so re-generation will occur in this case
+      - test_name: Generate restricted validity cert with valid_at (idempotent)
+        type: host
+        valid_from: +0s
+        valid_to: +32w
+        valid_at: +2w
+        changed: true
+      # Relative date time is based on current time so re-generation will occur in this case
+      - test_name: Generate restricted validity cert with valid_at (idempotent, check mode)
+        type: host
+        valid_from: +0s
+        valid_to: +32w
+        valid_at: +2w
+        check_mode: true
+        changed: true
+      - test_name: Generate always valid cert only for example.com and examplehost (check mode)
+        type: host
+        valid_from: always
+        valid_to: forever
+        principals: &principals
+          - example.com
+          - examplehost
+        check_mode: true
+        changed: true
+      - test_name: Generate always valid cert only for example.com and examplehost
+        type: host
+        valid_from: always
+        valid_to: forever
+        principals: *principals
+        changed: true
+      - test_name: Generate always valid cert only for example.com and examplehost (idempotent)
+        type: host
+        valid_from: always
+        valid_to: forever
+        principals: *principals
+        changed: false
+      - test_name: Generate always valid cert only for example.com and examplehost (idempotent, check mode)
+        type: host
+        valid_from: always
+        valid_to: forever
+        principals: *principals
+        check_mode: true
+        changed: false
+      - test_name: Generate always valid cert only for example.com and examplehost (idempotent, switch)
+        type: host
+        valid_from: always
+        valid_to: forever
+        principals:
+          - examplehost
+          - example.com
+        changed: false
+      - test_name: Generate OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019 (check mode)
+        type: host
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        check_mode: true
+        changed: true
+      - test_name: Generate OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019
+        type: host
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: true
+      - test_name: Generate OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019 (idempotent)
+        type: host
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: false
+      - test_name: Generate OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019 (idempotent, check mode)
+        type: host
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        check_mode: true
+        changed: false
+      - test_name: Generate an OpenSSH user Certificate with clear and force-command option (check mode)
+        type: user
+        options: &options
+          - "clear"
+          - "force-command=/tmp/bla/foo"
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        check_mode: true
+        changed: true
+      - test_name: Generate an OpenSSH user Certificate with clear and force-command option
+        type: user
+        options: *options
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: true
+      - test_name: Generate an OpenSSH user Certificate with clear and force-command option (idempotent)
+        type: user
+        options: *options
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: false
+      - test_name: Generate an OpenSSH user Certificate with clear and force-command option (idempotent, check mode)
+        type: user
+        options: *options
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        check_mode: true
+        changed: false
+      - test_name: Generate an OpenSSH user Certificate with clear and force-command option (idempotent, switch)
+        type: user
+        options:
+          - "force-command=/tmp/bla/foo"
+          - "clear"
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: false
+      # Options are currently not checked for idempotency purposes
+      - test_name: Generate an OpenSSH user Certificate with no options (idempotent)
+        type: user
+        valid_from: "2001-01-21"
+        valid_to: "2019-01-21"
+        changed: false
+      - test_name: Generate cert without serial
+        type: user
+        valid_from: always
+        valid_to: forever
+        changed: true
+      - test_name: Generate cert without serial (idempotent)
+        type: user
+        valid_from: always
+        valid_to: forever
+        changed: false
+      - test_name: Generate cert with serial 42
+        type: user
+        valid_from: always
+        valid_to: forever
+        serial_number: 42
+        changed: true
+      - test_name: Generate cert with serial 42 (idempotent)
+        type: user
+        valid_from: always
+        valid_to: forever
+        serial_number: 42
+        changed: false
+      - test_name: Generate cert with changed serial number
+        type: user
+        valid_from: always
+        valid_to: forever
+        serial_number: 1337
+        changed: true
+      - test_name: Generate cert with removed serial number
+        type: user
+        valid_from: always
+        valid_to: forever
+        serial_number: 0
+        changed: true
+      - test_name: Generate a new cert with serial number
+        type: user
+        valid_from: always
+        valid_to: forever
+        serial_number: 42
+        changed: true
+      - test_name: Generate cert again, omitting the parameter serial_number (idempotent)
+        type: user
+        valid_from: always
+        valid_to: forever
+        changed: false
+      # Identifiers are not included in idempotency checks so a new cert will not be generated
+      - test_name: Generate cert with identifier
+        type: user
+        identifier: foo
+        valid_from: always
+        valid_to: forever
+        changed: false
+
+- name: Execute idempotency tests
+  openssh_cert:
+    force: "{{ test_case.force | default(omit) }}"
+    identifier: "{{ test_case.identifier | default(omit) }}"
+    options: "{{ test_case.options | default(omit) }}"
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    principals: "{{ test_case.principals | default(omit) }}"
+    serial_number: "{{ test_case.serial_number | default(omit) }}"
+    signing_key: "{{ signing_key }}"
+    state: "{{ test_case.state | default(omit) }}"
+    type: "{{ test_case.type | default(omit) }}"
+    valid_at: "{{ test_case.valid_at | default(omit) }}"
+    valid_from: "{{ test_case.valid_from | default(omit) }}"
+    valid_to: "{{ test_case.valid_to | default(omit) }}"
+  check_mode: "{{ test_case.check_mode | default(omit) }}"
+  register: idempotency_test_output
+  loop: "{{ test_cases }}"
+  loop_control:
+    loop_var: test_case
+
+- name: Assert task statuses
+  assert:
+    that:
+      - result.changed == test_cases[index].changed
+  loop: "{{ idempotency_test_output.results }}"
+  loop_control:
+    index_var: index
+    loop_var: result
+
+- name: Remove certificate
+  openssh_cert:
+    path: "{{ certificate_path }}"
+    state: absent
