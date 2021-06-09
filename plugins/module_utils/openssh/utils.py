@@ -123,6 +123,7 @@ class OpensshParser(object):
         raw_string = self.string()
         return raw_string.decode('ASCII').split(',')
 
+    # Convenience function, but not an official data type from SSH
     def string_list(self):
         result = []
         raw_string = self.string()
@@ -134,6 +135,7 @@ class OpensshParser(object):
 
         return result
 
+    # Convenience function, but not an official data type from SSH
     def option_list(self):
         result = []
         raw_string = self.string()
