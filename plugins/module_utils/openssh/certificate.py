@@ -276,9 +276,12 @@ class OpensshCertificate(object):
         if format_identifier != parser.string():
             raise ValueError("Certificate formats do not match")
 
-        cert_info = cls._parse_cert_info(pub_key_type, parser)
-        signing_key = parser.string()
-        signature = parser.string()
+        try:
+            cert_info = cls._parse_cert_info(pub_key_type, parser)
+            signing_key = parser.string()
+            signature = parser.string()
+        except (TypeError, ValueError) as e:
+            raise ValueError("Invalid certificate data: %s" % e)
 
         if parser.remaining_bytes():
             raise ValueError(
