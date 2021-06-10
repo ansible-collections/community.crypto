@@ -119,6 +119,10 @@ class OpensshCertificateInfo:
     def public_key_fingerprint(self):
         pass
 
+    @abc.abstractmethod
+    def parse_public_numbers(self, parser):
+        pass
+
 
 class OpensshRSACertificateInfo(OpensshCertificateInfo):
     def __init__(self, e=None, n=None, **kwargs):
@@ -138,6 +142,10 @@ class OpensshRSACertificateInfo(OpensshCertificateInfo):
         writer.mpint(self.n)
 
         return fingerprint(writer.bytes())
+
+    def parse_public_numbers(self, parser):
+        self.e = parser.mpint()
+        self.n = parser.mpint()
 
 
 class OpensshDSACertificateInfo(OpensshCertificateInfo):
@@ -162,6 +170,12 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         writer.mpint(self.y)
 
         return fingerprint(writer.bytes())
+
+    def parse_public_numbers(self, parser):
+        self.p = parser.mpint()
+        self.q = parser.mpint()
+        self.g = parser.mpint()
+        self.y = parser.mpint()
 
 
 class OpensshECDSACertificateInfo(OpensshCertificateInfo):
@@ -199,6 +213,10 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
         return fingerprint(writer.bytes())
 
+    def parse_public_numbers(self, parser):
+        self.curve = parser.string()
+        self.public_key = parser.string()
+
 
 class OpensshED25519CertificateInfo(OpensshCertificateInfo):
     def __init__(self, pk=None, **kwargs):
@@ -215,6 +233,9 @@ class OpensshED25519CertificateInfo(OpensshCertificateInfo):
         writer.string(self.pk)
 
         return fingerprint(writer.bytes())
+
+    def parse_public_numbers(self, parser):
+        self.pk = parser.string()
 
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
@@ -277,23 +298,7 @@ class OpensshCertificate(object):
     def _parse_cert_info(pub_key_type, parser):
         cert_info = get_cert_info_object(pub_key_type)
         cert_info.nonce = parser.string()
-
-        if pub_key_type == 'rsa':
-            cert_info.e = parser.mpint()
-            cert_info.n = parser.mpint()
-        elif pub_key_type == 'dsa':
-            cert_info.p = parser.mpint()
-            cert_info.q = parser.mpint()
-            cert_info.g = parser.mpint()
-            cert_info.y = parser.mpint()
-        elif pub_key_type in ('ecdsa-nistp256', 'ecdsa-nistp384', 'ecdsa-nistp521'):
-            cert_info.curve = parser.string()
-            cert_info.public_key = parser.string()
-        elif pub_key_type == 'ed25519':
-            cert_info.pk = parser.string()
-        else:
-            raise ValueError("%s is not a valid key type" % pub_key_type)
-
+        cert_info.parse_public_numbers(parser)
         cert_info.serial = parser.uint64()
         cert_info.cert_type = parser.uint32()
         cert_info.key_id = parser.string()

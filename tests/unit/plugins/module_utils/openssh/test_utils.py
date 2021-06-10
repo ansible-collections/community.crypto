@@ -70,9 +70,7 @@ def test_parse_openssh_version():
 
 @pytest.mark.parametrize("boolean", VALID_BOOLEAN)
 def test_valid_boolean(boolean):
-    writer = OpensshWriter()
-    writer.boolean(boolean)
-    assert OpensshParser(writer.bytes()).boolean() == boolean
+    assert OpensshParser(OpensshWriter().boolean(boolean).bytes()).boolean() == boolean
 
 
 @pytest.mark.parametrize("boolean", INVALID_BOOLEAN)
@@ -88,9 +86,7 @@ def test_invalid_boolean(boolean):
 
 @pytest.mark.parametrize("uint32", VALID_UINT32)
 def test_valid_uint32(uint32):
-    writer = OpensshWriter()
-    writer.uint32(uint32)
-    assert OpensshParser(writer.bytes()).uint32() == uint32
+    assert OpensshParser(OpensshWriter().uint32(uint32).bytes()).uint32() == uint32
 
 
 @pytest.mark.parametrize("uint32", INVALID_UINT32)
@@ -106,9 +102,7 @@ def test_invalid_uint32(uint32):
 
 @pytest.mark.parametrize("uint64", VALID_UINT64)
 def test_valid_uint64(uint64):
-    writer = OpensshWriter()
-    writer.uint64(uint64)
-    assert OpensshParser(writer.bytes()).uint64() == uint64
+    assert OpensshParser(OpensshWriter().uint64(uint64).bytes()).uint64() == uint64
 
 
 @pytest.mark.parametrize("uint64", INVALID_UINT64)
@@ -124,9 +118,7 @@ def test_invalid_uint64(uint64):
 
 @pytest.mark.parametrize("ssh_string", VALID_STRING)
 def test_valid_string(ssh_string):
-    writer = OpensshWriter()
-    writer.string(ssh_string)
-    assert OpensshParser(writer.bytes()).string() == ssh_string
+    assert OpensshParser(OpensshWriter().string(ssh_string).bytes()).string() == ssh_string
 
 
 @pytest.mark.parametrize("ssh_string", INVALID_STRING)
@@ -142,9 +134,7 @@ def test_invalid_string(ssh_string):
 
 @pytest.mark.parametrize("mpint", VALID_MPINT)
 def test_valid_mpint(mpint):
-    writer = OpensshWriter()
-    writer.mpint(mpint)
-    assert OpensshParser(writer.bytes()).mpint() == mpint
+    assert OpensshParser(OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
 
 
 @pytest.mark.parametrize("mpint", INVALID_MPINT)
@@ -185,6 +175,4 @@ def test_invalid_seek():
 
 def test_writer_bytes():
     buffer = bytearray(b'buffer')
-    writer = OpensshWriter(buffer)
-
-    assert writer.bytes() == buffer
+    assert OpensshWriter(buffer).bytes() == buffer

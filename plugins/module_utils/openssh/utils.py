@@ -249,6 +249,8 @@ class OpensshWriter(object):
 
         self._buff.extend(_BOOLEAN.pack(value))
 
+        return self
+
     def uint32(self, value):
         if not isinstance(value, int):
             raise TypeError("Value must be of type int not %s" % type(value))
@@ -256,6 +258,8 @@ class OpensshWriter(object):
             raise ValueError("Value must be a positive integer less than %s" % _UINT32_MAX)
 
         self._buff.extend(_UINT32.pack(value))
+
+        return self
 
     def uint64(self, value):
         if not isinstance(value, (long, int)):
@@ -265,17 +269,23 @@ class OpensshWriter(object):
 
         self._buff.extend(_UINT64.pack(value))
 
+        return self
+
     def string(self, value):
         if not isinstance(value, (bytes, bytearray)):
             raise TypeError("Value must be bytes-like not %s" % type(value))
         self.uint32(len(value))
         self._buff.extend(value)
 
+        return self
+
     def mpint(self, value):
         if not isinstance(value, (int, long)):
             raise TypeError("Value must be of type (long, int) not %s" % type(value))
 
         self.string(self._int_to_mpint(value))
+
+        return self
 
     def name_list(self, value):
         if not isinstance(value, list):
@@ -285,6 +295,8 @@ class OpensshWriter(object):
             self.string(','.join(value).encode('ASCII'))
         except UnicodeEncodeError as e:
             raise ValueError("Name-list's must consist of US-ASCII characters: %s" % e)
+
+        return self
 
     def string_list(self, value):
         if not isinstance(value, list):
@@ -296,19 +308,21 @@ class OpensshWriter(object):
 
         self.string(writer.bytes())
 
+        return self
+
     def option_list(self, value):
         if not isinstance(value, list) or (value and not isinstance(value[0], tuple)):
             raise TypeError("Value must be a list of tuples")
 
         writer = OpensshWriter()
-        for pair in value:
-            writer.string(pair[0])
+        for name, data in value:
+            writer.string(name)
             # SSH option data is encoded twice though this behavior is not documented
-            inner_writer = OpensshWriter()
-            inner_writer.string(pair[1])
-            writer.string(inner_writer.bytes())
+            writer.string(OpensshWriter().string(data).bytes())
 
         self.string(writer.bytes())
+
+        return self
 
     @staticmethod
     def _int_to_mpint(num):
