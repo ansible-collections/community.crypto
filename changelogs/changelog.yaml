@@ -468,3 +468,14 @@ releases:
       name: openssl_publickey_info
       namespace: ''
     release_date: '2021-06-02'
+  1.7.1:
+    changes:
+      bugfixes:
+      - openssl_pkcs12 - fix crash when loading passphrase-protected PKCS#12 files
+        with ``cryptography`` backend (https://github.com/ansible-collections/community.crypto/issues/247,
+        https://github.com/ansible-collections/community.crypto/pull/248).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.7.1.yml
+    - 248-openssl_pkcs12-passphrase-fix.yml
+    release_date: '2021-06-11'

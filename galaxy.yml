@@ -1,6 +1,6 @@
 namespace: community
 name: crypto
-version: 1.8.0
+version: 1.7.1
 readme: README.md
 authors:
   - Ansible (github.com/ansible)
