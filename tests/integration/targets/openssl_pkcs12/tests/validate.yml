@@ -8,7 +8,7 @@
   register: p12_validate_no_pkey
 
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 with multiple certs'
-  shell: "{{ openssl_binary }} pkcs12 -info -in {{ output_dir }}/ansible_multi_certs.p12 -nodes -passin pass:'' | grep subject"
+  shell: "{{ openssl_binary }} pkcs12 -info -in {{ output_dir }}/ansible_multi_certs.p12 -nodes -passin pass:'hunter3' | grep subject"
   register: p12_validate_multi_certs
 
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 (assert)'
