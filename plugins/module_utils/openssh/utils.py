@@ -83,34 +83,31 @@ class OpensshParser(object):
         self._pos = 0
 
     def boolean(self):
-        self._check_position(self.BOOLEAN_OFFSET)
+        next_pos = self._check_position(self.BOOLEAN_OFFSET)
 
-        next_pos = self._pos + self.BOOLEAN_OFFSET
         value = _BOOLEAN.unpack(self._data[self._pos:next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint32(self):
-        self._check_position(self.UINT32_OFFSET)
+        next_pos = self._check_position(self.UINT32_OFFSET)
 
-        next_pos = self._pos + self.UINT32_OFFSET
         value = _UINT32.unpack(self._data[self._pos:next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint64(self):
-        self._check_position(self.UINT64_OFFSET)
+        next_pos = self._check_position(self.UINT64_OFFSET)
 
-        next_pos = self._pos + self.UINT64_OFFSET
         value = _UINT64.unpack(self._data[self._pos:next_pos])[0]
         self._pos = next_pos
         return value
 
     def string(self):
         length = self.uint32()
-        self._check_position(length)
 
-        next_pos = self._pos + length
+        next_pos = self._check_position(length)
+
         value = self._data[self._pos:next_pos]
         self._pos = next_pos
         # Cast to bytes is required as a memoryview slice is itself a memoryview
@@ -154,8 +151,7 @@ class OpensshParser(object):
         return result
 
     def seek(self, offset):
-        self._check_position(offset)
-        self._pos = self._pos + offset
+        self._pos = self._check_position(offset)
 
         return self._pos
 
@@ -168,7 +164,7 @@ class OpensshParser(object):
         elif self._pos + offset < 0:
             raise ValueError("Position cannot be less than zero.")
         else:
-            return
+            return self._pos + offset
 
     @classmethod
     def signature_data(cls, signature_string):
@@ -325,7 +321,7 @@ class OpensshWriter(object):
         for name, data in value:
             writer.string(name)
             # SSH option data is encoded twice though this behavior is not documented
-            writer.string(OpensshWriter().string(data).bytes())
+            writer.string(OpensshWriter().string(data).bytes() if data else bytes())
 
         self.string(writer.bytes())
 

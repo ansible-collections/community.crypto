@@ -181,7 +181,11 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
 class OpensshECDSACertificateInfo(OpensshCertificateInfo):
     def __init__(self, curve=None, public_key=None, **kwargs):
         super(OpensshECDSACertificateInfo, self).__init__(**kwargs)
-        self.curve = curve
+        if curve is None:
+            self._curve = curve
+        else:
+            self.curve = curve
+
         self.public_key = public_key
 
     @property
@@ -190,10 +194,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
     @curve.setter
     def curve(self, curve):
-
-        if curve is None:
-            self._curve = curve
-        elif curve in _ECDSA_CURVE_IDENTIFIERS.values():
+        if curve in _ECDSA_CURVE_IDENTIFIERS.values():
             self._curve = curve
             self.type_string = _SSH_TYPE_STRINGS[_ECDSA_CURVE_IDENTIFIERS_LOOKUP[curve]] + _CERT_SUFFIX_V01
         else:
