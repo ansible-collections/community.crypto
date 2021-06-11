@@ -171,26 +171,33 @@ class OpensshParser(object):
             return
 
     @classmethod
-    def signature_data(cls, signature_string, key_type):
+    def signature_data(cls, signature_string):
         signature_data = {}
-        if key_type == 'rsa':
+
+        parser = cls(signature_string)
+        signature_type = parser.string()
+        signature_blob = parser.string()
+
+        blob_parser = cls(signature_blob)
+        if signature_type == b'ssh-rsa':
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
-            signature_data['s'] = cls._big_int(signature_string, "big")
-        elif key_type == 'dsa':
+            signature_data['s'] = cls._big_int(signature_blob, "big")
+        elif signature_type == b'ssh-dss':
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
-            signature_data['r'] = cls._big_int(signature_string[:20], "big")
-            signature_data['s'] = cls._big_int(signature_string[20:], "big")
-        elif key_type in ('ecdsa-nistp256', 'ecdsa-nistp384', 'ecdsa-nistp521'):
-            parser = cls(signature_string)
+            signature_data['r'] = cls._big_int(signature_blob[:20], "big")
+            signature_data['s'] = cls._big_int(signature_blob[20:], "big")
+        elif signature_type in (b'ecdsa-sha2-nistp256', b'ecdsa-sha2-nistp384', b'ecdsa-sha2-nistp521'):
             # https://datatracker.ietf.org/doc/html/rfc5656#section-3.1.2
-            signature_data['r'] = parser.mpint()
-            signature_data['s'] = parser.mpint()
-        elif key_type == 'ed25519':
+            signature_data['r'] = blob_parser.mpint()
+            signature_data['s'] = blob_parser.mpint()
+        elif signature_type == 'ssh-ed25519':
             # https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.2
-            signature_data['R'] = cls._big_int(signature_string[:32], "little")
-            signature_data['S'] = cls._big_int(signature_string[32:], "little")
+            signature_data['R'] = cls._big_int(signature_blob[:32], "little")
+            signature_data['S'] = cls._big_int(signature_blob[32:], "little")
         else:
-            raise ValueError("%s is not a valid key type" % key_type)
+            raise ValueError("%s is not a valid signature type" % signature_type)
+
+        signature_data['signature_type'] = signature_type
 
         return signature_data
 
