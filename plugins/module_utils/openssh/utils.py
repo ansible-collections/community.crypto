@@ -190,7 +190,7 @@ class OpensshParser(object):
             # https://datatracker.ietf.org/doc/html/rfc5656#section-3.1.2
             signature_data['r'] = blob_parser.mpint()
             signature_data['s'] = blob_parser.mpint()
-        elif signature_type == 'ssh-ed25519':
+        elif signature_type == b'ssh-ed25519':
             # https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.2
             signature_data['R'] = cls._big_int(signature_blob[:32], "little")
             signature_data['S'] = cls._big_int(signature_blob[32:], "little")
