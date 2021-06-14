@@ -84,7 +84,19 @@ else
     export ANSIBLE_COLLECTIONS_PATHS="$PWD/../../../"
 fi
 
+if [ "${test}" == "sanity/extra" ]; then
+    retry pip install junit-xml --disable-pip-version-check
+fi
+
 # START: HACK install integration test dependencies
+if [ "${test}" == "sanity/extra" ]; then
+    # Nothing further should be added to this list.
+    # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install community.internal_test_tools
+fi
+
 if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_version}" != "2.9" ]; then
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
     # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
