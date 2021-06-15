@@ -68,7 +68,7 @@ EXAMPLES = r'''
       no_log: true  # make sure that private key data is not accidentally revealed in logs!
 
     - name: Update encrypted key when openssl_privatekey_pipe reported a change
-      community.sops.encrypt_sops:
+      community.sops.sops_encrypt:
         path: private_key.pem.sops
         content_text: "{{ output.privatekey }}"
       when: output is changed
