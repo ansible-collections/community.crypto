@@ -181,9 +181,8 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
 class OpensshECDSACertificateInfo(OpensshCertificateInfo):
     def __init__(self, curve=None, public_key=None, **kwargs):
         super(OpensshECDSACertificateInfo, self).__init__(**kwargs)
-        if curve is None:
-            self._curve = curve
-        else:
+        self._curve = None
+        if curve is not None:
             self.curve = curve
 
         self.public_key = public_key

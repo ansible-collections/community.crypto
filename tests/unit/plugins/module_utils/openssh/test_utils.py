@@ -75,13 +75,8 @@ def test_valid_boolean(boolean):
 
 @pytest.mark.parametrize("boolean", INVALID_BOOLEAN)
 def test_invalid_boolean(boolean):
-    result = False
-
-    try:
+    with pytest.raises(TypeError):
         OpensshWriter().boolean(boolean)
-    except TypeError:
-        result = True
-    assert result
 
 
 @pytest.mark.parametrize("uint32", VALID_UINT32)
@@ -91,13 +86,8 @@ def test_valid_uint32(uint32):
 
 @pytest.mark.parametrize("uint32", INVALID_UINT32)
 def test_invalid_uint32(uint32):
-    result = False
-
-    try:
+    with pytest.raises(ValueError):
         OpensshWriter().uint32(uint32)
-    except (TypeError, ValueError):
-        result = True
-    assert result
 
 
 @pytest.mark.parametrize("uint64", VALID_UINT64)
@@ -107,13 +97,8 @@ def test_valid_uint64(uint64):
 
 @pytest.mark.parametrize("uint64", INVALID_UINT64)
 def test_invalid_uint64(uint64):
-    result = False
-
-    try:
+    with pytest.raises(ValueError):
         OpensshWriter().uint64(uint64)
-    except (TypeError, ValueError):
-        result = True
-    assert result
 
 
 @pytest.mark.parametrize("ssh_string", VALID_STRING)
@@ -123,13 +108,8 @@ def test_valid_string(ssh_string):
 
 @pytest.mark.parametrize("ssh_string", INVALID_STRING)
 def test_invalid_string(ssh_string):
-    result = False
-
-    try:
+    with pytest.raises(TypeError):
         OpensshWriter().string(ssh_string)
-    except TypeError:
-        result = True
-    assert result
 
 
 @pytest.mark.parametrize("mpint", VALID_MPINT)
@@ -139,13 +119,8 @@ def test_valid_mpint(mpint):
 
 @pytest.mark.parametrize("mpint", INVALID_MPINT)
 def test_invalid_mpint(mpint):
-    result = False
-
-    try:
+    with pytest.raises(TypeError):
         OpensshWriter().mpint(mpint)
-    except TypeError:
-        result = True
-    assert result
 
 
 def test_valid_seek():
@@ -161,16 +136,12 @@ def test_invalid_seek():
     result = False
     buffer = b'buffer'
     parser = OpensshParser(buffer)
-    try:
+
+    with pytest.raises(ValueError):
         parser.seek(len(buffer) + 1)
-    except ValueError:
-        result = True
-    try:
+
+    with pytest.raises(ValueError):
         parser.seek(-1)
-        result = False
-    except ValueError:
-        pass
-    assert result
 
 
 def test_writer_bytes():

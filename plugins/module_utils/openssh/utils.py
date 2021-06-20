@@ -236,7 +236,12 @@ class OpensshParser(object):
 
 
 class OpensshWriter(object):
-    """Writes SSH encoded values to a bytes-like buffer"""
+    """Writes SSH encoded values to a bytes-like buffer
+
+    .. warning::
+        This class should not be used to construct Openssh objects, but rather as a utility to assist
+        in validating parsed material.
+    """
     def __init__(self, buffer=None):
         if buffer is not None:
             if not isinstance(buffer, (bytes, bytearray)):
