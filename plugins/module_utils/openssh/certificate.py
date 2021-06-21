@@ -40,7 +40,7 @@ from hashlib import sha256
 from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     OpensshParser,
-    OpensshWriter,
+    _OpensshWriter,
 )
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
@@ -136,7 +136,7 @@ class OpensshRSACertificateInfo(OpensshCertificateInfo):
         if any([self.e is None, self.n is None]):
             return b''
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         writer.string(_SSH_TYPE_STRINGS['rsa'])
         writer.mpint(self.e)
         writer.mpint(self.n)
@@ -162,7 +162,7 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         if any([self.p is None, self.q is None, self.g is None, self.y is None]):
             return b''
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         writer.string(_SSH_TYPE_STRINGS['dsa'])
         writer.mpint(self.p)
         writer.mpint(self.q)
@@ -206,7 +206,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
         if any([self.curve is None, self.public_key is None]):
             return b''
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         writer.string(_SSH_TYPE_STRINGS[_ECDSA_CURVE_IDENTIFIERS_LOOKUP[self.curve]])
         writer.string(self.curve)
         writer.string(self.public_key)
@@ -228,7 +228,7 @@ class OpensshED25519CertificateInfo(OpensshCertificateInfo):
         if self.pk is None:
             return b''
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         writer.string(_SSH_TYPE_STRINGS['ed25519'])
         writer.string(self.pk)
 

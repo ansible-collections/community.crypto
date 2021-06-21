@@ -10,7 +10,7 @@ import pytest
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,
     OpensshParser,
-    OpensshWriter
+    _OpensshWriter
 )
 
 SSH_VERSION_STRING = "OpenSSH_7.9p1, OpenSSL 1.1.0i-fips  14 Aug 2018"
@@ -70,57 +70,57 @@ def test_parse_openssh_version():
 
 @pytest.mark.parametrize("boolean", VALID_BOOLEAN)
 def test_valid_boolean(boolean):
-    assert OpensshParser(OpensshWriter().boolean(boolean).bytes()).boolean() == boolean
+    assert OpensshParser(_OpensshWriter().boolean(boolean).bytes()).boolean() == boolean
 
 
 @pytest.mark.parametrize("boolean", INVALID_BOOLEAN)
 def test_invalid_boolean(boolean):
     with pytest.raises(TypeError):
-        OpensshWriter().boolean(boolean)
+        _OpensshWriter().boolean(boolean)
 
 
 @pytest.mark.parametrize("uint32", VALID_UINT32)
 def test_valid_uint32(uint32):
-    assert OpensshParser(OpensshWriter().uint32(uint32).bytes()).uint32() == uint32
+    assert OpensshParser(_OpensshWriter().uint32(uint32).bytes()).uint32() == uint32
 
 
 @pytest.mark.parametrize("uint32", INVALID_UINT32)
 def test_invalid_uint32(uint32):
     with pytest.raises(ValueError):
-        OpensshWriter().uint32(uint32)
+        _OpensshWriter().uint32(uint32)
 
 
 @pytest.mark.parametrize("uint64", VALID_UINT64)
 def test_valid_uint64(uint64):
-    assert OpensshParser(OpensshWriter().uint64(uint64).bytes()).uint64() == uint64
+    assert OpensshParser(_OpensshWriter().uint64(uint64).bytes()).uint64() == uint64
 
 
 @pytest.mark.parametrize("uint64", INVALID_UINT64)
 def test_invalid_uint64(uint64):
     with pytest.raises(ValueError):
-        OpensshWriter().uint64(uint64)
+        _OpensshWriter().uint64(uint64)
 
 
 @pytest.mark.parametrize("ssh_string", VALID_STRING)
 def test_valid_string(ssh_string):
-    assert OpensshParser(OpensshWriter().string(ssh_string).bytes()).string() == ssh_string
+    assert OpensshParser(_OpensshWriter().string(ssh_string).bytes()).string() == ssh_string
 
 
 @pytest.mark.parametrize("ssh_string", INVALID_STRING)
 def test_invalid_string(ssh_string):
     with pytest.raises(TypeError):
-        OpensshWriter().string(ssh_string)
+        _OpensshWriter().string(ssh_string)
 
 
 @pytest.mark.parametrize("mpint", VALID_MPINT)
 def test_valid_mpint(mpint):
-    assert OpensshParser(OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
+    assert OpensshParser(_OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
 
 
 @pytest.mark.parametrize("mpint", INVALID_MPINT)
 def test_invalid_mpint(mpint):
     with pytest.raises(TypeError):
-        OpensshWriter().mpint(mpint)
+        _OpensshWriter().mpint(mpint)
 
 
 def test_valid_seek():
@@ -146,4 +146,4 @@ def test_invalid_seek():
 
 def test_writer_bytes():
     buffer = bytearray(b'buffer')
-    assert OpensshWriter(buffer).bytes() == buffer
+    assert _OpensshWriter(buffer).bytes() == buffer

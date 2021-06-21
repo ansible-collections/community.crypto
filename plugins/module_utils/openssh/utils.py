@@ -235,11 +235,12 @@ class OpensshParser(object):
         return result
 
 
-class OpensshWriter(object):
+class _OpensshWriter(object):
     """Writes SSH encoded values to a bytes-like buffer
 
     .. warning::
-        This class should not be used to construct Openssh objects, but rather as a utility to assist
+        This class is a private API and must not be exported outside of the openssh module_utils.
+        It is not to be used to construct Openssh objects, but rather as a utility to assist
         in validating parsed material.
     """
     def __init__(self, buffer=None):
@@ -310,7 +311,7 @@ class OpensshWriter(object):
         if not isinstance(value, list):
             raise TypeError("Value must be a list of byte string not %s" % type(value))
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         for s in value:
             writer.string(s)
 
@@ -322,11 +323,11 @@ class OpensshWriter(object):
         if not isinstance(value, list) or (value and not isinstance(value[0], tuple)):
             raise TypeError("Value must be a list of tuples")
 
-        writer = OpensshWriter()
+        writer = _OpensshWriter()
         for name, data in value:
             writer.string(name)
             # SSH option data is encoded twice though this behavior is not documented
-            writer.string(OpensshWriter().string(data).bytes() if data else bytes())
+            writer.string(_OpensshWriter().string(data).bytes() if data else bytes())
 
         self.string(writer.bytes())
 
