@@ -165,7 +165,7 @@ from socket import create_connection, setdefaulttimeout, socket
 from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_REQUIRED
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_oid_to_name,

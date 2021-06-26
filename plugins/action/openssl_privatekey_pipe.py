@@ -9,7 +9,7 @@ __metaclass__ = type
 
 import base64
 
-from ansible.module_utils._text import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_native, to_bytes
 
 from ansible_collections.community.crypto.plugins.plugin_utils.action_module import ActionModuleBase
 

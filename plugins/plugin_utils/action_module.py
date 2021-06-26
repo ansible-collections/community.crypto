@@ -60,7 +60,7 @@ from ansible.module_utils.six import (
     string_types,
     text_type,
 )
-from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.action import ActionBase
 
 
