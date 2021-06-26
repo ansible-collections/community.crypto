@@ -12,7 +12,7 @@ import os
 
 from random import randrange
 
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     get_relative_time_option,

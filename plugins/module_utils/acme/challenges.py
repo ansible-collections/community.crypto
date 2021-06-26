@@ -14,7 +14,7 @@ import json
 import re
 import time
 
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
 

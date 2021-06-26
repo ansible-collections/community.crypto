@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible.module_utils.six import binary_type
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 
 
 def format_error_problem(problem, subproblem_prefix=''):

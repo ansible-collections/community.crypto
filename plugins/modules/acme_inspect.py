@@ -241,7 +241,7 @@ output_json:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native, to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,

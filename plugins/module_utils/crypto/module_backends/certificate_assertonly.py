@@ -11,7 +11,7 @@ __metaclass__ = type
 import abc
 import datetime
 
-from ansible.module_utils._text import to_native, to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     parse_name_field,

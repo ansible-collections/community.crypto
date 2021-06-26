@@ -12,7 +12,7 @@ import os
 import tempfile
 import traceback
 
-from ansible.module_utils._text import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_native, to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
     CertificateError,

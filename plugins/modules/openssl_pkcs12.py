@@ -242,7 +242,7 @@ import traceback
 from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,

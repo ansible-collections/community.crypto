@@ -23,7 +23,7 @@ import base64
 import binascii
 import re
 
-from ansible.module_utils._text import to_text, to_bytes
+from ansible.module_utils.common.text.converters import to_text, to_bytes
 from ._asn1 import serialize_asn1_string_as_der
 
 try:

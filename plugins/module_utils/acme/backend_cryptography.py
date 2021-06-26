@@ -14,7 +14,7 @@ import datetime
 import os
 import sys
 
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CryptoBackend,

@@ -25,7 +25,7 @@ import traceback
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import unquote
-from ansible.module_utils._text import to_native, to_text, to_bytes
+from ansible.module_utils.common.text.converters import to_native, to_text, to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     get_default_argspec,
