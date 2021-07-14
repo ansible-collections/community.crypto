@@ -147,7 +147,10 @@ class OpensshCertificateTimeParameters(object):
         elif timestamp == 0xFFFFFFFFFFFFFFFF:
             result = _FOREVER
         else:
-            result = datetime.utcfromtimestamp(timestamp)
+            try:
+                result = datetime.utcfromtimestamp(timestamp)
+            except OverflowError as e:
+                raise ValueError
         return result
 
     @staticmethod

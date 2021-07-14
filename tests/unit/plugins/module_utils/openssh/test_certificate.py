@@ -148,11 +148,11 @@ VALID_TIME_PARAMETERS = [
     ("1980-01-01T00:00:00", "1980-01-01T00:00:00", "19800101000000", 315532800,
      "1990-01-01T00:00:00", "1990-01-01T00:00:00", "19900101000000", 631152000,
      "19800101000000:19900101000000"),
-    ("always", "always", "19700101000000", 0,
+    ("always", "always", "always", 0,
      "1990-01-01T00:00:00", "1990-01-01T00:00:00", "19900101000000", 631152000,
      "always:19900101000000"),
     ("1980-01-01", "1980-01-01T00:00:00", "19800101000000", 315532800,
-     "forever", "forever", "99991231235959", 253402300800,
+     "forever", "forever", "forever", 253402300800,
      "19800101000000:forever"),
 ]
 
@@ -262,7 +262,7 @@ def test_valid_time_parameters(valid_from, valid_from_hr, valid_from_openssh, va
 
 
 @pytest.mark.parametrize("valid_from,valid_to", INVALID_TIME_PARAMETERS)
-def test_valid_time_parameters(valid_from, valid_to):
+def test_invalid_time_parameters(valid_from, valid_to):
     with pytest.raises(ValueError):
         OpensshCertificateTimeParameters(valid_from, valid_to)
 
