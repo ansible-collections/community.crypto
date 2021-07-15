@@ -331,7 +331,7 @@ class Certificate(object):
         result = {'changed': self.changed}
 
         if self.module._diff:
-            result.update(self._generate_diff())
+            result['diff'] = self._generate_diff()
 
         if self.state == 'present':
             result.update({
@@ -383,7 +383,7 @@ class Certificate(object):
         after = self.data.to_dict() if self.data else {}
         after.pop('nonce', None)
 
-        return {'diff': {'before': before, 'after': after}}
+        return {'before': before, 'after': after}
 
     def _get_cert_info(self):
         return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
