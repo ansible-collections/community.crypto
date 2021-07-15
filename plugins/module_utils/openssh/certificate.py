@@ -223,27 +223,6 @@ class OpensshCertificateInfo:
     def signing_key_fingerprint(self):
         return fingerprint(self.signing_key)
 
-    def to_dict(self):
-        time_parameters = OpensshCertificateTimeParameters(
-            valid_from=self.valid_after,
-            valid_to=self.valid_before
-        )
-        return {
-            'type_string': self.type_string,
-            'nonce': self.nonce,
-            'serial': self.serial,
-            'cert_type': self.cert_type,
-            'identifier': self.key_id,
-            'principals': self.principals,
-            'valid_after': time_parameters.valid_from(date_format='human_readable'),
-            'valid_before': time_parameters.valid_to(date_format='human_readable'),
-            'critical_options': self.critical_options,
-            'extensions': [e[0] for e in self.extensions],
-            'reserved': self.reserved,
-            'public_key': self.public_key_fingerprint(),
-            'signing_key': self.signing_key_fingerprint(),
-        }
-
     @abc.abstractmethod
     def public_key_fingerprint(self):
         pass
@@ -372,7 +351,7 @@ class OpensshCertificate(object):
     """Encapsulates a formatted OpenSSH certificate including signature and signing key"""
     def __init__(self, cert_info, signature):
 
-        self.cert_info = cert_info
+        self._cert_info = cert_info
         self.signature = signature
 
     @classmethod
@@ -420,6 +399,58 @@ class OpensshCertificate(object):
             signature=signature,
         )
 
+    @property
+    def type_string(self):
+        return self._cert_info.type_string
+
+    @property
+    def nonce(self):
+        return self._cert_info.nonce
+
+    @property
+    def public_key(self):
+        return self._cert_info.public_key_fingerprint()
+
+    @property
+    def serial(self):
+        return self._cert_info.serial
+
+    @property
+    def type(self):
+        return self._cert_info.cert_type
+
+    @property
+    def key_id(self):
+        return self._cert_info.key_id
+
+    @property
+    def principals(self):
+        return self._cert_info.principals
+
+    @property
+    def valid_after(self):
+        return self._cert_info.valid_after
+
+    @property
+    def valid_before(self):
+        return self._cert_info.valid_before
+
+    @property
+    def critical_options(self):
+        return self._cert_info.critical_options
+
+    @property
+    def extensions(self):
+        return self._cert_info.extensions
+
+    @property
+    def reserved(self):
+        return self._cert_info.reserved
+
+    @property
+    def signing_key(self):
+        return self._cert_info.signing_key_fingerprint()
+
     @staticmethod
     def _parse_cert_info(pub_key_type, parser):
         cert_info = get_cert_info_object(pub_key_type)
@@ -437,6 +468,27 @@ class OpensshCertificate(object):
         cert_info.signing_key = parser.string()
 
         return cert_info
+
+    def to_dict(self):
+        time_parameters = OpensshCertificateTimeParameters(
+            valid_from=self.valid_after,
+            valid_to=self.valid_before
+        )
+        return {
+            'type_string': self.type_string,
+            'nonce': self.nonce,
+            'serial': self.serial,
+            'cert_type': self.type,
+            'identifier': self.key_id,
+            'principals': self.principals,
+            'valid_after': time_parameters.valid_from(date_format='human_readable'),
+            'valid_before': time_parameters.valid_to(date_format='human_readable'),
+            'critical_options': self.critical_options,
+            'extensions': [e[0] for e in self.extensions],
+            'reserved': self.reserved,
+            'public_key': self.public_key,
+            'signing_key': self.signing_key,
+        }
 
 
 def fingerprint(public_key):
