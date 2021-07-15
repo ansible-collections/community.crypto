@@ -255,8 +255,9 @@ class Certificate(object):
         self.use_agent = module.params['use_agent']
         self.valid_at = module.params['valid_at']
 
-        self.certificate = None
         self.changed = False
+        self.data = None
+        self.original_data = None
         self.time_parameters = None
 
         if self.state == 'present':
@@ -268,10 +269,11 @@ class Certificate(object):
             except ValueError as e:
                 self.module.fail_json(msg=to_native(e))
 
-        try:
-            self.original_certificate = OpensshCertificate.load(self.path) if self.exists() else None
-        except (TypeError, ValueError) as e:
-            self.module.fail_json(msg="Unable to read existing certificate: %s" % to_native(e))
+        if self.exists():
+            try:
+                self.original_data = OpensshCertificate.load(self.path)
+            except (TypeError, ValueError) as e:
+                self.module.warn("Unable to read existing certificate: %s" % to_native(e))
 
         self._validate_parameters()
 
@@ -306,7 +308,7 @@ class Certificate(object):
                         self.module.add_cleanup_file(backup_cert)
 
                 try:
-                    self.certificate = OpensshCertificate.load(self.path)
+                    self.data = OpensshCertificate.load(self.path)
                 except (TypeError, ValueError) as e:
                     self.module.fail_json(msg="Unable to read new certificate: %s" % to_native(e))
 
@@ -376,9 +378,9 @@ class Certificate(object):
         return result
 
     def _generate_diff(self):
-        before = self.original_certificate.to_dict() if self.original_certificate else {}
+        before = self.original_data.to_dict() if self.original_data else {}
         before.pop('nonce', None)
-        after = self.certificate.to_dict() if self.certificate else {}
+        after = self.data.to_dict() if self.data else {}
         after.pop('nonce', None)
 
         return {'diff': {'before': before, 'after': after}}
@@ -387,18 +389,18 @@ class Certificate(object):
         return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
 
     def _is_valid(self):
-        if self.original_certificate:
+        if self.original_data:
             try:
                 original_time_parameters = OpensshCertificateTimeParameters(
-                    valid_from=self.original_certificate.valid_after,
-                    valid_to=self.original_certificate.valid_before
+                    valid_from=self.original_data.valid_after,
+                    valid_to=self.original_data.valid_before
                 )
             except ValueError as e:
                 return self.module.fail_json(msg=to_native(e))
             return all([
-                self.original_certificate.type == self.type,
-                set(to_text(p) for p in self.original_certificate.principals) == set(self.principals),
-                self.original_certificate.serial == self.serial_number if self.serial_number is not None else True,
+                self.original_data.type == self.type,
+                set(to_text(p) for p in self.original_data.principals) == set(self.principals),
+                self.original_data.serial == self.serial_number if self.serial_number is not None else True,
                 original_time_parameters == self.time_parameters,
                 original_time_parameters.within_range(self.valid_at)
             ])
