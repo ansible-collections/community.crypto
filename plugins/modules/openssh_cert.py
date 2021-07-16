@@ -36,6 +36,18 @@ options:
             - Should the certificate be regenerated even if it already exists and is valid.
         type: bool
         default: false
+    idempotency:
+        description:
+            - When C(partial) and I(force=false) an existing certificate will be regenerated based on
+              I(serial), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
+            - When C(full) and I(force=false), I(identifier), I(options), I(public_key), and I(signing_key)
+              are also considered when compared against an existing certificate.
+        type: str
+        choices:
+            - partial
+            - full
+        default: partial
+        version_added: 1.8.0
     path:
         description:
             - Path of the file containing the certificate.
@@ -224,8 +236,10 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
+    get_default_options,
     OpensshCertificate,
     OpensshCertificateTimeParameters,
+    parse_option_list,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
@@ -242,8 +256,9 @@ class Certificate(object):
         self.ssh_keygen = module.get_bin_path('ssh-keygen', True)
 
         self.force = module.params['force']
+        self.idempotency = module.params['idempotency']
         self.identifier = module.params['identifier'] or ""
-        self.options = module.params['options']
+        self.options = module.params['options'] or []
         self.path = module.params['path']
         self.pkcs11_provider = module.params['pkcs11_provider']
         self.principals = module.params['principals'] or []
@@ -377,6 +392,28 @@ class Certificate(object):
 
         return result
 
+    def _compare_options(self):
+        try:
+            critical_options, extensions = parse_option_list(
+                list(set(self.options).union(set(get_default_options())))
+            )
+        except ValueError as e:
+            return self.module.fail_json(msg=to_native(e))
+
+        return (set(self.original_data.critical_options) == set(critical_options) and
+                set(self.original_data.extensions) == set(extensions))
+
+    def _compare_time_parameters(self):
+        try:
+            original_time_parameters = OpensshCertificateTimeParameters(
+                valid_from=self.original_data.valid_after,
+                valid_to=self.original_data.valid_before
+            )
+        except ValueError as e:
+            return self.module.fail_json(msg=to_native(e))
+
+        return original_time_parameters == self.time_parameters and original_time_parameters.within_range(self.valid_at)
+
     def _generate_diff(self):
         before = self.original_data.to_dict() if self.original_data else {}
         before.pop('nonce', None)
@@ -388,21 +425,24 @@ class Certificate(object):
     def _get_cert_info(self):
         return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
 
+    def _get_key_fingerprint(self, path):
+        stdout = self.module.run_command([self.ssh_keygen, '-lf', path], check_rc=True)[1]
+        return stdout.split()[1]
+
     def _is_valid(self):
         if self.original_data:
-            try:
-                original_time_parameters = OpensshCertificateTimeParameters(
-                    valid_from=self.original_data.valid_after,
-                    valid_to=self.original_data.valid_before
-                )
-            except ValueError as e:
-                return self.module.fail_json(msg=to_native(e))
-            return all([
-                self.original_data.type == self.type,
-                set(to_text(p) for p in self.original_data.principals) == set(self.principals),
+            partial_result = all([
+                set(self.original_data.principals) == set(self.principals),
                 self.original_data.serial == self.serial_number if self.serial_number is not None else True,
-                original_time_parameters == self.time_parameters,
-                original_time_parameters.within_range(self.valid_at)
+                self.original_data.type == self.type,
+                self._compare_time_parameters(),
+            ])
+
+            return partial_result if self.idempotency == 'partial' else partial_result and all([
+                self._compare_options(),
+                self.original_data.key_id == self.identifier,
+                self.original_data.public_key == self._get_key_fingerprint(self.public_key),
+                self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
             ])
         return False
 
@@ -452,6 +492,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             force=dict(type='bool', default=False),
+            idempotency=dict(type='str', default='partial', choices=['partial', 'full']),
             identifier=dict(type='str'),
             options=dict(type='list', elements='str'),
             path=dict(type='path', required=True),

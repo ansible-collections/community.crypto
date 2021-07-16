@@ -40,12 +40,35 @@
     valid_to: forever
   register: new_public_key_output
 
-# Signing key and public key are not considered during idempotency checks
+- name: Generate cert with new signing key - full idempotency
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ new_signing_key }}"
+    valid_from: always
+    valid_to: forever
+    idempotency: full
+  register: new_signing_key_full_idempotency_output
+
+- name: Generate cert with new pubic key - full idempotency
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ new_public_key }}"
+    signing_key: "{{ new_signing_key }}"
+    valid_from: always
+    valid_to: forever
+    idempotency: full
+  register: new_public_key_full_idempotency_output
+
 - name: Assert changes to public key or signing key results in no change
   assert:
     that:
       - new_signing_key_output is not changed
       - new_public_key_output is not changed
+      - new_signing_key_full_idempotency_output is changed
+      - new_public_key_full_idempotency_output is changed
 
 - name: Remove certificate
   openssh_cert:

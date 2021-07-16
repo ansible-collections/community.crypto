@@ -8,8 +8,11 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
+    get_default_options,
     OpensshCertificate,
-    OpensshCertificateTimeParameters
+    OpensshCertificateOption,
+    OpensshCertificateTimeParameters,
+    parse_option_list
 )
 
 # Type: ssh-rsa-cert-v01@openssh.com user certificate
@@ -118,16 +121,16 @@ ED25519_FINGERPRINT = b'SHA256:NP4JdfkCopbjwMepq0aPrpMz13cNmEd+uDOxC/j9N40'
 # garbage
 INVALID_DATA = b'yDspTN+BJzvIK2Q+CRD3qBDVSi+YqSxwyz432VEaHKlXbuLURirY0QpuBCqgR6tCtWW5vEGkXKZ3'
 
-VALID_OPTS = [(b'force-command', b'/usr/bin/csh')]
-INVALID_OPTS = [(b'test', b'undefined')]
+VALID_OPTS = [OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')]
+INVALID_OPTS = [OpensshCertificateOption('critical', 'test', 'undefined')]
 VALID_EXTENSIONS = [
-    (b'permit-X11-forwarding', b''),
-    (b'permit-agent-forwarding', b''),
-    (b'permit-port-forwarding', b''),
-    (b'permit-pty', b''),
-    (b'permit-user-rc', b''),
+    OpensshCertificateOption('extension', 'permit-X11-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-port-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-pty', ''),
+    OpensshCertificateOption('extension', 'permit-user-rc', ''),
 ]
-INVALID_EXTENSIONS = [(b'test', b'')]
+INVALID_EXTENSIONS = [OpensshCertificateOption('extension', 'test', '')]
 
 VALID_TIME_PARAMETERS = [
     (0, "always", "always", 0,
@@ -175,6 +178,20 @@ INVALID_VALIDITY_TEST = [
     ("always", "2000-01-01", "2000-01-02"),
     ("2000-01-01", "forever", "1999-12-31"),
     ("2000-01-01 00:00:00", "2000-01-01 00:00:01", "2000-01-01 00:00:02"),
+]
+
+VALID_OPTIONS = [
+    ("force-command=/usr/bin/csh", OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')),
+    ("permit-X11-forwarding", OpensshCertificateOption('extension', 'permit-X11-forwarding', '')),
+    ("critical:foo=bar", OpensshCertificateOption('critical', 'foo', 'bar')),
+    ("extension:foo", OpensshCertificateOption('extension', 'foo', '')),
+]
+
+INVALID_OPTIONS = [
+    "foobar",
+    "foo=bar",
+    'foo:bar=baz',
+    [],
 ]
 
 
@@ -275,3 +292,32 @@ def test_valid_validity_test(valid_from, valid_to, valid_at):
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", INVALID_VALIDITY_TEST)
 def test_invalid_validity_test(valid_from, valid_to, valid_at):
     assert not OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)
+
+
+@pytest.mark.parametrize("option_string,option_object", VALID_OPTIONS)
+def test_valid_options(option_string, option_object):
+    assert OpensshCertificateOption.from_string(option_string) == option_object
+
+
+@pytest.mark.parametrize("option_string", INVALID_OPTIONS)
+def test_invalid_options(option_string):
+    with pytest.raises(ValueError):
+        OpensshCertificateOption.from_string(option_string)
+
+
+def test_parse_option_list():
+    option_list = ['force-command=/usr/bin/csh', 'no-pty', 'no-agent-forwarding'] + list(get_default_options())
+    critical_options, extensions = parse_option_list(option_list)
+
+    critical_option_objects = [
+        OpensshCertificateOption.from_string('force-command=/usr/bin/csh'),
+    ]
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-X11-forwarding'),
+        OpensshCertificateOption.from_string('permit-port-forwarding'),
+        OpensshCertificateOption.from_string('permit-user-rc'),
+    ]
+
+    assert set(critical_options) == set(critical_option_objects)
+    assert set(extensions) == set(extension_objects)
