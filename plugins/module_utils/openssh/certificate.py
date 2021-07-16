@@ -100,6 +100,18 @@ class OpensshCertificateTimeParameters(object):
             )
         return ""
 
+    def valid_from(self, date_format):
+        return self.format_datetime(self._valid_from, date_format)
+
+    def valid_to(self, date_format):
+        return self.format_datetime(self._valid_to, date_format)
+
+    def within_range(self, valid_at):
+        if valid_at is not None:
+            valid_at_datetime = self.to_datetime(valid_at)
+            return self._valid_from <= valid_at_datetime <= self._valid_to
+        return True
+
     @staticmethod
     def format_datetime(dt, date_format):
         if date_format in ('human_readable', 'openssh'):
@@ -116,29 +128,18 @@ class OpensshCertificateTimeParameters(object):
             raise ValueError("%s is not a valid format" % date_format)
         return result
 
-    def to_datetime(self, time_string_or_timestamp):
+    @staticmethod
+    def to_datetime(time_string_or_timestamp):
         try:
             if isinstance(time_string_or_timestamp, str):
-                result = self._time_string_to_datetime(time_string_or_timestamp.strip())
+                result = OpensshCertificateTimeParameters._time_string_to_datetime(time_string_or_timestamp.strip())
             elif isinstance(time_string_or_timestamp, (long, int)):
-                result = self._timestamp_to_datetime(time_string_or_timestamp)
+                result = OpensshCertificateTimeParameters._timestamp_to_datetime(time_string_or_timestamp)
             else:
-                raise ValueError
+                raise ValueError("Value must be of type (str, int, long) not %s" % type(time_string_or_timestamp))
         except ValueError:
             raise
         return result
-
-    def valid_from(self, date_format):
-        return self.format_datetime(self._valid_from, date_format)
-
-    def valid_to(self, date_format):
-        return self.format_datetime(self._valid_to, date_format)
-
-    def within_range(self, valid_at):
-        if valid_at is not None:
-            valid_at_datetime = self.to_datetime(valid_at)
-            return self._valid_from <= valid_at_datetime <= self._valid_to
-        return True
 
     @staticmethod
     def _timestamp_to_datetime(timestamp):
