@@ -20,7 +20,8 @@ requirements:
 options:
     state:
         description:
-            - Whether the host or user certificate should exist or not, taking action if the state is different from what is stated.
+            - Whether the host or user certificate should exist or not, taking action if the state is different
+              from what is stated.
         type: str
         default: "present"
         choices: [ 'present', 'absent' ]
@@ -215,423 +216,270 @@ info:
 
 '''
 
-import errno
 import os
-import re
-import tempfile
-
-from datetime import datetime
-from datetime import MINYEAR, MAXYEAR
 from distutils.version import LooseVersion
-from shutil import copy2, rmtree
+from sys import version_info
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_native, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import convert_relative_to_datetime
-from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import parse_openssh_version
+from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
+    OpensshCertificate,
+    OpensshCertificateTimeParameters,
+)
 
+from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
+    parse_openssh_version,
+)
 
-class CertificateError(Exception):
-    pass
+PY27 = version_info[0:2] >= (2, 7)
 
 
 class Certificate(object):
-
     def __init__(self, module):
-        self.state = module.params['state']
-        self.force = module.params['force']
-        self.type = module.params['type']
-        self.signing_key = module.params['signing_key']
-        self.use_agent = module.params['use_agent']
-        self.pkcs11_provider = module.params['pkcs11_provider']
-        self.public_key = module.params['public_key']
-        self.path = module.params['path']
-        self.identifier = module.params['identifier']
-        self.serial_number = module.params['serial_number']
-        self.valid_from = module.params['valid_from']
-        self.valid_to = module.params['valid_to']
-        self.valid_at = module.params['valid_at']
-        self.principals = module.params['principals']
-        self.options = module.params['options']
-        self.changed = False
         self.check_mode = module.check_mode
-        self.cert_info = {}
-
-        if self.state == 'present':
-
-            if self.options and self.type == "host":
-                module.fail_json(msg="Options can only be used with user certificates.")
-
-            if self.valid_at:
-                self.valid_at = self.valid_at.lstrip()
-
-            self.valid_from = self.valid_from.lstrip()
-            self.valid_to = self.valid_to.lstrip()
-
+        self.module = module
         self.ssh_keygen = module.get_bin_path('ssh-keygen', True)
 
-    def generate(self, module):
+        self.force = module.params['force']
+        self.identifier = module.params['identifier'] or ""
+        self.options = module.params['options']
+        self.path = module.params['path']
+        self.pkcs11_provider = module.params['pkcs11_provider']
+        self.principals = module.params['principals'] or []
+        self.public_key = module.params['public_key']
+        self.serial_number = module.params['serial_number']
+        self.signing_key = module.params['signing_key']
+        self.state = module.params['state']
+        self.type = module.params['type']
+        self.use_agent = module.params['use_agent']
+        self.valid_at = module.params['valid_at']
 
-        if not self.is_valid(module, perms_required=False) or self.force:
-            args = [
-                self.ssh_keygen,
-                '-s', self.signing_key
-            ]
-
-            if self.pkcs11_provider:
-                args.extend(['-D', self.pkcs11_provider])
-
-            if self.use_agent:
-                args.extend(['-U'])
-
-            validity = ""
-
-            if not (self.valid_from == "always" and self.valid_to == "forever"):
-
-                if not self.valid_from == "always":
-                    timeobj = self.convert_to_datetime(module, self.valid_from)
-                    validity += (
-                        str(timeobj.year).zfill(4) +
-                        str(timeobj.month).zfill(2) +
-                        str(timeobj.day).zfill(2) +
-                        str(timeobj.hour).zfill(2) +
-                        str(timeobj.minute).zfill(2) +
-                        str(timeobj.second).zfill(2)
-                    )
-                else:
-                    validity += "19700101010101"
-
-                validity += ":"
-
-                if self.valid_to == "forever":
-                    # on ssh-keygen versions that have the year 2038 bug this will cause the datetime to be 2038-01-19T04:14:07
-                    timeobj = datetime(MAXYEAR, 12, 31)
-                else:
-                    timeobj = self.convert_to_datetime(module, self.valid_to)
-
-                validity += (
-                    str(timeobj.year).zfill(4) +
-                    str(timeobj.month).zfill(2) +
-                    str(timeobj.day).zfill(2) +
-                    str(timeobj.hour).zfill(2) +
-                    str(timeobj.minute).zfill(2) +
-                    str(timeobj.second).zfill(2)
-                )
-
-                args.extend(["-V", validity])
-
-            if self.type == 'host':
-                args.extend(['-h'])
-
-            if self.identifier:
-                args.extend(['-I', self.identifier])
-            else:
-                args.extend(['-I', ""])
-
-            if self.serial_number is not None:
-                args.extend(['-z', str(self.serial_number)])
-
-            if self.principals:
-                args.extend(['-n', ','.join(self.principals)])
-
-            if self.options:
-                for option in self.options:
-                    args.extend(['-O'])
-                    args.extend([option])
-
-            args.extend(['-P', ''])
-
-            try:
-                temp_directory = tempfile.mkdtemp()
-                copy2(self.public_key, temp_directory)
-                args.extend([temp_directory + "/" + os.path.basename(self.public_key)])
-                module.run_command(args, environ_update=dict(TZ="UTC"), check_rc=True)
-                copy2(temp_directory + "/" + os.path.splitext(os.path.basename(self.public_key))[0] + "-cert.pub", self.path)
-                rmtree(temp_directory, ignore_errors=True)
-                proc = module.run_command([self.ssh_keygen, '-L', '-f', self.path])
-                self.cert_info = proc[1].split()
-                self.changed = True
-            except Exception as e:
-                try:
-                    self.remove()
-                    rmtree(temp_directory, ignore_errors=True)
-                except OSError as exc:
-                    if exc.errno != errno.ENOENT:
-                        raise CertificateError(exc)
-                    else:
-                        pass
-                module.fail_json(msg="%s" % to_native(e))
-
-        file_args = module.load_file_common_arguments(module.params)
-        if module.check_file_absent_if_check_mode(file_args['path']):
-            self.changed = True
-        elif module.set_fs_attributes_if_different(file_args, False):
-            self.changed = True
-
-    def convert_to_datetime(self, module, timestring):
-
-        if self.is_relative(timestring):
-            result = convert_relative_to_datetime(timestring)
-            if result is None:
-                module.fail_json(
-                    msg="'%s' is not a valid time format." % timestring)
-            else:
-                return result
-        else:
-            formats = ["%Y-%m-%d",
-                       "%Y-%m-%d %H:%M:%S",
-                       "%Y-%m-%dT%H:%M:%S",
-                       ]
-            for fmt in formats:
-                try:
-                    return datetime.strptime(timestring, fmt)
-                except ValueError:
-                    pass
-            module.fail_json(msg="'%s' is not a valid time format" % timestring)
-
-    def is_relative(self, timestr):
-        if timestr.startswith("+") or timestr.startswith("-"):
-            return True
-        return False
-
-    def is_same_datetime(self, datetime_one, datetime_two):
-
-        # This function is for backwards compatibility only because .total_seconds() is new in python2.7
-        def timedelta_total_seconds(time_delta):
-            return (time_delta.microseconds + 0.0 + (time_delta.seconds + time_delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
-        # try to use .total_ seconds() from python2.7
-        try:
-            return (datetime_one - datetime_two).total_seconds() == 0.0
-        except AttributeError:
-            return timedelta_total_seconds(datetime_one - datetime_two) == 0.0
-
-    def is_valid(self, module, perms_required=True):
-
-        def _check_state():
-            return os.path.exists(self.path)
-
-        if _check_state():
-            proc = module.run_command([self.ssh_keygen, '-L', '-f', self.path], environ_update=dict(TZ="UTC"), check_rc=False)
-            if proc[0] != 0:
-                return False
-            self.cert_info = proc[1].split()
-            principals = re.findall("(?<=Principals:)(.*)(?=Critical)", proc[1], re.S)[0].split()
-            principals = list(map(str.strip, principals))
-            if principals == ["(none)"]:
-                principals = None
-            cert_type = re.findall("( user | host )", proc[1])[0].strip()
-            serial_number = re.search(r"Serial: (\d+)", proc[1]).group(1)
-            validity = re.findall("(from (\\d{4}-\\d{2}-\\d{2}T\\d{2}(:\\d{2}){2}) to (\\d{4}-\\d{2}-\\d{2}T\\d{2}(:\\d{2}){2}))", proc[1])
-            if validity:
-                if validity[0][1]:
-                    cert_valid_from = self.convert_to_datetime(module, validity[0][1])
-                    if self.is_same_datetime(cert_valid_from, self.convert_to_datetime(module, "1970-01-01 01:01:01")):
-                        cert_valid_from = datetime(MINYEAR, 1, 1)
-                else:
-                    cert_valid_from = datetime(MINYEAR, 1, 1)
-
-                if validity[0][3]:
-                    cert_valid_to = self.convert_to_datetime(module, validity[0][3])
-                    if self.is_same_datetime(cert_valid_to, self.convert_to_datetime(module, "2038-01-19 03:14:07")):
-                        cert_valid_to = datetime(MAXYEAR, 12, 31)
-                else:
-                    cert_valid_to = datetime(MAXYEAR, 12, 31)
-            else:
-                cert_valid_from = datetime(MINYEAR, 1, 1)
-                cert_valid_to = datetime(MAXYEAR, 12, 31)
-        else:
-            return False
-
-        def _check_perms(module):
-            file_args = module.load_file_common_arguments(module.params)
-            return not module.set_fs_attributes_if_different(file_args, False)
-
-        def _check_serial_number():
-            if self.serial_number is None:
-                return True
-            return self.serial_number == int(serial_number)
-
-        def _check_type():
-            return self.type == cert_type
-
-        def _check_principals():
-            if not principals or not self.principals:
-                return self.principals == principals
-            return set(self.principals) == set(principals)
-
-        def _check_validity(module):
-            if self.valid_from == "always":
-                earliest_time = datetime(MINYEAR, 1, 1)
-            elif self.is_relative(self.valid_from):
-                earliest_time = None
-            else:
-                earliest_time = self.convert_to_datetime(module, self.valid_from)
-
-            if self.valid_to == "forever":
-                last_time = datetime(MAXYEAR, 12, 31)
-            elif self.is_relative(self.valid_to):
-                last_time = None
-            else:
-                last_time = self.convert_to_datetime(module, self.valid_to)
-
-            if earliest_time:
-                if not self.is_same_datetime(earliest_time, cert_valid_from):
-                    return False
-            if last_time:
-                if not self.is_same_datetime(last_time, cert_valid_to):
-                    return False
-
-            if self.valid_at:
-                if cert_valid_from <= self.convert_to_datetime(module, self.valid_at) <= cert_valid_to:
-                    return True
-
-            if earliest_time and last_time:
-                return True
-
-            return False
-
-        if perms_required and not _check_perms(module):
-            return False
-
-        return _check_type() and _check_principals() and _check_validity(module) and _check_serial_number()
-
-    def dump(self):
-
-        """Serialize the object into a dictionary."""
-
-        def filter_keywords(arr, keywords):
-            concated = []
-            string = ""
-            for word in arr:
-                if word in keywords:
-                    concated.append(string)
-                    string = word
-                else:
-                    string += " " + word
-            concated.append(string)
-            # drop the certificate path
-            concated.pop(0)
-            return concated
-
-        def format_cert_info():
-            return filter_keywords(self.cert_info, [
-                "Type:",
-                "Public",
-                "Signing",
-                "Key",
-                "Serial:",
-                "Valid:",
-                "Principals:",
-                "Critical",
-                "Extensions:"])
+        self.changed = False
+        self.data = None
+        self.original_data = None
+        self.time_parameters = None
 
         if self.state == 'present':
-            result = {
-                'changed': self.changed,
+            try:
+                self.time_parameters = OpensshCertificateTimeParameters(
+                    valid_from=module.params['valid_from'],
+                    valid_to=module.params['valid_to'],
+                )
+            except ValueError as e:
+                self.module.fail_json(msg=to_native(e))
+
+        if self.exists():
+            try:
+                self.original_data = OpensshCertificate.load(self.path)
+            except (TypeError, ValueError) as e:
+                self.module.warn("Unable to read existing certificate: %s" % to_native(e))
+
+        self._validate_parameters()
+
+    def exists(self):
+        return os.path.exists(self.path)
+
+    def generate(self):
+        if not self._is_valid() or self.force:
+            if not self.check_mode:
+                key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
+
+                try:
+                    self.module.preserved_copy(self.public_key, key_copy)
+                except OSError as e:
+                    self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
+                self.module.add_cleanup_file(key_copy)
+
+                self.module.run_command(self._command_arguments(key_copy), environ_update=dict(TZ="UTC"), check_rc=True)
+
+                temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
+                self.module.add_cleanup_file(temp_cert)
+                backup_cert = self.module.backup_local(self.path) if self.exists() else None
+
+                try:
+                    self.module.atomic_move(temp_cert, self.path)
+                except OSError as e:
+                    if backup_cert is not None:
+                        self.module.atomic_move(backup_cert, self.path)
+                    self.module.fail_json(msg="Unable to write certificate to %s: %s" % (self.path, to_native(e)))
+                else:
+                    if backup_cert is not None:
+                        self.module.add_cleanup_file(backup_cert)
+
+                try:
+                    self.data = OpensshCertificate.load(self.path)
+                except (TypeError, ValueError) as e:
+                    self.module.fail_json(msg="Unable to read new certificate: %s" % to_native(e))
+
+            self.changed = True
+
+        if self.exists():
+            self._update_permissions()
+
+    def remove(self):
+        if self.exists():
+            if not self.check_mode:
+                try:
+                    os.remove(self.path)
+                except OSError as e:
+                    self.module.fail_json(msg="Unable to remove existing certificate: %s" % to_native(e))
+            self.changed = True
+
+    @property
+    def result(self):
+        result = {'changed': self.changed}
+
+        if self.module._diff:
+            result['diff'] = self._generate_diff()
+
+        if self.state == 'present':
+            result.update({
                 'type': self.type,
                 'filename': self.path,
-                'info': format_cert_info(),
-            }
-        else:
-            result = {
-                'changed': self.changed,
-            }
+                'info': format_cert_info(self._get_cert_info()),
+            })
 
         return result
 
-    def remove(self):
-        """Remove the resource from the filesystem."""
+    def _check_if_base_dir(self, path):
+        base_dir = os.path.dirname(path) or '.'
+        if not os.path.isdir(base_dir):
+            self.module.fail_json(
+                name=base_dir,
+                msg='The directory %s does not exist or the file is not a directory' % base_dir
+            )
 
-        try:
-            os.remove(self.path)
-            self.changed = True
-        except OSError as exc:
-            if exc.errno != errno.ENOENT:
-                raise CertificateError(exc)
-            else:
-                pass
+    def _command_arguments(self, key_copy_path):
+        result = [
+            self.ssh_keygen,
+            '-s', self.signing_key,
+            '-P', '',
+            '-I', self.identifier,
+        ]
+
+        if self.options:
+            for option in self.options:
+                result.extend(['-O', option])
+        if self.pkcs11_provider:
+            result.extend(['-D', self.pkcs11_provider])
+        if self.principals:
+            result.extend(['-n', ','.join(self.principals)])
+        if self.serial_number is not None:
+            result.extend(['-z', str(self.serial_number)])
+        if self.type == 'host':
+            result.extend(['-h'])
+        if self.use_agent:
+            result.extend(['-U'])
+        if self.time_parameters.validity_string:
+            result.extend(['-V', self.time_parameters.validity_string])
+        result.append(key_copy_path)
+
+        return result
+
+    def _generate_diff(self):
+        before = self.original_data.to_dict() if self.original_data else {}
+        before.pop('nonce', None)
+        after = self.data.to_dict() if self.data else {}
+        after.pop('nonce', None)
+
+        return {'before': before, 'after': after}
+
+    def _get_cert_info(self):
+        return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
+
+    def _is_valid(self):
+        if self.original_data:
+            try:
+                original_time_parameters = OpensshCertificateTimeParameters(
+                    valid_from=self.original_data.valid_after,
+                    valid_to=self.original_data.valid_before
+                )
+            except ValueError as e:
+                return self.module.fail_json(msg=to_native(e))
+            return all([
+                self.original_data.type == self.type,
+                set(to_text(p) for p in self.original_data.principals) == set(self.principals),
+                self.original_data.serial == self.serial_number if self.serial_number is not None else True,
+                original_time_parameters == self.time_parameters,
+                original_time_parameters.within_range(self.valid_at)
+            ])
+        return False
+
+    def _update_permissions(self):
+        file_args = self.module.load_file_common_arguments(self.module.params)
+        self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
+
+    def _validate_parameters(self):
+        self._check_if_base_dir(self.path)
+
+        if self.state == 'present':
+            for path in (self.public_key, self.signing_key):
+                self._check_if_base_dir(path)
+
+            if self.options and self.type == "host":
+                self.module.fail_json(msg="Options can only be used with user certificates.")
+
+        if self.use_agent:
+            ssh_version_string = self.module.run_command([self.module.get_bin_path('ssh', True), '-Vq'])[2].strip()
+            ssh_version = parse_openssh_version(ssh_version_string)
+            if ssh_version is None:
+                self.module.fail_json(msg="Failed to parse ssh version from: %s" % ssh_version_string)
+            elif LooseVersion(ssh_version) < LooseVersion("7.6"):
+                self.module.fail_json(
+                    msg="Signing with CA key in ssh agent requires ssh 7.6 or newer." +
+                        " Your version is: %s" % ssh_version_string
+                )
+
+
+def format_cert_info(cert_info):
+    result = []
+    string = ""
+
+    for word in cert_info.split():
+        if word in ("Type:", "Public", "Signing", "Key", "Serial:", "Valid:", "Principals:", "Critical", "Extensions:"):
+            result.append(string)
+            string = word
+        else:
+            string += " " + word
+    result.append(string)
+    # Drop the certificate path
+    result.pop(0)
+    return result
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'present']),
             force=dict(type='bool', default=False),
-            type=dict(type='str', choices=['host', 'user']),
-            signing_key=dict(type='path'),
-            use_agent=dict(type='bool', default=False),
-            pkcs11_provider=dict(type='str'),
-            public_key=dict(type='path'),
-            path=dict(type='path', required=True),
             identifier=dict(type='str'),
+            options=dict(type='list', elements='str'),
+            path=dict(type='path', required=True),
+            pkcs11_provider=dict(type='str'),
+            principals=dict(type='list', elements='str'),
+            public_key=dict(type='path'),
+            signing_key=dict(type='path'),
             serial_number=dict(type='int'),
+            state=dict(type='str', default='present', choices=['absent', 'present']),
+            type=dict(type='str', choices=['host', 'user']),
+            use_agent=dict(type='bool', default=False),
+            valid_at=dict(type='str'),
             valid_from=dict(type='str'),
             valid_to=dict(type='str'),
-            valid_at=dict(type='str'),
-            principals=dict(type='list', elements='str'),
-            options=dict(type='list', elements='str'),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
         required_if=[('state', 'present', ['type', 'signing_key', 'public_key', 'valid_from', 'valid_to'])],
     )
 
-    if module.params['use_agent']:
-        ssh = module.get_bin_path('ssh', True)
-        proc = module.run_command([ssh, '-Vq'])
-        ssh_version_string = proc[2].strip()
-        ssh_version = parse_openssh_version(ssh_version_string)
-        if ssh_version is None:
-            module.fail_json(msg="Failed to parse ssh version")
-        elif LooseVersion(ssh_version) < LooseVersion("7.6"):
-            module.fail_json(
-                msg=(
-                    "Signing with CA key in ssh agent requires ssh 7.6 or newer."
-                    " Your version is: %s"
-                ) % ssh_version_string
-            )
-
-    def isBaseDir(path):
-        base_dir = os.path.dirname(path) or '.'
-        if not os.path.isdir(base_dir):
-            module.fail_json(
-                name=base_dir,
-                msg='The directory %s does not exist or the file is not a directory' % base_dir
-            )
-    if module.params['state'] == "present":
-        isBaseDir(module.params['signing_key'])
-        isBaseDir(module.params['public_key'])
-
-    isBaseDir(module.params['path'])
-
     certificate = Certificate(module)
 
     if certificate.state == 'present':
-
-        if module.check_mode:
-            certificate.changed = module.params['force'] or not certificate.is_valid(module)
-        else:
-            try:
-                certificate.generate(module)
-            except Exception as exc:
-                module.fail_json(msg=to_native(exc))
-
+        certificate.generate()
     else:
+        certificate.remove()
 
-        if module.check_mode:
-            certificate.changed = os.path.exists(module.params['path'])
-            if certificate.changed:
-                certificate.cert_info = {}
-        else:
-            try:
-                certificate.remove()
-            except Exception as exc:
-                module.fail_json(msg=to_native(exc))
-
-    result = certificate.dump()
-    module.exit_json(**result)
+    module.exit_json(**certificate.result)
 
 
 if __name__ == '__main__':

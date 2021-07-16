@@ -1,0 +1,58 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- set_fact:
+    new_signing_key: "{{ output_dir }}/new_key"
+    new_public_key: "{{ output_dir }}/new_key.pub"
+
+- name: Generate new test key
+  openssh_keypair:
+    path: "{{ new_signing_key }}"
+
+- name: Generate cert with original keys
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+
+- name: Generate cert with new signing key
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ new_signing_key }}"
+    valid_from: always
+    valid_to: forever
+  register: new_signing_key_output
+
+- name: Generate cert with new public key
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ new_public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+  register: new_public_key_output
+
+# Signing key and public key are not considered during idempotency checks
+- name: Assert changes to public key or signing key results in no change
+  assert:
+    that:
+      - new_signing_key_output is not changed
+      - new_public_key_output is not changed
+
+- name: Remove certificate
+  openssh_cert:
+    path: "{{ certificate_path }}"
+    state: absent
+
+- name: Remove new keypair
+  openssh_keypair:
+    path: "{{ new_signing_key }}"
+    state: absent

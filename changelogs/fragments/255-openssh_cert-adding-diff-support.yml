@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - openssh_cert - adding ``diff`` support (https://github.com/ansible-collections/community.crypto/pull/255).
+bugfixes:
+  - openssh_cert - fixed certificate generation to restore original certificate if an error is encountered
+    (https://github.com/ansible-collections/community.crypto/pull/255).

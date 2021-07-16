@@ -1,0 +1,61 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- set_fact:
+    test_cases:
+      - test_name: Generate certificate
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: "{{ certificate_path }}"
+        valid_from: always
+        valid_to: forever
+        changed: true
+      - test_name: Remove certificate (check mode)
+        state: absent
+        path: "{{ certificate_path }}"
+        check_mode: true
+        changed: true
+      - test_name: Remove certificate
+        state: absent
+        path: "{{ certificate_path }}"
+        changed: true
+      - test_name: Remove certificate (idempotent)
+        state: absent
+        path: "{{ certificate_path }}"
+        changed: false
+      - test_name: Remove certificate (idempotent, check mode)
+        state: absent
+        path: "{{ certificate_path }}"
+        check_mode: true
+        changed: false
+
+- name: Execute remove tests
+  openssh_cert:
+    options: "{{ test_case.options | default(omit) }}"
+    path: "{{ test_case.path | default(omit) }}"
+    public_key: "{{ test_case.public_key | default(omit) }}"
+    principals: "{{ test_case.principals | default(omit) }}"
+    serial_number: "{{ test_case.serial_number | default(omit) }}"
+    signing_key: "{{ test_case.signing_key | default(omit) }}"
+    state: "{{ test_case.state | default(omit) }}"
+    type: "{{ test_case.type | default(omit) }}"
+    valid_at: "{{ test_case.valid_at | default(omit) }}"
+    valid_from: "{{ test_case.valid_from | default(omit) }}"
+    valid_to: "{{ test_case.valid_to | default(omit) }}"
+  check_mode: "{{ test_case.check_mode | default(omit) }}"
+  register: remove_test_output
+  loop: "{{ test_cases }}"
+  loop_control:
+    loop_var: test_case
+
+- name: Assert task statuses
+  assert:
+    that:
+      - result.changed == test_cases[index].changed
+  loop: "{{ remove_test_output.results }}"
+  loop_control:
+    index_var: index
+    loop_var: result
