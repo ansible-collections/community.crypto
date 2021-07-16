@@ -19,7 +19,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import os
 import re
+from contextlib import contextmanager
 from struct import Struct
 
 from ansible.module_utils.six import PY3
@@ -54,6 +56,16 @@ _UINT64 = Struct(b'!Q')
 _UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 
 
+def any_in(sequence, *elements):
+    return any(e in sequence for e in elements)
+
+
+def file_mode(path):
+    if not os.path.exists(path):
+        return 0o000
+    return os.stat(path).st_mode & 0o777
+
+
 def parse_openssh_version(version_string):
     """Parse the version output of ssh -V and return version numbers that can be compared"""
 
@@ -66,6 +78,20 @@ def parse_openssh_version(version_string):
         version = None
 
     return version
+
+
+@contextmanager
+def secure_open(path, mode):
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
+    try:
+        yield fd
+    finally:
+        os.close(fd)
+
+
+def secure_write(path, mode, content):
+    with secure_open(path, mode) as fd:
+        os.write(fd, content)
 
 
 # See https://datatracker.ietf.org/doc/html/rfc4251#section-5 for SSH data types
