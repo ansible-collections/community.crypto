@@ -200,9 +200,9 @@ def test_rsa_certificate(tmpdir):
     cert_file.write(RSA_CERT_SIGNED_BY_DSA, mode='wb')
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.key_id == b'test'
+    assert cert.key_id == 'test'
     assert cert.serial == 0
-    assert cert.type_string == b'ssh-rsa-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-rsa-cert-v01@openssh.com'
     assert cert.public_key == RSA_FINGERPRINT
     assert cert.signing_key == DSA_FINGERPRINT
 
@@ -213,7 +213,7 @@ def test_dsa_certificate(tmpdir):
 
     cert = OpensshCertificate.load(str(cert_file))
 
-    assert cert.type_string == b'ssh-dss-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-dss-cert-v01@openssh.com'
     assert cert.public_key == DSA_FINGERPRINT
     assert cert.signing_key == ECDSA_FINGERPRINT
     assert cert.critical_options == []
@@ -225,7 +225,7 @@ def test_ecdsa_certificate(tmpdir):
     cert_file.write(ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.type_string == b'ecdsa-sha2-nistp256-cert-v01@openssh.com'
+    assert cert.type_string == 'ecdsa-sha2-nistp256-cert-v01@openssh.com'
     assert cert.public_key == ECDSA_FINGERPRINT
     assert cert.signing_key == ED25519_FINGERPRINT
     assert cert.critical_options == VALID_OPTS
@@ -237,7 +237,7 @@ def test_ed25519_certificate(tmpdir):
     cert_file.write(ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.type_string == b'ssh-ed25519-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-ed25519-cert-v01@openssh.com'
     assert cert.public_key == ED25519_FINGERPRINT
     assert cert.signing_key == RSA_FINGERPRINT
     assert cert.critical_options == INVALID_OPTS
