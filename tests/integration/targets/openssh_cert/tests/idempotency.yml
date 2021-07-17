@@ -186,7 +186,7 @@
         type: user
         valid_from: "2001-01-21"
         valid_to: "2019-01-21"
-        idempotency: full
+        regenerate: full_idempotence
         changed: true
       - test_name: Generate cert without serial
         type: user
@@ -244,7 +244,7 @@
         identifier: foo
         valid_from: always
         valid_to: forever
-        idempotency: full
+        regenerate: full_idempotence
         changed: true
 
 - name: Execute idempotency tests
@@ -262,7 +262,7 @@
     valid_at: "{{ test_case.valid_at | default(omit) }}"
     valid_from: "{{ test_case.valid_from | default(omit) }}"
     valid_to: "{{ test_case.valid_to | default(omit) }}"
-    idempotency: "{{ test_case.idempotency | default(omit) }}"
+    regenerate: "{{ test_case.regenerate | default(omit) }}"
   check_mode: "{{ test_case.check_mode | default(omit) }}"
   register: idempotency_test_output
   loop: "{{ test_cases }}"

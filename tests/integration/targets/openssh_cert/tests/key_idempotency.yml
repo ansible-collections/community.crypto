@@ -48,7 +48,7 @@
     signing_key: "{{ new_signing_key }}"
     valid_from: always
     valid_to: forever
-    idempotency: full
+    regenerate: full_idempotence
   register: new_signing_key_full_idempotency_output
 
 - name: Generate cert with new pubic key - full idempotency
@@ -59,7 +59,7 @@
     signing_key: "{{ new_signing_key }}"
     valid_from: always
     valid_to: forever
-    idempotency: full
+    regenerate: full_idempotence
   register: new_public_key_full_idempotency_output
 
 - name: Assert changes to public key or signing key results in no change unless idempotency=full

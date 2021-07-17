@@ -34,25 +34,34 @@ options:
     force:
         description:
             - Should the certificate be regenerated even if it already exists and is valid.
+            - Equivalent to I(regenerate=always).
         type: bool
         default: false
-    idempotency:
-        description:
-            - When C(partial) and I(force=false) an existing certificate will be regenerated based on
-              I(serial), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
-            - When C(full) and I(force=false), I(identifier), I(options), I(public_key), and I(signing_key)
-              are also considered when compared against an existing certificate.
-        type: str
-        choices:
-            - partial
-            - full
-        default: partial
-        version_added: 1.8.0
     path:
         description:
             - Path of the file containing the certificate.
         type: path
         required: true
+    regenerate:
+        description:
+            - When C(never) the task will fail if a certificate already exists at I(path) and is unreadable
+              otherwise a new certificate will only be generated if there is no existing certificate.
+            - When C(fail) the task will fail if a certificate already exists at I(path) and does not
+              match the module's options.
+            - When C(partial_idempotence) an existing certificate will be regenerated based on
+              I(serial), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
+            - When C(full_idempotence) I(identifier), I(options), I(public_key), and I(signing_key)
+              are also considered when compared against an existing certificate.
+            - C(always) is equivalent to I(force=true).
+        type: str
+        choices:
+            - never
+            - fail
+            - partial_idempotence
+            - full_idempotence
+            - always
+        default: partial_idempotence
+        version_added: 1.8.0
     signing_key:
         description:
             - The path to the private openssh key that is used for signing the public key in order to generate the certificate.
@@ -255,13 +264,13 @@ class Certificate(object):
         self.ssh_keygen = module.get_bin_path('ssh-keygen', True)
 
         self.force = module.params['force']
-        self.idempotency = module.params['idempotency']
         self.identifier = module.params['identifier'] or ""
         self.options = module.params['options'] or []
         self.path = module.params['path']
         self.pkcs11_provider = module.params['pkcs11_provider']
         self.principals = module.params['principals'] or []
         self.public_key = module.params['public_key']
+        self.regenerate = module.params['regenerate'] if not self.force else 'always'
         self.serial_number = module.params['serial_number']
         self.signing_key = module.params['signing_key']
         self.state = module.params['state']
@@ -287,6 +296,8 @@ class Certificate(object):
             try:
                 self.original_data = OpensshCertificate.load(self.path)
             except (TypeError, ValueError) as e:
+                if self.regenerate in ('never', 'fail'):
+                    self.module.fail_json(msg="Unable to read existing certificate: %s" % to_native(e))
                 self.module.warn("Unable to read existing certificate: %s" % to_native(e))
 
         self._validate_parameters()
@@ -295,7 +306,7 @@ class Certificate(object):
         return os.path.exists(self.path)
 
     def generate(self):
-        if not self._is_valid() or self.force:
+        if self._should_generate():
             if not self.check_mode:
                 temp_cert = self._generate_temp_certificate()
                 backup_cert = self.module.backup_local(self.path) if self.exists() else None
@@ -440,13 +451,31 @@ class Certificate(object):
                 self._compare_time_parameters(),
             ])
 
-            return partial_result if self.idempotency == 'partial' else partial_result and all([
+            return partial_result if self.regenerate == 'partial_idempotence' else partial_result and all([
                 self._compare_options(),
                 self.original_data.key_id == self.identifier,
                 self.original_data.public_key == self._get_key_fingerprint(self.public_key),
                 self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
             ])
         return False
+
+    def _should_generate(self):
+        if self.regenerate == 'never':
+            result = self.original_data is None
+        elif self.regenerate == 'fail':
+            if not self._is_valid():
+                cert = self.original_data.to_dict()
+                cert.pop('nonce', None)
+                self.module.fail_json(
+                    msg="Certificate does not match the provided options.",
+                    cert=cert
+                )
+            result = self.original_data is None
+        elif self.regenerate in ('partial_idempotence', 'full_idempotence'):
+            result = not self._is_valid()
+        else:
+            result = True
+        return result
 
     def _update_permissions(self):
         file_args = self.module.load_file_common_arguments(self.module.params)
@@ -494,13 +523,17 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             force=dict(type='bool', default=False),
-            idempotency=dict(type='str', default='partial', choices=['partial', 'full']),
             identifier=dict(type='str'),
             options=dict(type='list', elements='str'),
             path=dict(type='path', required=True),
             pkcs11_provider=dict(type='str'),
             principals=dict(type='list', elements='str'),
             public_key=dict(type='path'),
+            regenerate=dict(
+                type='str',
+                default='partial_idempotence',
+                choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
+            ),
             signing_key=dict(type='path'),
             serial_number=dict(type='int'),
             state=dict(type='str', default='present', choices=['absent', 'present']),
