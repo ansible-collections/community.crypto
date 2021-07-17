@@ -91,7 +91,7 @@ _DIRECTIVES = (
 )
 
 _EXTENSIONS = (
-    'permit-X11-forwarding',
+    'permit-x11-forwarding',
     'permit-agent-forwarding',
     'permit-port-forwarding',
     'permit-pty',
@@ -215,7 +215,7 @@ class OpensshCertificateOption(object):
             raise TypeError("data must be a string not %s" % type(data))
 
         self._option_type = option_type
-        self._name = name
+        self._name = name.lower()
         self._data = data
 
     def __eq__(self, other):
@@ -267,6 +267,8 @@ class OpensshCertificateOption(object):
             name, data = option_string.strip().split('=', 1)
         else:
             name, data = option_string.strip(), ''
+
+        name = name.lower()
 
         if option_type is None:
             if name in _CRITICAL_OPTIONS:
@@ -604,9 +606,17 @@ class OpensshCertificate(object):
         }
 
 
-def apply_directives(directives, extensions):
+def apply_directives(directives):
     if any(d not in _DIRECTIVES for d in directives):
         raise ValueError("directives must be one of %s" % ", ".join(_DIRECTIVES))
+
+    default_options = [
+        OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
+        OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
+        OpensshCertificateOption('extension', 'permit-port-forwarding', ''),
+        OpensshCertificateOption('extension', 'permit-pty', ''),
+        OpensshCertificateOption('extension', 'permit-user-rc', ''),
+    ]
 
     directive_to_option = {
         'no-x11-forwarding': OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
@@ -616,15 +626,10 @@ def apply_directives(directives, extensions):
         'no-user-rc': OpensshCertificateOption('extension', 'permit-user-rc', ''),
     }
 
-    if 'clear' not in directives:
-        result = extensions[:]
-        for directive in directives:
-            option = directive_to_option[directive]
-            if option in result:
-                result.remove(option)
-        return result
-    else:
+    if 'clear' in directives:
         return []
+    else:
+        return list(set(default_options) - set(directive_to_option[d] for d in directives))
 
 
 def fingerprint(public_key):
@@ -649,10 +654,6 @@ def get_cert_info_object(key_type):
     return cert_info
 
 
-def get_default_options():
-    return _EXTENSIONS
-
-
 def is_relative_time_string(time_string):
     return time_string.startswith("+") or time_string.startswith("-")
 
@@ -663,8 +664,8 @@ def parse_option_list(option_list):
     extensions = []
 
     for option in option_list:
-        if option in _DIRECTIVES:
-            directives.append(option)
+        if option.lower() in _DIRECTIVES:
+            directives.append(option.lower())
         else:
             option_object = OpensshCertificateOption.from_string(option)
             if option_object.type == 'critical':
@@ -672,4 +673,4 @@ def parse_option_list(option_list):
             else:
                 extensions.append(option_object)
 
-    return critical_options, apply_directives(directives, extensions)
+    return critical_options, list(set(extensions + apply_directives(directives)))

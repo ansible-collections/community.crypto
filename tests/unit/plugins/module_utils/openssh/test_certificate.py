@@ -8,7 +8,6 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
-    get_default_options,
     OpensshCertificate,
     OpensshCertificateOption,
     OpensshCertificateTimeParameters,
@@ -124,7 +123,7 @@ INVALID_DATA = b'yDspTN+BJzvIK2Q+CRD3qBDVSi+YqSxwyz432VEaHKlXbuLURirY0QpuBCqgR6t
 VALID_OPTS = [OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')]
 INVALID_OPTS = [OpensshCertificateOption('critical', 'test', 'undefined')]
 VALID_EXTENSIONS = [
-    OpensshCertificateOption('extension', 'permit-X11-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
     OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
     OpensshCertificateOption('extension', 'permit-port-forwarding', ''),
     OpensshCertificateOption('extension', 'permit-pty', ''),
@@ -182,7 +181,9 @@ INVALID_VALIDITY_TEST = [
 
 VALID_OPTIONS = [
     ("force-command=/usr/bin/csh", OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')),
-    ("permit-X11-forwarding", OpensshCertificateOption('extension', 'permit-X11-forwarding', '')),
+    ("Force-Command=/Usr/Bin/Csh", OpensshCertificateOption('critical', 'force-command', '/Usr/Bin/Csh')),
+    ("permit-x11-forwarding", OpensshCertificateOption('extension', 'permit-x11-forwarding', '')),
+    ("permit-X11-forwarding", OpensshCertificateOption('extension', 'permit-x11-forwarding', '')),
     ("critical:foo=bar", OpensshCertificateOption('critical', 'foo', 'bar')),
     ("extension:foo", OpensshCertificateOption('extension', 'foo', '')),
 ]
@@ -306,18 +307,42 @@ def test_invalid_options(option_string):
 
 
 def test_parse_option_list():
-    option_list = ['force-command=/usr/bin/csh', 'no-pty', 'no-agent-forwarding'] + list(get_default_options())
-    critical_options, extensions = parse_option_list(option_list)
+    critical_options, extensions = parse_option_list(['force-command=/usr/bin/csh'])
 
     critical_option_objects = [
         OpensshCertificateOption.from_string('force-command=/usr/bin/csh'),
     ]
 
     extension_objects = [
-        OpensshCertificateOption.from_string('permit-X11-forwarding'),
+        OpensshCertificateOption.from_string('permit-x11-forwarding'),
+        OpensshCertificateOption.from_string('permit-agent-forwarding'),
         OpensshCertificateOption.from_string('permit-port-forwarding'),
         OpensshCertificateOption.from_string('permit-user-rc'),
+        OpensshCertificateOption.from_string('permit-pty'),
     ]
 
     assert set(critical_options) == set(critical_option_objects)
+    assert set(extensions) == set(extension_objects)
+
+
+def test_parse_option_list_with_directives():
+    critical_options, extensions = parse_option_list(['clear', 'no-pty', 'permit-pty', 'permit-user-rc'])
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-user-rc'),
+        OpensshCertificateOption.from_string('permit-pty'),
+    ]
+
+    assert set(critical_options) == set()
+    assert set(extensions) == set(extension_objects)
+
+
+def test_parse_option_list_case_sensitivity():
+    critical_options, extensions = parse_option_list(['CLEAR', 'no-X11-forwarding', 'permit-X11-forwarding'])
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-x11-forwarding'),
+    ]
+
+    assert set(critical_options) == set()
     assert set(extensions) == set(extension_objects)

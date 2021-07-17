@@ -62,7 +62,7 @@
     idempotency: full
   register: new_public_key_full_idempotency_output
 
-- name: Assert changes to public key or signing key results in no change
+- name: Assert changes to public key or signing key results in no change unless idempotency=full
   assert:
     that:
       - new_signing_key_output is not changed

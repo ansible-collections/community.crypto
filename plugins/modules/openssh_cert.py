@@ -236,7 +236,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
-    get_default_options,
     OpensshCertificate,
     OpensshCertificateTimeParameters,
     parse_option_list,
@@ -383,9 +382,7 @@ class Certificate(object):
 
     def _compare_options(self):
         try:
-            critical_options, extensions = parse_option_list(
-                list(set(self.options).union(set(get_default_options())))
-            )
+            critical_options, extensions = parse_option_list(self.options)
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
 
