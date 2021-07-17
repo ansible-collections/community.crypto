@@ -610,14 +610,6 @@ def apply_directives(directives):
     if any(d not in _DIRECTIVES for d in directives):
         raise ValueError("directives must be one of %s" % ", ".join(_DIRECTIVES))
 
-    default_options = [
-        OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
-        OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
-        OpensshCertificateOption('extension', 'permit-port-forwarding', ''),
-        OpensshCertificateOption('extension', 'permit-pty', ''),
-        OpensshCertificateOption('extension', 'permit-user-rc', ''),
-    ]
-
     directive_to_option = {
         'no-x11-forwarding': OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
         'no-agent-forwarding': OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
@@ -629,7 +621,11 @@ def apply_directives(directives):
     if 'clear' in directives:
         return []
     else:
-        return list(set(default_options) - set(directive_to_option[d] for d in directives))
+        return list(set(default_options()) - set(directive_to_option[d] for d in directives))
+
+
+def default_options():
+    return [OpensshCertificateOption('extension', name, '') for name in _EXTENSIONS]
 
 
 def fingerprint(public_key):
