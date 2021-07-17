@@ -298,18 +298,7 @@ class Certificate(object):
     def generate(self):
         if not self._is_valid() or self.force:
             if not self.check_mode:
-                key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
-
-                try:
-                    self.module.preserved_copy(self.public_key, key_copy)
-                except OSError as e:
-                    self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
-                self.module.add_cleanup_file(key_copy)
-
-                self.module.run_command(self._command_arguments(key_copy), environ_update=dict(TZ="UTC"), check_rc=True)
-
-                temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
-                self.module.add_cleanup_file(temp_cert)
+                temp_cert = self._generate_temp_certificate()
                 backup_cert = self.module.backup_local(self.path) if self.exists() else None
 
                 try:
@@ -421,6 +410,22 @@ class Certificate(object):
         after.pop('nonce', None)
 
         return {'before': before, 'after': after}
+
+    def _generate_temp_certificate(self):
+        key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
+
+        try:
+            self.module.preserved_copy(self.public_key, key_copy)
+        except OSError as e:
+            self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
+        self.module.add_cleanup_file(key_copy)
+
+        self.module.run_command(self._command_arguments(key_copy), environ_update=dict(TZ="UTC"), check_rc=True)
+
+        temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
+        self.module.add_cleanup_file(temp_cert)
+
+        return temp_cert
 
     def _get_cert_info(self):
         return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
