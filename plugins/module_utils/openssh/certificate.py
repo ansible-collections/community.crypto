@@ -268,19 +268,8 @@ class OpensshCertificateOption(object):
         else:
             name, data = option_string.strip(), ''
 
-        name = name.lower()
-
-        if option_type is None:
-            if name in _CRITICAL_OPTIONS:
-                option_type = 'critical'
-            elif name in _EXTENSIONS:
-                option_type = 'extension'
-            else:
-                raise ValueError("%s is not a valid option. " % name +
-                                 "Custom options must start with 'critical:' or 'extension:' to indicate type")
-
         return cls(
-            option_type=option_type,
+            option_type=option_type or get_option_type(name.lower()),
             name=name,
             data=data
         )
@@ -648,6 +637,17 @@ def get_cert_info_object(key_type):
         raise ValueError("%s is not a valid key type" % key_type)
 
     return cert_info
+
+
+def get_option_type(name):
+    if name in _CRITICAL_OPTIONS:
+        result = 'critical'
+    elif name in _EXTENSIONS:
+        result = 'extension'
+    else:
+        raise ValueError("%s is not a valid option. " % name +
+                         "Custom options must start with 'critical:' or 'extension:' to indicate type")
+    return result
 
 
 def is_relative_time_string(time_string):

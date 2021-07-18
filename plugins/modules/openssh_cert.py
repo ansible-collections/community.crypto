@@ -345,7 +345,10 @@ class Certificate(object):
         result = {'changed': self.changed}
 
         if self.module._diff:
-            result['diff'] = self._generate_diff()
+            result['diff'] = {
+                'before': get_cert_dict(self.original_data),
+                'after': get_cert_dict(self.data)
+            }
 
         if self.state == 'present':
             result.update({
@@ -397,8 +400,10 @@ class Certificate(object):
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
 
-        return (set(self.original_data.critical_options) == set(critical_options) and
-                set(self.original_data.extensions) == set(extensions))
+        return all([
+            set(self.original_data.critical_options) == set(critical_options),
+            set(self.original_data.extensions) == set(extensions)
+        ])
 
     def _compare_time_parameters(self):
         try:
@@ -409,15 +414,10 @@ class Certificate(object):
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
 
-        return original_time_parameters == self.time_parameters and original_time_parameters.within_range(self.valid_at)
-
-    def _generate_diff(self):
-        before = self.original_data.to_dict() if self.original_data else {}
-        before.pop('nonce', None)
-        after = self.data.to_dict() if self.data else {}
-        after.pop('nonce', None)
-
-        return {'before': before, 'after': after}
+        return all([
+            original_time_parameters == self.time_parameters,
+            original_time_parameters.within_range(self.valid_at)
+        ])
 
     def _generate_temp_certificate(self):
         key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
@@ -464,11 +464,9 @@ class Certificate(object):
             result = self.original_data is None
         elif self.regenerate == 'fail':
             if not self._is_valid():
-                cert = self.original_data.to_dict()
-                cert.pop('nonce', None)
                 self.module.fail_json(
                     msg="Certificate does not match the provided options.",
-                    cert=cert
+                    cert=get_cert_dict(self.original_data)
                 )
             result = self.original_data is None
         elif self.regenerate in ('partial_idempotence', 'full_idempotence'):
@@ -516,6 +514,15 @@ def format_cert_info(cert_info):
     result.append(string)
     # Drop the certificate path
     result.pop(0)
+    return result
+
+
+def get_cert_dict(data):
+    if data is not None:
+        result = data.to_dict()
+        result.pop('nonce')
+    else:
+        result = {}
     return result
 
 
