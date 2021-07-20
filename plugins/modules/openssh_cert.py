@@ -443,37 +443,34 @@ class Certificate(object):
         return stdout.split()[1]
 
     def _is_valid(self):
-        if self.original_data:
-            partial_result = all([
-                set(self.original_data.principals) == set(self.principals),
-                self.original_data.serial == self.serial_number if self.serial_number is not None else True,
-                self.original_data.type == self.type,
-                self._compare_time_parameters(),
-            ])
+        partial_result = all([
+            set(self.original_data.principals) == set(self.principals),
+            self.original_data.serial == self.serial_number if self.serial_number is not None else True,
+            self.original_data.type == self.type,
+            self._compare_time_parameters(),
+        ])
 
-            return partial_result if self.regenerate == 'partial_idempotence' else partial_result and all([
-                self._compare_options(),
-                self.original_data.key_id == self.identifier,
-                self.original_data.public_key == self._get_key_fingerprint(self.public_key),
-                self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
-            ])
-        return False
+        return partial_result if self.regenerate == 'partial_idempotence' else partial_result and all([
+            self._compare_options(),
+            self.original_data.key_id == self.identifier,
+            self.original_data.public_key == self._get_key_fingerprint(self.public_key),
+            self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
+        ])
 
     def _should_generate(self):
         if self.regenerate == 'never':
-            result = self.original_data is None
+            return self.original_data is None
         elif self.regenerate == 'fail':
-            if not self._is_valid():
+            if self.original_data and not self._is_valid():
                 self.module.fail_json(
                     msg="Certificate does not match the provided options.",
                     cert=get_cert_dict(self.original_data)
                 )
-            result = self.original_data is None
+            return self.original_data is None
         elif self.regenerate in ('partial_idempotence', 'full_idempotence'):
-            result = not self._is_valid()
+            return self.original_data is None or not self._is_valid()
         else:
-            result = True
-        return result
+            return True
 
     def _update_permissions(self):
         file_args = self.module.load_file_common_arguments(self.module.params)
@@ -518,11 +515,11 @@ def format_cert_info(cert_info):
 
 
 def get_cert_dict(data):
-    if data is not None:
-        result = data.to_dict()
-        result.pop('nonce')
-    else:
-        result = {}
+    if data is None:
+        return {}
+
+    result = data.to_dict()
+    result.pop('nonce')
     return result
 
 

@@ -12,6 +12,7 @@
         path: "{{ certificate_path }}"
         valid_from: always
         valid_to: forever
+        regenerate: never
         changed: true
       - test_name: Regenerate never - same options
         type: user
@@ -42,6 +43,19 @@
         valid_from: always
         valid_to: forever
         regenerate: never
+        changed: true
+      - test_name: Remove certificate
+        path: "{{ certificate_path }}"
+        state: absent
+        changed: true
+      - test_name: Regenerate fail - new certificate
+        type: user
+        signing_key: "{{ signing_key }}"
+        public_key: "{{ public_key }}"
+        path: "{{ certificate_path }}"
+        valid_from: always
+        valid_to: forever
+        regenerate: fail
         changed: true
       - test_name: Regenerate fail - same options
         type: user
