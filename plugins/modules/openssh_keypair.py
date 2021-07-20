@@ -122,6 +122,7 @@ notes:
     - In case the ssh key is broken or password protected, the module will fail.
       Set the I(force) option to C(yes) if you want to regenerate the keypair.
     - Supports C(check_mode).
+    - In the case a custom C(mode), C(group), C(owner), or other file attribute is provided it will be applied to both key files.
 
 extends_documentation_fragment: files
 '''

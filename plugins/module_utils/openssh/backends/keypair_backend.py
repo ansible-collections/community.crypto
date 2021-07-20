@@ -118,7 +118,9 @@ class KeypairBackend(object):
                     self.module.fail_json(msg='Unable to update the comment for the public key.')
                 self._update_comment()
 
-        if self._permissions_changed() or self._permissions_changed(public_key=True):
+        private_key_perms_changed = self._permissions_changed()
+        public_key_perms_changed = self._permissions_changed(public_key=True)
+        if private_key_perms_changed or public_key_perms_changed:
             self.changed = True
 
     def is_private_key_valid(self, perms_required=True):
