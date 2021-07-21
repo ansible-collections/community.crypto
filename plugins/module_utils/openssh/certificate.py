@@ -205,7 +205,7 @@ class OpensshCertificateTimeParameters(object):
 
 class OpensshCertificateOption(object):
     def __init__(self, option_type, name, data):
-        if not isinstance(option_type, six.string_types) or option_type not in ('critical', 'extension'):
+        if option_type not in ('critical', 'extension'):
             raise ValueError("type must be either 'critical' or 'extension'")
 
         if not isinstance(name, six.string_types):

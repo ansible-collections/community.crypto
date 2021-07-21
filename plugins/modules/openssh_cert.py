@@ -44,8 +44,8 @@ options:
         required: true
     regenerate:
         description:
-            - When C(never) the task will fail if a certificate already exists at I(path) and is unreadable
-              otherwise a new certificate will only be generated if there is no existing certificate.
+            - When C(never) the task will fail if a certificate already exists at I(path) and is unreadable.
+              Otherwise, a new certificate will only be generated if there is no existing certificate.
             - When C(fail) the task will fail if a certificate already exists at I(path) and does not
               match the module's options.
             - When C(partial_idempotence) an existing certificate will be regenerated based on
@@ -450,7 +450,10 @@ class Certificate(object):
             self._compare_time_parameters(),
         ])
 
-        return partial_result if self.regenerate == 'partial_idempotence' else partial_result and all([
+        if self.regenerate == 'partial_idempotence':
+            return partial_result
+
+        return partial_result and all([
             self._compare_options(),
             self.original_data.key_id == self.identifier,
             self.original_data.public_key == self._get_key_fingerprint(self.public_key),
