@@ -244,6 +244,8 @@ from sys import version_info
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_text
 
+from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import safe_atomic_move
+
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateTimeParameters,
@@ -309,17 +311,11 @@ class Certificate(object):
         if self._should_generate():
             if not self.check_mode:
                 temp_cert = self._generate_temp_certificate()
-                backup_cert = self.module.backup_local(self.path) if self.exists() else None
 
                 try:
-                    self.module.atomic_move(temp_cert, self.path)
+                    safe_atomic_move(self.module, temp_cert, self.path)
                 except OSError as e:
-                    if backup_cert is not None:
-                        self.module.atomic_move(backup_cert, self.path)
                     self.module.fail_json(msg="Unable to write certificate to %s: %s" % (self.path, to_native(e)))
-                else:
-                    if backup_cert is not None:
-                        self.module.add_cleanup_file(backup_cert)
 
                 try:
                     self.data = OpensshCertificate.load(self.path)
