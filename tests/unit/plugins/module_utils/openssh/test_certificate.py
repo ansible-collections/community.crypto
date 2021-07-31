@@ -9,7 +9,9 @@ import pytest
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
     OpensshCertificate,
-    OpensshCertificateTimeParameters
+    OpensshCertificateOption,
+    OpensshCertificateTimeParameters,
+    parse_option_list
 )
 
 # Type: ssh-rsa-cert-v01@openssh.com user certificate
@@ -42,7 +44,7 @@ RSA_CERT_SIGNED_BY_DSA = (
     b'Q7c8c/tNDaL7uqV46QQAAADcAAAAHc3NoLWRzcwAAAChaQ94wqca+KhkHtbkLpjvGsfu0Gy03SAb0+o11Shk/BXnK7N/cwEVD ' +
     b'ansible@ansible-host'
 )
-RSA_FINGERPRINT = b'SHA256:SvUwwUer4AwsdePYseJR3LcZS8lnKi6BqiL51Dop030'
+RSA_FINGERPRINT = 'SHA256:SvUwwUer4AwsdePYseJR3LcZS8lnKi6BqiL51Dop030'
 # Type: ssh-dss-cert-v01@openssh.com user certificate
 # Public key: DSA-CERT SHA256:YCdJ2lYU+FSkWUud7zg1SJszprXoRGNU/GVcqXUjgC8
 # Signing CA: ECDSA SHA256:w9lp4zGRJShhm4DzO3ulVm0BEcR0PMjrM6VanQo4C0w
@@ -64,7 +66,7 @@ DSA_CERT_SIGNED_BY_ECDSA_NO_OPTS = (
     b'wvanQKM01uU73swNIt+ZFra9kRSi21xjzgMPn7U0AAABkAAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAABJAAAAIGmlKa/riG7+EpoW6dTJY6' +
     b'0N8BrEcniKgOxdRM1EPJ2DAAAAIQDnK4stvbvS+Bn0/42Was7uOfJtnLYXs5EuB2L3uejPcQ== ansible@ansible-host'
 )
-DSA_FINGERPRINT = b'SHA256:YCdJ2lYU+FSkWUud7zg1SJszprXoRGNU/GVcqXUjgC8'
+DSA_FINGERPRINT = 'SHA256:YCdJ2lYU+FSkWUud7zg1SJszprXoRGNU/GVcqXUjgC8'
 # Type: ecdsa-sha2-nistp256-cert-v01@openssh.com user certificate
 # Public key: ECDSA-CERT SHA256:w9lp4zGRJShhm4DzO3ulVm0BEcR0PMjrM6VanQo4C0w
 # Signing CA: ED25519 SHA256:NP4JdfkCopbjwMepq0aPrpMz13cNmEd+uDOxC/j9N40
@@ -90,7 +92,7 @@ ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS = (
     b'TUxOQAAAEAdp3eOLRN5t2wW29TBWbz604uuXg88jH4RA4HDhbRupa/x2rN3j6iZQ4VXPLA4JtdfIslHFkH6HUlxU8XsoJwP ' +
     b'ansible@ansible-host'
 )
-ECDSA_FINGERPRINT = b'SHA256:w9lp4zGRJShhm4DzO3ulVm0BEcR0PMjrM6VanQo4C0w'
+ECDSA_FINGERPRINT = 'SHA256:w9lp4zGRJShhm4DzO3ulVm0BEcR0PMjrM6VanQo4C0w'
 # Type: ssh-ed25519-cert-v01@openssh.com user certificate
 # Public key: ED25519-CERT SHA256:NP4JdfkCopbjwMepq0aPrpMz13cNmEd+uDOxC/j9N40
 # Signing CA: RSA SHA256:SvUwwUer4AwsdePYseJR3LcZS8lnKi6BqiL51Dop030
@@ -114,20 +116,20 @@ ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS = (
     b'7WJpz3eypBJt4TglwRTJpp54IMN2CyDQm0N97x9ris8jQQHlCF2EgZp1u4aOiZJTSJ5d4hapO0uZwXOI9AIWy/lmx0/6jX07MWrs4iXpfiF' +
     b'5T4s6kEn7YW4SaJ0Z7xGp3V0vDOxh+jwHZGD5GM449Il6QxQwDY5BSJq+iMR467yaIjw2g8Kt4ZiU= ansible@ansible-host'
 )
-ED25519_FINGERPRINT = b'SHA256:NP4JdfkCopbjwMepq0aPrpMz13cNmEd+uDOxC/j9N40'
+ED25519_FINGERPRINT = 'SHA256:NP4JdfkCopbjwMepq0aPrpMz13cNmEd+uDOxC/j9N40'
 # garbage
 INVALID_DATA = b'yDspTN+BJzvIK2Q+CRD3qBDVSi+YqSxwyz432VEaHKlXbuLURirY0QpuBCqgR6tCtWW5vEGkXKZ3'
 
-VALID_OPTS = [(b'force-command', b'/usr/bin/csh')]
-INVALID_OPTS = [(b'test', b'undefined')]
+VALID_OPTS = [OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')]
+INVALID_OPTS = [OpensshCertificateOption('critical', 'test', 'undefined')]
 VALID_EXTENSIONS = [
-    (b'permit-X11-forwarding', b''),
-    (b'permit-agent-forwarding', b''),
-    (b'permit-port-forwarding', b''),
-    (b'permit-pty', b''),
-    (b'permit-user-rc', b''),
+    OpensshCertificateOption('extension', 'permit-x11-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-agent-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-port-forwarding', ''),
+    OpensshCertificateOption('extension', 'permit-pty', ''),
+    OpensshCertificateOption('extension', 'permit-user-rc', ''),
 ]
-INVALID_EXTENSIONS = [(b'test', b'')]
+INVALID_EXTENSIONS = [OpensshCertificateOption('extension', 'test', '')]
 
 VALID_TIME_PARAMETERS = [
     (0, "always", "always", 0,
@@ -177,15 +179,31 @@ INVALID_VALIDITY_TEST = [
     ("2000-01-01 00:00:00", "2000-01-01 00:00:01", "2000-01-01 00:00:02"),
 ]
 
+VALID_OPTIONS = [
+    ("force-command=/usr/bin/csh", OpensshCertificateOption('critical', 'force-command', '/usr/bin/csh')),
+    ("Force-Command=/Usr/Bin/Csh", OpensshCertificateOption('critical', 'force-command', '/Usr/Bin/Csh')),
+    ("permit-x11-forwarding", OpensshCertificateOption('extension', 'permit-x11-forwarding', '')),
+    ("permit-X11-forwarding", OpensshCertificateOption('extension', 'permit-x11-forwarding', '')),
+    ("critical:foo=bar", OpensshCertificateOption('critical', 'foo', 'bar')),
+    ("extension:foo", OpensshCertificateOption('extension', 'foo', '')),
+]
+
+INVALID_OPTIONS = [
+    "foobar",
+    "foo=bar",
+    'foo:bar=baz',
+    [],
+]
+
 
 def test_rsa_certificate(tmpdir):
     cert_file = tmpdir / 'id_rsa-cert.pub'
     cert_file.write(RSA_CERT_SIGNED_BY_DSA, mode='wb')
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.key_id == b'test'
+    assert cert.key_id == 'test'
     assert cert.serial == 0
-    assert cert.type_string == b'ssh-rsa-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-rsa-cert-v01@openssh.com'
     assert cert.public_key == RSA_FINGERPRINT
     assert cert.signing_key == DSA_FINGERPRINT
 
@@ -196,7 +214,7 @@ def test_dsa_certificate(tmpdir):
 
     cert = OpensshCertificate.load(str(cert_file))
 
-    assert cert.type_string == b'ssh-dss-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-dss-cert-v01@openssh.com'
     assert cert.public_key == DSA_FINGERPRINT
     assert cert.signing_key == ECDSA_FINGERPRINT
     assert cert.critical_options == []
@@ -208,7 +226,7 @@ def test_ecdsa_certificate(tmpdir):
     cert_file.write(ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.type_string == b'ecdsa-sha2-nistp256-cert-v01@openssh.com'
+    assert cert.type_string == 'ecdsa-sha2-nistp256-cert-v01@openssh.com'
     assert cert.public_key == ECDSA_FINGERPRINT
     assert cert.signing_key == ED25519_FINGERPRINT
     assert cert.critical_options == VALID_OPTS
@@ -220,7 +238,7 @@ def test_ed25519_certificate(tmpdir):
     cert_file.write(ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
-    assert cert.type_string == b'ssh-ed25519-cert-v01@openssh.com'
+    assert cert.type_string == 'ssh-ed25519-cert-v01@openssh.com'
     assert cert.public_key == ED25519_FINGERPRINT
     assert cert.signing_key == RSA_FINGERPRINT
     assert cert.critical_options == INVALID_OPTS
@@ -275,3 +293,56 @@ def test_valid_validity_test(valid_from, valid_to, valid_at):
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", INVALID_VALIDITY_TEST)
 def test_invalid_validity_test(valid_from, valid_to, valid_at):
     assert not OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)
+
+
+@pytest.mark.parametrize("option_string,option_object", VALID_OPTIONS)
+def test_valid_options(option_string, option_object):
+    assert OpensshCertificateOption.from_string(option_string) == option_object
+
+
+@pytest.mark.parametrize("option_string", INVALID_OPTIONS)
+def test_invalid_options(option_string):
+    with pytest.raises(ValueError):
+        OpensshCertificateOption.from_string(option_string)
+
+
+def test_parse_option_list():
+    critical_options, extensions = parse_option_list(['force-command=/usr/bin/csh'])
+
+    critical_option_objects = [
+        OpensshCertificateOption.from_string('force-command=/usr/bin/csh'),
+    ]
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-x11-forwarding'),
+        OpensshCertificateOption.from_string('permit-agent-forwarding'),
+        OpensshCertificateOption.from_string('permit-port-forwarding'),
+        OpensshCertificateOption.from_string('permit-user-rc'),
+        OpensshCertificateOption.from_string('permit-pty'),
+    ]
+
+    assert set(critical_options) == set(critical_option_objects)
+    assert set(extensions) == set(extension_objects)
+
+
+def test_parse_option_list_with_directives():
+    critical_options, extensions = parse_option_list(['clear', 'no-pty', 'permit-pty', 'permit-user-rc'])
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-user-rc'),
+        OpensshCertificateOption.from_string('permit-pty'),
+    ]
+
+    assert set(critical_options) == set()
+    assert set(extensions) == set(extension_objects)
+
+
+def test_parse_option_list_case_sensitivity():
+    critical_options, extensions = parse_option_list(['CLEAR', 'no-X11-forwarding', 'permit-X11-forwarding'])
+
+    extension_objects = [
+        OpensshCertificateOption.from_string('permit-x11-forwarding'),
+    ]
+
+    assert set(critical_options) == set()
+    assert set(extensions) == set(extension_objects)

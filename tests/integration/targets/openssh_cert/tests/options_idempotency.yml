@@ -1,0 +1,102 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Generate cert with no options
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    options:
+      - clear
+    regenerate: full_idempotence
+  register: no_options
+
+- name: Generate cert with no options with explicit directives
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    options:
+      - no-user-rc
+      - no-x11-forwarding
+      - no-agent-forwarding
+      - no-port-forwarding
+      - no-pty
+    regenerate: full_idempotence
+  register: no_options_explicit_directives
+
+- name: Generate cert with explicit extension
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    options:
+      - clear
+      - permit-pty
+    regenerate: full_idempotence
+  register: explicit_extension_before
+
+- name: Generate cert with explicit extension (idempotency)
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    options:
+      - clear
+      - permit-pty
+    regenerate: full_idempotence
+  register: explicit_extension_after
+
+- name: Generate cert with explicit extension and corresponding directive
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    options:
+      - no-pty
+      - permit-pty
+    regenerate: full_idempotence
+  register: explicit_extension_and_directive
+
+- name: Generate cert with default options
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    regenerate: full_idempotence
+  register: default_options
+
+- name: Assert options results
+  assert:
+    that:
+      - no_options is changed
+      - no_options_explicit_directives is not changed
+      - explicit_extension_before is changed
+      - explicit_extension_after is not changed
+      - explicit_extension_and_directive is changed
+      - default_options is not changed
+
+- name: Remove certificate
+  openssh_cert:
+    path: "{{ certificate_path }}"
+    state: absent

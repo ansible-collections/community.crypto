@@ -34,6 +34,7 @@ options:
     force:
         description:
             - Should the certificate be regenerated even if it already exists and is valid.
+            - Equivalent to I(regenerate=always).
         type: bool
         default: false
     path:
@@ -41,6 +42,26 @@ options:
             - Path of the file containing the certificate.
         type: path
         required: true
+    regenerate:
+        description:
+            - When C(never) the task will fail if a certificate already exists at I(path) and is unreadable.
+              Otherwise, a new certificate will only be generated if there is no existing certificate.
+            - When C(fail) the task will fail if a certificate already exists at I(path) and does not
+              match the module's options.
+            - When C(partial_idempotence) an existing certificate will be regenerated based on
+              I(serial), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
+            - When C(full_idempotence) I(identifier), I(options), I(public_key), and I(signing_key)
+              are also considered when compared against an existing certificate.
+            - C(always) is equivalent to I(force=true).
+        type: str
+        choices:
+            - never
+            - fail
+            - partial_idempotence
+            - full_idempotence
+            - always
+        default: partial_idempotence
+        version_added: 1.8.0
     signing_key:
         description:
             - The path to the private openssh key that is used for signing the public key in order to generate the certificate.
@@ -223,9 +244,12 @@ from sys import version_info
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_text
 
+from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import safe_atomic_move
+
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateTimeParameters,
+    parse_option_list,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
@@ -243,11 +267,12 @@ class Certificate(object):
 
         self.force = module.params['force']
         self.identifier = module.params['identifier'] or ""
-        self.options = module.params['options']
+        self.options = module.params['options'] or []
         self.path = module.params['path']
         self.pkcs11_provider = module.params['pkcs11_provider']
         self.principals = module.params['principals'] or []
         self.public_key = module.params['public_key']
+        self.regenerate = module.params['regenerate'] if not self.force else 'always'
         self.serial_number = module.params['serial_number']
         self.signing_key = module.params['signing_key']
         self.state = module.params['state']
@@ -273,6 +298,8 @@ class Certificate(object):
             try:
                 self.original_data = OpensshCertificate.load(self.path)
             except (TypeError, ValueError) as e:
+                if self.regenerate in ('never', 'fail'):
+                    self.module.fail_json(msg="Unable to read existing certificate: %s" % to_native(e))
                 self.module.warn("Unable to read existing certificate: %s" % to_native(e))
 
         self._validate_parameters()
@@ -281,31 +308,14 @@ class Certificate(object):
         return os.path.exists(self.path)
 
     def generate(self):
-        if not self._is_valid() or self.force:
+        if self._should_generate():
             if not self.check_mode:
-                key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
+                temp_cert = self._generate_temp_certificate()
 
                 try:
-                    self.module.preserved_copy(self.public_key, key_copy)
+                    safe_atomic_move(self.module, temp_cert, self.path)
                 except OSError as e:
-                    self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
-                self.module.add_cleanup_file(key_copy)
-
-                self.module.run_command(self._command_arguments(key_copy), environ_update=dict(TZ="UTC"), check_rc=True)
-
-                temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
-                self.module.add_cleanup_file(temp_cert)
-                backup_cert = self.module.backup_local(self.path) if self.exists() else None
-
-                try:
-                    self.module.atomic_move(temp_cert, self.path)
-                except OSError as e:
-                    if backup_cert is not None:
-                        self.module.atomic_move(backup_cert, self.path)
                     self.module.fail_json(msg="Unable to write certificate to %s: %s" % (self.path, to_native(e)))
-                else:
-                    if backup_cert is not None:
-                        self.module.add_cleanup_file(backup_cert)
 
                 try:
                     self.data = OpensshCertificate.load(self.path)
@@ -331,7 +341,10 @@ class Certificate(object):
         result = {'changed': self.changed}
 
         if self.module._diff:
-            result['diff'] = self._generate_diff()
+            result['diff'] = {
+                'before': get_cert_dict(self.original_data),
+                'after': get_cert_dict(self.data)
+            }
 
         if self.state == 'present':
             result.update({
@@ -377,34 +390,86 @@ class Certificate(object):
 
         return result
 
-    def _generate_diff(self):
-        before = self.original_data.to_dict() if self.original_data else {}
-        before.pop('nonce', None)
-        after = self.data.to_dict() if self.data else {}
-        after.pop('nonce', None)
+    def _compare_options(self):
+        try:
+            critical_options, extensions = parse_option_list(self.options)
+        except ValueError as e:
+            return self.module.fail_json(msg=to_native(e))
 
-        return {'before': before, 'after': after}
+        return all([
+            set(self.original_data.critical_options) == set(critical_options),
+            set(self.original_data.extensions) == set(extensions)
+        ])
+
+    def _compare_time_parameters(self):
+        try:
+            original_time_parameters = OpensshCertificateTimeParameters(
+                valid_from=self.original_data.valid_after,
+                valid_to=self.original_data.valid_before
+            )
+        except ValueError as e:
+            return self.module.fail_json(msg=to_native(e))
+
+        return all([
+            original_time_parameters == self.time_parameters,
+            original_time_parameters.within_range(self.valid_at)
+        ])
+
+    def _generate_temp_certificate(self):
+        key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
+
+        try:
+            self.module.preserved_copy(self.public_key, key_copy)
+        except OSError as e:
+            self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
+        self.module.add_cleanup_file(key_copy)
+
+        self.module.run_command(self._command_arguments(key_copy), environ_update=dict(TZ="UTC"), check_rc=True)
+
+        temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
+        self.module.add_cleanup_file(temp_cert)
+
+        return temp_cert
 
     def _get_cert_info(self):
         return self.module.run_command([self.ssh_keygen, '-Lf', self.path])[1]
 
+    def _get_key_fingerprint(self, path):
+        stdout = self.module.run_command([self.ssh_keygen, '-lf', path], check_rc=True)[1]
+        return stdout.split()[1]
+
     def _is_valid(self):
-        if self.original_data:
-            try:
-                original_time_parameters = OpensshCertificateTimeParameters(
-                    valid_from=self.original_data.valid_after,
-                    valid_to=self.original_data.valid_before
+        partial_result = all([
+            set(self.original_data.principals) == set(self.principals),
+            self.original_data.serial == self.serial_number if self.serial_number is not None else True,
+            self.original_data.type == self.type,
+            self._compare_time_parameters(),
+        ])
+
+        if self.regenerate == 'partial_idempotence':
+            return partial_result
+
+        return partial_result and all([
+            self._compare_options(),
+            self.original_data.key_id == self.identifier,
+            self.original_data.public_key == self._get_key_fingerprint(self.public_key),
+            self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
+        ])
+
+    def _should_generate(self):
+        if self.regenerate == 'never':
+            return self.original_data is None
+        elif self.regenerate == 'fail':
+            if self.original_data and not self._is_valid():
+                self.module.fail_json(
+                    msg="Certificate does not match the provided options.",
+                    cert=get_cert_dict(self.original_data)
                 )
-            except ValueError as e:
-                return self.module.fail_json(msg=to_native(e))
-            return all([
-                self.original_data.type == self.type,
-                set(to_text(p) for p in self.original_data.principals) == set(self.principals),
-                self.original_data.serial == self.serial_number if self.serial_number is not None else True,
-                original_time_parameters == self.time_parameters,
-                original_time_parameters.within_range(self.valid_at)
-            ])
-        return False
+            return self.original_data is None
+        elif self.regenerate in ('partial_idempotence', 'full_idempotence'):
+            return self.original_data is None or not self._is_valid()
+        else:
+            return True
 
     def _update_permissions(self):
         file_args = self.module.load_file_common_arguments(self.module.params)
@@ -448,6 +513,15 @@ def format_cert_info(cert_info):
     return result
 
 
+def get_cert_dict(data):
+    if data is None:
+        return {}
+
+    result = data.to_dict()
+    result.pop('nonce')
+    return result
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -458,6 +532,11 @@ def main():
             pkcs11_provider=dict(type='str'),
             principals=dict(type='list', elements='str'),
             public_key=dict(type='path'),
+            regenerate=dict(
+                type='str',
+                default='partial_idempotence',
+                choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
+            ),
             signing_key=dict(type='path'),
             serial_number=dict(type='int'),
             state=dict(type='str', default='present', choices=['absent', 'present']),

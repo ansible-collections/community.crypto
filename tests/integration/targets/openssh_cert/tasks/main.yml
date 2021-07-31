@@ -22,6 +22,12 @@
     - name: Import key_idempotency tests
       import_tasks: ../tests/key_idempotency.yml
 
+    - name: Import options tests
+      import_tasks: ../tests/options_idempotency.yml
+
+    - name: Import regenerate tests
+      import_tasks: ../tests/regenerate.yml
+
     - name: Import remove tests
       import_tasks: ../tests/remove.yml
   when: not (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6")
