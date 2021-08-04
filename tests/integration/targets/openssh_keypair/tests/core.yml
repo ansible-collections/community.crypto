@@ -53,7 +53,7 @@
       - core_output['fingerprint'] is string
       - core_output['fingerprint'].startswith('SHA256:')
   # SHA256 was made the default hashing algorithm for fingerprints in OpenSSH 6.8
-  when: backend == 'opensshbin' and openssh_version is version('6.8', '>=')
+  when: not (backend == 'opensshbin' and openssh_version is version('6.8', '<'))
 
 - name: "({{ backend }}) Assert key returns public_key"
   assert:

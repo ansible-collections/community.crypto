@@ -56,7 +56,7 @@
         path: "{{ output_dir }}/default_size_ed25519"
         state: absent
   # Support for ed25519 keys was added in OpenSSH 6.5
-  when: "backend == 'opensshbin' and openssh_version is version('6.5', '>=')"
+  when: not (backend == 'opensshbin' and openssh_version is version('6.5', '<'))
 
 - name: "({{ backend }}) Generate key - force"
   openssh_keypair:
@@ -108,7 +108,7 @@
     that:
       - modified_comment_output.comment == 'test_modified@comment'
   # Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
-  when: "backend == 'opensshbin' and openssh_version is version('7.2', '>=')"
+  when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
 
 - name: "({{ backend }}) Remove key - comment"
   openssh_keypair:
