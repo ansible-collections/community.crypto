@@ -1,0 +1,8 @@
+---
+minor_changes:
+  - openssh_keypair - added ``diff`` support (https://github.com/ansible-collections/community.crypto/pull/260).
+bugfixes:
+  - openssh_keypair - fixed error handling to restore original keypair if regeneration fails
+    (https://github.com/ansible-collections/community.crypto/pull/260).
+  - openssh_keypair - fixed ``cryptography`` backend to preserve original file permissions when regenerating a keypair
+    requires existing files to be overwritten (https://github.com/ansible-collections/community.crypto/pull/260).
