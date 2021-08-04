@@ -87,13 +87,6 @@
   assert:
     that:
       - write_only_private_key_after.stat.mode == '0200'
-  when: backend == 'opensshbin'
-
-- name: "({{ backend }}) Assert key permissions are not preserved with 'cryptography'"
-  assert:
-    that:
-      - write_only_private_key_after.stat.mode == '0600'
-  when: backend == 'cryptography'
 
 - name: "({{ backend }}) Remove key - write-only"
   openssh_keypair:
