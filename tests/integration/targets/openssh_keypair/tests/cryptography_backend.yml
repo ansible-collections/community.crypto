@@ -42,7 +42,7 @@
 
 - name: Modify unprotected key with passphrase
   openssh_keypair:
-    path: './unprotected'
+    path: '{{ output_dir }}/unprotected'
     size: 2048
     passphrase: "{{ passphrase }}"
     backend: cryptography
@@ -51,7 +51,7 @@
 
 - name: Modify unprotected key with passphrase (force)
   openssh_keypair:
-    path: './unprotected'
+    path: '{{ output_dir }}/unprotected'
     size: 2048
     passphrase: "{{ passphrase }}"
     force: true
