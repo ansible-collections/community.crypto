@@ -1,0 +1,94 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: "({{ backend }}) Generate key (check mode)"
+  openssh_keypair:
+    path: "{{ output_dir }}/core"
+    size: 2048
+    backend: "{{ backend }}"
+  register: check_core_output
+  check_mode: true
+
+- name: "({{ backend }}) Generate key"
+  openssh_keypair:
+    path: "{{ output_dir }}/core"
+    size: 2048
+    backend: "{{ backend }}"
+  register: core_output
+
+- name: "({{ backend }}) Generate key (check mode idempotent)"
+  openssh_keypair:
+    path: "{{ output_dir }}/core"
+    size: 2048
+    backend: "{{ backend }}"
+  register: idempotency_check_core_output
+  check_mode: true
+
+- name: "({{ backend }}) Generate key (idempotent)"
+  openssh_keypair:
+    path: '{{ output_dir }}/core'
+    size: 2048
+    backend: "{{ backend }}"
+  register: idempotency_core_output
+
+- name: "({{ backend }}) Log key return values"
+  debug:
+    msg: "{{ core_output }}"
+
+- name: "({{ backend }}) Assert core behavior"
+  assert:
+    that:
+      - check_core_output is changed
+      - core_output is changed
+      - idempotency_check_core_output is not changed
+      - idempotency_check_core_output.public_key.startswith('ssh-rsa')
+      - idempotency_core_output is not changed
+
+- name: "({{ backend }}) Assert key returns fingerprint"
+  assert:
+    that:
+      - core_output['fingerprint'] is string
+      - core_output['fingerprint'].startswith('SHA256:')
+  # only distro old enough that it still gives md5 with no prefix
+  when: not (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
+
+- name: "({{ backend }}) Assert key returns public_key"
+  assert:
+    that:
+      - core_output['public_key'] is string
+      - core_output['public_key'].startswith('ssh-rsa ')
+
+- name: "({{ backend }}) Assert key returns size value"
+  assert:
+    that:
+      - core_output['size']|type_debug == 'int'
+      - core_output['size'] == 2048
+
+- name: "({{ backend }}) Assert key returns key type"
+  assert:
+    that:
+      - core_output['type'] is string
+      - core_output['type'] == 'rsa'
+
+- name: "({{ backend }}) Retrieve key size from 'ssh-keygen'"
+  shell: "ssh-keygen -lf {{ output_dir }}/core | grep -o -E '^[0-9]+'"
+  register: core_size_ssh_keygen
+
+- name: "({{ backend }}) Assert key size matches 'ssh-keygen' output"
+  assert:
+    that:
+      - core_size_ssh_keygen.stdout == '2048'
+
+- name: "({{ backend }}) Assert public key module return equal to the public key content"
+  assert:
+    that:
+      - "core_output.public_key == lookup('file', output_dir ~ '/core.pub').strip('\n')"
+
+- name: "({{ backend }}) Remove key"
+  openssh_keypair:
+    path: '{{ output_dir }}/core'
+    backend: "{{ backend }}"
+    state: absent

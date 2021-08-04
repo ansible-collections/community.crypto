@@ -1,0 +1,45 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: "({{ backend }}) Generate key"
+  openssh_keypair:
+    path: '{{ output_dir }}/removed'
+    backend: "{{ backend }}"
+    state: present
+
+- name: "({{ backend }}) Generate key (idempotency)"
+  openssh_keypair:
+    path: '{{ output_dir }}/removed'
+    backend: "{{ backend }}"
+    state: present
+
+- name: "({{ backend }}) Remove key"
+  openssh_keypair:
+    state: absent
+    path: '{{ output_dir }}/removed'
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Remove key (idempotency)"
+  openssh_keypair:
+    state: absent
+    path: '{{ output_dir }}/removed'
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Check private key status"
+  stat:
+    path: '{{ output_dir }}/removed'
+  register: removed_private_key
+
+- name: "({{ backend }}) Check public key status"
+  stat:
+    path: '{{ output_dir }}/removed.pub'
+  register: removed_public_key
+
+- name: "({{ backend }}) Assert key pair files are removed"
+  assert:
+    that:
+      - not removed_private_key.stat.exists
+      - not removed_public_key.stat.exists
