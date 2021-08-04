@@ -71,12 +71,11 @@
     state: absent
 
 - name: Generate PEM encoded key with passphrase
-  command: 'ssh-keygen -f {{ output_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+  command: 'ssh-keygen -b 4096 -f {{ output_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
     path: '{{ output_dir }}/pem_encoded'
-    size: 2048
     passphrase: "{{ passphrase }}"
     backend: cryptography
   register: pem_encoded_output
