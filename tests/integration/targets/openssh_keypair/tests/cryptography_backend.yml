@@ -1,0 +1,92 @@
+---
+- name: Generate a password protected key
+  command: 'ssh-keygen -f {{ output_dir }}/password_protected -N {{ passphrase }}'
+
+- name: Modify the password protected key with passphrase
+  openssh_keypair:
+    path: '{{ output_dir }}/password_protected'
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    backend: cryptography
+  register: password_protected_output
+
+- name: Check password protected key idempotency
+  openssh_keypair:
+    path: '{{ output_dir }}/password_protected'
+    size: 1024
+    passphrase: "{{ passphrase }}"
+    backend: cryptography
+  register: password_protected_idempotency_output
+
+- name: Ensure that ssh-keygen can read keys generated with passphrase
+  command: 'ssh-keygen -yf {{ output_dir }}/password_protected -P {{ passphrase }}'
+  register: password_protected_ssh_keygen_output
+
+- name: Check that password protected key with passphrase was regenerated
+  assert:
+    that:
+      - password_protected_output is changed
+      - password_protected_idempotency_output is not changed
+      - password_protected_ssh_keygen_output is success
+
+- name: Remove password protected key
+  openssh_keypair:
+    path: '{{ output_dir }}/password_protected'
+    backend: cryptography
+    state: absent
+
+- name: Generate an unprotected key
+  openssh_keypair:
+    path: '{{ output_dir }}/unprotected'
+    backend: cryptography
+
+- name: Modify unprotected key with passphrase
+  openssh_keypair:
+    path: '{{ output_dir }}/unprotected'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    backend: cryptography
+  ignore_errors: true
+  register: unprotected_modification_output
+
+- name: Modify unprotected key with passphrase (force)
+  openssh_keypair:
+    path: '{{ output_dir }}/unprotected'
+    size: 2048
+    passphrase: "{{ passphrase }}"
+    force: true
+    backend: cryptography
+  register: force_unprotected_modification_output
+
+- name: Check that unprotected key was modified
+  assert:
+    that:
+      - unprotected_modification_output is failed
+      - force_unprotected_modification_output is changed
+
+- name: Remove unprotected key
+  openssh_keypair:
+    path: '{{ output_dir }}/unprotected'
+    backend: cryptography
+    state: absent
+
+- name: Generate PEM encoded key with passphrase
+  command: 'ssh-keygen -b 4096 -f {{ output_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+
+- name: Try to verify a PEM encoded key
+  openssh_keypair:
+    path: '{{ output_dir }}/pem_encoded'
+    passphrase: "{{ passphrase }}"
+    backend: cryptography
+  register: pem_encoded_output
+
+- name: Check that PEM encoded file is read without errors
+  assert:
+    that:
+      - pem_encoded_output is not changed
+
+- name: Remove PEM encoded key
+  openssh_keypair:
+    path: '{{ output_dir }}/pem_encoded'
+    backend: cryptography
+    state: absent

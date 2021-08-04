@@ -1,0 +1,138 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: "({{ backend }}) Generate key - broken"
+  copy:
+    dest: '{{ item }}'
+    content: ''
+    mode: '0700'
+  loop:
+    - "{{ output_dir }}/broken"
+    - "{{ output_dir }}/broken.pub"
+
+- name: "({{ backend }}) Regenerate key - broken"
+  openssh_keypair:
+    path: "{{ output_dir }}/broken"
+    backend: "{{ backend }}"
+  register: broken_output
+  ignore_errors: true
+
+- name: "({{ backend }}) Assert broken key causes failure - broken"
+  assert:
+    that:
+      - broken_output is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken.' in broken_output.msg"
+
+- name: "({{ backend }}) Regenerate key with force - broken"
+  openssh_keypair:
+    path: "{{ output_dir }}/broken"
+    backend: "{{ backend }}"
+    force: true
+  register: force_broken_output
+
+- name: "({{ backend }}) Assert broken key regenerated when 'force=true' - broken"
+  assert:
+    that:
+      - force_broken_output is changed
+
+- name: "({{ backend }}) Remove key - broken"
+  openssh_keypair:
+    path: "{{ output_dir }}/broken"
+    backend: "{{ backend }}"
+    state: absent
+
+- name: "({{ backend }}) Generate key - write-only"
+  openssh_keypair:
+    path: "{{ output_dir }}/write-only"
+    mode: "0200"
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Check private key status - write-only"
+  stat:
+    path: '{{ output_dir }}/write-only'
+  register: write_only_private_key
+
+- name: "({{ backend }}) Check public key status - write-only"
+  stat:
+    path: '{{ output_dir }}/write-only.pub'
+  register: write_only_public_key
+
+- name: "({{ backend }}) Assert that private and public keys match permissions - write-only"
+  assert:
+    that:
+      - write_only_private_key.stat.mode == '0200'
+      - write_only_public_key.stat.mode == '0200'
+
+- name: "({{ backend }}) Regenerate key with force - write-only"
+  openssh_keypair:
+    path: "{{ output_dir }}/write-only"
+    backend: "{{ backend }}"
+    force: true
+  register: write_only_output
+
+- name: "({{ backend }}) Check private key status after regeneration - write-only"
+  stat:
+    path: '{{ output_dir }}/write-only'
+  register: write_only_private_key_after
+
+- name: "({{ backend }}) Assert key is regenerated - write-only"
+  assert:
+    that:
+      - write_only_output is changed
+
+- name: "({{ backend }}) Assert key permissions are preserved with 'opensshbin'"
+  assert:
+    that:
+      - write_only_private_key_after.stat.mode == '0200'
+  when: backend == 'opensshbin'
+
+- name: "({{ backend }}) Assert key permissions are not preserved with 'cryptography'"
+  assert:
+    that:
+      - write_only_private_key_after.stat.mode == '0600'
+  when: backend == 'cryptography'
+
+- name: "({{ backend }}) Remove key - write-only"
+  openssh_keypair:
+    path: "{{ output_dir }}/write-only"
+    backend: "{{ backend }}"
+    state: absent
+
+- name: "({{ backend }}) Generate key with ssh-keygen - password_protected"
+  command: "ssh-keygen -f {{ output_dir }}/password_protected -N {{ passphrase }}"
+
+- name: "({{ backend }}) Modify key - password_protected"
+  openssh_keypair:
+    path: "{{ output_dir }}/password_protected"
+    size: 2048
+    backend: "{{ backend }}"
+  register: password_protected_output
+  ignore_errors: true
+
+- name: "({{ backend }}) Assert key cannot be read - password_protected"
+  assert:
+    that:
+      - password_protected_output is failed
+      - "'Unable to read the key. The key is protected with a passphrase or broken.' in password_protected_output.msg"
+
+- name: "({{ backend }}) Modify key with 'force=true' - password_protected"
+  openssh_keypair:
+    path: "{{ output_dir }}/password_protected"
+    size: 2048
+    backend: "{{ backend }}"
+    force: true
+  register: force_password_protected_output
+
+- name: "({{ backend }}) Assert key regenerated with 'force=true' - password_protected"
+  assert:
+    that:
+      - force_password_protected_output is changed
+
+- name: "({{ backend }}) Remove key - password_protected"
+  openssh_keypair:
+    path: "{{ output_dir }}/password_protected"
+    backend: "{{ backend }}"
+    state: absent

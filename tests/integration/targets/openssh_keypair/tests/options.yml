@@ -1,0 +1,110 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- set_fact:
+    key_types:
+      - rsa
+      - dsa
+      - ecdsa
+
+- name: "({{ backend }}) Generate keys with default size - size"
+  openssh_keypair:
+    path: "{{ output_dir }}/default_size_{{ item }}"
+    type: "{{ item }}"
+    backend: "{{ backend }}"
+  loop: "{{ key_types }}"
+
+- name: "({{ backend }}) Retrieve key size from 'ssh-keygen' - size"
+  shell: "ssh-keygen -lf {{ output_dir }}/default_size_{{ item }} | grep -o -E '^[0-9]+'"
+  loop: "{{ key_types }}"
+  register: key_size_output
+
+- name: "({{ backend }}) Assert key sizes match default size - size"
+  assert:
+    that:
+      - key_size_output.results[0].stdout == '4096'
+      - key_size_output.results[1].stdout == '1024'
+      - key_size_output.results[2].stdout == '256'
+
+- name: "({{ backend }}) Remove keys - size"
+  openssh_keypair:
+    path: "{{ output_dir }}/default_size_{{ item }}"
+    state: absent
+  loop: "{{ key_types }}"
+
+- block:
+    - name: "({{ backend }}) Generate ed25519 key with default size - size"
+      openssh_keypair:
+        path: "{{ output_dir }}/default_size_ed25519"
+        type: ed25519
+        backend: "{{ backend }}"
+
+    - name: "({{ backend }}) Retrieve ed25519 key size from 'ssh-keygen' - size"
+      shell: "ssh-keygen -lf {{ output_dir }}/default_size_ed25519 | grep -o -E '^[0-9]+'"
+      register: ed25519_key_size_output
+
+    - name: "({{ backend }}) Assert ed25519 key size matches default size - size"
+      assert:
+        that:
+          - ed25519_key_size_output.stdout == '256'
+
+    - name: "({{ backend }}) Remove ed25519 key - size"
+      openssh_keypair:
+        path: "{{ output_dir }}/default_size_ed25519"
+        state: absent
+  when: not (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
+
+- name: "({{ backend }}) Generate key - force"
+  openssh_keypair:
+    path: "{{ output_dir }}/force"
+    type: rsa
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Regenerate key - force"
+  openssh_keypair:
+    path: "{{ output_dir }}/force"
+    type: rsa
+    force: true
+    backend: "{{ backend }}"
+  register: force_output
+
+- name: "({{ backend }}) Assert key regenerated - force"
+  assert:
+    that:
+      - force_output is changed
+
+- name: "({{ backend }}) Remove key - force"
+  openssh_keypair:
+    path: "{{ output_dir }}/force"
+    state: absent
+    backend: "{{ backend }}"
+
+- name: "({{ backend }}) Generate key - comment"
+  openssh_keypair:
+    path: "{{ output_dir }}/comment"
+    comment: "test@comment"
+    backend: "{{ backend }}"
+  register: comment_output
+
+- name: "({{ backend }}) Modify comment - comment"
+  openssh_keypair:
+    path: "{{ output_dir }}/comment"
+    comment: "test_modified@comment"
+    backend: "{{ backend }}"
+  register: modified_comment_output
+
+- name: "({{ backend }}) Assert only comment changed - comment"
+  assert:
+    that:
+      - comment_output.public_key == modified_comment_output.public_key
+      - comment_output.comment == 'test@comment'
+      - modified_comment_output.comment == 'test_modified@comment'
+
+- name: "({{ backend }}) Remove key - comment"
+  openssh_keypair:
+    path: "{{ output_dir }}/comment"
+    state: absent
+    backend: "{{ backend }}"
