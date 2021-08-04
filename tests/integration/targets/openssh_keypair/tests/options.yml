@@ -96,12 +96,18 @@
     backend: "{{ backend }}"
   register: modified_comment_output
 
-- name: "({{ backend }}) Assert only comment changed - comment"
+- name: "({{ backend }}) Assert comment preserved public key - comment"
   assert:
     that:
       - comment_output.public_key == modified_comment_output.public_key
       - comment_output.comment == 'test@comment'
+
+- name: "({{ backend }}) Assert comment changed - comment"
+  assert:
+    that:
       - modified_comment_output.comment == 'test_modified@comment'
+  # Per the OpenSSH 5.3p1 man pages for ssh-keygen only rsa1 keys permitted comment updates as of that release
+  when: not (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
 
 - name: "({{ backend }}) Remove key - comment"
   openssh_keypair:

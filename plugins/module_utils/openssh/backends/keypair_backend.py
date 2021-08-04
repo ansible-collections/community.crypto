@@ -120,9 +120,10 @@ class KeypairBackend(OpensshModule):
     def _execute(self):
         self.original_private_key = self._load_private_key()
         self.original_public_key = self._load_public_key()
-        self._validate_key_load()
 
         if self.state == 'present':
+            self._validate_key_load()
+
             if self._should_generate():
                 self._generate()
             elif not self._public_key_valid():
