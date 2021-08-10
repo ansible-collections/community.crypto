@@ -1,2 +1,0 @@
-bugfixes:
-  - openssh_keypair - fixed a bug that prevented custom file attributes being applied to public keys (https://github.com/ansible-collections/community.crypto/pull/257).

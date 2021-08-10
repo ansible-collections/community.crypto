@@ -479,3 +479,27 @@ releases:
     - 1.7.1.yml
     - 248-openssl_pkcs12-passphrase-fix.yml
     release_date: '2021-06-11'
+  1.8.0:
+    changes:
+      bugfixes:
+      - openssh_cert - fixed certificate generation to restore original certificate
+        if an error is encountered (https://github.com/ansible-collections/community.crypto/pull/255).
+      - openssh_keypair - fixed a bug that prevented custom file attributes being
+        applied to public keys (https://github.com/ansible-collections/community.crypto/pull/257).
+      minor_changes:
+      - Avoid internal ansible-core module_utils in favor of equivalent public API
+        available since at least Ansible 2.9 (https://github.com/ansible-collections/community.crypto/pull/253).
+      - openssh certificate module utils - new module_utils for parsing OpenSSH certificates
+        (https://github.com/ansible-collections/community.crypto/pull/246).
+      - openssh_cert - added ``regenerate`` option to validate additional certificate
+        parameters which trigger regeneration of an existing certificate (https://github.com/ansible-collections/community.crypto/pull/256).
+      - openssh_cert - adding ``diff`` support (https://github.com/ansible-collections/community.crypto/pull/255).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 1.8.0.yml
+    - 246-openssh-certificate-module-utils.yml
+    - 255-openssh_cert-adding-diff-support.yml
+    - 256-openssh_cert-adding-idempotency-option.yml
+    - 257-openssh-keypair-fix-pubkey-permissions.yml
+    - ansible-core-_text.yml
+    release_date: '2021-08-10'

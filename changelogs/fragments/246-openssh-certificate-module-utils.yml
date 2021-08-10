@@ -1,2 +1,0 @@
-minor_changes:
-  - openssh certificate module utils - new module_utils for parsing OpenSSH certificates (https://github.com/ansible-collections/community.crypto/pull/246).

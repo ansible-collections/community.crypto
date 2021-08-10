@@ -1,4 +1,0 @@
----
-minor_changes:
-  - openssh_cert - added ``regenerate`` option to validate additional certificate parameters which trigger
-    regeneration of an existing certificate (https://github.com/ansible-collections/community.crypto/pull/256).
