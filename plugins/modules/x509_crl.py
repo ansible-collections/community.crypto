@@ -597,7 +597,7 @@ class CRL(OpenSSLObject):
                 entry['invalidity_date_critical'],
             )
 
-    def check(self, perms_required=True, ignore_conversion=True):
+    def check(self, module, perms_required=True, ignore_conversion=True):
         """Ensure the resource is in its desired state."""
 
         state_and_perms = super(CRL, self).check(self.module, perms_required)
@@ -689,9 +689,9 @@ class CRL(OpenSSLObject):
 
     def generate(self):
         result = None
-        if not self.check(perms_required=False, ignore_conversion=True) or self.force:
+        if not self.check(self.module, perms_required=False, ignore_conversion=True) or self.force:
             result = self._generate_crl()
-        elif not self.check(perms_required=False, ignore_conversion=False) and self.crl:
+        elif not self.check(self.module, perms_required=False, ignore_conversion=False) and self.crl:
             if self.format == 'pem':
                 result = self.crl.public_bytes(Encoding.PEM)
             else:
@@ -834,7 +834,7 @@ def main():
         if module.params['state'] == 'present':
             if module.check_mode:
                 result = crl.dump(check_mode=True)
-                result['changed'] = module.params['force'] or not crl.check() or not crl.check(ignore_conversion=False)
+                result['changed'] = module.params['force'] or not crl.check(module) or not crl.check(module, ignore_conversion=False)
                 module.exit_json(**result)
 
             crl.generate()
