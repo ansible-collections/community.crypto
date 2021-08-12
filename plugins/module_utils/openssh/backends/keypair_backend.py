@@ -451,7 +451,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
 
 def any_in(sequence, *elements):
-    return any([e in sequence for e in elements])
+    return any(e in sequence for e in elements)
 
 
 def select_backend(module, backend):
