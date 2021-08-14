@@ -242,7 +242,7 @@ def main():
             server_name=dict(type='str'),
             timeout=dict(type='int', default=10),
             select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
-            starttls=dict(type='str', choices=['mysql'])
+            starttls=dict(type='str', choices=['mysql']),
         ),
     )
 
