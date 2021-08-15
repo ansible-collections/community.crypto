@@ -50,6 +50,14 @@ options:
         - Proxy port used when get a certificate.
       type: int
       default: 8080
+    starttls:
+      description:
+        - Requests a secure connection for protocols which require clients to initiate encryption.
+        - Only available for C(mysql) currently.
+      type: str
+      choices:
+        - mysql
+      version_added: 1.9.0
     timeout:
       description:
         - The timeout in seconds
@@ -209,6 +217,20 @@ else:
     CRYPTOGRAPHY_FOUND = True
 
 
+def send_starttls_packet(sock, server_type):
+    if server_type == 'mysql':
+        ssl_request_packet = (
+            b'\x20\x00\x00\x01\x85\xae\x7f\x00' +
+            b'\x00\x00\x00\x01\x21\x00\x00\x00' +
+            b'\x00\x00\x00\x00\x00\x00\x00\x00' +
+            b'\x00\x00\x00\x00\x00\x00\x00\x00' +
+            b'\x00\x00\x00\x00'
+        )
+
+        sock.recv(8192)  # discard initial handshake from server for this naive implementation
+        sock.send(ssl_request_packet)
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -220,6 +242,7 @@ def main():
             server_name=dict(type='str'),
             timeout=dict(type='int', default=10),
             select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
+            starttls=dict(type='str', choices=['mysql']),
         ),
     )
 
@@ -230,6 +253,7 @@ def main():
     proxy_port = module.params.get('proxy_port')
     timeout = module.params.get('timeout')
     server_name = module.params.get('server_name')
+    start_tls_server_type = module.params.get('starttls')
 
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':
@@ -304,6 +328,9 @@ def main():
                 ctx = create_default_context()
                 ctx.check_hostname = False
                 ctx.verify_mode = CERT_NONE
+
+            if start_tls_server_type is not None:
+                send_starttls_packet(sock, start_tls_server_type)
 
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
