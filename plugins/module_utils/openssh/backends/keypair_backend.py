@@ -71,7 +71,7 @@ class KeypairBackend(OpensshModule):
         self.public_key = None
 
     @abc.abstractmethod
-    def _generate_keypair(self, path):
+    def _generate_keypair(self, private_key_path):
         pass
 
     @abc.abstractmethod
@@ -343,7 +343,7 @@ class KeypairBackendCryptography(KeypairBackend):
         self.passphrase = to_bytes(module.params['passphrase']) if module.params['passphrase'] else None
         self.private_key_format = self._get_key_format(module.params['private_key_format'])
 
-    def _generate_keypair(self, path):
+    def _generate_keypair(self, private_key_path):
         keypair = OpensshKeypair.generate(
             keytype=self.type,
             size=self.size,
@@ -351,9 +351,11 @@ class KeypairBackendCryptography(KeypairBackend):
             comment=self.comment or '',
         )
         secure_write(
-            path, 0o600, OpensshKeypair.encode_openssh_privatekey(keypair.asymmetric_keypair, self.private_key_format)
+            private_key_path,
+            0o600,
+            OpensshKeypair.encode_openssh_privatekey(keypair.asymmetric_keypair, self.private_key_format)
         )
-        secure_write(path + '.pub', 0o644, keypair.public_key)
+        secure_write(private_key_path + '.pub', 0o644, keypair.public_key)
 
     def _get_private_key(self):
         keypair = OpensshKeypair.load(path=self.private_key_path, passphrase=self.passphrase, no_public_key=True)

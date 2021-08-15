@@ -55,11 +55,13 @@ class OpensshModule(object):
         self.changed = False
         self.check_mode = self.module.check_mode
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def diff(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def _result(self):
         pass
 
