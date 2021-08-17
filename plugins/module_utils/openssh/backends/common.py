@@ -31,19 +31,17 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.utils imp
 
 def _restore_on_failure(f):
     def backup_and_restore(self, sources_and_destinations, *args, **kwargs):
-        backups = [(d, self.module.backup_local(d) if os.path.exists(d) else None) for s, d in sources_and_destinations]
+        backups = [(d, self.module.backup_local(d)) for s, d in sources_and_destinations if os.path.exists(d)]
 
         try:
             f(self, sources_and_destinations, *args, **kwargs)
         except Exception:
             for destination, backup in backups:
-                if backup is not None:
-                    self.module.atomic_move(backup, destination)
+                self.module.atomic_move(backup, destination)
             raise
         else:
             for destination, backup in backups:
-                if backup is not None:
-                    self.module.add_cleanup_file(backup)
+                self.module.add_cleanup_file(backup)
     return backup_and_restore
 
 
@@ -55,15 +53,9 @@ class OpensshModule(object):
         self.changed = False
         self.check_mode = self.module.check_mode
 
-    @property
-    @abc.abstractmethod
-    def diff(self):
-        pass
-
-    @property
-    @abc.abstractmethod
-    def _result(self):
-        pass
+    def execute(self):
+        self._execute()
+        self.module.exit_json(**self.result)
 
     @abc.abstractmethod
     def _execute(self):
@@ -80,9 +72,15 @@ class OpensshModule(object):
 
         return result
 
-    def execute(self):
-        self._execute()
-        self.module.exit_json(**self.result)
+    @property
+    @abc.abstractmethod
+    def _result(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def diff(self):
+        pass
 
     @staticmethod
     def skip_if_check_mode(f):
