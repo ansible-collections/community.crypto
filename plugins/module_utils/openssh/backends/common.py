@@ -29,8 +29,11 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.utils imp
 )
 
 
-def _restore_on_failure(f):
+def restore_on_failure(f):
     def backup_and_restore(self, sources_and_destinations, *args, **kwargs):
+        if not isinstance(sources_and_destinations, (list, tuple)):
+            sources_and_destinations = [(sources_and_destinations, sources_and_destinations)]
+
         backups = [(d, self.module.backup_local(d)) for s, d in sources_and_destinations if os.path.exists(d)]
 
         try:
@@ -43,6 +46,11 @@ def _restore_on_failure(f):
             for destination, backup in backups:
                 self.module.add_cleanup_file(backup)
     return backup_and_restore
+
+
+@restore_on_failure
+def safe_atomic_move(module, path, destination):
+    module.atomic_move(path, destination)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -110,7 +118,7 @@ class OpensshModule(object):
             return ""
         return parse_openssh_version(self.module.run_command([ssh_bin, '-V', '-q'])[2].strip())
 
-    @_restore_on_failure
+    @restore_on_failure
     def _safe_secure_move(self, sources_and_destinations):
         """Moves a list of files from 'source' to 'destination' and restores 'destination' from backup upon failure.
            If 'destination' does not already exist, then 'source' permissions are preserved to prevent
