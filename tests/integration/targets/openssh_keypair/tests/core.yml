@@ -52,8 +52,8 @@
     that:
       - core_output['fingerprint'] is string
       - core_output['fingerprint'].startswith('SHA256:')
-  # only distro old enough that it still gives md5 with no prefix
-  when: not (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
+  # SHA256 was made the default hashing algorithm for fingerprints in OpenSSH 6.8
+  when: not (backend == 'opensshbin' and openssh_version is version('6.8', '<'))
 
 - name: "({{ backend }}) Assert key returns public_key"
   assert:

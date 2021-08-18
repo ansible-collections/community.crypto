@@ -186,8 +186,6 @@ comment:
     sample: test@comment
 '''
 
-import os
-
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.keypair_backend import (
@@ -218,32 +216,9 @@ def main():
         add_file_common_args=True,
     )
 
-    base_dir = os.path.dirname(module.params['path']) or '.'
-    if not os.path.isdir(base_dir):
-        module.fail_json(
-            name=base_dir,
-            msg='The directory %s does not exist or the file is not a directory' % base_dir
-        )
-
     keypair = select_backend(module, module.params['backend'])[1]
 
-    if module.params['state'] == 'present':
-        if module.check_mode:
-            keypair.changed = any([
-                keypair.force,
-                not keypair.is_private_key_valid(),
-                not keypair.is_public_key_valid()
-            ])
-        else:
-            keypair.generate()
-    else:
-        # When `state=absent` no details from an existing key at the given `path` are returned in the module result
-        if module.check_mode:
-            keypair.changed = keypair.exists()
-        else:
-            keypair.remove()
-
-    module.exit_json(**keypair.result)
+    keypair.execute()
 
 
 if __name__ == '__main__':
