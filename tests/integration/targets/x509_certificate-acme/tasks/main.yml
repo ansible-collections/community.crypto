@@ -99,17 +99,6 @@
     regexp: 'os\.remove\(wellknown_path\)'
     replace: 'pass'
 
-- name: "Monkey-patch acme-tiny: Avoid crash on already valid challenges (https://github.com/diafygi/acme-tiny/pull/254)"
-  blockinfile:
-    path: "{{ output_dir }}/acme-tiny"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: AVOID CRASH ON ALREADY VALID CHALLENGES"
-    insertbefore: '# find the http-01 challenge and write the challenge file'
-    block: |2
-              # skip if already valid
-              if authorization['status'] == "valid":
-                  log.info("{0} already verified. Skipping.".format(domain))
-                  continue
-
 - name: Create challenges directory
   file:
     path: '{{ output_dir }}/challenges'
