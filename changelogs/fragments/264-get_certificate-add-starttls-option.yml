@@ -1,4 +1,0 @@
----
-minor_changes:
-  - get_certificate - added ``starttls`` option to retrieve certificates from servers which require clients to request
-    an encrypted connection (https://github.com/ansible-collections/community.crypto/pull/264).
