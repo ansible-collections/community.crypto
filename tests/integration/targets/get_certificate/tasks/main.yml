@@ -23,16 +23,6 @@
 
   when: pyopenssl_version.stdout is version('0.15', '>=')
 
-- name: Remove output directory
-  file:
-    path: "{{ output_dir }}"
-    state: absent
-
-- name: Re-create output directory
-  file:
-    path: "{{ output_dir }}"
-    state: directory
-
 - block:
 
   - include_tasks: ../tests/validate.yml

@@ -97,14 +97,19 @@
       # We got the correct response from the module
       - "'ca_cert file does not exist' == result.msg"
 
+- name: Get a temp directory
+  tempfile:
+    state: directory
+  register: my_temp_dir
+
 - name: Download CA Cert as pem from server
   get_url:
     url: "http://ansible.http.tests/cacert.pem"
-    dest: "{{ output_dir }}/temp.pem"
+    dest: "{{ my_temp_dir.path }}/temp.pem"
 
 - name: Get servers certificate comparing it to its own ca_cert file
   get_certificate:
-    ca_cert: '{{ output_dir }}/temp.pem'
+    ca_cert: '{{ my_temp_dir.path }}/temp.pem'
     host: "{{ httpbin_host }}"
     port: 443
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -114,11 +119,6 @@
     that:
       - result is not changed
       - result is not failed
-
-- name: Get a temp directory
-  tempfile:
-    state: directory
-  register: my_temp_dir
 
 - name: Deploy the bogus_ca.pem file
   copy:
