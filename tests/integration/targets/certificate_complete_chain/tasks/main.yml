@@ -16,7 +16,6 @@
     copy:
       src: '{{ role_path }}/files/'
       dest: '{{ remote_tmp_dir }}/files/'
-      remote_src: yes
   - name: Find root for cert 1
     certificate_complete_chain:
       input_chain: '{{ lookup(''file'', ''cert1-fullchain.pem'', rstrip=False) }}'
