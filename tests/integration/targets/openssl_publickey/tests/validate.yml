@@ -1,18 +1,23 @@
 ---
+- name: "({{ select_crypto_backend }}) Read publickey 1"
+  slurp:
+    src: '{{ remote_tmp_dir }}/publickey.pub'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Validate publickey 1 idempotence and result behavior"
   assert:
     that:
       - publickey is changed
       - publickey_idempotence is not changed
-      - publickey.publickey == lookup('file', output_dir ~ '/publickey.pub', rstrip=False)
+      - publickey.publickey == (slurp.content | b64decode)
       - publickey.publickey == publickey_idempotence.publickey
 
 - name: "({{ select_crypto_backend }}) Validate public key (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate public key (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ output_dir }}/publickey.pub'
+  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey.pub'
   register: publickey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate public key (assert)"
@@ -21,13 +26,13 @@
       - publickey_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format (test - privatekey's publickey)"
-  shell: 'ssh-keygen -y -f {{ output_dir }}/privatekey.pem'
+  shell: 'ssh-keygen -y -f {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_publickey
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format  (test - publickey)"
   slurp:
-    src: '{{ output_dir }}/publickey-ssh.pub'
+    src: '{{ remote_tmp_dir }}/publickey-ssh.pub'
   register: publickey
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
 
@@ -45,7 +50,7 @@
 
 - name: "({{ select_crypto_backend }}) Validate publickey2 (test - Ensure key has been removed)"
   stat:
-    path: '{{ output_dir }}/publickey2.pub'
+    path: '{{ remote_tmp_dir }}/publickey2.pub'
   register: publickey2
 
 - name: "({{ select_crypto_backend }}) Validate publickey2 (assert - Ensure key has been removed)"
@@ -62,12 +67,12 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate publickey3 (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey3.pem -passin pass:ansible'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey3.pem -passin pass:ansible'
   register: privatekey3_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate publickey3 (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ output_dir }}/publickey3.pub'
+  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey3.pub'
   register: publickey3_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
@@ -83,12 +88,12 @@
       - publickey3_idempotence is not changed
 
 - name: "({{ select_crypto_backend }}) Validate publickey4 (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey4_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate publickey4 (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ output_dir }}/publickey4.pub'
+  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey4.pub'
   register: publickey4_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
@@ -109,12 +114,12 @@
       - privatekey5_3.backup_file is string
 
 - name: "({{ select_crypto_backend }}) Validate public key 5 (test - privatekey's pubkey)"
-  command: '{{ openssl_binary }} ec -in {{ output_dir }}/privatekey5.pem -pubout'
+  command: '{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey5.pem -pubout'
   register: privatekey5_pubkey
 
 - name: "({{ select_crypto_backend }}) Validate public key 5 (test - publickey pubkey)"
-  # Fancy way of writing "cat {{ output_dir }}/publickey5.pub"
-  command: '{{ openssl_binary }} ec -pubin -in {{ output_dir }}/publickey5.pub -pubout'
+  # Fancy way of writing "cat {{ remote_tmp_dir }}/publickey5.pub"
+  command: '{{ openssl_binary }} ec -pubin -in {{ remote_tmp_dir }}/publickey5.pub -pubout'
   register: publickey5_pubkey
 
 - name: "({{ select_crypto_backend }}) Validate public key 5 (assert)"

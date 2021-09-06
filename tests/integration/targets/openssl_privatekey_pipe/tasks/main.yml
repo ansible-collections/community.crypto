@@ -19,12 +19,12 @@
 
 - name: Remove output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:

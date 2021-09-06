@@ -4,7 +4,7 @@
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
-    path: '{{ output_dir }}/cert_1.pem'
+    path: '{{ remote_tmp_dir }}/cert_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -37,9 +37,14 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
+- name: ({{select_crypto_backend}}) Read file
+  slurp:
+    src: '{{ remote_tmp_dir }}/cert_1.pem'
+  register: slurp
+
 - name: ({{select_crypto_backend}}) Get certificate info directly
   x509_certificate_info:
-    content: '{{ lookup("file", output_dir ~ "/cert_1.pem") }}'
+    content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
@@ -50,7 +55,7 @@
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
-    path: '{{ output_dir }}/cert_2.pem'
+    path: '{{ remote_tmp_dir }}/cert_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     valid_at:
       today: "+0d"
@@ -69,7 +74,7 @@
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
-    path: '{{ output_dir }}/cert_3.pem'
+    path: '{{ remote_tmp_dir }}/cert_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -91,7 +96,7 @@
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
-    path: '{{ output_dir }}/cert_4.pem'
+    path: '{{ remote_tmp_dir }}/cert_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 

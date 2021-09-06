@@ -1,12 +1,12 @@
 ---
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
   openssl_csr_pipe:
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -15,7 +15,7 @@
 
 - name: "({{ select_crypto_backend }}) Generate CSR"
   openssl_csr_pipe:
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -24,7 +24,7 @@
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
   openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -33,7 +33,7 @@
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent, check mode)"
   openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -43,7 +43,7 @@
 - name: "({{ select_crypto_backend }}) Generate CSR (changed)"
   openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -52,7 +52,7 @@
 - name: "({{ select_crypto_backend }}) Generate CSR (changed, check mode)"
   openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -60,7 +60,7 @@
   register: generate_csr_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - Common Name)"

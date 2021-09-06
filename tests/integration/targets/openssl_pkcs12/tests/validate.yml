@@ -1,14 +1,14 @@
 ---
 - name: '({{ select_crypto_backend }}) Validate PKCS#12'
-  command: "{{ openssl_binary }} pkcs12 -info -in {{ output_dir }}/ansible.p12 -nodes -passin pass:''"
+  command: "{{ openssl_binary }} pkcs12 -info -in {{ remote_tmp_dir }}/ansible.p12 -nodes -passin pass:''"
   register: p12
 
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 with no private key'
-  command: "{{ openssl_binary }} pkcs12 -info -in {{ output_dir }}/ansible_no_pkey.p12 -nodes -passin pass:''"
+  command: "{{ openssl_binary }} pkcs12 -info -in {{ remote_tmp_dir }}/ansible_no_pkey.p12 -nodes -passin pass:''"
   register: p12_validate_no_pkey
 
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 with multiple certs'
-  shell: "{{ openssl_binary }} pkcs12 -info -in {{ output_dir }}/ansible_multi_certs.p12 -nodes -passin pass:'hunter3' | grep subject"
+  shell: "{{ openssl_binary }} pkcs12 -info -in {{ remote_tmp_dir }}/ansible_multi_certs.p12 -nodes -passin pass:'hunter3' | grep subject"
   register: p12_validate_multi_certs
 
 - name: '({{ select_crypto_backend }}) Validate PKCS#12 (assert)'
@@ -62,11 +62,20 @@
       - p12_backup_5.backup_file is undefined
       - p12_backup_4.pkcs12 is none
 
+- name: '({{ select_crypto_backend }}) Read files'
+  slurp:
+    src: '{{ item }}'
+  loop:
+    - "{{ remote_tmp_dir ~ '/ansible_empty.pem' }}"
+    - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
+    - "{{ remote_tmp_dir ~ '/ansible3.crt' }}"
+  register: slurp
+
 - name: '({{ select_crypto_backend }}) Load "empty" file'
   set_fact:
-    empty_contents: "{{ lookup('file', output_dir ~ '/ansible_empty.pem') }}"
-    empty_expected_pyopenssl: "{{ lookup('file', output_dir ~ '/ansible3.crt') ~ '\n' ~ lookup('file', output_dir ~ '/ansible2.crt') }}"
-    empty_expected_cryptography: "{{ lookup('file', output_dir ~ '/ansible2.crt') ~ '\n' ~ lookup('file', output_dir ~ '/ansible3.crt') }}"
+    empty_contents: "{{ slurp.results[0].content | b64decode }}"
+    empty_expected_pyopenssl: "{{ (slurp.results[2].content | b64decode) ~ (slurp.results[1].content | b64decode) }}"
+    empty_expected_cryptography: "{{ (slurp.results[1].content | b64decode) ~ (slurp.results[2].content | b64decode) }}"
 
 - name: '({{ select_crypto_backend }}) Check "empty" file'
   assert:

@@ -31,15 +31,15 @@
 
 - name: Generate private keys
   openssl_privatekey:
-    path: '{{ output_dir }}/{{ item.name }}.key'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
     type: ECC
     curve: secp256r1
   loop: "{{ certificates }}"
 
 - name: Generate CSRs
   openssl_csr:
-    path: '{{ output_dir }}/{{ item.name }}.csr'
-    privatekey_path: '{{ output_dir }}/{{ item.name }}.key'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
     subject: "{{ item.subject | default(omit) }}"
     subject_alt_name: "{{ item.subject_alt_name | default(omit) }}"
     basic_constraints: "{{ 'CA:TRUE' if item.is_ca | default(false) else omit }}"
@@ -48,26 +48,26 @@
 
 - name: Generate CA certificates
   x509_certificate:
-    path: '{{ output_dir }}/{{ item.name }}.pem'
-    csr_path: '{{ output_dir }}/{{ item.name }}.csr'
-    privatekey_path: '{{ output_dir }}/{{ item.name }}.key'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
     provider: selfsigned
   loop: "{{ certificates }}"
   when: item.is_ca | default(false)
 
 - name: Generate other certificates
   x509_certificate:
-    path: '{{ output_dir }}/{{ item.name }}.pem'
-    csr_path: '{{ output_dir }}/{{ item.name }}.csr'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     provider: ownca
-    ownca_path: '{{ output_dir }}/ca.pem'
-    ownca_privatekey_path: '{{ output_dir }}/ca.key'
+    ownca_path: '{{ remote_tmp_dir }}/ca.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca.key'
   loop: "{{ certificates }}"
   when: not (item.is_ca | default(false))
 
 - name: Get certificate infos
   x509_certificate_info:
-    path: '{{ output_dir }}/{{ item }}.pem'
+    path: '{{ remote_tmp_dir }}/{{ item }}.pem'
   loop:
   - cert-1
   - cert-2

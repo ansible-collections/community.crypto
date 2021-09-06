@@ -6,7 +6,7 @@
 
 - name: Backend auto-detection test
   openssh_keypair:
-    path: '{{ output_dir }}/auto_backend_key'
+    path: '{{ remote_tmp_dir }}/auto_backend_key'
     state: "{{ item }}"
   loop: ['present', 'absent']
 

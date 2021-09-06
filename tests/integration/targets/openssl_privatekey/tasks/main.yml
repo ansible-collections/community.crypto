@@ -33,7 +33,7 @@
 
 - name: Run module with backend autodetection
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_backend_selection.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
     size: '{{ default_rsa_key_size }}'
 
 - block:
@@ -51,12 +51,12 @@
 
 - name: Remove output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:
@@ -75,7 +75,7 @@
   block:
   - name: "Fingerprint comparison: pyOpenSSL"
     openssl_privatekey:
-      path: '{{ output_dir }}/fingerprint-{{ item }}.pem'
+      path: '{{ remote_tmp_dir }}/fingerprint-{{ item }}.pem'
       type: "{{ item }}"
       size: '{{ default_rsa_key_size }}'
       select_crypto_backend: pyopenssl
@@ -86,7 +86,7 @@
 
   - name: "Fingerprint comparison: cryptography"
     openssl_privatekey:
-      path: '{{ output_dir }}/fingerprint-{{ item }}.pem'
+      path: '{{ remote_tmp_dir }}/fingerprint-{{ item }}.pem'
       type: "{{ item }}"
       size: '{{ default_rsa_key_size }}'
       select_crypto_backend: cryptography

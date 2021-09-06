@@ -12,13 +12,13 @@
 
 - name: "({{ backend }}) Generate keys with default size - size"
   openssh_keypair:
-    path: "{{ output_dir }}/default_size_{{ item }}"
+    path: "{{ remote_tmp_dir }}/default_size_{{ item }}"
     type: "{{ item }}"
     backend: "{{ backend }}"
   loop: "{{ key_types }}"
 
 - name: "({{ backend }}) Retrieve key size from 'ssh-keygen' - size"
-  shell: "ssh-keygen -lf {{ output_dir }}/default_size_{{ item }} | grep -o -E '^[0-9]+'"
+  shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_{{ item }} | grep -o -E '^[0-9]+'"
   loop: "{{ key_types }}"
   register: key_size_output
 
@@ -31,19 +31,19 @@
 
 - name: "({{ backend }}) Remove keys - size"
   openssh_keypair:
-    path: "{{ output_dir }}/default_size_{{ item }}"
+    path: "{{ remote_tmp_dir }}/default_size_{{ item }}"
     state: absent
   loop: "{{ key_types }}"
 
 - block:
     - name: "({{ backend }}) Generate ed25519 key with default size - size"
       openssh_keypair:
-        path: "{{ output_dir }}/default_size_ed25519"
+        path: "{{ remote_tmp_dir }}/default_size_ed25519"
         type: ed25519
         backend: "{{ backend }}"
 
     - name: "({{ backend }}) Retrieve ed25519 key size from 'ssh-keygen' - size"
-      shell: "ssh-keygen -lf {{ output_dir }}/default_size_ed25519 | grep -o -E '^[0-9]+'"
+      shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_ed25519 | grep -o -E '^[0-9]+'"
       register: ed25519_key_size_output
 
     - name: "({{ backend }}) Assert ed25519 key size matches default size - size"
@@ -53,20 +53,20 @@
 
     - name: "({{ backend }}) Remove ed25519 key - size"
       openssh_keypair:
-        path: "{{ output_dir }}/default_size_ed25519"
+        path: "{{ remote_tmp_dir }}/default_size_ed25519"
         state: absent
   # Support for ed25519 keys was added in OpenSSH 6.5
   when: not (backend == 'opensshbin' and openssh_version is version('6.5', '<'))
 
 - name: "({{ backend }}) Generate key - force"
   openssh_keypair:
-    path: "{{ output_dir }}/force"
+    path: "{{ remote_tmp_dir }}/force"
     type: rsa
     backend: "{{ backend }}"
 
 - name: "({{ backend }}) Regenerate key - force"
   openssh_keypair:
-    path: "{{ output_dir }}/force"
+    path: "{{ remote_tmp_dir }}/force"
     type: rsa
     force: true
     backend: "{{ backend }}"
@@ -79,20 +79,20 @@
 
 - name: "({{ backend }}) Remove key - force"
   openssh_keypair:
-    path: "{{ output_dir }}/force"
+    path: "{{ remote_tmp_dir }}/force"
     state: absent
     backend: "{{ backend }}"
 
 - name: "({{ backend }}) Generate key - comment"
   openssh_keypair:
-    path: "{{ output_dir }}/comment"
+    path: "{{ remote_tmp_dir }}/comment"
     comment: "test@comment"
     backend: "{{ backend }}"
   register: comment_output
 
 - name: "({{ backend }}) Modify comment - comment"
   openssh_keypair:
-    path: "{{ output_dir }}/comment"
+    path: "{{ remote_tmp_dir }}/comment"
     comment: "test_modified@comment"
     backend: "{{ backend }}"
   register: modified_comment_output
@@ -112,6 +112,6 @@
 
 - name: "({{ backend }}) Remove key - comment"
   openssh_keypair:
-    path: "{{ output_dir }}/comment"
+    path: "{{ remote_tmp_dir }}/comment"
     state: absent
     backend: "{{ backend }}"

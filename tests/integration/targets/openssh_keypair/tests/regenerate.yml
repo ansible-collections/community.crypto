@@ -10,22 +10,22 @@
     path: "{{ item }}"
     state: absent
   with_fileglob:
-    - "{{ output_dir }}/regenerate*"
+    - "{{ remote_tmp_dir }}/regenerate*"
 
 - name: "({{ backend }}) Regenerate - setup simple keys"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
     backend: "{{ backend }}"
   loop: "{{ regenerate_values }}"
 - name: "({{ backend }}) Regenerate - setup password protected keys"
-  command: 'ssh-keygen -f {{ output_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
+  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - setup broken keys"
   copy:
-    dest: '{{ output_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
+    dest: '{{ remote_tmp_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
     content: 'broken key'
     mode: '0700'
   with_nested:
@@ -33,12 +33,12 @@
     - [ '', '.pub' ]
 
 - name: "({{ backend }}) Regenerate - setup password protected keys for passphrse test"
-  command: 'ssh-keygen -f {{ output_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
+  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - modify broken keys (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-c-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -60,7 +60,7 @@
 
 - name: "({{ backend }}) Regenerate - modify broken keys"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-c-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -81,7 +81,7 @@
 
 - name: "({{ backend }}) Regenerate - modify password protected keys (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -103,7 +103,7 @@
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
     passphrase: "{{ passphrase }}"
@@ -127,7 +127,7 @@
 
 - name: "({{ backend }}) Regenerate - modify password protected keys"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-b-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -148,7 +148,7 @@
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-d-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-d-{{ item }}'
     type: rsa
     size: 1024
     passphrase: "{{ passphrase }}"
@@ -171,7 +171,7 @@
 
 - name: "({{ backend }}) Regenerate - not modify regular keys (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -189,7 +189,7 @@
 
 - name: "({{ backend }}) Regenerate - not modify regular keys"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
     regenerate: '{{ item }}'
@@ -206,7 +206,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust key size (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
     regenerate: '{{ item }}'
@@ -226,7 +226,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust key size"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
     regenerate: '{{ item }}'
@@ -245,8 +245,8 @@
 
 - name: "({{ backend }}) Regenerate - redistribute keys"
   copy:
-    src: '{{ output_dir }}/regenerate-a-always{{ item.1 }}'
-    dest: '{{ output_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
+    src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
+    dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
     remote_src: true
   with_nested:
     - "{{ regenerate_values }}"
@@ -255,7 +255,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust key type (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: dsa
     size: 1024
     regenerate: '{{ item }}'
@@ -275,7 +275,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust key type"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: dsa
     size: 1024
     regenerate: '{{ item }}'
@@ -294,8 +294,8 @@
 
 - name: "({{ backend }}) Regenerate - redistribute keys"
   copy:
-    src: '{{ output_dir }}/regenerate-a-always{{ item.1 }}'
-    dest: '{{ output_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
+    src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
+    dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
     remote_src: true
   with_nested:
     - "{{ regenerate_values }}"
@@ -304,7 +304,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust comment (check mode)"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: dsa
     size: 1024
     comment: test comment
@@ -320,7 +320,7 @@
 
 - name: "({{ backend }}) Regenerate - adjust comment"
   openssh_keypair:
-    path: '{{ output_dir }}/regenerate-a-{{ item }}'
+    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: dsa
     size: 1024
     comment: test comment

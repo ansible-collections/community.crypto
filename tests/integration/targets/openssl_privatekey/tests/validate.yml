@@ -2,6 +2,11 @@
 - set_fact:
     system_potentially_has_no_algorithm_support: "{{ ansible_os_family == 'FreeBSD' }}"
 
+- name: "({{ select_crypto_backend }}) Read private key"
+  slurp:
+    src: '{{ remote_tmp_dir }}/privatekey1.pem'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Validate privatekey1 idempotency and content returned"
   assert:
     that:
@@ -9,12 +14,12 @@
       - privatekey1 is changed
       - privatekey1_idempotence_check is not changed
       - privatekey1_idempotence is not changed
-      - privatekey1.privatekey == lookup('file', output_dir ~ '/privatekey1.pem', rstrip=False)
+      - privatekey1.privatekey == (slurp.content | b64decode)
       - privatekey1.privatekey == privatekey1_idempotence.privatekey
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 (test - RSA key with size 4096 bits)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ output_dir }}/privatekey1.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey1.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey1
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 (assert - RSA key with size 4096 bits)"
@@ -24,7 +29,7 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey2 (test - RSA key with size 2048 bits)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ output_dir }}/privatekey2.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey2.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey2
 
 - name: "({{ select_crypto_backend }}) Validate privatekey2 (assert - RSA key with size 2048 bits)"
@@ -34,7 +39,7 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey3 (test - DSA key with size 3072 bits)"
-  shell: "{{ openssl_binary }} dsa -noout -text -in {{ output_dir }}/privatekey3.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  shell: "{{ openssl_binary }} dsa -noout -text -in {{ remote_tmp_dir }}/privatekey3.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey3
 
 - name: Validate privatekey3 (assert - DSA key with size 3072 bits)
@@ -45,7 +50,7 @@
 
 - name: "({{ select_crypto_backend }}) Validate privatekey4 (test - Ensure key has been removed)"
   stat:
-    path: '{{ output_dir }}/privatekey4.pem'
+    path: '{{ remote_tmp_dir }}/privatekey4.pem'
   register: privatekey4
 
 - name: "({{ select_crypto_backend }}) Validate privatekey4 (assert - Ensure key has been removed)"
@@ -62,7 +67,7 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (test - Passphrase protected key + idempotence)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ output_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey5
   # Current version of OS/X that runs in the CI (10.11) does not have an up to date version of the OpenSSL library
   # leading to this test to fail when run in the CI. However, this test has been run for 10.12 and has returned succesfully.
@@ -81,7 +86,7 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (test - Passphrase protected key with non ascii character)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ output_dir }}/privatekey6.pem -passin pass:ànsïblé | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey6.pem -passin pass:ànsïblé | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey6
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
@@ -92,7 +97,7 @@
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (dump with OpenSSL)"
-  shell: "{{ openssl_binary }} ec -in {{ output_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"
+  shell: "{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"
   loop: "{{ privatekey_ecc_generate.results }}"
   register: privatekey_ecc_dump
   when: openssl_version.stdout is version('0.9.8zh', '>=') and 'skip_reason' not in item

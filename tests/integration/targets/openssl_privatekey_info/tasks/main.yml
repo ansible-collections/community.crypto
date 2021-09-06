@@ -6,17 +6,17 @@
 
 - name: Generate privatekey 1
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_1.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_1.pem'
 
 - name: Generate privatekey 2 (less bits)
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_2.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_2.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate privatekey 3 (with password)
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_3.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     passphrase: hunter2
     cipher: auto
     size: '{{ default_rsa_key_size }}'
@@ -24,7 +24,7 @@
 
 - name: Generate privatekey 4 (ECC)
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_4.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_4.pem'
     type: ECC
     curve: "{{ (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') | ternary('secp521r1', 'secp256k1') }}"
     # ^ cryptography on CentOS6 doesn't support secp256k1, so we use secp521r1 instead
@@ -32,7 +32,7 @@
 
 - name: Generate privatekey 5 (DSA)
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_5.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_5.pem'
     type: DSA
     size: 1024
 

@@ -6,12 +6,12 @@
 
 - name: Generate privatekey
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate privatekey with password
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
@@ -19,8 +19,8 @@
 
 - name: Generate CSR 1
   openssl_csr:
-    path: '{{ output_dir }}/csr_1.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/csr_1.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.example.com
       C: de
@@ -87,8 +87,8 @@
 
 - name: Generate CSR 2
   openssl_csr:
-    path: '{{ output_dir }}/csr_2.csr'
-    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/csr_2.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
     useCommonNameForSAN: no
     basic_constraints:
@@ -96,8 +96,8 @@
 
 - name: Generate CSR 3
   openssl_csr:
-    path: '{{ output_dir }}/csr_3.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/csr_3.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     useCommonNameForSAN: no
     subject_alt_name:
       - "DNS:*.ansible.com"
@@ -114,8 +114,8 @@
 
 - name: Generate CSR 4
   openssl_csr:
-    path: '{{ output_dir }}/csr_4.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/csr_4.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     useCommonNameForSAN: no
     authority_key_identifier: '{{ "44:55:66:77" if cryptography_version.stdout is version("1.3", ">=") else omit }}'
 

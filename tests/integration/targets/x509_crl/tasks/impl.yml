@@ -1,16 +1,16 @@
 ---
 - name: Create CRL 1 (check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -22,16 +22,16 @@
 
 - name: Create CRL 1 (check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -43,16 +43,16 @@
 
 - name: Create CRL 1
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -68,31 +68,36 @@
 
 - name: Retrieve CRL 1 infos
   x509_crl_info:
-    path: '{{ output_dir }}/ca-crl1.crl'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
   register: crl_1_info_1
+
+- name: ({{select_crypto_backend}}) Read ca-crl1.crl
+  slurp:
+    src: '{{ remote_tmp_dir }}/ca-crl1.crl'
+  register: slurp
 
 - name: Retrieve CRL 1 infos via file content
   x509_crl_info:
-    content: '{{ lookup("file", output_dir ~ "/ca-crl1.crl") }}'
+    content: '{{ slurp.content | b64decode }}'
   register: crl_1_info_2
 
 - name: Retrieve CRL 1 infos via file content (Base64)
   x509_crl_info:
-    content: '{{ lookup("file", output_dir ~ "/ca-crl1.crl") | b64encode }}'
+    content: '{{ slurp.content }}'
   register: crl_1_info_3
 
 - name: Create CRL 1 (idempotent, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -104,16 +109,16 @@
 
 - name: Create CRL 1 (idempotent)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -122,18 +127,27 @@
         revocation_date: 20191001000000Z
   register: crl_1_idem
 
+- name: ({{select_crypto_backend}}) Read file
+  slurp:
+    src: '{{ remote_tmp_dir }}/{{ item }}'
+  loop:
+    - ca.key
+    - cert-1.pem
+    - cert-2.pem
+  register: slurp
+
 - name: Create CRL 1 (idempotent with content, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_content: "{{ lookup('file', output_dir ~ '/ca.key') }}"
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_content: "{{ slurp.results[0].content | b64decode }}"
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - content: "{{ lookup('file', output_dir ~ '/cert-1.pem') }}"
+      - content: "{{ slurp.results[1].content | b64decode }}"
         revocation_date: 20191013000000Z
-      - content: "{{ lookup('file', output_dir ~ '/cert-2.pem') }}"
+      - content: "{{ slurp.results[2].content | b64decode }}"
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -145,16 +159,16 @@
 
 - name: Create CRL 1 (idempotent with content)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_content: "{{ lookup('file', output_dir ~ '/ca.key') }}"
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_content: "{{ slurp.results[0].content | b64decode }}"
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - content: "{{ lookup('file', output_dir ~ '/cert-1.pem') }}"
+      - content: "{{ slurp.results[1].content | b64decode }}"
         revocation_date: 20191013000000Z
-      - content: "{{ lookup('file', output_dir ~ '/cert-2.pem') }}"
+      - content: "{{ slurp.results[2].content | b64decode }}"
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -165,17 +179,17 @@
 
 - name: Create CRL 1 (format, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     format: der
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -187,17 +201,17 @@
 
 - name: Create CRL 1 (format)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     format: der
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -208,17 +222,17 @@
 
 - name: Create CRL 1 (format, idempotent, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     format: der
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -230,17 +244,17 @@
 
 - name: Create CRL 1 (format, idempotent)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     format: der
     issuer:
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
         revocation_date: 20191013000000Z
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
         reason_critical: yes
@@ -252,12 +266,12 @@
 
 - name: Retrieve CRL 1 infos via file
   x509_crl_info:
-    path: '{{ output_dir }}/ca-crl1.crl'
+    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
   register: crl_1_info_4
 
 - name: Read ca-crl1.crl
   slurp:
-    src: "{{ output_dir }}/ca-crl1.crl"
+    src: "{{ remote_tmp_dir }}/ca-crl1.crl"
   register: content
 
 - name: Retrieve CRL 1 infos via file content (Base64)
@@ -267,15 +281,15 @@
 
 - name: Create CRL 2 (check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -285,15 +299,15 @@
 
 - name: Create CRL 2
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -302,15 +316,15 @@
 
 - name: Create CRL 2 (idempotent, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -321,15 +335,15 @@
 
 - name: Create CRL 2 (idempotent)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-1.pem'
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-1.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -339,8 +353,8 @@
 
 - name: Create CRL 2 (idempotent update, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
@@ -354,8 +368,8 @@
 
 - name: Create CRL 2 (idempotent update)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
@@ -368,14 +382,14 @@
 
 - name: Create CRL 2 (idempotent update, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -386,14 +400,14 @@
 
 - name: Create CRL 2 (idempotent update)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -403,14 +417,14 @@
 
 - name: Create CRL 2 (changed timestamps, check mode)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -421,14 +435,14 @@
 
 - name: Create CRL 2 (changed timestamps)
   x509_crl:
-    path: '{{ output_dir }}/ca-crl2.crl'
-    privatekey_path: '{{ output_dir }}/ca.key'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
       CN: Ansible
     last_update: +0d
     next_update: +0d
     revoked_certificates:
-      - path: '{{ output_dir }}/cert-2.pem'
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
         reason_critical: yes
         invalidity_date: 20191012000000Z
@@ -439,6 +453,6 @@
 
 - name: Retrieve CRL 2 infos
   x509_crl_info:
-    path: '{{ output_dir }}/ca-crl2.crl'
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     list_revoked_certificates: false
   register: crl_2_info_1

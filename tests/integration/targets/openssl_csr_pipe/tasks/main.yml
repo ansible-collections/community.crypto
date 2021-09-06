@@ -6,11 +6,11 @@
 
 - name: Prepare private key for backend autodetection test
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_backend_selection.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
     size: '{{ default_rsa_key_size }}'
 - name: Run module with backend autodetection
   openssl_csr_pipe:
-    privatekey_path: '{{ output_dir }}/privatekey_backend_selection.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
     subject:
       commonName: www.ansible.com
 
@@ -24,12 +24,12 @@
 
 - name: Remove output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:

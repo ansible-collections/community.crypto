@@ -4,7 +4,7 @@
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
-    path: '{{ output_dir }}/csr_1.csr'
+    path: '{{ remote_tmp_dir }}/csr_1.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -34,9 +34,14 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
+- name: "({{ select_crypto_backend }}) Read CSR"
+  slurp:
+    src: '{{ remote_tmp_dir }}/csr_1.csr.pem'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Get CSR info directly"
   openssl_csr_info:
-    content: '{{ lookup("file", output_dir ~ "/csr_1.csr") }}'
+    content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
@@ -47,7 +52,7 @@
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
-    path: '{{ output_dir }}/csr_2.csr'
+    path: '{{ remote_tmp_dir }}/csr_2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -57,7 +62,7 @@
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
-    path: '{{ output_dir }}/csr_3.csr'
+    path: '{{ remote_tmp_dir }}/csr_3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -79,7 +84,7 @@
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
-    path: '{{ output_dir }}/csr_4.csr'
+    path: '{{ remote_tmp_dir }}/csr_4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 

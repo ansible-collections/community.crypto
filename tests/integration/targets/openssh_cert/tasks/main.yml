@@ -5,9 +5,9 @@
 
 - name: Declare global variables
   set_fact:
-    signing_key: '{{ output_dir }}/id_key'
-    public_key: '{{ output_dir }}/id_key.pub'
-    certificate_path: '{{ output_dir }}/id_cert'
+    signing_key: '{{ remote_tmp_dir }}/id_key'
+    public_key: '{{ remote_tmp_dir }}/id_key.pub'
+    certificate_path: '{{ remote_tmp_dir }}/id_cert'
 
 - name: Generate keypair
   openssh_keypair:
