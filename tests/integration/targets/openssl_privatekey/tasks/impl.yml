@@ -520,7 +520,7 @@
     ignore_errors: yes
     register: privatekey_fmt_2_step_6
 
-  - name: "({{ select_crypto_backend }}) Read private key
+  - name: "({{ select_crypto_backend }}) Read private key"
     slurp:
       src: '{{ remote_tmp_dir }}/publickey_1.pem'
     register: slurp
