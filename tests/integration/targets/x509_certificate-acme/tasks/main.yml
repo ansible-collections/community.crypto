@@ -8,38 +8,48 @@
   - name: Obtain root and intermediate certificates
     get_url:
       url: "http://{{ acme_host }}:5000/{{ item.0 }}-certificate-for-ca/{{ item.1 }}"
-      dest: "{{ output_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
+      dest: "{{ remote_tmp_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
     loop: "{{ query('nested', types, root_numbers) }}"
 
   - name: Analyze root certificates
     x509_certificate_info:
-      path: "{{ output_dir }}/acme-root-{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/acme-root-{{ item }}.pem"
     loop: "{{ root_numbers }}"
     register: acme_roots
 
   - name: Analyze intermediate certificates
     x509_certificate_info:
-      path: "{{ output_dir }}/acme-intermediate-{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/acme-intermediate-{{ item }}.pem"
     loop: "{{ root_numbers }}"
     register: acme_intermediates
 
-  - set_fact:
-      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
-      y__: "{{ lookup('file', output_dir ~ '/acme-root-' ~ item.item ~ '.pem', rstrip=False) }}"
-    loop: "{{ acme_roots.results }}"
-    register: acme_roots_tmp
+  - name: Read root certificates
+    slurp:
+      src: "{{ remote_tmp_dir ~ '/acme-root-' ~ item ~ '.pem' }}"
+    loop: "{{ root_numbers }}"
+    register: slurp_root
 
   - set_fact:
       x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
-      y__: "{{ lookup('file', output_dir ~ '/acme-intermediate-' ~ item.item ~ '.pem', rstrip=False) }}"
+    loop: "{{ acme_roots.results }}"
+    register: acme_roots_tmp
+
+  - name: Read intermediate certificates
+    slurp:
+      src: "{{ remote_tmp_dir ~ '/acme-intermediate-' ~ item ~ '.pem' }}"
+    loop: "{{ root_numbers }}"
+    register: slurp_intermediate
+
+  - set_fact:
+      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
     loop: "{{ acme_intermediates.results }}"
     register: acme_intermediates_tmp
 
   - set_fact:
       acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_root_certs: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+      acme_root_certs: "{{ slurp_root.results | map(attribute='content') | map(b64decode) | list }}"
       acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_intermediate_certs: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+      acme_intermediate_certs: "{{ slurp_intermediate.results | map(attribute='content') | map(b64decode) | list }}"
 
   vars:
     types:
@@ -56,16 +66,16 @@
 - name: Get hold of acme-tiny executable
   get_url:
     url: https://raw.githubusercontent.com/diafygi/acme-tiny/master/acme_tiny.py
-    dest: "{{ output_dir }}/acme-tiny"
+    dest: "{{ remote_tmp_dir }}/acme-tiny"
 
 - name: Make sure acme-tiny is executable
   file:
-    path: "{{ output_dir }}/acme-tiny"
+    path: "{{ remote_tmp_dir }}/acme-tiny"
     mode: "0755"
 
 - name: "Monkey-patch acme-tiny: Disable certificate validation"
   blockinfile:
-    path: "{{ output_dir }}/acme-tiny"
+    path: "{{ remote_tmp_dir }}/acme-tiny"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: DISABLE CERTIFICATE VALIDATION FOR HTTPS REQUESTS"
     insertafter: '^#!.*'
     block: |
@@ -83,25 +93,25 @@
 
 - name: "Monkey-patch acme-tiny: Disable check that challenge file is reachable via HTTP"
   replace:
-    path: "{{ output_dir }}/acme-tiny"
+    path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'parser\.add_argument\("--disable-check", default=False,'
     replace: 'parser.add_argument("--disable-check", default=True,'
 
 - name: "Monkey-patch acme-tiny: Instead of writing challenge files to disk, post them to challenge server"
   replace:
-    path: "{{ output_dir }}/acme-tiny"
+    path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'with open\(wellknown_path, "w"\) as [^:]+:\n\s+[^. ]+\.write\(([^)]+)\)'
     replace: 'r = Request(url="http://{{ acme_host }}:5000/http/" + domain + "/" + token, data=\1.encode("utf8"), headers={"content-type": "application/octet-stream"}) ; r.get_method = lambda: "PUT" ; urlopen(r).close()'
 
 - name: "Monkey-patch acme-tiny: Remove file cleanup"
   replace:
-    path: "{{ output_dir }}/acme-tiny"
+    path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'os\.remove\(wellknown_path\)'
     replace: 'pass'
 
 - name: Create challenges directory
   file:
-    path: '{{ output_dir }}/challenges'
+    path: '{{ remote_tmp_dir }}/challenges'
     state: directory
 
 - name: Running tests

@@ -3,7 +3,7 @@
 - block:
   - name: Generate account keys
     openssl_privatekey:
-      path: "{{ output_dir }}/{{ item.name }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
       type: "{{ item.type }}"
       size: "{{ item.size | default(omit) }}"
       curve: "{{ item.curve | default(omit) }}"
@@ -22,6 +22,10 @@
         type: RSA
         size: "{{ default_rsa_key_size }}"
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
+- name: Read account key (EC256)
+  slurp:
+    src: '{{ remote_tmp_dir }}/account-ec256.pem'
+  register: slurp
 - name: Obtain cert 1
   include_tasks: obtain-cert.yml
   vars:
@@ -31,7 +35,7 @@
     rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-ec256.pem') }}"
+    account_key_content: "{{ slurp.content | b64decode }}"
     challenge: http-01
     modify_account: yes
     deactivate_authzs: no
@@ -76,8 +80,8 @@
 - name: Revoke certificate 1 via account key
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec256.pem"
-    certificate: "{{ output_dir }}/cert-1.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    certificate: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -86,19 +90,23 @@
 - name: Revoke certificate 2 via certificate private key
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    private_key_src: "{{ output_dir }}/cert-2.key"
+    private_key_src: "{{ remote_tmp_dir }}/cert-2.key"
     private_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
-    certificate: "{{ output_dir }}/cert-2.pem"
+    certificate: "{{ remote_tmp_dir }}/cert-2.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
   ignore_errors: yes
   register: cert_2_revoke
+- name: Read account key (RSA)
+  slurp:
+    src: '{{ remote_tmp_dir }}/account-rsa.pem'
+  register: slurp
 - name: Revoke certificate 3 via account key (fullchain)
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa.pem') }}"
-    certificate: "{{ output_dir }}/cert-3-fullchain.pem"
+    account_key_content: "{{ slurp.content | b64decode }}"
+    certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no

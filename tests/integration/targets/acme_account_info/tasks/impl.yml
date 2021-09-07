@@ -2,7 +2,7 @@
 - block:
   - name: Generate account keys
     openssl_privatekey:
-      path: "{{ output_dir }}/{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
       type: ECC
       curve: secp256r1
       force: true
@@ -10,7 +10,7 @@
 
   - name: Parse account keys (to ease debugging some test failures)
     openssl_privatekey_info:
-      path: "{{ output_dir }}/{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
       return_private_key_data: true
     loop: "{{ account_keys }}"
 
@@ -22,7 +22,7 @@
 - name: Check that account does not exist
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -31,7 +31,7 @@
 - name: Create it now
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -44,16 +44,21 @@
 - name: Check that account exists
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
   register: account_created
 
+- name: Read account key
+  slurp:
+    src: '{{ remote_tmp_dir }}/accountkey.pem'
+  register: slurp
+
 - name: Clear email address
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ lookup('file', output_dir ~ '/accountkey.pem') }}"
+    account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -64,7 +69,7 @@
 - name: Check that account was modified
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -74,7 +79,7 @@
 - name: Check with wrong account URI
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -84,7 +89,7 @@
 - name: Check with wrong account key
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no

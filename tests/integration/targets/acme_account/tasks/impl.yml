@@ -1,7 +1,7 @@
 - block:
   - name: Generate account keys
     openssl_privatekey:
-      path: "{{ output_dir }}/{{ item.name }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
       passphrase: "{{ item.pass | default(omit, true) }}"
       cipher: "{{ 'auto' if item.pass | default() else omit }}"
       type: ECC
@@ -11,7 +11,7 @@
 
   - name: Parse account keys (to ease debugging some test failures)
     openssl_privatekey_info:
-      path: "{{ output_dir }}/{{ item.name }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
       passphrase: "{{ item.pass | default(omit, true) }}"
       return_private_key_data: true
     loop: "{{ account_keys }}"
@@ -28,7 +28,7 @@
 - name: Do not try to create account
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -40,7 +40,7 @@
 - name: Create it now (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -56,7 +56,7 @@
 - name: Create it now
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -70,7 +70,7 @@
 - name: Create it now (idempotent)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -81,10 +81,15 @@
     - mailto:example@example.org
   register: account_created_idempotent
 
+- name: Read account key
+  slurp:
+    src: '{{ remote_tmp_dir }}/accountkey.pem'
+  register: slurp
+
 - name: Change email address (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ lookup('file', output_dir ~ '/accountkey.pem') }}"
+    account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -99,7 +104,7 @@
 - name: Change email address
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ lookup('file', output_dir ~ '/accountkey.pem') }}"
+    account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -112,7 +117,7 @@
 - name: Change email address (idempotent)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -126,7 +131,7 @@
 - name: Cannot access account with wrong URI
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri ~ '12345thisdoesnotexist' }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -139,7 +144,7 @@
 - name: Clear contact email addresses (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -153,7 +158,7 @@
 - name: Clear contact email addresses
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -165,7 +170,7 @@
 - name: Clear contact email addresses (idempotent)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -177,11 +182,11 @@
 - name: Change account key (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    new_account_key_src: "{{ output_dir }}/accountkey2.pem"
+    new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
@@ -193,11 +198,11 @@
 - name: Change account key
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    new_account_key_src: "{{ output_dir }}/accountkey2.pem"
+    new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
@@ -207,7 +212,7 @@
 - name: Deactivate account (check mode, diff)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -220,7 +225,7 @@
 - name: Deactivate account
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -231,7 +236,7 @@
 - name: Deactivate account (idempotent)
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -242,7 +247,7 @@
 - name: Do not try to create account II
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey2.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
@@ -255,7 +260,7 @@
 - name: Do not try to create account III
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -267,7 +272,7 @@
 - name: Create account with External Account Binding
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/{{ item.account }}.pem"
+    account_key_src: "{{ remote_tmp_dir }}/{{ item.account }}.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
