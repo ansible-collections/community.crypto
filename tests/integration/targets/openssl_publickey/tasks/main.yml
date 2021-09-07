@@ -7,13 +7,13 @@
 - block:
   - name: Generate privatekey1 - standard
     openssl_privatekey:
-      path: '{{ output_dir }}/privatekey_autodetect.pem'
+      path: '{{ remote_tmp_dir }}/privatekey_autodetect.pem'
       size: '{{ default_rsa_key_size }}'
 
   - name: Run module with backend autodetection
     openssl_publickey:
-      path: '{{ output_dir }}/privatekey_autodetect_public.pem'
-      privatekey_path: '{{ output_dir }}/privatekey_autodetect.pem'
+      path: '{{ remote_tmp_dir }}/privatekey_autodetect_public.pem'
+      privatekey_path: '{{ remote_tmp_dir }}/privatekey_autodetect.pem'
 
   when: |
     pyopenssl_version.stdout is version('16.0.0', '>=') or
@@ -33,12 +33,12 @@
 
 - name: Remove output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:

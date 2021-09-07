@@ -1,10 +1,10 @@
 ---
 - name: Generate a password protected key
-  command: 'ssh-keygen -f {{ output_dir }}/password_protected -N {{ passphrase }}'
+  command: 'ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}'
 
 - name: Modify the password protected key with passphrase
   openssh_keypair:
-    path: '{{ output_dir }}/password_protected'
+    path: '{{ remote_tmp_dir }}/password_protected'
     size: 1024
     passphrase: "{{ passphrase }}"
     backend: cryptography
@@ -12,14 +12,14 @@
 
 - name: Check password protected key idempotency
   openssh_keypair:
-    path: '{{ output_dir }}/password_protected'
+    path: '{{ remote_tmp_dir }}/password_protected'
     size: 1024
     passphrase: "{{ passphrase }}"
     backend: cryptography
   register: password_protected_idempotency_output
 
 - name: Ensure that ssh-keygen can read keys generated with passphrase
-  command: 'ssh-keygen -yf {{ output_dir }}/password_protected -P {{ passphrase }}'
+  command: 'ssh-keygen -yf {{ remote_tmp_dir }}/password_protected -P {{ passphrase }}'
   register: password_protected_ssh_keygen_output
 
 - name: Check that password protected key with passphrase was regenerated
@@ -31,18 +31,18 @@
 
 - name: Remove password protected key
   openssh_keypair:
-    path: '{{ output_dir }}/password_protected'
+    path: '{{ remote_tmp_dir }}/password_protected'
     backend: cryptography
     state: absent
 
 - name: Generate an unprotected key
   openssh_keypair:
-    path: '{{ output_dir }}/unprotected'
+    path: '{{ remote_tmp_dir }}/unprotected'
     backend: cryptography
 
 - name: Modify unprotected key with passphrase
   openssh_keypair:
-    path: '{{ output_dir }}/unprotected'
+    path: '{{ remote_tmp_dir }}/unprotected'
     size: 2048
     passphrase: "{{ passphrase }}"
     backend: cryptography
@@ -51,7 +51,7 @@
 
 - name: Modify unprotected key with passphrase (force)
   openssh_keypair:
-    path: '{{ output_dir }}/unprotected'
+    path: '{{ remote_tmp_dir }}/unprotected'
     size: 2048
     passphrase: "{{ passphrase }}"
     force: true
@@ -66,16 +66,16 @@
 
 - name: Remove unprotected key
   openssh_keypair:
-    path: '{{ output_dir }}/unprotected'
+    path: '{{ remote_tmp_dir }}/unprotected'
     backend: cryptography
     state: absent
 
 - name: Generate PEM encoded key with passphrase
-  command: 'ssh-keygen -b 4096 -f {{ output_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+  command: 'ssh-keygen -b 4096 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
-    path: '{{ output_dir }}/pem_encoded'
+    path: '{{ remote_tmp_dir }}/pem_encoded'
     passphrase: "{{ passphrase }}"
     backend: cryptography
   register: pem_encoded_output
@@ -87,6 +87,6 @@
 
 - name: Remove PEM encoded key
   openssh_keypair:
-    path: '{{ output_dir }}/pem_encoded'
+    path: '{{ remote_tmp_dir }}/pem_encoded'
     backend: cryptography
     state: absent

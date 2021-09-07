@@ -8,38 +8,48 @@
   - name: Obtain root and intermediate certificates
     get_url:
       url: "http://{{ acme_host }}:5000/{{ item.0 }}-certificate-for-ca/{{ item.1 }}"
-      dest: "{{ output_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
+      dest: "{{ remote_tmp_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
     loop: "{{ query('nested', types, root_numbers) }}"
 
   - name: Analyze root certificates
     x509_certificate_info:
-      path: "{{ output_dir }}/acme-root-{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/acme-root-{{ item }}.pem"
     loop: "{{ root_numbers }}"
     register: acme_roots
 
   - name: Analyze intermediate certificates
     x509_certificate_info:
-      path: "{{ output_dir }}/acme-intermediate-{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/acme-intermediate-{{ item }}.pem"
     loop: "{{ root_numbers }}"
     register: acme_intermediates
 
-  - set_fact:
-      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
-      y__: "{{ lookup('file', output_dir ~ '/acme-root-' ~ item.item ~ '.pem', rstrip=False) }}"
-    loop: "{{ acme_roots.results }}"
-    register: acme_roots_tmp
+  - name: Read root certificates
+    slurp:
+      src: "{{ remote_tmp_dir ~ '/acme-root-' ~ item ~ '.pem' }}"
+    loop: "{{ root_numbers }}"
+    register: slurp_roots
 
   - set_fact:
       x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
-      y__: "{{ lookup('file', output_dir ~ '/acme-intermediate-' ~ item.item ~ '.pem', rstrip=False) }}"
+    loop: "{{ acme_roots.results }}"
+    register: acme_roots_tmp
+
+  - name: Read intermediate certificates
+    slurp:
+      src: "{{ remote_tmp_dir ~ '/acme-intermediate-' ~ item ~ '.pem' }}"
+    loop: "{{ root_numbers }}"
+    register: slurp_intermediates
+
+  - set_fact:
+      x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
     loop: "{{ acme_intermediates.results }}"
     register: acme_intermediates_tmp
 
   - set_fact:
       acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_root_certs: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+      acme_root_certs: "{{ slurp_roots.results | map(attribute='content') | map('b64decode') | list }}"
       acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_intermediate_certs: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.y__') | list }}"
+      acme_intermediate_certs: "{{ slurp_intermediates.results | map(attribute='content') | map('b64decode') | list }}"
 
   vars:
     types:
@@ -88,12 +98,12 @@
 
 - name: Remove output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:

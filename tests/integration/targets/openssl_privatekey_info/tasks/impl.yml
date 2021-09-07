@@ -4,7 +4,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 1 info
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_1.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -24,9 +24,14 @@
   set_fact:
     info_results: "{{ info_results | combine({'key1': result}) }}"
 
+- name: ({{select_crypto_backend}}) Read private key
+  slurp:
+    src: '{{ remote_tmp_dir }}/privatekey_1.pem'
+  register: slurp
+
 - name: ({{select_crypto_backend}}) Get key 1 info directly
   openssl_privatekey_info:
-    content: '{{ lookup("file", output_dir ~ "/privatekey_1.pem") }}'
+    content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
@@ -37,7 +42,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 2 info
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_2.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_2.pem'
     return_private_key_data: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -63,7 +68,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 3 info (without passphrase)
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_3.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     return_private_key_data: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
   ignore_errors: yes
@@ -88,7 +93,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 3 info (with passphrase)
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_3.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     passphrase: hunter2
     return_private_key_data: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -114,7 +119,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 4 info
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_4.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_4.pem'
     return_private_key_data: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -153,7 +158,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 5 info
   openssl_privatekey_info:
-    path: '{{ output_dir }}/privatekey_5.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_5.pem'
     return_private_key_data: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result

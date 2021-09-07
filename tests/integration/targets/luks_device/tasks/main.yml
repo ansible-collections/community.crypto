@@ -4,18 +4,25 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Copy keyfiles
+  copy:
+    src: '{{ item }}'
+    dest: '{{ remote_tmp_dir }}/{{ item }}'
+  loop:
+    - keyfile1
+    - keyfile2
 - name: Make sure cryptsetup is installed
   package:
     name: cryptsetup
     state: present
   become: yes
 - name: Create cryptfile
-  command: dd if=/dev/zero of={{ output_dir.replace('~', ansible_env.HOME) }}/cryptfile bs=1M count=32
+  command: dd if=/dev/zero of={{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile bs=1M count=32
 - name: Create lookback device
-  command: losetup -f {{ output_dir.replace('~', ansible_env.HOME) }}/cryptfile
+  command: losetup -f {{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile
   become: yes
 - name: Determine loop device name
-  command: losetup -j {{ output_dir.replace('~', ansible_env.HOME) }}/cryptfile --output name
+  command: losetup -j {{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile --output name
   become: yes
   register: cryptfile_device_output
 - set_fact:
@@ -37,5 +44,5 @@
   - command: losetup -d "{{ cryptfile_device }}"
     become: yes
   - file:
-      dest: "{{ output_dir }}/cryptfile"
+      dest: "{{ remote_tmp_dir }}/cryptfile"
       state: absent

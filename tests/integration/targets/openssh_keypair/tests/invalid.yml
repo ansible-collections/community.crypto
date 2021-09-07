@@ -10,12 +10,12 @@
     content: ''
     mode: '0700'
   loop:
-    - "{{ output_dir }}/broken"
-    - "{{ output_dir }}/broken.pub"
+    - "{{ remote_tmp_dir }}/broken"
+    - "{{ remote_tmp_dir }}/broken.pub"
 
 - name: "({{ backend }}) Regenerate key - broken"
   openssh_keypair:
-    path: "{{ output_dir }}/broken"
+    path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
   register: broken_output
   ignore_errors: true
@@ -28,7 +28,7 @@
 
 - name: "({{ backend }}) Regenerate key with force - broken"
   openssh_keypair:
-    path: "{{ output_dir }}/broken"
+    path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
     force: true
   register: force_broken_output
@@ -40,24 +40,24 @@
 
 - name: "({{ backend }}) Remove key - broken"
   openssh_keypair:
-    path: "{{ output_dir }}/broken"
+    path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
     state: absent
 
 - name: "({{ backend }}) Generate key - write-only"
   openssh_keypair:
-    path: "{{ output_dir }}/write-only"
+    path: "{{ remote_tmp_dir }}/write-only"
     mode: "0200"
     backend: "{{ backend }}"
 
 - name: "({{ backend }}) Check private key status - write-only"
   stat:
-    path: '{{ output_dir }}/write-only'
+    path: '{{ remote_tmp_dir }}/write-only'
   register: write_only_private_key
 
 - name: "({{ backend }}) Check public key status - write-only"
   stat:
-    path: '{{ output_dir }}/write-only.pub'
+    path: '{{ remote_tmp_dir }}/write-only.pub'
   register: write_only_public_key
 
 - name: "({{ backend }}) Assert that private and public keys match permissions - write-only"
@@ -68,14 +68,14 @@
 
 - name: "({{ backend }}) Regenerate key with force - write-only"
   openssh_keypair:
-    path: "{{ output_dir }}/write-only"
+    path: "{{ remote_tmp_dir }}/write-only"
     backend: "{{ backend }}"
     force: true
   register: write_only_output
 
 - name: "({{ backend }}) Check private key status after regeneration - write-only"
   stat:
-    path: '{{ output_dir }}/write-only'
+    path: '{{ remote_tmp_dir }}/write-only'
   register: write_only_private_key_after
 
 - name: "({{ backend }}) Assert key is regenerated - write-only"
@@ -90,16 +90,16 @@
 
 - name: "({{ backend }}) Remove key - write-only"
   openssh_keypair:
-    path: "{{ output_dir }}/write-only"
+    path: "{{ remote_tmp_dir }}/write-only"
     backend: "{{ backend }}"
     state: absent
 
 - name: "({{ backend }}) Generate key with ssh-keygen - password_protected"
-  command: "ssh-keygen -f {{ output_dir }}/password_protected -N {{ passphrase }}"
+  command: "ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}"
 
 - name: "({{ backend }}) Modify key - password_protected"
   openssh_keypair:
-    path: "{{ output_dir }}/password_protected"
+    path: "{{ remote_tmp_dir }}/password_protected"
     size: 2048
     backend: "{{ backend }}"
   register: password_protected_output
@@ -113,7 +113,7 @@
 
 - name: "({{ backend }}) Modify key with 'force=true' - password_protected"
   openssh_keypair:
-    path: "{{ output_dir }}/password_protected"
+    path: "{{ remote_tmp_dir }}/password_protected"
     size: 2048
     backend: "{{ backend }}"
     force: true
@@ -126,6 +126,6 @@
 
 - name: "({{ backend }}) Remove key - password_protected"
   openssh_keypair:
-    path: "{{ output_dir }}/password_protected"
+    path: "{{ remote_tmp_dir }}/password_protected"
     backend: "{{ backend }}"
     state: absent

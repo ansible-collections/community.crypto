@@ -4,7 +4,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 1 info
   openssl_publickey_info:
-    path: '{{ output_dir }}/publickey_1.pem'
+    path: '{{ remote_tmp_dir }}/publickey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -22,9 +22,14 @@
   set_fact:
     info_results: "{{ info_results | combine({'key1': result}) }}"
 
+- name: ({{select_crypto_backend}}) Read file
+  slurp:
+    src: '{{ remote_tmp_dir }}/publickey_1.pem'
+  register: slurp
+
 - name: ({{select_crypto_backend}}) Get key 1 info directly
   openssl_publickey_info:
-    content: '{{ lookup("file", output_dir ~ "/publickey_1.pem") }}'
+    content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
@@ -35,7 +40,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 2 info
   openssl_publickey_info:
-    path: '{{ output_dir }}/publickey_2.pem'
+    path: '{{ remote_tmp_dir }}/publickey_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -56,7 +61,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 3 info
   openssl_publickey_info:
-    path: '{{ output_dir }}/publickey_3.pem'
+    path: '{{ remote_tmp_dir }}/publickey_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
@@ -89,7 +94,7 @@
 
 - name: ({{select_crypto_backend}}) Get key 4 info
   openssl_publickey_info:
-    path: '{{ output_dir }}/publickey_4.pem'
+    path: '{{ remote_tmp_dir }}/publickey_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 

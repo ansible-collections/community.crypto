@@ -12,7 +12,7 @@
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'
         use_agent: true
         valid_from: always
         valid_to: forever
@@ -33,7 +33,7 @@
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'
         use_agent: true
         valid_from: always
         valid_to: forever
@@ -44,7 +44,7 @@
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'
         use_agent: true
         valid_from: always
         valid_to: forever
@@ -54,7 +54,7 @@
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'
         use_agent: true
         valid_from: always
         valid_to: forever
@@ -71,7 +71,7 @@
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'
         use_agent: true
         valid_from: always
         valid_to: forever
@@ -80,4 +80,4 @@
     - name: Remove certificate
       openssh_cert:
         state: absent
-        path: '{{ output_dir }}/id_cert_with_agent'
+        path: '{{ remote_tmp_dir }}/id_cert_with_agent'

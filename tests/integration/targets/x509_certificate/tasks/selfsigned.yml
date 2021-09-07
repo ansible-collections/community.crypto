@@ -1,12 +1,12 @@
 ---
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey with password
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: auto
     select_crypto_backend: cryptography
@@ -14,8 +14,8 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR
   x509_certificate:
-    path: '{{ output_dir }}/cert_no_csr.pem'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -24,8 +24,8 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR - idempotency
   x509_certificate:
-    path: '{{ output_dir }}/cert_no_csr.pem'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -34,8 +34,8 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR (check mode)
   x509_certificate:
-    path: '{{ output_dir }}/cert_no_csr.pem'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -44,23 +44,23 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
   openssl_csr:
-    path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.example.com
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
   openssl_csr:
-    path: '{{ output_dir }}/csr_minimal_change.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/csr_minimal_change.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.example.org
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
   x509_certificate:
-    path: '{{ output_dir }}/cert.pem'
-    csr_path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -69,9 +69,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
   x509_certificate:
-    path: '{{ output_dir }}/cert.pem'
-    csr_path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -80,9 +80,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode)
   x509_certificate:
-    path: '{{ output_dir }}/cert.pem'
-    csr_path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -90,9 +90,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode, other CSR)
   x509_certificate:
-    path: '{{ output_dir }}/cert.pem'
-    csr_path: '{{ output_dir }}/csr_minimal_change.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_minimal_change.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -101,8 +101,8 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate
   x509_certificate:
-    path: '{{ output_dir }}/cert.pem'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: assertonly
     has_expired: False
     version: 3
@@ -115,9 +115,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned v2 certificate
   x509_certificate:
-    path: '{{ output_dir }}/cert_v2.pem'
-    csr_path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert_v2.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_version: 2
@@ -127,7 +127,7 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey2
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey2.pem'
+    path: '{{ remote_tmp_dir }}/privatekey2.pem'
     size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR2
@@ -141,8 +141,8 @@
       OU:
         - Roadrunner pest control
         - Pyrotechnics
-    path: '{{ output_dir }}/csr2.csr'
-    privatekey_path: '{{ output_dir }}/privatekey2.pem'
+    path: '{{ remote_tmp_dir }}/csr2.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     keyUsage:
       - digitalSignature
     extendedKeyUsage:
@@ -151,17 +151,17 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate2
   x509_certificate:
-    path: '{{ output_dir }}/cert2.pem'
-    csr_path: '{{ output_dir }}/csr2.csr'
-    privatekey_path: '{{ output_dir }}/privatekey2.pem'
+    path: '{{ remote_tmp_dir }}/cert2.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr2.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate2
   x509_certificate:
-    path: '{{ output_dir }}/cert2.pem'
-    privatekey_path: '{{ output_dir }}/privatekey2.pem'
+    path: '{{ remote_tmp_dir }}/cert2.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     provider: assertonly
     has_expired: False
     version: 3
@@ -186,45 +186,45 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create private key 3
   openssl_privatekey:
-    path: "{{ output_dir }}/privatekey3.pem"
+    path: "{{ remote_tmp_dir }}/privatekey3.pem"
     size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create CSR 3
   openssl_csr:
     subject:
       CN: www.example.com
-    privatekey_path: "{{ output_dir }}/privatekey3.pem"
-    path: "{{ output_dir }}/csr3.pem"
+    privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
+    path: "{{ remote_tmp_dir }}/csr3.pem"
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create certificate3 with notBefore and notAfter
   x509_certificate:
     provider: selfsigned
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    path: "{{ output_dir }}/cert3.pem"
-    csr_path: "{{ output_dir }}/csr3.pem"
-    privatekey_path: "{{ output_dir }}/privatekey3.pem"
+    path: "{{ remote_tmp_dir }}/cert3.pem"
+    csr_path: "{{ remote_tmp_dir }}/csr3.pem"
+    privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     type: ECC
     curve: "{{ (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') | ternary('secp521r1', 'secp256k1') }}"
     # ^ cryptography on CentOS6 doesn't support secp256k1, so we use secp521r1 instead
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
   openssl_csr:
-    path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     subject:
       commonName: www.example.com
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
   x509_certificate:
-    path: '{{ output_dir }}/cert_ecc.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/cert_ecc.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -232,17 +232,17 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR (privatekey passphrase)
   openssl_csr:
-    path: '{{ output_dir }}/csr_pass.csr'
-    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/csr_pass.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
     subject:
       commonName: www.example.com
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (privatekey passphrase)
   x509_certificate:
-    path: '{{ output_dir }}/cert_pass.pem'
-    csr_path: '{{ output_dir }}/csr_pass.csr'
-    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/cert_pass.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_pass.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
     provider: selfsigned
     selfsigned_digest: sha256
@@ -251,9 +251,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 1)
   x509_certificate:
-    path: '{{ output_dir }}/cert_pw1.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/cert_pw1.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     privatekey_passphrase: hunter2
     provider: selfsigned
     selfsigned_digest: sha256
@@ -263,9 +263,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 2)
   x509_certificate:
-    path: '{{ output_dir }}/cert_pw2.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/cert_pw2.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: wrong_password
     provider: selfsigned
     selfsigned_digest: sha256
@@ -275,9 +275,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 3)
   x509_certificate:
-    path: '{{ output_dir }}/cert_pw3.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekeypw.pem'
+    path: '{{ remote_tmp_dir }}/cert_pw3.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -286,22 +286,22 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
   copy:
-    dest: "{{ output_dir }}/cert_broken.pem"
+    dest: "{{ remote_tmp_dir }}/cert_broken.pem"
     content: "broken"
 - name: (Selfsigned, {{select_crypto_backend}}) Regenerate broken cert
   x509_certificate:
-    path: '{{ output_dir }}/cert_broken.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/cert_broken.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
   register: selfsigned_broken
 
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_backup.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     backup: yes
@@ -309,9 +309,9 @@
   register: selfsigned_backup_1
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (idempotent)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_backup.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     backup: yes
@@ -319,9 +319,9 @@
   register: selfsigned_backup_2
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (change)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_backup.pem'
-    csr_path: '{{ output_dir }}/csr.csr'
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     backup: yes
@@ -329,7 +329,7 @@
   register: selfsigned_backup_3
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_backup.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
     backup: yes
@@ -337,7 +337,7 @@
   register: selfsigned_backup_4
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove, idempotent)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_backup.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
     backup: yes
@@ -346,9 +346,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_ski.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
@@ -358,9 +358,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (idempotency)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_ski.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
@@ -370,9 +370,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_ski.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: never_create
@@ -382,9 +382,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove idempotency)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_ski.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: never_create
@@ -394,9 +394,9 @@
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (re-enable)
   x509_certificate:
-    path: '{{ output_dir }}/selfsigned_cert_ski.pem'
-    csr_path: '{{ output_dir }}/csr_ecc.csr'
-    privatekey_path: '{{ output_dir }}/privatekey_ecc.pem'
+    path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
+    csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
@@ -408,7 +408,7 @@
   block:
     - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekeys
       openssl_privatekey:
-        path: '{{ output_dir }}/privatekey_{{ item }}.pem'
+        path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
         type: '{{ item }}'
       loop:
         - Ed25519
@@ -422,8 +422,8 @@
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
           openssl_csr:
-            path: '{{ output_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ output_dir }}/privatekey_{{ item }}.pem'
+            path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
+            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             subject:
               commonName: www.ansible.com
             select_crypto_backend: '{{ select_crypto_backend }}'
@@ -434,9 +434,9 @@
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
           x509_certificate:
-            path: '{{ output_dir }}/cert_{{ item }}.pem'
-            csr_path: '{{ output_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ output_dir }}/privatekey_{{ item }}.pem'
+            path: '{{ remote_tmp_dir }}/cert_{{ item }}.pem'
+            csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
+            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             provider: selfsigned
             selfsigned_digest: sha256
             select_crypto_backend: '{{ select_crypto_backend }}'
@@ -448,9 +448,9 @@
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
           x509_certificate:
-            path: '{{ output_dir }}/cert_{{ item }}.pem'
-            csr_path: '{{ output_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ output_dir }}/privatekey_{{ item }}.pem'
+            path: '{{ remote_tmp_dir }}/cert_{{ item }}.pem'
+            csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
+            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             provider: selfsigned
             selfsigned_digest: sha256
             select_crypto_backend: '{{ select_crypto_backend }}'

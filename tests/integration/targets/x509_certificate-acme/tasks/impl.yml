@@ -1,18 +1,18 @@
 ---
 - name: Generate account key
   openssl_privatekey:
-    path: '{{ output_dir }}/account.key'
+    path: '{{ remote_tmp_dir }}/account.key'
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate privatekey
   openssl_privatekey:
-    path: '{{ output_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate CSRs
   openssl_csr:
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
-    path: '{{ output_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     subject_alt_name: '{{ item.sans }}'
   loop:
   - name: cert-1
@@ -26,17 +26,17 @@
 - name: Retrieve certificate 1
   x509_certificate:
     provider: acme
-    path: '{{ output_dir }}/cert-1.pem'
-    csr_path: '{{ output_dir }}/cert-1.csr'
-    acme_accountkey_path: '{{ output_dir }}/account.key'
-    acme_challenge_path: '{{ output_dir }}/challenges/'
+    path: '{{ remote_tmp_dir }}/cert-1.pem'
+    csr_path: '{{ remote_tmp_dir }}/cert-1.csr'
+    acme_accountkey_path: '{{ remote_tmp_dir }}/account.key'
+    acme_challenge_path: '{{ remote_tmp_dir }}/challenges/'
     acme_directory: https://{{ acme_host }}:14000/dir
   environment:
-    PATH: '{{ lookup("env", "PATH") }}:{{ output_dir }}'
+    PATH: '{{ lookup("env", "PATH") }}:{{ remote_tmp_dir }}'
 
 - name: Get certificate information
   x509_certificate_info:
-    path: '{{ output_dir }}/cert-1.pem'
+    path: '{{ remote_tmp_dir }}/cert-1.pem'
   register: result
 
 - name: Validate certificate information
@@ -48,17 +48,17 @@
 - name: Retrieve certificate 2
   x509_certificate:
     provider: acme
-    path: '{{ output_dir }}/cert-2.pem'
-    csr_path: '{{ output_dir }}/cert-2.csr'
-    acme_accountkey_path: '{{ output_dir }}/account.key'
-    acme_challenge_path: '{{ output_dir }}/challenges/'
+    path: '{{ remote_tmp_dir }}/cert-2.pem'
+    csr_path: '{{ remote_tmp_dir }}/cert-2.csr'
+    acme_accountkey_path: '{{ remote_tmp_dir }}/account.key'
+    acme_challenge_path: '{{ remote_tmp_dir }}/challenges/'
     acme_directory: https://{{ acme_host }}:14000/dir
   environment:
-    PATH: '{{ lookup("env", "PATH") }}:{{ output_dir }}'
+    PATH: '{{ lookup("env", "PATH") }}:{{ remote_tmp_dir }}'
 
 - name: Get certificate information
   x509_certificate_info:
-    path: '{{ output_dir }}/cert-2.pem'
+    path: '{{ remote_tmp_dir }}/cert-2.pem'
   register: result
 
 - name: Validate certificate information

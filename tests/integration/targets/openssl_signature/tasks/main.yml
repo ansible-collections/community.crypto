@@ -71,7 +71,7 @@
 
 - name: Generate private keys
   openssl_privatekey:
-    path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     type: '{{ item.type }}'
     curve: '{{ item.curve | default(omit) }}'
     size: '{{ item.size | default(omit) }}'
@@ -82,31 +82,31 @@
 
 - name: Generate public keys
   openssl_publickey:
-    path: '{{ output_dir }}/{{item.backend}}_publickey_{{ item.type }}_{{ item.passwd }}.pem'
-    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    path: '{{ remote_tmp_dir }}/{{item.backend}}_publickey_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
   loop: '{{ all_tests }}'
 
 - name: Generate CSRs
   openssl_csr:
-    path: '{{ output_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
-    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    path: '{{ remote_tmp_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
   loop: '{{ all_tests }}'
 
 - name: Generate selfsigned certificates
   x509_certificate:
     provider: selfsigned
-    path: '{{ output_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
-    privatekey_path: '{{ output_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
+    path: '{{ remote_tmp_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
-    csr_path: '{{ output_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
+    csr_path: '{{ remote_tmp_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
   loop: '{{ all_tests }}'
 
 - name: Create statement to be signed
   copy:
     content: "Erst wenn der Subwoofer die Katze inhaliert, fickt der Bass richtig übel. -- W.A. Mozart"
-    dest: '{{ output_dir }}/statement.txt'
+    dest: '{{ remote_tmp_dir }}/statement.txt'
 
 - name: Loop over all variants
   include_tasks: loop.yml

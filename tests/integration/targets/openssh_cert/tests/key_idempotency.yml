@@ -4,8 +4,8 @@
 ####################################################################
 
 - set_fact:
-    new_signing_key: "{{ output_dir }}/new_key"
-    new_public_key: "{{ output_dir }}/new_key.pub"
+    new_signing_key: "{{ remote_tmp_dir }}/new_key"
+    new_public_key: "{{ remote_tmp_dir }}/new_key.pub"
 
 - name: Generate new test key
   openssh_keypair:

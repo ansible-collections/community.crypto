@@ -1,31 +1,31 @@
 ---
 - name: (Removal, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
-    path: '{{ output_dir }}/removal_privatekey.pem'
+    path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
     size: '{{ default_rsa_key_size_certifiates }}'
 
 - name: (Removal, {{select_crypto_backend}}) Generate CSR
   openssl_csr:
-    path: '{{ output_dir }}/removal_csr.csr'
-    privatekey_path: '{{ output_dir }}/removal_privatekey.pem'
+    path: '{{ remote_tmp_dir }}/removal_csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
 
 - name: (Removal, {{select_crypto_backend}}) Generate selfsigned certificate
   x509_certificate:
-    path: '{{ output_dir }}/removal_cert.pem'
-    csr_path: '{{ output_dir }}/removal_csr.csr'
-    privatekey_path: '{{ output_dir }}/removal_privatekey.pem'
+    path: '{{ remote_tmp_dir }}/removal_cert.pem'
+    csr_path: '{{ remote_tmp_dir }}/removal_csr.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "(Removal, {{select_crypto_backend}}) Check that file is not gone"
   stat:
-    path: "{{ output_dir }}/removal_cert.pem"
+    path: "{{ remote_tmp_dir }}/removal_cert.pem"
   register: removal_1_prestat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate"
   x509_certificate:
-    path: "{{ output_dir }}/removal_cert.pem"
+    path: "{{ remote_tmp_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: yes
@@ -33,12 +33,12 @@
 
 - name: "(Removal, {{select_crypto_backend}}) Check that file is gone"
   stat:
-    path: "{{ output_dir }}/removal_cert.pem"
+    path: "{{ remote_tmp_dir }}/removal_cert.pem"
   register: removal_1_poststat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate (idempotent)"
   x509_certificate:
-    path: "{{ output_dir }}/removal_cert.pem"
+    path: "{{ remote_tmp_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: removal_2

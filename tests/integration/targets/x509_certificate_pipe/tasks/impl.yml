@@ -1,7 +1,7 @@
 ---
 - name: "({{ select_crypto_backend }}) Generate privatekey"
   openssl_privatekey:
-    path: '{{ output_dir }}/{{ item }}.pem'
+    path: '{{ remote_tmp_dir }}/{{ item }}.pem'
     size: '{{ default_rsa_key_size_certifiates }}'
   loop:
     - privatekey
@@ -9,8 +9,8 @@
 
 - name: "({{ select_crypto_backend }}) Generate CSRs"
   openssl_csr:
-    privatekey_path: '{{ output_dir }}/{{ item.key }}.pem'
-    path: '{{ output_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{ item.key }}.pem'
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     subject:
       commonName: '{{ item.cn }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -33,10 +33,10 @@
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (check mode)"
   x509_certificate_pipe:
     provider: selfsigned
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: generate_certificate_check
@@ -44,10 +44,10 @@
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate"
   x509_certificate_pipe:
     provider: selfsigned
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: generate_certificate
 
@@ -55,10 +55,10 @@
   x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: generate_certificate_idempotent
 
@@ -66,10 +66,10 @@
   x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: generate_certificate_idempotent_check
@@ -78,10 +78,10 @@
   x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-2.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: generate_certificate_changed
 
@@ -89,16 +89,16 @@
   x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
-    privatekey_path: '{{ output_dir }}/privatekey.pem'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
     selfsigned_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-2.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
@@ -135,10 +135,10 @@
   x509_certificate_pipe:
     provider: ownca
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-3.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: ownca_generate_certificate_check
@@ -147,10 +147,10 @@
   x509_certificate_pipe:
     provider: ownca
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-3.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_generate_certificate
 
@@ -159,10 +159,10 @@
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-3.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_generate_certificate_idempotent
 
@@ -171,10 +171,10 @@
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-3.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: ownca_generate_certificate_idempotent_check
@@ -184,10 +184,10 @@
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-4.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_generate_certificate_changed
 
@@ -196,16 +196,16 @@
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
-    ownca_privatekey_path: '{{ output_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
-    csr_path: '{{ output_dir }}/cert-4.csr'
+    csr_path: '{{ remote_tmp_dir }}/cert-4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
   register: ownca_generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey2.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"

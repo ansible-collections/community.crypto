@@ -2,7 +2,7 @@
 ## PRIVATE KEY ################################################################################
 - name: ({{ certgen_title }}) Create cert private key
   openssl_privatekey:
-    path: "{{ output_dir }}/{{ certificate_name }}.key"
+    path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     type: "{{ 'RSA' if key_type == 'rsa' else 'ECC' }}"
     size: "{{ rsa_bits if key_type == 'rsa' else omit }}"
     curve: >-
@@ -17,8 +17,8 @@
 ## CSR ########################################################################################
 - name: ({{ certgen_title }}) Create cert CSR
   openssl_csr:
-    path: "{{ output_dir }}/{{ certificate_name }}.csr"
-    privatekey_path: "{{ output_dir }}/{{ certificate_name }}.key"
+    path: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
+    privatekey_path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     privatekey_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
     subject_alt_name: "{{ subject_alt_name }}"
     subject_alt_name_critical: "{{ subject_alt_name_critical }}"
@@ -31,15 +31,15 @@
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key: "{{ (output_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
+    account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
     account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
     modify_account: "{{ modify_account }}"
-    csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"
+    csr: "{{ omit if use_csr_content | default(false) else remote_tmp_dir ~ '/' ~ certificate_name ~ '.csr' }}"
     csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
-    dest: "{{ output_dir }}/{{ certificate_name }}.pem"
-    fullchain_dest: "{{ output_dir }}/{{ certificate_name }}-fullchain.pem"
-    chain_dest: "{{ output_dir }}/{{ certificate_name }}-chain.pem"
+    dest: "{{ remote_tmp_dir }}/{{ certificate_name }}.pem"
+    fullchain_dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-fullchain.pem"
+    chain_dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-chain.pem"
     challenge: "{{ challenge }}"
     deactivate_authzs: "{{ deactivate_authzs }}"
     force: "{{ force }}"
@@ -72,20 +72,25 @@
   acme_challenge_cert_helper:
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
-    private_key_src: "{{ output_dir }}/{{ certificate_name }}.key"
+    private_key_src: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     private_key_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
-  with_dict: "{{ challenge_data.challenge_data }}"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else {} }}"
   register: tls_alpn_challenges
+  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
+- name: ({{ certgen_title }}) Read private key
+  slurp:
+    src: '{{ remote_tmp_dir }}/{{ certificate_name }}.key'
+  register: slurp
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Set TLS ALPN challenges (acm_challenge_cert_helper)
   uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.domain }}/{{ item.identifier }}/certificate-and-key"
     method: PUT
     body_format: raw
-    body: "{{ item.challenge_certificate }}\n{{ lookup('file', output_dir ~ '/' ~ certificate_name ~ '.key') }}"
+    body: "{{ item.challenge_certificate }}\n{{ slurp.content | b64decode }}"
     headers:
       content-type: "application/pem-certificate-chain"
-  with_items: "{{ tls_alpn_challenges.results }}"
+  with_items: "{{ tls_alpn_challenges.results if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else [] }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (der-value-b64)
   uri:
@@ -95,7 +100,7 @@
     body: "{{ item.value['tls-alpn-01'].resource_value }}"
     headers:
       content-type: "application/octet-stream"
-  with_dict: "{{ challenge_data.challenge_data }}"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64') else [] }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64')"
 ## ACME STEP 2 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 2
@@ -104,16 +109,16 @@
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key: "{{ (output_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
+    account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
     account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
     account_uri: "{{ challenge_data.account_uri }}"
     modify_account: "{{ modify_account }}"
-    csr: "{{ omit if use_csr_content | default(false) else output_dir ~ '/' ~ certificate_name ~ '.csr' }}"
+    csr: "{{ omit if use_csr_content | default(false) else remote_tmp_dir ~ '/' ~ certificate_name ~ '.csr' }}"
     csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
-    dest: "{{ output_dir }}/{{ certificate_name }}.pem"
-    fullchain_dest: "{{ output_dir }}/{{ certificate_name }}-fullchain.pem"
-    chain_dest: "{{ output_dir }}/{{ certificate_name }}-chain.pem"
+    dest: "{{ remote_tmp_dir }}/{{ certificate_name }}.pem"
+    fullchain_dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-fullchain.pem"
+    chain_dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-chain.pem"
     challenge: "{{ challenge }}"
     deactivate_authzs: "{{ deactivate_authzs }}"
     force: "{{ force }}"
@@ -146,5 +151,5 @@
 - name: ({{ certgen_title }}) Get root certificate
   get_url:
     url: "http://{{ acme_host }}:5000/root-certificate-for-ca/{{ acme_expected_root_number | default(0) if select_crypto_backend == 'cryptography' else 0 }}"
-    dest: "{{ output_dir }}/{{ certificate_name }}-root.pem"
+    dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-root.pem"
 ###############################################################################################

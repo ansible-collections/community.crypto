@@ -7,7 +7,7 @@
 - block:
   - name: Generate ECC256 accoun keys
     openssl_privatekey:
-      path: "{{ output_dir }}/account-ec256.pem"
+      path: "{{ remote_tmp_dir }}/account-ec256.pem"
       type: ECC
       curve: secp256r1
       force: true

@@ -2,7 +2,7 @@
 - block:
   - name: Generate account keys
     openssl_privatekey:
-      path: "{{ output_dir }}/{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
       type: ECC
       curve: secp256r1
       force: true
@@ -10,7 +10,7 @@
 
   - name: Parse account keys (to ease debugging some test failures)
     openssl_privatekey_info:
-      path: "{{ output_dir }}/{{ item }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
       return_private_key_data: true
     loop: "{{ account_keys }}"
 
@@ -32,7 +32,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     url: "{{ directory.directory.newAccount}}"
     method: post
     content: '{"termsOfServiceAgreed":true}'
@@ -46,7 +46,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
     method: get
@@ -58,7 +58,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
     method: post
@@ -77,7 +77,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ directory.directory.newOrder }}"
     method: post
@@ -100,7 +100,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ new_order.headers.location }}"
     method: get
@@ -112,7 +112,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item }}"
     method: get
@@ -125,7 +125,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ (item.challenges | selectattr('type', 'equalto', 'http-01') | list)[0].url }}"
     method: get
@@ -138,7 +138,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item.url }}"
     method: post
@@ -152,7 +152,7 @@
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
     validate_certs: no
-    account_key_src: "{{ output_dir }}/accountkey.pem"
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item.url }}"
     method: get

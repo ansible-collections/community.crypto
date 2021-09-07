@@ -54,7 +54,7 @@
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
     new_passphrase: "{{ cryptfile_passphrase2 }}"
-    new_keyfile: "{{ role_path }}/files/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -122,7 +122,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -135,7 +135,7 @@
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
-    new_keyfile: "{{ role_path }}/files/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -144,7 +144,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    remove_keyfile: "{{ role_path }}/files/keyfile1"
+    remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
     remove_passphrase: "{{ cryptfile_passphrase1 }}"
   become: yes
   ignore_errors: yes
@@ -157,7 +157,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -219,7 +219,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     new_passphrase: "{{ cryptfile_passphrase3 }}"
     pbkdf:
       iteration_time: 0.1

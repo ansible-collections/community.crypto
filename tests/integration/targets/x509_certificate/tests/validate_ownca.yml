@@ -1,18 +1,18 @@
 ---
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - verify CA)
-  shell: '{{ openssl_binary }} verify -CAfile {{ output_dir }}/ca_cert.pem {{ output_dir }}/ownca_cert.pem | sed "s/.*: \(.*\)/\1/g"'
+  shell: '{{ openssl_binary }} verify -CAfile {{ remote_tmp_dir }}/ca_cert.pem {{ remote_tmp_dir }}/ownca_cert.pem | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_verify_ca
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ output_dir }}/ownca_cert.pem'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert.pem'
   register: ownca_cert_modulus
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca issuer value)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/ownca_cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_cert_issuer
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certficate version == default == 3)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/ownca_cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert_version
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (assert)
@@ -31,15 +31,20 @@
       - ownca_certificate.notBefore == ownca_certificate_idempotence.notBefore
       - ownca_certificate.notAfter == ownca_certificate_idempotence.notAfter
 
+- name: (OwnCA validation, {{select_crypto_backend}}) Read certificate
+  slurp:
+    src: '{{ remote_tmp_dir }}/ownca_cert.pem'
+  register: slurp
+
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca data return
   assert:
     that:
-      - ownca_certificate.certificate == lookup('file', output_dir ~ '/ownca_cert.pem', rstrip=False)
+      - ownca_certificate.certificate == (slurp.content | b64decode)
       - ownca_certificate.certificate == ownca_certificate_idempotence.certificate
 
 - block:
   - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate v2 (test - ownca certificate version == 2)
-    shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/ownca_cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+    shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
     register: ownca_cert_v2_version
 
   - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate version 2 (assert)
@@ -57,7 +62,7 @@
 
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (test - ownca certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ output_dir }}/ownca_cert2.pem'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert2.pem'
   register: ownca_cert2_modulus
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (assert)
@@ -66,11 +71,11 @@
       - ownca_cert2_modulus.stdout == privatekey2_modulus.stdout
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate owncal certificate3 (test - notBefore)
-  shell: '{{ openssl_binary }} x509 -noout -in {{ output_dir }}/ownca_cert3.pem -text | grep "Not Before" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/ownca_cert3.pem -text | grep "Not Before" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert3_notBefore
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate3 (test - notAfter)
-  shell: '{{ openssl_binary }} x509 -noout -in {{ output_dir }}/ownca_cert3.pem -text | grep "Not After" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/ownca_cert3.pem -text | grep "Not After" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert3_notAfter
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate3 (assert - notBefore)
@@ -84,11 +89,11 @@
       - ownca_cert3_notAfter.stdout == 'Oct 23 13:37:42 2019'
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca certificate pubkey)
-  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ output_dir }}/ownca_cert_ecc.pem'
+  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem'
   register: ownca_cert_ecc_pubkey
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca issuer value)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/ownca_cert_ecc.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert_ecc.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_cert_ecc_issuer
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (assert)

@@ -4,7 +4,7 @@
 ####################################################################
 
 - name: register cryptography version
-  command: '{{ ansible_python.executable }} -c ''import cryptography; print(cryptography.__version__)'''
+  command: '{{ ansible_python.executable }} -c "import cryptography; print(cryptography.__version__)"'
   register: cryptography_version
 - block:
   - name: Make sure testhost directory exists
@@ -16,10 +16,9 @@
     copy:
       src: '{{ role_path }}/files/'
       dest: '{{ remote_tmp_dir }}/files/'
-      remote_src: yes
   - name: Find root for cert 1
     certificate_complete_chain:
-      input_chain: '{{ lookup(''file'', ''cert1-fullchain.pem'', rstrip=False) }}'
+      input_chain: '{{ lookup("file", "cert1-fullchain.pem", rstrip=False) }}'
       root_certificates:
       - '{{ remote_tmp_dir }}/files/roots/'
     register: cert1_root
@@ -30,7 +29,7 @@
       - cert1_root.root == lookup('file', 'cert1-root.pem', rstrip=False)
   - name: Find rootchain for cert 1
     certificate_complete_chain:
-      input_chain: '{{ lookup(''file'', ''cert1.pem'', rstrip=False) }}'
+      input_chain: '{{ lookup("file", "cert1.pem", rstrip=False) }}'
       intermediate_certificates:
       - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
       root_certificates:
@@ -44,7 +43,7 @@
       - cert1_rootchain.root == lookup('file', 'cert1-root.pem', rstrip=False)
   - name: Find root for cert 2
     certificate_complete_chain:
-      input_chain: '{{ lookup(''file'', ''cert2-fullchain.pem'', rstrip=False) }}'
+      input_chain: '{{ lookup("file", "cert2-fullchain.pem", rstrip=False) }}'
       root_certificates:
       - '{{ remote_tmp_dir }}/files/roots/'
     register: cert2_root
@@ -55,7 +54,7 @@
       - cert2_root.root == lookup('file', 'cert2-root.pem', rstrip=False)
   - name: Find rootchain for cert 2
     certificate_complete_chain:
-      input_chain: '{{ lookup(''file'', ''cert2.pem'', rstrip=False) }}'
+      input_chain: '{{ lookup("file", "cert2.pem", rstrip=False) }}'
       intermediate_certificates:
       - '{{ remote_tmp_dir }}/files/cert2-chain.pem'
       root_certificates:
@@ -69,7 +68,7 @@
       - cert2_rootchain.root == lookup('file', 'cert2-root.pem', rstrip=False)
   - name: Find alternate rootchain for cert 2
     certificate_complete_chain:
-      input_chain: '{{ lookup(''file'', ''cert2.pem'', rstrip=True) }}'
+      input_chain: '{{ lookup("file", "cert2.pem", rstrip=True) }}'
       intermediate_certificates:
       - '{{ remote_tmp_dir }}/files/cert2-altchain.pem'
       root_certificates:

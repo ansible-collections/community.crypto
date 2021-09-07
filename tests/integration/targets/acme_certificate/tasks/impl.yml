@@ -3,7 +3,7 @@
 - block:
   - name: Generate account keys
     openssl_privatekey:
-      path: "{{ output_dir }}/{{ item.name }}.pem"
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
       type: "{{ item.type }}"
       size: "{{ item.size | default(omit) }}"
       curve: "{{ item.curve | default(omit) }}"
@@ -28,15 +28,19 @@
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key_src: "{{ output_dir }}/account-ec256.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     state: absent
+- name: Read account key (EC384)
+  slurp:
+    src: '{{ remote_tmp_dir }}/account-ec384.pem'
+  register: slurp
 - name: Create ECC384 account
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-ec384.pem') }}"
+    account_key_content: "{{ slurp.content | b64decode }}"
     state: present
     allow_creation: yes
     terms_agreed: yes
@@ -49,7 +53,7 @@
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
-    account_key_src: "{{ output_dir }}/account-rsa.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     state: present
     allow_creation: yes
     terms_agreed: yes
@@ -115,6 +119,10 @@
   set_fact:
     cert_2_obtain_results: "{{ certificate_obtain_result }}"
     cert_2_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+- name: Read account key (RSA)
+  slurp:
+    src: '{{ remote_tmp_dir }}/account-rsa.pem'
+  register: slurp_account_key
 - name: Obtain cert 3
   include_tasks: obtain-cert.yml
   vars:
@@ -123,7 +131,7 @@
     key_type: ec384
     subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-rsa.pem') }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: dns-01
     modify_account: no
     deactivate_authzs: no
@@ -231,6 +239,10 @@
   set_fact:
     cert_5_recreate_2: "{{ challenge_data is changed }}"
     cert_5c_obtain_results: "{{ certificate_obtain_result }}"
+- name: Read account key (EC384)
+  slurp:
+    src: '{{ remote_tmp_dir }}/account-ec384.pem'
+  register: slurp_account_key
 - name: Obtain cert 5 (should again by force)
   include_tasks: obtain-cert.yml
   vars:
@@ -239,7 +251,7 @@
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ lookup('file', output_dir ~ '/account-ec384.pem') }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: http-01
     modify_account: no
     deactivate_authzs: yes
@@ -341,100 +353,100 @@
 ## DISSECT CERTIFICATES #######################################################################
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
 - name: Verifying cert 1
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-1-root.pem" -untrusted "{{ output_dir }}/cert-1-chain.pem" "{{ output_dir }}/cert-1.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-1-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-1-chain.pem" "{{ remote_tmp_dir }}/cert-1.pem"'
   ignore_errors: yes
   register: cert_1_valid
 - name: Verifying cert 2
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-2-root.pem" -untrusted "{{ output_dir }}/cert-2-chain.pem" "{{ output_dir }}/cert-2.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-2-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-2-chain.pem" "{{ remote_tmp_dir }}/cert-2.pem"'
   ignore_errors: yes
   register: cert_2_valid
 - name: Verifying cert 3
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-3-root.pem" -untrusted "{{ output_dir }}/cert-3-chain.pem" "{{ output_dir }}/cert-3.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-3-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-3-chain.pem" "{{ remote_tmp_dir }}/cert-3.pem"'
   ignore_errors: yes
   register: cert_3_valid
 - name: Verifying cert 4
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-4-root.pem" -untrusted "{{ output_dir }}/cert-4-chain.pem" "{{ output_dir }}/cert-4.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-4-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-4-chain.pem" "{{ remote_tmp_dir }}/cert-4.pem"'
   ignore_errors: yes
   register: cert_4_valid
 - name: Verifying cert 5
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-5-root.pem" -untrusted "{{ output_dir }}/cert-5-chain.pem" "{{ output_dir }}/cert-5.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-5-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-5-chain.pem" "{{ remote_tmp_dir }}/cert-5.pem"'
   ignore_errors: yes
   register: cert_5_valid
 - name: Verifying cert 6
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-6-root.pem" -untrusted "{{ output_dir }}/cert-6-chain.pem" "{{ output_dir }}/cert-6.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-6-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-6-chain.pem" "{{ remote_tmp_dir }}/cert-6.pem"'
   ignore_errors: yes
   register: cert_6_valid
 - name: Verifying cert 7
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-7-root.pem" -untrusted "{{ output_dir }}/cert-7-chain.pem" "{{ output_dir }}/cert-7.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-7-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-7-chain.pem" "{{ remote_tmp_dir }}/cert-7.pem"'
   ignore_errors: yes
   register: cert_7_valid
 - name: Verifying cert 8
-  command: '{{ openssl_binary }} verify -CAfile "{{ output_dir }}/cert-8-root.pem" -untrusted "{{ output_dir }}/cert-8-chain.pem" "{{ output_dir }}/cert-8.pem"'
+  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
   ignore_errors: yes
   register: cert_8_valid
 # Dump certificate info
 - name: Dumping cert 1
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-1.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-1.pem" -noout -text'
   register: cert_1_text
 - name: Dumping cert 2
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-2.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-2.pem" -noout -text'
   register: cert_2_text
 - name: Dumping cert 3
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-3.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-3.pem" -noout -text'
   register: cert_3_text
 - name: Dumping cert 4
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-4.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-4.pem" -noout -text'
   register: cert_4_text
 - name: Dumping cert 5
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-5.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-5.pem" -noout -text'
   register: cert_5_text
 - name: Dumping cert 6
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-6.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-6.pem" -noout -text'
   register: cert_6_text
 - name: Dumping cert 7
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-7.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-7.pem" -noout -text'
   register: cert_7_text
 - name: Dumping cert 8
-  command: '{{ openssl_binary }} x509 -in "{{ output_dir }}/cert-8.pem" -noout -text'
+  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
   register: cert_8_text
 # Dump certificate info
 - name: Dumping cert 1
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-1.pem"
+    path: "{{ remote_tmp_dir }}/cert-1.pem"
   register: cert_1_info
 - name: Dumping cert 2
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-2.pem"
+    path: "{{ remote_tmp_dir }}/cert-2.pem"
   register: cert_2_info
 - name: Dumping cert 3
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-3.pem"
+    path: "{{ remote_tmp_dir }}/cert-3.pem"
   register: cert_3_info
 - name: Dumping cert 4
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-4.pem"
+    path: "{{ remote_tmp_dir }}/cert-4.pem"
   register: cert_4_info
 - name: Dumping cert 5
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-5.pem"
+    path: "{{ remote_tmp_dir }}/cert-5.pem"
   register: cert_5_info
 - name: Dumping cert 6
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-6.pem"
+    path: "{{ remote_tmp_dir }}/cert-6.pem"
   register: cert_6_info
 - name: Dumping cert 7
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-7.pem"
+    path: "{{ remote_tmp_dir }}/cert-7.pem"
   register: cert_7_info
 - name: Dumping cert 8
   x509_certificate_info:
-    path: "{{ output_dir }}/cert-8.pem"
+    path: "{{ remote_tmp_dir }}/cert-8.pem"
   register: cert_8_info
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec256.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -443,7 +455,7 @@
 - name: Retrieve orders as URL list (1/2)
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec256.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -452,7 +464,7 @@
 - name: Retrieve orders as URL list (2/2)
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec384.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -461,7 +473,7 @@
 - name: Retrieve orders as object list (1/2)
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec256.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no
@@ -470,7 +482,7 @@
 - name: Retrieve orders as object list (2/2)
   acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ output_dir }}/account-ec384.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
     validate_certs: no

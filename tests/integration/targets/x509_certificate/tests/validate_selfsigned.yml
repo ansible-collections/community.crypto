@@ -1,6 +1,6 @@
 ---
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - privatekey modulus)
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate behavior for no CSR
@@ -11,11 +11,11 @@
       - selfsigned_certificate_no_csr_idempotence_check is not changed
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate with no CSR (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ output_dir }}/cert_no_csr.pem'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert_no_csr.pem'
   register: cert_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate with no CSR (test - certficate version == default == 3)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/cert_no_csr.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/cert_no_csr.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
   register: cert_version
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate with no CSR (assert)
@@ -31,23 +31,28 @@
       - selfsigned_certificate_no_csr.notBefore == selfsigned_certificate_no_csr_idempotence.notBefore
       - selfsigned_certificate_no_csr.notAfter == selfsigned_certificate_no_csr_idempotence.notAfter
 
+- name: (Selfsigned validation, {{select_crypto_backend}}) Read certificate with no CSR
+  slurp:
+    src: '{{ remote_tmp_dir }}/cert_no_csr.pem'
+  register: slurp
+
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate data retrieval with no CSR
   assert:
     that:
-      - selfsigned_certificate_no_csr.certificate == lookup('file', output_dir ~ '/cert_no_csr.pem', rstrip=False)
+      - selfsigned_certificate_no_csr.certificate == (slurp.content | b64decode)
       - selfsigned_certificate_no_csr.certificate == selfsigned_certificate_no_csr_idempotence.certificate
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ output_dir }}/cert.pem'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert.pem'
   register: cert_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - issuer value)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g; s/ //g;"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g; s/ //g;"'
   register: cert_issuer
 
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - certficate version == default == 3)
-  shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
   register: cert_version
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (assert)
@@ -64,10 +69,15 @@
       - selfsigned_certificate.notBefore == selfsigned_certificate_idempotence.notBefore
       - selfsigned_certificate.notAfter == selfsigned_certificate_idempotence.notAfter
 
+- name: (Selfsigned validation, {{select_crypto_backend}}) Read certificate
+  slurp:
+    src: '{{ remote_tmp_dir }}/cert.pem'
+  register: slurp
+
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate data retrieval
   assert:
     that:
-      - selfsigned_certificate.certificate == lookup('file', output_dir ~ '/cert.pem', rstrip=False)
+      - selfsigned_certificate.certificate == (slurp.content | b64decode)
       - selfsigned_certificate.certificate == selfsigned_certificate_idempotence.certificate
 
 - name: Make sure that changes in CSR are detected even if private key is specified
@@ -77,7 +87,7 @@
 
 - block:
   - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate v2 (test - certificate version == 2)
-    shell: '{{ openssl_binary }} x509 -noout  -in {{ output_dir}}/cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+    shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
     register: cert_v2_version
 
   - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate version 2 (assert)
@@ -95,11 +105,11 @@
   when: select_crypto_backend == 'cryptography'
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (test - privatekey modulus)
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ output_dir }}/privatekey2.pem'
+  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey2_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ output_dir }}/cert2.pem'
+  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert2.pem'
   register: cert2_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (assert)
@@ -108,11 +118,11 @@
       - cert2_modulus.stdout == privatekey2_modulus.stdout
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate3 (test - notBefore)
-  shell: '{{ openssl_binary }} x509 -noout -in {{ output_dir }}/cert3.pem -text | grep "Not Before" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/cert3.pem -text | grep "Not Before" | sed "s/.*: \(.*\) .*/\1/g"'
   register: cert3_notBefore
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate3 (test - notAfter)
-  shell: '{{ openssl_binary }} x509 -noout -in {{ output_dir }}/cert3.pem -text | grep "Not After" | sed "s/.*: \(.*\) .*/\1/g"'
+  shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/cert3.pem -text | grep "Not After" | sed "s/.*: \(.*\) .*/\1/g"'
   register: cert3_notAfter
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate3 (assert - notBefore)
@@ -126,11 +136,11 @@
       - cert3_notAfter.stdout == 'Oct 23 13:37:42 2019'
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (test - privatekey's pubkey)
-  shell: '{{ openssl_binary }} ec -pubout -in {{ output_dir }}/privatekey_ecc.pem'
+  shell: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey_ecc.pem'
   register: privatekey_ecc_pubkey
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (test - certificate pubkey)
-  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ output_dir }}/cert_ecc.pem'
+  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/cert_ecc.pem'
   register: cert_ecc_pubkey
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (assert)

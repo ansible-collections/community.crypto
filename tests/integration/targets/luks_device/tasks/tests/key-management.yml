@@ -3,7 +3,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -14,7 +14,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -31,7 +31,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -43,8 +43,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
-    new_keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -54,8 +54,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
-    new_keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   register: result_2
 
@@ -70,7 +70,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -91,8 +91,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
-    remove_keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   register: result_1
 
@@ -100,8 +100,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile1"
-    remove_keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   register: result_2
 
@@ -116,7 +116,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -128,7 +128,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -149,8 +149,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile2"
-    remove_keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: remove_last_key
@@ -165,7 +165,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: open_try
@@ -182,8 +182,8 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-    keyfile: "{{ role_path }}/files/keyfile2"
-    remove_keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyfile: "{{ remote_tmp_dir }}/keyfile2"
     force_remove_last_key: yes
   become: yes
 
@@ -193,7 +193,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile2"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
   become: yes
   ignore_errors: yes
   register: open_try

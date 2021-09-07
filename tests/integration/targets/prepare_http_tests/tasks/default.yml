@@ -42,10 +42,16 @@
     dest: "/tmp/ansible.pem"
   when: ansible_os_family == 'FreeBSD'
 
+- name: FreeBSD - Read test cacert
+  slurp:
+    src: "/tmp/ansible.pem"
+  register: slurp
+  when: ansible_os_family == 'FreeBSD'
+
 - name: FreeBSD - Add cacert to root certificate store
   blockinfile:
     path: "/etc/ssl/cert.pem"
-    block: "{{ lookup('file', '/tmp/ansible.pem') }}"
+    block: "{{ slurp.content | b64decode }}"
   when: ansible_os_family == 'FreeBSD'
 
 - name: MacOS - Retrieve test cacert
