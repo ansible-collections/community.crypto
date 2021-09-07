@@ -4,6 +4,13 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Copy keyfiles
+  copy:
+    src: '{{ item }}'
+    dest: '{{ remote_tmp_dir }}/{{ item }}'
+  loop:
+    - keyfile1
+    - keyfile2
 - name: Make sure cryptsetup is installed
   package:
     name: cryptsetup

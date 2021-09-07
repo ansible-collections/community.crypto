@@ -3,7 +3,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   check_mode: yes
@@ -13,7 +13,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -22,7 +22,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   become: yes
@@ -31,7 +31,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   check_mode: yes
@@ -48,7 +48,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   check_mode: yes
   become: yes
   register: open_check
@@ -56,21 +56,21 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   register: open
 - name: Open (idempotent)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
   register: open_idem
 - name: Open (idempotent, check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   check_mode: yes
   become: yes
   register: open_idem_check
@@ -118,7 +118,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
 
 - name: Closed (via device, check)
@@ -158,7 +158,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
   become: yes
 
 - name: Absent (check)

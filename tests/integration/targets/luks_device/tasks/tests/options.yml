@@ -3,7 +3,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 256
     pbkdf:
       iteration_count: 1000
@@ -13,7 +13,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 256
     pbkdf:
       iteration_count: 1000
@@ -23,7 +23,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 512
     pbkdf:
       iteration_count: 1000
@@ -33,7 +33,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     passphrase: "{{ cryptfile_passphrase1 }}"
     pbkdf:
       iteration_count: 1000

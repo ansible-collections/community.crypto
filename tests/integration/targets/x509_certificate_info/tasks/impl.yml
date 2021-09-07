@@ -112,9 +112,14 @@
   set_fact:
     info_results: "{{ info_results + [result] }}"
 
+- name: Copy packed cert 1 to remote
+  copy:
+    src: cert1.pem
+    dest: '{{ remote_tmp_dir }}/packed-cert-1.pem'
+
 - name: ({{select_crypto_backend}}) Get certificate info for packaged cert 1
   x509_certificate_info:
-    path: '{{ role_path }}/files/cert1.pem'
+    path: '{{ remote_tmp_dir }}/packed-cert-1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 - assert:

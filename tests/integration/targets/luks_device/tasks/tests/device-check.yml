@@ -3,7 +3,7 @@
   luks_device:
     device: /dev/asdfasdfasdf
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   check_mode: yes
@@ -14,7 +14,7 @@
   luks_device:
     device: /dev/asdfasdfasdf
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   ignore_errors: yes
@@ -31,7 +31,7 @@
   luks_device:
     device: /tmp/
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   check_mode: yes
@@ -42,7 +42,7 @@
   luks_device:
     device: /tmp/
     state: present
-    keyfile: "{{ role_path }}/files/keyfile1"
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
   ignore_errors: yes
