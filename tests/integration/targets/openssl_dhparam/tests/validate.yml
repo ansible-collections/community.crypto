@@ -36,7 +36,7 @@
 
 - name: "[{{ select_crypto_backend }}] Read result"
   slurp:
-    src: '{{ remote_tmp_dir }}/publickey_1.pem'
+    src: '{{ remote_tmp_dir }}/dh768.pem'
   register: slurp
 
 - name: "[{{ select_crypto_backend }}] Make sure correct values are returned"

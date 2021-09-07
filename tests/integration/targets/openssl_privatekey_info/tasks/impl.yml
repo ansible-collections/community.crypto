@@ -26,7 +26,7 @@
 
 - name: ({{select_crypto_backend}}) Read private key
   slurp:
-    src: '{{ remote_tmp_dir }}/publickey_1.pem'
+    src: '{{ remote_tmp_dir }}/privatekey_1.pem'
   register: slurp
 
 - name: ({{select_crypto_backend}}) Get key 1 info directly

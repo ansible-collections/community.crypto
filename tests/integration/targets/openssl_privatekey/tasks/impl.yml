@@ -522,7 +522,7 @@
 
   - name: "({{ select_crypto_backend }}) Read private key"
     slurp:
-      src: '{{ remote_tmp_dir }}/publickey_1.pem'
+      src: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
     register: slurp
     when: privatekey_fmt_2_step_1 is not failed
 

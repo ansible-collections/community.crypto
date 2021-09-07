@@ -84,13 +84,13 @@
 
 - name: "({{ backend }}) Read core.pub"
   slurp:
-    src: '{{ remote_tmp_dir }}/core.pub.pem'
+    src: '{{ remote_tmp_dir }}/core.pub'
   register: slurp
 
 - name: "({{ backend }}) Assert public key module return equal to the public key content"
   assert:
     that:
-      - "core_output.public_key == (slurp.content | b64decode).strip('\n')"
+      - "core_output.public_key == (slurp.content | b64decode).strip('\n ')"
 
 - name: "({{ backend }}) Remove key"
   openssh_keypair:

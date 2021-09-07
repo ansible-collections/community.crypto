@@ -36,7 +36,7 @@
 
 - name: "({{ select_crypto_backend }}) Read CSR"
   slurp:
-    src: '{{ remote_tmp_dir }}/csr_1.csr.pem'
+    src: '{{ remote_tmp_dir }}/csr_1.csr'
   register: slurp
 
 - name: "({{ select_crypto_backend }}) Get CSR info directly"

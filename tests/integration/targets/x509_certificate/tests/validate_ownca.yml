@@ -33,7 +33,7 @@
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Read certificate
   slurp:
-    src: '{{ remote_tmp_dir }}/publickey_1.pem'
+    src: '{{ remote_tmp_dir }}/ownca_cert.pem'
   register: slurp
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca data return

@@ -39,7 +39,7 @@
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate data retrieval with no CSR
   assert:
     that:
-      - selfsigned_certificate_no_csr.certificate == (slurp.output | b64decode)
+      - selfsigned_certificate_no_csr.certificate == (slurp.content | b64decode)
       - selfsigned_certificate_no_csr.certificate == selfsigned_certificate_no_csr_idempotence.certificate
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - certificate modulus)
@@ -77,7 +77,7 @@
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate data retrieval
   assert:
     that:
-      - selfsigned_certificate.certificate == (slurp.output | b64decode)
+      - selfsigned_certificate.certificate == (slurp.content | b64decode)
       - selfsigned_certificate.certificate == selfsigned_certificate_idempotence.certificate
 
 - name: Make sure that changes in CSR are detected even if private key is specified
