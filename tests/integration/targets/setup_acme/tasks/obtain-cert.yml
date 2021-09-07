@@ -74,7 +74,7 @@
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     private_key_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
-  with_dict: "{{ challenge_data.challenge_data }}"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else {} }}"
   register: tls_alpn_challenges
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Read private key
@@ -90,7 +90,7 @@
     body: "{{ item.challenge_certificate }}\n{{ slurp.content | b64decode }}"
     headers:
       content-type: "application/pem-certificate-chain"
-  with_items: "{{ tls_alpn_challenges.results }}"
+  with_items: "{{ tls_alpn_challenges.results if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else [] }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (der-value-b64)
   uri:
