@@ -46,6 +46,7 @@
   slurp:
     src: "/tmp/ansible.pem"
   register: slurp
+  when: ansible_os_family == 'FreeBSD'
 
 - name: FreeBSD - Add cacert to root certificate store
   blockinfile:
