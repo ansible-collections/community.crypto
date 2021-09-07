@@ -25,7 +25,7 @@
 - name: Read account key (EC256)
   slurp:
     src: '{{ remote_tmp_dir }}/account-ec256.pem'
-  register: slurp
+  register: slurp_account_key
 - name: Obtain cert 1
   include_tasks: obtain-cert.yml
   vars:
@@ -35,7 +35,7 @@
     rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ slurp.content | b64decode }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: http-01
     modify_account: yes
     deactivate_authzs: no
@@ -101,11 +101,11 @@
 - name: Read account key (RSA)
   slurp:
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
-  register: slurp
+  register: slurp_account_key
 - name: Revoke certificate 3 via account key (fullchain)
   acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_content: "{{ slurp.content | b64decode }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir

@@ -100,7 +100,7 @@
     body: "{{ item.value['tls-alpn-01'].resource_value }}"
     headers:
       content-type: "application/octet-stream"
-  with_dict: "{{ challenge_data.challenge_data }}"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64') else [] }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64')"
 ## ACME STEP 2 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 2

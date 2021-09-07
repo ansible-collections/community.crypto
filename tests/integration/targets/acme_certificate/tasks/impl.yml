@@ -122,7 +122,7 @@
 - name: Read account key (RSA)
   slurp:
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
-  register: slurp
+  register: slurp_account_key
 - name: Obtain cert 3
   include_tasks: obtain-cert.yml
   vars:
@@ -131,7 +131,7 @@
     key_type: ec384
     subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ slurp.content | b64decode }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: dns-01
     modify_account: no
     deactivate_authzs: no
@@ -242,7 +242,7 @@
 - name: Read account key (EC384)
   slurp:
     src: '{{ remote_tmp_dir }}/account-ec384.pem'
-  register: slurp
+  register: slurp_account_key
 - name: Obtain cert 5 (should again by force)
   include_tasks: obtain-cert.yml
   vars:
@@ -251,7 +251,7 @@
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
     subject_alt_name_critical: no
-    account_key_content: "{{ slurp.content | b64decode }}"
+    account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: http-01
     modify_account: no
     deactivate_authzs: yes
