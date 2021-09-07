@@ -27,7 +27,7 @@
     slurp:
       src: "{{ remote_tmp_dir ~ '/acme-root-' ~ item ~ '.pem' }}"
     loop: "{{ root_numbers }}"
-    register: slurp_root
+    register: slurp_roots
 
   - set_fact:
       x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
@@ -38,7 +38,7 @@
     slurp:
       src: "{{ remote_tmp_dir ~ '/acme-intermediate-' ~ item ~ '.pem' }}"
     loop: "{{ root_numbers }}"
-    register: slurp_intermediate
+    register: slurp_intermediates
 
   - set_fact:
       x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
@@ -47,9 +47,9 @@
 
   - set_fact:
       acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_root_certs: "{{ slurp_root.results | map(attribute='content') | map(b64decode) | list }}"
+      acme_root_certs: "{{ slurp_roots.results | map(attribute='content') | map('b64decode') | list }}"
       acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
-      acme_intermediate_certs: "{{ slurp_intermediate.results | map(attribute='content') | map(b64decode) | list }}"
+      acme_intermediate_certs: "{{ slurp_intermediates.results | map(attribute='content') | map('b64decode') | list }}"
 
   vars:
     types:
