@@ -227,12 +227,11 @@ options:
         description:
             - The authority key identifier as a hex string, where two bytes are separated by colons.
             - "Example: C(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33)"
-            - If specified, I(authority_cert_issuer) must also be specified.
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: str
     authority_cert_issuer:
@@ -241,23 +240,24 @@ options:
             - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName) and the ones specific to your CA)
             - "Example: C(DNS:ca.example.org)"
-            - If specified, I(authority_key_identifier) must also be specified.
+            - If specified, I(authority_cert_serial_number) must also be specified.
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: list
         elements: str
     authority_cert_serial_number:
         description:
             - The authority cert serial number.
+            - If specified, I(authority_cert_issuer) must also be specified.
             - Note that this is only supported if the C(cryptography) backend is used!
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: int
     crl_distribution_points:
