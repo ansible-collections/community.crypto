@@ -231,7 +231,7 @@ options:
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: str
     authority_cert_issuer:
@@ -245,7 +245,7 @@ options:
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: list
         elements: str
@@ -257,7 +257,7 @@ options:
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
-            - The C(AuthorityKeyIdentifier) will only be added if at least one of I(authority_key_identifier),
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
               I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
         type: int
     crl_distribution_points:
