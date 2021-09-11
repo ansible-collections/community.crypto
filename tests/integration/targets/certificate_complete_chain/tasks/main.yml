@@ -3,9 +3,6 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: register cryptography version
-  command: '{{ ansible_python.executable }} -c "import cryptography; print(cryptography.__version__)"'
-  register: cryptography_version
 - block:
   - name: Make sure testhost directory exists
     file:
