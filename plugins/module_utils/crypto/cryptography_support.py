@@ -280,11 +280,13 @@ def _dn_escape_value(value):
     '''
     Escape Distinguished Name's attribute value.
     '''
-    value = value.replace('\\', '\\\\')
-    for ch in [',', '#', '+', '<', '>', ';', '"', '=', '/']:
-        value = value.replace(ch, '\\%s' % ch)
-    if value.startswith(' '):
-        value = r'\ ' + value[1:]
+    value = value.replace('\\', r'\\')
+    for ch in [',', '+', '<', '>', ';', '"']:
+        value = value.replace(ch, r'\%s' % ch)
+    if value.startswith((' ', '#')):
+        value = r'\%s' % value[0] + value[1:]
+    if value.endswith(' '):
+        value = value[:-1] + r'\ '
     return value
 
 
@@ -304,9 +306,11 @@ def cryptography_decode_name(name):
     if isinstance(name, x509.UniformResourceIdentifier):
         return 'URI:{0}'.format(name.value)
     if isinstance(name, x509.DirectoryName):
-        return 'dirName:' + ''.join([
-            '/{0}={1}'.format(cryptography_oid_to_name(attribute.oid, short=True), _dn_escape_value(attribute.value))
-            for attribute in name.value
+        # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
+        # list needs to be reversed, and joined by commas
+        return 'dirName:' + ','.join([
+            '{0}={1}'.format(cryptography_oid_to_name(attribute.oid, short=True), _dn_escape_value(attribute.value))
+            for attribute in reversed(list(name.value))
         ])
     if isinstance(name, x509.RegisteredID):
         return 'RID:{0}'.format(name.value.dotted_string)
