@@ -161,21 +161,21 @@ def _parse_hex(bytesstr):
     return data
 
 
-DN_COMPONENT_START_RE = re.compile(r'^ *([a-zA-z0-9]+) *= *')
-DN_HEX_LETTER = '0123456789abcdef'
+DN_COMPONENT_START_RE = re.compile(u'^ *([a-zA-z0-9]+) *= *')
+DN_HEX_LETTER = u'0123456789abcdef'
 
 
-def _parse_dn_component(name, sep=',', decode_remainder=True):
+def _parse_dn_component(name, sep=u',', decode_remainder=True):
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
-        raise OpenSSLObjectError('cannot start part in "{0}"'.format(name))
+        raise OpenSSLObjectError(u'cannot start part in "{0}"'.format(name))
     oid = cryptography_name_to_oid(m.group(1))
     idx = len(m.group(0))
     decoded_name = []
-    sep_str = sep + '\\'
+    sep_str = sep + u'\\'
     if decode_remainder:
         length = len(name)
-        if length > idx and name[idx] == '#':
+        if length > idx and name[idx] == u'#':
             # Decoding a hex string
             idx += 1
             while idx + 1 < length:
@@ -184,7 +184,7 @@ def _parse_dn_component(name, sep=',', decode_remainder=True):
                 idx1 = DN_HEX_LETTER.find(ch1.lower())
                 idx2 = DN_HEX_LETTER.find(ch2.lower())
                 if idx1 < 0 or idx2 < 0:
-                    raise OpenSSLObjectError('Invalid hex sequence entry "{0}{1}"'.format(ch1, ch2))
+                    raise OpenSSLObjectError(u'Invalid hex sequence entry "{0}{1}"'.format(ch1, ch2))
                 idx += 2
                 decoded_name.append(chr(idx1 * 16 + idx2))
         else:
@@ -196,16 +196,16 @@ def _parse_dn_component(name, sep=',', decode_remainder=True):
                 if i > idx:
                     decoded_name.append(name[idx:i])
                     idx = i
-                while idx + 1 < length and name[idx] == '\\':
+                while idx + 1 < length and name[idx] == u'\\':
                     ch = name[idx + 1]
                     idx1 = DN_HEX_LETTER.find(ch.lower())
                     if idx1 >= 0:
                         if idx + 2 >= length:
-                            raise OpenSSLObjectError(r'Hex escape sequence "\{0}" incomplete at end of string'.format(ch))
+                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}" incomplete at end of string'.format(ch))
                         ch2 = name[idx + 2]
                         idx2 = DN_HEX_LETTER.find(ch2.lower())
                         if idx2 < 0:
-                            raise OpenSSLObjectError(r'Hex escape sequence "\{0}{1}" has invalid second letter'.format(ch, ch2))
+                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}{1}" has invalid second letter'.format(ch, ch2))
                         ch = chr(idx1 * 16 + idx2)
                         idx += 1
                     idx += 2
@@ -215,7 +215,7 @@ def _parse_dn_component(name, sep=',', decode_remainder=True):
     else:
         decoded_name.append(name[idx:])
         idx = len(name)
-    return x509.NameAttribute(oid, ''.join(decoded_name)), name[idx:]
+    return x509.NameAttribute(oid, u''.join(decoded_name)), name[idx:]
 
 
 def _parse_dn(name):
@@ -226,20 +226,20 @@ def _parse_dn(name):
     '''
     original_name = name
     name = name.lstrip()
-    sep = ','
-    if name.startswith('/'):
-        sep = '/'
+    sep = u','
+    if name.startswith(u'/'):
+        sep = u'/'
         name = name[1:]
     result = []
     while name:
         try:
             attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
-            raise OpenSSLObjectError('Error while parsing distinguished name "{0}": {1}'.format(original_name, e))
+            raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": {1}'.format(original_name, e))
         result.append(attribute)
         if name:
             if name[0] != sep or len(name) < 2:
-                raise OpenSSLObjectError('Error while parsing distinguished name "{0}": unexpected end of string'.format(original_name))
+                raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": unexpected end of string'.format(original_name))
             name = name[1:]
     return result
 
@@ -250,7 +250,7 @@ def cryptography_parse_relative_distinguished_name(rdn):
         try:
             names.append(_parse_dn_component(to_text(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
-            raise OpenSSLObjectError('Error while parsing relative distinguished name "{0}": {1}'.format(part, e))
+            raise OpenSSLObjectError(u'Error while parsing relative distinguished name "{0}": {1}'.format(part, e))
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
