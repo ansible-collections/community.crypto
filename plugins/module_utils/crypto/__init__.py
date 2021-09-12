@@ -25,7 +25,6 @@ __metaclass__ = type
 # please stop doing so.
 
 from .basic import (
-    HAS_PYOPENSSL,
     CRYPTOGRAPHY_HAS_X25519,
     CRYPTOGRAPHY_HAS_X25519_FULL,
     CRYPTOGRAPHY_HAS_X448,
@@ -73,12 +72,6 @@ from ._objects_data import OID_MAP as _OID_MAP
 from ._objects import OID_LOOKUP as _OID_LOOKUP
 from ._objects import NORMALIZE_NAMES as _NORMALIZE_NAMES
 from ._objects import NORMALIZE_NAMES_SHORT as _NORMALIZE_NAMES_SHORT
-
-from .pyopenssl_support import (
-    pyopenssl_normalize_name,
-    pyopenssl_get_extensions_from_cert,
-    pyopenssl_get_extensions_from_csr,
-)
 
 from .support import (
     get_fingerprint_of_bytes,
