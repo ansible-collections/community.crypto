@@ -33,7 +33,7 @@ options:
          key."
       - "Private keys can be created with the
          M(community.crypto.openssl_privatekey) or M(community.crypto.openssl_privatekey_pipe)
-         modules. If the requisites (pyOpenSSL or cryptography) are not available,
+         modules. If the requisite (cryptography) is not available,
          keys can also be created directly with the C(openssl) command line tool:
          RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys
          can be created with C(openssl ecparam -genkey ...). Any other tool creating

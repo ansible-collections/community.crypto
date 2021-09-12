@@ -43,11 +43,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     REVOCATION_REASON_MAP,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
-    pyopenssl_normalize_name_attribute,
-    pyopenssl_parse_name_constraints,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
     get_csr_info,
 )
@@ -55,27 +50,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
 
-MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
-    if OpenSSL.SSL.OPENSSL_VERSION_NUMBER >= 0x10100000:
-        # OpenSSL 1.1.0 or newer
-        OPENSSL_MUST_STAPLE_NAME = b"tlsfeature"
-        OPENSSL_MUST_STAPLE_VALUE = b"status_request"
-    else:
-        # OpenSSL 1.0.x or older
-        OPENSSL_MUST_STAPLE_NAME = b"1.3.6.1.5.5.7.1.24"
-        OPENSSL_MUST_STAPLE_VALUE = b"DER:30:03:02:01:05"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -271,174 +246,6 @@ class CertificateSigningRequestBackend(object):
             after=self.diff_after,
         )
         return result
-
-
-# Implementation with using pyOpenSSL
-class CertificateSigningRequestPyOpenSSLBackend(CertificateSigningRequestBackend):
-    def __init__(self, module):
-        for o in ('create_subject_key_identifier', ):
-            if module.params[o]:
-                module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
-        for o in ('subject_key_identifier', 'authority_key_identifier', 'authority_cert_issuer', 'authority_cert_serial_number', 'crl_distribution_points'):
-            if module.params[o] is not None:
-                module.fail_json(msg='You cannot use {0} with the pyOpenSSL backend!'.format(o))
-        super(CertificateSigningRequestPyOpenSSLBackend, self).__init__(module, 'pyopenssl')
-
-    def generate_csr(self):
-        """(Re-)Generate CSR."""
-        self._ensure_private_key_loaded()
-
-        req = crypto.X509Req()
-        req.set_version(self.version - 1)
-        subject = req.get_subject()
-        for entry in self.subject:
-            if entry[1] is not None:
-                # Workaround for https://github.com/pyca/pyopenssl/issues/165
-                nid = OpenSSL._util.lib.OBJ_txt2nid(to_bytes(entry[0]))
-                if nid == 0:
-                    raise CertificateSigningRequestError('Unknown subject field identifier "{0}"'.format(entry[0]))
-                res = OpenSSL._util.lib.X509_NAME_add_entry_by_NID(subject._name, nid, OpenSSL._util.lib.MBSTRING_UTF8, to_bytes(entry[1]), -1, -1, 0)
-                if res == 0:
-                    raise CertificateSigningRequestError('Invalid value for subject field identifier "{0}": {1}'.format(entry[0], entry[1]))
-
-        extensions = []
-        if self.subjectAltName:
-            altnames = ', '.join(self.subjectAltName)
-            try:
-                extensions.append(crypto.X509Extension(b"subjectAltName", self.subjectAltName_critical, altnames.encode('ascii')))
-            except OpenSSL.crypto.Error as e:
-                raise CertificateSigningRequestError(
-                    'Error while parsing Subject Alternative Names {0} (check for missing type prefix, such as "DNS:"!): {1}'.format(
-                        ', '.join(["{0}".format(san) for san in self.subjectAltName]), str(e)
-                    )
-                )
-
-        if self.keyUsage:
-            usages = ', '.join(self.keyUsage)
-            extensions.append(crypto.X509Extension(b"keyUsage", self.keyUsage_critical, usages.encode('ascii')))
-
-        if self.extendedKeyUsage:
-            usages = ', '.join(self.extendedKeyUsage)
-            extensions.append(crypto.X509Extension(b"extendedKeyUsage", self.extendedKeyUsage_critical, usages.encode('ascii')))
-
-        if self.basicConstraints:
-            usages = ', '.join(self.basicConstraints)
-            extensions.append(crypto.X509Extension(b"basicConstraints", self.basicConstraints_critical, usages.encode('ascii')))
-
-        if self.name_constraints_permitted or self.name_constraints_excluded:
-            usages = ', '.join(
-                ['permitted;{0}'.format(name) for name in self.name_constraints_permitted] +
-                ['excluded;{0}'.format(name) for name in self.name_constraints_excluded]
-            )
-            extensions.append(crypto.X509Extension(b"nameConstraints", self.name_constraints_critical, usages.encode('ascii')))
-
-        if self.ocspMustStaple:
-            extensions.append(crypto.X509Extension(OPENSSL_MUST_STAPLE_NAME, self.ocspMustStaple_critical, OPENSSL_MUST_STAPLE_VALUE))
-
-        if extensions:
-            req.add_extensions(extensions)
-
-        req.set_pubkey(self.privatekey)
-        req.sign(self.privatekey, self.digest)
-        self.csr = req
-
-    def get_csr_data(self):
-        """Return bytes for self.csr."""
-        return crypto.dump_certificate_request(crypto.FILETYPE_PEM, self.csr)
-
-    def _check_csr(self):
-        def _check_subject(csr):
-            subject = [(OpenSSL._util.lib.OBJ_txt2nid(to_bytes(sub[0])), to_bytes(sub[1])) for sub in self.subject]
-            current_subject = [(OpenSSL._util.lib.OBJ_txt2nid(to_bytes(sub[0])), to_bytes(sub[1])) for sub in csr.get_subject().get_components()]
-            if not set(subject) == set(current_subject):
-                return False
-
-            return True
-
-        def _check_subjectAltName(extensions):
-            altnames_ext = next((ext for ext in extensions if ext.get_short_name() == b'subjectAltName'), '')
-            altnames = [pyopenssl_normalize_name_attribute(altname.strip()) for altname in
-                        to_text(altnames_ext, errors='surrogate_or_strict').split(',') if altname.strip()]
-            if self.subjectAltName:
-                if (set(altnames) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.subjectAltName]) or
-                        altnames_ext.get_critical() != self.subjectAltName_critical):
-                    return False
-            else:
-                if altnames:
-                    return False
-
-            return True
-
-        def _check_keyUsage_(extensions, extName, expected, critical):
-            usages_ext = [ext for ext in extensions if ext.get_short_name() == extName]
-            if (not usages_ext and expected) or (usages_ext and not expected):
-                return False
-            elif not usages_ext and not expected:
-                return True
-            else:
-                current = [OpenSSL._util.lib.OBJ_txt2nid(to_bytes(usage.strip())) for usage in str(usages_ext[0]).split(',')]
-                expected = [OpenSSL._util.lib.OBJ_txt2nid(to_bytes(usage)) for usage in expected]
-                return set(current) == set(expected) and usages_ext[0].get_critical() == critical
-
-        def _check_keyUsage(extensions):
-            usages_ext = [ext for ext in extensions if ext.get_short_name() == b'keyUsage']
-            if (not usages_ext and self.keyUsage) or (usages_ext and not self.keyUsage):
-                return False
-            elif not usages_ext and not self.keyUsage:
-                return True
-            else:
-                # OpenSSL._util.lib.OBJ_txt2nid() always returns 0 for all keyUsage values
-                # (since keyUsage has a fixed bitfield for these values and is not extensible).
-                # Therefore, we create an extension for the wanted values, and compare the
-                # data of the extensions (which is the serialized bitfield).
-                expected_ext = crypto.X509Extension(b"keyUsage", False, ', '.join(self.keyUsage).encode('ascii'))
-                return usages_ext[0].get_data() == expected_ext.get_data() and usages_ext[0].get_critical() == self.keyUsage_critical
-
-        def _check_extenededKeyUsage(extensions):
-            return _check_keyUsage_(extensions, b'extendedKeyUsage', self.extendedKeyUsage, self.extendedKeyUsage_critical)
-
-        def _check_basicConstraints(extensions):
-            return _check_keyUsage_(extensions, b'basicConstraints', self.basicConstraints, self.basicConstraints_critical)
-
-        def _check_nameConstraints(extensions):
-            nc_ext = next((ext for ext in extensions if ext.get_short_name() == b'nameConstraints'), '')
-            permitted, excluded = pyopenssl_parse_name_constraints(nc_ext)
-            if self.name_constraints_permitted or self.name_constraints_excluded:
-                if set(permitted) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.name_constraints_permitted]):
-                    return False
-                if set(excluded) != set([pyopenssl_normalize_name_attribute(to_text(name)) for name in self.name_constraints_excluded]):
-                    return False
-                if nc_ext.get_critical() != self.name_constraints_critical:
-                    return False
-            else:
-                if permitted or excluded:
-                    return False
-
-            return True
-
-        def _check_ocspMustStaple(extensions):
-            oms_ext = [ext for ext in extensions if to_bytes(ext.get_short_name()) == OPENSSL_MUST_STAPLE_NAME and to_bytes(ext) == OPENSSL_MUST_STAPLE_VALUE]
-            if OpenSSL.SSL.OPENSSL_VERSION_NUMBER < 0x10100000:
-                # Older versions of libssl don't know about OCSP Must Staple
-                oms_ext.extend([ext for ext in extensions if ext.get_short_name() == b'UNDEF' and ext.get_data() == b'\x30\x03\x02\x01\x05'])
-            if self.ocspMustStaple:
-                return len(oms_ext) > 0 and oms_ext[0].get_critical() == self.ocspMustStaple_critical
-            else:
-                return len(oms_ext) == 0
-
-        def _check_extensions(csr):
-            extensions = csr.get_extensions()
-            return (_check_subjectAltName(extensions) and _check_keyUsage(extensions) and
-                    _check_extenededKeyUsage(extensions) and _check_basicConstraints(extensions) and
-                    _check_ocspMustStaple(extensions) and _check_nameConstraints(extensions))
-
-        def _check_signature(csr):
-            try:
-                return csr.verify(self.privatekey)
-            except crypto.Error:
-                return False
-
-        return _check_subject(self.existing_csr) and _check_extensions(self.existing_csr) and _check_signature(self.existing_csr)
 
 
 def parse_crl_distribution_points(module, crl_distribution_points):
@@ -762,34 +569,17 @@ def select_backend(module, backend):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
-        # First try cryptography, then pyOpenSSL
+        # Try cryptography
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            backend = 'pyopenssl'
 
         # Success?
         if backend == 'auto':
             module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
-    if backend == 'pyopenssl':
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        try:
-            getattr(crypto.X509Req, 'get_extensions')
-        except AttributeError:
-            module.fail_json(msg='You need to have PyOpenSSL>=0.15 to generate CSRs')
-
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-        return backend, CertificateSigningRequestPyOpenSSLBackend(module)
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
@@ -853,7 +643,7 @@ def get_csr_argument_spec():
                 ),
                 mutually_exclusive=[('full_name', 'relative_name')]
             ),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_together=[
             ['authority_cert_issuer', 'authority_cert_serial_number'],

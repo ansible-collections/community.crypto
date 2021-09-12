@@ -38,18 +38,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
-MINIMAL_PYOPENSSL_VERSION = '0.15'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 CRYPTOGRAPHY_VERSION = None
@@ -173,43 +161,12 @@ class CertificateBackend(object):
 
     def _check_privatekey(self):
         """Check whether provided parameters match, assuming self.existing_certificate and self.privatekey have been populated."""
-        if self.backend == 'pyopenssl':
-            ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD)
-            ctx.use_privatekey(self.privatekey)
-            ctx.use_certificate(self.existing_certificate)
-            try:
-                ctx.check_privatekey()
-                return True
-            except OpenSSL.SSL.Error:
-                return False
-        elif self.backend == 'cryptography':
+        if self.backend == 'cryptography':
             return cryptography_compare_public_keys(self.existing_certificate.public_key(), self.privatekey.public_key())
 
     def _check_csr(self):
         """Check whether provided parameters match, assuming self.existing_certificate and self.csr have been populated."""
-        if self.backend == 'pyopenssl':
-            # Verify that CSR is signed by certificate's private key
-            try:
-                self.csr.verify(self.existing_certificate.get_pubkey())
-            except OpenSSL.crypto.Error:
-                return False
-            # Check subject
-            if self.check_csr_subject and self.csr.get_subject() != self.existing_certificate.get_subject():
-                return False
-            # Check extensions
-            if not self.check_csr_extensions:
-                return True
-            csr_extensions = self.csr.get_extensions()
-            cert_extension_count = self.existing_certificate.get_extension_count()
-            if len(csr_extensions) != cert_extension_count:
-                return False
-            for extension_number in range(0, cert_extension_count):
-                cert_extension = self.existing_certificate.get_extension(extension_number)
-                csr_extension = filter(lambda extension: extension.get_short_name() == cert_extension.get_short_name(), csr_extensions)
-                if cert_extension.get_data() != list(csr_extension)[0].get_data():
-                    return False
-            return True
-        elif self.backend == 'cryptography':
+        if self.backend == 'cryptography':
             # Verify that CSR is signed by certificate's private key
             if not self.csr.is_signature_valid:
                 return False
@@ -244,10 +201,6 @@ class CertificateBackend(object):
 
     def _check_subject_key_identifier(self):
         """Check whether Subject Key Identifier matches, assuming self.existing_certificate has been populated."""
-        if self.backend != 'cryptography':
-            # We do not support SKI with pyOpenSSL backend
-            return True
-
         # Get hold of certificate's SKI
         try:
             ext = self.existing_certificate.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
@@ -328,10 +281,6 @@ class CertificateProvider(object):
     def needs_version_two_certs(self, module):
         """Whether the provider needs to create a version 2 certificate."""
 
-    def needs_pyopenssl_get_extensions(self, module):
-        """Whether the provider needs to use get_extensions() with pyOpenSSL."""
-        return True
-
     @abc.abstractmethod
     def create_backend(self, module, backend):
         """Create an implementation for a backend.
@@ -352,45 +301,22 @@ def select_backend(module, backend, provider):
     if backend == 'auto':
         # Detect what backend we can use
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
         # If cryptography is available we'll use it
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            backend = 'pyopenssl'
-
-        if provider.needs_version_two_certs(module):
-            module.warn('crypto backend forced to pyopenssl. The cryptography library does not support v2 certificates')
-            backend = 'pyopenssl'
 
         # Fail if no backend has been found
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
-    if backend == 'pyopenssl':
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        if provider.needs_pyopenssl_get_extensions(module):
-            try:
-                getattr(crypto.X509Req, 'get_extensions')
-            except AttributeError:
-                module.fail_json(msg='You need to have PyOpenSSL>=0.15')
-
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
         if provider.needs_version_two_certs(module):
-            module.fail_json(msg='The cryptography backend does not support v2 certificates, '
-                                 'use select_crypto_backend=pyopenssl for v2 certificates')
+            module.fail_json(msg='The cryptography backend does not support v2 certificates')
 
     return provider.create_backend(module, backend)
 
@@ -402,7 +328,7 @@ def get_certificate_argument_spec():
             force=dict(type='bool', default=False,),
             csr_path=dict(type='path'),
             csr_content=dict(type='str'),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
 
             # General properties of a certificate
             privatekey_path=dict(type='path'),

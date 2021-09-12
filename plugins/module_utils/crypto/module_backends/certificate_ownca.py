@@ -227,100 +227,6 @@ def generate_serial_number():
             return result
 
 
-class OwnCACertificateBackendPyOpenSSL(CertificateBackend):
-    def __init__(self, module):
-        super(OwnCACertificateBackendPyOpenSSL, self).__init__(module, 'pyopenssl')
-
-        self.notBefore = get_relative_time_option(self.module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
-        self.notAfter = get_relative_time_option(self.module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
-        self.digest = self.module.params['ownca_digest']
-        self.version = self.module.params['ownca_version']
-        self.serial_number = generate_serial_number()
-        if self.module.params['ownca_create_subject_key_identifier'] != 'create_if_not_provided':
-            self.module.fail_json(msg='ownca_create_subject_key_identifier cannot be used with the pyOpenSSL backend!')
-        if self.module.params['ownca_create_authority_key_identifier']:
-            self.module.warn('ownca_create_authority_key_identifier is ignored by the pyOpenSSL backend!')
-        self.ca_cert_path = self.module.params['ownca_path']
-        self.ca_cert_content = self.module.params['ownca_content']
-        if self.ca_cert_content is not None:
-            self.ca_cert_content = self.ca_cert_content.encode('utf-8')
-        self.ca_privatekey_path = self.module.params['ownca_privatekey_path']
-        self.ca_privatekey_content = self.module.params['ownca_privatekey_content']
-        if self.ca_privatekey_content is not None:
-            self.ca_privatekey_content = self.ca_privatekey_content.encode('utf-8')
-        self.ca_privatekey_passphrase = self.module.params['ownca_privatekey_passphrase']
-
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                'The certificate signing request file {0} does not exist'.format(self.csr_path)
-            )
-        if self.ca_cert_content is None and not os.path.exists(self.ca_cert_path):
-            raise CertificateError(
-                'The CA certificate file {0} does not exist'.format(self.ca_cert_path)
-            )
-        if self.ca_privatekey_content is None and not os.path.exists(self.ca_privatekey_path):
-            raise CertificateError(
-                'The CA private key file {0} does not exist'.format(self.ca_privatekey_path)
-            )
-
-        self._ensure_csr_loaded()
-        self.ca_cert = load_certificate(
-            path=self.ca_cert_path,
-            content=self.ca_cert_content,
-        )
-        try:
-            self.ca_privatekey = load_privatekey(
-                path=self.ca_privatekey_path,
-                content=self.ca_privatekey_content,
-                passphrase=self.ca_privatekey_passphrase
-            )
-        except OpenSSLBadPassphraseError as exc:
-            self.module.fail_json(msg=str(exc))
-
-    def generate_certificate(self):
-        """(Re-)Generate certificate."""
-        cert = crypto.X509()
-        cert.set_serial_number(self.serial_number)
-        cert.set_notBefore(to_bytes(self.notBefore))
-        cert.set_notAfter(to_bytes(self.notAfter))
-        cert.set_subject(self.csr.get_subject())
-        cert.set_issuer(self.ca_cert.get_subject())
-        cert.set_version(self.version - 1)
-        cert.set_pubkey(self.csr.get_pubkey())
-        cert.add_extensions(self.csr.get_extensions())
-
-        cert.sign(self.ca_privatekey, self.digest)
-        self.cert = cert
-
-    def get_certificate_data(self):
-        """Return bytes for self.cert."""
-        return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert)
-
-    def dump(self, include_certificate):
-        result = super(OwnCACertificateBackendPyOpenSSL, self).dump(include_certificate)
-        result.update({
-            'ca_cert': self.ca_cert_path,
-            'ca_privatekey': self.ca_privatekey_path,
-        })
-
-        if self.module.check_mode:
-            result.update({
-                'notBefore': self.notBefore,
-                'notAfter': self.notAfter,
-                'serial_number': self.serial_number,
-            })
-        else:
-            if self.cert is None:
-                self.cert = self.existing_certificate
-            result.update({
-                'notBefore': self.cert.get_notBefore(),
-                'notAfter': self.cert.get_notAfter(),
-                'serial_number': self.cert.get_serial_number(),
-            })
-
-        return result
-
-
 class OwnCACertificateProvider(CertificateProvider):
     def validate_module_args(self, module):
         if module.params['ownca_path'] is None and module.params['ownca_content'] is None:
@@ -334,8 +240,6 @@ class OwnCACertificateProvider(CertificateProvider):
     def create_backend(self, module, backend):
         if backend == 'cryptography':
             return OwnCACertificateBackendCryptography(module)
-        if backend == 'pyopenssl':
-            return OwnCACertificateBackendPyOpenSSL(module)
 
 
 def add_ownca_provider_to_argument_spec(argument_spec):

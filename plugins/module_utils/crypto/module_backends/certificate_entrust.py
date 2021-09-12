@@ -58,18 +58,7 @@ class EntrustCertificateBackend(CertificateBackend):
         # We want to always force behavior of trying to use the organization provided in the CSR.
         # To that end we need to parse out the organization from the CSR.
         self.csr_org = None
-        if self.backend == 'pyopenssl':
-            csr_subject = self.csr.get_subject()
-            csr_subject_components = csr_subject.get_components()
-            for k, v in csr_subject_components:
-                if k.upper() == 'O':
-                    # Entrust does not support multiple validated organizations in a single certificate
-                    if self.csr_org is not None:
-                        self.module.fail_json(msg=("Entrust provider does not currently support multiple validated organizations. Multiple organizations "
-                                                   "found in Subject DN: '{0}'. ".format(csr_subject)))
-                    else:
-                        self.csr_org = v
-        elif self.backend == 'cryptography':
+        if self.backend == 'cryptography':
             csr_subject_orgs = self.csr.subject.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)
             if len(csr_subject_orgs) == 1:
                 self.csr_org = csr_subject_orgs[0].value
@@ -162,11 +151,7 @@ class EntrustCertificateBackend(CertificateBackend):
         if self.existing_certificate:
             serial_number = None
             expiry = None
-            if self.backend == 'pyopenssl':
-                serial_number = "{0:X}".format(self.existing_certificate.get_serial_number())
-                time_string = to_native(self.existing_certificate.get_notAfter())
-                expiry = datetime.datetime.strptime(time_string, "%Y%m%d%H%M%SZ")
-            elif self.backend == 'cryptography':
+            if self.backend == 'cryptography':
                 serial_number = "{0:X}".format(cryptography_serial_number_of_cert(self.existing_certificate))
                 expiry = self.existing_certificate.not_valid_after
 

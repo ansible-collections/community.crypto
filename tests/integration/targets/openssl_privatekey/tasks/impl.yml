@@ -67,7 +67,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey5.pem'
     passphrase: ansible
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
@@ -75,7 +75,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey5.pem'
     passphrase: ansible
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_idempotence
@@ -84,13 +84,10 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey6.pem'
     passphrase: ànsïblé
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- set_fact:
-    ecc_types: []
-  when: select_crypto_backend == 'pyopenssl'
 - set_fact:
     ecc_types:
     - curve: secp384r1
@@ -150,7 +147,6 @@
     - curve: sect163r2
       openssl_name: sect163r2
       min_cryptography_version: "0.5"
-  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Test ECC key generation"
   openssl_privatekey:
@@ -221,7 +217,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
@@ -231,7 +227,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
@@ -257,7 +253,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
@@ -278,7 +274,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
@@ -289,7 +285,7 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: yes
@@ -551,7 +547,7 @@
     type: RSA
     size: '{{ default_rsa_key_size }}'
     passphrase: hunter2
-    cipher: "{{ 'aes256' if select_crypto_backend == 'pyopenssl' else 'auto' }}"
+    cipher: auto
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
 - name: "({{ select_crypto_backend }}) Regenerate - setup broken keys"

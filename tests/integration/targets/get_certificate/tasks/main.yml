@@ -30,17 +30,7 @@
       that:
         - result is success or skip_tests
 
-  when: |
-    pyopenssl_version.stdout is version('0.15', '>=') or
-    cryptography_version.stdout is version('1.6', '>=')
-
-- block:
-
-  - include_tasks: ../tests/validate.yml
-    vars:
-      select_crypto_backend: pyopenssl
-
-  when: pyopenssl_version.stdout is version('0.15', '>=') and not skip_tests
+  when: cryptography_version.stdout is version('1.6', '>=')
 
 - block:
 

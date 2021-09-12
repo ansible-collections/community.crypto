@@ -17,13 +17,9 @@ description:
     - This module allows one to query information on OpenSSL Certificate Signing Requests (CSR).
     - In case the CSR signature cannot be validated, the module will fail. In this case, all return
       variables are still returned.
-    - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL. If both the
-      cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
-      cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
-      C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
-      and will be removed in community.crypto 2.0.0.
+    - It uses the cryptography python library to interact with OpenSSL.
 requirements:
-    - PyOpenSSL >= 0.15 or cryptography >= 1.3
+    - cryptography >= 1.3
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
@@ -42,14 +38,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
 
 seealso:
 - module: community.crypto.openssl_csr
@@ -267,7 +260,7 @@ subject_key_identifier:
         - The CSR's subject key identifier.
         - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
         - Is C(none) if the C(SubjectKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_key_identifier:
@@ -275,14 +268,14 @@ authority_key_identifier:
         - The CSR's authority key identifier.
         - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_cert_issuer:
     description:
         - The CSR's authority cert issuer as a list of general names.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: list
     elements: str
     sample: "[DNS:www.ansible.com, IP:1.2.3.4]"
@@ -290,7 +283,7 @@ authority_cert_serial_number:
     description:
         - The CSR's authority cert serial number.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: int
     sample: '12345'
 '''
@@ -313,7 +306,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path'),
             content=dict(type='str'),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_one_of=(
             ['path', 'content'],

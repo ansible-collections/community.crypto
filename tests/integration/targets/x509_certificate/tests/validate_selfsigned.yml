@@ -185,7 +185,6 @@
       - selfsigned_subject_key_identifier_3 is changed
       - selfsigned_subject_key_identifier_4 is not changed
       - selfsigned_subject_key_identifier_5 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)
   assert:

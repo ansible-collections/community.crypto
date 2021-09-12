@@ -4,40 +4,18 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Prepare private key for backend autodetection test
-  openssl_privatekey:
-    path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
-    size: '{{ default_rsa_key_size }}'
-- name: Run module with backend autodetection
-  openssl_csr:
-    path: '{{ remote_tmp_dir }}/csr_backend_selection.csr'
-    privatekey_path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
-    subject:
-      commonName: www.ansible.com
-
 - block:
-  - name: Running tests with pyOpenSSL backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: pyopenssl
+  - name: Prepare private key for backend autodetection test
+    openssl_privatekey:
+      path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
+      size: '{{ default_rsa_key_size }}'
+  - name: Run module with backend autodetection
+    openssl_csr:
+      path: '{{ remote_tmp_dir }}/csr_backend_selection.csr'
+      privatekey_path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
+      subject:
+        commonName: www.ansible.com
 
-  - import_tasks: ../tests/validate.yml
-    vars:
-      select_crypto_backend: pyopenssl
-
-  when: pyopenssl_version.stdout is version('0.15', '>=')
-
-- name: Remove output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: absent
-
-- name: Re-create output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: directory
-
-- block:
   - name: Running tests with cryptography backend
     include_tasks: impl.yml
     vars:

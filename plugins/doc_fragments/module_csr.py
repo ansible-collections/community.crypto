@@ -15,13 +15,8 @@ description:
     - This module allows one to (re)generate OpenSSL certificate signing requests.
     - This module supports the subjectAltName, keyUsage, extendedKeyUsage, basicConstraints and OCSP Must Staple
       extensions.
-    - "The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available. This can be
-      overridden with the I(select_crypto_backend) option. Please note that the
-      PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
 requirements:
-    - Either cryptography >= 1.3
-    - Or pyOpenSSL >= 0.15
+    - cryptography >= 1.3
 options:
     digest:
         description:
@@ -196,14 +191,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
     create_subject_key_identifier:
         description:
             - Create the Subject Key Identifier from the public key.

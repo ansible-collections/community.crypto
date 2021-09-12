@@ -46,19 +46,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
 
-MINIMAL_PYOPENSSL_VERSION = '0.6'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -261,61 +249,6 @@ class PrivateKeyBackend:
             after=self.diff_after,
         )
         return result
-
-
-# Implementation with using pyOpenSSL
-class PrivateKeyPyOpenSSLBackend(PrivateKeyBackend):
-
-    def __init__(self, module):
-        super(PrivateKeyPyOpenSSLBackend, self).__init__(module=module, backend='pyopenssl')
-
-        if self.type == 'RSA':
-            self.openssl_type = crypto.TYPE_RSA
-        elif self.type == 'DSA':
-            self.openssl_type = crypto.TYPE_DSA
-        else:
-            self.module.fail_json(msg="PyOpenSSL backend only supports RSA and DSA keys.")
-
-        if self.format != 'auto_ignore':
-            self.module.fail_json(msg="PyOpenSSL backend only supports auto_ignore format.")
-
-    def generate_private_key(self):
-        """(Re-)Generate private key."""
-        self.private_key = crypto.PKey()
-        try:
-            self.private_key.generate_key(self.openssl_type, self.size)
-        except (TypeError, ValueError) as exc:
-            raise PrivateKeyError(exc)
-
-    def _ensure_existing_private_key_loaded(self):
-        if self.existing_private_key is None and self.has_existing():
-            try:
-                self.existing_private_key = load_privatekey(
-                    None, self.passphrase, content=self.existing_private_key_bytes, backend=self.backend)
-            except OpenSSLBadPassphraseError as exc:
-                raise PrivateKeyError(exc)
-
-    def get_private_key_data(self):
-        """Return bytes for self.private_key"""
-        if self.cipher and self.passphrase:
-            return crypto.dump_privatekey(crypto.FILETYPE_PEM, self.private_key,
-                                          self.cipher, to_bytes(self.passphrase))
-        else:
-            return crypto.dump_privatekey(crypto.FILETYPE_PEM, self.private_key)
-
-    def _check_passphrase(self):
-        try:
-            load_privatekey(None, self.passphrase, content=self.existing_private_key_bytes, backend=self.backend)
-            return True
-        except Exception as dummy:
-            return False
-
-    def _check_size_and_type(self):
-        return self.size == self.existing_private_key.bits() and self.openssl_type == self.existing_private_key.type()
-
-    def _check_format(self):
-        # Not supported by this backend
-        return True
 
 
 # Implementation with using cryptography
@@ -550,36 +483,16 @@ def select_backend(module, backend):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
         # Decision
-        if module.params['cipher'] and module.params['passphrase'] and module.params['cipher'] != 'auto':
-            # First try pyOpenSSL, then cryptography
-            if can_use_pyopenssl:
-                backend = 'pyopenssl'
-            elif can_use_cryptography:
-                backend = 'cryptography'
-        else:
-            # First try cryptography, then pyOpenSSL
-            if can_use_cryptography:
-                backend = 'cryptography'
-            elif can_use_pyopenssl:
-                backend = 'pyopenssl'
+        if can_use_cryptography:
+            backend = 'cryptography'
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
-    if backend == 'pyopenssl':
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-        return backend, PrivateKeyPyOpenSSLBackend(module)
-    elif backend == 'cryptography':
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
@@ -605,7 +518,7 @@ def get_privatekey_argument_spec():
             cipher=dict(type='str'),
             format=dict(type='str', default='auto_ignore', choices=['pkcs1', 'pkcs8', 'raw', 'auto', 'auto_ignore']),
             format_mismatch=dict(type='str', default='regenerate', choices=['regenerate', 'convert']),
-            select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
+            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
             regenerate=dict(
                 type='str',
                 default='full_idempotence',

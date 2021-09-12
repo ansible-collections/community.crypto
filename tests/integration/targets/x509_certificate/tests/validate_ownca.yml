@@ -140,7 +140,6 @@
       - ownca_subject_key_identifier_3 is changed
       - ownca_subject_key_identifier_4 is not changed
       - ownca_subject_key_identifier_5 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Check create authority key identifier
   assert:
@@ -150,7 +149,6 @@
       - ownca_authority_key_identifier_3 is changed
       - ownca_authority_key_identifier_4 is not changed
       - ownca_authority_key_identifier_5 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)
   assert:

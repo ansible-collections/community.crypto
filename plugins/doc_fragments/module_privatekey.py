@@ -22,13 +22,8 @@ description:
       (or specify none), change the keysize, etc., the private key will be
       regenerated. If you are concerned that this could B(overwrite your private key),
       consider using the I(backup) option."
-    - "The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available. This can be
-      overridden with the I(select_crypto_backend) option. Please note that the
-      PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
 requirements:
-    - Either cryptography >= 1.2.3 (older versions might work as well)
-    - Or pyOpenSSL
+    - cryptography >= 1.2.3 (older versions might work as well)
 options:
     size:
         description:
@@ -80,22 +75,16 @@ options:
         type: str
     cipher:
         description:
-            - The cipher to encrypt the private key. (Valid values can be found by
-              running `openssl list -cipher-algorithms` or `openssl list-cipher-algorithms`,
-              depending on your OpenSSL version.)
-            - When using the C(cryptography) backend, use C(auto).
+            - The cipher to encrypt the private key. Must be C(auto).
         type: str
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
     format:
         description:
             - Determines which format the private key is written in. By default, PKCS1 (traditional OpenSSL format)
@@ -105,8 +94,6 @@ options:
               selected one for generation.
             - Note that if the format for an existing private key mismatches, the key is B(regenerated) by default.
               To change this behavior, use the I(format_mismatch) option.
-            - The I(format) option is only supported by the C(cryptography) backend. The C(pyopenssl) backend will
-              fail if a value different from C(auto_ignore) is used.
         type: str
         default: auto_ignore
         choices: [ pkcs1, pkcs8, raw, auto, auto_ignore ]
