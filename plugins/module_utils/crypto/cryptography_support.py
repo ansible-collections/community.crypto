@@ -162,29 +162,56 @@ def _parse_hex(bytesstr):
 
 
 DN_COMPONENT_START_RE = re.compile(r'^ *([a-zA-z0-9]+) *= *')
+DN_HEX_LETTER = '0123456789abcdef'
 
 
-def _parse_dn_component(name, sep=',', sep_str='\\', decode_remainder=True):
+def _parse_dn_component(name, sep=',', decode_remainder=True):
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
         raise OpenSSLObjectError('cannot start part in "{0}"'.format(name))
     oid = cryptography_name_to_oid(m.group(1))
     idx = len(m.group(0))
     decoded_name = []
+    sep_str = sep + '\\'
     if decode_remainder:
         length = len(name)
-        while idx < length:
-            i = idx
-            while i < length and name[i] not in sep_str:
-                i += 1
-            if i > idx:
-                decoded_name.append(name[idx:i])
-                idx = i
-            while idx + 1 < length and name[idx] == '\\':
-                decoded_name.append(name[idx + 1])
+        if length > idx and name[idx] == '#':
+            # Decoding a hex string
+            idx += 1
+            while idx + 1 < length:
+                ch1 = name[idx]
+                ch2 = name[idx + 1]
+                idx1 = DN_HEX_LETTER.find(ch1.lower())
+                idx2 = DN_HEX_LETTER.find(ch2.lower())
+                if idx1 < 0 or idx2 < 0:
+                    raise OpenSSLObjectError('Invalid hex sequence entry "{0}{1}"'.format(ch1, ch2))
                 idx += 2
-            if idx < length and name[idx] == sep:
-                break
+                decoded_name.append(chr(idx1 * 16 + idx2))
+        else:
+            # Decoding a regular string
+            while idx < length:
+                i = idx
+                while i < length and name[i] not in sep_str:
+                    i += 1
+                if i > idx:
+                    decoded_name.append(name[idx:i])
+                    idx = i
+                while idx + 1 < length and name[idx] == '\\':
+                    ch = name[idx + 1]
+                    idx1 = DN_HEX_LETTER.find(ch.lower())
+                    if idx1 >= 0:
+                        if idx + 2 >= length:
+                            raise OpenSSLObjectError(r'Hex escape sequence "\{0}" incomplete at end of string'.format(ch))
+                        ch2 = name[idx + 2]
+                        idx2 = DN_HEX_LETTER.find(ch2.lower())
+                        if idx2 < 0:
+                            raise OpenSSLObjectError(r'Hex escape sequence "\{0}{1}" has invalid second letter'.format(ch, ch2))
+                        ch = chr(idx1 * 16 + idx2)
+                        idx += 1
+                    idx += 2
+                    decoded_name.append(ch)
+                if idx < length and name[idx] == sep:
+                    break
     else:
         decoded_name.append(name[idx:])
         idx = len(name)
@@ -203,11 +230,10 @@ def _parse_dn(name):
     if name.startswith('/'):
         sep = '/'
         name = name[1:]
-    sep_str = sep + '\\'
     result = []
     while name:
         try:
-            attribute, name = _parse_dn_component(name, sep=sep, sep_str=sep_str)
+            attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError('Error while parsing distinguished name "{0}": {1}'.format(original_name, e))
         result.append(attribute)
@@ -268,7 +294,7 @@ def cryptography_get_name(name, what='Subject Alternative Name'):
             b_value = serialize_asn1_string_as_der(value)
             return x509.OtherName(x509.ObjectIdentifier(oid), b_value)
         if name.startswith('dirName:'):
-            return x509.DirectoryName(x509.Name(_parse_dn(to_text(name[8:]))))
+            return x509.DirectoryName(x509.Name(reversed(_parse_dn(to_text(name[8:])))))
     except Exception as e:
         raise OpenSSLObjectError('Cannot parse {what} "{name}": {error}'.format(name=name, what=what, error=e))
     if ':' not in name:
@@ -283,6 +309,7 @@ def _dn_escape_value(value):
     value = value.replace('\\', r'\\')
     for ch in [',', '+', '<', '>', ';', '"']:
         value = value.replace(ch, r'\%s' % ch)
+    value = value.replace('\0', r'\00')
     if value.startswith((' ', '#')):
         value = r'\%s' % value[0] + value[1:]
     if value.endswith(' '):
