@@ -4,28 +4,34 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Include OS-specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
-  when: not ansible_os_family == "Darwin"
+- name: Install from system packages
+  when: ansible_os_family != "Darwin" and target_system_python
+  block:
 
-- name: Install pyOpenSSL (Python 3)
-  become: true
-  package:
-    name: '{{ pyopenssl_package_name_python3 }}'
-  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
+  - name: Include OS-specific variables
+    include_vars: '{{ ansible_os_family }}.yml'
 
-- name: Install pyOpenSSL (Python 2)
-  become: true
-  package:
-    name: '{{ pyopenssl_package_name }}'
-  when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
+  - name: Install pyOpenSSL (Python 3 from system packages)
+    become: true
+    package:
+      name: '{{ pyopenssl_package_name_python3 }}'
+    when: ansible_python_version is version('3.0', '>=')
 
-- name: Install pyOpenSSL (Darwin)
-  become: true
-  pip:
-    name: pyOpenSSL
-    extra_args: "-c {{ remote_constraints }}"
-  when: ansible_os_family == 'Darwin'
+  - name: Install pyOpenSSL (Python 2 from system packages)
+    become: true
+    package:
+      name: '{{ pyopenssl_package_name }}'
+    when: ansible_python_version is version('3.0', '<')
+
+- name: Install from PyPi
+  when: ansible_os_family == "Darwin" or not target_system_python
+  block:
+
+  - name: Install pyOpenSSL (PyPi)
+    become: true
+    pip:
+      name: pyOpenSSL
+      extra_args: "-c {{ remote_constraints }}"
 
 - name: Register pyOpenSSL version
   command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
