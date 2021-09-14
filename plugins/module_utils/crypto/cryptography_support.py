@@ -22,6 +22,7 @@ __metaclass__ = type
 import base64
 import binascii
 import re
+import sys
 
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 from ._asn1 import serialize_asn1_string_as_der
@@ -161,61 +162,68 @@ def _parse_hex(bytesstr):
     return data
 
 
-DN_COMPONENT_START_RE = re.compile(u'^ *([a-zA-z0-9]+) *= *')
-DN_HEX_LETTER = u'0123456789abcdef'
+DN_COMPONENT_START_RE = re.compile(b'^ *([a-zA-z0-9.]+) *= *')
+DN_HEX_LETTER = b'0123456789abcdef'
 
 
-def _parse_dn_component(name, sep=u',', decode_remainder=True):
+if sys.version_info[0] < 3:
+    _int_to_byte = chr
+else:
+    def _int_to_byte(value):
+        return bytes((value, ))
+
+
+def _parse_dn_component(name, sep=b',', decode_remainder=True):
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
-        raise OpenSSLObjectError(u'cannot start part in "{0}"'.format(name))
-    oid = cryptography_name_to_oid(m.group(1))
+        raise OpenSSLObjectError(u'cannot start part in "{0}"'.format(to_text(name)))
+    oid = cryptography_name_to_oid(to_text(m.group(1)))
     idx = len(m.group(0))
     decoded_name = []
-    sep_str = sep + u'\\'
+    sep_str = sep + b'\\'
     if decode_remainder:
         length = len(name)
-        if length > idx and name[idx] == u'#':
+        if length > idx and name[idx:idx + 1] == b'#':
             # Decoding a hex string
             idx += 1
             while idx + 1 < length:
-                ch1 = name[idx]
-                ch2 = name[idx + 1]
+                ch1 = name[idx:idx + 1]
+                ch2 = name[idx + 1:idx + 2]
                 idx1 = DN_HEX_LETTER.find(ch1.lower())
                 idx2 = DN_HEX_LETTER.find(ch2.lower())
                 if idx1 < 0 or idx2 < 0:
-                    raise OpenSSLObjectError(u'Invalid hex sequence entry "{0}{1}"'.format(ch1, ch2))
+                    raise OpenSSLObjectError(u'Invalid hex sequence entry "{0}"'.format(to_text(ch1 + ch2)))
                 idx += 2
-                decoded_name.append(chr(idx1 * 16 + idx2))
+                decoded_name.append(_int_to_byte(idx1 * 16 + idx2))
         else:
             # Decoding a regular string
             while idx < length:
                 i = idx
-                while i < length and name[i] not in sep_str:
+                while i < length and name[i:i + 1] not in sep_str:
                     i += 1
                 if i > idx:
                     decoded_name.append(name[idx:i])
                     idx = i
-                while idx + 1 < length and name[idx] == u'\\':
-                    ch = name[idx + 1]
+                while idx + 1 < length and name[idx:idx + 1] == b'\\':
+                    ch = name[idx + 1:idx + 2]
                     idx1 = DN_HEX_LETTER.find(ch.lower())
                     if idx1 >= 0:
                         if idx + 2 >= length:
-                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}" incomplete at end of string'.format(ch))
-                        ch2 = name[idx + 2]
+                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}" incomplete at end of string'.format(to_text(ch)))
+                        ch2 = name[idx + 2:idx + 3]
                         idx2 = DN_HEX_LETTER.find(ch2.lower())
                         if idx2 < 0:
-                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}{1}" has invalid second letter'.format(ch, ch2))
-                        ch = chr(idx1 * 16 + idx2)
+                            raise OpenSSLObjectError(u'Hex escape sequence "\\{0}" has invalid second letter'.format(to_text(ch + ch2)))
+                        ch = _int_to_byte(idx1 * 16 + idx2)
                         idx += 1
                     idx += 2
                     decoded_name.append(ch)
-                if idx < length and name[idx] == sep:
+                if idx < length and name[idx:idx + 1] == sep:
                     break
     else:
         decoded_name.append(name[idx:])
         idx = len(name)
-    return x509.NameAttribute(oid, u''.join(decoded_name)), name[idx:]
+    return x509.NameAttribute(oid, to_text(b''.join(decoded_name))), name[idx:]
 
 
 def _parse_dn(name):
@@ -226,20 +234,20 @@ def _parse_dn(name):
     '''
     original_name = name
     name = name.lstrip()
-    sep = u','
-    if name.startswith(u'/'):
-        sep = u'/'
+    sep = b','
+    if name.startswith(b'/'):
+        sep = b'/'
         name = name[1:]
     result = []
     while name:
         try:
             attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
-            raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": {1}'.format(original_name, e))
+            raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": {1}'.format(to_text(original_name), e))
         result.append(attribute)
         if name:
-            if name[0] != sep or len(name) < 2:
-                raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": unexpected end of string'.format(original_name))
+            if name[0:1] != sep or len(name) < 2:
+                raise OpenSSLObjectError(u'Error while parsing distinguished name "{0}": unexpected end of string'.format(to_text(original_name)))
             name = name[1:]
     return result
 
@@ -248,7 +256,7 @@ def cryptography_parse_relative_distinguished_name(rdn):
     names = []
     for part in rdn:
         try:
-            names.append(_parse_dn_component(to_text(part), decode_remainder=False)[0])
+            names.append(_parse_dn_component(to_bytes(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(u'Error while parsing relative distinguished name "{0}": {1}'.format(part, e))
     return cryptography.x509.RelativeDistinguishedName(names)
@@ -294,7 +302,7 @@ def cryptography_get_name(name, what='Subject Alternative Name'):
             b_value = serialize_asn1_string_as_der(value)
             return x509.OtherName(x509.ObjectIdentifier(oid), b_value)
         if name.startswith('dirName:'):
-            return x509.DirectoryName(x509.Name(reversed(_parse_dn(to_text(name[8:])))))
+            return x509.DirectoryName(x509.Name(reversed(_parse_dn(to_bytes(name[8:])))))
     except Exception as e:
         raise OpenSSLObjectError('Cannot parse {what} "{name}": {error}'.format(name=name, what=what, error=e))
     if ':' not in name:
