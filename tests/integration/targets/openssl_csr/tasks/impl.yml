@@ -536,14 +536,14 @@
       commonName: www.example.com
       C: de
       L: Somewhere
-      ST: Zurich
-      streetAddress: Welcome Street
-      O: Ansible
-      organizationalUnitName: Crypto Department
+      ST: Zürich
+      streetAddress: Welcome Street N° 5
+      O: Ansiblé
+      organizationalUnitName: Crÿpto Depârtment ☺
       serialNumber: "1234"
-      SN: Last Name
+      SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
       GN: First Name
-      title: Chief
+      title: Chïeﬀ
       pseudonym: test
       UID: asdf
       emailAddress: test@example.com
@@ -641,17 +641,17 @@
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
-      commonName: www.example.com
-      C: de
+      CN: www.example.com
+      countryName: de
       L: Somewhere
-      ST: Zurich
-      streetAddress: Welcome Street
-      O: Ansible
-      organizationalUnitName: Crypto Department
+      ST: Zürich
+      streetAddress: Welcome Street N° 5
+      organizationName: Ansiblé
+      organizationalUnitName: Crÿpto Depârtment ☺
       serialNumber: "1234"
-      SN: Last Name
+      SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
       GN: First Name
-      title: Chief
+      title: Chïeﬀ
       pseudonym: test
       UID: asdf
       emailAddress: test@example.com
@@ -750,17 +750,17 @@
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
-      commonName: www.example.com
-      C: de
+      CN: www.example.com
+      countryName: de
       L: Somewhere
-      ST: Zurich
-      streetAddress: Welcome Street
-      O: Ansible
-      organizationalUnitName: Crypto Department
+      ST: Zürich
+      streetAddress: Welcome Street N° 5
+      organizationName: Ansiblé
+      organizationalUnitName: Crÿpto Depârtment ☺
       serialNumber: "1234"
-      SN: Last Name
+      SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
       GN: First Name
-      title: Chief
+      title: Chïeﬀ
       pseudonym: test
       UID: asdf
       emailAddress: test@example.com

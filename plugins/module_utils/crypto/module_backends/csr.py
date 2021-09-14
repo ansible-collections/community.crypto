@@ -592,7 +592,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
     def _check_csr(self):
         """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
         def _check_subject(csr):
-            subject = [(cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.subject]
+            subject = [(cryptography_name_to_oid(entry[0]), to_text(entry[1])) for entry in self.subject]
             current_subject = [(sub.oid, sub.value) for sub in csr.subject]
             return set(subject) == set(current_subject)
 
@@ -604,8 +604,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
         def _check_subjectAltName(extensions):
             current_altnames_ext = _find_extension(extensions, cryptography.x509.SubjectAlternativeName)
-            current_altnames = [str(altname) for altname in current_altnames_ext.value] if current_altnames_ext else []
-            altnames = [str(cryptography_get_name(altname)) for altname in self.subjectAltName] if self.subjectAltName else []
+            current_altnames = [to_text(altname) for altname in current_altnames_ext.value] if current_altnames_ext else []
+            altnames = [to_text(cryptography_get_name(altname)) for altname in self.subjectAltName] if self.subjectAltName else []
             if set(altnames) != set(current_altnames):
                 return False
             if altnames:
@@ -678,10 +678,10 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
         def _check_nameConstraints(extensions):
             current_nc_ext = _find_extension(extensions, cryptography.x509.NameConstraints)
-            current_nc_perm = [str(altname) for altname in current_nc_ext.value.permitted_subtrees] if current_nc_ext else []
-            current_nc_excl = [str(altname) for altname in current_nc_ext.value.excluded_subtrees] if current_nc_ext else []
-            nc_perm = [str(cryptography_get_name(altname, 'name constraints permitted')) for altname in self.name_constraints_permitted]
-            nc_excl = [str(cryptography_get_name(altname, 'name constraints excluded')) for altname in self.name_constraints_excluded]
+            current_nc_perm = [to_text(altname) for altname in current_nc_ext.value.permitted_subtrees] if current_nc_ext else []
+            current_nc_excl = [to_text(altname) for altname in current_nc_ext.value.excluded_subtrees] if current_nc_ext else []
+            nc_perm = [to_text(cryptography_get_name(altname, 'name constraints permitted')) for altname in self.name_constraints_permitted]
+            nc_excl = [to_text(cryptography_get_name(altname, 'name constraints excluded')) for altname in self.name_constraints_excluded]
             if set(nc_perm) != set(current_nc_perm) or set(nc_excl) != set(current_nc_excl):
                 return False
             if nc_perm or nc_excl:
@@ -710,9 +710,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 aci = None
                 csr_aci = None
                 if self.authority_cert_issuer is not None:
-                    aci = [str(cryptography_get_name(n, 'authority cert issuer')) for n in self.authority_cert_issuer]
+                    aci = [to_text(cryptography_get_name(n, 'authority cert issuer')) for n in self.authority_cert_issuer]
                 if ext.value.authority_cert_issuer is not None:
-                    csr_aci = [str(n) for n in ext.value.authority_cert_issuer]
+                    csr_aci = [to_text(n) for n in ext.value.authority_cert_issuer]
                 return (ext.value.key_identifier == self.authority_key_identifier
                         and csr_aci == aci
                         and ext.value.authority_cert_serial_number == self.authority_cert_serial_number)
