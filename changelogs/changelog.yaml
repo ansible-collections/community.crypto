@@ -535,3 +535,15 @@ releases:
     fragments:
     - 1.9.2.yml
     release_date: '2021-08-30'
+  1.9.3:
+    changes:
+      bugfixes:
+      - openssl_csr and openssl_csr_pipe - make sure that Unicode strings are used
+        to compare strings with the cryptography backend. This fixes idempotency problems
+        with non-ASCII letters on Python 2 (https://github.com/ansible-collections/community.crypto/issues/270,
+        https://github.com/ansible-collections/community.crypto/pull/271).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 1.9.3.yml
+    - 271-openssl_csr-utf8.yml
+    release_date: '2021-09-14'
