@@ -93,7 +93,7 @@
         valid_from: always
         valid_to: forever
         regenerate: always
-  when: openssh_version is version("7.2", ">=")
+  when: openssh_version is version("7.3", ">=")
 
 - name: Generate cert with new signing key
   openssh_cert:

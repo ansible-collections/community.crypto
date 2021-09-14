@@ -73,7 +73,8 @@ options:
               can be used when generating host certificates (a corresponding change to the sshd_config to add C(ssh-rsa)
               to the C(CASignatureAlgorithms) keyword is also required).
             - Using any value for this option with a non-RSA I(signing_key) will cause this module to fail.
-            - "Note: OpenSSH versions prior to 7.2 do not support SHA-2 signature algorithms for RSA keys."
+            - "Note: OpenSSH versions prior to 7.2 do not support SHA-2 signature algorithms for RSA keys and OpenSSH
+               versions prior to 7.3 do not support SHA-2 signature algorithms for certificates."
             - See U(https://www.openssh.com/txt/release-8.2) for more information.
         type: str
         choices:
