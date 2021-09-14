@@ -5,6 +5,22 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.2
+======
+
+Release Summary
+---------------
+
+Bugfix release to fix the changelog. No other change compared to 1.9.0.
+
+v1.9.1
+======
+
+Release Summary
+---------------
+
+Accidental 1.9.1 release. Identical to 1.9.0.
+
 v1.9.0
 ======
 
