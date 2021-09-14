@@ -49,7 +49,7 @@ options:
             - When C(fail) the task will fail if a certificate already exists at I(path) and does not
               match the module's options.
             - When C(partial_idempotence) an existing certificate will be regenerated based on
-              I(serial), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
+              I(serial), I(signature_algorithm), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
             - When C(full_idempotence) I(identifier), I(options), I(public_key), and I(signing_key)
               are also considered when compared against an existing certificate.
             - C(always) is equivalent to I(force=true).
