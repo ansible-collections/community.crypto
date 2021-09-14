@@ -11,7 +11,7 @@
          'secp384r1' if key_type == 'ec384' else
          'secp521r1' if key_type == 'ec521' else
          'invalid value for key_type!' }}
-    passphrase: "{{ certificate_passphrase | default(omit, true) }}"
+    passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
     cipher: "{{ 'auto' if certificate_passphrase | default() else omit }}"
     force: true
 ## CSR ########################################################################################
@@ -19,7 +19,7 @@
   openssl_csr:
     path: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
     privatekey_path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
-    privatekey_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
+    privatekey_passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
     subject_alt_name: "{{ subject_alt_name }}"
     subject_alt_name_critical: "{{ subject_alt_name_critical }}"
     return_content: true
@@ -33,7 +33,7 @@
     validate_certs: no
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
-    account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
+    account_key_passphrase: "{{ account_key_passphrase | default(omit) | default(omit, true) }}"
     modify_account: "{{ modify_account }}"
     csr: "{{ omit if use_csr_content | default(false) else remote_tmp_dir ~ '/' ~ certificate_name ~ '.csr' }}"
     csr_content: "{{ csr_result.csr if use_csr_content | default(false) else omit }}"
@@ -73,7 +73,7 @@
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
-    private_key_passphrase: "{{ certificate_passphrase | default(omit, true) }}"
+    private_key_passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
   with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else {} }}"
   register: tls_alpn_challenges
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
@@ -111,7 +111,7 @@
     validate_certs: no
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
-    account_key_passphrase: "{{ account_key_passphrase | default(omit, true) }}"
+    account_key_passphrase: "{{ account_key_passphrase | default(omit) | default(omit, true) }}"
     account_uri: "{{ challenge_data.account_uri }}"
     modify_account: "{{ modify_account }}"
     csr: "{{ omit if use_csr_content | default(false) else remote_tmp_dir ~ '/' ~ certificate_name ~ '.csr' }}"

@@ -2,8 +2,8 @@
   - name: Generate account keys
     openssl_privatekey:
       path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      passphrase: "{{ item.pass | default(omit, true) }}"
-      cipher: "{{ 'auto' if item.pass | default() else omit }}"
+      passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
+      cipher: "{{ 'auto' if (item.pass | default(false)) else omit }}"
       type: ECC
       curve: secp256r1
       force: true
@@ -12,7 +12,7 @@
   - name: Parse account keys (to ease debugging some test failures)
     openssl_privatekey_info:
       path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      passphrase: "{{ item.pass | default(omit, true) }}"
+      passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
       return_private_key_data: true
     loop: "{{ account_keys }}"
 

@@ -109,6 +109,13 @@
     regexp: 'os\.remove\(wellknown_path\)'
     replace: 'pass'
 
+- name: "Monkey-patch acme-tiny: Allow to run with Python 2"
+  replace:
+    path: "{{ remote_tmp_dir }}/acme-tiny"
+    regexp: '#!/usr/bin/env python3'
+    replace: '#!/usr/bin/env python'
+  when: ansible_facts.python.version.major == 2
+
 - name: Create challenges directory
   file:
     path: '{{ remote_tmp_dir }}/challenges'

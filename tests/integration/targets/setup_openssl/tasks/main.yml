@@ -98,7 +98,7 @@
     - name: Install cryptography (PyPi)
       become: true
       pip:
-        name: cryptography>=3.3
+        name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
         extra_args: "-c {{ remote_constraints }}"
 
 - name: Register cryptography version
