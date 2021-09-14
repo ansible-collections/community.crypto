@@ -1,3 +1,11 @@
 shippable/cloud/group1
 shippable/posix/group1
 cloud/acme
+
+# Skip all VMs, since we cannot talk to the ACME simulator from these:
+# (TODO: remove when ansible-core 2.12 is the earliest version we support)
+skip/aix
+skip/freebsd
+skip/macos
+skip/osx
+skip/rhel
