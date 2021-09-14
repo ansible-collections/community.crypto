@@ -201,8 +201,9 @@ class OpensshParser(object):
         signature_blob = parser.string()
 
         blob_parser = cls(signature_blob)
-        if signature_type == b'ssh-rsa':
+        if signature_type in (b'ssh-rsa', b'rsa-sha2-256', b'rsa-sha2-512'):
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
+            # https://datatracker.ietf.org/doc/html/rfc8332#section-3
             signature_data['s'] = cls._big_int(signature_blob, "big")
         elif signature_type == b'ssh-dss':
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6

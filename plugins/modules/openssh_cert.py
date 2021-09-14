@@ -62,6 +62,25 @@ options:
             - always
         default: partial_idempotence
         version_added: 1.8.0
+    signature_algorithm:
+        description:
+            - As of OpenSSH 8.2 the SHA-1 signature algorithm for RSA keys has been disabled and C(ssh) will refuse
+              host certificates signed with the SHA-1 algorithm. OpenSSH 8.1 made C(rsa-sha2-512) the default algorithm
+              when acting as a CA and signing certificates with a RSA key. However, for OpenSSH versions less than 8.1
+              the SHA-2 signature algorithms, C(rsa-sha2-256) or C(rsa-sha2-512), must be specified using this option
+              if compatibility with newer C(ssh) clients is required. Conversely if hosts using OpenSSH version 8.2
+              or greater must remain compatible with C(ssh) clients using OpenSSH less than 7.2, then C(ssh-rsa)
+              can be used when generating host certificates (a corresponding change to the sshd_config to add C(ssh-rsa)
+              to the C(CASignatureAlgorithms) keyword is also required).
+            - Using any value for this option with a non-RSA I(signing_key) will cause this module to fail.
+            - "Note: OpenSSH versions prior to 7.2 do not support SHA-2 signature algorithms for RSA keys."
+            - See U(https://www.openssh.com/txt/release-8.2) for more information.
+        type: str
+        choices:
+            - ssh-rsa
+            - rsa-sha2-256
+            - rsa-sha2-512
+        version_added: 1.10.0
     signing_key:
         description:
             - The path to the private openssh key that is used for signing the public key in order to generate the certificate.
@@ -269,6 +288,7 @@ class Certificate(OpensshModule):
         self.public_key = self.module.params['public_key']
         self.regenerate = self.module.params['regenerate'] if not self.module.params['force'] else 'always'
         self.serial_number = self.module.params['serial_number']
+        self.signature_algorithm = self.module.params['signature_algorithm']
         self.signing_key = self.module.params['signing_key']
         self.state = self.module.params['state']
         self.type = self.module.params['type']
@@ -366,6 +386,7 @@ class Certificate(OpensshModule):
     def _is_partially_valid(self):
         return all([
             set(self.original_data.principals) == set(self.principals),
+            self.original_data.signature_type == self.signature_algorithm if self.signature_algorithm else True,
             self.original_data.serial == self.serial_number if self.serial_number is not None else True,
             self.original_data.type == self.type,
             self._compare_time_parameters(),
@@ -425,7 +446,7 @@ class Certificate(OpensshModule):
 
         self.ssh_keygen.generate_certificate(
             key_copy, self.identifier, self.options, self.pkcs11_provider, self.principals, self.serial_number,
-            self.signing_key, self.type, self.time_parameters, self.use_agent,
+            self.signature_algorithm, self.signing_key, self.type, self.time_parameters, self.use_agent,
             environ_update=dict(TZ="UTC"), check_rc=True
         )
 
@@ -485,6 +506,8 @@ def get_cert_dict(data):
 
     result = data.to_dict()
     result.pop('nonce')
+    result['signature_algorithm'] = data.signature_type
+
     return result
 
 
@@ -503,6 +526,7 @@ def main():
                 default='partial_idempotence',
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
+            signature_algorithm=dict(type='str', choices=['ssh-rsa', 'rsa-sha2-256', 'rsa-sha2-512']),
             signing_key=dict(type='path'),
             serial_number=dict(type='int'),
             state=dict(type='str', default='present', choices=['absent', 'present']),

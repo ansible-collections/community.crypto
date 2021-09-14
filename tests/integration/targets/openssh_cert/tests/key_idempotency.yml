@@ -20,6 +20,81 @@
     valid_from: always
     valid_to: forever
 
+- block:
+    - name: Generate cert with updated signature algorithm
+      openssh_cert:
+        type: user
+        path: "{{ certificate_path }}"
+        public_key: "{{ public_key }}"
+        signing_key: "{{ signing_key }}"
+        signature_algorithm: rsa-sha2-256
+        valid_from: always
+        valid_to: forever
+      register: updated_signature_algorithm
+
+    - name: Assert signature algorithm update causes change
+      assert:
+        that:
+          - updated_signature_algorithm is changed
+
+    - name: Generate cert with updated signature algorithm (idempotent)
+      openssh_cert:
+        type: user
+        path: "{{ certificate_path }}"
+        public_key: "{{ public_key }}"
+        signing_key: "{{ signing_key }}"
+        signature_algorithm: rsa-sha2-256
+        valid_from: always
+        valid_to: forever
+      register: updated_signature_algorithm_idempotent
+
+    - name: Assert signature algorithm update is idempotent
+      assert:
+        that:
+          - updated_signature_algorithm_idempotent is not changed
+
+    - name: Generate cert with original signature algorithm
+      openssh_cert:
+        type: user
+        path: "{{ certificate_path }}"
+        public_key: "{{ public_key }}"
+        signing_key: "{{ signing_key }}"
+        signature_algorithm: ssh-rsa
+        valid_from: always
+        valid_to: forever
+      register: second_signature_algorithm
+
+    - name: Assert second signature algorithm update causes change
+      assert:
+        that:
+          - second_signature_algorithm is changed
+
+    - name: Omit signature algorithm
+      openssh_cert:
+        type: user
+        path: "{{ certificate_path }}"
+        public_key: "{{ public_key }}"
+        signing_key: "{{ signing_key }}"
+        valid_from: always
+        valid_to: forever
+      register: omitted_signature_algorithm
+
+    - name: Assert omitted_signature_algorithm does not cause change
+      assert:
+        that:
+          - omitted_signature_algorithm is not changed
+
+    - name: Revert to original certificate
+      openssh_cert:
+        type: user
+        path: "{{ certificate_path }}"
+        public_key: "{{ public_key }}"
+        signing_key: "{{ signing_key }}"
+        valid_from: always
+        valid_to: forever
+        regenerate: always
+  when: openssh_version is version("7.2", ">=")
+
 - name: Generate cert with new signing key
   openssh_cert:
     type: user
