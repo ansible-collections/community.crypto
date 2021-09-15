@@ -4,16 +4,35 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- set_fact:
+    skip_tests: false
+
 - block:
 
   - name: Get servers certificate with backend auto-detection
     get_certificate:
       host: "{{ httpbin_host }}"
       port: 443
+    ignore_errors: true
+    register: result
+
+  - set_fact:
+      skip_tests: |
+        {{
+          result is failed and (
+            'error: [Errno 1] _ssl.c:492: error:14094410:SSL routines:SSL3_READ_BYTES:sslv3 alert handshake failure' in result.msg
+            or
+            'error: _ssl.c:314: Invalid SSL protocol variant specified.' in result.msg
+          )
+        }}
+
+  - assert:
+      that:
+        - result is success or skip_tests
 
   when: |
     pyopenssl_version.stdout is version('0.15', '>=') or
-    (cryptography_version.stdout is version('1.6', '>=') and (ansible_distribution != 'CentOS' or ansible_distribution_major_version|int > 6))
+    cryptography_version.stdout is version('1.6', '>=')
 
 - block:
 
@@ -21,7 +40,7 @@
     vars:
       select_crypto_backend: pyopenssl
 
-  when: pyopenssl_version.stdout is version('0.15', '>=')
+  when: pyopenssl_version.stdout is version('0.15', '>=') and not skip_tests
 
 - block:
 
@@ -32,6 +51,4 @@
   # The module doesn't work with CentOS 6. Since the pyOpenSSL installed there is too old,
   # we never noticed before. This becomes a problem with the new cryptography backend,
   # since there is a new enough cryptography version...
-  when: |
-    cryptography_version.stdout is version('1.6', '>=') and
-    (ansible_distribution != 'CentOS' or ansible_distribution_major_version|int > 6)
+  when: cryptography_version.stdout is version('1.6', '>=') and not skip_tests
