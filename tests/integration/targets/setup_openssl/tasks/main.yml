@@ -8,7 +8,9 @@
   command: "{{ ansible_python.executable }} -c 'import os; print(dict(os.environ))'"
   register: sys_environment
 
-- debug: var=sys_environment
+- name: Show system environment
+  debug:
+    var: sys_environment.stdout_lines
 
 - name: Default value for OpenSSL binary path
   set_fact:
