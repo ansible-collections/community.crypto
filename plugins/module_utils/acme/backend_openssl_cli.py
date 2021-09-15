@@ -230,7 +230,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         filename = csr_filename
         data = None
         if csr_content is not None:
-            filename = '-'
+            filename = '/dev/stdin'
             data = csr_content.encode('utf-8')
 
         openssl_csr_cmd = [self.openssl_binary, "req", "-in", filename, "-noout", "-text"]
@@ -267,7 +267,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         filename = cert_filename
         data = None
         if cert_content is not None:
-            filename = '-'
+            filename = '/dev/stdin'
             data = cert_content.encode('utf-8')
             cert_filename_suffix = ''
         elif cert_filename is not None:
