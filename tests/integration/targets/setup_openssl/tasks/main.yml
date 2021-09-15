@@ -18,14 +18,19 @@
   include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"
 
+- name: Check whether OpenSSL is there
+  command: "{{ openssl_binary }} version"
+  register: openssl_version_full
+  ignore_errors: true
+
 - name: Install OpenSSL
   become: true
   package:
     name: '{{ openssl_package_name }}'
-  when: not ansible_os_family == 'Darwin'
+  when: not ansible_os_family == 'Darwin' and openssl_version_full is failed
 
 - name: Register openssl version (full)
-  shell: "{{ openssl_binary }} version"
+  command: "{{ openssl_binary }} version"
   register: openssl_version_full
 
 - name: Show openssl version (full)
@@ -60,7 +65,7 @@
         openssl_binary: "{{ brew_openssl_prefix.stdout }}/bin/openssl"
 
     - name: MACOS | Register openssl version (full)
-      shell: "{{ openssl_binary }} version"
+      command: "{{ openssl_binary }} version"
       register: openssl_version_full_again
       # We must use a different variable to prevent the 'when' condition of the surrounding block to fail
 
@@ -69,7 +74,7 @@
         var: openssl_version_full_again.stdout_lines
 
 - name: Register openssl version
-  shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
+  shell: "{{ openssl_binary }} version | cut -d' ' -f2"
   register: openssl_version
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
