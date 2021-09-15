@@ -555,6 +555,11 @@ class OpensshCertificate(object):
     def signing_key(self):
         return to_text(self._cert_info.signing_key_fingerprint())
 
+    @property
+    def signature_type(self):
+        signature_data = OpensshParser.signature_data(self.signature)
+        return to_text(signature_data['signature_type'])
+
     @staticmethod
     def _parse_cert_info(pub_key_type, parser):
         cert_info = get_cert_info_object(pub_key_type)

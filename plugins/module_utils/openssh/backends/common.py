@@ -160,7 +160,8 @@ class KeygenCommand(object):
         self._run_command = module.run_command
 
     def generate_certificate(self, certificate_path, identifier, options, pkcs11_provider, principals,
-                             serial_number, signing_key_path, type, time_parameters, use_agent, **kwargs):
+                             serial_number, signature_algorithm, signing_key_path, type,
+                             time_parameters, use_agent, **kwargs):
         args = [self._bin_path, '-s', signing_key_path, '-P', '', '-I', identifier]
 
         if options:
@@ -178,6 +179,8 @@ class KeygenCommand(object):
             args.extend(['-U'])
         if time_parameters.validity_string:
             args.extend(['-V', time_parameters.validity_string])
+        if signature_algorithm:
+            args.extend(['-t', signature_algorithm])
         args.append(certificate_path)
 
         return self._run_command(args, **kwargs)
