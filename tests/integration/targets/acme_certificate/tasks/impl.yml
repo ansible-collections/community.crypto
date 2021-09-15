@@ -264,66 +264,70 @@
   set_fact:
     cert_5_recreate_3: "{{ challenge_data is changed }}"
     cert_5d_obtain_results: "{{ certificate_obtain_result }}"
-- name: Obtain cert 6
-  include_tasks: obtain-cert.yml
-  vars:
-    certgen_title: Certificate 6
-    certificate_name: cert-6
-    key_type: rsa
-    rsa_bits: "{{ default_rsa_key_size }}"
-    subject_alt_name: "DNS:example.org"
-    subject_alt_name_critical: no
-    account_key: account-ec256
-    challenge: tls-alpn-01
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
-    remaining_days: 10
-    terms_agreed: yes
-    account_email: "example@example.org"
-    acme_expected_root_number: 0
-    select_chain:
-      # All intermediates have the same subject key identifier, so always
-      # the first chain will be found, and we need a second condition to
-      # make sure that the first condition actually works. (The second
-      # condition has been tested above.)
-      - test_certificates: first
-        subject_key_identifier: "{{ acme_intermediates[0].subject_key_identifier }}"
-      - test_certificates: last
-        issuer: "{{ acme_roots[1].subject }}"
-    use_csr_content: true
-- name: Store obtain results for cert 6
-  set_fact:
-    cert_6_obtain_results: "{{ certificate_obtain_result }}"
-    cert_6_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
-- name: Obtain cert 7
-  include_tasks: obtain-cert.yml
-  vars:
-    certgen_title: Certificate 7
-    certificate_name: cert-7
-    key_type: rsa
-    rsa_bits: "{{ default_rsa_key_size }}"
-    subject_alt_name:
-    - "IP:127.0.0.1"
-    # - "IP:::1"
-    subject_alt_name_critical: no
-    account_key: account-ec256
-    challenge: http-01
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
-    remaining_days: 10
-    terms_agreed: yes
-    account_email: "example@example.org"
-    acme_expected_root_number: 2
-    select_chain:
-      - test_certificates: last
-        authority_key_identifier: "{{ acme_roots[2].subject_key_identifier }}"
-    use_csr_content: false
-- name: Store obtain results for cert 7
-  set_fact:
-    cert_7_obtain_results: "{{ certificate_obtain_result }}"
-    cert_7_alternate: "{{ 2 if select_crypto_backend == 'cryptography' else 0 }}"
+- block:
+  - name: Obtain cert 6
+    include_tasks: obtain-cert.yml
+    vars:
+      certgen_title: Certificate 6
+      certificate_name: cert-6
+      key_type: rsa
+      rsa_bits: "{{ default_rsa_key_size }}"
+      subject_alt_name: "DNS:example.org"
+      subject_alt_name_critical: no
+      account_key: account-ec256
+      challenge: tls-alpn-01
+      modify_account: yes
+      deactivate_authzs: no
+      force: no
+      remaining_days: 10
+      terms_agreed: yes
+      account_email: "example@example.org"
+      acme_expected_root_number: 0
+      select_chain:
+        # All intermediates have the same subject key identifier, so always
+        # the first chain will be found, and we need a second condition to
+        # make sure that the first condition actually works. (The second
+        # condition has been tested above.)
+        - test_certificates: first
+          subject_key_identifier: "{{ acme_intermediates[0].subject_key_identifier }}"
+        - test_certificates: last
+          issuer: "{{ acme_roots[1].subject }}"
+      use_csr_content: true
+  - name: Store obtain results for cert 6
+    set_fact:
+      cert_6_obtain_results: "{{ certificate_obtain_result }}"
+      cert_6_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+  when: acme_intermediates[0].subject_key_identifier is defined
+- block:
+  - name: Obtain cert 7
+    include_tasks: obtain-cert.yml
+    vars:
+      certgen_title: Certificate 7
+      certificate_name: cert-7
+      key_type: rsa
+      rsa_bits: "{{ default_rsa_key_size }}"
+      subject_alt_name:
+      - "IP:127.0.0.1"
+      # - "IP:::1"
+      subject_alt_name_critical: no
+      account_key: account-ec256
+      challenge: http-01
+      modify_account: yes
+      deactivate_authzs: no
+      force: no
+      remaining_days: 10
+      terms_agreed: yes
+      account_email: "example@example.org"
+      acme_expected_root_number: 2
+      select_chain:
+        - test_certificates: last
+          authority_key_identifier: "{{ acme_roots[2].subject_key_identifier }}"
+      use_csr_content: false
+  - name: Store obtain results for cert 7
+    set_fact:
+      cert_7_obtain_results: "{{ certificate_obtain_result }}"
+      cert_7_alternate: "{{ 2 if select_crypto_backend == 'cryptography' else 0 }}"
+  when: acme_roots[2].subject_key_identifier is defined
 - name: Obtain cert 8
   include_tasks: obtain-cert.yml
   vars:
@@ -376,10 +380,12 @@
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-6-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-6-chain.pem" "{{ remote_tmp_dir }}/cert-6.pem"'
   ignore_errors: yes
   register: cert_6_valid
+  when: acme_intermediates[0].subject_key_identifier is defined
 - name: Verifying cert 7
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-7-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-7-chain.pem" "{{ remote_tmp_dir }}/cert-7.pem"'
   ignore_errors: yes
   register: cert_7_valid
+  when: acme_roots[2].subject_key_identifier is defined
 - name: Verifying cert 8
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
   ignore_errors: yes
@@ -403,9 +409,11 @@
 - name: Dumping cert 6
   command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-6.pem" -noout -text'
   register: cert_6_text
+  when: acme_intermediates[0].subject_key_identifier is defined
 - name: Dumping cert 7
   command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-7.pem" -noout -text'
   register: cert_7_text
+  when: acme_roots[2].subject_key_identifier is defined
 - name: Dumping cert 8
   command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
   register: cert_8_text
@@ -434,10 +442,12 @@
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-6.pem"
   register: cert_6_info
+  when: acme_intermediates[0].subject_key_identifier is defined
 - name: Dumping cert 7
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-7.pem"
   register: cert_7_info
+  when: acme_roots[2].subject_key_identifier is defined
 - name: Dumping cert 8
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-8.pem"
