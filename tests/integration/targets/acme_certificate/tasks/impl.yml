@@ -328,32 +328,34 @@
       cert_7_obtain_results: "{{ certificate_obtain_result }}"
       cert_7_alternate: "{{ 2 if select_crypto_backend == 'cryptography' else 0 }}"
   when: acme_roots[2].subject_key_identifier is defined
-- name: Obtain cert 8
-  include_tasks: obtain-cert.yml
-  vars:
-    certgen_title: Certificate 8
-    certificate_name: cert-8
-    key_type: rsa
-    rsa_bits: "{{ default_rsa_key_size }}"
-    subject_alt_name:
-    - "IP:127.0.0.1"
-    # IPv4 only since our test validation server doesn't work
-    # with IPv6 (thanks to Python's socketserver).
-    subject_alt_name_critical: no
-    account_key: account-ec256
-    challenge: tls-alpn-01
-    challenge_alpn_tls: acme_challenge_cert_helper
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
-    remaining_days: 10
-    terms_agreed: yes
-    account_email: "example@example.org"
-    use_csr_content: true
-- name: Store obtain results for cert 8
-  set_fact:
-    cert_8_obtain_results: "{{ certificate_obtain_result }}"
-    cert_8_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+- block:
+  - name: Obtain cert 8
+    include_tasks: obtain-cert.yml
+    vars:
+      certgen_title: Certificate 8
+      certificate_name: cert-8
+      key_type: rsa
+      rsa_bits: "{{ default_rsa_key_size }}"
+      subject_alt_name:
+      - "IP:127.0.0.1"
+      # IPv4 only since our test validation server doesn't work
+      # with IPv6 (thanks to Python's socketserver).
+      subject_alt_name_critical: no
+      account_key: account-ec256
+      challenge: tls-alpn-01
+      challenge_alpn_tls: acme_challenge_cert_helper
+      modify_account: yes
+      deactivate_authzs: no
+      force: no
+      remaining_days: 10
+      terms_agreed: yes
+      account_email: "example@example.org"
+      use_csr_content: true
+  - name: Store obtain results for cert 8
+    set_fact:
+      cert_8_obtain_results: "{{ certificate_obtain_result }}"
+      cert_8_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+  when: cryptography_version.stdout is version('1.3', '>=')
 ## DISSECT CERTIFICATES #######################################################################
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
 - name: Verifying cert 1
@@ -390,6 +392,7 @@
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
   ignore_errors: yes
   register: cert_8_valid
+  when: cryptography_version.stdout is version('1.3', '>=')
 # Dump certificate info
 - name: Dumping cert 1
   command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-1.pem" -noout -text'
@@ -417,6 +420,7 @@
 - name: Dumping cert 8
   command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
   register: cert_8_text
+  when: cryptography_version.stdout is version('1.3', '>=')
 # Dump certificate info
 - name: Dumping cert 1
   x509_certificate_info:
@@ -452,6 +456,7 @@
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-8.pem"
   register: cert_8_info
+  when: cryptography_version.stdout is version('1.3', '>=')
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders
   acme_account_info:

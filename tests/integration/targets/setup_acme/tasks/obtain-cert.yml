@@ -68,21 +68,21 @@
     body: "{{ item.value }}"
   with_dict: "{{ challenge_data.challenge_data_dns }}"
   when: "challenge_data is changed and challenge == 'dns-01'"
-- name: ({{ certgen_title }}) Create TLS ALPN challenges (acm_challenge_cert_helper)
+- name: ({{ certgen_title }}) Create TLS ALPN challenges (acme_challenge_cert_helper)
   acme_challenge_cert_helper:
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     private_key_passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
-  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else {} }}"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper') else {} }}"
   register: tls_alpn_challenges
-  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
+  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Read private key
   slurp:
     src: '{{ remote_tmp_dir }}/{{ certificate_name }}.key'
   register: slurp
-  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
-- name: ({{ certgen_title }}) Set TLS ALPN challenges (acm_challenge_cert_helper)
+  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
+- name: ({{ certgen_title }}) Set TLS ALPN challenges (acme_challenge_cert_helper)
   uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.domain }}/{{ item.identifier }}/certificate-and-key"
     method: PUT
@@ -90,8 +90,8 @@
     body: "{{ item.challenge_certificate }}\n{{ slurp.content | b64decode }}"
     headers:
       content-type: "application/pem-certificate-chain"
-  with_items: "{{ tls_alpn_challenges.results if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper') else [] }}"
-  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is defined and challenge_alpn_tls == 'acme_challenge_cert_helper')"
+  with_items: "{{ tls_alpn_challenges.results if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper') else [] }}"
+  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (der-value-b64)
   uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.value['tls-alpn-01'].resource }}/{{ item.value['tls-alpn-01'].resource_original }}/der-value-b64"
@@ -100,8 +100,8 @@
     body: "{{ item.value['tls-alpn-01'].resource_value }}"
     headers:
       content-type: "application/octet-stream"
-  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64') else [] }}"
-  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls is not defined or challenge_alpn_tls == 'der-value-b64')"
+  with_dict: "{{ challenge_data.challenge_data if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'der-value-b64') else {} }}"
+  when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'der-value-b64')"
 ## ACME STEP 2 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 2
   acme_certificate:
