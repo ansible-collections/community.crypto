@@ -202,7 +202,10 @@ def main():
         ),
     )
     if not HAS_CRYPTOGRAPHY:
-        module.fail_json(msg=missing_required_lib('cryptography >= 1.3'), exception=CRYPTOGRAPHY_IMP_ERR)
+        # Some callbacks die when exception is provided with value None
+        if CRYPTOGRAPHY_IMP_ERR:
+            module.fail_json(msg=missing_required_lib('cryptography >= 1.3'), exception=CRYPTOGRAPHY_IMP_ERR)
+        module.fail_json(msg=missing_required_lib('cryptography >= 1.3'))
 
     try:
         # Get parameters
