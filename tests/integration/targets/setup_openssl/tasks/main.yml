@@ -8,7 +8,9 @@
   command: "{{ ansible_python.executable }} -c 'import os; print(dict(os.environ))'"
   register: sys_environment
 
-- debug: var=sys_environment
+- name: Show system environment
+  debug:
+    var: sys_environment.stdout_lines
 
 - name: Default value for OpenSSL binary path
   set_fact:
@@ -18,14 +20,19 @@
   include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"
 
+- name: Check whether OpenSSL is there
+  command: "{{ openssl_binary }} version"
+  register: openssl_version_full
+  ignore_errors: true
+
 - name: Install OpenSSL
   become: true
   package:
     name: '{{ openssl_package_name }}'
-  when: not ansible_os_family == 'Darwin'
+  when: not ansible_os_family == 'Darwin' and openssl_version_full is failed
 
 - name: Register openssl version (full)
-  shell: "{{ openssl_binary }} version"
+  command: "{{ openssl_binary }} version"
   register: openssl_version_full
 
 - name: Show openssl version (full)
@@ -60,7 +67,7 @@
         openssl_binary: "{{ brew_openssl_prefix.stdout }}/bin/openssl"
 
     - name: MACOS | Register openssl version (full)
-      shell: "{{ openssl_binary }} version"
+      command: "{{ openssl_binary }} version"
       register: openssl_version_full_again
       # We must use a different variable to prevent the 'when' condition of the surrounding block to fail
 
@@ -69,29 +76,37 @@
         var: openssl_version_full_again.stdout_lines
 
 - name: Register openssl version
-  shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
+  shell: "{{ openssl_binary }} version | cut -d' ' -f2"
   register: openssl_version
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
-  - name: Install cryptography (Python 3)
-    become: true
-    package:
-      name: '{{ cryptography_package_name_python3 }}'
-    when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
 
-  - name: Install cryptography (Python 2)
-    become: true
-    package:
-      name: '{{ cryptography_package_name }}'
-    when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
+  - name: Install from system packages
+    when: ansible_os_family != "Darwin" and target_system_python
+    block:
 
-  - name: Install cryptography (Darwin)
-    become: true
-    pip:
-      name: cryptography>=3.3
-      extra_args: "-c {{ remote_constraints }}"
-    when: ansible_os_family == 'Darwin'
+    - name: Install cryptography (Python 3 from system packages)
+      become: true
+      package:
+        name: '{{ cryptography_package_name_python3 }}'
+      when: ansible_python_version is version('3.0', '>=')
+
+    - name: Install cryptography (Python 2 from system packages)
+      become: true
+      package:
+        name: '{{ cryptography_package_name }}'
+      when: ansible_python_version is version('3.0', '<')
+
+  - name: Install from PyPi
+    when: ansible_os_family == "Darwin" or not target_system_python
+    block:
+
+    - name: Install cryptography (PyPi)
+      become: true
+      pip:
+        name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
+        extra_args: "-c {{ remote_constraints }}"
 
 - name: Register cryptography version
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
