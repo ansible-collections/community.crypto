@@ -48,3 +48,10 @@ system_python_version_data:
     '15':
       - '2.7'
       - '3.6'
+
+cannot_upgrade_cryptography:
+  FreeBSD:
+    '12.2':
+      - '3.8'  # on the VMs in CI, system packages are used for this version as well
+    '13.0':
+      - '3.8'  # on the VMs in CI, system packages are used for this version as well

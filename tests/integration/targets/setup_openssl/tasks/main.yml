@@ -106,6 +106,7 @@
       become: true
       pip:
         name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
+        state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
         extra_args: "-c {{ remote_constraints }}"
 
 - name: Register cryptography version
