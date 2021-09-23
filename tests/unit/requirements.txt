@@ -1,6 +1,7 @@
 cryptography
 ipaddress ; python_version < '3.0'
 pyopenssl
+bcrypt
 
 unittest2 ; python_version < '2.7'
 importlib ; python_version < '2.7'
