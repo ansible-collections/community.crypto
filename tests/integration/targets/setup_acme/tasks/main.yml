@@ -9,6 +9,10 @@
   set_fact:
     openssl_binary: openssl
 
+- name: Make sure cryptography is installed
+  pip:
+    name: cryptography
+
 - name: Register openssl version
   shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
   register: openssl_version
