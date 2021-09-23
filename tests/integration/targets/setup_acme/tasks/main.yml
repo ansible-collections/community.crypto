@@ -12,6 +12,7 @@
 - name: Make sure cryptography is installed
   pip:
     name: cryptography
+    extra_args: "-c {{ remote_constraints }}"
 
 - name: Register openssl version
   shell: "{{ openssl_binary }}  version | cut -d' ' -f2"
