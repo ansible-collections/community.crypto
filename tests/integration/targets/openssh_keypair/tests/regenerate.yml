@@ -5,12 +5,18 @@
 ####################################################################
 
 # Ensures no conflicts from previous test runs
+- name: "({{ backend }}) Find old test artifacts"
+  ansible.builtin.find:
+    paths: "{{ remote_tmp_dir }}"
+    patterns:
+      - "regenerate*"
+  register: old_test_artifacts
+
 - name: "({{ backend }}) Cleanup Output Directory"
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: absent
-  with_fileglob:
-    - "{{ remote_tmp_dir }}/regenerate*"
+  loop: "{{ old_test_artifacts.files }}"
 
 - name: "({{ backend }}) Regenerate - setup simple keys"
   openssh_keypair:
