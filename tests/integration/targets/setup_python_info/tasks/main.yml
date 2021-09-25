@@ -25,31 +25,45 @@
   set_fact:
     target_system_python: >-
       {{
-        (ansible_facts.python.version.major ~ '.' ~ ansible_facts.python.version.minor)
-        in
-        (
-          system_python_version_data[ansible_facts.distribution] |
-          default(system_python_version_data[ansible_facts.os_family])
-        )[ansible_facts.distribution_version | internal__get_major_minor_version]
-        | default(
-          (
-            system_python_version_data[ansible_facts.distribution] |
-            default(system_python_version_data[ansible_facts.os_family])
-          )[ansible_facts.distribution_major_version]
+        system_python_version_data |
+        internal__version_lookup(
+          ansible_facts.distribution,
+          ansible_facts.os_family,
+          ansible_facts.distribution_version,
+          ansible_facts.distribution_major_version,
+          ansible_facts.python.version.major ~ '.' ~ ansible_facts.python.version.minor
+        )
+      }}
+    target_system_python_cannot_upgrade_cryptography: >-
+      {{
+        cannot_upgrade_cryptography |
+        internal__version_lookup(
+          ansible_facts.distribution,
+          ansible_facts.os_family,
+          ansible_facts.distribution_version,
+          ansible_facts.distribution_major_version,
+          ansible_facts.python.version.major ~ '.' ~ ansible_facts.python.version.minor
         )
       }}
     controller_system_python: >-
       {{
-        (hostvars['localhost'].ansible_facts.python.version.major ~ '.' ~ hostvars['localhost'].ansible_facts.python.version.minor)
-        in
-        (
-          system_python_version_data[hostvars['localhost'].ansible_facts.distribution] |
-          default(system_python_version_data[hostvars['localhost'].ansible_facts.os_family])
-        )[ansible_facts.distribution_version | internal__get_major_minor_version]
-        | default(
-          (
-            system_python_version_data[hostvars['localhost'].ansible_facts.distribution] |
-            default(system_python_version_data[hostvars['localhost'].ansible_facts.os_family])
-          )[hostvars['localhost'].ansible_facts.distribution_major_version]
+        system_python_version_data |
+        internal__version_lookup(
+          hostvars['localhost'].ansible_facts.distribution,
+          hostvars['localhost'].ansible_facts.os_family,
+          hostvars['localhost'].ansible_facts.distribution_version,
+          hostvars['localhost'].ansible_facts.distribution_major_version,
+          hostvars['localhost'].ansible_facts.python.version.major ~ '.' ~ hostvars['localhost'].ansible_facts.python.version.minor
+        )
+      }}
+    controller_system_python_cannot_upgrade_cryptography: >-
+      {{
+        cannot_upgrade_cryptography |
+        internal__version_lookup(
+          hostvars['localhost'].ansible_facts.distribution,
+          hostvars['localhost'].ansible_facts.os_family,
+          hostvars['localhost'].ansible_facts.distribution_version,
+          hostvars['localhost'].ansible_facts.distribution_major_version,
+          hostvars['localhost'].ansible_facts.python.version.major ~ '.' ~ hostvars['localhost'].ansible_facts.python.version.minor
         )
       }}

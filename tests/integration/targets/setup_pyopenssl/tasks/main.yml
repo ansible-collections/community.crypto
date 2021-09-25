@@ -31,6 +31,7 @@
     become: true
     pip:
       name: pyOpenSSL
+      state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
       extra_args: "-c {{ remote_constraints }}"
 
 - name: Register pyOpenSSL version
