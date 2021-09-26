@@ -55,7 +55,7 @@ stages:
               test: 'devel/sanity/extra'
             - name: Units
               test: 'devel/units/1'
-  - stage: Ansible_2.12
+  - stage: Ansible_2_12
     displayName: Sanity & Units 2.12
     dependsOn: []
     jobs:
@@ -126,7 +126,7 @@ stages:
               test: ubuntu1804
             - name: Ubuntu 20.04
               test: ubuntu2004
-  - stage: Docker_2.12
+  - stage: Docker_2_12
     displayName: Docker 2.12
     dependsOn: []
     jobs:
@@ -212,7 +212,7 @@ stages:
               test: freebsd/12.2
             - name: FreeBSD 13.0
               test: freebsd/13.0
-  - stage: Remote_2.12
+  - stage: Remote_2_12
     displayName: Remote 2.12
     dependsOn: []
     jobs:
@@ -282,7 +282,7 @@ stages:
             - test: 3.8
             - test: 3.9
             - test: "3.10"
-  - stage: Cloud_2.12
+  - stage: Cloud_2_12
     displayName: Cloud 2.12
     dependsOn: []
     jobs:
