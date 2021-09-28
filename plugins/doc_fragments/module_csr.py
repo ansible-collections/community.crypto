@@ -46,6 +46,8 @@ options:
             - This option will no longer accept unsupported values from community.crypto 2.0.0 on.
         type: int
         default: 1
+        choices:
+            - 1
     subject:
         description:
             - Key/value pairs that will be present in the subject name field of the certificate signing request.

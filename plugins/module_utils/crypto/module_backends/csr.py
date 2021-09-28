@@ -561,11 +561,6 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
 
 def select_backend(module, backend):
-    if module.params['version'] != 1:
-        module.deprecate('The version option will only support allowed values from community.crypto 2.0.0 on. '
-                         'Currently, only the value 1 is allowed by RFC 2986',
-                         version='2.0.0', collection_name='community.crypto')
-
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
@@ -595,7 +590,7 @@ def get_csr_argument_spec():
             privatekey_path=dict(type='path'),
             privatekey_content=dict(type='str', no_log=True),
             privatekey_passphrase=dict(type='str', no_log=True),
-            version=dict(type='int', default=1),
+            version=dict(type='int', default=1, choices=[1]),
             subject=dict(type='dict'),
             country_name=dict(type='str', aliases=['C', 'countryName']),
             state_or_province_name=dict(type='str', aliases=['ST', 'stateOrProvinceName']),

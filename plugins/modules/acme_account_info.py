@@ -31,9 +31,8 @@ options:
          by the ACME server."
       - "A value of C(ignore) will not fetch the list of orders."
       - "If the value is not C(ignore) and the ACME server supports orders, the C(order_uris)
-         return value is always populated. The C(orders) return value currently depends on
-         whether this option is set to C(url_list) or C(object_list). In community.crypto 2.0.0,
-         it will only be returned if this option is set to C(object_list)."
+         return value is always populated. The C(orders) return value is only returned
+         if this option is set to C(object_list)."
       - "Currently, Let's Encrypt does not return orders, so the C(orders) result
          will always be empty."
     type: str
@@ -125,12 +124,9 @@ account:
 orders:
   description:
     - "The list of orders."
-    - "If I(retrieve_orders) is C(url_list), this will be a list of URLs. In community.crypto 2.0.0,
-       this return value will no longer be returned for C(url_list)."
-    - "If I(retrieve_orders) is C(object_list), this will be a list of objects."
   type: list
-  #elements: ... depends on retrieve_orders
-  returned: if account exists, I(retrieve_orders) is not C(ignore), and server supports order listing
+  elements: dict
+  returned: if account exists, I(retrieve_orders) is C(object_list), and server supports order listing
   contains:
     status:
       description: The order's status.
@@ -282,9 +278,6 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if module._name in ('acme_account_facts', 'community.crypto.acme_account_facts'):
-        module.deprecate("The 'acme_account_facts' module has been renamed to 'acme_account_info'",
-                         version='2.0.0', collection_name='community.crypto')
     backend = create_backend(module, True)
 
     try:
@@ -313,13 +306,6 @@ def main():
             if account_data.get('orders') and module.params['retrieve_orders'] != 'ignore':
                 orders = get_orders_list(module, client, account_data['orders'])
                 result['order_uris'] = orders
-                if module.params['retrieve_orders'] == 'url_list':
-                    module.deprecate(
-                        'retrieve_orders=url_list now returns the order URI list as `order_uris`.'
-                        ' Right now it also returns this list as `orders` for backwards compatibility,'
-                        ' but this will stop in community.crypto 2.0.0',
-                        version='2.0.0', collection_name='community.crypto')
-                    result['orders'] = orders
                 if module.params['retrieve_orders'] == 'object_list':
                     result['orders'] = [get_order(client, order) for order in orders]
         module.exit_json(**result)

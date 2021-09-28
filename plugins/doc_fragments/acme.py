@@ -74,10 +74,9 @@ options:
       - "The ACME version of the endpoint."
       - "Must be C(1) for the classic Let's Encrypt and Buypass ACME endpoints,
          or C(2) for standardized ACME v2 endpoints."
-      - "The default value is C(1). Note that in community.crypto 2.0.0, this
-         option B(will be required) and will no longer have a default."
       - "The value C(1) is deprecated since community.crypto 2.0.0 and will be
          removed from community.crypto 3.0.0."
+    required: true
     type: int
     choices: [ 1, 2 ]
   acme_directory:
@@ -87,22 +86,12 @@ options:
       - "For safety reasons the default is set to the Let's Encrypt staging
          server (for the ACME v1 protocol). This will create technically correct,
          but untrusted certificates."
-      - "The default value is C(https://acme-staging.api.letsencrypt.org/directory).
-         Note that in community.crypto 2.0.0, this option B(will be required) and
-         will no longer have a default. Note that the default is the Let's Encrypt
-         staging server for the ACME v1 protocol, which is deprecated and will
-         be disabled in May 2021 (see
-         L(here,https://community.letsencrypt.org/t/end-of-life-plan-for-acmev1/88430/7)
-         for details)."
       - "For Let's Encrypt, all staging endpoints can be found here:
          U(https://letsencrypt.org/docs/staging-environment/). For Buypass, all
          endpoints can be found here:
          U(https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints)"
       - "For B(Let's Encrypt), the production directory URL for ACME v2 is
-         U(https://acme-v02.api.letsencrypt.org/directory).
-         (The production directory URL for ACME v1 is
-         U(https://acme-v01.api.letsencrypt.org/directory) and will be
-         disabled in July 2021.)"
+         U(https://acme-v02.api.letsencrypt.org/directory)."
       - "For B(Buypass), the production directory URL for ACME v2 and v1 is
          U(https://api.buypass.com/acme/directory)."
       - "For B(ZeroSSL), the production directory URL for ACME v2 is
@@ -114,6 +103,7 @@ options:
          L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
          to help us supporting it. Feedback that an ACME server not mentioned does work
          is also appreciated."
+    required: true
     type: str
   validate_certs:
     description:
