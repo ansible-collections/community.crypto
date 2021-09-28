@@ -1,0 +1,2 @@
+removed_features:
+  - "x509_certificate - remove ``assertonly`` provider (https://github.com/ansible-collections/community.crypto/pull/289)."
