@@ -9,25 +9,6 @@
     size: '{{ default_rsa_key_size }}'
 
 - block:
-  - name: Running tests with pyOpenSSL backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: pyopenssl
-
-  # FIXME: minimal pyOpenSSL version?!
-  when: pyopenssl_version.stdout is version('0.6', '>=')
-
-- name: Remove output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: absent
-
-- name: Re-create output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: directory
-
-- block:
   - name: Running tests with cryptography backend
     include_tasks: impl.yml
     vars:

@@ -74,13 +74,13 @@
       - "'Subject Alternative Name' in generate_csr_invalid_san.msg"
 
 - name: "({{ select_crypto_backend }}) Validate invalid SAN (2/2)"
-  # Note that pyOpenSSL simply accepts this name, and modern cryptography versions do so as well.
+  # Note that modern cryptography versions simply accept this name.
   # The error has been observed with cryptography 1.7.2 and 1.9, but not with 2.3 and newer.
   assert:
     that:
       - generate_csr_invalid_san_2 is failed
       - "'The label system:kube-controller-manager is not a valid A-label' in generate_csr_invalid_san_2.msg"
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.0', '<')
+  when: cryptography_version.stdout is version('2.0', '<')
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (test - everything)"
   shell: "{{ openssl_binary }} req -noout -in {{ remote_tmp_dir }}/csr_ocsp.csr -text"
@@ -156,7 +156,6 @@
       - subject_key_identifier_4 is changed
       - subject_key_identifier_5 is not changed
       - subject_key_identifier_6 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: "({{ select_crypto_backend }}) Verify that authority key identifier handling works"
   assert:
@@ -165,7 +164,6 @@
       - authority_key_identifier_2 is not changed
       - authority_key_identifier_3 is changed
       - authority_key_identifier_4 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: "({{ select_crypto_backend }}) Verify that authority cert issuer / serial number handling works"
   assert:
@@ -175,7 +173,6 @@
       - authority_cert_issuer_sn_3 is changed
       - authority_cert_issuer_sn_4 is changed
       - authority_cert_issuer_sn_5 is changed
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: "({{ select_crypto_backend }}) Check backup"
   assert:
@@ -243,38 +240,7 @@
         ]
       - everything_info.name_constraints_critical == true
 
-- name: "({{ select_crypto_backend }}) Check CSR with everything (pyOpenSSL specific)"
-  assert:
-    that:
-      - everything_info.subject_alt_name == [
-            "DNS:www.ansible.com",
-            "IP:1.2.3.4",
-            "IP:::1",
-            "email:test@example.org",
-            "URI:https://example.org/test/index.html",
-            "RID:1.2.3.4",
-        ]
-      - everything_info.extended_key_usage == [
-            "Any Extended Key Usage",
-            "Biometric Info",
-            "Code Signing",
-            "E-mail Protection",
-            "IPSec User",
-            "OCSP Signing",
-            "TLS Web Client Authentication",
-            "TLS Web Server Authentication",
-            "TLS Web Server Authentication",
-            "Time Stamping",
-            "dvcs",
-            "qcStatements",
-        ]
-      - everything_info.name_constraints_permitted == [
-          "DNS:www.example.com",
-          "IP:1.2.3.0/24",
-        ]
-  when: select_crypto_backend == 'pyopenssl'
-
-- name: "({{ select_crypto_backend }}) Check CSR with everything (non-pyOpenSSL specific)"
+- name: "({{ select_crypto_backend }}) Check CSR with everything"
   assert:
     that:
       - everything_info.authority_cert_issuer == [
@@ -316,7 +282,6 @@
           "IP:1.2.3.0/24",
           "IP:::1:0:0/112",
         ]
-  when: select_crypto_backend != 'pyopenssl'
 
 - name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)"
   assert:

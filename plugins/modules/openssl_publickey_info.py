@@ -14,14 +14,10 @@ module: openssl_publickey_info
 short_description: Provide information for OpenSSL public keys
 description:
     - This module allows one to query information on OpenSSL public keys.
-    - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL. If both the
-      cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
-      cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
-      C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
-      and will be removed in community.crypto 2.0.0.
+    - It uses the cryptography python library to interact with OpenSSL.
 version_added: 1.7.0
 requirements:
-    - PyOpenSSL >= 0.15 or cryptography >= 1.2.3
+    - cryptography >= 1.2.3
 author:
     - Felix Fontein (@felixfontein)
 options:
@@ -38,14 +34,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
 
 notes:
 - Supports C(check_mode).
@@ -174,7 +167,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path'),
             content=dict(type='str', no_log=True),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_one_of=(
             ['path', 'content'],

@@ -15,14 +15,9 @@ short_description: Generate an OpenSSL public key from its private key.
 description:
     - This module allows one to (re)generate OpenSSL public keys from their private keys.
     - Keys are generated in PEM or OpenSSH format.
-    - "The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available. This can be
-      overridden with the I(select_crypto_backend) option. When I(format) is C(OpenSSH),
-      the C(cryptography) backend has to be used. Please note that the PyOpenSSL backend
-      was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
+    - The module uses the cryptography Python library.
 requirements:
-    - Either cryptography >= 1.2.3 (older versions might work as well)
-    - Or pyOpenSSL >= 16.0.0
+    - cryptography >= 1.2.3 (older versions might work as well)
     - Needs cryptography >= 1.4 if I(format) is C(OpenSSH)
 author:
     - Yanis Guenane (@Spredzy)
@@ -76,12 +71,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
     return_content:
         description:
             - If set to C(yes), will return the (current or generated) public key's content as I(publickey).
@@ -157,7 +151,6 @@ filename:
 fingerprint:
     description:
     - The fingerprint of the public key. Fingerprint will be generated for each hashlib.algorithms available.
-    - Requires PyOpenSSL >= 16.0 for meaningful output.
     returned: changed or success
     type: dict
     sample:
@@ -208,20 +201,8 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     get_publickey_info,
 )
 
-MINIMAL_PYOPENSSL_VERSION = '16.0.0'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
 MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = '1.4'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -300,11 +281,6 @@ class PublicKey(OpenSSLObject):
                     crypto_serialization.Encoding.PEM,
                     crypto_serialization.PublicFormat.SubjectPublicKeyInfo
                 )
-        else:
-            try:
-                return crypto.dump_publickey(crypto.FILETYPE_PEM, self.privatekey)
-            except AttributeError as dummy:
-                raise PublicKeyError('You need to have PyOpenSSL>=16.0.0 to generate public keys')
 
     def generate(self, module):
         """Generate the public key."""
@@ -372,11 +348,6 @@ class PublicKey(OpenSSLObject):
                             crypto_serialization.Encoding.PEM,
                             crypto_serialization.PublicFormat.SubjectPublicKeyInfo
                         )
-                else:
-                    publickey_content = crypto.dump_publickey(
-                        crypto.FILETYPE_PEM,
-                        crypto.load_publickey(crypto.FILETYPE_PEM, publickey_content)
-                    )
             except Exception as dummy:
                 return False
 
@@ -434,7 +405,7 @@ def main():
             format=dict(type='str', default='PEM', choices=['OpenSSH', 'PEM']),
             privatekey_passphrase=dict(type='str', no_log=True),
             backup=dict(type='bool', default=False),
-            select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
+            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
             return_content=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
@@ -453,36 +424,20 @@ def main():
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(minimal_cryptography_version)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
         # Decision
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            if module.params['format'] == 'OpenSSH':
-                module.fail_json(
-                    msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH)),
-                    exception=CRYPTOGRAPHY_IMP_ERR
-                )
-            backend = 'pyopenssl'
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      minimal_cryptography_version,
-                                      MINIMAL_PYOPENSSL_VERSION))
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(minimal_cryptography_version))
 
     if module.params['format'] == 'OpenSSH' and backend != 'cryptography':
         module.fail_json(msg="Format OpenSSH requires the cryptography backend.")
 
-    if backend == 'pyopenssl':
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(minimal_cryptography_version)),
                              exception=CRYPTOGRAPHY_IMP_ERR)

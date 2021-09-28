@@ -23,14 +23,6 @@ __metaclass__ = type
 from distutils.version import LooseVersion
 
 try:
-    import OpenSSL  # noqa
-    from OpenSSL import crypto  # noqa
-    HAS_PYOPENSSL = True
-except ImportError:
-    # Error handled in the calling module.
-    HAS_PYOPENSSL = False
-
-try:
     import cryptography
     from cryptography import x509
 

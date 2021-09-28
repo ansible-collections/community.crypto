@@ -97,7 +97,6 @@ curve:
 fingerprint:
     description:
     - The fingerprint of the public key. Fingerprint will be generated for each C(hashlib.algorithms) available.
-    - The PyOpenSSL backend requires PyOpenSSL >= 16.0 for meaningful output.
     returned: changed or success
     type: dict
     sample:

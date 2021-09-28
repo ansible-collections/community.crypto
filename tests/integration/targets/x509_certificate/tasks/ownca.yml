@@ -340,7 +340,6 @@
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_subject_key_identifier_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (idempotency)
@@ -353,7 +352,6 @@
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_subject_key_identifier_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (remove)
@@ -366,7 +364,6 @@
     ownca_digest: sha256
     ownca_create_subject_key_identifier: never_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_subject_key_identifier_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (remove idempotency)
@@ -379,7 +376,6 @@
     ownca_digest: sha256
     ownca_create_subject_key_identifier: never_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_subject_key_identifier_4
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (re-enable)
@@ -392,7 +388,6 @@
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_subject_key_identifier_5
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier
@@ -405,7 +400,6 @@
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_authority_key_identifier_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (idempotency)
@@ -418,7 +412,6 @@
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_authority_key_identifier_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (remove)
@@ -431,7 +424,6 @@
     ownca_digest: sha256
     ownca_create_authority_key_identifier: no
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_authority_key_identifier_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (remove idempotency)
@@ -444,7 +436,6 @@
     ownca_digest: sha256
     ownca_create_authority_key_identifier: no
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_authority_key_identifier_4
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (re-add)
@@ -457,7 +448,6 @@
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: ownca_authority_key_identifier_5
 
 - name: (OwnCA, {{select_crypto_backend}}) Ed25519 and Ed448 tests (for cryptography >= 2.6)

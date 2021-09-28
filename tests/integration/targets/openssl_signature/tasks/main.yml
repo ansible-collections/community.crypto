@@ -5,7 +5,7 @@
 ####################################################################
 
 # Test matrix:
-# * pyopenssl or cryptography
+# * cryptography
 # * DSA or ECC or ...
 # * password protected private key or not
 
@@ -24,11 +24,6 @@
   set_fact:
     backends: "{{ backends + [ { 'backend': 'cryptography' } ] }}"
   when: cryptography_version.stdout is version('1.4', '>=')
-
-- name: Add pyopenssl backend
-  set_fact:
-    backends: "{{ backends + [ { 'backend': 'pyopenssl' } ] }}"
-  when: pyopenssl_version.stdout is version('0.11', '>=')
 
 - name: Add RSA tests
   set_fact:
@@ -58,14 +53,11 @@
     all_tests: >-
       [
       {% for b in backends %}
-      {% for kt in key_types %}
-      {% for kp in key_password %}
-      {# Exclude Ed25519 and Ed448 tests on pyopenssl #}
-      {% if not (b.backend == 'pyopenssl' and (kt.type == 'Ed25519' or kt.type == 'Ed448')) %}
-      {{ b | combine (kt) | combine(kp) }},
-      {% endif %}
-      {% endfor %}
-      {% endfor %}
+      {%   for kt in key_types %}
+      {%     for kp in key_password %}
+      {{       b | combine (kt) | combine(kp) }},
+      {%     endfor %}
+      {%   endfor %}
       {% endfor %}
       ]
 

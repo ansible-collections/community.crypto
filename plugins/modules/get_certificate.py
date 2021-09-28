@@ -14,10 +14,7 @@ author: "John Westcott IV (@john-westcott-iv)"
 short_description: Get a certificate from a host:port
 description:
     - Makes a secure connection and returns information about the presented certificate
-    - "The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available. This can be
-      overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL
-      backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0."
+    - The module uses the cryptography Python library.
     - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with python >= 2.7.
 options:
     host:
@@ -66,19 +63,18 @@ options:
     select_crypto_backend:
       description:
         - Determines which crypto backend to use.
-        - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-        - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+        - The default choice is C(auto), which tries to use C(cryptography) if available.
         - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
       type: str
       default: auto
-      choices: [ auto, cryptography, pyopenssl ]
+      choices: [ auto, cryptography ]
 
 notes:
   - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 
 requirements:
   - "python >= 2.7 when using C(proxy_host)"
-  - "cryptography >= 1.6 or pyOpenSSL >= 0.15"
+  - "cryptography >= 1.6"
 '''
 
 RETURN = '''
@@ -180,7 +176,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_get_extensions_from_cert,
 )
 
-MINIMAL_PYOPENSSL_VERSION = '0.15'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 
 CREATE_DEFAULT_CONTEXT_IMP_ERR = None
@@ -191,17 +186,6 @@ except ImportError:
     HAS_CREATE_DEFAULT_CONTEXT = False
 else:
     HAS_CREATE_DEFAULT_CONTEXT = True
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -241,7 +225,7 @@ def main():
             proxy_port=dict(type='int', default=8080),
             server_name=dict(type='str'),
             timeout=dict(type='int', default=10),
-            select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
+            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
             starttls=dict(type='str', choices=['mysql']),
         ),
     )
@@ -259,28 +243,17 @@ def main():
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
-        # First try cryptography, then pyOpenSSL
+        # Try cryptography
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            backend = 'pyopenssl'
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
-    if backend == 'pyopenssl':
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
@@ -343,37 +316,7 @@ def main():
 
     result['cert'] = cert
 
-    if backend == 'pyopenssl':
-        x509 = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
-        result['subject'] = {}
-        for component in x509.get_subject().get_components():
-            result['subject'][component[0]] = component[1]
-
-        result['expired'] = x509.has_expired()
-
-        result['extensions'] = []
-        extension_count = x509.get_extension_count()
-        for index in range(0, extension_count):
-            extension = x509.get_extension(index)
-            result['extensions'].append({
-                'critical': extension.get_critical(),
-                'asn1_data': extension.get_data(),
-                'name': extension.get_short_name(),
-            })
-
-        result['issuer'] = {}
-        for component in x509.get_issuer().get_components():
-            result['issuer'][component[0]] = component[1]
-
-        result['not_after'] = x509.get_notAfter()
-        result['not_before'] = x509.get_notBefore()
-
-        result['serial_number'] = x509.get_serial_number()
-        result['signature_algorithm'] = x509.get_signature_algorithm()
-
-        result['version'] = x509.get_version()
-
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography_backend())
         result['subject'] = {}
         for attribute in x509.subject:

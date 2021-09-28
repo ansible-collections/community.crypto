@@ -30,38 +30,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_oid_to_name,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pyopenssl_support import (
-    pyopenssl_get_extensions_from_csr,
-    pyopenssl_normalize_name,
-    pyopenssl_normalize_name_attribute,
-    pyopenssl_parse_name_constraints,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     get_publickey_info,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
-MINIMAL_PYOPENSSL_VERSION = '0.15'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-    if OpenSSL.SSL.OPENSSL_VERSION_NUMBER >= 0x10100000:
-        # OpenSSL 1.1.0 or newer
-        OPENSSL_MUST_STAPLE_NAME = b"tlsfeature"
-        OPENSSL_MUST_STAPLE_VALUE = b"status_request"
-    else:
-        # OpenSSL 1.0.x or older
-        OPENSSL_MUST_STAPLE_NAME = b"1.3.6.1.5.5.7.1.24"
-        OPENSSL_MUST_STAPLE_VALUE = b"DER:30:03:02:01:05"
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -173,20 +146,19 @@ class CSRInfoRetrieval(object):
             'public_key_fingerprints': public_key_info['fingerprints'],
         })
 
-        if self.backend != 'pyopenssl':
-            ski = self._get_subject_key_identifier()
-            if ski is not None:
-                ski = to_native(binascii.hexlify(ski))
-                ski = ':'.join([ski[i:i + 2] for i in range(0, len(ski), 2)])
-            result['subject_key_identifier'] = ski
+        ski = self._get_subject_key_identifier()
+        if ski is not None:
+            ski = to_native(binascii.hexlify(ski))
+            ski = ':'.join([ski[i:i + 2] for i in range(0, len(ski), 2)])
+        result['subject_key_identifier'] = ski
 
-            aki, aci, acsn = self._get_authority_key_identifier()
-            if aki is not None:
-                aki = to_native(binascii.hexlify(aki))
-                aki = ':'.join([aki[i:i + 2] for i in range(0, len(aki), 2)])
-            result['authority_key_identifier'] = aki
-            result['authority_cert_issuer'] = aci
-            result['authority_cert_serial_number'] = acsn
+        aki, aci, acsn = self._get_authority_key_identifier()
+        if aki is not None:
+            aki = to_native(binascii.hexlify(aki))
+            aki = ':'.join([aki[i:i + 2] for i in range(0, len(aki), 2)])
+        result['authority_key_identifier'] = aki
+        result['authority_cert_issuer'] = aci
+        result['authority_cert_serial_number'] = acsn
 
         result['extensions_by_oid'] = self._get_all_extensions()
 
@@ -332,112 +304,9 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         return self.csr.is_signature_valid
 
 
-class CSRInfoRetrievalPyOpenSSL(CSRInfoRetrieval):
-    """validate the supplied CSR."""
-
-    def __init__(self, module, content, validate_signature):
-        super(CSRInfoRetrievalPyOpenSSL, self).__init__(module, 'pyopenssl', content, validate_signature)
-
-    def __get_name(self, name):
-        result = []
-        for sub in name.get_components():
-            result.append([pyopenssl_normalize_name(sub[0]), to_text(sub[1])])
-        return result
-
-    def _get_subject_ordered(self):
-        return self.__get_name(self.csr.get_subject())
-
-    def _get_extension(self, short_name):
-        for extension in self.csr.get_extensions():
-            if extension.get_short_name() == short_name:
-                result = [
-                    pyopenssl_normalize_name(usage.strip()) for usage in to_text(extension, errors='surrogate_or_strict').split(',')
-                ]
-                return sorted(result), bool(extension.get_critical())
-        return None, False
-
-    def _get_key_usage(self):
-        return self._get_extension(b'keyUsage')
-
-    def _get_extended_key_usage(self):
-        return self._get_extension(b'extendedKeyUsage')
-
-    def _get_basic_constraints(self):
-        return self._get_extension(b'basicConstraints')
-
-    def _get_ocsp_must_staple(self):
-        extensions = self.csr.get_extensions()
-        oms_ext = [
-            ext for ext in extensions
-            if to_bytes(ext.get_short_name()) == OPENSSL_MUST_STAPLE_NAME and to_bytes(ext) == OPENSSL_MUST_STAPLE_VALUE
-        ]
-        if OpenSSL.SSL.OPENSSL_VERSION_NUMBER < 0x10100000:
-            # Older versions of libssl don't know about OCSP Must Staple
-            oms_ext.extend([ext for ext in extensions if ext.get_short_name() == b'UNDEF' and ext.get_data() == b'\x30\x03\x02\x01\x05'])
-        if oms_ext:
-            return True, bool(oms_ext[0].get_critical())
-        else:
-            return None, False
-
-    def _get_subject_alt_name(self):
-        for extension in self.csr.get_extensions():
-            if extension.get_short_name() == b'subjectAltName':
-                result = [pyopenssl_normalize_name_attribute(altname.strip()) for altname in
-                          to_text(extension, errors='surrogate_or_strict').split(', ')]
-                return result, bool(extension.get_critical())
-        return None, False
-
-    def _get_name_constraints(self):
-        for extension in self.csr.get_extensions():
-            if extension.get_short_name() == b'nameConstraints':
-                permitted, excluded = pyopenssl_parse_name_constraints(extension)
-                return permitted, excluded, bool(extension.get_critical())
-        return None, None, False
-
-    def _get_public_key_pem(self):
-        try:
-            return crypto.dump_publickey(
-                crypto.FILETYPE_PEM,
-                self.csr.get_pubkey(),
-            )
-        except AttributeError:
-            try:
-                bio = crypto._new_mem_buf()
-                rc = crypto._lib.PEM_write_bio_PUBKEY(bio, self.csr.get_pubkey()._pkey)
-                if rc != 1:
-                    crypto._raise_current_error()
-                return crypto._bio_to_string(bio)
-            except AttributeError:
-                self.module.warn('Your pyOpenSSL version does not support dumping public keys. '
-                                 'Please upgrade to version 16.0 or newer, or use the cryptography backend.')
-
-    def _get_public_key_object(self):
-        return self.csr.get_pubkey()
-
-    def _get_subject_key_identifier(self):
-        # Won't be implemented
-        return None
-
-    def _get_authority_key_identifier(self):
-        # Won't be implemented
-        return None, None, None
-
-    def _get_all_extensions(self):
-        return pyopenssl_get_extensions_from_csr(self.csr)
-
-    def _is_signature_valid(self):
-        try:
-            return bool(self.csr.verify(self.csr.get_pubkey()))
-        except crypto.Error:
-            # OpenSSL error means that key is not consistent
-            return False
-
-
 def get_csr_info(module, backend, content, validate_signature=True, prefer_one_fingerprint=False):
     if backend == 'cryptography':
         info = CSRInfoRetrievalCryptography(module, content, validate_signature=validate_signature)
-    elif backend == 'pyopenssl':
-        info = CSRInfoRetrievalPyOpenSSL(module, content, validate_signature=validate_signature)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
@@ -445,34 +314,17 @@ def select_backend(module, backend, content, validate_signature=True):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
-        # First try cryptography, then pyOpenSSL
+        # Try cryptography
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            backend = 'pyopenssl'
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
-    if backend == 'pyopenssl':
-        if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
-        try:
-            getattr(crypto.X509Req, 'get_extensions')
-        except AttributeError:
-            module.fail_json(msg='You need to have PyOpenSSL>=0.15 to generate CSRs')
-
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='2.0.0', collection_name='community.crypto')
-        return backend, CSRInfoRetrievalPyOpenSSL(module, content, validate_signature=validate_signature)
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)

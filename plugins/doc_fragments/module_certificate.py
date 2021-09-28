@@ -14,12 +14,9 @@ class ModuleDocFragment(object):
     DOCUMENTATION = r'''
 description:
     - This module allows one to (re)generate OpenSSL certificates.
-    - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL.
-    - If both the cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
-      cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with C(select_crypto_backend)).
-      Please note that the PyOpenSSL backend was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0.
+    - It uses the cryptography python library to interact with OpenSSL.
 requirements:
-    - PyOpenSSL >= 0.15 or cryptography >= 1.6 (if using C(selfsigned), C(ownca) or C(assertonly) provider)
+    - cryptography >= 1.6 (if using C(selfsigned), C(ownca) or C(assertonly) provider)
 options:
     force:
         description:
@@ -58,14 +55,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
 
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.

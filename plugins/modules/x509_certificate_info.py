@@ -15,11 +15,7 @@ module: x509_certificate_info
 short_description: Provide information of OpenSSL X.509 certificates
 description:
     - This module allows one to query information on OpenSSL certificates.
-    - It uses the pyOpenSSL or cryptography python library to interact with OpenSSL. If both the
-      cryptography and PyOpenSSL libraries are available (and meet the minimum version requirements)
-      cryptography will be preferred as a backend over PyOpenSSL (unless the backend is forced with
-      C(select_crypto_backend)). Please note that the PyOpenSSL backend was deprecated in Ansible 2.9
-      and will be removed in community.crypto 2.0.0.
+    - It uses the cryptography python library to interact with OpenSSL.
     - Note that this module was called C(openssl_certificate_info) when included directly in Ansible
       up to version 2.9.  When moved to the collection C(community.crypto), it was renamed to
       M(community.crypto.x509_certificate_info). From Ansible 2.10 on, it can still be used by the
@@ -29,7 +25,7 @@ description:
       keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid
       a deprecation warning.
 requirements:
-    - PyOpenSSL >= 0.15 or cryptography >= 1.6
+    - cryptography >= 1.6
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
@@ -60,14 +56,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            - Please note that the C(pyopenssl) backend has been deprecated in Ansible 2.9, and will be removed in community.crypto 2.0.0.
-              From that point on, only the C(cryptography) backend will be available.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
 
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
@@ -341,7 +334,7 @@ subject_key_identifier:
         - The certificate's subject key identifier.
         - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
         - Is C(none) if the C(SubjectKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_key_identifier:
@@ -349,14 +342,14 @@ authority_key_identifier:
         - The certificate's authority key identifier.
         - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_cert_issuer:
     description:
         - The certificate's authority cert issuer as a list of general names.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: list
     elements: str
     sample: "[DNS:www.ansible.com, IP:1.2.3.4]"
@@ -364,7 +357,7 @@ authority_cert_serial_number:
     description:
         - The certificate's authority cert serial number.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-    returned: success and if the pyOpenSSL backend is I(not) used
+    returned: success
     type: int
     sample: '12345'
 ocsp_uri:
@@ -398,7 +391,7 @@ def main():
             path=dict(type='path'),
             content=dict(type='str'),
             valid_at=dict(type='dict'),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_one_of=(
             ['path', 'content'],

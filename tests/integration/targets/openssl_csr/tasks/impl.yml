@@ -363,7 +363,6 @@
       commonName: www.ansible.com
     subject_key_identifier: "00:11:22:33"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (idempotency)"
@@ -374,7 +373,6 @@
       commonName: www.ansible.com
     subject_key_identifier: "00:11:22:33"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (change)"
@@ -385,7 +383,6 @@
       commonName: www.ansible.com
     subject_key_identifier: "44:55:66:77:88"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (auto-create)"
@@ -396,7 +393,6 @@
       commonName: www.ansible.com
     create_subject_key_identifier: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (auto-create idempotency)"
@@ -407,7 +403,6 @@
       commonName: www.ansible.com
     create_subject_key_identifier: yes
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_5
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (remove)"
@@ -417,7 +412,6 @@
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: subject_key_identifier_6
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier"
@@ -428,7 +422,6 @@
       commonName: www.ansible.com
     authority_key_identifier: "00:11:22:33"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_key_identifier_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (idempotency)"
@@ -439,7 +432,6 @@
       commonName: www.ansible.com
     authority_key_identifier: "00:11:22:33"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_key_identifier_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (change)"
@@ -450,7 +442,6 @@
       commonName: www.ansible.com
     authority_key_identifier: "44:55:66:77:88"
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_key_identifier_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (remove)"
@@ -460,7 +451,6 @@
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_key_identifier_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number"
@@ -474,7 +464,6 @@
       - "IP:1.2.3.4"
     authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_cert_issuer_sn_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (idempotency)"
@@ -488,7 +477,6 @@
       - "IP:1.2.3.4"
     authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_cert_issuer_sn_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (change issuer)"
@@ -502,7 +490,6 @@
       - "DNS:ca.example.org"
     authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_cert_issuer_sn_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (change serial number)"
@@ -516,7 +503,6 @@
       - "DNS:ca.example.org"
     authority_cert_serial_number: 54321
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_cert_issuer_sn_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (remove)"
@@ -525,7 +511,6 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
-  when: select_crypto_backend != 'pyopenssl'
   register: authority_cert_issuer_sn_5
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything"
@@ -561,37 +546,24 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
-    subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage }}'
+    subject_alt_name: '{{ value_for_san }}'
     basic_constraints:
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted }}'
     name_constraints_excluded:
       - "DNS:.example.com"
       - "DNS:.org"
     name_constraints_critical: yes
     ocsp_must_staple: yes
-    subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_issuer: '{{ value_for_authority_cert_issuer if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
+    subject_key_identifier: 00:11:22:33
+    authority_key_identifier: 44:55:66:77
+    authority_cert_issuer: '{{ value_for_authority_cert_issuer }}'
+    authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
-    value_for_extended_key_usage_pyopenssl:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
     value_for_extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
       - TLS Web Server Authentication
@@ -609,13 +581,6 @@
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-    value_for_san_pyopenssl:
-      - "DNS:www.ansible.com"
-      - "IP:1.2.3.4"
-      - "IP:::1"
-      - "email:test@example.org"
-      - "URI:https://example.org/test/index.html"
-      - "RID:1.2.3.4"
     value_for_san:
       - "DNS:www.ansible.com"
       - "IP:1.2.3.4"
@@ -631,9 +596,6 @@
       - "DNS:www.example.com"
       - "IP:1.2.3.0/24"
       - "IP:::1:0:0/112"
-    value_for_name_constraints_permitted_pyopenssl:
-      - "DNS:www.example.com"
-      - "IP:1.2.3.0/255.255.255.0"
   register: everything_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything (idempotent, check mode)"
@@ -669,37 +631,24 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
-    subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage }}'
+    subject_alt_name: '{{ value_for_san }}'
     basic_constraints:
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted }}'
     name_constraints_excluded:
       - "DNS:.org"
       - "DNS:.example.com"
     name_constraints_critical: yes
     ocsp_must_staple: yes
-    subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_issuer: '{{ value_for_authority_cert_issuer if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
+    subject_key_identifier: 00:11:22:33
+    authority_key_identifier: 44:55:66:77
+    authority_cert_issuer: '{{ value_for_authority_cert_issuer }}'
+    authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
-    value_for_extended_key_usage_pyopenssl:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
     value_for_extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
       - TLS Web Server Authentication
@@ -717,13 +666,6 @@
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-    value_for_san_pyopenssl:
-      - "DNS:www.ansible.com"
-      - "IP:1.2.3.4"
-      - "IP:::1"
-      - "email:test@example.org"
-      - "URI:https://example.org/test/index.html"
-      - "RID:1.2.3.4"
     value_for_san:
       - "DNS:www.ansible.com"
       - "IP:1.2.3.4"
@@ -739,9 +681,6 @@
       - "DNS:www.example.com"
       - "IP:1.2.3.0/255.255.255.0"
       - "IP:0::0:1:0:0/112"
-    value_for_name_constraints_permitted_pyopenssl:
-      - "DNS:www.example.com"
-      - "IP:1.2.3.0/255.255.255.0"
   check_mode: yes
   register: everything_2
 
@@ -778,37 +717,24 @@
       - Encipher Only
       - decipherOnly
     key_usage_critical: yes
-    extended_key_usage: '{{ value_for_extended_key_usage if select_crypto_backend != "pyopenssl" else value_for_extended_key_usage_pyopenssl }}'
-    subject_alt_name: '{{ value_for_san if select_crypto_backend != "pyopenssl" else value_for_san_pyopenssl }}'
+    extended_key_usage: '{{ value_for_extended_key_usage }}'
+    subject_alt_name: '{{ value_for_san }}'
     basic_constraints:
       - "CA:TRUE"
       - "pathlen:23"
     basic_constraints_critical: yes
-    name_constraints_permitted: '{{ value_for_name_constraints_permitted if select_crypto_backend != "pyopenssl" else value_for_name_constraints_permitted_pyopenssl }}'
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted }}'
     name_constraints_excluded:
       - "DNS:.org"
       - "DNS:.example.com"
     name_constraints_critical: yes
     ocsp_must_staple: yes
-    subject_key_identifier: '{{ "00:11:22:33" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_key_identifier: '{{ "44:55:66:77" if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_issuer: '{{ value_for_authority_cert_issuer if select_crypto_backend != "pyopenssl" else omit }}'
-    authority_cert_serial_number: '{{ 12345 if select_crypto_backend != "pyopenssl" else omit }}'
+    subject_key_identifier: 00:11:22:33
+    authority_key_identifier: 44:55:66:77
+    authority_cert_issuer: '{{ value_for_authority_cert_issuer }}'
+    authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
   vars:
-    value_for_extended_key_usage_pyopenssl:
-      - serverAuth  # the same as "TLS Web Server Authentication"
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
-      - Code Signing
-      - E-mail Protection
-      - timeStamping
-      - OCSPSigning
-      - Any Extended Key Usage
-      - qcStatements
-      - DVCS
-      - IPSec User
-      - biometricInfo
     value_for_extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
       - TLS Web Server Authentication
@@ -826,13 +752,6 @@
     value_for_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-    value_for_san_pyopenssl:
-      - "DNS:www.ansible.com"
-      - "IP:1.2.3.4"
-      - "IP:::1"
-      - "email:test@example.org"
-      - "URI:https://example.org/test/index.html"
-      - "RID:1.2.3.4"
     value_for_san:
       - "DNS:www.ansible.com"
       - "IP:1.2.3.4"
@@ -848,9 +767,6 @@
       - "DNS:www.example.com"
       - "IP:1.2.3.0/255.255.255.0"
       - "IP:0::0:1:0:0/112"
-    value_for_name_constraints_permitted_pyopenssl:
-      - "DNS:www.example.com"
-      - "IP:1.2.3.0/255.255.255.0"
   register: everything_3
 
 - name: "({{ select_crypto_backend }}) Get info from CSR with everything"

@@ -98,25 +98,10 @@ def get_fingerprint_of_bytes(source, prefer_one=False):
     return fingerprint
 
 
-def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl', prefer_one=False):
+def get_fingerprint_of_privatekey(privatekey, backend='cryptography', prefer_one=False):
     """Generate the fingerprint of the public key. """
 
-    if backend == 'pyopenssl':
-        try:
-            publickey = crypto.dump_publickey(crypto.FILETYPE_ASN1, privatekey)
-        except AttributeError:
-            # If PyOpenSSL < 16.0 crypto.dump_publickey() will fail.
-            try:
-                bio = crypto._new_mem_buf()
-                rc = crypto._lib.i2d_PUBKEY_bio(bio, privatekey._pkey)
-                if rc != 1:
-                    crypto._raise_current_error()
-                publickey = crypto._bio_to_string(bio)
-            except AttributeError:
-                # By doing this we prevent the code from raising an error
-                # yet we return no value in the fingerprint hash.
-                return None
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         publickey = privatekey.public_key().public_bytes(
             serialization.Encoding.DER,
             serialization.PublicFormat.SubjectPublicKeyInfo
@@ -125,7 +110,7 @@ def get_fingerprint_of_privatekey(privatekey, backend='pyopenssl', prefer_one=Fa
     return get_fingerprint_of_bytes(publickey, prefer_one=prefer_one)
 
 
-def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl', prefer_one=False):
+def get_fingerprint(path, passphrase=None, content=None, backend='cryptography', prefer_one=False):
     """Generate the fingerprint of the public key. """
 
     privatekey = load_privatekey(path, passphrase=passphrase, content=content, check_passphrase=False, backend=backend)
@@ -133,7 +118,7 @@ def get_fingerprint(path, passphrase=None, content=None, backend='pyopenssl', pr
     return get_fingerprint_of_privatekey(privatekey, backend=backend, prefer_one=prefer_one)
 
 
-def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, backend='pyopenssl'):
+def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, backend='cryptography'):
     """Load the specified OpenSSL private key.
 
     The content can also be specified via content; in that case,
@@ -213,14 +198,9 @@ def load_publickey(path=None, content=None, backend=None):
             return serialization.load_pem_public_key(content, backend=cryptography_backend())
         except Exception as e:
             raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
-    else:
-        try:
-            return crypto.load_publickey(crypto.FILETYPE_PEM, content)
-        except crypto.Error as e:
-            raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
 
 
-def load_certificate(path, content=None, backend='pyopenssl'):
+def load_certificate(path, content=None, backend='cryptography'):
     """Load the specified certificate."""
 
     try:
@@ -240,7 +220,7 @@ def load_certificate(path, content=None, backend='pyopenssl'):
             raise OpenSSLObjectError(exc)
 
 
-def load_certificate_request(path, content=None, backend='pyopenssl'):
+def load_certificate_request(path, content=None, backend='cryptography'):
     """Load the specified certificate signing request."""
     try:
         if content is None:
@@ -250,9 +230,7 @@ def load_certificate_request(path, content=None, backend='pyopenssl'):
             csr_content = content
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
-    if backend == 'pyopenssl':
-        return crypto.load_certificate_request(crypto.FILETYPE_PEM, csr_content)
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         try:
             return x509.load_pem_x509_csr(csr_content, cryptography_backend())
         except ValueError as exc:
@@ -322,9 +300,7 @@ def get_relative_time_option(input_string, input_name, backend='cryptography'):
         elif backend == 'cryptography':
             return result_datetime
     # Absolute time
-    if backend == 'pyopenssl':
-        return input_string
-    elif backend == 'cryptography':
+    if backend == 'cryptography':
         for date_fmt in ['%Y%m%d%H%M%SZ', '%Y%m%d%H%MZ', '%Y%m%d%H%M%S%z', '%Y%m%d%H%M%z']:
             try:
                 return datetime.datetime.strptime(result, date_fmt)

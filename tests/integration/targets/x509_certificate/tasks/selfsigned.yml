@@ -353,7 +353,6 @@
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: selfsigned_subject_key_identifier_1
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (idempotency)
@@ -365,7 +364,6 @@
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: selfsigned_subject_key_identifier_2
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove)
@@ -377,7 +375,6 @@
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: never_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: selfsigned_subject_key_identifier_3
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove idempotency)
@@ -389,7 +386,6 @@
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: never_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: selfsigned_subject_key_identifier_4
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (re-enable)
@@ -401,7 +397,6 @@
     selfsigned_digest: sha256
     selfsigned_create_subject_key_identifier: always_create
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend != 'pyopenssl'
   register: selfsigned_subject_key_identifier_5
 
 - name: (Selfsigned, {{select_crypto_backend}}) Ed25519 and Ed448 tests (for cryptography >= 2.6)

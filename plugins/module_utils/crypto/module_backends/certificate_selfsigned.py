@@ -163,76 +163,6 @@ def generate_serial_number():
             return result
 
 
-class SelfSignedCertificateBackendPyOpenSSL(CertificateBackend):
-    def __init__(self, module):
-        super(SelfSignedCertificateBackendPyOpenSSL, self).__init__(module, 'pyopenssl')
-
-        if module.params['selfsigned_create_subject_key_identifier'] != 'create_if_not_provided':
-            module.fail_json(msg='selfsigned_create_subject_key_identifier cannot be used with the pyOpenSSL backend!')
-        self.notBefore = get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
-        self.notAfter = get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
-        self.digest = module.params['selfsigned_digest']
-        self.version = module.params['selfsigned_version']
-        self.serial_number = generate_serial_number()
-
-        if self.csr_path is not None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                'The certificate signing request file {0} does not exist'.format(self.csr_path)
-            )
-        if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
-            raise CertificateError(
-                'The private key file {0} does not exist'.format(self.privatekey_path)
-            )
-
-        self._ensure_private_key_loaded()
-
-        self._ensure_csr_loaded()
-        if self.csr is None:
-            # Create empty CSR on the fly
-            self.csr = crypto.X509Req()
-            self.csr.set_pubkey(self.privatekey)
-            self.csr.sign(self.privatekey, self.digest)
-
-    def generate_certificate(self):
-        """(Re-)Generate certificate."""
-        cert = crypto.X509()
-        cert.set_serial_number(self.serial_number)
-        cert.set_notBefore(to_bytes(self.notBefore))
-        cert.set_notAfter(to_bytes(self.notAfter))
-        cert.set_subject(self.csr.get_subject())
-        cert.set_issuer(self.csr.get_subject())
-        cert.set_version(self.version - 1)
-        cert.set_pubkey(self.csr.get_pubkey())
-        cert.add_extensions(self.csr.get_extensions())
-
-        cert.sign(self.privatekey, self.digest)
-        self.cert = cert
-
-    def get_certificate_data(self):
-        """Return bytes for self.cert."""
-        return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert)
-
-    def dump(self, include_certificate):
-        result = super(SelfSignedCertificateBackendPyOpenSSL, self).dump(include_certificate)
-
-        if self.module.check_mode:
-            result.update({
-                'notBefore': self.notBefore,
-                'notAfter': self.notAfter,
-                'serial_number': self.serial_number,
-            })
-        else:
-            if self.cert is None:
-                self.cert = self.existing_certificate
-            result.update({
-                'notBefore': self.cert.get_notBefore(),
-                'notAfter': self.cert.get_notAfter(),
-                'serial_number': self.cert.get_serial_number(),
-            })
-
-        return result
-
-
 class SelfSignedCertificateProvider(CertificateProvider):
     def validate_module_args(self, module):
         if module.params['privatekey_path'] is None and module.params['privatekey_content'] is None:
@@ -244,8 +174,6 @@ class SelfSignedCertificateProvider(CertificateProvider):
     def create_backend(self, module, backend):
         if backend == 'cryptography':
             return SelfSignedCertificateBackendCryptography(module)
-        if backend == 'pyopenssl':
-            return SelfSignedCertificateBackendPyOpenSSL(module)
 
 
 def add_selfsigned_provider_to_argument_spec(argument_spec):

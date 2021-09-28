@@ -20,10 +20,6 @@
       - "result.public_data.exponent > 5"
       - "'private_data' not in result"
 
-- name: Update result list
-  set_fact:
-    info_results: "{{ info_results | combine({'key1': result}) }}"
-
 - name: ({{select_crypto_backend}}) Read private key
   slurp:
     src: '{{ remote_tmp_dir }}/privatekey_1.pem'
@@ -61,10 +57,6 @@
       - "'private_data' in result"
       - "result.public_data.modulus == result.private_data.p * result.private_data.q"
       - "result.private_data.exponent > 5"
-
-- name: Update result list
-  set_fact:
-    info_results: "{{ info_results | combine({'key2': result}) }}"
 
 - name: ({{select_crypto_backend}}) Get key 3 info (without passphrase)
   openssl_privatekey_info:
@@ -113,10 +105,6 @@
       - "result.public_data.modulus == result.private_data.p * result.private_data.q"
       - "result.private_data.exponent > 5"
 
-- name: Update result list
-  set_fact:
-    info_results: "{{ info_results | combine({'key3': result}) }}"
-
 - name: ({{select_crypto_backend}}) Get key 4 info
   openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_4.pem'
@@ -124,37 +112,20 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- block:
-  - name: Check that ECC key info is ok
-    assert:
-      that:
-        - "'public_key' in result"
-        - "'public_key_fingerprints' in result"
-        - "'type' in result"
-        - "result.type == 'ECC'"
-        - "'public_data' in result"
-        - "result.public_data.curve is string"
-        - "result.public_data.x != 0"
-        - "result.public_data.y != 0"
-        - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
-        - "'private_data' in result"
-        - "result.private_data.multiplier > 1024"
-
-  - name: Update result list
-    set_fact:
-      info_results: "{{ info_results | combine({'key4': result}) }}"
-  when: select_crypto_backend != 'pyopenssl' or (pyopenssl_version.stdout is version('16.1.0', '>=') and cryptography_version.stdout is version('0.0', '>'))
-
 - name: Check that ECC key info is ok
   assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"
       - "'type' in result"
-      - "result.type.startswith('unknown ')"
+      - "result.type == 'ECC'"
       - "'public_data' in result"
+      - "result.public_data.curve is string"
+      - "result.public_data.x != 0"
+      - "result.public_data.y != 0"
+      - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
       - "'private_data' in result"
-  when: select_crypto_backend == 'pyopenssl' and not (pyopenssl_version.stdout is version('16.1.0', '>=') and cryptography_version.stdout is version('0.0', '>'))
+      - "result.private_data.multiplier > 1024"
 
 - name: ({{select_crypto_backend}}) Get key 5 info
   openssl_privatekey_info:
@@ -177,7 +148,3 @@
       - "result.public_data.y > 2"
       - "'private_data' in result"
       - "result.private_data.x > 2"
-
-- name: Update result list
-  set_fact:
-    info_results: "{{ info_results | combine({'key5': result}) }}"

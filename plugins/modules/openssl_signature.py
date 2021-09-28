@@ -15,13 +15,9 @@ version_added: 1.1.0
 short_description: Sign data with openssl
 description:
     - This module allows one to sign data using a private key.
-    - The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available. This can be
-      overridden with the I(select_crypto_backend) option. Please note that the PyOpenSSL backend
-      was deprecated in Ansible 2.9 and will be removed in community.crypto 2.0.0.
+    - The module uses the cryptography Python library.
 requirements:
-    - Either cryptography >= 1.4 (some key types require newer versions)
-    - Or pyOpenSSL >= 0.11 (Ed25519 and Ed448 keys are not supported with this backend)
+    - cryptography >= 1.4 (some key types require newer versions)
 author:
     - Patrick Pichler (@aveexy)
     - Markus Teufelberger (@MarkusTeufelberger)
@@ -50,12 +46,11 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - The default choice is C(auto), which tries to use C(cryptography) if available.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
-        choices: [ auto, cryptography, pyopenssl ]
+        choices: [ auto, cryptography ]
 notes:
     - |
       When using the C(cryptography) backend, the following key types require at least the following C(cryptography) version:
@@ -99,19 +94,7 @@ import traceback
 from distutils.version import LooseVersion
 import base64
 
-MINIMAL_PYOPENSSL_VERSION = '0.11'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.4'
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -168,34 +151,6 @@ class SignatureBase(OpenSSLObject):
     def dump(self):
         # Empty method because OpenSSLObject wants this
         pass
-
-
-# Implementation with using pyOpenSSL
-class SignaturePyOpenSSL(SignatureBase):
-
-    def __init__(self, module, backend):
-        super(SignaturePyOpenSSL, self).__init__(module, backend)
-
-    def run(self):
-
-        result = dict()
-
-        try:
-            with open(self.path, "rb") as f:
-                _in = f.read()
-
-            private_key = load_privatekey(
-                path=self.privatekey_path,
-                content=self.privatekey_content,
-                passphrase=self.privatekey_passphrase,
-                backend=self.backend,
-            )
-
-            signature = OpenSSL.crypto.sign(private_key, _in, "sha256")
-            result['signature'] = base64.b64encode(signature)
-            return result
-        except Exception as e:
-            raise OpenSSLObjectError(e)
 
 
 # Implementation with using cryptography
@@ -262,7 +217,7 @@ def main():
             privatekey_content=dict(type='str', no_log=True),
             privatekey_passphrase=dict(type='str', no_log=True),
             path=dict(type='path', required=True),
-            select_crypto_backend=dict(type='str', choices=['auto', 'pyopenssl', 'cryptography'], default='auto'),
+            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
         ),
         mutually_exclusive=(
             ['privatekey_path', 'privatekey_content'],
@@ -283,29 +238,17 @@ def main():
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
         # Decision
         if can_use_cryptography:
             backend = 'cryptography'
-        elif can_use_pyopenssl:
-            backend = 'pyopenssl'
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
-                MINIMAL_CRYPTOGRAPHY_VERSION,
-                MINIMAL_PYOPENSSL_VERSION))
+            module.fail_json(msg=("Can't detect the required Python library "
+                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
     try:
-        if backend == 'pyopenssl':
-            if not PYOPENSSL_FOUND:
-                module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                                 exception=PYOPENSSL_IMP_ERR)
-            module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                             version='2.0.0', collection_name='community.crypto')
-            _sign = SignaturePyOpenSSL(module, backend)
-        elif backend == 'cryptography':
+        if backend == 'cryptography':
             if not CRYPTOGRAPHY_FOUND:
                 module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                                  exception=CRYPTOGRAPHY_IMP_ERR)
