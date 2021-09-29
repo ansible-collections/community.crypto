@@ -1,0 +1,2 @@
+deprecated_features:
+  - "acme_* modules - ACME version 1 is now deprecated and support for it will be removed in community.crypto 2.0.0 (https://github.com/ansible-collections/community.crypto/pull/288)."

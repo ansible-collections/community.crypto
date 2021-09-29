@@ -366,6 +366,10 @@ def create_backend(module, needs_acme_v2):
     if needs_acme_v2 and module.params['acme_version'] < 2:
         module.fail_json(msg='The {0} module requires the ACME v2 protocol!'.format(module._name))
 
+    if module.params['acme_version'] == 1:
+        module.deprecate("The value 1 for 'acme_version' is deprecated. Please switch to ACME v2",
+                         version='3.0.0', collection_name='community.crypto')
+
     # AnsibleModule() changes the locale, so change it back to C because we rely
     # on datetime.datetime.strptime() when parsing certificate dates.
     locale.setlocale(locale.LC_ALL, 'C')

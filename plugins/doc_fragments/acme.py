@@ -76,7 +76,8 @@ options:
          or C(2) for standardized ACME v2 endpoints."
       - "The default value is C(1). Note that in community.crypto 2.0.0, this
          option B(will be required) and will no longer have a default."
-      - "Please also note that we will deprecate ACME v1 support eventually."
+      - "The value C(1) is deprecated since community.crypto 2.0.0 and will be
+         removed from community.crypto 3.0.0."
     type: int
     choices: [ 1, 2 ]
   acme_directory:
