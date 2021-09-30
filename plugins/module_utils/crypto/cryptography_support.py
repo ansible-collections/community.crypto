@@ -70,6 +70,13 @@ def cryptography_get_extensions_from_cert(cert):
     # (that is only stored for unrecognized extensions), we have to re-do
     # the extension parsing outselves.
     backend = default_backend()
+    try:
+        # For certain old versions of cryptography, backend is a MultiBackend object,
+        # which has no _lib attribute. In that case, revert to the old approach.
+        x = backend._lib
+    except AttributeError:
+        backend = cert._backend
+
     result = dict()
     try:
         x509_obj = cert._x509
@@ -118,6 +125,12 @@ def cryptography_get_extensions_from_csr(csr):
     # the extension parsing outselves.
     result = dict()
     backend = default_backend()
+    try:
+        # For certain old versions of cryptography, backend is a MultiBackend object,
+        # which has no _lib attribute. In that case, revert to the old approach.
+        x = backend._lib
+    except AttributeError:
+        backend = csr._backend
 
     extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
     extensions = backend._ffi.gc(
@@ -533,6 +546,12 @@ def parse_pkcs12(pkcs12_bytes, passphrase=None):
     if certificate:
         # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
         backend = default_backend()
+        try:
+            # For certain old versions of cryptography, backend is a MultiBackend object,
+            # which has no _lib attribute. In that case, revert to the old approach.
+            x = backend._lib
+        except AttributeError:
+            backend = certificate._backend
         maybe_name = backend._lib.X509_alias_get0(certificate._x509, backend._ffi.NULL)
         if maybe_name != backend._ffi.NULL:
             friendly_name = backend._ffi.string(maybe_name)
