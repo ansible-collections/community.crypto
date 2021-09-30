@@ -30,6 +30,7 @@ from ._asn1 import serialize_asn1_string_as_der
 try:
     import cryptography
     from cryptography import x509
+    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     import ipaddress
 except ImportError:
@@ -68,24 +69,46 @@ def cryptography_get_extensions_from_cert(cert):
     # Since cryptography won't give us the DER value for an extension
     # (that is only stored for unrecognized extensions), we have to re-do
     # the extension parsing outselves.
+    backend = default_backend()
     result = dict()
-    backend = cert._backend
-    x509_obj = cert._x509
+    try:
+        x509_obj = cert._x509
 
-    for i in range(backend._lib.X509_get_ext_count(x509_obj)):
-        ext = backend._lib.X509_get_ext(x509_obj, i)
-        if ext == backend._ffi.NULL:
-            continue
-        crit = backend._lib.X509_EXTENSION_get_critical(ext)
-        data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._ffi.NULL)
-        der = backend._ffi.buffer(data.data, data.length)[:]
-        entry = dict(
-            critical=(crit == 1),
-            value=base64.b64encode(der),
-        )
-        oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
-        result[oid] = entry
+        for i in range(backend._lib.X509_get_ext_count(x509_obj)):
+            ext = backend._lib.X509_get_ext(x509_obj, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            result[oid] = entry
+    except AttributeError:
+        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+        # not allow to get the raw value of an extension, so we have to use this ugly hack:
+        x509_obj = cert._x509
+        exts = list(cert.extensions)
+
+        for i in range(backend._lib.X509_get_ext_count(x509_obj)):
+            ext = backend._lib.X509_get_ext(x509_obj, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            oid = exts[i].oid.dotted_string
+            result[oid] = entry
+
     return result
 
 
@@ -94,7 +117,7 @@ def cryptography_get_extensions_from_csr(csr):
     # (that is only stored for unrecognized extensions), we have to re-do
     # the extension parsing outselves.
     result = dict()
-    backend = csr._backend
+    backend = default_backend()
 
     extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
     extensions = backend._ffi.gc(
@@ -105,20 +128,40 @@ def cryptography_get_extensions_from_csr(csr):
         )
     )
 
-    for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
-        ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
-        if ext == backend._ffi.NULL:
-            continue
-        crit = backend._lib.X509_EXTENSION_get_critical(ext)
-        data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._ffi.NULL)
-        der = backend._ffi.buffer(data.data, data.length)[:]
-        entry = dict(
-            critical=(crit == 1),
-            value=base64.b64encode(der),
-        )
-        oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
-        result[oid] = entry
+    try:
+        for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
+            ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            result[oid] = entry
+    except AttributeError:
+        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+        # not allow to get the raw value of an extension, so we have to use this ugly hack:
+        exts = list(csr.extensions)
+        for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
+            ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            oid = exts[i].oid.dotted_string
+            result[oid] = entry
+
     return result
 
 
@@ -489,9 +532,9 @@ def parse_pkcs12(pkcs12_bytes, passphrase=None):
     friendly_name = None
     if certificate:
         # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
-        maybe_name = certificate._backend._lib.X509_alias_get0(
-            certificate._x509, certificate._backend._ffi.NULL)
-        if maybe_name != certificate._backend._ffi.NULL:
-            friendly_name = certificate._backend._ffi.string(maybe_name)
+        backend = default_backend()
+        maybe_name = backend._lib.X509_alias_get0(certificate._x509, backend._ffi.NULL)
+        if maybe_name != backend._ffi.NULL:
+            friendly_name = backend._ffi.string(maybe_name)
 
     return private_key, certificate, additional_certificates, friendly_name
