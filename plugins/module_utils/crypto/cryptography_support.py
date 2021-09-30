@@ -78,43 +78,28 @@ def cryptography_get_extensions_from_cert(cert):
         backend = cert._backend
 
     result = dict()
-    try:
-        x509_obj = cert._x509
+    x509_obj = cert._x509
+    # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+    # not allow to get the raw value of an extension, so we have to use this ugly hack:
+    exts = list(cert.extensions)
 
-        for i in range(backend._lib.X509_get_ext_count(x509_obj)):
-            ext = backend._lib.X509_get_ext(x509_obj, i)
-            if ext == backend._ffi.NULL:
-                continue
-            crit = backend._lib.X509_EXTENSION_get_critical(ext)
-            data = backend._lib.X509_EXTENSION_get_data(ext)
-            backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der),
-            )
+    for i in range(backend._lib.X509_get_ext_count(x509_obj)):
+        ext = backend._lib.X509_get_ext(x509_obj, i)
+        if ext == backend._ffi.NULL:
+            continue
+        crit = backend._lib.X509_EXTENSION_get_critical(ext)
+        data = backend._lib.X509_EXTENSION_get_data(ext)
+        backend.openssl_assert(data != backend._ffi.NULL)
+        der = backend._ffi.buffer(data.data, data.length)[:]
+        entry = dict(
+            critical=(crit == 1),
+            value=base64.b64encode(der),
+        )
+        try:
             oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
-            result[oid] = entry
-    except AttributeError:
-        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
-        # not allow to get the raw value of an extension, so we have to use this ugly hack:
-        x509_obj = cert._x509
-        exts = list(cert.extensions)
-
-        for i in range(backend._lib.X509_get_ext_count(x509_obj)):
-            ext = backend._lib.X509_get_ext(x509_obj, i)
-            if ext == backend._ffi.NULL:
-                continue
-            crit = backend._lib.X509_EXTENSION_get_critical(ext)
-            data = backend._lib.X509_EXTENSION_get_data(ext)
-            backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der),
-            )
+        except AttributeError:
             oid = exts[i].oid.dotted_string
-            result[oid] = entry
+        result[oid] = entry
 
     return result
 
@@ -141,39 +126,27 @@ def cryptography_get_extensions_from_csr(csr):
         )
     )
 
-    try:
-        for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
-            ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
-            if ext == backend._ffi.NULL:
-                continue
-            crit = backend._lib.X509_EXTENSION_get_critical(ext)
-            data = backend._lib.X509_EXTENSION_get_data(ext)
-            backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der),
-            )
+    # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+    # not allow to get the raw value of an extension, so we have to use this ugly hack:
+    exts = list(csr.extensions)
+
+    for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
+        ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
+        if ext == backend._ffi.NULL:
+            continue
+        crit = backend._lib.X509_EXTENSION_get_critical(ext)
+        data = backend._lib.X509_EXTENSION_get_data(ext)
+        backend.openssl_assert(data != backend._ffi.NULL)
+        der = backend._ffi.buffer(data.data, data.length)[:]
+        entry = dict(
+            critical=(crit == 1),
+            value=base64.b64encode(der),
+        )
+        try:
             oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
-            result[oid] = entry
-    except AttributeError:
-        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
-        # not allow to get the raw value of an extension, so we have to use this ugly hack:
-        exts = list(csr.extensions)
-        for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
-            ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
-            if ext == backend._ffi.NULL:
-                continue
-            crit = backend._lib.X509_EXTENSION_get_critical(ext)
-            data = backend._lib.X509_EXTENSION_get_data(ext)
-            backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der),
-            )
+        except AttributeError:
             oid = exts[i].oid.dotted_string
-            result[oid] = entry
+        result[oid] = entry
 
     return result
 
