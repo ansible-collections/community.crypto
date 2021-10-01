@@ -113,8 +113,6 @@ stages:
         parameters:
           testFormat: devel/linux/{0}/1
           targets:
-            - name: CentOS 6
-              test: centos6
             - name: CentOS 7
               test: centos7
             - name: CentOS 8
@@ -139,6 +137,8 @@ stages:
         parameters:
           testFormat: 2.12/linux/{0}/1
           targets:
+            - name: CentOS 6
+              test: centos6
             - name: CentOS 8
               test: centos8
             - name: Fedora 33
@@ -277,7 +277,6 @@ stages:
           nameFormat: Python {0}
           testFormat: devel/cloud/{0}/1
           targets:
-            - test: 2.6
             - test: 2.7
             - test: 3.5
             - test: 3.6
@@ -294,6 +293,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.12/cloud/{0}/1
           targets:
+            - test: 2.6
             - test: 3.9
   - stage: Cloud_2_11
     displayName: Cloud 2.11
