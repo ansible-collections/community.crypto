@@ -1,0 +1,2 @@
+bugfixes:
+  - "openssl_pkcs12 - fix compatibility with the cryptography 35.0.0 release (https://github.com/ansible-collections/community.crypto/pull/296)."
