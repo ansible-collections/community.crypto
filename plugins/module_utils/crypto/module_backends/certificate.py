@@ -223,7 +223,7 @@ class CertificateBackend(object):
                 return False
         return True
 
-    def needs_regeneration(self):
+    def needs_regeneration(self, not_before=None, not_after=None):
         """Check whether a regeneration is necessary."""
         if self.force or self.existing_certificate_bytes is None:
             return True
@@ -246,6 +246,16 @@ class CertificateBackend(object):
         # Check SubjectKeyIdentifier
         if self.create_subject_key_identifier != 'never_create' and not self._check_subject_key_identifier():
             return True
+
+        # Check not before
+        if not_before is not None:
+            if self.existing_certificate.not_valid_before != not_before:
+                return True
+
+        # Check not after
+        if not_after is not None:
+            if self.existing_certificate.not_valid_after != not_after:
+                return True
 
         return False
 

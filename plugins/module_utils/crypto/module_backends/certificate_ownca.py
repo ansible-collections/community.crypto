@@ -169,7 +169,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         return self.cert.public_bytes(Encoding.PEM)
 
     def needs_regeneration(self):
-        if super(OwnCACertificateBackendCryptography, self).needs_regeneration():
+        if super(OwnCACertificateBackendCryptography, self).needs_regeneration(not_before=self.notBefore, not_after=self.notAfter):
             return True
 
         # Check AuthorityKeyIdentifier
