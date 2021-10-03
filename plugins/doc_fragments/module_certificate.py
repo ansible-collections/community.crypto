@@ -452,7 +452,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will start being valid from now.
-            - Note that this value is B(not used for idempotency checks).
+            - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
             - This is only used by the C(ownca) provider.
         type: str
         default: +0s
@@ -465,7 +465,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
-            - Note that this value is B(not used for idempotency checks).
+            - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
             - This is only used by the C(ownca) provider.
             - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
               Please see U(https://support.apple.com/en-us/HT210176) for more details.
@@ -543,7 +543,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will start being valid from now.
-            - Note that this value is B(not used for idempotency checks).
+            - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
             - This is only used by the C(selfsigned) provider.
         type: str
         default: +0s
@@ -557,7 +557,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
-            - Note that this value is B(not used for idempotency checks).
+            - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
             - This is only used by the C(selfsigned) provider.
             - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
               Please see U(https://support.apple.com/en-us/HT210176) for more details.
