@@ -21,9 +21,11 @@ __metaclass__ = type
 
 import base64
 
-from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text, to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
+
+from ._objects import OID_LOOKUP
 
 try:
     import OpenSSL
@@ -87,18 +89,25 @@ def pyopenssl_get_extensions_from_cert(cert):
             critical=bool(ext.get_critical()),
             value=base64.b64encode(ext.get_data()),
         )
-        oid = obj2txt(
-            OpenSSL._util.lib,
-            OpenSSL._util.ffi,
-            OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
-        )
-        # This could also be done a bit simpler:
-        #
-        #   oid = obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
-        #
-        # Unfortunately this gives the wrong result in case the linked OpenSSL
-        # doesn't know the OID. That's why we have to get the OID dotted string
-        # similarly to how cryptography does it.
+        try:
+            oid = obj2txt(
+                OpenSSL._util.lib,
+                OpenSSL._util.ffi,
+                OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
+            )
+            # This could also be done a bit simpler:
+            #
+            #   oid = obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
+            #
+            # Unfortunately this gives the wrong result in case the linked OpenSSL
+            # doesn't know the OID. That's why we have to get the OID dotted string
+            # similarly to how cryptography does it.
+        except AttributeError:
+            # When PyOpenSSL is used with cryptography >= 35.0.0, obj2txt cannot be used.
+            # We try to figure out the OID with our internal lookup table, and if we fail,
+            # we use the short name OpenSSL returns.
+            oid = to_native(ext.get_short_name())
+            oid = OID_LOOKUP.get(oid, oid)
         result[oid] = entry
     return result
 
@@ -113,18 +122,25 @@ def pyopenssl_get_extensions_from_csr(csr):
             critical=bool(ext.get_critical()),
             value=base64.b64encode(ext.get_data()),
         )
-        oid = obj2txt(
-            OpenSSL._util.lib,
-            OpenSSL._util.ffi,
-            OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
-        )
-        # This could also be done a bit simpler:
-        #
-        #   oid = obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
-        #
-        # Unfortunately this gives the wrong result in case the linked OpenSSL
-        # doesn't know the OID. That's why we have to get the OID dotted string
-        # similarly to how cryptography does it.
+        try:
+            oid = obj2txt(
+                OpenSSL._util.lib,
+                OpenSSL._util.ffi,
+                OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
+            )
+            # This could also be done a bit simpler:
+            #
+            #   oid = obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
+            #
+            # Unfortunately this gives the wrong result in case the linked OpenSSL
+            # doesn't know the OID. That's why we have to get the OID dotted string
+            # similarly to how cryptography does it.
+        except AttributeError:
+            # When PyOpenSSL is used with cryptography >= 35.0.0, obj2txt cannot be used.
+            # We try to figure out the OID with our internal lookup table, and if we fail,
+            # we use the short name OpenSSL returns.
+            oid = to_native(ext.get_short_name())
+            oid = OID_LOOKUP.get(oid, oid)
         result[oid] = entry
     return result
 
