@@ -24,8 +24,8 @@ notes:
      principle be used with any CA providing an ACME endpoint, such as
      L(Buypass Go SSL,https://www.buypass.com/ssl/products/acme)."
 requirements:
-  - python >= 2.6
   - either openssl or L(cryptography,https://cryptography.io/) >= 1.5
+  - ipaddress
 options:
   account_key_src:
     description:

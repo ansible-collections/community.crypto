@@ -29,7 +29,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
+try:
+    import ipaddress
+except ImportError:
+    pass
 
 
 _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
@@ -216,7 +219,7 @@ class OpenSSLCLIBackend(CryptoBackend):
     @staticmethod
     def _normalize_ip(ip):
         try:
-            return to_native(compat_ipaddress.ip_address(to_text(ip)).compressed)
+            return to_native(ipaddress.ip_address(to_text(ip)).compressed)
         except ValueError:
             # We don't want to error out on something IPAddress() can't parse
             return ip

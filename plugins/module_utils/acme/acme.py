@@ -12,6 +12,7 @@ import copy
 import datetime
 import json
 import locale
+import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.urls import fetch_url
@@ -37,6 +38,14 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
+
+try:
+    import ipaddress
+except ImportError:
+    HAS_IPADDRESS = False
+    IPADDRESS_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_IPADDRESS = True
 
 
 def _assert_fetch_url_success(module, response, info, allow_redirect=False, allow_client_error=True, allow_server_error=True):
@@ -327,6 +336,9 @@ def get_default_argspec():
 
 
 def create_backend(module, needs_acme_v2):
+    if not HAS_IPADDRESS:
+        module.fail_json(msg=missing_required_lib('ipaddress'), exception=IPADDRESS_IMPORT_ERROR)
+
     backend = module.params['select_crypto_backend']
 
     # Backend autodetect

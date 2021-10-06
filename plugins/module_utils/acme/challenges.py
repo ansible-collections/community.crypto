@@ -16,8 +16,6 @@ import time
 
 from ansible.module_utils.common.text.converters import to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress as compat_ipaddress
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
@@ -27,6 +25,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
     ACMEProtocolException,
     ModuleFailException,
 )
+
+try:
+    import ipaddress
+except ImportError:
+    pass
 
 
 def create_key_authorization(client, token):
@@ -110,7 +113,7 @@ class Challenge(object):
             # https://www.rfc-editor.org/rfc/rfc8737.html#section-3
             if identifier_type == 'ip':
                 # IPv4/IPv6 address: use reverse mapping (RFC1034, RFC3596)
-                resource = compat_ipaddress.ip_address(identifier).reverse_pointer
+                resource = ipaddress.ip_address(identifier).reverse_pointer
                 if not resource.endswith('.'):
                     resource += '.'
             else:
