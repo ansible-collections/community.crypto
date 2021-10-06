@@ -562,3 +562,23 @@ releases:
     - 279-acme-openssl.yml
     - 282-acme_challenge_cert_helper-error.yml
     release_date: '2021-09-28'
+  1.9.5:
+    changes:
+      bugfixes:
+      - get_certificate - fix compatibility with the cryptography 35.0.0 release (https://github.com/ansible-collections/community.crypto/pull/294).
+      - openssl_csr_info - fix compatibility with the cryptography 35.0.0 release
+        (https://github.com/ansible-collections/community.crypto/pull/294).
+      - openssl_csr_info - fix compatibility with the cryptography 35.0.0 release
+        in PyOpenSSL backend (https://github.com/ansible-collections/community.crypto/pull/300).
+      - openssl_pkcs12 - fix compatibility with the cryptography 35.0.0 release (https://github.com/ansible-collections/community.crypto/pull/296).
+      - x509_certificate_info - fix compatibility with the cryptography 35.0.0 release
+        (https://github.com/ansible-collections/community.crypto/pull/294).
+      - x509_certificate_info - fix compatibility with the cryptography 35.0.0 release
+        in PyOpenSSL backend (https://github.com/ansible-collections/community.crypto/pull/300).
+      release_summary: Bugfix release to fully support cryptography 35.0.0.
+    fragments:
+    - 1.9.5.yml
+    - 294-cryptography-35.0.0.yml
+    - 296-openssl_pkcs12-cryptography-35.yml
+    - 300-pyopenssl-cryptography-35.yml
+    release_date: '2021-10-06'

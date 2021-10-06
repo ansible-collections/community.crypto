@@ -1,3 +1,0 @@
-bugfixes:
-  - "openssl_csr_info - fix compatibility with the cryptography 35.0.0 release in PyOpenSSL backend (https://github.com/ansible-collections/community.crypto/pull/300)."
-  - "x509_certificate_info - fix compatibility with the cryptography 35.0.0 release in PyOpenSSL backend (https://github.com/ansible-collections/community.crypto/pull/300)."
