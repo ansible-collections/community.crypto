@@ -48,6 +48,15 @@ except ImportError:
     # Error handled in the calling module.
     _load_key_and_certificates = None
 
+try:
+    # This is a separate try/except since this is only present in cryptography 36.0.0 or newer
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        load_pkcs12 as _load_pkcs12,
+    )
+except ImportError:
+    # Error handled in the calling module.
+    _load_pkcs12 = None
+
 from .basic import (
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
@@ -512,10 +521,26 @@ def cryptography_serial_number_of_cert(cert):
 def parse_pkcs12(pkcs12_bytes, passphrase=None):
     '''Returns a tuple (private_key, certificate, additional_certificates, friendly_name).
     '''
-    if _load_key_and_certificates is None:
-        raise ValueError('load_key_and_certificates() not present in the current cryptography version')
-    private_key, certificate, additional_certificates = _load_key_and_certificates(
-        pkcs12_bytes, to_bytes(passphrase) if passphrase is not None else None)
+    if _load_pkcs12 is None and _load_key_and_certificates is None:
+        raise ValueError('neither load_pkcs12() nor load_key_and_certificates() present in the current cryptography version')
+
+    if passphrase is not None:
+        passphrase = to_bytes(passphrase)
+
+    # Main code for cryptography 36.0.0 and forward
+    if _load_pkcs12 is not None:
+        pkcs12 = _load_pkcs12(pkcs12_bytes, passphrase)
+        additional_certificates = [cert.certificate for cert in pkcs12.additional_certs]
+        private_key = pkcs12.key
+        certificate = None
+        friendly_name = None
+        if pkcs12.cert:
+            certificate = pkcs12.cert.certificate
+            friendly_name = pkcs12.cert.friendly_name
+        return private_key, certificate, additional_certificates, friendly_name
+
+    # Backwards compatibility code for cryptography < 36.0.0
+    private_key, certificate, additional_certificates = _load_key_and_certificates(pkcs12_bytes, passphrase)
 
     friendly_name = None
     if certificate:
