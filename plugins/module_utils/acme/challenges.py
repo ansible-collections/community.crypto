@@ -13,7 +13,6 @@ import hashlib
 import json
 import re
 import time
-import traceback
 
 from ansible.module_utils.common.text.converters import to_bytes
 
