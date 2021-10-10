@@ -110,21 +110,27 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: yes
 
-- name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate
-  x509_certificate:
+- name: (OwnCA, {{select_crypto_backend}}) Get certificate information
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/ownca_cert.pem'
-    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    provider: assertonly
-    has_expired: False
-    version: 3
-    signature_algorithms:
-      - sha256WithRSAEncryption
-      - sha256WithECDSAEncryption
-    subject:
-      commonName: www.example.com
-    issuer:
-      commonName: Example CA
     select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: (OwnCA, {{select_crypto_backend}}) Get private key information
+  community.crypto.openssl_privatekey_info:
+    path: '{{ remote_tmp_dir }}/privatekey.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_privatekey
+
+- name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate
+  assert:
+    that:
+      - result.public_key == result_privatekey.public_key
+      - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
+      - "result.subject.commonName == 'www.example.com'"
+      - "result.issuer.commonName == 'Example CA'"
+      - not result.expired
+      - result.version == 3
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca v2 certificate
   x509_certificate:
@@ -151,33 +157,35 @@
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate2
-  x509_certificate:
+- name: (OwnCA, {{select_crypto_backend}}) Get certificate information
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/ownca_cert2.pem'
-    privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
-    provider: assertonly
-    has_expired: False
-    version: 3
-    signature_algorithms:
-      - sha256WithRSAEncryption
-      - sha256WithECDSAEncryption
-    subject:
-      commonName: www.example.com
-      C: US
-      ST: California
-      L: Los Angeles
-      O: ACME Inc.
-      OU:
-        - Roadrunner pest control
-        - Pyrotechnics
-    keyUsage:
-      - digitalSignature
-    extendedKeyUsage:
-      - ipsecUser
-      - biometricInfo
-    issuer:
-      commonName: Example CA
     select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result
+
+- name: (OwnCA, {{select_crypto_backend}}) Get private key information
+  community.crypto.openssl_privatekey_info:
+    path: '{{ remote_tmp_dir }}/privatekey2.pem'
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_privatekey
+
+- name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate2
+  assert:
+    that:
+      - result.public_key == result_privatekey.public_key
+      - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
+      - "result.subject.commonName == 'www.example.com'"
+      - "result.subject.countryName == 'US'"
+      - "result.subject.localityName == 'Los Angeles'"  # L
+      - "result.subject.organizationName == 'ACME Inc.'"
+      - "['organizationalUnitName', 'Pyrotechnics'] in result.subject_ordered"
+      - "['organizationalUnitName', 'Roadrunner pest control'] in result.subject_ordered"
+      - "result.issuer.commonName == 'Example CA'"
+      - not result.expired
+      - result.version == 3
+      - "'Digital Signature' in result.key_usage"
+      - "'IPSec User' in result.extended_key_usage"
+      - "'Biometric Info' in result.extended_key_usage"
 
 - name: (OwnCA, {{select_crypto_backend}}) Create ownca certificate with notBefore and notAfter
   x509_certificate:
