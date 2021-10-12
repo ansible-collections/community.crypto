@@ -43,7 +43,7 @@ options:
             - The version of the certificate signing request.
             - "The only allowed value according to L(RFC 2986,https://tools.ietf.org/html/rfc2986#section-4.1)
                is 1."
-            - This option will no longer accept unsupported values from community.crypto 2.0.0 on.
+            - This option no longer accepts unsupported values since community.crypto 2.0.0.
         type: int
         default: 1
         choices:
