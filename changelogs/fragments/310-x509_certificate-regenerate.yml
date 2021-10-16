@@ -1,0 +1,4 @@
+minor_changes:
+  - "x509_certificate, x509_certificate_pipe - add ``regenerate`` option to allow better control on when certificates should be regenerated (https://github.com/ansible-collections/community.crypto/issues/295, https://github.com/ansible-collections/community.crypto/pull/310)."
+breaking_changes:
+  - "x509_certificate, x509_certificate_pipe - by default, broken certificates will now cause the module to fail instead of them being regenerated. This can be changed with the ``regenerate`` option (https://github.com/ansible-collections/community.crypto/pull/310)."

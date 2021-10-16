@@ -15,6 +15,7 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
@@ -62,7 +63,9 @@ class CertificateBackend(object):
         self.module = module
         self.backend = backend
 
-        self.force = module.params['force']
+        self.regenerate = module.params['regenerate']
+        if module.params['force']:
+            self.regenerate = 'always'
         self.privatekey_path = module.params['privatekey_path']
         self.privatekey_content = module.params['privatekey_content']
         if self.privatekey_content is not None:
@@ -223,39 +226,50 @@ class CertificateBackend(object):
                 return False
         return True
 
+    def needs_regeneration_true(self):
+        if self.regenerate == 'fail':
+            self.module.fail_json(msg='The certificate would be regenerated')
+        return True
+
     def needs_regeneration(self, not_before=None, not_after=None):
         """Check whether a regeneration is necessary."""
-        if self.force or self.existing_certificate_bytes is None:
+        if self.regenerate == 'always' or self.existing_certificate_bytes is None:
             return True
+        if self.regenerate == 'never':
+            return False
 
         try:
             self._ensure_existing_certificate_loaded()
-        except Exception as dummy:
-            return True
+        except Exception as exc:
+            if self.regenerate == 'full_idempotence':
+                return self.needs_regeneration_true()
+            self.module.fail_json(msg='The existing certificate can not be loaded: {0}. '.format(to_native(exc))
+                + 'To force regeneration, call the module with `generate` set to `full_idempotence` or `always`,'
+                + ' or with `force=yes`.')
 
         # Check whether private key matches
         self._ensure_private_key_loaded()
         if self.privatekey is not None and not self._check_privatekey():
-            return True
+            return self.needs_regeneration_true()
 
         # Check whether CSR matches
         self._ensure_csr_loaded()
         if self.csr is not None and not self._check_csr():
-            return True
+            return self.needs_regeneration_true()
 
         # Check SubjectKeyIdentifier
         if self.create_subject_key_identifier != 'never_create' and not self._check_subject_key_identifier():
-            return True
+            return self.needs_regeneration_true()
 
         # Check not before
-        if not_before is not None:
+        if not_before is not None and self.regenerate in ('full_idempotence', 'fail'):
             if self.existing_certificate.not_valid_before != not_before:
-                return True
+                return self.needs_regeneration_true()
 
         # Check not after
-        if not_after is not None:
+        if not_after is not None and self.regenerate in ('full_idempotence', 'fail'):
             if self.existing_certificate.not_valid_after != not_after:
-                return True
+                return self.needs_regeneration_true()
 
         return False
 
@@ -338,6 +352,11 @@ def get_certificate_argument_spec():
             force=dict(type='bool', default=False,),
             csr_path=dict(type='path'),
             csr_content=dict(type='str'),
+            regenerate=dict(
+                type='str',
+                default='partial_idempotence',
+                choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
+            ),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
 
             # General properties of a certificate

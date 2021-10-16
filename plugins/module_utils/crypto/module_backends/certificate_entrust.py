@@ -124,7 +124,7 @@ class EntrustCertificateBackend(CertificateBackend):
         return self.cert_bytes
 
     def needs_regeneration(self):
-        parent_check = super(EntrustCertificateBackend, self).needs_regeneration()
+        parent_check = super(EntrustCertificateBackend, self).needs_regeneration(not_after=self.notAfter)
 
         try:
             cert_details = self._get_cert_details()
@@ -134,11 +134,11 @@ class EntrustCertificateBackend(CertificateBackend):
         # Always issue a new certificate if the certificate is expired, suspended or revoked
         status = cert_details.get('status', False)
         if status == 'EXPIRED' or status == 'SUSPENDED' or status == 'REVOKED':
-            return True
+            return self.needs_regeneration_true()
 
         # If the requested cert type was specified and it is for a different certificate type than the initial certificate, a new one is needed
         if self.module.params['entrust_cert_type'] and cert_details.get('certType') and self.module.params['entrust_cert_type'] != cert_details.get('certType'):
-            return True
+            return self.needs_regeneration_true()
 
         return parent_check
 
