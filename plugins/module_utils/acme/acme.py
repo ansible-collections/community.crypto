@@ -328,8 +328,8 @@ def get_default_argspec():
         account_key_content=dict(type='str', no_log=True),
         account_key_passphrase=dict(type='str', no_log=True),
         account_uri=dict(type='str'),
-        acme_directory=dict(type='str'),
-        acme_version=dict(type='int', choices=[1, 2]),
+        acme_directory=dict(type='str', required=True),
+        acme_version=dict(type='int', required=True, choices=[1, 2]),
         validate_certs=dict(type='bool', default=True),
         select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'openssl', 'cryptography']),
     )
@@ -364,16 +364,6 @@ def create_backend(module, needs_acme_v2):
             'This should only be done for testing against a local ACME server for '
             'development purposes, but *never* for production purposes.'
         )
-
-    if module.params['acme_version'] is None:
-        module.params['acme_version'] = 1
-        module.deprecate("The option 'acme_version' will be required from community.crypto 2.0.0 on",
-                         version='2.0.0', collection_name='community.crypto')
-
-    if module.params['acme_directory'] is None:
-        module.params['acme_directory'] = 'https://acme-staging.api.letsencrypt.org/directory'
-        module.deprecate("The option 'acme_directory' will be required from community.crypto 2.0.0 on",
-                         version='2.0.0', collection_name='community.crypto')
 
     if needs_acme_v2 and module.params['acme_version'] < 2:
         module.fail_json(msg='The {0} module requires the ACME v2 protocol!'.format(module._name))

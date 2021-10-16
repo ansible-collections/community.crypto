@@ -371,10 +371,6 @@ def main():
         supports_check_mode=True,
     )
 
-    if module._name == 'community.crypto.openssl_certificate':
-        module.deprecate("The 'community.crypto.openssl_certificate' module has been renamed to 'community.crypto.x509_certificate'",
-                         version='2.0.0', collection_name='community.crypto')
-
     try:
         if module.params['state'] == 'absent':
             certificate = CertificateAbsent(module)

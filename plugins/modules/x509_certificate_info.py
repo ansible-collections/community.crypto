@@ -401,9 +401,6 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if module._name == 'community.crypto.openssl_certificate_info':
-        module.deprecate("The 'community.crypto.openssl_certificate_info' module has been renamed to 'community.crypto.x509_certificate_info'",
-                         version='2.0.0', collection_name='community.crypto')
 
     if module.params['content'] is not None:
         data = module.params['content'].encode('utf-8')
