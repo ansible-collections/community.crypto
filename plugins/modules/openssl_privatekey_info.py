@@ -53,7 +53,9 @@ options:
             - Whether to check consistency of the private key.
             - In community.crypto < 2.0.0, consistency was always checked.
             - Since community.crypto 2.0.0, the consistency check has been disabled by default to
-              avoid private key material to be transported around only when requested explicitly.
+              avoid private key material to be transported around and computed with, and only do
+              so when requested explicitly. This can potentially prevent
+              L(side-channel attacks,https://en.wikipedia.org/wiki/Side-channel_attack).
         type: bool
         default: false
         version_added: 2.0.0
