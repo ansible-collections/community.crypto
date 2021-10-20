@@ -55,20 +55,21 @@ else:
 SIGNATURE_TEST_DATA = b'1234'
 
 
-def _get_cryptography_private_key_info(key):
+def _get_cryptography_private_key_info(key, need_private_key_data=False):
     key_type, key_public_data = _get_cryptography_public_key_info(key.public_key())
     key_private_data = dict()
-    if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-        private_numbers = key.private_numbers()
-        key_private_data['p'] = private_numbers.p
-        key_private_data['q'] = private_numbers.q
-        key_private_data['exponent'] = private_numbers.d
-    elif isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
-        private_numbers = key.private_numbers()
-        key_private_data['x'] = private_numbers.x
-    elif isinstance(key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
-        private_numbers = key.private_numbers()
-        key_private_data['multiplier'] = private_numbers.private_value
+    if need_private_key_data:
+        if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
+            private_numbers = key.private_numbers()
+            key_private_data['p'] = private_numbers.p
+            key_private_data['q'] = private_numbers.q
+            key_private_data['exponent'] = private_numbers.d
+        elif isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
+            private_numbers = key.private_numbers()
+            key_private_data['x'] = private_numbers.x
+        elif isinstance(key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
+            private_numbers = key.private_numbers()
+            key_private_data['multiplier'] = private_numbers.private_value
     return key_type, key_public_data, key_private_data
 
 
@@ -174,20 +175,21 @@ class PrivateKeyParseError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyInfoRetrieval(object):
-    def __init__(self, module, backend, content, passphrase=None, return_private_key_data=False):
+    def __init__(self, module, backend, content, passphrase=None, return_private_key_data=False, check_consistency=False):
         # content must be a bytes string
         self.module = module
         self.backend = backend
         self.content = content
         self.passphrase = passphrase
         self.return_private_key_data = return_private_key_data
+        self.check_consistency = check_consistency
 
     @abc.abstractmethod
     def _get_public_key(self, binary):
         pass
 
     @abc.abstractmethod
-    def _get_key_info(self):
+    def _get_key_info(self, need_private_key_data=False):
         pass
 
     @abc.abstractmethod
@@ -216,20 +218,22 @@ class PrivateKeyInfoRetrieval(object):
         result['public_key_fingerprints'] = get_fingerprint_of_bytes(
             pk, prefer_one=prefer_one_fingerprint) if pk is not None else dict()
 
-        key_type, key_public_data, key_private_data = self._get_key_info()
+        key_type, key_public_data, key_private_data = self._get_key_info(
+            need_private_key_data=self.return_private_key_data or self.check_consistency)
         result['type'] = key_type
         result['public_data'] = key_public_data
         if self.return_private_key_data:
             result['private_data'] = key_private_data
 
-        result['key_is_consistent'] = self._is_key_consistent(key_public_data, key_private_data)
-        if result['key_is_consistent'] is False:
-            # Only fail when it is False, to avoid to fail on None (which means "we don't know")
-            msg = (
-                "Private key is not consistent! (See "
-                "https://blog.hboeck.de/archives/888-How-I-tricked-Symantec-with-a-Fake-Private-Key.html)"
-            )
-            raise PrivateKeyConsistencyError(msg, result)
+        if self.check_consistency:
+            result['key_is_consistent'] = self._is_key_consistent(key_public_data, key_private_data)
+            if result['key_is_consistent'] is False:
+                # Only fail when it is False, to avoid to fail on None (which means "we don't know")
+                msg = (
+                    "Private key is not consistent! (See "
+                    "https://blog.hboeck.de/archives/888-How-I-tricked-Symantec-with-a-Fake-Private-Key.html)"
+                )
+                raise PrivateKeyConsistencyError(msg, result)
         return result
 
 
@@ -244,8 +248,8 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
             serialization.PublicFormat.SubjectPublicKeyInfo
         )
 
-    def _get_key_info(self):
-        return _get_cryptography_private_key_info(self.key)
+    def _get_key_info(self, need_private_key_data=False):
+        return _get_cryptography_private_key_info(self.key, need_private_key_data=need_private_key_data)
 
     def _is_key_consistent(self, key_public_data, key_private_data):
         return _is_cryptography_key_consistent(self.key, key_public_data, key_private_data)
@@ -258,7 +262,7 @@ def get_privatekey_info(module, backend, content, passphrase=None, return_privat
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, backend, content, passphrase=None, return_private_key_data=False):
+def select_backend(module, backend, content, passphrase=None, return_private_key_data=False, check_consistency=False):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
@@ -277,6 +281,6 @@ def select_backend(module, backend, content, passphrase=None, return_private_key
             module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                              exception=CRYPTOGRAPHY_IMP_ERR)
         return backend, PrivateKeyInfoRetrievalCryptography(
-            module, content, passphrase=passphrase, return_private_key_data=return_private_key_data)
+            module, content, passphrase=passphrase, return_private_key_data=return_private_key_data, check_consistency=check_consistency)
     else:
         raise ValueError('Unsupported value for backend: {0}'.format(backend))

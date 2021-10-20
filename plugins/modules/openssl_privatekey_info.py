@@ -45,9 +45,20 @@ options:
             - Whether to return private key data.
             - Only set this to C(yes) when you want private information about this key to
               leave the remote machine.
-            - "WARNING: you have to make sure that private key data isn't accidentally logged!"
+            - "B(WARNING:) you have to make sure that private key data isn't accidentally logged!"
         type: bool
         default: no
+    check_consistency:
+        description:
+            - Whether to check consistency of the private key.
+            - In community.crypto < 2.0.0, consistency was always checked.
+            - Since community.crypto 2.0.0, the consistency check has been disabled by default to
+              avoid private key material to be transported around and computed with, and only do
+              so when requested explicitly. This can potentially prevent
+              L(side-channel attacks,https://en.wikipedia.org/wiki/Side-channel_attack).
+        type: bool
+        default: false
+        version_added: 2.0.0
 
     select_crypto_backend:
         description:
@@ -95,7 +106,7 @@ key_is_consistent:
         - Whether the key is consistent. Can also return C(none) next to C(yes) and
           C(no), to indicate that consistency could not be checked.
         - In case the check returns C(no), the module will fail.
-    returned: always
+    returned: when I(check_consistency=true)
     type: bool
 public_key:
     description: Private key's public key in PEM format.
@@ -208,6 +219,7 @@ def main():
             content=dict(type='str', no_log=True),
             passphrase=dict(type='str', no_log=True),
             return_private_key_data=dict(type='bool', default=False),
+            check_consistency=dict(type='bool', default=False),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_one_of=(
@@ -241,7 +253,8 @@ def main():
         module.params['select_crypto_backend'],
         data,
         passphrase=module.params['passphrase'],
-        return_private_key_data=module.params['return_private_key_data'])
+        return_private_key_data=module.params['return_private_key_data'],
+        check_consistency=module.params['check_consistency'])
 
     try:
         result.update(module_backend.get_info())
