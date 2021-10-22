@@ -345,14 +345,14 @@ def _dn_escape_value(value):
     '''
     Escape Distinguished Name's attribute value.
     '''
-    value = value.replace('\\', r'\\')
-    for ch in [',', '+', '<', '>', ';', '"']:
-        value = value.replace(ch, r'\%s' % ch)
-    value = value.replace('\0', r'\00')
-    if value.startswith((' ', '#')):
-        value = r'\%s' % value[0] + value[1:]
-    if value.endswith(' '):
-        value = value[:-1] + r'\ '
+    value = value.replace(u'\\', u'\\\\')
+    for ch in [u',', u'+', u'<', u'>', u';', u'"']:
+        value = value.replace(ch, u'\\%s' % ch)
+    value = value.replace(u'\0', u'\\00')
+    if value.startswith((u' ', u'#')):
+        value = u'\\%s' % value[0] + value[1:]
+    if value.endswith(u' '):
+        value = value[:-1] + u'\\ '
     return value
 
 
@@ -362,26 +362,26 @@ def cryptography_decode_name(name):
     Raises an OpenSSLObjectError if the name is not supported.
     '''
     if isinstance(name, x509.DNSName):
-        return 'DNS:{0}'.format(name.value)
+        return u'DNS:{0}'.format(name.value)
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
-            return 'IP:{0}/{1}'.format(name.value.network_address.compressed, name.value.prefixlen)
-        return 'IP:{0}'.format(name.value.compressed)
+            return u'IP:{0}/{1}'.format(name.value.network_address.compressed, name.value.prefixlen)
+        return u'IP:{0}'.format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
-        return 'email:{0}'.format(name.value)
+        return u'email:{0}'.format(name.value)
     if isinstance(name, x509.UniformResourceIdentifier):
-        return 'URI:{0}'.format(name.value)
+        return u'URI:{0}'.format(name.value)
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas
-        return 'dirName:' + ','.join([
-            '{0}={1}'.format(cryptography_oid_to_name(attribute.oid, short=True), _dn_escape_value(attribute.value))
+        return u'dirName:' + ','.join([
+            u'{0}={1}'.format(to_text(cryptography_oid_to_name(attribute.oid, short=True)), _dn_escape_value(attribute.value))
             for attribute in reversed(list(name.value))
         ])
     if isinstance(name, x509.RegisteredID):
-        return 'RID:{0}'.format(name.value.dotted_string)
+        return u'RID:{0}'.format(name.value.dotted_string)
     if isinstance(name, x509.OtherName):
-        return 'otherName:{0};{1}'.format(name.type_id.dotted_string, _get_hex(name.value))
+        return u'otherName:{0};{1}'.format(name.type_id.dotted_string, _get_hex(name.value))
     raise OpenSSLObjectError('Cannot decode name "{0}"'.format(name))
 
 
