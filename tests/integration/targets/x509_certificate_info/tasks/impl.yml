@@ -19,6 +19,14 @@
       - "['organizationalUnitName', 'ACME Department'] in result.subject_ordered"
       - result.public_key_type == 'RSA'
       - result.public_key_data.size == (default_rsa_key_size_certifiates | int)
+      - "result.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
 
 - name: Check SubjectKeyIdentifier and AuthorityKeyIdentifier
   assert:
