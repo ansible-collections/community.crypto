@@ -336,7 +336,7 @@ def cryptography_decode_name(name):
         return u'URI:{0}'.format(name.value)
     if isinstance(name, x509.DirectoryName):
         return u'dirName:' + u''.join([
-            u'/{0}={1}'.format(cryptography_oid_to_name(attribute.oid, short=True), _dn_escape_value(attribute.value))
+            u'/{0}={1}'.format(to_text(cryptography_oid_to_name(attribute.oid, short=True)), _dn_escape_value(attribute.value))
             for attribute in name.value
         ])
     if isinstance(name, x509.RegisteredID):
