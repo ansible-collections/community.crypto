@@ -66,11 +66,6 @@
     that:
       - crl_1_format_idem.crl | b64decode == content.content | b64decode
 
-- name: Read ca-crl2.crl
-  slurp:
-    src: '{{ remote_tmp_dir }}/ca-crl2.crl'
-  register: slurp
-
 - name: Validate CRL 2
   assert:
     that:
@@ -84,9 +79,26 @@
       - crl_2_idem_update is not changed
       - crl_2_change_check is changed
       - crl_2_change is changed
-      - crl_2_change.crl == (slurp.content | b64decode)
+      - crl_2_change.crl == (slurp_crl2_1.content | b64decode)
+      - crl_2_change_order_ignore is not changed
+      - crl_2_change_order is changed
+      - crl_2_change_order.crl == (slurp_crl2_2.content | b64decode)
 
 - name: Validate CRL 2 info
   assert:
     that:
       - "'revoked_certificates' not in crl_2_info_1"
+      - >
+        crl_2_info_1.issuer_ordered == [
+          ['commonName', 'Ansible'],
+          ['commonName', 'CRL'],
+          ['countryName', 'US'],
+          ['commonName', 'Test'],
+        ]
+      - >
+        crl_2_info_2.issuer_ordered == [
+          ['commonName', 'Ansible'],
+          ['countryName', 'US'],
+          ['commonName', 'CRL'],
+          ['commonName', 'Test'],
+        ]

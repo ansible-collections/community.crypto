@@ -29,8 +29,8 @@
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    subject:
-      commonName: www.ansible.com
+    subject_ordered:
+      - commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: yes
   register: generate_csr_idempotent
@@ -517,23 +517,23 @@
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    subject:
-      commonName: www.example.com
-      C: de
-      L: Somewhere
-      ST: Zürich
-      streetAddress: Welcome Street N° 5
-      O: Ansiblé
-      organizationalUnitName: Crÿpto Depârtment ☺
-      serialNumber: "1234"
-      SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
-      GN: First Name
-      title: Chïeﬀ
-      pseudonym: test
-      UID: asdf
-      emailAddress: test@example.com
-      postalAddress: 1234 Somewhere
-      postalCode: "1234"
+    subject_ordered:
+      - commonName: www.example.com
+      - C: de
+      - L: Somewhere
+      - ST: Zürich
+      - streetAddress: Welcome Street N° 5
+      - O: Ansiblé
+      - organizationalUnitName: Crÿpto Depârtment ☺
+      - serialNumber: "1234"
+      - SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
+      - GN: First Name
+      - title: Chïeﬀ
+      - pseudonym: test
+      - UID: asdf
+      - emailAddress: test@example.com
+      - postalAddress: 1234 Somewhere
+      - postalCode: "1234"
     useCommonNameForSAN: no
     key_usage:
       - digitalSignature
@@ -602,23 +602,23 @@
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    subject:
-      CN: www.example.com
-      countryName: de
-      L: Somewhere
-      ST: Zürich
-      streetAddress: Welcome Street N° 5
-      organizationName: Ansiblé
-      organizationalUnitName: Crÿpto Depârtment ☺
-      serialNumber: "1234"
-      SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
-      GN: First Name
-      title: Chïeﬀ
-      pseudonym: test
-      UID: asdf
-      emailAddress: test@example.com
-      postalAddress: 1234 Somewhere
-      postalCode: "1234"
+    subject_ordered:
+      - CN: www.example.com
+      - countryName: de
+      - L: Somewhere
+      - ST: Zürich
+      - streetAddress: Welcome Street N° 5
+      - organizationName: Ansiblé
+      - organizationalUnitName: Crÿpto Depârtment ☺
+      - serialNumber: "1234"
+      - SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
+      - GN: First Name
+      - title: Chïeﬀ
+      - pseudonym: test
+      - UID: asdf
+      - emailAddress: test@example.com
+      - postalAddress: 1234 Somewhere
+      - postalCode: "1234"
     useCommonNameForSAN: no
     key_usage:
       - digitalSignature
@@ -689,18 +689,19 @@
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
+      # Subject has been reordered, but is inside 'subject' and not 'subject_ordered'
       CN: www.example.com
-      countryName: de
       L: Somewhere
+      countryName: de
       ST: Zürich
       streetAddress: Welcome Street N° 5
-      organizationName: Ansiblé
       organizationalUnitName: Crÿpto Depârtment ☺
+      organizationName: Ansiblé
       serialNumber: "1234"
       SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
       GN: First Name
-      title: Chïeﬀ
       pseudonym: test
+      title: Chïeﬀ
       UID: asdf
       emailAddress: test@example.com
       postalAddress: 1234 Somewhere
@@ -768,6 +769,93 @@
       - "IP:1.2.3.0/255.255.255.0"
       - "IP:0::0:1:0:0/112"
   register: everything_3
+
+- name: "({{ select_crypto_backend }}) Generate CSR with everything (not idempotent, check mode)"
+  openssl_csr:
+    path: '{{ remote_tmp_dir }}/csr_everything.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    subject_ordered:
+      # Subject has been reordered, this should force a change
+      - CN: www.example.com
+      - L: Somewhere
+      - countryName: de
+      - ST: Zürich
+      - streetAddress: Welcome Street N° 5
+      - organizationalUnitName: Crÿpto Depârtment ☺
+      - organizationName: Ansiblé
+      - serialNumber: "1234"
+      - SN: Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr.
+      - GN: First Name
+      - pseudonym: test
+      - title: Chïeﬀ
+      - UID: asdf
+      - emailAddress: test@example.com
+      - postalAddress: 1234 Somewhere
+      - postalCode: "1234"
+    useCommonNameForSAN: no
+    key_usage:
+      - digitalSignature
+      - keyAgreement
+      - Non Repudiation
+      - Key Encipherment
+      - dataEncipherment
+      - Certificate Sign
+      - cRLSign
+      - Encipher Only
+      - decipherOnly
+    key_usage_critical: yes
+    extended_key_usage: '{{ value_for_extended_key_usage }}'
+    subject_alt_name: '{{ value_for_san }}'
+    basic_constraints:
+      - "CA:TRUE"
+      - "pathlen:23"
+    basic_constraints_critical: yes
+    name_constraints_permitted: '{{ value_for_name_constraints_permitted }}'
+    name_constraints_excluded:
+      - "DNS:.org"
+      - "DNS:.example.com"
+    name_constraints_critical: yes
+    ocsp_must_staple: yes
+    subject_key_identifier: 00:11:22:33
+    authority_key_identifier: 44:55:66:77
+    authority_cert_issuer: '{{ value_for_authority_cert_issuer }}'
+    authority_cert_serial_number: 12345
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  vars:
+    value_for_extended_key_usage:
+      - serverAuth  # the same as "TLS Web Server Authentication"
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+      - Code Signing
+      - E-mail Protection
+      - timeStamping
+      - OCSPSigning
+      - Any Extended Key Usage
+      - qcStatements
+      - DVCS
+      - IPSec User
+      - biometricInfo
+      - 1.2.3.4.5.6
+    value_for_authority_cert_issuer:
+      - "DNS:ca.example.org"
+      - "IP:1.2.3.4"
+    value_for_san:
+      - "DNS:www.ansible.com"
+      - "IP:1.2.3.4"
+      - "IP:::1"
+      - "email:test@example.org"
+      - "URI:https://example.org/test/index.html"
+      - "RID:1.2.3.4"
+      - "otherName:1.2.3.4;0c:07:63:65:72:74:72:65:71"
+      - "otherName:1.3.6.1.4.1.311.20.2.3;UTF8:bob@localhost"
+      - "dirName:CN= example.net,    O  =Example Net"
+      - "dirName:/CN=  example.com/O  =Example Com"
+    value_for_name_constraints_permitted:
+      - "DNS:www.example.com"
+      - "IP:1.2.3.0/255.255.255.0"
+      - "IP:0::0:1:0:0/112"
+  register: everything_4
+  check_mode: true
 
 - name: "({{ select_crypto_backend }}) Get info from CSR with everything"
   community.crypto.openssl_csr_info:

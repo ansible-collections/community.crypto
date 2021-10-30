@@ -17,27 +17,6 @@
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-  check_mode: yes
-  register: crl_1_check
-
-- name: Create CRL 1 (check mode)
-  x509_crl:
-    path: '{{ remote_tmp_dir }}/ca-crl1.crl'
-    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
-    last_update: 20191013000000Z
-    next_update: 20191113000000Z
-    revoked_certificates:
-      - path: '{{ remote_tmp_dir }}/cert-1.pem'
-        revocation_date: 20191013000000Z
-      - path: '{{ remote_tmp_dir }}/cert-2.pem'
-        revocation_date: 20191013000000Z
-        reason: key_compromise
-        reason_critical: yes
-        invalidity_date: 20191012000000Z
-      - serial_number: 1234
-        revocation_date: 20191001000000Z
   check_mode: true
   register: crl_1_check
 
@@ -283,8 +262,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -301,8 +283,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -318,8 +303,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - C: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -337,8 +325,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -355,8 +346,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -370,8 +364,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -384,8 +381,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -402,8 +402,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -419,8 +422,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -437,8 +443,11 @@
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
-    issuer:
-      CN: Ansible
+    issuer_ordered:
+      - CN: Ansible
+      - CN: CRL
+      - countryName: US
+      - CN: Test
     last_update: +0d
     next_update: +0d
     revoked_certificates:
@@ -451,8 +460,67 @@
     return_content: yes
   register: crl_2_change
 
+- name: Read ca-crl2.crl
+  slurp:
+    src: '{{ remote_tmp_dir }}/ca-crl2.crl'
+  register: slurp_crl2_1
+
 - name: Retrieve CRL 2 infos
   x509_crl_info:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     list_revoked_certificates: false
   register: crl_2_info_1
+
+- name: Create CRL 2 (changed order, should be ignored)
+  x509_crl:
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+    issuer:
+      countryName: US
+      CN:
+        - Ansible
+        - CRL
+        - Test
+    last_update: +0d
+    next_update: +0d
+    revoked_certificates:
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
+        reason: key_compromise
+        reason_critical: yes
+        invalidity_date: 20191012000000Z
+    ignore_timestamps: true
+    mode: update
+    return_content: yes
+  register: crl_2_change_order_ignore
+
+- name: Create CRL 2 (changed order)
+  x509_crl:
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+    issuer_ordered:
+      - CN: Ansible
+      - countryName: US
+      - CN: CRL
+      - CN: Test
+    last_update: +0d
+    next_update: +0d
+    revoked_certificates:
+      - path: '{{ remote_tmp_dir }}/cert-2.pem'
+        reason: key_compromise
+        reason_critical: yes
+        invalidity_date: 20191012000000Z
+    ignore_timestamps: true
+    mode: update
+    return_content: yes
+  register: crl_2_change_order
+
+- name: Read ca-crl2.crl
+  slurp:
+    src: '{{ remote_tmp_dir }}/ca-crl2.crl'
+  register: slurp_crl2_2
+
+- name: Retrieve CRL 2 infos again
+  x509_crl_info:
+    path: '{{ remote_tmp_dir }}/ca-crl2.crl'
+    list_revoked_certificates: false
+  register: crl_2_info_2

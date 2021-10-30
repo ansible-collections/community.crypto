@@ -195,6 +195,7 @@
       - everything_1 is changed
       - everything_2 is not changed
       - everything_3 is not changed
+      - everything_4 is changed
       - everything_info.basic_constraints == [
           "CA:TRUE",
           "pathlen:23",
@@ -233,6 +234,25 @@
       - everything_info.subject.title == "Chïeﬀ"
       - everything_info.subject.userId == "asdf"
       - everything_info.subject | length == 16
+      - >
+        everything_info.subject_ordered == [
+          ["commonName", "www.example.com"],
+          ["countryName", "de"],
+          ["localityName", "Somewhere"],
+          ["stateOrProvinceName", "Zürich"],
+          ["streetAddress", "Welcome Street N° 5"],
+          ["organizationName", "Ansiblé"],
+          ["organizationalUnitName", "Crÿpto Depârtment ☺"],
+          ["serialNumber", "1234"],
+          ["surname", "Last Name Which Happens To Be A Very Løng String With A Lot Of Spaces, Jr."],
+          ["givenName", "First Name"],
+          ["title", "Chïeﬀ"],
+          ["pseudonym", "test"],
+          ["userId", "asdf"],
+          ["emailAddress", "test@example.com"],
+          ["postalAddress", "1234 Somewhere"],
+          ["postalCode", "1234"],
+        ]
       - everything_info.subject_alt_name_critical == false
       - everything_info.name_constraints_excluded == [
           "DNS:.example.com",

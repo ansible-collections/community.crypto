@@ -237,16 +237,43 @@ def load_certificate_request(path, content=None, backend='cryptography'):
             raise OpenSSLObjectError(exc)
 
 
-def parse_name_field(input_dict):
+def parse_name_field(input_dict, name_field_name=None):
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
     result = []
-    for key in input_dict:
-        if isinstance(input_dict[key], list):
-            for entry in input_dict[key]:
+    for key, value in input_dict.items():
+        if isinstance(value, list):
+            for entry in value:
+                if not isinstance(entry, six.string_types):
+                    if name_field_name:
+                        raise ValueError('Values for {key} in {name} must be strings'.format(key=key, name=name_field_name))
+                    raise ValueError('Values for {key} must be strings'.format(key=key))
                 result.append((key, entry))
+        elif isinstance(value, six.string_types):
+            result.append((key, value))
         else:
-            result.append((key, input_dict[key]))
+            if name_field_name:
+                raise ValueError(
+                    'Value for {key} in {name} must be either a string or a list of strings'.format(key=key, name=name_field_name))
+            raise ValueError('Value for {key} must be either a string or a list of strings'.format(key=key))
+    return result
+
+
+def parse_ordered_name_field(input_list, name_field_name):
+    """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
+
+    result = []
+    for index, entry in enumerate(input_list):
+        if len(entry) != 1:
+            raise ValueError(
+                'Entry #{index} in {name} must be a dictionary with exactly one key-value pair'.format(
+                    name=name_field_name, index=index + 1))
+        try:
+            result.extend(parse_name_field(entry, name_field_name=name_field_name))
+        except ValueError as exc:
+            raise ValueError(
+                'Error while processing entry #{index} in {name}: {error}'.format(
+                    name=name_field_name, index=index + 1, error=exc))
     return result
 
 

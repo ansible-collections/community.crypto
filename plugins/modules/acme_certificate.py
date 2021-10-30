@@ -580,9 +580,12 @@ class ACMECertificateClient(object):
 
         if self.module.params['select_chain']:
             for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
-                self.select_chain_matcher.append(
-                    self.client.backend.create_chain_matcher(
-                        Criterium(criterium, index=criterium_idx)))
+                try:
+                    self.select_chain_matcher.append(
+                        self.client.backend.create_chain_matcher(
+                            Criterium(criterium, index=criterium_idx)))
+                except ValueError as exc:
+                    self.module.warn('Error while parsing criterium: {error}. Ignoring criterium.'.format(error=exc))
 
         # Make sure account exists
         modify_account = module.params['modify_account']
