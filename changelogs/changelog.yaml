@@ -582,3 +582,12 @@ releases:
     - 296-openssl_pkcs12-cryptography-35.yml
     - 300-pyopenssl-cryptography-35.yml
     release_date: '2021-10-06'
+  1.9.6:
+    changes:
+      bugfixes:
+      - cryptography backend - improve Unicode handling for Python 2 (https://github.com/ansible-collections/community.crypto/pull/313).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 1.9.6.yml
+    - 313-unicode-names.yml
+    release_date: '2021-10-30'
