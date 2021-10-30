@@ -134,6 +134,10 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         """Return bytes for self.cert."""
         return self.cert.public_bytes(Encoding.PEM)
 
+    def needs_regeneration(self):
+        return super(SelfSignedCertificateBackendCryptography, self).needs_regeneration(
+            not_before=self.notBefore, not_after=self.notAfter)
+
     def dump(self, include_certificate):
         result = super(SelfSignedCertificateBackendCryptography, self).dump(include_certificate)
 

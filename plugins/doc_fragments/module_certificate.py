@@ -52,6 +52,14 @@ options:
             - This is required if the private key is password protected.
         type: str
 
+    ignore_timestamps:
+        description:
+            - Whether the "not before" and "not after" timestamps should be ignored for idempotency checks.
+            - It is better to keep the default value C(true) when using relative timestamps (like C(+0s) for now).
+        type: bool
+        default: true
+        version_added: 2.0.0
+
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
@@ -185,6 +193,7 @@ options:
             - The minimum certificate lifetime is 90 days, and maximum is three years.
             - If this value is not specified, the certificate will stop being valid 365 days the date of issue.
             - This is only used by the C(entrust) provider.
+            - Please note that this value is B(not) covered by the I(ignore_timestamps) option.
         type: str
         default: +365d
 
@@ -258,6 +267,8 @@ options:
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will start being valid from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
+              This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
+              avoid relative timestamps when setting I(ignore_timestamps=false).
             - This is only used by the C(ownca) provider.
         type: str
         default: +0s
@@ -271,6 +282,8 @@ options:
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
+              This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
+              avoid relative timestamps when setting I(ignore_timestamps=false).
             - This is only used by the C(ownca) provider.
             - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
               Please see U(https://support.apple.com/en-us/HT210176) for more details.
@@ -349,6 +362,8 @@ options:
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will start being valid from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
+              This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
+              avoid relative timestamps when setting I(ignore_timestamps=false).
             - This is only used by the C(selfsigned) provider.
         type: str
         default: +0s
@@ -363,6 +378,8 @@ options:
               + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
+              This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
+              avoid relative timestamps when setting I(ignore_timestamps=false).
             - This is only used by the C(selfsigned) provider.
             - On macOS 10.15 and onwards, TLS server certificates must have a validity period of 825 days or fewer.
               Please see U(https://support.apple.com/en-us/HT210176) for more details.

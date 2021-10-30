@@ -63,6 +63,7 @@ class CertificateBackend(object):
         self.backend = backend
 
         self.force = module.params['force']
+        self.ignore_timestamps = module.params['ignore_timestamps']
         self.privatekey_path = module.params['privatekey_path']
         self.privatekey_content = module.params['privatekey_content']
         if self.privatekey_content is not None:
@@ -223,7 +224,7 @@ class CertificateBackend(object):
                 return False
         return True
 
-    def needs_regeneration(self):
+    def needs_regeneration(self, not_before=None, not_after=None):
         """Check whether a regeneration is necessary."""
         if self.force or self.existing_certificate_bytes is None:
             return True
@@ -247,6 +248,15 @@ class CertificateBackend(object):
         if self.create_subject_key_identifier != 'never_create' and not self._check_subject_key_identifier():
             return True
 
+        # Check not before
+        if not_before is not None and not self.ignore_timestamps:
+            if self.existing_certificate.not_valid_before != not_before:
+                return True
+
+        # Check not after
+        if not_after is not None and not self.ignore_timestamps:
+            if self.existing_certificate.not_valid_after != not_after:
+                return True
         return False
 
     def dump(self, include_certificate):
@@ -328,6 +338,7 @@ def get_certificate_argument_spec():
             force=dict(type='bool', default=False,),
             csr_path=dict(type='path'),
             csr_content=dict(type='str'),
+            ignore_timestamps=dict(type='bool', default=True),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
 
             # General properties of a certificate
