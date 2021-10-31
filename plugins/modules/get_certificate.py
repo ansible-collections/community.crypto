@@ -99,7 +99,13 @@ extensions:
         asn1_data:
             returned: success
             type: str
-            description: The Base64 encoded ASN.1 content of the extnesion.
+            description:
+              - The Base64 encoded ASN.1 content of the extension.
+              - B(Note) that depending on the C(cryptography) version used, it is
+                not possible to extract the ASN.1 content of the extension, but only
+                to provide the re-encoded content of the extension in case it was
+                parsed by C(cryptography). This should usually result in exactly the
+                same value, except if the original extension value was malformed.
         name:
             returned: success
             type: str

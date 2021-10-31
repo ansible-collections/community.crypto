@@ -1,0 +1,6 @@
+breaking_changes:
+  - "get_certificate, openssl_csr_info, x509_certificate_info - depending on the ``cryptography`` version used,
+     the modules might not return the ASN.1 value for an extension as contained in the certificate respectively CSR,
+     but a re-encoded version of it. This should usually be identical to the value contained in the source file,
+     unless the value was malformed. For extensions not handled by C(cryptography) always the value contained in
+     the source file is returned (https://github.com/ansible-collections/community.crypto/pull/318)."
