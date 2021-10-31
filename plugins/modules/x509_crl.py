@@ -484,7 +484,7 @@ class CRL(OpenSSLObject):
                 self.issuer_ordered = False
                 self.issuer = parse_name_field(module.params['issuer'], 'issuer')
                 self.issuer = [(entry[0], entry[1]) for entry in self.issuer if entry[1]]
-        except ValueError as exc:
+        except (TypeError, ValueError) as exc:
             module.fail_json(msg=to_native(exc))
 
         self.last_update = get_relative_time_option(module.params['last_update'], 'last_update')
