@@ -247,7 +247,7 @@ def parse_name_field(input_dict, name_field_name=None):
                 if not isinstance(entry, six.string_types):
                     if name_field_name:
                         raise TypeError('Values for {key} in {name} must be strings'.format(key=key, name=name_field_name))
-                    raise TypeError(Values for {key} must be strings'.format(key=key))
+                    raise TypeError('Values for {key} must be strings'.format(key=key))
                 result.append((key, entry))
         elif isinstance(value, six.string_types):
             result.append((key, value))
