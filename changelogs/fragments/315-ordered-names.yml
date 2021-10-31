@@ -5,4 +5,5 @@ minor_changes:
   - "x509_crl - there is now stricter validation of the values of the ``issuer`` option (https://github.com/ansible-collections/community.crypto/pull/316)."
   - "x509_crl - provide a new ``issuer_ordered`` option if the order of the components in the issuer is of importance (https://github.com/ansible-collections/community.crypto/issues/291, https://github.com/ansible-collections/community.crypto/pull/316)."
 breaking_changes:
+  - "openssl_csr, openssl_csr_pipe, x509_crl - the ``subject`` respectively ``issuer`` fields no longer ignore empty values, but instead fail when encountering them (https://github.com/ansible-collections/community.crypto/pull/316)."
   - "x509_crl - for idempotency checks, the ``issuer`` order is ignored. If order is important, use the new ``issuer_ordered`` option (https://github.com/ansible-collections/community.crypto/pull/316)."
