@@ -103,7 +103,13 @@ extensions_by_oid:
             returned: success
             type: bool
         value:
-            description: The Base64 encoded value (in DER format) of the extension
+            description:
+              - The Base64 encoded value (in DER format) of the extension.
+              - B(Note) that depending on the C(cryptography) version used, it is
+                not possible to extract the ASN.1 content of the extension, but only
+                to provide the re-encoded content of the extension in case it was
+                parsed by C(cryptography). This should usually result in exactly the
+                same value, except if the original extension value was malformed.
             returned: success
             type: str
             sample: "MAMCAQU="
