@@ -16,7 +16,7 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -27,6 +27,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_privatekey,
     load_certificate_request,
     parse_name_field,
+    parse_ordered_name_field,
     select_message_digest,
 )
 
@@ -119,6 +120,7 @@ class CertificateSigningRequestBackend(object):
         if self.create_subject_key_identifier and self.subject_key_identifier is not None:
             module.fail_json(msg='subject_key_identifier cannot be specified if create_subject_key_identifier is true')
 
+        self.ordered_subject = False
         self.subject = [
             ('C', module.params['country_name']),
             ('ST', module.params['state_or_province_name']),
@@ -128,10 +130,18 @@ class CertificateSigningRequestBackend(object):
             ('CN', module.params['common_name']),
             ('emailAddress', module.params['email_address']),
         ]
-
-        if module.params['subject']:
-            self.subject = self.subject + parse_name_field(module.params['subject'])
         self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
+
+        try:
+            if module.params['subject']:
+                self.subject = self.subject + parse_name_field(module.params['subject'], 'subject')
+            if module.params['subject_ordered']:
+                if self.subject:
+                    raise CertificateSigningRequestError('subject_ordered cannot be combined with any other subject field')
+                self.subject = parse_ordered_name_field(module.params['subject_ordered'], 'subject_ordered')
+                self.ordered_subject = True
+        except ValueError as exc:
+            raise CertificateSigningRequestError(to_native(exc))
 
         self.using_common_name_for_san = False
         if not self.subjectAltName and module.params['use_common_name_for_san']:
@@ -401,7 +411,10 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         def _check_subject(csr):
             subject = [(cryptography_name_to_oid(entry[0]), to_text(entry[1])) for entry in self.subject]
             current_subject = [(sub.oid, sub.value) for sub in csr.subject]
-            return set(subject) == set(current_subject)
+            if self.ordered_subject:
+                return subject == current_subject
+            else:
+                return set(subject) == set(current_subject)
 
         def _find_extension(extensions, exttype):
             return next(
@@ -592,6 +605,7 @@ def get_csr_argument_spec():
             privatekey_passphrase=dict(type='str', no_log=True),
             version=dict(type='int', default=1, choices=[1]),
             subject=dict(type='dict'),
+            subject_ordered=dict(type='list', elements='dict'),
             country_name=dict(type='str', aliases=['C', 'countryName']),
             state_or_province_name=dict(type='str', aliases=['ST', 'stateOrProvinceName']),
             locality_name=dict(type='str', aliases=['L', 'localityName']),
@@ -645,6 +659,7 @@ def get_csr_argument_spec():
         ],
         mutually_exclusive=[
             ['privatekey_path', 'privatekey_content'],
+            ['subject', 'subject_ordered'],
         ],
         required_one_of=[
             ['privatekey_path', 'privatekey_content'],

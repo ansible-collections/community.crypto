@@ -52,7 +52,20 @@ options:
         description:
             - Key/value pairs that will be present in the subject name field of the certificate signing request.
             - If you need to specify more than one value with the same key, use a list as value.
+            - If the order of the components is important, use I(subject_ordered).
+            - Mutually exclusive with I(subject_ordered).
         type: dict
+    subject_ordered:
+        description:
+            - A list of dictionaries, where every dictionary must contain one key/value pair. This key/value pair
+              will be present in the subject name field of the certificate signing request.
+            - If you want to specify more than one value with the same key in a row, you can use a list as value.
+            - Mutually exclusive with I(subject), and any other subject field option, such as I(country_name),
+              I(state_or_province_name), I(locality_name), I(organization_name), I(organizational_unit_name),
+              I(common_name), or I(email_address).
+        type: list
+        elements: dict
+        version_added: 2.0.0
     country_name:
         description:
             - The countryName field of the certificate signing request subject.

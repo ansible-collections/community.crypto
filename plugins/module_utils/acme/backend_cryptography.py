@@ -118,11 +118,11 @@ class CryptographyChainMatcher(ChainMatcher):
         self.issuer = []
         if criterium.subject:
             self.subject = [
-                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.subject)
+                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.subject, 'subject')
             ]
         if criterium.issuer:
             self.issuer = [
-                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.issuer)
+                (cryptography_name_to_oid(k), to_native(v)) for k, v in parse_name_field(criterium.issuer, 'issuer')
             ]
         self.subject_key_identifier = CryptographyChainMatcher._parse_key_identifier(
             criterium.subject_key_identifier, 'subject_key_identifier', criterium.index, module)

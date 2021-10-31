@@ -92,8 +92,21 @@ options:
         description:
             - Key/value pairs that will be present in the issuer name field of the CRL.
             - If you need to specify more than one value with the same key, use a list as value.
-            - Required if I(state) is C(present).
+            - If the order of the components is important, use I(issuer_ordered).
+            - One of I(issuer) and I(issuer_ordered) is required if I(state) is C(present).
+            - Mutually exclusive with I(issuer_ordered).
         type: dict
+    issuer_ordered:
+        description:
+            - A list of dictionaries, where every dictionary must contain one key/value pair.
+              This key/value pair will be present in the issuer name field of the CRL.
+            - If you want to specify more than one value with the same key in a row, you can
+              use a list as value.
+            - One of I(issuer) and I(issuer_ordered) is required if I(state) is C(present).
+            - Mutually exclusive with I(issuer).
+        type: list
+        elements: dict
+        version_added: 2.0.0
 
     last_update:
         description:
@@ -386,6 +399,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_privatekey,
     load_certificate,
     parse_name_field,
+    parse_ordered_name_field,
     get_relative_time_option,
     select_message_digest,
 )
@@ -462,8 +476,15 @@ class CRL(OpenSSLObject):
             self.privatekey_content = self.privatekey_content.encode('utf-8')
         self.privatekey_passphrase = module.params['privatekey_passphrase']
 
-        self.issuer = parse_name_field(module.params['issuer'])
-        self.issuer = [(entry[0], entry[1]) for entry in self.issuer if entry[1]]
+        try:
+            if module.params['issuer_ordered']:
+                self.issuer_ordered = True
+                self.issuer = parse_ordered_name_field(module.params['issuer_ordered'], 'issuer_ordered')
+            else:
+                self.issuer_ordered = False
+                self.issuer = parse_name_field(module.params['issuer'], 'issuer')
+        except (TypeError, ValueError) as exc:
+            module.fail_json(msg=to_native(exc))
 
         self.last_update = get_relative_time_option(module.params['last_update'], 'last_update')
         self.next_update = get_relative_time_option(module.params['next_update'], 'next_update')
@@ -616,7 +637,11 @@ class CRL(OpenSSLObject):
             return False
 
         want_issuer = [(cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.issuer]
-        if want_issuer != [(sub.oid, sub.value) for sub in self.crl.issuer]:
+        is_issuer = [(sub.oid, sub.value) for sub in self.crl.issuer]
+        if not self.issuer_ordered:
+            want_issuer = set(want_issuer)
+            is_issuer = set(is_issuer)
+        if want_issuer != is_issuer:
             return False
 
         old_entries = [self._compress_entry(cryptography_decode_revoked_certificate(cert)) for cert in self.crl]
@@ -782,6 +807,7 @@ def main():
             privatekey_content=dict(type='str', no_log=True),
             privatekey_passphrase=dict(type='str', no_log=True),
             issuer=dict(type='dict'),
+            issuer_ordered=dict(type='list', elements='dict'),
             last_update=dict(type='str', default='+0s'),
             next_update=dict(type='str'),
             digest=dict(type='str', default='sha256'),
@@ -815,10 +841,12 @@ def main():
         ),
         required_if=[
             ('state', 'present', ['privatekey_path', 'privatekey_content'], True),
-            ('state', 'present', ['issuer', 'next_update', 'revoked_certificates'], False),
+            ('state', 'present', ['issuer', 'issuer_ordered'], True),
+            ('state', 'present', ['next_update', 'revoked_certificates'], False),
         ],
         mutually_exclusive=(
             ['privatekey_path', 'privatekey_content'],
+            ['issuer', 'issuer_ordered'],
         ),
         supports_check_mode=True,
         add_file_common_args=True,
