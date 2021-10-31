@@ -253,9 +253,9 @@ def parse_name_field(input_dict, name_field_name=None):
             result.append((key, value))
         else:
             if name_field_name:
-                raise ValueError(
+                raise TypeError(
                     'Value for {key} in {name} must be either a string or a list of strings'.format(key=key, name=name_field_name))
-            raise ValueError('Value for {key} must be either a string or a list of strings'.format(key=key))
+            raise TypeError('Value for {key} must be either a string or a list of strings'.format(key=key))
     return result
 
 
@@ -270,7 +270,7 @@ def parse_ordered_name_field(input_list, name_field_name):
                     name=name_field_name, index=index + 1))
         try:
             result.extend(parse_name_field(entry, name_field_name=name_field_name))
-        except ValueError as exc:
+        except (TypeError, ValueError) as exc:
             raise ValueError(
                 'Error while processing entry #{index} in {name}: {error}'.format(
                     name=name_field_name, index=index + 1, error=exc))
