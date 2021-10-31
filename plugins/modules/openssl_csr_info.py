@@ -104,7 +104,7 @@ extensions_by_oid:
             type: bool
         value:
             description:
-              - The Base64 encoded value (in DER format) of the extension
+              - The Base64 encoded value (in DER format) of the extension.
               - B(Note) that depending on the C(cryptography) version used, it is
                 not possible to extract the ASN.1 content of the extension, but only
                 to provide the re-encoded content of the extension in case it was
