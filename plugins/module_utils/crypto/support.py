@@ -239,23 +239,23 @@ def load_certificate_request(path, content=None, backend='cryptography'):
 
 def parse_name_field(input_dict, name_field_name=None):
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
+    error_str = '{key}' if name_field_name is None else '{key} in {name}'
 
     result = []
     for key, value in input_dict.items():
         if isinstance(value, list):
             for entry in value:
                 if not isinstance(entry, six.string_types):
-                    if name_field_name:
-                        raise TypeError('Values for {key} in {name} must be strings'.format(key=key, name=name_field_name))
-                    raise TypeError('Values for {key} must be strings'.format(key=key))
+                    raise TypeError(('Values %s must be strings' % error_str).format(key=key, name=name_field_name))
+                if not entry:
+                    raise ValueError(('Values for %s must not be empty strings' % error_str).format(key=key))
                 result.append((key, entry))
         elif isinstance(value, six.string_types):
+            if not value:
+                raise ValueError(('Value for %s must not be an empty string' % error_str).format(key=key))
             result.append((key, value))
         else:
-            if name_field_name:
-                raise TypeError(
-                    'Value for {key} in {name} must be either a string or a list of strings'.format(key=key, name=name_field_name))
-            raise TypeError('Value for {key} must be either a string or a list of strings'.format(key=key))
+            raise TypeError(('Value for %s must be either a string or a list of strings' % error_str).format(key=key))
     return result
 
 

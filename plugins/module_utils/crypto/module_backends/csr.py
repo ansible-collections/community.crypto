@@ -130,11 +130,11 @@ class CertificateSigningRequestBackend(object):
             ('CN', module.params['common_name']),
             ('emailAddress', module.params['email_address']),
         ]
+        self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
 
         try:
             if module.params['subject']:
                 self.subject = self.subject + parse_name_field(module.params['subject'], 'subject')
-            self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
             if module.params['subject_ordered']:
                 if self.subject:
                     raise CertificateSigningRequestError('subject_ordered cannot be combined with any other subject field')
