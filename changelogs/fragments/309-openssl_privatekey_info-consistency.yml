@@ -1,4 +1,0 @@
-minor_changes:
-  - openssl_privatekey_info - add ``check_consistency`` option to request private key consistency checks to be done (https://github.com/ansible-collections/community.crypto/pull/309).
-breaking_changes:
-  - openssl_privatekey_info - by default consistency checks are not run; they need to be explicitly requested by passing ``check_consistency=true`` (https://github.com/ansible-collections/community.crypto/pull/309).

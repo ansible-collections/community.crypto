@@ -1,2 +1,0 @@
-minor_changes:
-  - "x509_certificate, x509_certificate_pipe - add ``ignore_timestamps`` option which allows to enable idempotency for 'not before' and 'not after' options (https://github.com/ansible-collections/community.crypto/issues/295, https://github.com/ansible-collections/community.crypto/pull/317)."

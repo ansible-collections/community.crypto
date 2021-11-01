@@ -1,5 +1,0 @@
-release_summary: >
-  A new major release of the ``community.crypto`` collection.
-  The main changes are removal of the PyOpenSSL backends for almost all modules (``openssl_pkcs12`` being the only exception),
-  and removal of the ``assertonly`` provider in the ``x509_certificate`` provider.
-  There are also some other breaking changes which should improve the user interface/experience of this collection long-term.
