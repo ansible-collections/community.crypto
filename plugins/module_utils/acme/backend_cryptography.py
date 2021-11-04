@@ -361,7 +361,7 @@ class CryptographyBackend(CryptoBackend):
         if cert_content is None:
             return -1
 
-        # Make sure we have at most one PEM. Otherwise cryptography 35.0.0 will barf.
+        # Make sure we have at most one PEM. Otherwise cryptography 36.0.0 will barf.
         cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or '')
 
         try:
