@@ -1,2 +1,2 @@
 bugfixes:
-  - "acme_certificate - if ``fullchain_dest`` is specified and the ``cryptography`` backend is used with cryptography 35.0.0 or newer, the module crashed when trying to read the certificate from the chain, as cryptography no longer ignores the concatenated other PEM certificates. The module now removes the concatenated PEM certificates before loading the main certificate (https://github.com/ansible-collections/community.crypto/pull/324)."
+  - "acme_certificate - avoid passing multiple certificates to ``cryptography``'s X.509 certificate loader when ``fullchain_dest`` is used. Doing so potentially produces an error when cryptography 36.0.0 is used (https://github.com/ansible-collections/community.crypto/pull/324)."
