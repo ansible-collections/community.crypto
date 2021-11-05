@@ -14,7 +14,7 @@ import datetime
 import os
 import sys
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CryptoBackend,
@@ -39,6 +39,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_name_to_oid,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    extract_first_pem,
 )
 
 try:
@@ -356,6 +360,9 @@ class CryptographyBackend(CryptoBackend):
 
         if cert_content is None:
             return -1
+
+        # Make sure we have at most one PEM. Otherwise cryptography 36.0.0 will barf.
+        cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or '')
 
         try:
             cert = cryptography.x509.load_pem_x509_certificate(cert_content, _cryptography_backend)

@@ -1,0 +1,2 @@
+bugfixes:
+  - "acme_certificate - avoid passing multiple certificates to ``cryptography``'s X.509 certificate loader when ``fullchain_dest`` is used. Doing so potentially produces an error when cryptography 36.0.0 is used (https://github.com/ansible-collections/community.crypto/pull/324)."
