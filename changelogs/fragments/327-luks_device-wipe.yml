@@ -1,2 +1,2 @@
 bugfixes:
-  - "luks_device - on ``state=absent`` now also runs ``cryptsetup erase`` to make sure the device is no longer accepted as a LUKS device (https://github.com/ansible-collections/community.crypto/issues/326, https://github.com/ansible-collections/community.crypto/pull/327)."
+  - "luks_device - on ``state=absent`` now also runs ``cryptsetup erase`` as well as a built-in LUKS signature cleaner to make sure the device is no longer accepted as a LUKS device (https://github.com/ansible-collections/community.crypto/issues/326, https://github.com/ansible-collections/community.crypto/pull/327)."
