@@ -356,8 +356,10 @@ LUKS_NAME_REGEX = re.compile(r'\s*crypt\s+([^\s]*)\s*')
 LUKS_DEVICE_REGEX = re.compile(r'\s*device:\s+([^\s]*)\s*')
 
 
+# See https://gitlab.com/cryptsetup/cryptsetup/-/wikis/LUKS-standard/on-disk-format.pdf
 LUKS_HEADER = b'LUKS\xba\xbe'
 LUKS_HEADER_L = 6
+# See https://gitlab.com/cryptsetup/LUKS2-docs/-/blob/master/luks2_doc_wip.pdf
 LUKS2_HEADER_OFFSETS = [0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000]
 LUKS2_HEADER2 = b'SKUL\xba\xbe'
 
