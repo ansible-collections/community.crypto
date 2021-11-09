@@ -356,6 +356,32 @@ LUKS_NAME_REGEX = re.compile(r'\s*crypt\s+([^\s]*)\s*')
 LUKS_DEVICE_REGEX = re.compile(r'\s*device:\s+([^\s]*)\s*')
 
 
+LUKS_HEADER = b'LUKS\xba\xbe'
+LUKS_HEADER_L = 6
+LUKS2_HEADER_OFFSETS = [0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000]
+LUKS2_HEADER2 = b'SKUL\xba\xbe'
+
+
+def wipe_luks_headers(device):
+    wipe_offsets = []
+    with open(device, 'rb') as f:
+        # f.seek(0)
+        data = f.read(LUKS_HEADER_L)
+        if data == LUKS_HEADER:
+            wipe_offsets.append(0)
+        for offset in LUKS2_HEADER_OFFSETS:
+            f.seek(offset)
+            data = f.read(LUKS_HEADER_L)
+            if data == LUKS2_HEADER2:
+                wipe_offsets.append(offset)
+
+    if wipe_offsets:
+        with open(device, 'wb') as f:
+            for offset in wipe_offsets:
+                f.seek(offset)
+                f.write(b'\x00\x00\x00\x00\x00\x00')
+
+
 class Handler(object):
 
     def __init__(self, module):
@@ -508,7 +534,7 @@ class CryptHandler(Handler):
             raise ValueError('Error while closing LUKS container %s' % (name))
 
     def run_luks_erase(self, device, ignore_errors=False):
-        result = self._run_command([self._cryptsetup_bin, 'erase', device])
+        result = self._run_command([self._cryptsetup_bin, 'erase', '-q', device])
         if result[RETURN_CODE] != 0 and not ignore_errors:
             raise ValueError('Error while erasing LUKS container %s' % (device))
 
@@ -523,6 +549,14 @@ class CryptHandler(Handler):
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while wiping luks container %s: %s'
                              % (device, result[STDERR]))
+
+        # For LUKS2, sometimes both `cryptsetup erase` and `wipefs` do **not**
+        # erase all LUKS signatures (they seem to miss the second header). That's
+        # why we do it ourselves here.
+        try:
+            wipe_luks_headers(device)
+        except Exception as exc:
+            raise ValueError('Error while wiping luks container %s: %s' % (device, exc))
 
     def run_luks_add_key(self, device, keyfile, passphrase, new_keyfile,
                          new_passphrase, pbkdf):
