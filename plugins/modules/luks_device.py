@@ -543,7 +543,7 @@ class CryptHandler(Handler):
             self.run_luks_close(name)
         result = self._run_command([wipefs_bin, '--all', device])
         if result[RETURN_CODE] != 0:
-            raise ValueError('Error while wiping luks container %s: %s'
+            raise ValueError('Error while wiping LUKS container signatures for %s: %s'
                              % (device, result[STDERR]))
 
         # For LUKS2, sometimes both `cryptsetup erase` and `wipefs` do **not**
@@ -552,7 +552,7 @@ class CryptHandler(Handler):
         try:
             wipe_luks_headers(device)
         except Exception as exc:
-            raise ValueError('Error while wiping luks container %s: %s' % (device, exc))
+            raise ValueError('Error while wiping LUKS container signatures for %s: %s' % (device, exc))
 
     def run_luks_add_key(self, device, keyfile, passphrase, new_keyfile,
                          new_passphrase, pbkdf):
