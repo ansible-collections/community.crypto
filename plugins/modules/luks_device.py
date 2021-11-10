@@ -535,18 +535,12 @@ class CryptHandler(Handler):
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while closing LUKS container %s' % (name))
 
-    def run_luks_erase(self, device, ignore_errors=False):
-        result = self._run_command([self._cryptsetup_bin, 'erase', '-q', device])
-        if result[RETURN_CODE] != 0 and not ignore_errors:
-            raise ValueError('Error while erasing LUKS container %s' % (device))
-
     def run_luks_remove(self, device):
         wipefs_bin = self._module.get_bin_path('wipefs', True)
 
         name = self.get_container_name_by_device(device)
         if name is not None:
             self.run_luks_close(name)
-        self.run_luks_erase(device, ignore_errors=True)
         result = self._run_command([wipefs_bin, '--all', device])
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while wiping luks container %s: %s'

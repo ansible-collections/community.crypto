@@ -46,16 +46,9 @@ def test_get_container_device_by_name(monkeypatch):
 
 
 def test_run_luks_remove(monkeypatch):
-    counter = [0]
-
     def run_command_check(self, command):
-        # check that 'cryptsetup erase' and 'wipefs' commands are actually called
-        if counter[0] == 0:
-            assert command[0] == "cryptsetup"
-            assert command[1] == "erase"
-        if counter[0] == 1:
-            assert command[0] == "wipefs"
-        counter[0] += 1
+        # check that wipefs command is actually called
+        assert command[0] == "wipefs"
         return [0, "", ""]
 
     module = DummyModule()
