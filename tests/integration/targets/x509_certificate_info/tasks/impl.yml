@@ -148,9 +148,9 @@
       # Subject Key Identifier
       - result.extensions_by_oid['2.5.29.14'].critical is false
       - result.extensions_by_oid['2.5.29.14'].value == 'BBRtcOI/yg62Ehbu5vQzxMUUdBOYMw=='
-      # Key Usage
+      # Key Usage (The certificate has 'AwIFoA==', while de-serializing and re-serializing yields 'AwIAoA=='!)
       - result.extensions_by_oid['2.5.29.15'].critical is true
-      - result.extensions_by_oid['2.5.29.15'].value == 'AwIFoA=='
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwIFoA==', 'AwIAoA==']
       # Subject Alternative Names
       - result.extensions_by_oid['2.5.29.17'].critical is false
       - result.extensions_by_oid['2.5.29.17'].value == 'MIIB5IIbY2VydC5pbnQteDEubGV0c2VuY3J5cHQub3JnghtjZXJ0LmludC14Mi5sZXRzZW5jcnlwdC5vcmeCG2NlcnQuaW50LXgzLmxldHNlbmNyeXB0Lm9yZ4IbY2VydC5pbnQteDQubGV0c2VuY3J5cHQub3JnghxjZXJ0LnJvb3QteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0YWdpbmcteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0Zy1pbnQteDEubGV0c2VuY3J5cHQub3JngiBjZXJ0LnN0Zy1yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ISY3AubGV0c2VuY3J5cHQub3JnghpjcC5yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ITY3BzLmxldHNlbmNyeXB0Lm9yZ4IbY3BzLnJvb3QteDEubGV0c2VuY3J5cHQub3Jnghtjcmwucm9vdC14MS5sZXRzZW5jcnlwdC5vcmeCD2xldHNlbmNyeXB0Lm9yZ4IWb3JpZ2luLmxldHNlbmNyeXB0Lm9yZ4IXb3JpZ2luMi5sZXRzZW5jcnlwdC5vcmeCFnN0YXR1cy5sZXRzZW5jcnlwdC5vcmeCE3d3dy5sZXRzZW5jcnlwdC5vcmc='
