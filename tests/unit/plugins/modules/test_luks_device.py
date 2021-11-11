@@ -58,6 +58,9 @@ def test_run_luks_remove(monkeypatch):
     monkeypatch.setattr(luks_device.Handler,
                         "_run_command",
                         run_command_check)
+    monkeypatch.setattr(luks_device,
+                        "wipe_luks_headers",
+                        lambda device: True)
     crypt = luks_device.CryptHandler(module)
     crypt.run_luks_remove("dummy")
 

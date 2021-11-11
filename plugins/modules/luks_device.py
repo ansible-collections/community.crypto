@@ -356,6 +356,34 @@ LUKS_NAME_REGEX = re.compile(r'\s*crypt\s+([^\s]*)\s*')
 LUKS_DEVICE_REGEX = re.compile(r'\s*device:\s+([^\s]*)\s*')
 
 
+# See https://gitlab.com/cryptsetup/cryptsetup/-/wikis/LUKS-standard/on-disk-format.pdf
+LUKS_HEADER = b'LUKS\xba\xbe'
+LUKS_HEADER_L = 6
+# See https://gitlab.com/cryptsetup/LUKS2-docs/-/blob/master/luks2_doc_wip.pdf
+LUKS2_HEADER_OFFSETS = [0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000]
+LUKS2_HEADER2 = b'SKUL\xba\xbe'
+
+
+def wipe_luks_headers(device):
+    wipe_offsets = []
+    with open(device, 'rb') as f:
+        # f.seek(0)
+        data = f.read(LUKS_HEADER_L)
+        if data == LUKS_HEADER:
+            wipe_offsets.append(0)
+        for offset in LUKS2_HEADER_OFFSETS:
+            f.seek(offset)
+            data = f.read(LUKS_HEADER_L)
+            if data == LUKS2_HEADER2:
+                wipe_offsets.append(offset)
+
+    if wipe_offsets:
+        with open(device, 'wb') as f:
+            for offset in wipe_offsets:
+                f.seek(offset)
+                f.write(b'\x00\x00\x00\x00\x00\x00')
+
+
 class Handler(object):
 
     def __init__(self, module):
@@ -515,8 +543,16 @@ class CryptHandler(Handler):
             self.run_luks_close(name)
         result = self._run_command([wipefs_bin, '--all', device])
         if result[RETURN_CODE] != 0:
-            raise ValueError('Error while wiping luks container %s: %s'
+            raise ValueError('Error while wiping LUKS container signatures for %s: %s'
                              % (device, result[STDERR]))
+
+        # For LUKS2, sometimes both `cryptsetup erase` and `wipefs` do **not**
+        # erase all LUKS signatures (they seem to miss the second header). That's
+        # why we do it ourselves here.
+        try:
+            wipe_luks_headers(device)
+        except Exception as exc:
+            raise ValueError('Error while wiping LUKS container signatures for %s: %s' % (device, exc))
 
     def run_luks_add_key(self, device, keyfile, passphrase, new_keyfile,
                          new_passphrase, pbkdf):
