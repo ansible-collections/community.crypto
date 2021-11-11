@@ -113,7 +113,7 @@ def cryptography_get_extensions_from_cert(cert):
         for ext in cert.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=ext.value.public_bytes(),
+                value=base64.b64encode(ext.value.public_bytes()),
             )
 
     return result
@@ -173,7 +173,7 @@ def cryptography_get_extensions_from_csr(csr):
         for ext in csr.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=ext.value.public_bytes(),
+                value=base64.b64encode(ext.value.public_bytes()),
             )
 
     return result
