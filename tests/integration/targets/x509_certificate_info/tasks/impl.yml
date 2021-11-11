@@ -32,7 +32,7 @@
       - result.extensions_by_oid['1.3.6.1.5.5.7.1.24'].value == 'MAMCAQU='
       # Key Usage
       - result.extensions_by_oid['2.5.29.15'].critical is true
-      - result.extensions_by_oid['2.5.29.15'].value == 'AwMA/4A='
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
       # Subject Alternative Names
       - result.extensions_by_oid['2.5.29.17'].critical is false
       - result.extensions_by_oid['2.5.29.17'].value == 'MG2CD3d3dy5hbnNpYmxlLmNvbYILeG4tLTc0aC5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
