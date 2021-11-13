@@ -1,1 +1,2 @@
+.azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
