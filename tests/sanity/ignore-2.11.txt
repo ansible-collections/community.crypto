@@ -1,3 +1,9 @@
+.azure-pipelines/scripts/publish-codecov.py replace-urlopen
+.azure-pipelines/scripts/publish-codecov.py compile-2.6!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py compile-2.7!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py compile-3.5!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py future-import-boilerplate
+.azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
 plugins/module_utils/acme/__init__.py empty-init
 plugins/module_utils/compat/ipaddress.py future-import-boilerplate
 plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
