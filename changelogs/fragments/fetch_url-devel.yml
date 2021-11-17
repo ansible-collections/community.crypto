@@ -1,0 +1,2 @@
+minor_changes:
+  - "acme_* modules - fix usage of ``fetch_url`` with changes in latest ansible-core ``devel`` branch (https://github.com/ansible-collections/community.crypto/pull/339)."
