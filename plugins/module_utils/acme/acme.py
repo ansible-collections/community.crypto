@@ -14,8 +14,9 @@ import json
 import locale
 
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.six import PY3
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
     OpenSSLCLIBackend,
@@ -228,9 +229,14 @@ class ACMEClient(object):
             resp, info = fetch_url(self.module, url, data=data, headers=headers, method='POST')
             _assert_fetch_url_success(self.module, resp, info)
             result = {}
+
             try:
+                # In Python 2, reading from a closed response yields a TypeError.
+                # In Python 3, read() simply returns ''
+                if PY3 and resp.closed:
+                    raise TypeError
                 content = resp.read()
-            except AttributeError:
+            except (AttributeError, TypeError):
                 content = info.pop('body', None)
 
             if content or not parse_json_result:
@@ -284,8 +290,12 @@ class ACMEClient(object):
             _assert_fetch_url_success(self.module, resp, info)
 
             try:
+                # In Python 2, reading from a closed response yields a TypeError.
+                # In Python 3, read() simply returns ''
+                if PY3 and resp.closed:
+                    raise TypeError
                 content = resp.read()
-            except AttributeError:
+            except (AttributeError, TypeError):
                 content = info.pop('body', None)
 
         # Process result
