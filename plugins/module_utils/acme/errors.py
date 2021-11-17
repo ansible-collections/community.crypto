@@ -7,8 +7,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.six import binary_type
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.six import binary_type, PY3
 
 
 def format_error_problem(problem, subproblem_prefix=''):
@@ -52,8 +52,12 @@ class ACMEProtocolException(ModuleFailException):
         # Try to get hold of content, if response is given and content is not provided
         if content is None and content_json is None and response is not None:
             try:
+                # In Python 2, reading from a closed response yields a TypeError.
+                # In Python 3, read() simply returns ''
+                if PY3 and response.closed:
+                    raise TypeError
                 content = response.read()
-            except AttributeError:
+            except (AttributeError, TypeError):
                 content = info.pop('body', None)
 
         # Make sure that content_json is None or a dictionary
