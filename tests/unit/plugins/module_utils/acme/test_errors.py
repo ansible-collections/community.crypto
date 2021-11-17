@@ -115,12 +115,14 @@ def test_format_error_problem(problem, subproblem_prefix, result):
 def create_regular_response(response_text):
     response = MagicMock()
     response.read = MagicMock(return_value=response_text.encode('utf-8'))
+    response.closed = False
     return response
 
 
 def create_error_response():
     response = MagicMock()
     response.read = MagicMock(side_effect=AttributeError('read'))
+    response.closed = True
     return response
 
 
