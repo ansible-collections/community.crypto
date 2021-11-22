@@ -67,87 +67,113 @@ DOTTED_OID = re.compile(r'^\d+(?:\.\d+)+$')
 
 
 def cryptography_get_extensions_from_cert(cert):
-    # Since cryptography won't give us the DER value for an extension
-    # (that is only stored for unrecognized extensions), we have to re-do
-    # the extension parsing outselves.
-    backend = default_backend()
-    try:
-        # For certain old versions of cryptography, backend is a MultiBackend object,
-        # which has no _lib attribute. In that case, revert to the old approach.
-        backend._lib
-    except AttributeError:
-        backend = cert._backend
-
     result = dict()
-    x509_obj = cert._x509
-    # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
-    # not allow to get the raw value of an extension, so we have to use this ugly hack:
-    exts = list(cert.extensions)
-
-    for i in range(backend._lib.X509_get_ext_count(x509_obj)):
-        ext = backend._lib.X509_get_ext(x509_obj, i)
-        if ext == backend._ffi.NULL:
-            continue
-        crit = backend._lib.X509_EXTENSION_get_critical(ext)
-        data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._ffi.NULL)
-        der = backend._ffi.buffer(data.data, data.length)[:]
-        entry = dict(
-            critical=(crit == 1),
-            value=base64.b64encode(der),
-        )
+    try:
+        # Since cryptography won't give us the DER value for an extension
+        # (that is only stored for unrecognized extensions), we have to re-do
+        # the extension parsing outselves.
+        backend = default_backend()
         try:
-            oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            # For certain old versions of cryptography, backend is a MultiBackend object,
+            # which has no _lib attribute. In that case, revert to the old approach.
+            backend._lib
         except AttributeError:
-            oid = exts[i].oid.dotted_string
-        result[oid] = entry
+            backend = cert._backend
+
+        x509_obj = cert._x509
+        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+        # not allow to get the raw value of an extension, so we have to use this ugly hack:
+        exts = list(cert.extensions)
+
+        for i in range(backend._lib.X509_get_ext_count(x509_obj)):
+            ext = backend._lib.X509_get_ext(x509_obj, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            try:
+                oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            except AttributeError:
+                oid = exts[i].oid.dotted_string
+            result[oid] = entry
+
+    except Exception:
+        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
+        # Use it's public_bytes() feature in that case. We will later switch this around
+        # so that this code will be the default, but for now this will act as a fallback
+        # since it will re-serialize de-serialized data, which can be different (if the
+        # original data was not canonicalized) from what was contained in the certificate.
+        for ext in cert.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=base64.b64encode(ext.value.public_bytes()),
+            )
 
     return result
 
 
 def cryptography_get_extensions_from_csr(csr):
-    # Since cryptography won't give us the DER value for an extension
-    # (that is only stored for unrecognized extensions), we have to re-do
-    # the extension parsing outselves.
     result = dict()
-    backend = default_backend()
     try:
-        # For certain old versions of cryptography, backend is a MultiBackend object,
-        # which has no _lib attribute. In that case, revert to the old approach.
-        backend._lib
-    except AttributeError:
-        backend = csr._backend
-
-    extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
-    extensions = backend._ffi.gc(
-        extensions,
-        lambda ext: backend._lib.sk_X509_EXTENSION_pop_free(
-            ext,
-            backend._ffi.addressof(backend._lib._original_lib, "X509_EXTENSION_free")
-        )
-    )
-
-    # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
-    # not allow to get the raw value of an extension, so we have to use this ugly hack:
-    exts = list(csr.extensions)
-
-    for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
-        ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
-        if ext == backend._ffi.NULL:
-            continue
-        crit = backend._lib.X509_EXTENSION_get_critical(ext)
-        data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._ffi.NULL)
-        der = backend._ffi.buffer(data.data, data.length)[:]
-        entry = dict(
-            critical=(crit == 1),
-            value=base64.b64encode(der),
-        )
+        # Since cryptography won't give us the DER value for an extension
+        # (that is only stored for unrecognized extensions), we have to re-do
+        # the extension parsing outselves.
+        backend = default_backend()
         try:
-            oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            # For certain old versions of cryptography, backend is a MultiBackend object,
+            # which has no _lib attribute. In that case, revert to the old approach.
+            backend._lib
         except AttributeError:
-            oid = exts[i].oid.dotted_string
-        result[oid] = entry
+            backend = csr._backend
+
+        extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
+        extensions = backend._ffi.gc(
+            extensions,
+            lambda ext: backend._lib.sk_X509_EXTENSION_pop_free(
+                ext,
+                backend._ffi.addressof(backend._lib._original_lib, "X509_EXTENSION_free")
+            )
+        )
+
+        # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
+        # not allow to get the raw value of an extension, so we have to use this ugly hack:
+        exts = list(csr.extensions)
+
+        for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
+            ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
+            if ext == backend._ffi.NULL:
+                continue
+            crit = backend._lib.X509_EXTENSION_get_critical(ext)
+            data = backend._lib.X509_EXTENSION_get_data(ext)
+            backend.openssl_assert(data != backend._ffi.NULL)
+            der = backend._ffi.buffer(data.data, data.length)[:]
+            entry = dict(
+                critical=(crit == 1),
+                value=base64.b64encode(der),
+            )
+            try:
+                oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
+            except AttributeError:
+                oid = exts[i].oid.dotted_string
+            result[oid] = entry
+
+    except Exception:
+        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
+        # Use it's public_bytes() feature in that case. We will later switch this around
+        # so that this code will be the default, but for now this will act as a fallback
+        # since it will re-serialize de-serialized data, which can be different (if the
+        # original data was not canonicalized) from what was contained in the CSR.
+        for ext in csr.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=base64.b64encode(ext.value.public_bytes()),
+            )
 
     return result
 
