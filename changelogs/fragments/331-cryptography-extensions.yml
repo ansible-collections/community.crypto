@@ -1,2 +1,0 @@
-bugfixes:
-- "get_certificate, openssl_csr_info, x509_certificate_info - add fallback code for extension parsing that works with cryptography 36.0.0 and newer. This code re-serializes de-serialized extensions and thus can return slightly different values if the extension in the original CSR resp. certificate was not canonicalized correctly. This code is currently used as a fallback if the existing code stops working, but we will switch it to be the main code in a future release (https://github.com/ansible-collections/community.crypto/pull/331)."

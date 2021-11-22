@@ -1,2 +1,0 @@
-bugfixes:
-  - "openssl_pkcs12 - use new PKCS#12 deserialization infrastructure from cryptography 36.0.0 if available (https://github.com/ansible-collections/community.crypto/pull/302)."

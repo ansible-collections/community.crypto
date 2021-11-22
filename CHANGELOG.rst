@@ -5,6 +5,27 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release with extra forward compatibility for newer versions of cryptography.
+
+Minor Changes
+-------------
+
+- acme_* modules - fix usage of ``fetch_url`` with changes in latest ansible-core ``devel`` branch (https://github.com/ansible-collections/community.crypto/pull/339).
+
+Bugfixes
+--------
+
+- acme_certificate - avoid passing multiple certificates to ``cryptography``'s X.509 certificate loader when ``fullchain_dest`` is used (https://github.com/ansible-collections/community.crypto/pull/324).
+- get_certificate, openssl_csr_info, x509_certificate_info - add fallback code for extension parsing that works with cryptography 36.0.0 and newer. This code re-serializes de-serialized extensions and thus can return slightly different values if the extension in the original CSR resp. certificate was not canonicalized correctly. This code is currently used as a fallback if the existing code stops working, but we will switch it to be the main code in a future release (https://github.com/ansible-collections/community.crypto/pull/331).
+- luks_device - now also runs a built-in LUKS signature cleaner on ``state=absent`` to make sure that also the secondary LUKS2 header is wiped when older versions of wipefs are used (https://github.com/ansible-collections/community.crypto/issues/326, https://github.com/ansible-collections/community.crypto/pull/327).
+- openssl_pkcs12 - use new PKCS#12 deserialization infrastructure from cryptography 36.0.0 if available (https://github.com/ansible-collections/community.crypto/pull/302).
+
 v2.0.0
 ======
 
