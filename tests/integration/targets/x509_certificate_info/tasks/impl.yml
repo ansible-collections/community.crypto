@@ -8,7 +8,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: Check whether issuer and subject behave as expected
+- name: Check whether issuer and subject and extensions behave as expected
   assert:
     that:
       - result.issuer.organizationalUnitName == 'ACME Department'
@@ -26,6 +26,21 @@
           'email:test@example.org',
           'URI:https://example.org/test/index.html'
         ]"
+      # TLS Feature
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.24'].critical == false
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.24'].value == 'MAMCAQU='
+      # Key Usage
+      - result.extensions_by_oid['2.5.29.15'].critical == true
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
+      # Subject Alternative Names
+      - result.extensions_by_oid['2.5.29.17'].critical == false
+      - result.extensions_by_oid['2.5.29.17'].value == 'MGCCD3d3dy5hbnNpYmxlLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
+      # Basic Constraints
+      - result.extensions_by_oid['2.5.29.19'].critical == true
+      - result.extensions_by_oid['2.5.29.19'].value == 'MAYBAf8CARc='
+      # Extended Key Usage
+      - result.extensions_by_oid['2.5.29.37'].critical == false
+      - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
 
 - name: Check SubjectKeyIdentifier and AuthorityKeyIdentifier
   assert:
@@ -34,6 +49,10 @@
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer == expected_authority_cert_issuer
       - result.authority_cert_serial_number == 12345
+      # Subject Key Identifier
+      - result.extensions_by_oid['2.5.29.14'].critical == false
+      # Authority Key Identifier
+      - result.extensions_by_oid['2.5.29.35'].critical == false
   vars:
     expected_authority_cert_issuer:
       - "DNS:ca.example.org"
@@ -129,10 +148,39 @@
     path: '{{ remote_tmp_dir }}/packed-cert-1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
-- assert:
+- name: Check extensions
+  assert:
     that:
       - "'ocsp_uri' in result"
       - "result.ocsp_uri == 'http://ocsp.int-x3.letsencrypt.org'"
+      - result.extensions_by_oid | length == 9
+      # Precert Signed Certificate Timestamps
+      - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].critical == false
+      - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].value == 'BIHyAPAAdgDBFkrgp3LS1DktyArBB3DU8MSb3pkaSEDB+gdRZPYzYAAAAWTdAoU6AAAEAwBHMEUCIG5WpfKF536KKa9fnVlYbwcfrKh09Hi2MSRwU2kad49UAiEA4RUKjJOgw11IHFNdit+sy1RcCU3QCSOEQYrJ1/oPltAAdgApPFGWVMg5ZbqqUPxYB9S3b79Yeily3KTDDPTlRUf0eAAAAWTdAoc+AAAEAwBHMEUCIQCJjo75K4rVDSiWQe3XFLY6MiG3zcHQrKb0YhM17r1UKAIgGa8qMoN03DLp+Rm9nRJ9XLbTJz1vbuu9PyXUY741P8E='
+      # Authority Information Access
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].critical == false
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].value == 'MGEwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLmludC14My5sZXRzZW5jcnlwdC5vcmcwLwYIKwYBBQUHMAKGI2h0dHA6Ly9jZXJ0LmludC14My5sZXRzZW5jcnlwdC5vcmcv'
+      # Subject Key Identifier
+      - result.extensions_by_oid['2.5.29.14'].critical == false
+      - result.extensions_by_oid['2.5.29.14'].value == 'BBRtcOI/yg62Ehbu5vQzxMUUdBOYMw=='
+      # Key Usage (The certificate has 'AwIFoA==', while de-serializing and re-serializing yields 'AwIAoA=='!)
+      - result.extensions_by_oid['2.5.29.15'].critical == true
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwIFoA==', 'AwIAoA==']
+      # Subject Alternative Names
+      - result.extensions_by_oid['2.5.29.17'].critical == false
+      - result.extensions_by_oid['2.5.29.17'].value == 'MIIB5IIbY2VydC5pbnQteDEubGV0c2VuY3J5cHQub3JnghtjZXJ0LmludC14Mi5sZXRzZW5jcnlwdC5vcmeCG2NlcnQuaW50LXgzLmxldHNlbmNyeXB0Lm9yZ4IbY2VydC5pbnQteDQubGV0c2VuY3J5cHQub3JnghxjZXJ0LnJvb3QteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0YWdpbmcteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0Zy1pbnQteDEubGV0c2VuY3J5cHQub3JngiBjZXJ0LnN0Zy1yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ISY3AubGV0c2VuY3J5cHQub3JnghpjcC5yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ITY3BzLmxldHNlbmNyeXB0Lm9yZ4IbY3BzLnJvb3QteDEubGV0c2VuY3J5cHQub3Jnghtjcmwucm9vdC14MS5sZXRzZW5jcnlwdC5vcmeCD2xldHNlbmNyeXB0Lm9yZ4IWb3JpZ2luLmxldHNlbmNyeXB0Lm9yZ4IXb3JpZ2luMi5sZXRzZW5jcnlwdC5vcmeCFnN0YXR1cy5sZXRzZW5jcnlwdC5vcmeCE3d3dy5sZXRzZW5jcnlwdC5vcmc='
+      # Basic Constraints
+      - result.extensions_by_oid['2.5.29.19'].critical == true
+      - result.extensions_by_oid['2.5.29.19'].value == 'MAA='
+      # Certificate Policies
+      - result.extensions_by_oid['2.5.29.32'].critical == false
+      - result.extensions_by_oid['2.5.29.32'].value == 'MIHzMAgGBmeBDAECATCB5gYLKwYBBAGC3xMBAQEwgdYwJgYIKwYBBQUHAgEWGmh0dHA6Ly9jcHMubGV0c2VuY3J5cHQub3JnMIGrBggrBgEFBQcCAjCBngyBm1RoaXMgQ2VydGlmaWNhdGUgbWF5IG9ubHkgYmUgcmVsaWVkIHVwb24gYnkgUmVseWluZyBQYXJ0aWVzIGFuZCBvbmx5IGluIGFjY29yZGFuY2Ugd2l0aCB0aGUgQ2VydGlmaWNhdGUgUG9saWN5IGZvdW5kIGF0IGh0dHBzOi8vbGV0c2VuY3J5cHQub3JnL3JlcG9zaXRvcnkv'
+      # Authority Key Identifier
+      - result.extensions_by_oid['2.5.29.35'].critical == false
+      - result.extensions_by_oid['2.5.29.35'].value == 'MBaAFKhKamMEfd265tE5t6ZFZe/zqOyh'
+      # Extended Key Usage
+      - result.extensions_by_oid['2.5.29.37'].critical == false
+      - result.extensions_by_oid['2.5.29.37'].value == 'MBQGCCsGAQUFBwMBBggrBgEFBQcDAg=='
 - name: Check fingerprints
   assert:
     that:
