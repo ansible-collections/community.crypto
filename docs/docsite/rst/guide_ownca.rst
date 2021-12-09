@@ -71,7 +71,7 @@ In the following example, we assume that the certificate to sign (including its 
 
     - name: Sign certificate with our CA
       community.crypto.x509_certificate_pipe:
-        csr_content: "{{ ca_csr.csr }}"
+        csr_content: "{{ csr.csr }}"
         provider: ownca
         ownca_path: /path/to/ca-certificate.pem
         ownca_privatekey_path: /path/to/ca-certificate.key
@@ -128,7 +128,7 @@ Please note that the above procedure is **not idempotent**. The following extend
     - name: Sign certificate with our CA
       community.crypto.x509_certificate_pipe:
         content: "{{ (certificate.content | b64decode) if certificate_exists.stat.exists else omit }}"
-        csr_content: "{{ ca_csr.csr }}"
+        csr_content: "{{ csr.csr }}"
         provider: ownca
         ownca_path: /path/to/ca-certificate.pem
         ownca_privatekey_path: /path/to/ca-certificate.key
