@@ -54,7 +54,7 @@ EXAMPLES = r'''
     path: /etc/ssl/private/ansible.com.pem
 
 - name: Create public key from private key
-  community.crypto.openssl_privatekey:
+  community.crypto.openssl_publickey:
     privatekey_path: /etc/ssl/private/ansible.com.pem
     path: /etc/ssl/ansible.com.pub
 
