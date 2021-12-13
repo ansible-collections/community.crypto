@@ -5,6 +5,14 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.8
+======
+
+Release Summary
+---------------
+
+Documentation fix release. No actual code changes.
+
 v1.9.7
 ======
 

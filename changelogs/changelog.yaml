@@ -622,3 +622,9 @@ releases:
     - 331-cryptography-extensions.yml
     - fetch_url-devel.yml
     release_date: '2021-11-22'
+  1.9.8:
+    changes:
+      release_summary: Documentation fix release. No actual code changes.
+    fragments:
+    - 1.9.8.yml
+    release_date: '2021-12-13'
