@@ -16,7 +16,7 @@ from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     CRYPTOGRAPHY_HAS_ED25519,
@@ -45,7 +45,7 @@ CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
-    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -265,7 +265,7 @@ def get_privatekey_info(module, backend, content, passphrase=None, return_privat
 def select_backend(module, backend, content, passphrase=None, return_private_key_data=False, check_consistency=False):
     if backend == 'auto':
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
 
         # Try cryptography
         if can_use_cryptography:

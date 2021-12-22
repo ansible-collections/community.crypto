@@ -26,7 +26,7 @@ from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text, to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
     HAS_OPENSSH_SUPPORT,
@@ -358,7 +358,7 @@ class KeypairBackendCryptography(KeypairBackend):
             # Default to OpenSSH 7.8 compatibility when OpenSSH is not installed
             ssh_version = self._get_ssh_version() or "7.8"
 
-            if Version(ssh_version) < Version("7.8") and self.type != 'ed25519':
+            if LooseVersion(ssh_version) < LooseVersion("7.8") and self.type != 'ed25519':
                 # OpenSSH made SSH formatted private keys available in version 6.5,
                 # but still defaulted to PKCS1 format with the exception of ed25519 keys
                 result = 'PKCS1'

@@ -27,7 +27,7 @@ import sys
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 from ._asn1 import serialize_asn1_string_as_der
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 try:
     import cryptography
@@ -557,7 +557,7 @@ def parse_pkcs12(pkcs12_bytes, passphrase=None):
     if _load_pkcs12 is not None:
         return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase)
 
-    if Version(cryptography.__version__) >= Version('35.0'):
+    if LooseVersion(cryptography.__version__) >= LooseVersion('35.0'):
         return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase)
 
     return _parse_pkcs12_legacy(pkcs12_bytes, passphrase)

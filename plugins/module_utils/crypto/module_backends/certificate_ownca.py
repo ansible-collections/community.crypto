@@ -14,7 +14,7 @@ from random import randrange
 
 from ansible.module_utils.common.text.converters import to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLBadPassphraseError,
@@ -143,7 +143,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                 ext = self.ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
                 cert_builder = cert_builder.add_extension(
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext.value)
-                    if CRYPTOGRAPHY_VERSION >= Version('2.7') else
+                    if CRYPTOGRAPHY_VERSION >= LooseVersion('2.7') else
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext),
                     critical=False
                 )
@@ -179,7 +179,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                 ext = self.ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
                 expected_ext = (
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext.value)
-                    if CRYPTOGRAPHY_VERSION >= Version('2.7') else
+                    if CRYPTOGRAPHY_VERSION >= LooseVersion('2.7') else
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext)
                 )
             except cryptography.x509.ExtensionNotFound:

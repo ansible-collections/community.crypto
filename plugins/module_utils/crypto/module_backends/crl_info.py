@@ -11,7 +11,7 @@ import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_oid_to_name,
@@ -37,7 +37,7 @@ try:
     import cryptography
     from cryptography import x509
     from cryptography.hazmat.backends import default_backend
-    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False

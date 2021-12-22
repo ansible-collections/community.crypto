@@ -145,7 +145,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
 
@@ -166,7 +166,7 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
     import ipaddress
-    HAS_CRYPTOGRAPHY = (Version(cryptography.__version__) >= Version('1.3'))
+    HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.3'))
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError as dummy:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()

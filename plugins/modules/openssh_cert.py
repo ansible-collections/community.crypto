@@ -262,7 +262,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_text
 
-from ansible_collections.community.crypto.plugins.module_utils.version import Version
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
@@ -325,7 +325,7 @@ class Certificate(OpensshModule):
         ssh_version = self._get_ssh_version()
         if not ssh_version:
             self.module.fail_json(msg="Failed to determine ssh version")
-        elif Version(ssh_version) < Version("7.6"):
+        elif LooseVersion(ssh_version) < LooseVersion("7.6"):
             self.module.fail_json(
                 msg="Signing with CA key in ssh agent requires ssh 7.6 or newer." +
                     " Your version is: %s" % ssh_version
