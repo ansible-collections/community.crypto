@@ -20,7 +20,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from distutils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 try:
     import cryptography
@@ -33,7 +33,7 @@ try:
     # actually doing that in x509_certificate, and potentially in other code,
     # we need to monkey-patch __hash__ for these classes to make sure our code
     # works fine.
-    if LooseVersion(cryptography.__version__) < LooseVersion('2.1'):
+    if Version(cryptography.__version__) < Version('2.1'):
         # A very simply hash function which relies on the representation
         # of an object to be implemented. This is the case since at least
         # cryptography 1.0, see
@@ -50,7 +50,7 @@ try:
         x509.OtherName.__hash__ = simple_hash
         x509.RegisteredID.__hash__ = simple_hash
 
-        if LooseVersion(cryptography.__version__) < LooseVersion('1.2'):
+        if Version(cryptography.__version__) < Version('1.2'):
             # The hash functions for the following types were added for cryptography 1.2:
             # https://github.com/pyca/cryptography/commit/b642deed88a8696e5f01ce6855ccf89985fc35d0
             # https://github.com/pyca/cryptography/commit/d1b5681f6db2bde7a14625538bd7907b08dfb486

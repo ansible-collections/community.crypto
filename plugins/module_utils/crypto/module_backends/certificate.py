@@ -11,10 +11,10 @@ __metaclass__ = type
 import abc
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
@@ -44,7 +44,7 @@ CRYPTOGRAPHY_VERSION = None
 try:
     import cryptography
     from cryptography import x509
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -310,7 +310,7 @@ def select_backend(module, backend, provider):
     backend = module.params['select_crypto_backend']
     if backend == 'auto':
         # Detect what backend we can use
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
         # If cryptography is available we'll use it
         if can_use_cryptography:

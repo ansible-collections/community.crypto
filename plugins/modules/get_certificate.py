@@ -169,13 +169,14 @@ import base64
 import datetime
 import traceback
 
-from distutils.version import LooseVersion
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
 from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_REQUIRED
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_oid_to_name,
@@ -199,7 +200,7 @@ try:
     import cryptography.exceptions
     import cryptography.x509
     from cryptography.hazmat.backends import default_backend as cryptography_backend
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -248,7 +249,7 @@ def main():
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
         # Try cryptography
         if can_use_cryptography:

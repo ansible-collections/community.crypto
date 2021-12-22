@@ -91,8 +91,9 @@ signature:
 
 import os
 import traceback
-from distutils.version import LooseVersion
 import base64
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.4'
 
@@ -101,7 +102,7 @@ try:
     import cryptography
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.hashes
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -237,7 +238,7 @@ def main():
     backend = module.params['select_crypto_backend']
     if backend == 'auto':
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
         # Decision
         if can_use_cryptography:

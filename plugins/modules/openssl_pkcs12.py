@@ -239,10 +239,10 @@ import os
 import stat
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
@@ -275,7 +275,7 @@ PYOPENSSL_IMP_ERR = None
 try:
     import OpenSSL
     from OpenSSL import crypto
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
+    PYOPENSSL_VERSION = Version(OpenSSL.__version__)
 except ImportError:
     PYOPENSSL_IMP_ERR = traceback.format_exc()
     PYOPENSSL_FOUND = False
@@ -287,7 +287,7 @@ try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -634,8 +634,8 @@ class PkcsCryptography(Pkcs):
 def select_backend(module, backend):
     if backend == 'auto':
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= Version(MINIMAL_PYOPENSSL_VERSION)
 
         # If no restrictions are provided, first try cryptography, then pyOpenSSL
         if module.params['iter_size'] is not None or module.params['maciter_size'] is not None:

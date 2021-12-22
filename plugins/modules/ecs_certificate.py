@@ -519,10 +519,10 @@ import re
 import time
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     write_file,
@@ -535,7 +535,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -907,7 +907,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not CRYPTOGRAPHY_FOUND or CRYPTOGRAPHY_VERSION < LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION):
+    if not CRYPTOGRAPHY_FOUND or CRYPTOGRAPHY_VERSION < Version(MINIMAL_CRYPTOGRAPHY_VERSION):
         module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                          exception=CRYPTOGRAPHY_IMP_ERR)
 

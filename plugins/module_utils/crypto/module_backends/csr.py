@@ -12,11 +12,11 @@ import abc
 import binascii
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -62,7 +62,7 @@ try:
     import cryptography.hazmat.backends
     import cryptography.hazmat.primitives.serialization
     import cryptography.hazmat.primitives.hashes
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = Version(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
@@ -275,7 +275,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                     params['relative_name'] = cryptography_parse_relative_distinguished_name(parse_crl_distribution_point['relative_name'])
                 except Exception:
                     # If cryptography's version is < 1.6, the error is probably caused by that
-                    if CRYPTOGRAPHY_VERSION < LooseVersion('1.6'):
+                    if CRYPTOGRAPHY_VERSION < Version('1.6'):
                         raise OpenSSLObjectError('Cannot specify relative_name for cryptography < 1.6')
                     raise
             if parse_crl_distribution_point['crl_issuer'] is not None:
@@ -576,7 +576,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 def select_backend(module, backend):
     if backend == 'auto':
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= Version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
         # Try cryptography
         if can_use_cryptography:

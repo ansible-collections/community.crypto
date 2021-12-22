@@ -20,9 +20,10 @@ __metaclass__ = type
 
 import os
 from base64 import b64encode, b64decode
-from distutils.version import LooseVersion
 from getpass import getuser
 from socket import gethostname
+
+from ansible_collections.community.crypto.plugins.module_utils.version import Version
 
 try:
     from cryptography import __version__ as CRYPTOGRAPHY_VERSION
@@ -32,7 +33,7 @@ try:
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
-    if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.0"):
+    if Version(CRYPTOGRAPHY_VERSION) >= Version("3.0"):
         HAS_OPENSSH_PRIVATE_FORMAT = True
     else:
         HAS_OPENSSH_PRIVATE_FORMAT = False
