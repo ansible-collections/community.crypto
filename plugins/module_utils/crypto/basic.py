@@ -20,7 +20,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from distutils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 try:
     import cryptography
