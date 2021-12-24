@@ -9,9 +9,9 @@ __metaclass__ = type
 
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.basic import missing_required_lib
+
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_oid_to_name,

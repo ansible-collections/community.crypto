@@ -96,8 +96,9 @@ signature:
 
 import os
 import traceback
-from distutils.version import LooseVersion
 import base64
+
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 MINIMAL_PYOPENSSL_VERSION = '0.11'
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.4'

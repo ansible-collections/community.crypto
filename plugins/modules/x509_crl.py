@@ -367,10 +367,10 @@ import base64
 import os
 import traceback
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text
+
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     write_file,

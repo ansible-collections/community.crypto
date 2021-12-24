@@ -124,6 +124,8 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
@@ -140,7 +142,6 @@ try:
     import cryptography.hazmat.primitives.asymmetric.utils
     import cryptography.x509
     import cryptography.x509.oid
-    from distutils.version import LooseVersion
     HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.5'))
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError as dummy:
