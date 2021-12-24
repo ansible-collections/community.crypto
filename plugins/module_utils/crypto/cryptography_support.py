@@ -23,10 +23,10 @@ import base64
 import binascii
 import re
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 from ._asn1 import serialize_asn1_string_as_der
+
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 try:
     import cryptography

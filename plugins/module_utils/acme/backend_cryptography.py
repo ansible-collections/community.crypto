@@ -16,6 +16,8 @@ import sys
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CryptoBackend,
 )
@@ -57,7 +59,6 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-    from distutils.version import LooseVersion
     CRYPTOGRAPHY_VERSION = cryptography.__version__
     HAS_CURRENT_CRYPTOGRAPHY = (LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion('1.5'))
     if HAS_CURRENT_CRYPTOGRAPHY:
