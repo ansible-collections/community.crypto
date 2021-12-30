@@ -27,7 +27,7 @@
       - cert1_root.complete_chain | join('') == (lookup('file', 'cert1.pem', rstrip=False) ~ lookup('file', 'cert1-chain.pem', rstrip=False) ~ lookup('file', 'cert1-root.pem', rstrip=False))
       - cert1_root.root == lookup('file', 'cert1-root.pem', rstrip=False)
 
-  - name: Find rootchain for cert 1 using intermediate and root pem
+  - name: Find rootchain for cert 1 using intermediate and root PEM
     certificate_complete_chain:
       input_chain: '{{ lookup("file", "cert1.pem", rstrip=False) }}'
       intermediate_certificates:
@@ -54,7 +54,7 @@
       - cert2_root.complete_chain | join('') == (lookup('file', 'cert2.pem', rstrip=False) ~ lookup('file', 'cert2-chain.pem', rstrip=False) ~ lookup('file', 'cert2-root.pem', rstrip=False))
       - cert2_root.root == lookup('file', 'cert2-root.pem', rstrip=False)
 
-  - name: Find rootchain for cert 2 using intermediate and root pem
+  - name: Find rootchain for cert 2 using intermediate and root PEM
     certificate_complete_chain:
       input_chain: '{{ lookup("file", "cert2.pem", rstrip=False) }}'
       intermediate_certificates:
@@ -69,7 +69,7 @@
       - cert2_rootchain.chain[:-1] | join('') == lookup('file', 'cert2-chain.pem', rstrip=False)
       - cert2_rootchain.root == lookup('file', 'cert2-root.pem', rstrip=False)
 
-  - name: Find alternate rootchain for cert 2 using intermediate and root pem
+  - name: Find alternate rootchain for cert 2 using intermediate and root PEM
     certificate_complete_chain:
       input_chain: '{{ lookup("file", "cert2.pem", rstrip=True) }}'
       intermediate_certificates:
