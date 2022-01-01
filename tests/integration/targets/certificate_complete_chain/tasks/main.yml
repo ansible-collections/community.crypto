@@ -84,4 +84,48 @@
       - cert2_rootchain_alt.chain[:-1] | join('') == lookup('file', 'cert2-altchain.pem', rstrip=False)
       - cert2_rootchain_alt.root == lookup('file', 'cert2-altroot.pem', rstrip=False)
 
+  - name: Find alternate rootchain for cert 2 when complete chain is already presented to the module
+    certificate_complete_chain:
+      input_chain: '{{ lookup("file", "cert2.pem", rstrip=False) ~ lookup("file", "cert2-altchain.pem", rstrip=False) ~ lookup("file", "cert2-altroot.pem", rstrip=True) }}'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert2_complete_chain
+  - debug: var=cert2_complete_chain
+  - name: Verify rootchain for cert 2
+    assert:
+      that:
+      - cert2_complete_chain.complete_chain | join('') == (lookup('file', 'cert2.pem', rstrip=False) ~ lookup('file', 'cert2-altchain.pem', rstrip=False) ~ lookup('file', 'cert2-altroot.pem', rstrip=False))
+      - cert2_complete_chain.chain == []
+      - cert2_complete_chain.root == lookup('file', 'cert2-altroot.pem', rstrip=False)
+
+  - name: Check failure when no intermediate certificate can be found
+    certificate_complete_chain:
+      input_chain: '{{ lookup("file", "cert2.pem", rstrip=True) }}'
+      intermediate_certificates:
+      - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert2_no_intermediate
+    ignore_errors: true
+  - name: Verify failure
+    assert:
+      that:
+      - cert2_no_intermediate is failed
+      - "cert2_no_intermediate.msg.startswith('Cannot complete chain. Stuck at certificate ')"
+
+  - name: Check failure when infinite loop is found
+    certificate_complete_chain:
+      input_chain: '{{ lookup("file", "cert2-fullchain.pem", rstrip=True) }}'
+      intermediate_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+    register: cert2_infinite_loop
+    ignore_errors: true
+  - name: Verify failure
+    assert:
+      that:
+      - cert2_infinite_loop is failed
+      - "cert2_infinite_loop.msg == 'Found cycle while building certificate chain'"
+
   when: cryptography_version.stdout is version('1.5', '>=')
