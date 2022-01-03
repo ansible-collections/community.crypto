@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Create keys
+  openssl_privatekey:
+    size: '{{ item.size | default(omit) }}'
+    path: '{{ remote_tmp_dir }}/privatekey_{{ item.name }}.pem'
+    type: '{{ item.type | default(omit) }}'
+    curve: '{{ item.curve | default(omit) }}'
+    passphrase: '{{ item.passphrase | default(omit) }}'
+    cipher: '{{ "auto" if item.passphrase is defined else omit }}'
+    format: '{{ item.format }}'
+  loop:
+    - name: rsa_pass1
+      format: pkcs1
+      type: RSA
+      size: '{{ default_rsa_key_size }}'
+      passphrase: secret
+
+- name: Run module with backend autodetection
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_backend_selection.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+
+- block:
+  - name: Running tests with cryptography backend
+    include_tasks: impl.yml
+    vars:
+      select_crypto_backend: cryptography
+
+  when: cryptography_version.stdout is version('1.2.3', '>=')

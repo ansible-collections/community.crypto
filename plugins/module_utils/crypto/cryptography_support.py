@@ -532,6 +532,32 @@ def cryptography_compare_public_keys(key1, key2):
     return key1.public_numbers() == key2.public_numbers()
 
 
+def cryptography_compare_private_keys(key1, key2):
+    '''Tests whether two private keys are the same.
+
+    Needs special logic for Ed25519 and Ed448 keys, since they do not have private_numbers().
+    '''
+    if CRYPTOGRAPHY_HAS_ED25519:
+        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey)
+        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey)
+        if a or b:
+            if not a or not b:
+                return False
+            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+            return a == b
+    if CRYPTOGRAPHY_HAS_ED448:
+        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey)
+        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey)
+        if a or b:
+            if not a or not b:
+                return False
+            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+            return a == b
+    return key1.private_numbers() == key2.private_numbers()
+
+
 def cryptography_serial_number_of_cert(cert):
     '''Returns cert.serial_number.
 
