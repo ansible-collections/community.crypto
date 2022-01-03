@@ -55,32 +55,32 @@ python_cryptography_capabilities:
     has_ec:
       description:
         - Whether elliptic curves are supported.
-        - Theoretically this should be the case for version 0.5 and higher.
+        - Theoretically this should be the case for version 0.5 and higher, depending on the libssl version used.
       type: bool
     has_ec_sign:
       description:
         - Whether signing with elliptic curves is supported.
-        - Theoretically this should be the case for version 1.5 and higher.
+        - Theoretically this should be the case for version 1.5 and higher, depending on the libssl version used.
       type: bool
     has_ed25519:
       description:
         - Whether Ed25519 keys are supported.
-        - Theoretically this should be the case for version 2.6 and higher.
+        - Theoretically this should be the case for version 2.6 and higher, depending on the libssl version used.
       type: bool
     has_ed25519_sign:
       description:
         - Whether signing with Ed25519 keys is supported.
-        - Theoretically this should be the case for version 2.6 and higher.
+        - Theoretically this should be the case for version 2.6 and higher, depending on the libssl version used.
       type: bool
     has_ed448:
       description:
         - Whether Ed448 keys are supported.
-        - Theoretically this should be the case for version 2.6 and higher.
+        - Theoretically this should be the case for version 2.6 and higher, depending on the libssl version used.
       type: bool
     has_ed448_sign:
       description:
         - Whether signing with Ed448 keys is supported.
-        - Theoretically this should be the case for version 2.6 and higher.
+        - Theoretically this should be the case for version 2.6 and higher, depending on the libssl version used.
       type: bool
     has_dsa:
       description:
@@ -105,17 +105,17 @@ python_cryptography_capabilities:
     has_x25519:
       description:
         - Whether X25519 keys are supported.
-        - Theoretically this should be the case for version 2.0 and higher.
+        - Theoretically this should be the case for version 2.0 and higher, depending on the libssl version used.
       type: bool
     has_x25519_serialization:
       description:
         - Whether serialization of X25519 keys is supported.
-        - Theoretically this should be the case for version 2.5 and higher.
+        - Theoretically this should be the case for version 2.5 and higher, depending on the libssl version used.
       type: bool
     has_x448:
       description:
         - Whether X448 keys are supported.
-        - Theoretically this should be the case for version 2.5 and higher.
+        - Theoretically this should be the case for version 2.5 and higher, depending on the libssl version used.
       type: bool
 '''
 
@@ -140,14 +140,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     HAS_CRYPTOGRAPHY,
 )
 
-CRYPTOGRAPHY_IMP_ERR = None
-CRYPTOGRAPHY_VERSION = None
 try:
     import cryptography
-
-    CRYPTOGRAPHY_VERSION = cryptography.__version__
+    from cryptography.exceptions import UnsupportedAlgorithm
 except ImportError:
+    UnsupportedAlgorithm = Exception
+    CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
+else:
+    CRYPTOGRAPHY_VERSION = cryptography.__version__
+    CRYPTOGRAPHY_IMP_ERR = None
 
 
 def add_crypto_information(module, result):
@@ -156,21 +158,61 @@ def add_crypto_information(module, result):
         result['python_cryptography_import_error'] = CRYPTOGRAPHY_IMP_ERR
         return
 
+    has_ed25519 = CRYPTOGRAPHY_HAS_ED25519
+    if has_ed25519:
+        try:
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+            Ed25519PrivateKey.from_private_bytes(b'')
+        except UnsupportedAlgorithm:
+            has_ed25519 = True
+        except ValueError:
+            pass
+
+    has_ed448 = CRYPTOGRAPHY_HAS_ED448
+    if has_ed448:
+        try:
+            from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
+            Ed448PrivateKey.from_private_bytes(b'')
+        except UnsupportedAlgorithm:
+            has_ed448 = True
+        except ValueError:
+            pass
+
+    has_x25519 = CRYPTOGRAPHY_HAS_X25519
+    if has_x25519:
+        try:
+            from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+            X25519PrivateKey.from_private_bytes(b'')
+        except UnsupportedAlgorithm:
+            has_x25519 = True
+        except ValueError:
+            pass
+
+    has_x448 = CRYPTOGRAPHY_HAS_X448
+    if has_x448:
+        try:
+            from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
+            X448PrivateKey.from_private_bytes(b'')
+        except UnsupportedAlgorithm:
+            has_x448 = True
+        except ValueError:
+            pass
+
     info = {
         'version': CRYPTOGRAPHY_VERSION,
         'has_ec': CRYPTOGRAPHY_HAS_EC,
         'has_ec_sign': CRYPTOGRAPHY_HAS_EC_SIGN,
-        'has_ed25519': CRYPTOGRAPHY_HAS_ED25519,
+        'has_ed25519': has_ed25519,
         'has_ed25519_sign': CRYPTOGRAPHY_HAS_ED25519_SIGN,
-        'has_ed448': CRYPTOGRAPHY_HAS_ED448,
-        'has_ed448_sign': CRYPTOGRAPHY_HAS_ED448_SIGN,
+        'has_ed448': has_ed448,
+        'has_ed448_sign': has_ed448 and CRYPTOGRAPHY_HAS_ED448_SIGN,
         'has_dsa': CRYPTOGRAPHY_HAS_DSA,
         'has_dsa_sign': CRYPTOGRAPHY_HAS_DSA_SIGN,
         'has_rsa': CRYPTOGRAPHY_HAS_RSA,
         'has_rsa_sign': CRYPTOGRAPHY_HAS_RSA_SIGN,
-        'has_x25519': CRYPTOGRAPHY_HAS_X25519,
-        'has_x25519_serialization': CRYPTOGRAPHY_HAS_X25519_FULL,
-        'has_x448': CRYPTOGRAPHY_HAS_X448,
+        'has_x25519': has_x25519,
+        'has_x25519_serialization': has_x25519 and CRYPTOGRAPHY_HAS_X25519_FULL,
+        'has_x448': has_x448,
     }
     result['python_cryptography_capabilities'] = info
 
