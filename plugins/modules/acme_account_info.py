@@ -53,7 +53,7 @@ EXAMPLES = '''
 - name: Check whether an account with the given account key exists
   community.crypto.acme_account_info:
     account_key_src: /etc/pki/cert/private/account.key
-    register: account_data
+  register: account_data
 - name: Verify that account exists
   assert:
     that:
@@ -69,7 +69,7 @@ EXAMPLES = '''
   acme_account_info:
     account_key_content: "{{ acme_account_key }}"
     account_uri: "{{ acme_account_uri }}"
-    register: account_data
+  register: account_data
 - name: Verify that account exists
   assert:
     that:
