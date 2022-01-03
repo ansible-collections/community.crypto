@@ -288,11 +288,6 @@
         # select_crypto_backend: '{{ select_crypto_backend }}'
       register: convert_not_idem
 
-    - name: "({{ select_crypto_backend }}) Check whether file changed"
-      community.internal_test_tools.files_diff:
-        state: '{{ convert_file_info_data }}'
-      register: convert_file_info
-
     - assert:
         that:
           - convert_not_idem_check is changed
@@ -350,11 +345,6 @@
         format: raw
         # select_crypto_backend: '{{ select_crypto_backend }}'
       register: convert_not_idem
-
-    - name: "({{ select_crypto_backend }}) Check whether file changed"
-      community.internal_test_tools.files_diff:
-        state: '{{ convert_file_info_data }}'
-      register: convert_file_info
 
     - assert:
         that:
