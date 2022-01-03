@@ -252,7 +252,7 @@ def add_crypto_information(module, result):
         'has_ec': CRYPTOGRAPHY_HAS_EC,
         'has_ec_sign': CRYPTOGRAPHY_HAS_EC_SIGN,
         'has_ed25519': has_ed25519,
-        'has_ed25519_sign': CRYPTOGRAPHY_HAS_ED25519_SIGN,
+        'has_ed25519_sign': has_ed25519 and CRYPTOGRAPHY_HAS_ED25519_SIGN,
         'has_ed448': has_ed448,
         'has_ed448_sign': has_ed448 and CRYPTOGRAPHY_HAS_ED448_SIGN,
         'has_dsa': CRYPTOGRAPHY_HAS_DSA,

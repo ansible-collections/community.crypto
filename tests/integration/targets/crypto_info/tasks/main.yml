@@ -12,6 +12,27 @@
   debug:
     var: result
 
+- name: Determine complex version-based capabilities
+  set_fact:
+    supports_ed25519: >-
+      {{
+        cryptography_version.stdout is version("2.6", ">=")
+        and not (
+          ansible_os_family == "FreeBSD" and
+          ansible_facts.distribution_version is version("12.1", ">=") and
+          ansible_facts.distribution_version is version("12.2", "<")
+        )
+      }}
+    supports_ed448: >-
+      {{
+        cryptography_version.stdout is version("2.6", ">=")
+        and not (
+          ansible_os_family == "FreeBSD" and
+          ansible_facts.distribution_version is version("12.1", ">=") and
+          ansible_facts.distribution_version is version("12.2", "<")
+        )
+      }}
+
 - name: Verify information
   assert:
     that:
@@ -21,10 +42,10 @@
       - "'secp256r1' in result.python_cryptography_capabilities.curves"
       - result.python_cryptography_capabilities.has_ec == (cryptography_version.stdout is version('0.5', '>='))
       - result.python_cryptography_capabilities.has_ec_sign == (cryptography_version.stdout is version('1.5', '>='))
-      - result.python_cryptography_capabilities.has_ed25519 == (cryptography_version.stdout is version('2.6', '>='))
-      - result.python_cryptography_capabilities.has_ed25519_sign == (cryptography_version.stdout is version('2.6', '>='))
-      - result.python_cryptography_capabilities.has_ed448 == (cryptography_version.stdout is version('2.6', '>='))
-      - result.python_cryptography_capabilities.has_ed448_sign == (cryptography_version.stdout is version('2.6', '>='))
+      - result.python_cryptography_capabilities.has_ed25519 == supports_ed25519
+      - result.python_cryptography_capabilities.has_ed25519_sign == supports_ed25519
+      - result.python_cryptography_capabilities.has_ed448 == supports_ed448
+      - result.python_cryptography_capabilities.has_ed448_sign == supports_ed448
       - result.python_cryptography_capabilities.has_dsa == (cryptography_version.stdout is version('0.5', '>='))
       - result.python_cryptography_capabilities.has_dsa_sign == (cryptography_version.stdout is version('1.5', '>='))
       - result.python_cryptography_capabilities.has_rsa == (cryptography_version.stdout is version('0.5', '>='))
