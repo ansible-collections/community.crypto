@@ -60,6 +60,9 @@ except ImportError:
 from .basic import (
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
+    CRYPTOGRAPHY_HAS_X25519,
+    CRYPTOGRAPHY_HAS_X25519_FULL,
+    CRYPTOGRAPHY_HAS_X448,
     OpenSSLObjectError,
 )
 
@@ -506,55 +509,72 @@ def cryptography_key_needs_digest_for_signing(key):
     return True
 
 
+def _compare_public_keys(key1, key2, clazz):
+    a = isinstance(key1, clazz)
+    b = isinstance(key2, clazz)
+    if not (a or b):
+        return None
+    if not a or not b:
+        return False
+    a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+    b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+    return a == b
+
+
 def cryptography_compare_public_keys(key1, key2):
     '''Tests whether two public keys are the same.
 
     Needs special logic for Ed25519 and Ed448 keys, since they do not have public_numbers().
     '''
     if CRYPTOGRAPHY_HAS_ED25519:
-        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey)
-        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey)
-        if a or b:
-            if not a or not b:
-                return False
-            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            return a == b
+        res = _compare_public_keys(key1, key2, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey)
+        if res is not None:
+            return res
     if CRYPTOGRAPHY_HAS_ED448:
-        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey)
-        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey)
-        if a or b:
-            if not a or not b:
-                return False
-            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            return a == b
+        res = _compare_public_keys(key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey)
+        if res is not None:
+            return res
     return key1.public_numbers() == key2.public_numbers()
+
+
+def _compare_private_keys(key1, key2, clazz, has_no_private_bytes=False):
+    a = isinstance(key1, clazz)
+    b = isinstance(key2, clazz)
+    if not (a or b):
+        return None
+    if not a or not b:
+        return False
+    if has_no_private_bytes:
+        # We do not have the private_bytes() function - compare associated public keys
+        return cryptography_compare_public_keys(a.public_key(), b.public_key())
+    encryption_algorithm = cryptography.hazmat.primitives.serialization.NoEncryption()
+    a = key1.private_bytes(serialization.Encoding.Raw, serialization.PrivateFormat.Raw, encryption_algorithm=encryption_algorithm)
+    b = key2.private_bytes(serialization.Encoding.Raw, serialization.PrivateFormat.Raw, encryption_algorithm=encryption_algorithm)
+    return a == b
 
 
 def cryptography_compare_private_keys(key1, key2):
     '''Tests whether two private keys are the same.
 
-    Needs special logic for Ed25519 and Ed448 keys, since they do not have private_numbers().
+    Needs special logic for Ed25519, X25519, and Ed448 keys, since they do not have private_numbers().
     '''
     if CRYPTOGRAPHY_HAS_ED25519:
-        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey)
-        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey)
-        if a or b:
-            if not a or not b:
-                return False
-            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            return a == b
+        res = _compare_private_keys(key1, key2, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey)
+        if res is not None:
+            return res
+    if CRYPTOGRAPHY_HAS_X25519:
+        res = _compare_private_keys(
+            key1, key2, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey, has_no_private_bytes=not CRYPTOGRAPHY_HAS_X25519_FULL)
+        if res is not None:
+            return res
     if CRYPTOGRAPHY_HAS_ED448:
-        a = isinstance(key1, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey)
-        b = isinstance(key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey)
-        if a or b:
-            if not a or not b:
-                return False
-            a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-            return a == b
+        res = _compare_private_keys(key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey)
+        if res is not None:
+            return res
+    if CRYPTOGRAPHY_HAS_X448:
+        res = _compare_private_keys(key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey)
+        if res is not None:
+            return res
     return key1.private_numbers() == key2.private_numbers()
 
 

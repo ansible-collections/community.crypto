@@ -9,7 +9,6 @@ __metaclass__ = type
 
 
 import abc
-import base64
 import traceback
 
 from ansible.module_utils import six
@@ -24,17 +23,10 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X25519_FULL,
     CRYPTOGRAPHY_HAS_X448,
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
     OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    get_fingerprint_of_privatekey,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -43,12 +35,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_private_key_format,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_info import (
-    PrivateKeyConsistencyError,
-    PrivateKeyParseError,
-    get_privatekey_info,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
@@ -119,7 +105,7 @@ class PrivateKeyConvertBackend:
         return self.dest_private_key_bytes is not None
 
     @abc.abstractmethod
-    def _load_private_key(self, data, passphrase):
+    def _load_private_key(self, data, passphrase, current_hint=None):
         """Check whether data cna be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
         pass
 
@@ -131,7 +117,7 @@ class PrivateKeyConvertBackend:
             return True
 
         try:
-            format, self.dest_private_key = self._load_private_key(self.dest_private_key_bytes, self.dest_passphrase)
+            format, self.dest_private_key = self._load_private_key(self.dest_private_key_bytes, self.dest_passphrase, current_hint=self.src_private_key)
         except Exception:
             return True
 
@@ -187,7 +173,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 exception=traceback.format_exc()
             )
 
-    def _load_private_key(self, data, passphrase):
+    def _load_private_key(self, data, passphrase, current_hint=None):
         try:
             # Interpret bytes depending on format.
             format = identify_private_key_format(data)
@@ -199,15 +185,21 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 if len(data) == 57 and CRYPTOGRAPHY_HAS_ED448:
                     return format, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.from_private_bytes(data)
                 if len(data) == 32:
-                    if CRYPTOGRAPHY_HAS_X25519 and (self.type == 'X25519' or not CRYPTOGRAPHY_HAS_ED25519):
+                    if CRYPTOGRAPHY_HAS_X25519 and not CRYPTOGRAPHY_HAS_ED25519:
                         return format, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(data)
-                    if CRYPTOGRAPHY_HAS_ED25519 and (self.type == 'Ed25519' or not CRYPTOGRAPHY_HAS_X25519):
+                    if CRYPTOGRAPHY_HAS_ED25519 and not CRYPTOGRAPHY_HAS_X25519:
                         return format, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(data)
                     if CRYPTOGRAPHY_HAS_X25519 and CRYPTOGRAPHY_HAS_ED25519:
-                        try:
-                            return format, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(data)
-                        except Exception:
-                            return format, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(data)
+                        if isinstance(current_hint, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey):
+                            try:
+                                return format, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(data)
+                            except Exception:
+                                return format, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(data)
+                        else:
+                            try:
+                                return format, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(data)
+                            except Exception:
+                                return format, cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(data)
                 raise PrivateKeyError('Cannot load raw key')
             else:
                 return format, cryptography.hazmat.primitives.serialization.load_pem_private_key(
