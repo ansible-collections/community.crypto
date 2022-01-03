@@ -52,6 +52,12 @@ python_cryptography_capabilities:
     version:
       description: The library version.
       type: str
+    curves:
+      description:
+        - List of all supported elliptic curves.
+        - Theoretically this should be non-empty for version 0.5 and higher, depending on the libssl version used.
+      type: list
+      elements: str
     has_ec:
       description:
         - Whether elliptic curves are supported.
@@ -152,6 +158,29 @@ else:
     CRYPTOGRAPHY_IMP_ERR = None
 
 
+CURVES = [
+    ('secp224r1', 'SECP224R1'),
+    ('secp256k1', 'SECP256K1'),
+    ('secp256r1', 'SECP256R1'),
+    ('secp384r1', 'SECP384R1'),
+    ('secp521r1', 'SECP521R1'),
+    ('secp192r1', 'SECP192R1'),
+    ('sect163k1', 'SECT163K1'),
+    ('sect163r2', 'SECT163R2'),
+    ('sect233k1', 'SECT233K1'),
+    ('sect233r1', 'SECT233R1'),
+    ('sect283k1', 'SECT283K1'),
+    ('sect283r1', 'SECT283R1'),
+    ('sect409k1', 'SECT409K1'),
+    ('sect409r1', 'SECT409R1'),
+    ('sect571k1', 'SECT571K1'),
+    ('sect571r1', 'SECT571R1'),
+    ('brainpoolP256r1', 'BrainpoolP256R1'),
+    ('brainpoolP384r1', 'BrainpoolP384R1'),
+    ('brainpoolP512r1', 'BrainpoolP512R1'),
+]
+
+
 def add_crypto_information(module, result):
     result['python_cryptography_installed'] = HAS_CRYPTOGRAPHY
     if not HAS_CRYPTOGRAPHY:
@@ -198,8 +227,24 @@ def add_crypto_information(module, result):
         except ValueError:
             pass
 
+    curves = []
+    if CRYPTOGRAPHY_HAS_EC:
+        import cryptography.hazmat.backends
+        import cryptography.hazmat.primitives.asymmetric.ec
+
+        backend = cryptography.hazmat.backends.default_backend()
+        for curve_name, constructor_name in CURVES:
+            ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(constructor_name)
+            if ecclass:
+                try:
+                    cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(curve=ecclass(), backend=backend)
+                    curves.append(curve_name)
+                except UnsupportedAlgorithm:
+                    pass
+
     info = {
         'version': CRYPTOGRAPHY_VERSION,
+        'curves': curves,
         'has_ec': CRYPTOGRAPHY_HAS_EC,
         'has_ec_sign': CRYPTOGRAPHY_HAS_EC_SIGN,
         'has_ed25519': has_ed25519,
