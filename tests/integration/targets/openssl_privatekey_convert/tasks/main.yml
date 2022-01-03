@@ -7,7 +7,15 @@
 - name: Determine capabilities
   set_fact:
     supports_x25519: '{{ cryptography_version.stdout is version("2.5", ">=") }}'
-    supports_ed25519: '{{ cryptography_version.stdout is version("2.6", ">=") }}'
+    supports_ed25519: >-
+      {{
+        cryptography_version.stdout is version("2.6", ">=")
+        and not (
+          ansible_os_family == "FreeBSD" and
+          ansible_facts.distribution_version is version("12.1", ">=") and
+          ansible_facts.distribution_version is version("12.2", "<")
+        )
+      }}
 
 - name: Create keys
   openssl_privatekey:
