@@ -1,0 +1,33 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Retrieve information
+  crypto_info:
+  register: result
+
+- name: Display information
+  debug:
+    var: result
+
+- name: Verify information
+  assert:
+    that:
+      - result.python_cryptography_installed is true
+      - "'python_cryptography_import_error' not in result"
+      - result.python_cryptography_capabilities.version == cryptography_version.stdout
+      - result.python_cryptography_capabilities.has_ec == (cryptography_version.stdout is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_ec_sign == (cryptography_version.stdout is version('1.5', '>='))
+      - result.python_cryptography_capabilities.has_ed25519 == (cryptography_version.stdout is version('2.6', '>='))
+      - result.python_cryptography_capabilities.has_ed25519_sign == (cryptography_version.stdout is version('2.6', '>='))
+      - result.python_cryptography_capabilities.has_ed448 == (cryptography_version.stdout is version('2.6', '>='))
+      - result.python_cryptography_capabilities.has_ed448_sign == (cryptography_version.stdout is version('2.6', '>='))
+      - result.python_cryptography_capabilities.has_dsa == (cryptography_version.stdout is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_dsa_sign == (cryptography_version.stdout is version('1.5', '>='))
+      - result.python_cryptography_capabilities.has_rsa == (cryptography_version.stdout is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_rsa_sign == (cryptography_version.stdout is version('1.4', '>='))
+      - result.python_cryptography_capabilities.has_x25519 == (cryptography_version.stdout is version('2.0', '>='))
+      - result.python_cryptography_capabilities.has_x25519_serialization == (cryptography_version.stdout is version('2.5', '>='))
+      - result.python_cryptography_capabilities.has_x448 == (cryptography_version.stdout is version('2.5', '>='))
