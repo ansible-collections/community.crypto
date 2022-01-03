@@ -18,7 +18,6 @@
       - result.python_cryptography_installed
       - "'python_cryptography_import_error' not in result"
       - result.python_cryptography_capabilities.version == cryptography_version.stdout
-      - "'secp256k1' in result.python_cryptography_capabilities.curves"
       - "'secp256r1' in result.python_cryptography_capabilities.curves"
       - result.python_cryptography_capabilities.has_ec == (cryptography_version.stdout is version('0.5', '>='))
       - result.python_cryptography_capabilities.has_ec_sign == (cryptography_version.stdout is version('1.5', '>='))

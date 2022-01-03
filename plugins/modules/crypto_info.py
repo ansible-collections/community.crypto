@@ -192,40 +192,44 @@ def add_crypto_information(module, result):
         try:
             from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
             Ed25519PrivateKey.from_private_bytes(b'')
-        except UnsupportedAlgorithm:
-            has_ed25519 = True
         except ValueError:
             pass
+        except UnsupportedAlgorithm:
+            has_ed25519 = False
 
     has_ed448 = CRYPTOGRAPHY_HAS_ED448
     if has_ed448:
         try:
             from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
             Ed448PrivateKey.from_private_bytes(b'')
-        except UnsupportedAlgorithm:
-            has_ed448 = True
         except ValueError:
             pass
+        except UnsupportedAlgorithm:
+            has_ed448 = False
 
     has_x25519 = CRYPTOGRAPHY_HAS_X25519
     if has_x25519:
         try:
             from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
-            X25519PrivateKey.from_private_bytes(b'')
-        except UnsupportedAlgorithm:
-            has_x25519 = True
+            if CRYPTOGRAPHY_HAS_X25519_FULL:
+                X25519PrivateKey.from_private_bytes(b'')
+            else:
+                # Some versions do not support serialization and deserialization - use generate() instead
+                X25519PrivateKey.generate()
         except ValueError:
             pass
+        except UnsupportedAlgorithm:
+            has_x25519 = False
 
     has_x448 = CRYPTOGRAPHY_HAS_X448
     if has_x448:
         try:
             from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
             X448PrivateKey.from_private_bytes(b'')
-        except UnsupportedAlgorithm:
-            has_x448 = True
         except ValueError:
             pass
+        except UnsupportedAlgorithm:
+            has_x448 = False
 
     curves = []
     if CRYPTOGRAPHY_HAS_EC:
