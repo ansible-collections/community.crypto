@@ -15,7 +15,7 @@
 - name: Verify information
   assert:
     that:
-      - result.python_cryptography_installed is true
+      - result.python_cryptography_installed
       - "'python_cryptography_import_error' not in result"
       - result.python_cryptography_capabilities.version == cryptography_version.stdout
       - result.python_cryptography_capabilities.has_ec == (cryptography_version.stdout is version('0.5', '>='))
