@@ -238,12 +238,14 @@ class CertificateSet(object):
         self.module = module
         self.certificates = set()
         self.certificate_by_issuer = dict()
+        self.certificate_by_cert = dict()
 
     def _load_file(self, path):
         certs = load_PEM_list(self.module, path, fail_on_error=False)
         for cert in certs:
             self.certificates.add(cert)
             self.certificate_by_issuer[cert.cert.subject] = cert
+            self.certificate_by_cert[cert.cert] = cert
 
     def load(self, path):
         '''
@@ -273,6 +275,16 @@ def format_cert(cert):
     Return human readable representation of certificate for error messages.
     '''
     return str(cert.cert)
+
+
+def check_cycle(module, occured_certificates, next):
+    '''
+    Make sure that next is not in occured_certificates so far, and add it.
+    '''
+    next_cert = next.cert
+    if next_cert in occured_certificates:
+        module.fail_json(msg='Found cycle while building certificate chain')
+    occured_certificates.add(next_cert)
 
 
 def main():
@@ -313,13 +325,19 @@ def main():
     # Try to complete chain
     current = chain[-1]
     completed = []
+    occured_certificates = set([cert.cert for cert in chain])
+    if current.cert in roots.certificate_by_cert:
+        # Don't try to complete the chain when it's already ending with a root certificate
+        current = None
     while current:
         root = roots.find_parent(current)
         if root:
+            check_cycle(module, occured_certificates, root)
             completed.append(root)
             break
         intermediate = intermediates.find_parent(current)
         if intermediate:
+            check_cycle(module, occured_certificates, intermediate)
             completed.append(intermediate)
             current = intermediate
         else:
