@@ -15,7 +15,9 @@ author: "Felix Fontein (@felixfontein)"
 short_description: Retrieve cryptographic capabilities
 version_added: 2.1.0
 description:
-   - "Retrieve information on cryptographic capabilities."
+   - Retrieve information on cryptographic capabilities.
+   - The current version retrieves information on the L(Python cryptography library, https://cryptography.io/) available to
+     Ansible modules, and on the OpenSSL binary C(openssl) found in the path.
 notes:
    - Supports C(check_mode).
 options: {}
@@ -123,6 +125,30 @@ python_cryptography_capabilities:
         - Whether X448 keys are supported.
         - Theoretically this should be the case for version 2.5 and higher, depending on the libssl version used.
       type: bool
+
+openssl_present:
+  description: Whether the OpenSSL binary C(openssl) is installed and can be found in the PATH.
+  returned: always
+  type: bool
+  sample: true
+
+openssl:
+  description: Information on the installed OpenSSL binary.
+  returned: when I(openssl_present=true)
+  type: dict
+  contains:
+    path:
+      description: Path of the OpenSSL binary.
+      type: str
+      sample: /usr/bin/openssl
+    version:
+      description: The OpenSSL version.
+      type: str
+      sample: 1.1.1m
+    version_output:
+      description: The complete output of C(openssl version).
+      type: str
+      sample: 'OpenSSL 1.1.1m  14 Dec 2021\n'
 '''
 
 import traceback
@@ -268,8 +294,32 @@ def add_crypto_information(module):
     return result
 
 
+def add_openssl_information(module):
+    openssl_binary = module.get_bin_path('openssl')
+    result = {
+        'openssl_present': openssl_binary is not None,
+    }
+    if openssl_binary is None:
+        return result
+
+    openssl_result = {
+        'path': openssl_binary,
+    }
+    result['openssl'] = openssl_result
+
+    rc, out, err = module.run_command([openssl_binary, 'version'])
+    if rc == 0:
+        openssl_result['version_output'] = out
+        parts = out.split(' ', 2)
+        if len(parts) > 1:
+            openssl_result['version'] = parts[1]
+
+    return result
+
+
 INFO_FUNCTIONS = [
     add_crypto_information,
+    add_openssl_information,
 ]
 
 
