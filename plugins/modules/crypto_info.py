@@ -310,7 +310,7 @@ def add_openssl_information(module):
     rc, out, err = module.run_command([openssl_binary, 'version'])
     if rc == 0:
         openssl_result['version_output'] = out
-        parts = out.split(' ', 2)
+        parts = out.split(None, 2)
         if len(parts) > 1:
             openssl_result['version'] = parts[1]
 
