@@ -181,11 +181,12 @@ CURVES = [
 ]
 
 
-def add_crypto_information(module, result):
+def add_crypto_information(module):
+    result = {}
     result['python_cryptography_installed'] = HAS_CRYPTOGRAPHY
     if not HAS_CRYPTOGRAPHY:
         result['python_cryptography_import_error'] = CRYPTOGRAPHY_IMP_ERR
-        return
+        return result
 
     has_ed25519 = CRYPTOGRAPHY_HAS_ED25519
     if has_ed25519:
@@ -264,12 +265,19 @@ def add_crypto_information(module, result):
         'has_x448': has_x448,
     }
     result['python_cryptography_capabilities'] = info
+    return result
+
+
+INFO_FUNCTIONS = [
+    add_crypto_information,
+]
 
 
 def main():
     module = AnsibleModule(argument_spec={}, supports_check_mode=True)
     result = {}
-    add_crypto_information(module, result)
+    for fn in INFO_FUNCTIONS:
+        result.update(fn(module))
     module.exit_json(**result)
 
 
