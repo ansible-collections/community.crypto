@@ -184,7 +184,7 @@ else:
     CRYPTOGRAPHY_IMP_ERR = None
 
 
-CURVES = [
+CURVES = (
     ('secp224r1', 'SECP224R1'),
     ('secp256k1', 'SECP256K1'),
     ('secp256r1', 'SECP256R1'),
@@ -204,7 +204,7 @@ CURVES = [
     ('brainpoolP256r1', 'BrainpoolP256R1'),
     ('brainpoolP384r1', 'BrainpoolP384R1'),
     ('brainpoolP512r1', 'BrainpoolP512R1'),
-]
+)
 
 
 def add_crypto_information(module):
