@@ -34,13 +34,9 @@ options:
         type: str
     format:
         description:
-            - Determines which format the private key is written in. By default, PKCS1 (traditional OpenSSL format)
-              is used for all keys which support it. Please note that not every key can be exported in any format.
-            - The value C(auto) selects a fromat based on the key format. The value C(auto_ignore) does the same,
-              but for existing private key files, it will not force a regenerate when its format is not the automatically
-              selected one for generation.
-            - Note that if the format for an existing private key mismatches, the key is B(regenerated) by default.
-              To change this behavior, use the I(format_mismatch) option.
+            - Determines which format the destination private key should be written in.
+            - Please note that not every key can be exported in any format, and that not every
+              format supports encryption.
         type: str
         choices: [ pkcs1, pkcs8, raw ]
         required: true
