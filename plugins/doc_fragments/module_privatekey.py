@@ -89,7 +89,7 @@ options:
         description:
             - Determines which format the private key is written in. By default, PKCS1 (traditional OpenSSL format)
               is used for all keys which support it. Please note that not every key can be exported in any format.
-            - The value C(auto) selects a fromat based on the key format. The value C(auto_ignore) does the same,
+            - The value C(auto) selects a format based on the key format. The value C(auto_ignore) does the same,
               but for existing private key files, it will not force a regenerate when its format is not the automatically
               selected one for generation.
             - Note that if the format for an existing private key mismatches, the key is B(regenerated) by default.
