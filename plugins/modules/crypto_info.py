@@ -317,10 +317,10 @@ def add_openssl_information(module):
     return result
 
 
-INFO_FUNCTIONS = [
+INFO_FUNCTIONS = (
     add_crypto_information,
     add_openssl_information,
-]
+)
 
 
 def main():
