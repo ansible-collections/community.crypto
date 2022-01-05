@@ -20,6 +20,8 @@ Please note that this collection does **not** support Windows targets.
 
 Tested with the current Ansible 2.9, ansible-base 2.10, ansible-core 2.11, ansible-core 2.12, ansible-core 2.13, ansible-core 2.14, ansible-core 2.15, ansible-core 2.16, and ansible-core-2.17 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
 
+This collection does not work with ansible-core before 2.12 (this includes ansible-base and Ansible 2.9) on Python 2.12+.
+
 ## External requirements
 
 The exact requirements for every module are listed in the module documentation. 
