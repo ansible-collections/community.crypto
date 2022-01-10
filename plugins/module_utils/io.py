@@ -24,6 +24,19 @@ import os
 import tempfile
 
 
+def load_file(path, module=None):
+    '''
+    Load the file as a bytes string.
+    '''
+    try:
+        with open(path, 'rb') as f:
+            return f.read()
+    except Exception as exc:
+        if module is None:
+            raise
+        module.fail_json('Error while loading {0} - {1}'.format(path, str(exc)))
+
+
 def load_file_if_exists(path, module=None, ignore_errors=False):
     '''
     Load the file as a bytes string. If the file does not exist, ``None`` is returned.

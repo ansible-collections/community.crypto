@@ -1,0 +1,61 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Determine capabilities
+  set_fact:
+    supports_x25519: '{{ cryptography_version.stdout is version("2.5", ">=") }}'
+    supports_ed25519: >-
+      {{
+        cryptography_version.stdout is version("2.6", ">=")
+        and not (
+          ansible_os_family == "FreeBSD" and
+          ansible_facts.distribution_version is version("12.1", ">=") and
+          ansible_facts.distribution_version is version("12.2", "<")
+        )
+      }}
+
+- name: Create keys
+  openssl_privatekey:
+    size: '{{ item.size | default(omit) }}'
+    path: '{{ remote_tmp_dir }}/privatekey_{{ item.name }}.pem'
+    type: '{{ item.type | default(omit) }}'
+    curve: '{{ item.curve | default(omit) }}'
+    passphrase: '{{ item.passphrase | default(omit) }}'
+    cipher: '{{ "auto" if item.passphrase is defined else omit }}'
+    format: '{{ item.format }}'
+  when: item.condition | default(true)
+  loop:
+    - name: rsa_pass1
+      format: pkcs1
+      type: RSA
+      size: '{{ default_rsa_key_size }}'
+      passphrase: secret
+    - name: ed25519
+      format: pkcs8
+      type: Ed25519
+      size: '{{ default_rsa_key_size }}'
+      condition: '{{ supports_ed25519 }}'
+    - name: x25519
+      format: pkcs8
+      type: X25519
+      size: '{{ default_rsa_key_size }}'
+      condition: '{{ supports_x25519 }}'
+
+- name: Run module with backend autodetection
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_backend_selection.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+
+- block:
+  - name: Running tests with cryptography backend
+    include_tasks: impl.yml
+    vars:
+      select_crypto_backend: cryptography
+
+  when: cryptography_version.stdout is version('1.2.3', '>=')

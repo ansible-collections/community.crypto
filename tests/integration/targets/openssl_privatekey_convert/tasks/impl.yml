@@ -1,0 +1,386 @@
+---
+- name: Convert (check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_check
+  check_mode: true
+
+- name: Convert
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert
+
+- assert:
+    that:
+      - convert_check is changed
+      - convert is changed
+
+- name: "({{ select_crypto_backend }}) Collect file information"
+  community.internal_test_tools.files_collect:
+    files:
+      - path: '{{ remote_tmp_dir }}/output_1.pem'
+  register: convert_file_info_data
+
+- name: Convert (idempotent, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem_check
+  check_mode: true
+
+- name: Convert (idempotent)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs8
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_idem_check is not changed
+      - convert_idem is not changed
+      - convert_file_info is not changed
+
+- name: Convert (change format, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem_check
+  check_mode: true
+
+- name: Convert (change format)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_not_idem_check is changed
+      - convert_not_idem is changed
+      - convert_file_info is changed
+
+- name: "({{ select_crypto_backend }}) Collect file information"
+  community.internal_test_tools.files_collect:
+    files:
+      - path: '{{ remote_tmp_dir }}/output_1.pem'
+  register: convert_file_info_data
+
+- name: Convert (idempotent, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem_check
+  check_mode: true
+
+- name: Convert (idempotent)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter2
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_idem_check is not changed
+      - convert_idem is not changed
+      - convert_file_info is not changed
+
+- name: Convert (change password, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter3
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem_check
+  check_mode: true
+
+- name: Convert (change password)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter3
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_not_idem_check is changed
+      - convert_not_idem is changed
+      - convert_file_info is changed
+
+- name: "({{ select_crypto_backend }}) Collect file information"
+  community.internal_test_tools.files_collect:
+    files:
+      - path: '{{ remote_tmp_dir }}/output_1.pem'
+  register: convert_file_info_data
+
+- name: Convert (idempotent, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter3
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem_check
+  check_mode: true
+
+- name: Convert (idempotent)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    dest_passphrase: hunter3
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_idem_check is not changed
+      - convert_idem is not changed
+      - convert_file_info is not changed
+
+- name: Convert (remove password, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem_check
+  check_mode: true
+
+- name: Convert (remove password)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_not_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_not_idem_check is changed
+      - convert_not_idem is changed
+      - convert_file_info is changed
+
+- name: "({{ select_crypto_backend }}) Collect file information"
+  community.internal_test_tools.files_collect:
+    files:
+      - path: '{{ remote_tmp_dir }}/output_1.pem'
+  register: convert_file_info_data
+
+- name: Convert (idempotent, check mode)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem_check
+  check_mode: true
+
+- name: Convert (idempotent)
+  openssl_privatekey_convert:
+    src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
+    src_passphrase: secret
+    dest_path: '{{ remote_tmp_dir }}/output_1.pem'
+    format: pkcs1
+    # select_crypto_backend: '{{ select_crypto_backend }}'
+  register: convert_idem
+
+- name: "({{ select_crypto_backend }}) Check whether file changed"
+  community.internal_test_tools.files_diff:
+    state: '{{ convert_file_info_data }}'
+  register: convert_file_info
+
+- assert:
+    that:
+      - convert_idem_check is not changed
+      - convert_idem is not changed
+      - convert_file_info is not changed
+
+- when: supports_ed25519 | bool
+  block:
+    - name: Convert (change format to raw, check mode)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_2.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_not_idem_check
+      check_mode: true
+
+    - name: Convert (change format to raw)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_2.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_not_idem
+
+    - assert:
+        that:
+          - convert_not_idem_check is changed
+          - convert_not_idem is changed
+
+    - name: "({{ select_crypto_backend }}) Collect file information"
+      community.internal_test_tools.files_collect:
+        files:
+          - path: '{{ remote_tmp_dir }}/output_2.pem'
+      register: convert_file_info_data
+
+    - name: Convert (idempotent, check mode)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_2.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_idem_check
+      check_mode: true
+
+    - name: Convert (idempotent)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_2.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_idem
+
+    - name: "({{ select_crypto_backend }}) Check whether file changed"
+      community.internal_test_tools.files_diff:
+        state: '{{ convert_file_info_data }}'
+      register: convert_file_info
+
+    - assert:
+        that:
+          - convert_idem_check is not changed
+          - convert_idem is not changed
+          - convert_file_info is not changed
+
+- when: supports_x25519 | bool
+  block:
+    - name: Convert (change format to raw, check mode)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_3.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_not_idem_check
+      check_mode: true
+
+    - name: Convert (change format to raw)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_3.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_not_idem
+
+    - assert:
+        that:
+          - convert_not_idem_check is changed
+          - convert_not_idem is changed
+
+    - name: "({{ select_crypto_backend }}) Collect file information"
+      community.internal_test_tools.files_collect:
+        files:
+          - path: '{{ remote_tmp_dir }}/output_3.pem'
+      register: convert_file_info_data
+
+    - name: Convert (idempotent, check mode)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_3.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_idem_check
+      check_mode: true
+
+    - name: Convert (idempotent)
+      openssl_privatekey_convert:
+        src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
+        dest_path: '{{ remote_tmp_dir }}/output_3.pem'
+        format: raw
+        # select_crypto_backend: '{{ select_crypto_backend }}'
+      register: convert_idem
+
+    - name: "({{ select_crypto_backend }}) Check whether file changed"
+      community.internal_test_tools.files_diff:
+        state: '{{ convert_file_info_data }}'
+      register: convert_file_info
+
+    - assert:
+        that:
+          - convert_idem_check is not changed
+          - convert_idem is not changed
+          - convert_file_info is not changed
