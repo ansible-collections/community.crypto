@@ -104,9 +104,8 @@ options:
     subject_alt_name:
         description:
             - Subject Alternative Name (SAN) extension to attach to the certificate signing request.
-            - This can either be a 'comma separated string' or a YAML list.
-            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
-              C(otherName) and the ones specific to your CA).
+            - Values must be prefixed by their options. (These are C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName), and the ones specific to your CA).
             - Note that if no SAN is specified, but a common name, the common
               name will be added as a SAN except if C(useCommonNameForSAN) is
               set to I(false).
@@ -129,7 +128,7 @@ options:
         aliases: [ useCommonNameForSAN ]
     key_usage:
         description:
-            - This defines the purpose (e.g. encipherment, signature, certificate signing)
+            - This defines the purpose (for example encipherment, signature, certificate signing)
               of the key contained in the certificate.
         type: list
         elements: str
@@ -142,7 +141,7 @@ options:
         aliases: [ keyUsage_critical ]
     extended_key_usage:
         description:
-            - Additional restrictions (e.g. client authentication, server authentication)
+            - Additional restrictions (for example client authentication, server authentication)
               on the allowed purposes for which the public key may be used.
         type: list
         elements: str

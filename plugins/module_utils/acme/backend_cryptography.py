@@ -192,7 +192,7 @@ class CryptographyBackend(CryptoBackend):
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         Raises KeyParsingError in case of errors.
         '''
-        # If key_content isn't given, read key_file
+        # If key_content is not given, read key_file
         if key_content is None:
             key_content = read_file(key_file)
         else:

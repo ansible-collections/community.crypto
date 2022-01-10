@@ -166,7 +166,7 @@ class AnsibleActionModule(object):
             try:
                 self.aliases = self._handle_aliases()
             except (ValueError, TypeError) as e:
-                # Use exceptions here because it isn't safe to call fail_json until no_log is processed
+                # Use exceptions here because it is not safe to call fail_json until no_log is processed
                 raise _ModuleExitException(dict(failed=True, msg="Module alias error: %s" % to_native(e)))
 
             # Save parameter values that should never be logged
@@ -405,7 +405,7 @@ class AnsibleActionModule(object):
                             self.fail_json(msg=msg)
                     elif param[k] not in choices:
                         # PyYaml converts certain strings to bools.  If we can unambiguously convert back, do so before checking
-                        # the value.  If we can't figure this out, module author is responsible.
+                        # the value.  If we cannot figure this out, module author is responsible.
                         lowered_choices = None
                         if param[k] == 'False':
                             lowered_choices = lenient_lowercase(choices)
@@ -545,7 +545,7 @@ class AnsibleActionModule(object):
             except KeyError:
                 self.fail_json(msg="implementation error: unknown type %s requested for %s" % (wanted, k))
         else:
-            # set the type_checker to the callable, and reset wanted to the callable's name (or type if it doesn't have one, ala MagicMock)
+            # set the type_checker to the callable, and reset wanted to the callable's name (or type if it does not have one, ala MagicMock)
             type_checker = wanted
             wanted = getattr(wanted, '__name__', to_native(type(wanted)))
 

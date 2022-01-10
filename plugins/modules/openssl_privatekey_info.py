@@ -45,7 +45,7 @@ options:
             - Whether to return private key data.
             - Only set this to C(yes) when you want private information about this key to
               leave the remote machine.
-            - "B(WARNING:) you have to make sure that private key data isn't accidentally logged!"
+            - "B(WARNING:) you have to make sure that private key data is not accidentally logged!"
         type: bool
         default: no
     check_consistency:

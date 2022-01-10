@@ -118,10 +118,10 @@ class ACMEAccount(object):
                 self.client.set_account_uri(info['location'])
             return False, result
         elif info['status'] == 400 and result['type'] == 'urn:ietf:params:acme:error:accountDoesNotExist' and not allow_creation:
-            # Account does not exist (and we didn't try to create it)
+            # Account does not exist (and we did not try to create it)
             return False, None
         elif info['status'] == 403 and result['type'] == 'urn:ietf:params:acme:error:unauthorized' and 'deactivated' in (result.get('detail') or ''):
-            # Account has been deactivated; currently works for Pebble; hasn't been
+            # Account has been deactivated; currently works for Pebble; has not been
             # implemented for Boulder (https://github.com/letsencrypt/boulder/issues/3971),
             # might need adjustment in error detection.
             if not allow_creation:

@@ -219,7 +219,7 @@ class CertificateBackend(object):
             if ext.value.digest != x509.SubjectKeyIdentifier.from_public_key(self.existing_certificate.public_key()).digest:
                 return False
         else:
-            # If CSR had SKI and we didn't ignore it ('create_if_not_provided'), compare SKIs
+            # If CSR had SKI and we did not ignore it ('create_if_not_provided'), compare SKIs
             if ext.value.digest != csr_ext.value.digest:
                 return False
         return True
@@ -318,7 +318,7 @@ def select_backend(module, backend, provider):
 
         # Fail if no backend has been found
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect the required Python library "
+            module.fail_json(msg=("Cannot detect the required Python library "
                                   "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
     if backend == 'cryptography':

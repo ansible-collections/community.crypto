@@ -225,7 +225,7 @@ def main():
                 if result.get('type') == error_type and result.get('detail') == 'Certificate already revoked':
                     # Fallback: boulder returns this in case the certificate was already revoked.
                     already_revoked = True
-            # If we know the certificate was already revoked, we don't fail,
+            # If we know the certificate was already revoked, we do not fail,
             # but successfully terminate while indicating no change
             if already_revoked:
                 module.exit_json(changed=False)

@@ -133,7 +133,7 @@ EXAMPLES = '''
     - mailto:me@example.com
     - mailto:myself@example.org
 
-- name: Make sure account has given email address. Don't create account if it doesn't exist
+- name: Make sure account has given email address. Do not create account if it does not exist
   community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present

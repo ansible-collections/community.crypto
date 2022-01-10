@@ -1,0 +1,2 @@
+minor_changes:
+  - "Adjust error messages that indicate ``cryptography`` is not installed from ``Can't`` to ``Cannot`` (https://github.com/ansible-collections/community.crypto/pull/374)."

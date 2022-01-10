@@ -52,7 +52,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         '''
         if passphrase is not None:
             raise KeyParsingError('openssl backend does not support key passphrases')
-        # If key_file isn't given, but key_content, write that to a temporary file
+        # If key_file is not given, but key_content, write that to a temporary file
         if key_file is None:
             fd, tmpsrc = tempfile.mkstemp()
             self.module.add_cleanup_file(tmpsrc)  # Ansible will delete the file on exit
@@ -221,7 +221,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         try:
             return to_native(ipaddress.ip_address(to_text(ip)).compressed)
         except ValueError:
-            # We don't want to error out on something IPAddress() can't parse
+            # We do not want to error out on something IPAddress() cannot parse
             return ip
 
     def get_csr_identifiers(self, csr_filename=None, csr_content=None):

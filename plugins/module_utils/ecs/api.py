@@ -105,7 +105,7 @@ def bind(instance, method, operation_spec):
     def binding_scope_fn(*args, **kwargs):
         return method(instance, *args, **kwargs)
 
-    # Make sure we don't confuse users; add the proper name and documentation to the function.
+    # Make sure we do not confuse users; add the proper name and documentation to the function.
     # Users can use !help(<function>) to get help on the function from interactive python or pdb
     operation_name = operation_spec.get("operationId").split("Using")[0]
     binding_scope_fn.__name__ = str(operation_name)

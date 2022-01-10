@@ -81,8 +81,8 @@ options:
             - The number of days the certificate must have left being valid. If C(cert_days < remaining_days) then a new certificate will be
               obtained using I(request_type).
             - If C(request_type=renew), a renewal will fail if the certificate being renewed has been issued within the past 30 days, so do not set a
-              I(remaining_days) value that is within 30 days of the full lifetime of the certificate being acted upon. (e.g. if you are requesting Certificates
-              with a 90 day lifetime, do not set remaining_days to a value C(60) or higher).
+              I(remaining_days) value that is within 30 days of the full lifetime of the certificate being acted upon.
+            - For exmaple, if you are requesting Certificates with a 90 day lifetime, do not set I(remaining_days) to a value C(60) or higher).
             - The I(force) option may be used to ensure that a new certificate is always obtained.
         type: int
         default: 30
@@ -97,8 +97,8 @@ options:
             - Specifying C(request_type=reissue) means that an existing certificate (specified by I(tracking_id) if present, otherwise I(path)) will be
               reissued.
               If there is no certificate to reissue, a new certificate is requested.
-            - If a certificate was issued within the past 30 days, the 'renew' operation is not a valid operation and will fail.
-            - Note that C(reissue) is an operation that will result in the revocation of the certificate that is reissued, be cautious with it's use.
+            - If a certificate was issued within the past 30 days, the C(renew) operation is not a valid operation and will fail.
+            - Note that C(reissue) is an operation that will result in the revocation of the certificate that is reissued, be cautious with its use.
             - I(check_mode) is only supported if C(request_type=new)
             - For example, setting C(request_type=renew) and C(remaining_days=30) and pointing to the same certificate on multiple playbook runs means that on
               the first run new certificate will be requested. It will then be left along on future runs until it is within 30 days of expiry, then the
@@ -690,7 +690,7 @@ class EcsCertificate(object):
             if len(cert_results) == 1:
                 self.tracking_id = cert_results[0].get('trackingId')
         except RestOperationException as dummy:
-            # If we fail to find a cert by serial number, that's fine, we just don't set self.tracking_id
+            # If we fail to find a cert by serial number, that's fine, we just do not set self.tracking_id
             return
 
     def set_cert_details(self, module):
