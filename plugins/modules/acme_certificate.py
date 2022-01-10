@@ -170,7 +170,7 @@ options:
     aliases: ['cert']
   fullchain_dest:
     description:
-      - "The destination file for the full chain (i.e. certificate followed
+      - "The destination file for the full chain (that is, a certificate followed
          by chain of intermediate certificates)."
       - "Required if C(dest) is not specified."
     type: path
@@ -204,7 +204,7 @@ options:
     description:
       - Enforces the execution of the challenge and validation, even if an
         existing certificate is still valid for more than C(remaining_days).
-      - This is especially helpful when having an updated CSR e.g. with
+      - This is especially helpful when having an updated CSR, for example with
         additional domains for which a new certificate is desired.
     type: bool
     default: no
@@ -238,9 +238,9 @@ options:
           - "Determines which certificates in the chain will be tested."
           - "I(all) tests all certificates in the chain (excluding the leaf, which is
              identical in all chains)."
-          - "I(first) only tests the first certificate in the chain, i.e. the one which
+          - "I(first) only tests the first certificate in the chain, that is the one which
              signed the leaf."
-          - "I(last) only tests the last certificate in the chain, i.e. the one furthest
+          - "I(last) only tests the last certificate in the chain, that is the one furthest
              away from the leaf. Its issuer is the root certificate of this chain."
         type: str
         default: all

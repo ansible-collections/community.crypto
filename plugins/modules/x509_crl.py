@@ -114,7 +114,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
               I(ignore_timestamps) is set to C(yes).
         type: str
@@ -127,7 +127,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
               I(ignore_timestamps) is set to C(yes).
             - Required if I(state) is C(present).
@@ -172,7 +172,7 @@ options:
                     - Time can be specified either as relative time or as absolute timestamp.
                     - Time will always be interpreted as UTC.
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-                      + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+                      + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent, except when
                       I(ignore_timestamps) is set to C(yes).
                 type: str
@@ -215,7 +215,7 @@ options:
                     - Time can be specified either as relative time or as absolute timestamp.
                     - Time will always be interpreted as UTC.
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-                      + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+                      + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent. This will NOT
                       change when I(ignore_timestamps) is set to C(yes).
                 type: str
@@ -647,7 +647,7 @@ class CRL(OpenSSLObject):
         old_entries = [self._compress_entry(cryptography_decode_revoked_certificate(cert)) for cert in self.crl]
         new_entries = [self._compress_entry(cert) for cert in self.revoked_certificates]
         if self.update:
-            # We don't simply use a set so that duplicate entries are treated correctly
+            # We do not simply use a set so that duplicate entries are treated correctly
             for entry in new_entries:
                 try:
                     old_entries.remove(entry)

@@ -67,7 +67,7 @@ options:
         version_added: "1.0.0"
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) DH params' content as I(dhparams).
+            - If set to C(yes), will return the (current or generated) DH parameter's content as I(dhparams).
         type: bool
         default: no
         version_added: "1.0.0"
@@ -286,7 +286,7 @@ class DHParameterOpenSSL(DHParameterBase):
         rc, out, err = module.run_command(command, check_rc=False)
         result = to_native(out)
         if rc != 0:
-            # If the call failed the file probably doesn't exist or is
+            # If the call failed the file probably does not exist or is
             # unreadable
             return False
         # output contains "(xxxx bit)"
@@ -380,7 +380,7 @@ def main():
 
             # Success?
             if backend == 'auto':
-                module.fail_json(msg=("Can't detect either the required Python library cryptography (>= {0}) "
+                module.fail_json(msg=("Cannot detect either the required Python library cryptography (>= {0}) "
                                       "or the OpenSSL binary openssl").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
         if backend == 'openssl':

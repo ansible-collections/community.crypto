@@ -116,7 +116,7 @@ def cryptography_get_signature_algorithm_oid_from_crl(crl):
     try:
         return crl.signature_algorithm_oid
     except AttributeError:
-        # Older cryptography versions don't have signature_algorithm_oid yet
+        # Older cryptography versions do not have signature_algorithm_oid yet
         dotted = obj2txt(
             crl._backend._lib,
             crl._backend._ffi,

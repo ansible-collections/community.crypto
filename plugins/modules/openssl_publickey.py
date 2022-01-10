@@ -431,7 +431,7 @@ def main():
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect the required Python library "
+            module.fail_json(msg=("Cannot detect the required Python library "
                                   "cryptography (>= {0})").format(minimal_cryptography_version))
 
     if module.params['format'] == 'OpenSSH' and backend != 'cryptography':

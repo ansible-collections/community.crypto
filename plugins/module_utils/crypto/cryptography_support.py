@@ -79,7 +79,7 @@ DOTTED_OID = re.compile(r'^\d+(?:\.\d+)+$')
 def cryptography_get_extensions_from_cert(cert):
     result = dict()
     try:
-        # Since cryptography won't give us the DER value for an extension
+        # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing outselves.
         backend = default_backend()
@@ -131,7 +131,7 @@ def cryptography_get_extensions_from_cert(cert):
 def cryptography_get_extensions_from_csr(csr):
     result = dict()
     try:
-        # Since cryptography won't give us the DER value for an extension
+        # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing outselves.
         backend = default_backend()

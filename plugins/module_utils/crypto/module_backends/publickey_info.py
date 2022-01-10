@@ -155,7 +155,7 @@ def select_backend(module, backend, content=None, key=None):
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect any of the required Python libraries "
+            module.fail_json(msg=("Cannot detect any of the required Python libraries "
                                   "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
     if backend == 'cryptography':

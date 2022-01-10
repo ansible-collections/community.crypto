@@ -21,7 +21,7 @@ description:
 options:
     device:
         description:
-            - "Device to work with (e.g. C(/dev/sda1)). Needed in most cases.
+            - "Device to work with (for example C(/dev/sda1)). Needed in most cases.
               Can be omitted only when I(state=closed) together with I(name)
               is provided."
         type: str
@@ -53,7 +53,7 @@ options:
         description:
             - "Sets container name when I(state=opened). Can be used
               instead of I(device) when closing the existing container
-              (i.e. when I(state=closed))."
+              (that is, when I(state=closed))."
         type: str
     keyfile:
         description:
@@ -159,7 +159,7 @@ options:
             - "This option allows the user to define the cipher specification
               string for the LUKS container."
             - "Will only be used on container creation."
-            - "For pre-2.6.10 kernels, use C(aes-plain) as they don't understand
+            - "For pre-2.6.10 kernels, use C(aes-plain) as they do not understand
               the new cipher spec strings. To use ESSIV, use C(aes-cbc-essiv:sha256)."
         type: str
         version_added: '1.1.0'

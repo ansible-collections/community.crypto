@@ -50,7 +50,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h), and ASN.1 TIME (in other words, pattern C(YYYYMMDDHHMMSSZ)).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)), and ASN.1 TIME (in other words, pattern C(YYYYMMDDHHMMSSZ)).
               Note that all timestamps will be treated as being in UTC.
         type: dict
     select_crypto_backend:

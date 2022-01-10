@@ -94,7 +94,7 @@ options:
               this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if C(full_idempotence)
               is specified.
             - If set to C(never), the module will fail if the key cannot be read or the passphrase
-              isn't matching, and will never regenerate an existing key.
+              is not matching, and will never regenerate an existing key.
             - If set to C(fail), the module will fail if the key does not correspond to the module's
               options.
             - If set to C(partial_idempotence), the key will be regenerated if it does not conform to

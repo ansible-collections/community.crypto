@@ -17,7 +17,7 @@ description:
       L(ECC,https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) or
       L(EdDSA,https://en.wikipedia.org/wiki/EdDSA) private keys.
     - Keys are generated in PEM format.
-    - "Please note that the module regenerates private keys if they don't match
+    - "Please note that the module regenerates private keys if they do not match
       the module's options. In particular, if you provide another passphrase
       (or specify none), change the keysize, etc., the private key will be
       regenerated. If you are concerned that this could B(overwrite your private key),
@@ -111,12 +111,12 @@ options:
         description:
             - Allows to configure in which situations the module is allowed to regenerate private keys.
               The module will always generate a new key if the destination file does not exist.
-            - By default, the key will be regenerated when it doesn't match the module's options,
+            - By default, the key will be regenerated when it does not match the module's options,
               except when the key cannot be read or the passphrase does not match. Please note that
               this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if C(full_idempotence)
               is specified.
             - If set to C(never), the module will fail if the key cannot be read or the passphrase
-              isn't matching, and will never regenerate an existing key.
+              is not matching, and will never regenerate an existing key.
             - If set to C(fail), the module will fail if the key does not correspond to the module's
               options.
             - If set to C(partial_idempotence), the key will be regenerated if it does not conform to

@@ -228,7 +228,7 @@ class PrivateKeyInfoRetrieval(object):
         if self.check_consistency:
             result['key_is_consistent'] = self._is_key_consistent(key_public_data, key_private_data)
             if result['key_is_consistent'] is False:
-                # Only fail when it is False, to avoid to fail on None (which means "we don't know")
+                # Only fail when it is False, to avoid to fail on None (which means "we do not know")
                 msg = (
                     "Private key is not consistent! (See "
                     "https://blog.hboeck.de/archives/888-How-I-tricked-Symantec-with-a-Fake-Private-Key.html)"
@@ -273,7 +273,7 @@ def select_backend(module, backend, content, passphrase=None, return_private_key
 
         # Success?
         if backend == 'auto':
-            module.fail_json(msg=("Can't detect the required Python library "
+            module.fail_json(msg=("Cannot detect the required Python library "
                                   "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
 
     if backend == 'cryptography':

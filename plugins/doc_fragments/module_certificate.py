@@ -264,7 +264,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - If this value is not specified, the certificate will start being valid from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
               This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
@@ -279,7 +279,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
               This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
@@ -359,7 +359,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - If this value is not specified, the certificate will start being valid from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
               This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
@@ -375,7 +375,7 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (e.g. C(+32w1d2h).
+              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - If this value is not specified, the certificate will stop being valid 10 years from now.
             - Note that this value is B(not used to determine whether an existing certificate should be regenerated).
               This can be changed by setting the I(ignore_timestamps) option to C(false). Please note that you should
