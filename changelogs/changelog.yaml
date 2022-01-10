@@ -711,3 +711,29 @@ releases:
     fragments:
     - 2.0.2.yml
     release_date: '2021-12-20'
+  2.1.0:
+    changes:
+      bugfixes:
+      - Various modules and plugins - use vendored version of ``distutils.version``
+        instead of the deprecated Python standard library ``distutils`` (https://github.com/ansible-collections/community.crypto/pull/353).
+      - certificate_complete_chain - do not append root twice if the chain already
+        ends with a root certificate (https://github.com/ansible-collections/community.crypto/pull/360).
+      - certificate_complete_chain - do not hang when infinite loop is found (https://github.com/ansible-collections/community.crypto/issues/355,
+        https://github.com/ansible-collections/community.crypto/pull/360).
+      minor_changes:
+      - Adjust error messages that indicate ``cryptography`` is not installed from
+        ``Can't`` to ``Cannot`` (https://github.com/ansible-collections/community.crypto/pull/374).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 2.1.0.yml
+    - 353-distutils.version.yml
+    - 360-certificate_complete_chain-loop.yml
+    - 374-docs.yml
+    modules:
+    - description: Retrieve cryptographic capabilities
+      name: crypto_info
+      namespace: ''
+    - description: Convert OpenSSL private keys
+      name: openssl_privatekey_convert
+      namespace: ''
+    release_date: '2022-01-10'
