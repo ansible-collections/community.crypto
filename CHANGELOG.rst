@@ -5,6 +5,16 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.9
+======
+
+Bugfixes
+--------
+
+- Various modules and plugins - use vendored version of ``distutils.version`` instead of the deprecated Python standard library ``distutils`` (https://github.com/ansible-collections/community.crypto/pull/353).
+- certificate_complete_chain - do not append root twice if the chain already ends with a root certificate (https://github.com/ansible-collections/community.crypto/pull/360).
+- certificate_complete_chain - do not hang when infinite loop is found (https://github.com/ansible-collections/community.crypto/issues/355, https://github.com/ansible-collections/community.crypto/pull/360).
+
 v1.9.8
 ======
 
