@@ -198,6 +198,7 @@ EXAMPLES = '''
     valid_from: +0s
     valid_to: +32w
     valid_at: +2w
+    ignore_timestamps: true
 
 - name: Generate an OpenSSH host certificate that is valid forever and only for example.com and examplehost
   community.crypto.openssh_cert:
