@@ -131,6 +131,7 @@ options:
     ignore_timestamps:
         description:
             - "Whether the I(valid_from) and I(valid_to) timestamps should be ignored for idempotency checks."
+            - "However, the values will still be applied to a new certificate if it meets any other necessary conditions for generation/regeneration."
         type: bool
         default: false
         version_added: 2.2.0
