@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - openssh_cert - added 'ignore_timestamps' parameter so it can be used semi-idempotent with relative timestamps in valid_to/valid_from (https://github.com/ansible-collections/community.crypto/issues/379).
+  - openssh_cert - added ``ignore_timestamps`` parameter so it can be used semi-idempotent with relative timestamps in ``valid_to``/``valid_from`` (https://github.com/ansible-collections/community.crypto/issues/379).
