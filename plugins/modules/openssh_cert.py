@@ -112,8 +112,7 @@ options:
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | always)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
-            - "To ignore this value during comparison with an existing certificate set."
-               I(ignore_timestamps=true)."
+            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
             - Required if I(state) is C(present).
         type: str
     valid_to:
@@ -122,8 +121,7 @@ options:
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | forever)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
-            - "To ignore this value during comparison with an existing certificate set."
-               I(ignore_timestamps=true)."
+            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
             - Required if I(state) is C(present).
         type: str
     valid_at:
