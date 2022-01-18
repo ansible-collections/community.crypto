@@ -412,11 +412,11 @@ class Certificate(OpensshModule):
 
         if self.ignore_timestamps:
             return original_time_parameters.within_range(self.valid_at)
-        else:
-            return all([
-                original_time_parameters == self.time_parameters,
-                original_time_parameters.within_range(self.valid_at)
-            ])
+        
+        return all([
+            original_time_parameters == self.time_parameters,
+            original_time_parameters.within_range(self.valid_at)
+        ])
 
     def _compare_options(self):
         try:
