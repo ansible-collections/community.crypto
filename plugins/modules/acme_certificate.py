@@ -308,7 +308,7 @@ EXAMPLES = r'''
 # - copy:
 #     dest: /var/www/html/{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource'] }}
 #     content: "{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource_value'] }}"
-#     when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge['challenge_data']
+#   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge['challenge_data']
 #
 # Alternative way:
 #
