@@ -86,6 +86,57 @@
     regenerate: full_idempotence
   register: default_options
 
+- name: Generate cert with relative timestamp
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: +0s
+    valid_to: +32w
+    valid_at: +2w
+    regenerate: full_idempotence
+  register: relative_timestamp
+
+- name: Generate cert with ignore_timestamp true
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: +0s
+    valid_to: +32w
+    valid_at: +2w
+    ignore_timestamps: true
+    regenerate: full_idempotence
+  register: relative_timestamp_true
+
+- name: Generate cert with ignore_timestamp false
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: +0s
+    valid_to: +32w
+    valid_at: +2w
+    ignore_timestamps: false
+    regenerate: full_idempotence
+  register: relative_timestamp_false
+
+- name: Generate cert with ignore_timestamp true
+  openssh_cert:
+    type: user
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: +0s
+    valid_to: +32w
+    valid_at: +50w
+    ignore_timestamps: true
+    regenerate: full_idempotence
+  register: relative_timestamp_invalid_at
+
 - name: Assert options results
   assert:
     that:
@@ -95,6 +146,10 @@
       - explicit_extension_after is not changed
       - explicit_extension_and_directive is changed
       - default_options is not changed
+      - relative_timestamp is changed
+      - relative_timestamp_true is not changed
+      - relative_timestamp_false is changed
+      - relative_timestamp_invalid_at is changed
 
 - name: Remove certificate
   openssh_cert:
