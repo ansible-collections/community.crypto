@@ -111,7 +111,7 @@ options:
             - "The point in time the certificate is valid from. Time can be specified either as relative time or as absolute timestamp.
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | always)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
-               Note that if using relative time this module is NOT idempotent."
+               Note that if using relative time this module is NOT idempotent. To change default behaviour use I(ignore_timestamps) is C(true)."
             - Required if I(state) is C(present).
         type: str
     valid_to:
@@ -119,7 +119,7 @@ options:
             - "The point in time the certificate is valid to. Time can be specified either as relative time or as absolute timestamp.
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | forever)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
-               Note that if using relative time this module is NOT idempotent."
+               Note that if using relative time this module is NOT idempotent. To change default behaviour use I(ignore_timestamps) is C(true)."
             - Required if I(state) is C(present).
         type: str
     valid_at:
@@ -128,6 +128,12 @@ options:
                Time will always be interpreted as UTC. Mainly to be used with relative timespec for I(valid_from) and / or I(valid_to).
                Note that if using relative time this module is NOT idempotent."
         type: str
+    ignore_timestamps:
+        description:
+            - "Whether the I(valid_from) and I(valid_to) timestamps should be ignored for idempotency checks."
+        type: bool
+        default: false
+        version_added: 2.2.0
     principals:
         description:
             - "Certificates may be limited to be valid for a set of principal (user/host) names.
@@ -296,6 +302,7 @@ class Certificate(OpensshModule):
         self.type = self.module.params['type']
         self.use_agent = self.module.params['use_agent']
         self.valid_at = self.module.params['valid_at']
+        self.ignore_timestamps = self.module.params['ignore_timestamps']
 
         self._check_if_base_dir(self.path)
 
@@ -403,10 +410,13 @@ class Certificate(OpensshModule):
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
 
-        return all([
-            original_time_parameters == self.time_parameters,
-            original_time_parameters.within_range(self.valid_at)
-        ])
+        if self.ignore_timestamps:
+            return original_time_parameters.within_range(self.valid_at)
+        else:
+            return all([
+                original_time_parameters == self.time_parameters,
+                original_time_parameters.within_range(self.valid_at)
+            ])
 
     def _compare_options(self):
         try:
@@ -537,6 +547,7 @@ def main():
             valid_at=dict(type='str'),
             valid_from=dict(type='str'),
             valid_to=dict(type='str'),
+            ignore_timestamps=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
