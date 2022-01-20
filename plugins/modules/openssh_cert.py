@@ -50,6 +50,7 @@ options:
               match the module's options.
             - When C(partial_idempotence) an existing certificate will be regenerated based on
               I(serial), I(signature_algorithm), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
+              I(valid_from) and I(valid_to) can be excluded by I(ignore_timestamps=true).
             - When C(full_idempotence) I(identifier), I(options), I(public_key), and I(signing_key)
               are also considered when compared against an existing certificate.
             - C(always) is equivalent to I(force=true).
@@ -112,6 +113,7 @@ options:
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | always)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
+            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
             - Required if I(state) is C(present).
         type: str
     valid_to:
@@ -120,6 +122,7 @@ options:
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | forever)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
+            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
             - Required if I(state) is C(present).
         type: str
     valid_at:
@@ -128,6 +131,13 @@ options:
                Time will always be interpreted as UTC. Mainly to be used with relative timespec for I(valid_from) and / or I(valid_to).
                Note that if using relative time this module is NOT idempotent."
         type: str
+    ignore_timestamps:
+        description:
+            - "Whether the I(valid_from) and I(valid_to) timestamps should be ignored for idempotency checks."
+            - "However, the values will still be applied to a new certificate if it meets any other necessary conditions for generation/regeneration."
+        type: bool
+        default: false
+        version_added: 2.2.0
     principals:
         description:
             - "Certificates may be limited to be valid for a set of principal (user/host) names.
@@ -192,6 +202,7 @@ EXAMPLES = '''
     valid_from: +0s
     valid_to: +32w
     valid_at: +2w
+    ignore_timestamps: true
 
 - name: Generate an OpenSSH host certificate that is valid forever and only for example.com and examplehost
   community.crypto.openssh_cert:
@@ -296,6 +307,7 @@ class Certificate(OpensshModule):
         self.type = self.module.params['type']
         self.use_agent = self.module.params['use_agent']
         self.valid_at = self.module.params['valid_at']
+        self.ignore_timestamps = self.module.params['ignore_timestamps']
 
         self._check_if_base_dir(self.path)
 
@@ -402,6 +414,9 @@ class Certificate(OpensshModule):
             )
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
+
+        if self.ignore_timestamps:
+            return original_time_parameters.within_range(self.valid_at)
 
         return all([
             original_time_parameters == self.time_parameters,
@@ -537,6 +552,7 @@ def main():
             valid_at=dict(type='str'),
             valid_from=dict(type='str'),
             valid_to=dict(type='str'),
+            ignore_timestamps=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
