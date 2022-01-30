@@ -17,6 +17,12 @@ fi
 stage="${S:-prod}"
 provider="${P:-default}"
 
+if [ "${platform}/${version}" == "freebsd/13.0" ]; then
+    # On FreeBSD 13.0, installing PyOpenSSL 22.0.0 tries to upgrade cryptography, which
+    # will fail due to missing Rust compiler.
+    echo "pyopenssl < 22.0.0 ; python_version >= '3.8'" >> tests/utils/constraints.txt
+fi
+
 # shellcheck disable=SC2086
 ansible-test integration --color -v --retry-on-error "${target}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} ${UNSTABLE:+"$UNSTABLE"} \
     --remote "${platform}/${version}" --remote-terminate always --remote-stage "${stage}" --remote-provider "${provider}"
