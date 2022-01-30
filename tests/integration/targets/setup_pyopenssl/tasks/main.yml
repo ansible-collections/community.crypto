@@ -5,7 +5,7 @@
 ####################################################################
 
 - name: Install from system packages
-  when: ansible_os_family != "Darwin" and target_system_python
+  when: ansible_os_family != "Darwin" and (target_system_python or target_system_python_cannot_upgrade_cryptography)
   block:
 
   - name: Include OS-specific variables
@@ -24,7 +24,7 @@
     when: ansible_python_version is version('3.0', '<')
 
 - name: Install from PyPi
-  when: ansible_os_family == "Darwin" or not target_system_python
+  when: ansible_os_family == "Darwin" or not (target_system_python or target_system_python_cannot_upgrade_cryptography)
   block:
 
   - name: Install pyOpenSSL (PyPi)
