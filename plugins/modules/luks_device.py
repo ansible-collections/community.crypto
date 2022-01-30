@@ -821,6 +821,7 @@ def run_module():
     module = AnsibleModule(argument_spec=module_args,
                            supports_check_mode=True,
                            mutually_exclusive=mutually_exclusive)
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
     if module.params['device'] is not None:
         try:
