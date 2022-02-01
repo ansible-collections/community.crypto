@@ -528,6 +528,17 @@ releases:
     changes:
       release_summary: Accidental 1.9.1 release. Identical to 1.9.0.
     release_date: '2021-08-30'
+  1.9.10:
+    changes:
+      bugfixes:
+      - luks_devices - set ``LANG`` and similar environment variables to avoid translated
+        output, which can break some of the module's functionality like key management
+        (https://github.com/ansible-collections/community.crypto/pull/388, https://github.com/ansible-collections/community.crypto/issues/385).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 1.9.10.yml
+    - 388-luks_device-i18n.yml
+    release_date: '2022-02-01'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
