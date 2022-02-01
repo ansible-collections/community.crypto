@@ -737,3 +737,18 @@ releases:
       name: openssl_privatekey_convert
       namespace: ''
     release_date: '2022-01-10'
+  2.2.0:
+    changes:
+      bugfixes:
+      - luks_devices - set ``LANG`` and similar environment variables to avoid translated
+        output, which can break some of the module's functionality like key management
+        (https://github.com/ansible-collections/community.crypto/pull/388, https://github.com/ansible-collections/community.crypto/issues/385).
+      minor_changes:
+      - openssh_cert - added ``ignore_timestamps`` parameter so it can be used semi-idempotent
+        with relative timestamps in ``valid_to``/``valid_from`` (https://github.com/ansible-collections/community.crypto/issues/379).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 2.2.0.yml
+    - 381_openssh_cert_add_ignore_timestamps.yml
+    - 388-luks_device-i18n.yml
+    release_date: '2022-02-01'
