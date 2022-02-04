@@ -391,7 +391,7 @@ class Certificate(OpensshModule):
 
     def _is_fully_valid(self):
         return self._is_partially_valid() and all([
-            self._compare_options(),
+            self._compare_options() if self.original_data.type == 'user' else True,
             self.original_data.key_id == self.identifier,
             self.original_data.public_key == self._get_key_fingerprint(self.public_key),
             self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),

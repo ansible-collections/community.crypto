@@ -137,6 +137,27 @@
     regenerate: full_idempotence
   register: relative_timestamp_invalid_at
 
+- name: Generate host cert full_idempotence
+  openssh_cert:
+    type: host
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    regenerate: full_idempotence
+
+- name: Generate host cert full_idempotence again
+  openssh_cert:
+    type: host
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    regenerate: full_idempotence
+  register: host_cert_full_idempotence
+
 - name: Assert options results
   assert:
     that:
@@ -150,6 +171,7 @@
       - relative_timestamp_true is not changed
       - relative_timestamp_false is changed
       - relative_timestamp_invalid_at is changed
+      - host_cert_full_idempotence is not changed
 
 - name: Remove certificate
   openssh_cert:
