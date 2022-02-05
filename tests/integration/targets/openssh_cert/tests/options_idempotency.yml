@@ -86,6 +86,27 @@
     regenerate: full_idempotence
   register: default_options
 
+- name: Generate host cert full_idempotence
+  openssh_cert:
+    type: host
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    regenerate: full_idempotence
+
+- name: Generate host cert full_idempotence again
+  openssh_cert:
+    type: host
+    path: "{{ certificate_path }}"
+    public_key: "{{ public_key }}"
+    signing_key: "{{ signing_key }}"
+    valid_from: always
+    valid_to: forever
+    regenerate: full_idempotence
+  register: host_cert_full_idempotence
+
 - name: Assert options results
   assert:
     that:
@@ -95,6 +116,7 @@
       - explicit_extension_after is not changed
       - explicit_extension_and_directive is changed
       - default_options is not changed
+      - host_cert_full_idempotence is not changed
 
 - name: Remove certificate
   openssh_cert:
