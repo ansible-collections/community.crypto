@@ -752,3 +752,14 @@ releases:
     - 381_openssh_cert_add_ignore_timestamps.yml
     - 388-luks_device-i18n.yml
     release_date: '2022-02-01'
+  2.2.1:
+    changes:
+      bugfixes:
+      - openssh_cert - fixed false ``changed`` status for ``host`` certificates when
+        using ``full_idempotence`` (https://github.com/ansible-collections/community.crypto/issues/395,
+        https://github.com/ansible-collections/community.crypto/pull/396).
+      release_summary: Bugfix release.
+    fragments:
+    - 2.2.1.yml
+    - 396-openssh_cert-host-cert-idempotence-fix.yml
+    release_date: '2022-02-05'
