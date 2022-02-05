@@ -539,6 +539,17 @@ releases:
     - 1.9.10.yml
     - 388-luks_device-i18n.yml
     release_date: '2022-02-01'
+  1.9.11:
+    changes:
+      bugfixes:
+      - openssh_cert - fixed false ``changed`` status for ``host`` certificates when
+        using ``full_idempotence`` (https://github.com/ansible-collections/community.crypto/issues/395,
+        https://github.com/ansible-collections/community.crypto/pull/396).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.11.yml
+    - 396-openssh_cert-host-cert-idempotence-fix.yml
+    release_date: '2022-02-05'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared

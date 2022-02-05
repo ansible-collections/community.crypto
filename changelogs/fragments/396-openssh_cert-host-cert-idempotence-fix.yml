@@ -1,5 +1,0 @@
----
-bugfixes:
-  - openssh_cert - fixed false ``changed`` status for ``host`` certificates when using ``full_idempotence``
-    (https://github.com/ansible-collections/community.crypto/issues/395,
-    https://github.com/ansible-collections/community.crypto/pull/396).
