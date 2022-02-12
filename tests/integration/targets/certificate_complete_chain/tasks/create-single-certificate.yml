@@ -8,6 +8,7 @@
     path: '{{ remote_tmp_dir }}/{{ certificate.name }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{ certificate.name }}.key'
     subject: '{{ certificate.subject }}'
+    useCommonNameForSAN: false
 
 - name: Generate certificate for {{ certificate.name }}
   x509_certificate:
