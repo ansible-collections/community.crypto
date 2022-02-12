@@ -1,0 +1,144 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: Find root for cert 1 using directory
+    certificate_complete_chain:
+      input_chain: '{{ fullchain | trim }}'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots/'
+    register: cert1_root
+  - name: Verify root for cert 1
+    assert:
+      that:
+      - cert1_root.complete_chain | join('') == (fullchain ~ root)
+      - cert1_root.root == root
+  vars:
+    fullchain: "{{ lookup('file', 'cert1-fullchain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert1-root.pem', rstrip=False) }}"
+
+- block:
+  - name: Find rootchain for cert 1 using intermediate and root PEM
+    certificate_complete_chain:
+      input_chain: '{{ cert }}'
+      intermediate_certificates:
+      - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert1_rootchain
+  - name: Verify rootchain for cert 1
+    assert:
+      that:
+      - cert1_rootchain.complete_chain | join('') == (cert ~ chain ~ root)
+      - cert1_rootchain.chain[:-1] | join('') == chain
+      - cert1_rootchain.root == root
+  vars:
+    cert: "{{ lookup('file', 'cert1.pem', rstrip=False) }}"
+    chain: "{{ lookup('file', 'cert1-chain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert1-root.pem', rstrip=False) }}"
+
+- block:
+  - name: Find root for cert 2 using directory
+    certificate_complete_chain:
+      input_chain: "{{ fullchain | trim }}"
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots/'
+    register: cert2_root
+  - name: Verify root for cert 2
+    assert:
+      that:
+      - cert2_root.complete_chain | join('') == (fullchain ~ root)
+      - cert2_root.root == root
+  vars:
+    fullchain: "{{ lookup('file', 'cert2-fullchain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert2-root.pem', rstrip=False) }}"
+
+- block:
+  - name: Find rootchain for cert 2 using intermediate and root PEM
+    certificate_complete_chain:
+      input_chain: '{{ cert }}'
+      intermediate_certificates:
+      - '{{ remote_tmp_dir }}/files/cert2-chain.pem'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert2_rootchain
+  - name: Verify rootchain for cert 2
+    assert:
+      that:
+      - cert2_rootchain.complete_chain | join('') == (cert ~ chain ~ root)
+      - cert2_rootchain.chain[:-1] | join('') == chain
+      - cert2_rootchain.root == root
+  vars:
+    cert: "{{ lookup('file', 'cert2.pem', rstrip=False) }}"
+    chain: "{{ lookup('file', 'cert2-chain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert2-root.pem', rstrip=False) }}"
+
+- block:
+  - name: Find alternate rootchain for cert 2 using intermediate and root PEM
+    certificate_complete_chain:
+      input_chain: '{{ cert }}'
+      intermediate_certificates:
+      - '{{ remote_tmp_dir }}/files/cert2-altchain.pem'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert2_rootchain_alt
+  - name: Verify rootchain for cert 2
+    assert:
+      that:
+      - cert2_rootchain_alt.complete_chain | join('') == (cert ~ chain ~ root)
+      - cert2_rootchain_alt.chain[:-1] | join('') == chain
+      - cert2_rootchain_alt.root == root
+  vars:
+    cert: "{{ lookup('file', 'cert2.pem', rstrip=False) }}"
+    chain: "{{ lookup('file', 'cert2-altchain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert2-altroot.pem', rstrip=False) }}"
+
+- block:
+  - name: Find alternate rootchain for cert 2 when complete chain is already presented to the module
+    certificate_complete_chain:
+      input_chain: '{{ cert ~ chain ~ root }}'
+      root_certificates:
+      - '{{ remote_tmp_dir }}/files/roots.pem'
+    register: cert2_complete_chain
+  - name: Verify rootchain for cert 2
+    assert:
+      that:
+      - cert2_complete_chain.complete_chain | join('') == (cert ~ chain ~ root)
+      - cert2_complete_chain.chain == []
+      - cert2_complete_chain.root == root
+  vars:
+    cert: "{{ lookup('file', 'cert2.pem', rstrip=False) }}"
+    chain: "{{ lookup('file', 'cert2-altchain.pem', rstrip=False) }}"
+    root: "{{ lookup('file', 'cert2-altroot.pem', rstrip=False) }}"
+
+- name: Check failure when no intermediate certificate can be found
+  certificate_complete_chain:
+    input_chain: '{{ lookup("file", "cert2.pem", rstrip=True) }}'
+    intermediate_certificates:
+    - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+    root_certificates:
+    - '{{ remote_tmp_dir }}/files/roots.pem'
+  register: cert2_no_intermediate
+  ignore_errors: true
+- name: Verify failure
+  assert:
+    that:
+    - cert2_no_intermediate is failed
+    - "cert2_no_intermediate.msg.startswith('Cannot complete chain. Stuck at certificate ')"
+
+- name: Check failure when infinite loop is found
+  certificate_complete_chain:
+    input_chain: '{{ lookup("file", "cert2-fullchain.pem", rstrip=True) }}'
+    intermediate_certificates:
+    - '{{ remote_tmp_dir }}/files/roots.pem'
+    root_certificates:
+    - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+  register: cert2_infinite_loop
+  ignore_errors: true
+- name: Verify failure
+  assert:
+    that:
+    - cert2_infinite_loop is failed
+    - "cert2_infinite_loop.msg == 'Found cycle while building certificate chain'"
