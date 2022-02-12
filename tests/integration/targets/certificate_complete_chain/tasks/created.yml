@@ -34,7 +34,7 @@
     root_certificates:
     - '{{ remote_tmp_dir }}/a-root.pem'
 
-- name: Case D => fails, yet very very close from case C # only difference is order of intermediate_certificates
+- name: Case D => works as well after PR 403
   certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"
     intermediate_certificates:
