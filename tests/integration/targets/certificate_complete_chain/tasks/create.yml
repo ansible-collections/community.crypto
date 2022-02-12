@@ -25,7 +25,10 @@
   - name: Store read certificates
     set_fact:
       read_certificates: >-
-        {{ certificates_read.results | map(attribute='content') | map('b64decode') | zip(certificates | map(attribute='name')) | items2dict(key_name=1, value_name=0) }}
+        {{ certificates_read.results | map(attribute='content') | map('b64decode')
+           | zip(certificates | map(attribute='name'))
+           | list
+           | items2dict(key_name=1, value_name=0) }}
 
   vars:
     certificates:
