@@ -173,6 +173,12 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         if super(OwnCACertificateBackendCryptography, self).needs_regeneration(not_before=self.notBefore, not_after=self.notAfter):
             return True
 
+        self._ensure_existing_certificate_loaded()
+
+        # Check subject
+        if self.ca_cert.subject != self.existing_certificate.issuer:
+            return True
+
         # Check AuthorityKeyIdentifier
         if self.create_authority_key_identifier:
             try:
@@ -185,7 +191,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             except cryptography.x509.ExtensionNotFound:
                 expected_ext = x509.AuthorityKeyIdentifier.from_issuer_public_key(self.ca_cert.public_key())
 
-            self._ensure_existing_certificate_loaded()
             try:
                 ext = self.existing_certificate.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
                 if ext.value != expected_ext:
