@@ -200,11 +200,11 @@ stages:
           testFormat: devel/linux-community/{0}/1
           targets:
             - name: Debian Bullseye
-              test: debian-bullseye
+              test: debian-bullseye/3.9
             - name: ArchLinux
-              test: archlinux
+              test: archlinux/3.10
             - name: CentOS Stream 8
-              test: centos-stream8
+              test: centos-stream8/3.8
 
 ### Remote
   - stage: Remote_devel
