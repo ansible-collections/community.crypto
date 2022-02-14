@@ -42,23 +42,23 @@ except ImportError:
     pass
 
 try:
-    cryptography.hazmat.primitives.asymmetric.rsa
+    import cryptography.hazmat.primitives.asymmetric.rsa
 except ImportError:
     pass
 try:
-    cryptography.hazmat.primitives.asymmetric.ec
+    import cryptography.hazmat.primitives.asymmetric.ec
 except ImportError:
     pass
 try:
-    cryptography.hazmat.primitives.asymmetric.dsa
+    import cryptography.hazmat.primitives.asymmetric.dsa
 except ImportError:
     pass
 try:
-    cryptography.hazmat.primitives.asymmetric.ed25519
+    import cryptography.hazmat.primitives.asymmetric.ed25519
 except ImportError:
     pass
 try:
-    cryptography.hazmat.primitives.asymmetric.ed448
+    import cryptography.hazmat.primitives.asymmetric.ed448
 except ImportError:
     pass
 
