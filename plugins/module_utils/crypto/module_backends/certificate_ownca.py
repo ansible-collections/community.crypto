@@ -30,6 +30,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
+    cryptography_verify_certificate_signature,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -174,6 +175,10 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             return True
 
         self._ensure_existing_certificate_loaded()
+
+        # Check whether certificate is signed by CA certificate
+        if not cryptography_verify_certificate_signature(self.existing_certificate, self.ca_cert.public_key()):
+            return True
 
         # Check subject
         if self.ca_cert.subject != self.existing_certificate.issuer:
