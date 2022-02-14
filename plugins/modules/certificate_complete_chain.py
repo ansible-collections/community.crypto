@@ -237,14 +237,16 @@ class CertificateSet(object):
     def __init__(self, module):
         self.module = module
         self.certificates = set()
-        self.certificate_by_issuer = dict()
+        self.certificates_by_issuer = dict()
         self.certificate_by_cert = dict()
 
     def _load_file(self, path):
         certs = load_PEM_list(self.module, path, fail_on_error=False)
         for cert in certs:
             self.certificates.add(cert)
-            self.certificate_by_issuer[cert.cert.subject] = cert
+            if cert.cert.subject not in self.certificates_by_issuer:
+                self.certificates_by_issuer[cert.cert.subject] = []
+            self.certificates_by_issuer[cert.cert.subject].append(cert)
             self.certificate_by_cert[cert.cert] = cert
 
     def load(self, path):
@@ -263,8 +265,8 @@ class CertificateSet(object):
         '''
         Search for the parent (issuer) of a certificate. Return ``None`` if none was found.
         '''
-        potential_parent = self.certificate_by_issuer.get(cert.cert.issuer)
-        if potential_parent is not None:
+        potential_parents = self.certificates_by_issuer.get(cert.cert.issuer, [])
+        for potential_parent in potential_parents:
             if is_parent(self.module, cert, potential_parent):
                 return potential_parent
         return None
