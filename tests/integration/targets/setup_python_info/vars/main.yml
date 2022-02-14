@@ -57,7 +57,7 @@ system_python_version_data:
       - '3.10'
   Debian:
     '11':
-      - '2.9'
+      - '3.9'
 
 cannot_upgrade_cryptography:
   FreeBSD:
