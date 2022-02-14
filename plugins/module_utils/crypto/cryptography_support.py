@@ -699,7 +699,7 @@ def cryptography_verify_certificate_signature(certificate, signer_public_key):
     Check whether the given X509 certificate object was signed by the given public key object.
     '''
     try:
-        if CRYPTOGRAPHY_HAS_RSA and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
+        if CRYPTOGRAPHY_HAS_RSA_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
             signer_public_key.verify(
                 certificate.signature,
                 certificate.tbs_certificate_bytes,
