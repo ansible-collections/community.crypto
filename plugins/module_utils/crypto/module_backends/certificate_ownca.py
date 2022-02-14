@@ -302,6 +302,18 @@ class OwnCACertificateBackendPyOpenSSL(CertificateBackend):
         """Return bytes for self.cert."""
         return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert)
 
+    def needs_regeneration(self):
+        if super(OwnCACertificateBackendPyOpenSSL, self).needs_regeneration():
+            return True
+
+        self._ensure_existing_certificate_loaded()
+
+        # Check subject
+        if self.ca_cert.get_subject() != self.existing_certificate.get_issuer():
+            return True
+
+        return False
+
     def dump(self, include_certificate):
         result = super(OwnCACertificateBackendPyOpenSSL, self).dump(include_certificate)
         result.update({
