@@ -1,0 +1,49 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: Create private keys
+    openssl_privatekey:
+      path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
+      size: '{{ default_rsa_key_size_certifiates }}'
+    loop: '{{ certificates }}'
+
+  - name: Generate certificates
+    include_tasks: create-single-certificate.yml
+    loop: '{{ certificates }}'
+    loop_control:
+      loop_var: certificate
+
+  - name: Read certificates
+    slurp:
+      src: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
+    loop: '{{ certificates }}'
+    register: certificates_read
+
+  - name: Store read certificates
+    set_fact:
+      read_certificates: >-
+        {{ certificates_read.results | map(attribute='content') | map('b64decode')
+           | zip(certificates | map(attribute='name'))
+           | list
+           | items2dict(key_name=1, value_name=0) }}
+
+  vars:
+    certificates:
+      - name: a-root
+        subject:
+          commonName: root common name
+      - name: b-intermediate
+        subject:
+          commonName: intermediate common name
+        parent: a-root
+      - name: c-intermediate
+        subject:
+          commonName: intermediate common name
+        parent: a-root
+      - name: d-leaf
+        subject:
+          commonName: leaf certificate
+        parent: b-intermediate
