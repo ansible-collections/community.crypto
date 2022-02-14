@@ -31,6 +31,12 @@
       - ownca_certificate.notBefore == ownca_certificate_idempotence.notBefore
       - ownca_certificate.notAfter == ownca_certificate_idempotence.notAfter
 
+- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate regeneration
+  assert:
+    that:
+      - ownca_certificate_ca_subject_changed is changed
+      - ownca_certificate_ca_key_changed is changed
+
 - name: (OwnCA validation, {{select_crypto_backend}}) Read certificate
   slurp:
     src: '{{ remote_tmp_dir }}/ownca_cert.pem'
