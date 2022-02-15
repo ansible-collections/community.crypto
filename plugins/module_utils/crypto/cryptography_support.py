@@ -694,45 +694,38 @@ def _parse_pkcs12_legacy(pkcs12_bytes, passphrase=None):
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def cryptography_verify_certificate_signature(certificate, signer_public_key):
+def cryptography_verify_signature(signature, data, hash_algorithm, signer_public_key):
     '''
-    Check whether the given X509 certificate object was signed by the given public key object.
+    Check whether the given signature of the given data was signed by the given public key object.
     '''
     try:
         if CRYPTOGRAPHY_HAS_RSA_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
-            signer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-                padding.PKCS1v15(),
-                certificate.signature_hash_algorithm,
-            )
+            signer_public_key.verify(signature, data, padding.PKCS1v15(), hash_algorithm)
             return True
         if CRYPTOGRAPHY_HAS_EC_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey):
-            signer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(certificate.signature_hash_algorithm),
-            )
+            signer_public_key.verify(signature, data, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(hash_algorithm))
             return True
         if CRYPTOGRAPHY_HAS_DSA_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey):
-            signer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-                certificate.signature_hash_algorithm,
-            )
+            signer_public_key.verify(signature, data, hash_algorithm)
             return True
         if CRYPTOGRAPHY_HAS_ED25519_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey):
-            signer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-            )
+            signer_public_key.verify(signature, data)
             return True
         if CRYPTOGRAPHY_HAS_ED448_SIGN and isinstance(signer_public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey):
-            signer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-            )
+            signer_public_key.verify(signature, data)
             return True
         raise OpenSSLObjectError(u'Unsupported public key type {0}'.format(type(signer_public_key)))
     except InvalidSignature:
         return False
+
+
+def cryptography_verify_certificate_signature(certificate, signer_public_key):
+    '''
+    Check whether the given X509 certificate object was signed by the given public key object.
+    '''
+    return cryptography_verify_signature(
+        certificate.signature,
+        certificate.tbs_certificate_bytes,
+        certificate.signature_hash_algorithm,
+        signer_public_key
+    )
