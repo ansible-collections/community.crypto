@@ -348,7 +348,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     backup: yes
@@ -359,7 +359,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     backup: yes
@@ -370,7 +370,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     backup: yes
@@ -398,7 +398,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
@@ -411,7 +411,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
@@ -424,7 +424,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_subject_key_identifier: never_create
@@ -437,7 +437,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_subject_key_identifier: never_create
@@ -450,7 +450,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_subject_key_identifier: always_create
@@ -463,7 +463,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
@@ -476,7 +476,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
@@ -489,7 +489,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_authority_key_identifier: no
@@ -502,7 +502,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_authority_key_identifier: no
@@ -515,7 +515,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-    ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
     ownca_create_authority_key_identifier: yes
