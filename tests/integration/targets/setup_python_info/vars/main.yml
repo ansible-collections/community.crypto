@@ -52,6 +52,12 @@ system_python_version_data:
     '15':
       - '2.7'
       - '3.6'
+  Archlinux:
+    'NA':
+      - '3.10'
+  Debian:
+    '11':
+      - '3.9'
 
 cannot_upgrade_cryptography:
   FreeBSD:
