@@ -58,6 +58,11 @@ system_python_version_data:
   Debian:
     '11':
       - '3.9'
+  Alpine:
+    '3.15':
+      - '3.9'
+    '3.12':
+      - '3.8'
 
 cannot_upgrade_cryptography:
   FreeBSD:
