@@ -22,6 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
+    cryptography_verify_certificate_signature,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -133,6 +134,18 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
     def get_certificate_data(self):
         """Return bytes for self.cert."""
         return self.cert.public_bytes(Encoding.PEM)
+
+    def needs_regeneration(self):
+        if super(SelfSignedCertificateBackendCryptography, self).needs_regeneration():
+            return True
+
+        self._ensure_existing_certificate_loaded()
+
+        # Check whether certificate is signed by private key
+        if not cryptography_verify_certificate_signature(self.existing_certificate, self.privatekey.public_key()):
+            return True
+
+        return False
 
     def dump(self, include_certificate):
         result = super(SelfSignedCertificateBackendCryptography, self).dump(include_certificate)

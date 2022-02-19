@@ -28,8 +28,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_compare_public_keys,
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
+    cryptography_verify_certificate_signature,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -107,6 +109,9 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
+        if not cryptography_compare_public_keys(self.ca_cert.public_key(), self.ca_private_key.public_key()):
+            raise CertificateError('The CA private key does not belong to the CA certificate')
+
         if cryptography_key_needs_digest_for_signing(self.ca_private_key):
             if self.digest is None:
                 raise CertificateError(
@@ -173,6 +178,16 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         if super(OwnCACertificateBackendCryptography, self).needs_regeneration():
             return True
 
+        self._ensure_existing_certificate_loaded()
+
+        # Check whether certificate is signed by CA certificate
+        if not cryptography_verify_certificate_signature(self.existing_certificate, self.ca_cert.public_key()):
+            return True
+
+        # Check subject
+        if self.ca_cert.subject != self.existing_certificate.issuer:
+            return True
+
         # Check AuthorityKeyIdentifier
         if self.create_authority_key_identifier:
             try:
@@ -185,7 +200,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             except cryptography.x509.ExtensionNotFound:
                 expected_ext = x509.AuthorityKeyIdentifier.from_issuer_public_key(self.ca_cert.public_key())
 
-            self._ensure_existing_certificate_loaded()
             try:
                 ext = self.existing_certificate.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
                 if ext.value != expected_ext:
@@ -296,6 +310,18 @@ class OwnCACertificateBackendPyOpenSSL(CertificateBackend):
     def get_certificate_data(self):
         """Return bytes for self.cert."""
         return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert)
+
+    def needs_regeneration(self):
+        if super(OwnCACertificateBackendPyOpenSSL, self).needs_regeneration():
+            return True
+
+        self._ensure_existing_certificate_loaded()
+
+        # Check subject
+        if self.ca_cert.get_subject() != self.existing_certificate.get_issuer():
+            return True
+
+        return False
 
     def dump(self, include_certificate):
         result = super(OwnCACertificateBackendPyOpenSSL, self).dump(include_certificate)
