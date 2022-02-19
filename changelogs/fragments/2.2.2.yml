@@ -1,0 +1,4 @@
+release_summary: |
+  Regular bugfix release.
+
+  In this release, we extended the test matrix to include Alpine 3, ArchLinux, Debian Bullseye, and CentOS Stream 8. CentOS 8 was removed from the test matrix.
