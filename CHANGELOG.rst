@@ -5,6 +5,30 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.12
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- certificate_complete_chain - allow multiple potential intermediate certificates to have the same subject (https://github.com/ansible-collections/community.crypto/issues/399, https://github.com/ansible-collections/community.crypto/pull/403).
+- x509_certificate - for the ``ownca`` provider, check whether the CA private key actually belongs to the CA certificate. This fix only covers the ``cryptography`` backend, not the ``pyopenssl`` backend (https://github.com/ansible-collections/community.crypto/pull/407).
+- x509_certificate - regenerate certificate when the CA's public key changes for ``provider=ownca``. This fix only covers the ``cryptography`` backend, not the ``pyopenssl`` backend (https://github.com/ansible-collections/community.crypto/pull/407).
+- x509_certificate - regenerate certificate when the CA's subject changes for ``provider=ownca`` (https://github.com/ansible-collections/community.crypto/issues/400, https://github.com/ansible-collections/community.crypto/pull/402).
+- x509_certificate - regenerate certificate when the private key changes for ``provider=selfsigned``. This fix only covers the ``cryptography`` backend, not the ``pyopenssl`` backend (https://github.com/ansible-collections/community.crypto/pull/407).
+
+Known Issues
+------------
+
+- x509_certificate - when using the ``ownca`` provider with the ``pyopenssl`` backend, changing the CA's public key does not cause regeneration of the certificate (https://github.com/ansible-collections/community.crypto/pull/407).
+- x509_certificate - when using the ``ownca`` provider with the ``pyopenssl`` backend, it is possible to specify a CA private key which is not related to the CA certificate (https://github.com/ansible-collections/community.crypto/pull/407).
+- x509_certificate - when using the ``selfsigned`` provider with the ``pyopenssl`` backend, changing the private key does not cause regeneration of the certificate (https://github.com/ansible-collections/community.crypto/pull/407).
+
 v1.9.11
 =======
 
