@@ -178,7 +178,7 @@ public_key:
     description: The public key of the generated SSH private key.
     returned: changed or success
     type: str
-    sample: ssh-rsa AAAAB3Nza(...omitted...)veL4E3Xcw== test_key
+    sample: ssh-rsa AAAAB3Nza(...omitted...)veL4E3Xcw==
 comment:
     description: The comment of the generated key.
     returned: changed or success
