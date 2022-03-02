@@ -350,7 +350,7 @@ STDERR = 2
 
 # used to get <luks-name> out of lsblk output in format 'crypt <luks-name>'
 # regex takes care of any possible blank characters
-LUKS_NAME_REGEX = re.compile(r'\s*crypt\s+([^\s]*)\s*')
+LUKS_NAME_REGEX = re.compile(r'^crypt\s+([^\s]*)\s*$')
 # used to get </luks/device> out of lsblk output
 # in format 'device: </luks/device>'
 LUKS_DEVICE_REGEX = re.compile(r'\s*device:\s+([^\s]*)\s*')
@@ -446,13 +446,11 @@ class CryptHandler(Handler):
             raise ValueError('Error while obtaining LUKS name for %s: %s'
                              % (device, result[STDERR]))
 
-        m = LUKS_NAME_REGEX.search(result[STDOUT])
-
-        try:
-            name = m.group(1)
-        except AttributeError:
-            name = None
-        return name
+        for line in result[STDOUT].splitlines(False):
+            m = LUKS_NAME_REGEX.match(line)
+            if m:
+                return m.group(1)
+        return None
 
     def get_container_device_by_name(self, name):
         ''' obtain device name based on the LUKS container name
