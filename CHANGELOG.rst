@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.2.3
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- luks_device - fix parsing of ``lsblk`` output when device name ends with ``crypt`` (https://github.com/ansible-collections/community.crypto/issues/409, https://github.com/ansible-collections/community.crypto/pull/410).
+
 v2.2.2
 ======
 
