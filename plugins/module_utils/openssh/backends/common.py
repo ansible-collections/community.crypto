@@ -21,7 +21,6 @@ __metaclass__ = type
 import abc
 import os
 import stat
-import traceback
 
 from ansible.module_utils import six
 
@@ -80,7 +79,9 @@ class OpensshModule(object):
         try:
             self._execute()
         except Exception as e:
-            self.module.fail_json(details=to_native(e), exception=traceback.format_exec())
+            self.module.fail_json(
+                msg="module encountered exception: %s" % to_native(e),
+            )
 
         self.module.exit_json(**self.result)
 
