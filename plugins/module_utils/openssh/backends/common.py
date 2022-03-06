@@ -21,9 +21,11 @@ __metaclass__ = type
 import abc
 import os
 import stat
+import traceback
 
 from ansible.module_utils import six
 
+from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,
 )
@@ -75,7 +77,11 @@ class OpensshModule(object):
         self.check_mode = self.module.check_mode
 
     def execute(self):
-        self._execute()
+        try:
+            self._execute()
+        except Exception as e:
+            self.module.fail_json(details=to_native(e), exception=traceback.format_exec())
+
         self.module.exit_json(**self.result)
 
     @abc.abstractmethod
