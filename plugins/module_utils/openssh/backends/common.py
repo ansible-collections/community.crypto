@@ -81,7 +81,7 @@ class OpensshModule(object):
             self._execute()
         except Exception as e:
             self.module.fail_json(
-                msg="unexcepected error occurred",
+                msg="unexpected error occurred",
                 exception=traceback.format_exc(),
             )
 
