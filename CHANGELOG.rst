@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.2.4
+======
+
+Release Summary
+---------------
+
+Regular maintenance release.
+
+Bugfixes
+--------
+
+- openssh_* modules - fix exception handling to report traceback to users for enhanced traceability (https://github.com/ansible-collections/community.crypto/pull/417).
+
 v2.2.3
 ======
 

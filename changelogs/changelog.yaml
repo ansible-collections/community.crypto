@@ -801,3 +801,13 @@ releases:
     - 2.2.3.yml
     - 410-luks_device-lsblk-parsing.yml
     release_date: '2022-03-04'
+  2.2.4:
+    changes:
+      bugfixes:
+      - openssh_* modules - fix exception handling to report traceback to users for
+        enhanced traceability (https://github.com/ansible-collections/community.crypto/pull/417).
+      release_summary: Regular maintenance release.
+    fragments:
+    - 2.2.4.yml
+    - 417-openssh_modules-fix-exception-reporting.yml
+    release_date: '2022-03-22'
