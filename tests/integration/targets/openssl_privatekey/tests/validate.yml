@@ -2,10 +2,10 @@
 - set_fact:
     system_potentially_has_no_algorithm_support: "{{ ansible_os_family == 'FreeBSD' }}"
 
-- name: "({{ select_crypto_backend }}) Read private key"
+- name: "({{ select_crypto_backend }}) Read private key (privatekey1)"
   slurp:
     src: '{{ remote_tmp_dir }}/privatekey1.pem'
-  register: slurp
+  register: slurp1
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 idempotency and content returned"
   assert:
@@ -14,7 +14,7 @@
       - privatekey1 is changed
       - privatekey1_idempotence_check is not changed
       - privatekey1_idempotence is not changed
-      - privatekey1.privatekey == (slurp.content | b64decode)
+      - privatekey1.privatekey == (slurp1.content | b64decode)
       - privatekey1.privatekey == privatekey1_idempotence.privatekey
 
 
@@ -95,6 +95,16 @@
     that:
       - privatekey6.stdout == '{{ default_rsa_key_size }}'
   when: openssl_version.stdout is version('0.9.8zh', '>=')
+
+- name: "({{ select_crypto_backend }}) Read private key (privatekey7)"
+  slurp:
+    src: '{{ remote_tmp_dir }}/privatekey7.pem'
+  register: slurp7
+
+- name: "({{ select_crypto_backend }}) Validate privatekey7 (assert - Contains only the key and no format prefix)"
+  assert:
+    that:
+      - not (slurp7.content | b64decode).startswith('----')
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (dump with OpenSSL)"
   shell: "{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"

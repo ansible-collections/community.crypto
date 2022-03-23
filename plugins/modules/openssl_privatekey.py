@@ -56,6 +56,13 @@ options:
         type: bool
         default: no
         version_added: '1.0.0'
+    only_key:
+        description:
+            - If set to C(yes) the type of the key set at the beginning ("---BEGIN <type> PRIVATE KEY-----")
+              will not be saved. Only the key.
+        type: bool
+        default: no
+        version_added: '2.3.0'
     regenerate:
         version_added: '1.0.0'
 extends_documentation_fragment:
@@ -175,6 +182,7 @@ class PrivateKeyModule(OpenSSLObject):
         )
         self.module_backend = module_backend
         self.return_content = module.params['return_content']
+        self.only_key = module.params['only_key']
         if self.force:
             module_backend.regenerate = 'always'
 
@@ -196,6 +204,8 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.generate_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
+                if self.only_key:
+                    privatekey_data = self._remove_begin_format(privatekey_data)
                 if self.return_content:
                     self.privatekey_bytes = privatekey_data
                 write_file(module, privatekey_data, 0o600)
@@ -207,6 +217,8 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.convert_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
+                if self.only_key:
+                    privatekey_data = self._remove_begin_format(privatekey_data)
                 if self.return_content:
                     self.privatekey_bytes = privatekey_data
                 write_file(module, privatekey_data, 0o600)
@@ -235,6 +247,10 @@ class PrivateKeyModule(OpenSSLObject):
 
         return result
 
+    def _remove_begin_format(self, privatekey_data):
+        list_privatekey_data = privatekey_data.splitlines()[1:-1]
+        return b'\n'.join(list_privatekey_data)
+
 
 def main():
 
@@ -245,6 +261,7 @@ def main():
         path=dict(type='path', required=True),
         backup=dict(type='bool', default=False),
         return_content=dict(type='bool', default=False),
+        only_key=dict(type='bool', default=False)
     ))
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,
