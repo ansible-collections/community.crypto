@@ -200,12 +200,8 @@ stages:
         parameters:
           testFormat: 2.9/linux/{0}/1
           targets:
-            - name: CentOS 7
-              test: centos7
             - name: Fedora 31
               test: fedora31
-            - name: openSUSE 15 py3
-              test: opensuse15
             - name: Ubuntu 18.04
               test: ubuntu1804
 
@@ -268,8 +264,6 @@ stages:
               test: macos/11.1
             - name: RHEL 8.4
               test: rhel/8.4
-            - name: FreeBSD 13.0
-              test: freebsd/13.0
   - stage: Remote_2_11
     displayName: Remote 2.11
     dependsOn: []
@@ -335,12 +329,7 @@ stages:
           testFormat: 2.13/cloud/{0}/1
           targets:
             - test: 2.7
-            - test: 3.5
-            - test: 3.6
             - test: 3.7
-            - test: 3.8
-            - test: 3.9
-            - test: "3.10"
   - stage: Cloud_2_12
     displayName: Cloud 2.12
     dependsOn: []
