@@ -82,6 +82,7 @@ options:
             - ssh-rsa
             - rsa-sha2-256
             - rsa-sha2-512
+            - ssh-ed25519
         version_added: 1.10.0
     signing_key:
         description:
@@ -543,7 +544,7 @@ def main():
                 default='partial_idempotence',
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
-            signature_algorithm=dict(type='str', choices=['ssh-rsa', 'rsa-sha2-256', 'rsa-sha2-512']),
+            signature_algorithm=dict(type='str', choices=['ssh-rsa', 'rsa-sha2-256', 'rsa-sha2-512', 'ssh-ed25519']),
             signing_key=dict(type='path'),
             serial_number=dict(type='int'),
             state=dict(type='str', default='present', choices=['absent', 'present']),
