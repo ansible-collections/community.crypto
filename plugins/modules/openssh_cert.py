@@ -113,7 +113,7 @@ options:
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | always)
                where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
-             - "The value C(always) is only supported for OpenSSH 7.7 and greater, however, the value C(1970-01-01T00:00:01)
+            - "The value C(always) is only supported for OpenSSH 7.7 and greater, however, the value C(1970-01-01T00:00:01)
                can be used with earlier versions as an equivalent expression."
             - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
             - Required if I(state) is C(present).
