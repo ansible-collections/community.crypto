@@ -25,6 +25,8 @@ import re
 import sys
 
 from ansible.module_utils.common.text.converters import to_text, to_bytes
+from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse, ParseResult
+
 from ._asn1 import serialize_asn1_string_as_der
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
@@ -359,6 +361,35 @@ def cryptography_parse_relative_distinguished_name(rdn):
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
+def _adjust_idn(value, idn_rewrite):
+    if idn_rewrite == 'ignore':
+        return value
+    value = [v.encode('idna') for v in value.split(u'.')]
+    if idn_rewrite == 'unicode':
+        value = [v.decode('idna') for v in value]
+    else:
+        value = [v.decode('utf-8') for v in value]
+    return u'.'.join(value)
+
+
+def _adjust_idn_email(value, idn_rewrite):
+    idx = value.find(u'@')
+    if idx < 0:
+        return value
+    return u'{0}@{1}'.format(value[:idx], _adjust_idn(value[idx + 1:], idn_rewrite))
+
+
+def _adjust_idn_url(value, idn_rewrite):
+    url = urlparse(value)
+    idx = url.netloc.find(u'@')
+    if idx >= 0:
+        host = u'{0}@{1}'.format(url.netloc[:idx], _adjust_idn(url.netloc[idx + 1:], idn_rewrite))
+    else:
+        host = _adjust_idn(url.netloc, idn_rewrite)
+    return urlunparse(
+        ParseResult(scheme=url.scheme, netloc=host, path=url.path, params=url.params, query=url.query, fragment=url.fragment))
+
+
 def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
     Given a name string, returns a cryptography x509.GeneralName object.
@@ -366,16 +397,16 @@ def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
     try:
         if name.startswith('DNS:'):
-            return x509.DNSName(to_text(name[4:]))
+            return x509.DNSName(_adjust_idn(to_text(name[4:]), 'punycode'))
         if name.startswith('IP:'):
             address = to_text(name[3:])
             if '/' in address:
                 return x509.IPAddress(ipaddress.ip_network(address))
             return x509.IPAddress(ipaddress.ip_address(address))
         if name.startswith('email:'):
-            return x509.RFC822Name(to_text(name[6:]))
+            return x509.RFC822Name(_adjust_idn_email(to_text(name[6:]), 'punycode'))
         if name.startswith('URI:'):
-            return x509.UniformResourceIdentifier(to_text(name[4:]))
+            return x509.UniformResourceIdentifier(_adjust_idn_url(to_text(name[4:]), 'punycode'))
         if name.startswith('RID:'):
             m = re.match(r'^([0-9]+(?:\.[0-9]+)*)$', to_text(name[4:]))
             if not m:
@@ -422,21 +453,23 @@ def _dn_escape_value(value):
     return value
 
 
-def cryptography_decode_name(name):
+def cryptography_decode_name(name, idn_rewrite='ignore'):
     '''
     Given a cryptography x509.GeneralName object, returns a string.
     Raises an OpenSSLObjectError if the name is not supported.
     '''
+    if idn_rewrite not in ('ignore', 'punycode', 'unicode'):
+        raise AssertionError('idn_rewrite must be one of "ignore", "punycode", or "unicode"')
     if isinstance(name, x509.DNSName):
-        return u'DNS:{0}'.format(name.value)
+        return u'DNS:{0}'.format(_adjust_idn(name.value, idn_rewrite))
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
             return u'IP:{0}/{1}'.format(name.value.network_address.compressed, name.value.prefixlen)
         return u'IP:{0}'.format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
-        return u'email:{0}'.format(name.value)
+        return u'email:{0}'.format(_adjust_idn_email(name.value, idn_rewrite))
     if isinstance(name, x509.UniformResourceIdentifier):
-        return u'URI:{0}'.format(name.value)
+        return u'URI:{0}'.format(_adjust_idn_url(name.value, idn_rewrite))
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas

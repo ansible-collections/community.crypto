@@ -21,7 +21,8 @@
       - result.public_key_data.size == (default_rsa_key_size_certifiates | int)
       - "result.subject_alt_name == [
           'DNS:www.ansible.com',
-          'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--7ca3a') ~ '.com',
+          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
           'IP:1.2.3.4',
           'IP:::1',
           'email:test@example.org',
@@ -37,9 +38,9 @@
       - result.extensions_by_oid['2.5.29.17'].critical == false
       - >
         result.extensions_by_oid['2.5.29.17'].value == (
-          'MG+CD3d3dy5hbnNpYmxlLmNvbYINeG4tLTdjYTNhLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
+          'MIGCgg93d3cuYW5zaWJsZS5jb22CDXhuLS03Y2EzYS5jb22CEXd3dy54bi0tN2NhM2EuY29thwQBAgMEhxAAAAAAAAAAAAAAAAAAAAABgRB0ZXN0QGV4YW1wbGUub3JnhiNodHRwczovL2V4YW1wbGUub3JnL3Rlc3QvaW5kZXguaHRtbA=='
           if cryptography_version.stdout is version('2.1', '<') else
-          'MG2CD3d3dy5hbnNpYmxlLmNvbYILeG4tLTc0aC5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
+          'MHyCD3d3dy5hbnNpYmxlLmNvbYINeG4tLTdjYTNhLmNvbYILeG4tLTc0aC5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
         )
       # Basic Constraints
       - result.extensions_by_oid['2.5.29.19'].critical == true
