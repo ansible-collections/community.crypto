@@ -1,0 +1,103 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
+- name: On kernel >= 5.9 use performance flags
+  block:
+    - name: Create and open (check)
+      luks_device:
+        device: "{{ cryptfile_device }}"
+        state: opened
+        keyfile: "{{ remote_tmp_dir }}/keyfile1"
+        perf_same_cpu_crypt: true
+        perf_submit_from_crypt_cpus: true
+        perf_no_read_workqueue: true
+        perf_no_write_workqueue: true
+        persistent: true
+        pbkdf:
+          iteration_time: 0.1
+      check_mode: yes
+      become: yes
+      register: create_open_check
+    - name: Create and open
+      luks_device:
+        device: "{{ cryptfile_device }}"
+        state: opened
+        keyfile: "{{ remote_tmp_dir }}/keyfile1"
+        pbkdf:
+          iteration_time: 0.1
+        perf_same_cpu_crypt: true
+        perf_submit_from_crypt_cpus: true
+        perf_no_read_workqueue: true
+        perf_no_write_workqueue: true
+        persistent: true
+      become: yes
+      register: create_open
+    - name: Create and open (idempotent)
+      luks_device:
+        device: "{{ cryptfile_device }}"
+        state: opened
+        keyfile: "{{ remote_tmp_dir }}/keyfile1"
+        pbkdf:
+          iteration_time: 0.1
+        perf_same_cpu_crypt: true
+        perf_submit_from_crypt_cpus: true
+        perf_no_read_workqueue: true
+        perf_no_write_workqueue: true
+        persistent: true
+      become: yes
+      register: create_open_idem
+    - name: Create and open (idempotent, check)
+      luks_device:
+        device: "{{ cryptfile_device }}"
+        state: present
+        keyfile: "{{ remote_tmp_dir }}/keyfile1"
+        pbkdf:
+          iteration_time: 0.1
+        perf_same_cpu_crypt: true
+        perf_submit_from_crypt_cpus: true
+        perf_no_read_workqueue: true
+        perf_no_write_workqueue: true
+        persistent: true
+      check_mode: yes
+      become: yes
+      register: create_open_idem_check
+    - assert:
+        that:
+        - create_open_check is changed
+        - create_open is changed
+        - create_open_idem is not changed
+        - create_open_idem_check is not changed
+
+    - name: Dump LUKS Header
+      command: "cryptsetup luksDump {{ cryptfile_device }}"
+      become: yes
+      register: luks_header
+    - assert:
+        that:
+          - "'no-read-workqueue' in luks_header.stdout"
+          - "'no-write-workqueue' in luks_header.stdout"
+          - "'same-cpu-crypt' in luks_header.stdout"
+          - "'submit-from-crypt-cpus' in luks_header.stdout"
+
+    - name: Dump device mapper table
+      command: "dmsetup table {{ create_open.name }}"
+      become: yes
+      register: dm_table
+    - assert:
+        that:
+          - "'no_read_workqueue' in dm_table.stdout"
+          - "'no_write_workqueue' in dm_table.stdout"
+          - "'same_cpu_crypt' in dm_table.stdout"
+          - "'submit_from_crypt_cpus' in dm_table.stdout"
+
+    - name: Closed and Removed
+      luks_device:
+        name: "{{ cryptfile_device }}"
+        state: absent
+      become: yes
+
+  when:
+    - ansible_facts.kernel is version('5.9.0', '>=')
+    - ansible_facts.packages['cryptsetup'][0].version is version('2.3.4', '>=')

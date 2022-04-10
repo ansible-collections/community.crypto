@@ -217,6 +217,48 @@ options:
             - "Will only be used on container creation."
         type: int
         version_added: '1.5.0'
+    perf_same_cpu_crypt:
+        description:
+            - "Allows the user to perform encryption using the same CPU that IO was submitted on."
+            - "The default is to use an unbound workqueue so that encryption work is automatically balanced between available CPUs."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.3.0'
+    perf_submit_from_crypt_cpus:
+        description:
+            - "Allows the user to disable offloading writes to a separate thread after encryption."
+            - "There are some situations where offloading block write IO operations from the encryption threads
+              to a single thread degrades performance significantly."
+            - "The default is to offload block write IO operations to the same thread."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.3.0'
+    perf_no_read_workqueue:
+        description:
+            - "Allows the user to bypass dm-crypt internal workqueue and process read requests synchronously."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.3.0'
+    perf_no_write_workqueue:
+        description:
+            - "Allows the user to bypass dm-crypt internal workqueue and process write requests synchronously."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.3.0'
+    persistent:
+        description:
+            - "Allows the user to store options into container's metadata persistently and automatically use them next time.
+              Only I(perf_same_cpu_crypt), I(perf_submit_from_crypt_cpus), I(perf_no_read_workqueue), and I(perf_no_write_workqueue)
+              can be stored persistently."
+            - "Will only work with LUKS2 containers."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.3.0'
 
 requirements:
     - "cryptsetup"
@@ -517,10 +559,21 @@ class CryptHandler(Handler):
             raise ValueError('Error while creating LUKS on %s: %s'
                              % (device, result[STDERR]))
 
-    def run_luks_open(self, device, keyfile, passphrase, name):
+    def run_luks_open(self, device, keyfile, passphrase, perf_same_cpu_crypt, perf_submit_from_crypt_cpus,
+                      perf_no_read_workqueue, perf_no_write_workqueue, persistent, name):
         args = [self._cryptsetup_bin]
         if keyfile:
             args.extend(['--key-file', keyfile])
+        if perf_same_cpu_crypt:
+            args.extend(['--perf-same_cpu_crypt'])
+        if perf_submit_from_crypt_cpus:
+            args.extend(['--perf-submit_from_crypt_cpus'])
+        if perf_no_read_workqueue:
+            args.extend(['--perf-no_read_workqueue'])
+        if perf_no_write_workqueue:
+            args.extend(['--perf-no_write_workqueue'])
+        if persistent:
+            args.extend(['--persistent'])
         args.extend(['open', '--type', 'luks', device, name])
 
         result = self._run_command(args, data=passphrase)
@@ -802,6 +855,11 @@ def run_module():
             mutually_exclusive=[('iteration_time', 'iteration_count')],
         ),
         sector_size=dict(type='int'),
+        perf_same_cpu_crypt=dict(type='bool', default=False),
+        perf_submit_from_crypt_cpus=dict(type='bool', default=False),
+        perf_no_read_workqueue=dict(type='bool', default=False),
+        perf_no_write_workqueue=dict(type='bool', default=False),
+        persistent=dict(type='bool', default=False),
     )
 
     mutually_exclusive = [
@@ -877,6 +935,11 @@ def run_module():
                 crypt.run_luks_open(conditions.device,
                                     module.params['keyfile'],
                                     module.params['passphrase'],
+                                    module.params['perf_same_cpu_crypt'],
+                                    module.params['perf_submit_from_crypt_cpus'],
+                                    module.params['perf_no_read_workqueue'],
+                                    module.params['perf_no_write_workqueue'],
+                                    module.params['persistent'],
                                     name)
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
