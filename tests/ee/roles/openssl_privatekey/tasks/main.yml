@@ -1,0 +1,11 @@
+---
+- name: Create RSA private key
+  community.crypto.openssl_privatekey:
+    path: "{{ output_path }}/privatekey-1"
+    size: 2048
+
+- name: Create ECC private key
+  community.crypto.openssl_privatekey:
+    path: "{{ output_path }}/privatekey-2"
+    type: ECC
+    curve: secp256r1

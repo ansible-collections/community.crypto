@@ -1,0 +1,27 @@
+---
+- name: Run crypto_info
+  community.crypto.crypto_info:
+  register: result
+
+- name: Dump result
+  debug:
+    var: result
+
+- name: Validate result
+  assert:
+    that:
+      - result.openssl_present
+      - result.python_cryptography_installed
+      - result.python_cryptography_capabilities.has_dsa
+      - result.python_cryptography_capabilities.has_dsa_sign
+      - result.python_cryptography_capabilities.has_ec
+      - result.python_cryptography_capabilities.has_ec_sign
+      - result.python_cryptography_capabilities.has_ed25519
+      - result.python_cryptography_capabilities.has_ed25519_sign
+      - result.python_cryptography_capabilities.has_ed448
+      - result.python_cryptography_capabilities.has_ed448_sign
+      - result.python_cryptography_capabilities.has_rsa
+      - result.python_cryptography_capabilities.has_rsa_sign
+      - result.python_cryptography_capabilities.has_x25519
+      - result.python_cryptography_capabilities.has_x25519_serialization
+      - result.python_cryptography_capabilities.has_x448

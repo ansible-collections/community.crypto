@@ -1,2 +1,4 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
+tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
+tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

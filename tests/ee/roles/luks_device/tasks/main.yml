@@ -1,0 +1,45 @@
+---
+- name: Run cryptsetup (smoke test)
+  ansible.builtin.command: cryptsetup --version
+
+- name: Determine cryptfile path
+  ansible.builtin.set_fact:
+    cryptfile_path: "{{ output_path }}/cryptfile"
+    keyfile_path: "{{ output_path }}/keyfile"
+
+- name: Create cryptfile
+  ansible.builtin.command: dd if=/dev/zero of={{ cryptfile_path }} bs=1M count=32
+
+- name: Create keyfile
+  ansible.builtin.copy:
+    dest: "{{ keyfile_path }}"
+    content: hunter2
+
+- # Creating devices doesn't work well. We will have to try this again when luks_device
+  # supports working with container files directly.
+  when: false
+  block:
+  - name: Create lookback device
+    command: losetup -f {{ cryptfile_path }}
+
+  - name: Determine loop device name
+    command: losetup -j {{ cryptfile_path }} --output name
+    register: cryptfile_device_output
+
+  - set_fact:
+      cryptfile_device: "{{ cryptfile_device_output.stdout_lines[1] }}"
+
+  - name: Create LUKS container
+    community.crypto.luks_device:
+      device: "{{ cryptfile_device }}"
+      # device: "{{ cryptfile_path }}"
+      state: present
+      keyfile: "{{ keyfile_path }}"
+      pbkdf:
+        iteration_time: 0.1
+
+  - name: Destroy LUKS container
+    community.crypto.luks_device:
+      device: "{{ cryptfile_device }}"
+      # device: "{{ cryptfile_path }}"
+      state: absent
