@@ -1,1 +1,3 @@
+cryptography >= 36.0.2
+PyOpenSSL >= 22.0.0
 PyYAML
