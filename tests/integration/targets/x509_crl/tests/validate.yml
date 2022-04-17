@@ -107,37 +107,65 @@
   assert:
     that:
       - crl_3.revoked_certificates == crl_3_info.revoked_certificates
+      # cryptography < 2.1 strips username and password from URIs
       - crl_3.revoked_certificates[0].issuer == ([
           "DNS:ca.example.org",
           "DNS:ffóò.ḃâŗ.çøṁ",
           "email:foo@ḃâŗ.çøṁ",
-          "URI:https://admin:hunter2@ffóò.ḃâŗ.çøṁ/baz?foo=bar",
-          "URI:https://goo@www.straße.de",
+          "URI:https://ffóò.ḃâŗ.çøṁ/baz?foo=bar",
+          "URI:https://www.straße.de",
+          "URI:https://straße.de:8080",
           "URI:http://gefäß.org",
+          "URI:http://ä:1",
         ] if cryptography_version.stdout is version('2.1', '<') else [
           "DNS:ca.example.org",
           "DNS:xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n",
           "email:foo@xn--2ca8uh37e.xn--7ca8a981n",
           "URI:https://admin:hunter2@xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar",
           "URI:https://goo@www.xn--strae-oqa.de",
+          "URI:https://xn--strae-oqa.de:8080",
           "URI:http://xn--gef-7kay.org",
+          "URI:http://a:b@xn--4ca:1",
         ])
       - crl_3_idna is not changed
       - crl_3_idna.revoked_certificates == crl_3_info_idna.revoked_certificates
-      - crl_3_idna.revoked_certificates[0].issuer == [
+      - crl_3_idna.revoked_certificates[0].issuer == ([
+          "DNS:ca.example.org",
+          "DNS:xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n",
+          "email:foo@xn--2ca8uh37e.xn--7ca8a981n",
+          "URI:https://xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar",
+          "URI:https://www.xn--strae-oqa.de",
+          "URI:https://xn--strae-oqa.de:8080",
+          "URI:http://xn--gef-7kay.org",
+          "URI:http://xn--4ca:1",
+        ] if cryptography_version.stdout is version('2.1', '<') else [
           "DNS:ca.example.org",
           "DNS:xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n",
           "email:foo@xn--2ca8uh37e.xn--7ca8a981n",
           "URI:https://admin:hunter2@xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar",
           "URI:https://goo@www.xn--strae-oqa.de",
+          "URI:https://xn--strae-oqa.de:8080",
           "URI:http://xn--gef-7kay.org",
-        ]
+          "URI:http://a:b@xn--4ca:1",
+        ])
       - crl_3_unicode is not changed
       - crl_3_unicode.revoked_certificates == crl_3_info_unicode.revoked_certificates
-      - crl_3_unicode.revoked_certificates[0].issuer == [
+      - crl_3_unicode.revoked_certificates[0].issuer == ([
+          "DNS:ca.example.org",
+          "DNS:ffóò.ḃâŗ.çøṁ",
+          "email:foo@ḃâŗ.çøṁ",
+          "URI:https://ffóò.ḃâŗ.çøṁ/baz?foo=bar",
+          "URI:https://www.straße.de",
+          "URI:https://straße.de:8080",
+          "URI:http://gefäß.org",
+          "URI:http://ä:1",
+        ] if cryptography_version.stdout is version('2.1', '<') else [
           "DNS:ca.example.org",
           "DNS:ffóò.ḃâŗ.çøṁ",
           "email:foo@ḃâŗ.çøṁ",
           "URI:https://admin:hunter2@ffóò.ḃâŗ.çøṁ/baz?foo=bar",
           "URI:https://goo@www.straße.de",
+          "URI:https://straße.de:8080",
           "URI:http://gefäß.org",
+          "URI:http://a:b@ä:1",
+        ])

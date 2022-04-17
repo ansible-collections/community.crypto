@@ -542,7 +542,9 @@
           - "email:foo@ḃâŗ.çøṁ"
           - "URI:https://admin:hunter2@ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
           - "URI:https://goo@www.straße.de"
+          - "URI:https://straße.de:8080"
           - "URI:http://gefäß.org"
+          - "URI:http://a:b@ä:1"
         issuer_critical: true
   register: crl_3
 
@@ -563,7 +565,9 @@
           - "email:foo@xn--2ca8uh37e.xn--7ca8a981n"
           - "URI:https://admin:hunter2@xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar"
           - "URI:https://goo@www.xn--strae-oqa.de"
+          - "URI:https://xn--strae-oqa.de:8080"
           - "URI:http://xn--gef-7kay.org"
+          - "URI:http://a:b@xn--4ca:1"
         issuer_critical: true
     ignore_timestamps: true
     name_encoding: idna
@@ -586,7 +590,9 @@
           - "email:foo@ḃâŗ.çøṁ"
           - "URI:https://admin:hunter2@ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
           - "URI:https://goo@www.straße.de"
+          - "URI:https://straße.de:8080"
           - "URI:http://gefäß.org"
+          - "URI:http://a:b@ä:1"
         issuer_critical: true
     ignore_timestamps: true
     name_encoding: unicode

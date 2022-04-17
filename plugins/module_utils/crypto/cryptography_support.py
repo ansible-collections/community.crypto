@@ -435,11 +435,13 @@ def _adjust_idn_email(value, idn_rewrite):
 
 def _adjust_idn_url(value, idn_rewrite):
     url = urlparse(value)
-    idx = url.netloc.find(u'@')
-    if idx >= 0:
-        host = u'{0}@{1}'.format(url.netloc[:idx], _adjust_idn(url.netloc[idx + 1:], idn_rewrite))
-    else:
-        host = _adjust_idn(url.netloc, idn_rewrite)
+    host = _adjust_idn(url.hostname, idn_rewrite)
+    if url.username is not None and url.password is not None:
+        host = u'{0}:{1}@{2}'.format(url.username, url.password, host)
+    elif url.username is not None:
+        host = u'{0}@{1}'.format(url.username, host)
+    if url.port is not None:
+        host = u'{0}:{1}'.format(host, url.port)
     return urlunparse(
         ParseResult(scheme=url.scheme, netloc=host, path=url.path, params=url.params, query=url.query, fragment=url.fragment))
 
