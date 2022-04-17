@@ -41,7 +41,7 @@
       - result_unicode.subject_alt_name[1] == "DNS:âņsïbłè.com"
       - result_idna.subject_alt_name[1] == "DNS:xn--sb-oia0a7a53bya.com"
       - result.extensions_by_oid['2.5.29.17'].critical == false
-      - result.extensions_by_oid['2.5.29.17'].value == 'MHuCD3d3dy5hbnNpYmxlLmNvbYIZeG4tLXNiLW9pYTdjNnl1YTQ4MzdjLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
+      - result.extensions_by_oid['2.5.29.17'].value == 'MHmCD3d3dy5hbnNpYmxlLmNvbYIXeG4tLXNiLW9pYTBhN2E1M2J5YS5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
       # Basic Constraints
       - result.extensions_by_oid['2.5.29.19'].critical == true
       - result.extensions_by_oid['2.5.29.19'].value == 'MAYBAf8CARc='
