@@ -689,9 +689,7 @@ class CRL(OpenSSLObject):
             revoked_cert = revoked_cert.revocation_date(entry['revocation_date'])
             if entry['issuer'] is not None:
                 revoked_cert = revoked_cert.add_extension(
-                    x509.CertificateIssuer([
-                        cryptography_get_name(name, 'issuer') for name in entry['issuer']
-                    ]),
+                    x509.CertificateIssuer(entry['issuer']),
                     entry['issuer_critical']
                 )
             if entry['reason'] is not None:
