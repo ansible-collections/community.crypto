@@ -536,6 +536,8 @@
     revoked_certificates:
       - serial_number: 1234
         revocation_date: 20191001000000Z
+        # cryptography < 2.1 strips username and password from URIs. To avoid problems, we do
+        # not pass usernames and passwords for URIs when the cryptography version is < 2.1.
         issuer:
           - "DNS:ca.example.org"
           - "DNS:ﬀóò.ḃâŗ.çøṁ"
@@ -588,11 +590,11 @@
           - "DNS:ca.example.org"
           - "DNS:ﬀóò.ḃâŗ.çøṁ"
           - "email:foo@ḃâŗ.çøṁ"
-          - "URI:https://admin:hunter2@ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
-          - "URI:https://goo@www.straße.de"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'admin:hunter2@' }}ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'goo@' }}www.straße.de"
           - "URI:https://straße.de:8080"
           - "URI:http://gefäß.org"
-          - "URI:http://a:b@ä:1"
+          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'a:b@' }}ä:1"
         issuer_critical: true
     ignore_timestamps: true
     name_encoding: unicode

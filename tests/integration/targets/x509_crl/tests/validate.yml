@@ -107,7 +107,6 @@
   assert:
     that:
       - crl_3.revoked_certificates == crl_3_info.revoked_certificates
-      # cryptography < 2.1 strips username and password from URIs
       - crl_3.revoked_certificates[0].issuer == ([
           "DNS:ca.example.org",
           "DNS:ffóò.ḃâŗ.çøṁ",
