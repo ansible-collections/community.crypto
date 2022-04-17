@@ -8,6 +8,20 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
+- name: "({{ select_crypto_backend }}) Get CSR info (IDNA encoding)"
+  openssl_csr_info:
+    path: '{{ remote_tmp_dir }}/csr_1.csr'
+    name_encoding: idna
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_idna
+
+- name: "({{ select_crypto_backend }}) Get CSR info (Unicode encoding)"
+  openssl_csr_info:
+    path: '{{ remote_tmp_dir }}/csr_1.csr'
+    name_encoding: unicode
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_unicode
+
 - name: "({{ select_crypto_backend }}) Check whether subject and extensions behaves as expected"
   assert:
     that:
@@ -23,8 +37,11 @@
       - result.extensions_by_oid['2.5.29.15'].critical == true
       - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
       # Subject Alternative Names
+      - result.subject_alt_name[1] == ("DNS:âņsïbł€.com" if cryptography_version.stdout is version('2.1', '<') else "DNS:xn--sb-oia7c6yua4837c.com")
+      - result_unicode.subject_alt_name[1] == "DNS:âņsïbł€.com"
+      - result_idna.subject_alt_name[1] == "DNS:xn--sb-oia7c6yua4837c.com"
       - result.extensions_by_oid['2.5.29.17'].critical == false
-      - result.extensions_by_oid['2.5.29.17'].value == 'MGCCD3d3dy5hbnNpYmxlLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
+      - result.extensions_by_oid['2.5.29.17'].value == 'MHuCD3d3dy5hbnNpYmxlLmNvbYIZeG4tLXNiLW9pYTdjNnl1YTQ4MzdjLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
       # Basic Constraints
       - result.extensions_by_oid['2.5.29.19'].critical == true
       - result.extensions_by_oid['2.5.29.19'].value == 'MAYBAf8CARc='

@@ -4,6 +4,11 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Make sure the Python idna library is installed
+  pip:
+    name: idna
+    state: present
+
 - set_fact:
     certificates:
       - name: ca

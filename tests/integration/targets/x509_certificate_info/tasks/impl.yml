@@ -8,6 +8,20 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
+- name: ({{select_crypto_backend}}) Get certificate info (IDNA encoding)
+  x509_certificate_info:
+    path: '{{ remote_tmp_dir }}/cert_1.pem'
+    name_encoding: idna
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_idna
+
+- name: ({{select_crypto_backend}}) Get certificate info (Unicode encoding)
+  x509_certificate_info:
+    path: '{{ remote_tmp_dir }}/cert_1.pem'
+    name_encoding: unicode
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: result_unicode
+
 - name: Check whether issuer and subject and extensions behave as expected
   assert:
     that:
@@ -23,6 +37,24 @@
           'DNS:www.ansible.com',
           'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--7ca3a') ~ '.com',
           'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
+      - "result_idna.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:xn--7ca3a.com',
+          'DNS:' ~ ('www.xn--7ca3a' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
+      - "result_unicode.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:öç.com',
+          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else '☺') ~ '.com',
           'IP:1.2.3.4',
           'IP:::1',
           'email:test@example.org',

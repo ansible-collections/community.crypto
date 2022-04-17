@@ -95,12 +95,12 @@ def cryptography_decode_revoked_certificate(cert):
     return result
 
 
-def cryptography_dump_revoked(entry):
+def cryptography_dump_revoked(entry, idn_rewrite='ignore'):
     return {
         'serial_number': entry['serial_number'],
         'revocation_date': entry['revocation_date'].strftime(TIMESTAMP_FORMAT),
         'issuer':
-            [cryptography_decode_name(issuer) for issuer in entry['issuer']]
+            [cryptography_decode_name(issuer, idn_rewrite=idn_rewrite) for issuer in entry['issuer']]
             if entry['issuer'] is not None else None,
         'issuer_critical': entry['issuer_critical'],
         'reason': REVOCATION_REASON_MAP_INVERSE.get(entry['reason']) if entry['reason'] is not None else None,

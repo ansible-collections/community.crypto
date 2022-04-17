@@ -538,11 +538,76 @@
         revocation_date: 20191001000000Z
         issuer:
           - "DNS:ca.example.org"
+          - "DNS:ﬀóò.ḃâŗ.çøṁ"
+          - "email:foo@ḃâŗ.çøṁ"
+          - "URI:https://admin:hunter2@ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
+          - "URI:https://goo@www.straße.de"
+          - "URI:http://gefäß.org"
         issuer_critical: true
   register: crl_3
+
+- name: Create CRL 3 (IDNA encoding)
+  x509_crl:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+    issuer:
+      CN: Ansible
+    last_update: +0d
+    next_update: +0d
+    revoked_certificates:
+      - serial_number: 1234
+        revocation_date: 20191001000000Z
+        issuer:
+          - "DNS:ca.example.org"
+          - "DNS:xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n"
+          - "email:foo@xn--2ca8uh37e.xn--7ca8a981n"
+          - "URI:https://admin:hunter2@xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar"
+          - "URI:https://goo@www.xn--strae-oqa.de"
+          - "URI:http://xn--gef-7kay.org"
+        issuer_critical: true
+    ignore_timestamps: true
+    name_encoding: idna
+  register: crl_3_idna
+
+- name: Create CRL 3 (Unicode encoding)
+  x509_crl:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+    issuer:
+      CN: Ansible
+    last_update: +0d
+    next_update: +0d
+    revoked_certificates:
+      - serial_number: 1234
+        revocation_date: 20191001000000Z
+        issuer:
+          - "DNS:ca.example.org"
+          - "DNS:ﬀóò.ḃâŗ.çøṁ"
+          - "email:foo@ḃâŗ.çøṁ"
+          - "URI:https://admin:hunter2@ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
+          - "URI:https://goo@www.straße.de"
+          - "URI:http://gefäß.org"
+        issuer_critical: true
+    ignore_timestamps: true
+    name_encoding: unicode
+  register: crl_3_unicode
 
 - name: Retrieve CRL 3 infos
   x509_crl_info:
     path: '{{ remote_tmp_dir }}/ca-crl3.crl'
     list_revoked_certificates: true
   register: crl_3_info
+
+- name: Retrieve CRL 3 infos (IDNA encoding)
+  x509_crl_info:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    name_encoding: idna
+    list_revoked_certificates: true
+  register: crl_3_info_idna
+
+- name: Retrieve CRL 3 infos (Unicode encoding)
+  x509_crl_info:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    name_encoding: unicode
+    list_revoked_certificates: true
+  register: crl_3_info_unicode

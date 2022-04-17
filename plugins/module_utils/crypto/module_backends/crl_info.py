@@ -51,6 +51,7 @@ class CRLInfoRetrieval(object):
         self.module = module
         self.content = content
         self.list_revoked_certificates = list_revoked_certificates
+        self.name_encoding = module.params.get('name_encoding', 'ignore')
 
     def get_info(self):
         self.crl_pem = identify_pem_format(self.content)
@@ -86,7 +87,7 @@ class CRLInfoRetrieval(object):
             result['revoked_certificates'] = []
             for cert in self.crl:
                 entry = cryptography_decode_revoked_certificate(cert)
-                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry, idn_rewrite=self.name_encoding))
 
         return result
 
