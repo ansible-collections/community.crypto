@@ -23,6 +23,7 @@ import base64
 import binascii
 import re
 import sys
+import traceback
 
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse, ParseResult
@@ -81,6 +82,16 @@ try:
 except ImportError:
     # Error handled in the calling module.
     _load_pkcs12 = None
+
+try:
+    import idna
+
+    HAS_IDNA = True
+except ImportError:
+    HAS_IDNA = False
+    IDNA_IMP_ERROR = traceback.format_exc()
+
+from ansible.module_utils.basic import missing_required_lib
 
 from .basic import (
     CRYPTOGRAPHY_HAS_DSA_SIGN,
@@ -361,15 +372,58 @@ def cryptography_parse_relative_distinguished_name(rdn):
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
+def _is_ascii(value):
+    '''Check whether the Unicode string `value` contains only ASCII characters.'''
+    try:
+        value.encode("ascii")
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
 def _adjust_idn(value, idn_rewrite):
-    if idn_rewrite == 'ignore':
+    if idn_rewrite == 'ignore' or not value:
         return value
-    value = [v.encode('idna') for v in value.split(u'.')]
-    if idn_rewrite == 'unicode':
-        value = [v.decode('idna') for v in value]
-    else:
-        value = [v.decode('utf-8') for v in value]
-    return u'.'.join(value)
+    if idn_rewrite == 'punycode' and _is_ascii(value):
+        return value
+    if idn_rewrite not in ('punycode', 'unicode'):
+        raise ValueError('Invalid value for idn_rewrite: "{0}"'.format(idn_rewrite))
+    if not HAS_IDNA:
+        raise OpenSSLObjectError(
+            missing_required_lib('idna', reason='to transform {what} DNS name "{name}" to {dest}'.format(
+                name=value,
+                what='IDNA' if idn_rewrite == 'unicode' else 'Unicode',
+                dest='Unicode' if idn_rewrite == 'unicode' else 'IDNA',
+            )))
+    # Since IDNA does not like '*' or empty labels (except one empty label at the end),
+    # we split and let IDNA only handle labels that are neither empty or '*'.
+    parts = value.split(u'.')
+    for index, part in enumerate(parts):
+        if part in (u'', u'*'):
+            continue
+        try:
+            if idn_rewrite == 'punycode':
+                parts[index] = idna.encode(part).decode('ascii')
+            elif idn_rewrite == 'unicode':
+                parts[index] = idna.decode(part)
+        except idna.IDNAError as exc2008:
+            try:
+                if idn_rewrite == 'punycode':
+                    parts[index] = part.encode('idna').decode('ascii')
+                elif idn_rewrite == 'unicode':
+                    parts[index] = part.encode('ascii').decode('idna')
+            except Exception as exc2003:
+                raise OpenSSLObjectError(
+                    u'Error while transforming part "{part}" of {what} DNS name "{name}" to {dest}.'
+                    u' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'.format(
+                        part=part,
+                        name=value,
+                        what='IDNA' if idn_rewrite == 'unicode' else 'Unicode',
+                        dest='Unicode' if idn_rewrite == 'unicode' else 'IDNA',
+                        exc2003=exc2003,
+                        exc2008=exc2008,
+                    ))
+    return u'.'.join(parts)
 
 
 def _adjust_idn_email(value, idn_rewrite):
