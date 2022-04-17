@@ -37,9 +37,9 @@
       - result.extensions_by_oid['2.5.29.15'].critical == true
       - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
       # Subject Alternative Names
-      - result.subject_alt_name[1] == ("DNS:âņsïbł€.com" if cryptography_version.stdout is version('2.1', '<') else "DNS:xn--sb-oia7c6yua4837c.com")
-      - result_unicode.subject_alt_name[1] == "DNS:âņsïbł€.com"
-      - result_idna.subject_alt_name[1] == "DNS:xn--sb-oia7c6yua4837c.com"
+      - result.subject_alt_name[1] == ("DNS:âņsïbłè.com" if cryptography_version.stdout is version('2.1', '<') else "DNS:xn--sb-oia0a7a53bya.com")
+      - result_unicode.subject_alt_name[1] == "DNS:âņsïbłè.com"
+      - result_idna.subject_alt_name[1] == "DNS:xn--sb-oia0a7a53bya.com"
       - result.extensions_by_oid['2.5.29.17'].critical == false
       - result.extensions_by_oid['2.5.29.17'].value == 'MHuCD3d3dy5hbnNpYmxlLmNvbYIZeG4tLXNiLW9pYTdjNnl1YTQ4MzdjLmNvbYcEAQIDBIcQAAAAAAAAAAAAAAAAAAAAAYEQdGVzdEBleGFtcGxlLm9yZ4YjaHR0cHM6Ly9leGFtcGxlLm9yZy90ZXN0L2luZGV4Lmh0bWw='
       # Basic Constraints

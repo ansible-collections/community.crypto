@@ -72,7 +72,7 @@
       - biometricInfo
     subject_alt_name:
       - "DNS:www.ansible.com"
-      - "DNS:âņsïbł€.com"
+      - "DNS:âņsïbłè.com"
       - "IP:1.2.3.4"
       - "IP:::1"
       - "email:test@example.org"
