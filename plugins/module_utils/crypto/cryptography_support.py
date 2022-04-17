@@ -384,9 +384,9 @@ def _is_ascii(value):
 def _adjust_idn(value, idn_rewrite):
     if idn_rewrite == 'ignore' or not value:
         return value
-    if idn_rewrite == 'punycode' and _is_ascii(value):
+    if idn_rewrite == 'idna' and _is_ascii(value):
         return value
-    if idn_rewrite not in ('punycode', 'unicode'):
+    if idn_rewrite not in ('idna', 'unicode'):
         raise ValueError('Invalid value for idn_rewrite: "{0}"'.format(idn_rewrite))
     if not HAS_IDNA:
         raise OpenSSLObjectError(
@@ -402,13 +402,13 @@ def _adjust_idn(value, idn_rewrite):
         if part in (u'', u'*'):
             continue
         try:
-            if idn_rewrite == 'punycode':
+            if idn_rewrite == 'idna':
                 parts[index] = idna.encode(part).decode('ascii')
             elif idn_rewrite == 'unicode':
                 parts[index] = idna.decode(part)
         except idna.IDNAError as exc2008:
             try:
-                if idn_rewrite == 'punycode':
+                if idn_rewrite == 'idna':
                     parts[index] = part.encode('idna').decode('ascii')
                 elif idn_rewrite == 'unicode':
                     parts[index] = part.encode('ascii').decode('idna')
@@ -451,16 +451,16 @@ def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
     try:
         if name.startswith('DNS:'):
-            return x509.DNSName(_adjust_idn(to_text(name[4:]), 'punycode'))
+            return x509.DNSName(_adjust_idn(to_text(name[4:]), 'idna'))
         if name.startswith('IP:'):
             address = to_text(name[3:])
             if '/' in address:
                 return x509.IPAddress(ipaddress.ip_network(address))
             return x509.IPAddress(ipaddress.ip_address(address))
         if name.startswith('email:'):
-            return x509.RFC822Name(_adjust_idn_email(to_text(name[6:]), 'punycode'))
+            return x509.RFC822Name(_adjust_idn_email(to_text(name[6:]), 'idna'))
         if name.startswith('URI:'):
-            return x509.UniformResourceIdentifier(_adjust_idn_url(to_text(name[4:]), 'punycode'))
+            return x509.UniformResourceIdentifier(_adjust_idn_url(to_text(name[4:]), 'idna'))
         if name.startswith('RID:'):
             m = re.match(r'^([0-9]+(?:\.[0-9]+)*)$', to_text(name[4:]))
             if not m:
@@ -512,8 +512,8 @@ def cryptography_decode_name(name, idn_rewrite='ignore'):
     Given a cryptography x509.GeneralName object, returns a string.
     Raises an OpenSSLObjectError if the name is not supported.
     '''
-    if idn_rewrite not in ('ignore', 'punycode', 'unicode'):
-        raise AssertionError('idn_rewrite must be one of "ignore", "punycode", or "unicode"')
+    if idn_rewrite not in ('ignore', 'idna', 'unicode'):
+        raise AssertionError('idn_rewrite must be one of "ignore", "idna", or "unicode"')
     if isinstance(name, x509.DNSName):
         return u'DNS:{0}'.format(_adjust_idn(name.value, idn_rewrite))
     if isinstance(name, x509.IPAddress):
