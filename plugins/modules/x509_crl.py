@@ -409,6 +409,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_decode_name,
     cryptography_get_name,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
@@ -600,11 +601,20 @@ class CRL(OpenSSLObject):
         super(CRL, self).remove(self.module)
 
     def _compress_entry(self, entry):
+        issuer = None
+        if entry['issuer'] is not None:
+            # Normalize to IDNA. If this is used-provided, it was already converted to
+            # IDNA (by cryptography_get_name) and thus the `idna` library is present.
+            # If this is coming from cryptography and isn't already in IDNA (i.e. ascii),
+            # cryptography < 2.1 must be in use, which depends on `idna`. So this should
+            # not require `idna` except if it was already used by code earlier during
+            # this invocation.
+            issuer = tuple(cryptography_decode_name(issuer, idn_rewrite='idna') for issuer in entry['issuer'])
         if self.ignore_timestamps:
             # Throw out revocation_date
             return (
                 entry['serial_number'],
-                tuple(entry['issuer']) if entry['issuer'] is not None else None,
+                issuer,
                 entry['issuer_critical'],
                 entry['reason'],
                 entry['reason_critical'],
@@ -615,7 +625,7 @@ class CRL(OpenSSLObject):
             return (
                 entry['serial_number'],
                 entry['revocation_date'],
-                tuple(entry['issuer']) if entry['issuer'] is not None else None,
+                issuer,
                 entry['issuer_critical'],
                 entry['reason'],
                 entry['reason_critical'],
