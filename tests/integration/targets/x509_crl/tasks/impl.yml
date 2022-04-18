@@ -536,17 +536,22 @@
     revoked_certificates:
       - serial_number: 1234
         revocation_date: 20191001000000Z
-        # cryptography < 2.1 strips username and password from URIs. To avoid problems, we do
-        # not pass usernames and passwords for URIs when the cryptography version is < 2.1.
+        # * cryptography < 2.1 strips username and password from URIs. To avoid problems, we do
+        #   not pass usernames and passwords for URIs when the cryptography version is < 2.1.
+        # * Python 3.5 before 3.5.8 rc 1 has a bug in urllib.parse.urlparse() that results in an
+        #   error if a Unicode netloc has a username or password included.
+        #   (https://github.com/ansible-collections/community.crypto/pull/436#issuecomment-1101737134)
+        #   This affects the Python 3.5 included in Ansible 2.9's default test container; to avoid
+        #   this, we also do not pass usernames and passwords for Python 3.5.
         issuer:
           - "DNS:ca.example.org"
           - "DNS:ﬀóò.ḃâŗ.çøṁ"
           - "email:foo@ḃâŗ.çøṁ"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'admin:hunter2@' }}ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'goo@' }}www.straße.de"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'admin:hunter2@' }}ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'goo@' }}www.straße.de"
           - "URI:https://straße.de:8080"
           - "URI:http://gefäß.org"
-          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'a:b@' }}ä:1"
+          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'a:b@' }}ä:1"
         issuer_critical: true
   register: crl_3
 
@@ -565,11 +570,11 @@
           - "DNS:ca.example.org"
           - "DNS:xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n"
           - "email:foo@xn--2ca8uh37e.xn--7ca8a981n"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'admin:hunter2@' }}xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'goo@' }}www.xn--strae-oqa.de"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'admin:hunter2@' }}xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n/baz?foo=bar"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'goo@' }}www.xn--strae-oqa.de"
           - "URI:https://xn--strae-oqa.de:8080"
           - "URI:http://xn--gef-7kay.org"
-          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'a:b@' }}xn--4ca:1"
+          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'a:b@' }}xn--4ca:1"
         issuer_critical: true
     ignore_timestamps: true
     name_encoding: idna
@@ -590,11 +595,11 @@
           - "DNS:ca.example.org"
           - "DNS:ﬀóò.ḃâŗ.çøṁ"
           - "email:foo@ḃâŗ.çøṁ"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'admin:hunter2@' }}ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
-          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'goo@' }}www.straße.de"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'admin:hunter2@' }}ﬀóò.ḃâŗ.çøṁ/baz?foo=bar"
+          - "URI:https://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'goo@' }}www.straße.de"
           - "URI:https://straße.de:8080"
           - "URI:http://gefäß.org"
-          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') else 'a:b@' }}ä:1"
+          - "URI:http://{{ '' if cryptography_version.stdout is version('2.1', '<') or ansible_facts.python.version.minor == 5 else 'a:b@' }}ä:1"
         issuer_critical: true
     ignore_timestamps: true
     name_encoding: unicode
