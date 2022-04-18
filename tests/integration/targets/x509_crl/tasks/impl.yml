@@ -456,3 +456,25 @@
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     list_revoked_certificates: false
   register: crl_2_info_1
+
+- name: Create CRL 3
+  x509_crl:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+    issuer:
+      CN: Ansible
+    last_update: +0d
+    next_update: +0d
+    revoked_certificates:
+      - serial_number: 1234
+        revocation_date: 20191001000000Z
+        issuer:
+          - "DNS:ca.example.org"
+        issuer_critical: true
+  register: crl_3
+
+- name: Retrieve CRL 3 infos
+  x509_crl_info:
+    path: '{{ remote_tmp_dir }}/ca-crl3.crl'
+    list_revoked_certificates: true
+  register: crl_3_info
