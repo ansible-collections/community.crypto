@@ -102,3 +102,11 @@
           ['commonName', 'CRL'],
           ['commonName', 'Test'],
         ]
+
+- name: Validate CRL 3 info
+  assert:
+    that:
+      - crl_3.revoked_certificates == crl_3_info.revoked_certificates
+      - crl_3.revoked_certificates[0].issuer == [
+          "DNS:ca.example.org",
+        ]

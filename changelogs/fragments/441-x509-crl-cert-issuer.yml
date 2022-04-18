@@ -1,0 +1,2 @@
+bugfixes:
+  - "x509_crl - fix crash when ``issuer`` for a revoked certificate is specified (https://github.com/ansible-collections/community.crypto/pull/441)."
