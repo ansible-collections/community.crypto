@@ -20,11 +20,73 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_get_name,
+    _adjust_idn,
     _parse_dn_component,
     _parse_dn,
 )
 
 from cryptography.x509 import NameAttribute, oid
+
+
+@pytest.mark.parametrize('unicode, idna, cycled_unicode', [
+    (u'..', u'..', None),
+    (u'foo.com', u'foo.com', None),
+    (u'.foo.com.', u'.foo.com.', None),
+    (u'*.foo.com', u'*.foo.com', None),
+    (u'straße', u'xn--strae-oqa', None),
+    (u'ﬀóò.ḃâŗ.çøṁ', u'xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n', u'ffóò.ḃâŗ.çøṁ'),
+    (u'*.☺.', u'*.xn--74h.', None),
+])
+def test_adjust_idn(unicode, idna, cycled_unicode):
+    if cycled_unicode is None:
+        cycled_unicode = unicode
+
+    result = _adjust_idn(unicode, 'ignore')
+    print(result, unicode)
+    assert result == unicode
+
+    result = _adjust_idn(idna, 'ignore')
+    print(result, idna)
+    assert result == idna
+
+    result = _adjust_idn(unicode, 'unicode')
+    print(result, unicode)
+    assert result == unicode
+
+    result = _adjust_idn(idna, 'unicode')
+    print(result, cycled_unicode)
+    assert result == cycled_unicode
+
+    result = _adjust_idn(unicode, 'idna')
+    print(result, idna)
+    assert result == idna
+
+    result = _adjust_idn(idna, 'idna')
+    print(result, idna)
+    assert result == idna
+
+
+@pytest.mark.parametrize('value, idn_rewrite, message', [
+    (u'bar', 'foo', re.escape(u'Invalid value for idn_rewrite: "foo"')),
+])
+def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
+    with pytest.raises(ValueError, match=message):
+        result = _adjust_idn(value, idn_rewrite)
+
+
+@pytest.mark.parametrize('value, idn_rewrite, message', [
+    (
+        u'xn--a',
+        'unicode',
+        u'''^Error while transforming part "xn\\-\\-a" of IDNA DNS name "xn\\-\\-a" to Unicode\\.'''
+        u''' IDNA2008 transformation resulted in "Codepoint U\\+0080 at position 1 of '\\\\x80' not allowed",'''
+        u''' IDNA2003 transformation resulted in "decoding with 'idna' codec failed'''
+        u''' \\(UnicodeError: Invalid character '\\\\x80'\\)"\\.$'''
+    ),
+])
+def test_adjust_idn_fail_user_error(value, idn_rewrite, message):
+    with pytest.raises(OpenSSLObjectError, match=message):
+        result = _adjust_idn(value, idn_rewrite)
 
 
 def test_cryptography_get_name_invalid_prefix():

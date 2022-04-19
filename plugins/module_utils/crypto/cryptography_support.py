@@ -404,13 +404,13 @@ def _adjust_idn(value, idn_rewrite):
         try:
             if idn_rewrite == 'idna':
                 parts[index] = idna.encode(part).decode('ascii')
-            elif idn_rewrite == 'unicode':
+            elif idn_rewrite == 'unicode' and part.startswith(u'xn--'):
                 parts[index] = idna.decode(part)
         except idna.IDNAError as exc2008:
             try:
                 if idn_rewrite == 'idna':
                     parts[index] = part.encode('idna').decode('ascii')
-                elif idn_rewrite == 'unicode':
+                elif idn_rewrite == 'unicode' and part.startswith(u'xn--'):
                     parts[index] = part.encode('ascii').decode('idna')
             except Exception as exc2003:
                 raise OpenSSLObjectError(

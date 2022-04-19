@@ -1,5 +1,6 @@
 bcrypt
 cryptography
+idna
 ipaddress ; python_version < '3.0'
 
 unittest2 ; python_version < '2.7'
