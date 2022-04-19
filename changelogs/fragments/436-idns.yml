@@ -1,8 +1,12 @@
 minor_changes:
   - "Support automatic conversion for Internalionalized Domain Names (IDNs).
-     When passing general names, for example SANs to ``community.crypto.openssl_csr``, these will automatically be converted to IDNA.
+     When passing general names, for example Subject Altenative Names to ``community.crypto.openssl_csr``, these will automatically be converted to IDNA.
      Conversion will be done per label to IDNA2008 if possible, and IDNA2003 if IDNA2008 conversion fails for that label.
      Note that IDNA conversion requires `the Python idna library <https://pypi.org/project/idna/>`_ to be installed.
      Please note that depending on which versions of the cryptography library are used, it could try to process the converted IDNA
      another time with the Python ``idna`` library and reject IDNA2003 encoded values. Using a new enough ``cryptography`` version avoids this
      (https://github.com/ansible-collections/community.crypto/issues/426, https://github.com/ansible-collections/community.crypto/pull/436)."
+  - "openssl_csr_info - add ``name_encoding`` option to control the encoding (IDNA, Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436)."
+  - "x509_certificate_info - add ``name_encoding`` option to control the encoding (IDNA, Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436)."
+  - "x509_crl - add ``name_encoding`` option to control the encoding (IDNA, Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436)."
+  - "x509_crl_info - add ``name_encoding`` option to control the encoding (IDNA, Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436)."
