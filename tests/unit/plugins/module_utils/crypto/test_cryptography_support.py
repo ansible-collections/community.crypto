@@ -78,10 +78,10 @@ def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
     (
         u'xn--a',
         'unicode',
-        u'''^Error while transforming part "xn\\-\\-a" of IDNA DNS name "xn\\-\\-a" to Unicode\\.'''
-        u''' IDNA2008 transformation resulted in "Codepoint U\\+0080 at position 1 of '\\\\x80' not allowed",'''
-        u''' IDNA2003 transformation resulted in "decoding with 'idna' codec failed'''
-        u''' \\(UnicodeError: Invalid character '\\\\x80'\\)"\\.$'''
+        u'''^Error while transforming part u?"xn\\-\\-a" of IDNA DNS name u?"xn\\-\\-a" to Unicode\\.'''
+        u''' IDNA2008 transformation resulted in "Codepoint U\\+0080 at position 1 of u?'\\\\x80' not allowed",'''
+        u''' IDNA2003 transformation resulted in "(decoding with 'idna' codec failed'''
+        u''' \\(UnicodeError: )?Invalid character u?'\\\\x80'\\)?"\\.$'''
     ),
 ])
 def test_adjust_idn_fail_user_error(value, idn_rewrite, message):
