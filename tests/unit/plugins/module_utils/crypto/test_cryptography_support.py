@@ -9,10 +9,10 @@ __metaclass__ = type
 import re
 import sys
 
-from distutils.version import LooseVersion
-
 import cryptography
 import pytest
+
+from cryptography.x509 import NameAttribute, oid
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -24,7 +24,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     _parse_dn,
 )
 
-from cryptography.x509 import NameAttribute, oid
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 
 def test_cryptography_get_name_invalid_prefix():
