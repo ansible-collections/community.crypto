@@ -1,0 +1,2 @@
+bugfixes:
+  - "Make collection more robust when PyOpenSSL is used with an incompatible cryptography version (https://github.com/ansible-collections/community.crypto/pull/446)."
