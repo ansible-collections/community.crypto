@@ -12,8 +12,6 @@ import os
 
 from random import randrange
 
-from ansible.module_utils.common.text.converters import to_bytes
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     get_relative_time_option,
     select_message_digest,
@@ -30,11 +28,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     CertificateBackend,
     CertificateProvider,
 )
-
-try:
-    from OpenSSL import crypto
-except ImportError:
-    pass
 
 try:
     import cryptography
