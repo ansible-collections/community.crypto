@@ -29,7 +29,7 @@ from ._objects import OID_LOOKUP
 
 try:
     import OpenSSL
-except ImportError:
+except (ImportError, AttributeError):
     # Error handled in the calling module.
     pass
 

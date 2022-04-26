@@ -57,7 +57,7 @@ try:
         # OpenSSL 1.0.x or older
         OPENSSL_MUST_STAPLE_NAME = b"1.3.6.1.5.5.7.1.24"
         OPENSSL_MUST_STAPLE_VALUE = b"DER:30:03:02:01:05"
-except ImportError:
+except (ImportError, AttributeError):
     PYOPENSSL_IMP_ERR = traceback.format_exc()
     PYOPENSSL_FOUND = False
 else:

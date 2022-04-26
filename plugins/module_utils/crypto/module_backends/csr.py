@@ -63,7 +63,7 @@ try:
     import OpenSSL
     from OpenSSL import crypto
     PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except ImportError:
+except (ImportError, AttributeError):
     PYOPENSSL_IMP_ERR = traceback.format_exc()
     PYOPENSSL_FOUND = False
 else:

@@ -26,7 +26,7 @@ try:
     import OpenSSL  # noqa
     from OpenSSL import crypto  # noqa
     HAS_PYOPENSSL = True
-except ImportError:
+except (ImportError, AttributeError):
     # Error handled in the calling module.
     HAS_PYOPENSSL = False
 
