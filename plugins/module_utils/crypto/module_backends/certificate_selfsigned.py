@@ -33,7 +33,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 
 try:
     from OpenSSL import crypto
-except ImportError:
+except (ImportError, AttributeError):
     pass
 
 try:

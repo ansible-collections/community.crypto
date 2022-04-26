@@ -32,7 +32,7 @@ from ansible.module_utils.common.text.converters import to_native, to_bytes
 try:
     from OpenSSL import crypto
     HAS_PYOPENSSL = True
-except ImportError:
+except (ImportError, AttributeError):
     # Error handled in the calling module.
     HAS_PYOPENSSL = False
 
