@@ -34,7 +34,6 @@ __metaclass__ = type
 import json
 import os
 import re
-import time
 import traceback
 
 from ansible.module_utils.common.text.converters import to_text, to_native

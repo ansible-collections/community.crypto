@@ -12,8 +12,6 @@ import os
 
 from random import randrange
 
-from ansible.module_utils.common.text.converters import to_bytes
-
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -40,11 +38,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     CertificateBackend,
     CertificateProvider,
 )
-
-try:
-    from OpenSSL import crypto
-except ImportError:
-    pass
 
 try:
     import cryptography

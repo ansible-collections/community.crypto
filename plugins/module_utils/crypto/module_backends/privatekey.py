@@ -25,11 +25,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
     OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
     get_fingerprint_of_privatekey,
 )
 

@@ -368,7 +368,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.9/cloud/{0}/1
           targets:
-            - test: 3.5
+            - test: 2.7
 
   ## Finally
 

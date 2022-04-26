@@ -70,3 +70,6 @@ cannot_upgrade_cryptography:
       - '3.8'  # on the VMs in CI, system packages are used for this version as well
     '13.0':
       - '3.8'  # on the VMs in CI, system packages are used for this version as well
+  Ubuntu:
+    '18':
+      - '3.9'  # this is the default container for ansible-core 2.12; upgrading cryptography wrecks pyOpenSSL
