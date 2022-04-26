@@ -83,4 +83,4 @@
       - p12_empty is changed
       - p12_empty_idem is not changed
       - p12_empty_concat_idem is not changed
-      - empty_contents == (empty_expected_pyopenssl if select_crypto_backend == 'pyopenssl' else empty_expected_cryptography)
+      - (empty_contents == empty_expected_cryptography) or (empty_contents == empty_expected_pyopenssl and select_crypto_backend == 'pyopenssl')
