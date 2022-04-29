@@ -123,4 +123,11 @@ options:
     type: str
     default: auto
     choices: [ auto, cryptography, openssl ]
+  request_timeout:
+    description:
+      - The time Ansible should wait for a response from the ACME API.
+      - This timeout is applied to all HTTP(S) requests (HEAD, GET, POST).
+    type: int
+    default: 10
+    version_added: 2.3.0
 '''
