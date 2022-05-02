@@ -27,6 +27,7 @@
     certificate_path: "{{ output_path }}/pkcs12-cert.pem"
     state: present
     select_crypto_backend: cryptography
+  when: cryptography_version.stdout is ansible.builtin.version('3.0', '>=')
 
 - name: Create PKCS#12 with PyOpenSSL backend
   community.crypto.openssl_pkcs12:
