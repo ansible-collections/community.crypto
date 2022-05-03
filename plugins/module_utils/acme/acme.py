@@ -83,6 +83,8 @@ class ACMEDirectory(object):
 
         self.directory, dummy = account.get_request(self.directory_root, get_only=True)
 
+        self.request_timeout = module.params['request_timeout']
+
         # Check whether self.version matches what we expect
         if self.version == 1:
             for key in ('new-reg', 'new-authz', 'new-cert'):
@@ -103,7 +105,7 @@ class ACMEDirectory(object):
         url = self.directory_root if self.version == 1 else self.directory['newNonce']
         if resource is not None:
             url = resource
-        dummy, info = fetch_url(self.module, url, method='HEAD')
+        dummy, info = fetch_url(self.module, url, method='HEAD', timeout=self.request_timeout)
         if info['status'] not in (200, 204):
             raise NetworkException("Failed to get replay-nonce, got status {0}".format(info['status']))
         return info['replay-nonce']
@@ -130,6 +132,8 @@ class ACMEClient(object):
         # Grab account URI from module parameters.
         # Make sure empty string is treated as None.
         self.account_uri = module.params.get('account_uri') or None
+
+        self.request_timeout = module.params['request_timeout']
 
         self.account_key_data = None
         self.account_jwk = None
@@ -235,7 +239,7 @@ class ACMEClient(object):
             headers = {
                 'Content-Type': 'application/jose+json',
             }
-            resp, info = fetch_url(self.module, url, data=data, headers=headers, method='POST')
+            resp, info = fetch_url(self.module, url, data=data, headers=headers, method='POST', timeout=self.request_timeout)
             _assert_fetch_url_success(self.module, resp, info)
             result = {}
 
@@ -294,7 +298,7 @@ class ACMEClient(object):
 
         if get_only:
             # Perform unauthenticated GET
-            resp, info = fetch_url(self.module, uri, method='GET', headers=headers)
+            resp, info = fetch_url(self.module, uri, method='GET', headers=headers, timeout=self.request_timeout)
 
             _assert_fetch_url_success(self.module, resp, info)
 
@@ -342,6 +346,7 @@ def get_default_argspec():
         acme_version=dict(type='int', required=True, choices=[1, 2]),
         validate_certs=dict(type='bool', default=True),
         select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'openssl', 'cryptography']),
+        request_timeout=dict(type='int', default=10),
     )
 
 
