@@ -1,0 +1,41 @@
+---
+- name: Create private key
+  community.crypto.openssl_privatekey:
+    path: "{{ output_path }}/pkcs12-cert.key"
+    type: ECC
+    curve: secp256r1
+
+- name: Create CSR
+  community.crypto.openssl_csr:
+    path: "{{ output_path }}/pkcs12-cert.csr"
+    privatekey_path: "{{ output_path }}/pkcs12-cert.key"
+
+- name: Create certificate
+  community.crypto.x509_certificate:
+    path: "{{ output_path }}/pkcs12-cert.pem"
+    csr_path: "{{ output_path }}/pkcs12-cert.csr"
+    privatekey_path: "{{ output_path }}/pkcs12-cert.key"
+    provider: selfsigned
+
+- name: Create PKCS#12 with cryptography backend
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: "{{ output_path }}/pkcs12-1.p12"
+    mode: '0644'
+    friendly_name: foo
+    privatekey_path: "{{ output_path }}/pkcs12-cert.key"
+    certificate_path: "{{ output_path }}/pkcs12-cert.pem"
+    state: present
+    select_crypto_backend: cryptography
+  when: cryptography_version.stdout is ansible.builtin.version('3.0', '>=')
+
+- name: Create PKCS#12 with PyOpenSSL backend
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: "{{ output_path }}/pkcs12-2.p12"
+    mode: '0644'
+    friendly_name: foo
+    privatekey_path: "{{ output_path }}/pkcs12-cert.key"
+    certificate_path: "{{ output_path }}/pkcs12-cert.pem"
+    state: present
+    select_crypto_backend: pyopenssl

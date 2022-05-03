@@ -1,0 +1,7 @@
+minor_changes:
+  - "Prepare collection for inclusion in an Execution Environment by declaring its dependencies.
+     Please note that system packages are used for cryptography and PyOpenSSL, which can be
+     rather limited. If you need features from newer cryptography versions, you will have to
+     manually force a newer version to be installed by pip by specifying something like
+     ``cryptography >= 37.0.0`` in your Execution Environment's Python dependencies file
+     (https://github.com/ansible-collections/community.crypto/pull/440)."

@@ -1,0 +1,18 @@
+---
+- name: Create private key
+  community.crypto.openssl_privatekey:
+    path: "{{ output_path }}/cert.key"
+    type: ECC
+    curve: secp256r1
+
+- name: Create CSR
+  community.crypto.openssl_csr:
+    path: "{{ output_path }}/cert.csr"
+    privatekey_path: "{{ output_path }}/cert.key"
+
+- name: Create certificate
+  community.crypto.x509_certificate:
+    path: "{{ output_path }}/cert.pem"
+    csr_path: "{{ output_path }}/cert.csr"
+    privatekey_path: "{{ output_path }}/cert.key"
+    provider: selfsigned

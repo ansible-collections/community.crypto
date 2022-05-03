@@ -1,0 +1,13 @@
+---
+- name: Generate key with OpenSSH binary backend
+  community.crypto.openssh_keypair:
+    path: "{{ output_path }}/openssh-key-1"
+    size: 2048
+    backend: opensshbin
+
+- name: Generate key with cryptography backend
+  community.crypto.openssh_keypair:
+    path: "{{ output_path }}/openssh-key-2"
+    size: 2048
+    backend: cryptography
+  when: cryptography_version.stdout is ansible.builtin.version('3.0', '>=')

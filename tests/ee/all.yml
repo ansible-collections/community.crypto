@@ -1,0 +1,34 @@
+- hosts: localhost
+  tasks:
+    - name: Register cryptography version
+      command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+      register: cryptography_version
+
+    - name: Determine output directory
+      set_fact:
+        output_path: "{{ 'output-%0x' % ((2**32) | random) }}"
+
+    - name: Find all roles
+      ansible.builtin.find:
+        paths:
+          - "{{ (playbook_dir | default('.')) ~ '/roles' }}"
+        file_type: directory
+        depth: 1
+      register: result
+
+    - name: Create output directory
+      ansible.builtin.file:
+        path: "{{ output_path }}"
+        state: directory
+
+    - block:
+      - name: Include all roles
+        ansible.builtin.include_role:
+          name: "{{ item }}"
+        loop: "{{ result.files | map(attribute='path') | map('regex_replace', '.*/', '') | sort }}"
+
+      always:
+      - name: Remove output directory
+        ansible.builtin.file:
+          path: "{{ output_path }}"
+          state: absent
