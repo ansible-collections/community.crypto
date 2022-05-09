@@ -1,4 +1,0 @@
----
-bugfixes:
-- openssh_* modules - fix exception handling to report traceback to users for
-  enhanced traceability (https://github.com/ansible-collections/community.crypto/pull/417).

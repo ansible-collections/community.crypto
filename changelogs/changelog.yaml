@@ -595,6 +595,22 @@ releases:
     - 1.9.13.yml
     - 410-luks_device-lsblk-parsing.yml
     release_date: '2022-03-04'
+  1.9.14:
+    changes:
+      bugfixes:
+      - Make collection more robust when PyOpenSSL is used with an incompatible cryptography
+        version (https://github.com/ansible-collections/community.crypto/pull/446).
+      - openssh_* modules - fix exception handling to report traceback to users for
+        enhanced traceability (https://github.com/ansible-collections/community.crypto/pull/417).
+      - x509_crl - fix crash when ``issuer`` for a revoked certificate is specified
+        (https://github.com/ansible-collections/community.crypto/pull/441).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 1.9.14.yml
+    - 417-openssh_modules-fix-exception-reporting.yml
+    - 441-x509-crl-cert-issuer.yml
+    - 446-fix.yml
+    release_date: '2022-05-09'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
