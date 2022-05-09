@@ -1,0 +1,4 @@
+minor_changes:
+  - "openssl_pkcs12 - allow to provide the private key as text instead of having to read it from a file.
+     This allows to store the private key in an encrypted form, for example in Ansible Vault
+     (https://github.com/ansible-collections/community.crypto/pull/452)."

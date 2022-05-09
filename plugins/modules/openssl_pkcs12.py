@@ -92,7 +92,14 @@ options:
     privatekey_path:
         description:
             - File to read private key from.
+            - Mutually exclusive with I(privatekey_content).
         type: path
+    privatekey_content:
+        description:
+            - Content of the private key file.
+            - Mutually exclusive with I(privatekey_path).
+        type: str
+        version_added: "2.3.0"
     state:
         description:
             - Whether the file should exist or not.
@@ -160,7 +167,7 @@ EXAMPLES = r'''
     action: export
     path: /opt/certs/ansible.p12
     friendly_name: raclette
-    privatekey_path: /opt/certs/keys/key.pem
+    privatekey_content: '{{ private_key_contents }}'
     certificate_path: /opt/certs/cert.pem
     other_certificates_parse_all: true
     other_certificates:
@@ -328,6 +335,7 @@ class Pkcs(OpenSSLObject):
         self.pkcs12 = None
         self.privatekey_passphrase = module.params['privatekey_passphrase']
         self.privatekey_path = module.params['privatekey_path']
+        self.privatekey_content = module.params['privatekey_content']
         self.pkcs12_bytes = None
         self.return_content = module.params['return_content']
         self.src = module.params['src']
@@ -337,6 +345,15 @@ class Pkcs(OpenSSLObject):
 
         self.backup = module.params['backup']
         self.backup_file = None
+
+        if self.privatekey_path is not None:
+            try:
+                with open(self.privatekey_path, 'rb') as fh:
+                    self.privatekey_content = fh.read()
+            except (IOError, OSError) as exc:
+                raise PkcsError(exc)
+        elif self.privatekey_content is not None:
+            self.privatekey_content = to_bytes(self.privatekey_content)
 
         if self.other_certificates:
             if self.other_certificates_parse_all:
@@ -382,7 +399,7 @@ class Pkcs(OpenSSLObject):
         def _check_pkey_passphrase():
             if self.privatekey_passphrase:
                 try:
-                    load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
+                    load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend)
                 except OpenSSLObjectError:
                     return False
             return True
@@ -397,11 +414,11 @@ class Pkcs(OpenSSLObject):
                 pkcs12_privatekey, pkcs12_certificate, pkcs12_other_certificates, pkcs12_friendly_name = self.parse()
             except OpenSSLObjectError:
                 return False
-            if (pkcs12_privatekey is not None) and (self.privatekey_path is not None):
+            if (pkcs12_privatekey is not None) and (self.privatekey_content is not None):
                 expected_pkey = self._dump_privatekey(self.pkcs12)
                 if pkcs12_privatekey != expected_pkey:
                     return False
-            elif bool(pkcs12_privatekey) != bool(self.privatekey_path):
+            elif bool(pkcs12_privatekey) != bool(self.privatekey_content):
                 return False
 
             if (pkcs12_certificate is not None) and (self.certificate_path is not None):
@@ -504,10 +521,10 @@ class PkcsPyOpenSSL(Pkcs):
         if self.friendly_name:
             self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
 
-        if self.privatekey_path:
+        if self.privatekey_content:
             try:
                 self.pkcs12.set_privatekey(
-                    load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend))
+                    load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend))
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
@@ -558,9 +575,9 @@ class PkcsCryptography(Pkcs):
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
         pkey = None
-        if self.privatekey_path:
+        if self.privatekey_content:
             try:
-                pkey = load_privatekey(self.privatekey_path, self.privatekey_passphrase, backend=self.backend)
+                pkey = load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend)
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
@@ -683,6 +700,7 @@ def main():
         path=dict(type='path', required=True),
         privatekey_passphrase=dict(type='str', no_log=True),
         privatekey_path=dict(type='path'),
+        privatekey_content=dict(type='str', no_log=True),
         state=dict(type='str', default='present', choices=['absent', 'present']),
         src=dict(type='path'),
         backup=dict(type='bool', default=False),
@@ -694,10 +712,15 @@ def main():
         ['action', 'parse', ['src']],
     ]
 
+    mutually_exclusive = [
+        ['privatekey_path', 'privatekey_content'],
+    ]
+
     module = AnsibleModule(
         add_file_common_args=True,
         argument_spec=argument_spec,
         required_if=required_if,
+        mutually_exclusive=mutually_exclusive,
         supports_check_mode=True,
     )
 
