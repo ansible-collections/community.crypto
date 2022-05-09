@@ -811,3 +811,56 @@ releases:
     - 2.2.4.yml
     - 417-openssh_modules-fix-exception-reporting.yml
     release_date: '2022-03-22'
+  2.3.0:
+    changes:
+      bugfixes:
+      - Make collection more robust when PyOpenSSL is used with an incompatible cryptography
+        version (https://github.com/ansible-collections/community.crypto/pull/445).
+      - x509_crl - fix crash when ``issuer`` for a revoked certificate is specified
+        (https://github.com/ansible-collections/community.crypto/pull/441).
+      minor_changes:
+      - Prepare collection for inclusion in an Execution Environment by declaring
+        its dependencies. Please note that system packages are used for cryptography
+        and PyOpenSSL, which can be rather limited. If you need features from newer
+        cryptography versions, you will have to manually force a newer version to
+        be installed by pip by specifying something like ``cryptography >= 37.0.0``
+        in your Execution Environment's Python dependencies file (https://github.com/ansible-collections/community.crypto/pull/440).
+      - Support automatic conversion for Internalionalized Domain Names (IDNs). When
+        passing general names, for example Subject Altenative Names to ``community.crypto.openssl_csr``,
+        these will automatically be converted to IDNA. Conversion will be done per
+        label to IDNA2008 if possible, and IDNA2003 if IDNA2008 conversion fails for
+        that label. Note that IDNA conversion requires `the Python idna library <https://pypi.org/project/idna/>`_
+        to be installed. Please note that depending on which versions of the cryptography
+        library are used, it could try to process the converted IDNA another time
+        with the Python ``idna`` library and reject IDNA2003 encoded values. Using
+        a new enough ``cryptography`` version avoids this (https://github.com/ansible-collections/community.crypto/issues/426,
+        https://github.com/ansible-collections/community.crypto/pull/436).
+      - acme_* modules - add parameter ``request_timeout`` to manage HTTP(S) request
+        timeout (https://github.com/ansible-collections/community.crypto/issues/447,
+        https://github.com/ansible-collections/community.crypto/pull/448).
+      - luks_devices - added ``perf_same_cpu_crypt``, ``perf_submit_from_crypt_cpus``,
+        ``perf_no_read_workqueue``, ``perf_no_write_workqueue`` for performance tuning
+        when opening LUKS2 containers (https://github.com/ansible-collections/community.crypto/issues/427).
+      - luks_devices - added ``persistent`` option when opening LUKS2 containers (https://github.com/ansible-collections/community.crypto/pull/434).
+      - openssl_csr_info - add ``name_encoding`` option to control the encoding (IDNA,
+        Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436).
+      - openssl_pkcs12 - allow to provide the private key as text instead of having
+        to read it from a file. This allows to store the private key in an encrypted
+        form, for example in Ansible Vault (https://github.com/ansible-collections/community.crypto/pull/452).
+      - x509_certificate_info - add ``name_encoding`` option to control the encoding
+        (IDNA, Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436).
+      - x509_crl - add ``name_encoding`` option to control the encoding (IDNA, Unicode)
+        used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436).
+      - x509_crl_info - add ``name_encoding`` option to control the encoding (IDNA,
+        Unicode) used to return domain names in general names (https://github.com/ansible-collections/community.crypto/pull/436).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 2.3.0.yml
+    - 434-add-persistent-and-perf-options.yml
+    - 436-idns.yml
+    - 440-ee.yml
+    - 441-x509-crl-cert-issuer.yml
+    - 445-fix.yml
+    - 448-acme-request-timeouts.yml
+    - 452-openssl_pkcs12-private-key-content.yml
+    release_date: '2022-05-09'
