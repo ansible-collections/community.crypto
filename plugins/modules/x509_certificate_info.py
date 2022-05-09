@@ -62,6 +62,9 @@ options:
         default: auto
         choices: [ auto, cryptography ]
 
+extends_documentation_fragment:
+    - community.crypto.name_encoding
+
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
@@ -168,7 +171,9 @@ key_usage_critical:
     returned: success
     type: bool
 subject_alt_name:
-    description: Entries in the C(subject_alt_name) extension, or C(none) if extension is not present.
+    description:
+        - Entries in the C(subject_alt_name) extension, or C(none) if extension is not present.
+        - See I(name_encoding) for how IDNs are handled.
     returned: success
     type: list
     elements: str
@@ -355,6 +360,7 @@ authority_cert_issuer:
     description:
         - The certificate's authority cert issuer as a list of general names.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
+        - See I(name_encoding) for how IDNs are handled.
     returned: success
     type: list
     elements: str
@@ -397,6 +403,7 @@ def main():
             path=dict(type='path'),
             content=dict(type='str'),
             valid_at=dict(type='dict'),
+            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
         required_one_of=(

@@ -242,6 +242,7 @@ options:
 
 extends_documentation_fragment:
     - files
+    - community.crypto.name_encoding
 
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
@@ -297,6 +298,7 @@ issuer:
     description:
         - The CRL's issuer.
         - Note that for repeated values, only the last one will be returned.
+        - See I(name_encoding) for how IDNs are handled.
     returned: success
     type: dict
     sample: '{"organizationName": "Ansible", "commonName": "ca.example.com"}'
@@ -336,7 +338,9 @@ revoked_certificates:
             type: str
             sample: 20190413202428Z
         issuer:
-            description: The certificate's issuer.
+            description:
+                - The certificate's issuer.
+                - See I(name_encoding) for how IDNs are handled.
             type: list
             elements: str
             sample: '["DNS:ca.example.org"]'
@@ -405,6 +409,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_decode_name,
     cryptography_get_name,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
@@ -468,6 +473,7 @@ class CRL(OpenSSLObject):
         self.update = module.params['mode'] == 'update'
         self.ignore_timestamps = module.params['ignore_timestamps']
         self.return_content = module.params['return_content']
+        self.name_encoding = module.params['name_encoding']
         self.crl_content = None
 
         self.privatekey_path = module.params['privatekey_path']
@@ -595,11 +601,20 @@ class CRL(OpenSSLObject):
         super(CRL, self).remove(self.module)
 
     def _compress_entry(self, entry):
+        issuer = None
+        if entry['issuer'] is not None:
+            # Normalize to IDNA. If this is used-provided, it was already converted to
+            # IDNA (by cryptography_get_name) and thus the `idna` library is present.
+            # If this is coming from cryptography and isn't already in IDNA (i.e. ascii),
+            # cryptography < 2.1 must be in use, which depends on `idna`. So this should
+            # not require `idna` except if it was already used by code earlier during
+            # this invocation.
+            issuer = tuple(cryptography_decode_name(issuer, idn_rewrite='idna') for issuer in entry['issuer'])
         if self.ignore_timestamps:
             # Throw out revocation_date
             return (
                 entry['serial_number'],
-                tuple(entry['issuer']) if entry['issuer'] is not None else None,
+                issuer,
                 entry['issuer_critical'],
                 entry['reason'],
                 entry['reason_critical'],
@@ -610,7 +625,7 @@ class CRL(OpenSSLObject):
             return (
                 entry['serial_number'],
                 entry['revocation_date'],
-                tuple(entry['issuer']) if entry['issuer'] is not None else None,
+                issuer,
                 entry['issuer_critical'],
                 entry['reason'],
                 entry['reason_critical'],
@@ -765,7 +780,7 @@ class CRL(OpenSSLObject):
                 result['issuer'][k] = v
             result['revoked_certificates'] = []
             for entry in self.revoked_certificates:
-                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry, idn_rewrite=self.name_encoding))
         elif self.crl:
             result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
             result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
@@ -780,7 +795,7 @@ class CRL(OpenSSLObject):
             result['revoked_certificates'] = []
             for cert in self.crl:
                 entry = cryptography_decode_revoked_certificate(cert)
-                result['revoked_certificates'].append(cryptography_dump_revoked(entry))
+                result['revoked_certificates'].append(cryptography_dump_revoked(entry, idn_rewrite=self.name_encoding))
 
         if self.return_content:
             result['crl'] = self.crl_content
@@ -836,6 +851,7 @@ def main():
                 required_one_of=[['path', 'content', 'serial_number']],
                 mutually_exclusive=[['path', 'content', 'serial_number']],
             ),
+            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
         ),
         required_if=[
             ('state', 'present', ['privatekey_path', 'privatekey_content'], True),

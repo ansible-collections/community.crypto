@@ -207,6 +207,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
     def __init__(self, module, content):
         super(CertificateInfoRetrievalCryptography, self).__init__(module, 'cryptography', content)
+        self.name_encoding = module.params.get('name_encoding', 'ignore')
 
     def _get_der_bytes(self):
         return self.cert.public_bytes(serialization.Encoding.DER)
@@ -309,7 +310,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     def _get_subject_alt_name(self):
         try:
             san_ext = self.cert.extensions.get_extension_for_class(x509.SubjectAlternativeName)
-            result = [cryptography_decode_name(san) for san in san_ext.value]
+            result = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in san_ext.value]
             return result, san_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -341,7 +342,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             ext = self.cert.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
             issuer = None
             if ext.value.authority_cert_issuer is not None:
-                issuer = [cryptography_decode_name(san) for san in ext.value.authority_cert_issuer]
+                issuer = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in ext.value.authority_cert_issuer]
             return ext.value.key_identifier, issuer, ext.value.authority_cert_serial_number
         except cryptography.x509.ExtensionNotFound:
             return None, None, None

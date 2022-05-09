@@ -23,8 +23,11 @@ import base64
 import binascii
 import re
 import sys
+import traceback
 
 from ansible.module_utils.common.text.converters import to_text, to_bytes
+from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse, ParseResult
+
 from ._asn1 import serialize_asn1_string_as_der
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
@@ -79,6 +82,16 @@ try:
 except ImportError:
     # Error handled in the calling module.
     _load_pkcs12 = None
+
+try:
+    import idna
+
+    HAS_IDNA = True
+except ImportError:
+    HAS_IDNA = False
+    IDNA_IMP_ERROR = traceback.format_exc()
+
+from ansible.module_utils.basic import missing_required_lib
 
 from .basic import (
     CRYPTOGRAPHY_HAS_DSA_SIGN,
@@ -359,6 +372,80 @@ def cryptography_parse_relative_distinguished_name(rdn):
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
+def _is_ascii(value):
+    '''Check whether the Unicode string `value` contains only ASCII characters.'''
+    try:
+        value.encode("ascii")
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
+def _adjust_idn(value, idn_rewrite):
+    if idn_rewrite == 'ignore' or not value:
+        return value
+    if idn_rewrite == 'idna' and _is_ascii(value):
+        return value
+    if idn_rewrite not in ('idna', 'unicode'):
+        raise ValueError('Invalid value for idn_rewrite: "{0}"'.format(idn_rewrite))
+    if not HAS_IDNA:
+        raise OpenSSLObjectError(
+            missing_required_lib('idna', reason='to transform {what} DNS name "{name}" to {dest}'.format(
+                name=value,
+                what='IDNA' if idn_rewrite == 'unicode' else 'Unicode',
+                dest='Unicode' if idn_rewrite == 'unicode' else 'IDNA',
+            )))
+    # Since IDNA does not like '*' or empty labels (except one empty label at the end),
+    # we split and let IDNA only handle labels that are neither empty or '*'.
+    parts = value.split(u'.')
+    for index, part in enumerate(parts):
+        if part in (u'', u'*'):
+            continue
+        try:
+            if idn_rewrite == 'idna':
+                parts[index] = idna.encode(part).decode('ascii')
+            elif idn_rewrite == 'unicode' and part.startswith(u'xn--'):
+                parts[index] = idna.decode(part)
+        except idna.IDNAError as exc2008:
+            try:
+                if idn_rewrite == 'idna':
+                    parts[index] = part.encode('idna').decode('ascii')
+                elif idn_rewrite == 'unicode' and part.startswith(u'xn--'):
+                    parts[index] = part.encode('ascii').decode('idna')
+            except Exception as exc2003:
+                raise OpenSSLObjectError(
+                    u'Error while transforming part "{part}" of {what} DNS name "{name}" to {dest}.'
+                    u' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'.format(
+                        part=part,
+                        name=value,
+                        what='IDNA' if idn_rewrite == 'unicode' else 'Unicode',
+                        dest='Unicode' if idn_rewrite == 'unicode' else 'IDNA',
+                        exc2003=exc2003,
+                        exc2008=exc2008,
+                    ))
+    return u'.'.join(parts)
+
+
+def _adjust_idn_email(value, idn_rewrite):
+    idx = value.find(u'@')
+    if idx < 0:
+        return value
+    return u'{0}@{1}'.format(value[:idx], _adjust_idn(value[idx + 1:], idn_rewrite))
+
+
+def _adjust_idn_url(value, idn_rewrite):
+    url = urlparse(value)
+    host = _adjust_idn(url.hostname, idn_rewrite)
+    if url.username is not None and url.password is not None:
+        host = u'{0}:{1}@{2}'.format(url.username, url.password, host)
+    elif url.username is not None:
+        host = u'{0}@{1}'.format(url.username, host)
+    if url.port is not None:
+        host = u'{0}:{1}'.format(host, url.port)
+    return urlunparse(
+        ParseResult(scheme=url.scheme, netloc=host, path=url.path, params=url.params, query=url.query, fragment=url.fragment))
+
+
 def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
     Given a name string, returns a cryptography x509.GeneralName object.
@@ -366,16 +453,16 @@ def cryptography_get_name(name, what='Subject Alternative Name'):
     '''
     try:
         if name.startswith('DNS:'):
-            return x509.DNSName(to_text(name[4:]))
+            return x509.DNSName(_adjust_idn(to_text(name[4:]), 'idna'))
         if name.startswith('IP:'):
             address = to_text(name[3:])
             if '/' in address:
                 return x509.IPAddress(ipaddress.ip_network(address))
             return x509.IPAddress(ipaddress.ip_address(address))
         if name.startswith('email:'):
-            return x509.RFC822Name(to_text(name[6:]))
+            return x509.RFC822Name(_adjust_idn_email(to_text(name[6:]), 'idna'))
         if name.startswith('URI:'):
-            return x509.UniformResourceIdentifier(to_text(name[4:]))
+            return x509.UniformResourceIdentifier(_adjust_idn_url(to_text(name[4:]), 'idna'))
         if name.startswith('RID:'):
             m = re.match(r'^([0-9]+(?:\.[0-9]+)*)$', to_text(name[4:]))
             if not m:
@@ -422,21 +509,23 @@ def _dn_escape_value(value):
     return value
 
 
-def cryptography_decode_name(name):
+def cryptography_decode_name(name, idn_rewrite='ignore'):
     '''
     Given a cryptography x509.GeneralName object, returns a string.
     Raises an OpenSSLObjectError if the name is not supported.
     '''
+    if idn_rewrite not in ('ignore', 'idna', 'unicode'):
+        raise AssertionError('idn_rewrite must be one of "ignore", "idna", or "unicode"')
     if isinstance(name, x509.DNSName):
-        return u'DNS:{0}'.format(name.value)
+        return u'DNS:{0}'.format(_adjust_idn(name.value, idn_rewrite))
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
             return u'IP:{0}/{1}'.format(name.value.network_address.compressed, name.value.prefixlen)
         return u'IP:{0}'.format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
-        return u'email:{0}'.format(name.value)
+        return u'email:{0}'.format(_adjust_idn_email(name.value, idn_rewrite))
     if isinstance(name, x509.UniformResourceIdentifier):
-        return u'URI:{0}'.format(name.value)
+        return u'URI:{0}'.format(_adjust_idn_url(name.value, idn_rewrite))
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas

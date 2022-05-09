@@ -174,6 +174,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     """Validate the supplied CSR, using the cryptography backend"""
     def __init__(self, module, content, validate_signature):
         super(CSRInfoRetrievalCryptography, self).__init__(module, 'cryptography', content, validate_signature)
+        self.name_encoding = module.params.get('name_encoding', 'ignore')
 
     def _get_subject_ordered(self):
         result = []
@@ -256,7 +257,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def _get_subject_alt_name(self):
         try:
             san_ext = self.csr.extensions.get_extension_for_class(x509.SubjectAlternativeName)
-            result = [cryptography_decode_name(san) for san in san_ext.value]
+            result = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in san_ext.value]
             return result, san_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -264,8 +265,8 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def _get_name_constraints(self):
         try:
             nc_ext = self.csr.extensions.get_extension_for_class(x509.NameConstraints)
-            permitted = [cryptography_decode_name(san) for san in nc_ext.value.permitted_subtrees or []]
-            excluded = [cryptography_decode_name(san) for san in nc_ext.value.excluded_subtrees or []]
+            permitted = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in nc_ext.value.permitted_subtrees or []]
+            excluded = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in nc_ext.value.excluded_subtrees or []]
             return permitted, excluded, nc_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, None, False
@@ -291,7 +292,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
             ext = self.csr.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
             issuer = None
             if ext.value.authority_cert_issuer is not None:
-                issuer = [cryptography_decode_name(san) for san in ext.value.authority_cert_issuer]
+                issuer = [cryptography_decode_name(san, idn_rewrite=self.name_encoding) for san in ext.value.authority_cert_issuer]
             return ext.value.key_identifier, issuer, ext.value.authority_cert_serial_number
         except cryptography.x509.ExtensionNotFound:
             return None, None, None

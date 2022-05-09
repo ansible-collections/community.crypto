@@ -4,6 +4,11 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Make sure the Python idna library is installed
+  pip:
+    name: idna
+    state: present
+
 - name: Generate privatekey
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -67,7 +72,9 @@
       - biometricInfo
     subject_alt_name:
       - "DNS:www.ansible.com"
-      - "DNS:{{ 'öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h' }}.com"
+      - "DNS:öç.com"
+      # cryptography < 2.1 cannot handle certain Unicode characters
+      - "DNS:{{ 'www.öç' if cryptography_version.stdout is version('2.1', '<') else '☺' }}.com"
       - "IP:1.2.3.4"
       - "IP:::1"
       - "email:test@example.org"

@@ -40,6 +40,9 @@ options:
         default: true
         version_added: 1.7.0
 
+extends_documentation_fragment:
+    - community.crypto.name_encoding
+
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
@@ -76,6 +79,7 @@ issuer:
     description:
         - The CRL's issuer.
         - Note that for repeated values, only the last one will be returned.
+        - See I(name_encoding) for how IDNs are handled.
     returned: success
     type: dict
     sample: '{"organizationName": "Ansible", "commonName": "ca.example.com"}'
@@ -115,7 +119,9 @@ revoked_certificates:
             type: str
             sample: 20190413202428Z
         issuer:
-            description: The certificate's issuer.
+            description:
+                - The certificate's issuer.
+                - See I(name_encoding) for how IDNs are handled.
             type: list
             elements: str
             sample: '["DNS:ca.example.org"]'
@@ -173,6 +179,7 @@ def main():
             path=dict(type='path'),
             content=dict(type='str'),
             list_revoked_certificates=dict(type='bool', default=True),
+            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
         ),
         required_one_of=(
             ['path', 'content'],
