@@ -25,4 +25,6 @@ options:
             - ignore
             - idna
             - unicode
+requirements:
+    - If I(name_encoding) is set to another value than C(ignore), the L(idna Python library,https://pypi.org/project/idna/) needs to be installed.
 '''
