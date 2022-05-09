@@ -96,10 +96,11 @@ options:
          U(https://api.buypass.com/acme/directory)."
       - "For B(ZeroSSL), the production directory URL for ACME v2 is
          U(https://acme.zerossl.com/v2/DV90)."
-      - "B(Warning:) So far, the ACME modules have only been tested against Let's Encrypt
-         (staging and production), Buypass (staging and production), ZeroSSL (production),
-         and L(Pebble testing server,https://github.com/letsencrypt/Pebble). If you
-         experience problems with another ACME server, please
+      - "B(Warning:) So far, the ACME modules have only been tested by the developers against
+         Let's Encrypt (staging and production), Buypass (staging and production), ZeroSSL (production),
+         and L(Pebble testing server,https://github.com/letsencrypt/Pebble). We have got
+         community feedback that they also work with Sectigo ACME Service for InCommon."
+      - "If you experience problems with another ACME server, please
          L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
          to help us supporting it. Feedback that an ACME server not mentioned does work
          is also appreciated."
