@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.3.1
+======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+Bugfixes
+--------
+
+- Include ``PSF-license.txt`` file for ``plugins/module_utils/_version.py``.
+
 v2.3.0
 ======
 

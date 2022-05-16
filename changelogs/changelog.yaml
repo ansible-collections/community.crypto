@@ -864,3 +864,12 @@ releases:
     - 448-acme-request-timeouts.yml
     - 452-openssl_pkcs12-private-key-content.yml
     release_date: '2022-05-09'
+  2.3.1:
+    changes:
+      bugfixes:
+      - Include ``PSF-license.txt`` file for ``plugins/module_utils/_version.py``.
+      release_summary: Maintenance release.
+    fragments:
+    - 2.3.1.yml
+    - psf-license.yml
+    release_date: '2022-05-16'
