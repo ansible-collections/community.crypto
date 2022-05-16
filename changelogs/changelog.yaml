@@ -611,6 +611,15 @@ releases:
     - 441-x509-crl-cert-issuer.yml
     - 446-fix.yml
     release_date: '2022-05-09'
+  1.9.15:
+    changes:
+      bugfixes:
+      - Include ``PSF-license.txt`` file for ``plugins/module_utils/_version.py``.
+      release_summary: Maintenance release.
+    fragments:
+    - 1.9.15.yml
+    - psf-license.yml
+    release_date: '2022-05-16'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
