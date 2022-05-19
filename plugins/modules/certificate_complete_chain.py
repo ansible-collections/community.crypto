@@ -133,6 +133,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
+    import cryptography.exceptions
     import cryptography.hazmat.backends
     import cryptography.hazmat.primitives.serialization
     import cryptography.hazmat.primitives.asymmetric.rsa
@@ -189,6 +190,9 @@ def is_parent(module, cert, potential_parent):
             return False
         return True
     except cryptography.exceptions.InvalidSignature as dummy:
+        return False
+    except cryptography.exceptions.UnsupportedAlgorithm as dummy:
+        modlue.warn('Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm))
         return False
     except Exception as e:
         module.fail_json(msg='Unknown error on signature validation: {0}'.format(e))
