@@ -192,7 +192,7 @@ def is_parent(module, cert, potential_parent):
     except cryptography.exceptions.InvalidSignature as dummy:
         return False
     except cryptography.exceptions.UnsupportedAlgorithm as dummy:
-        modlue.warn('Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm))
+        module.warn('Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm))
         return False
     except Exception as e:
         module.fail_json(msg='Unknown error on signature validation: {0}'.format(e))
