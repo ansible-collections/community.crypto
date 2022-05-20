@@ -1,3 +1,1 @@
 has_pyopenssl: true
-pyopenssl_version:
-  stdout: 0.0.0
