@@ -130,11 +130,11 @@
 
 - name: Check failure when infinite loop is found
   certificate_complete_chain:
-    input_chain: '{{ lookup("file", "cert2-fullchain.pem", rstrip=True) }}'
+    input_chain: '{{ lookup("file", "cert1-fullchain.pem", rstrip=True) }}'
     intermediate_certificates:
     - '{{ remote_tmp_dir }}/files/roots.pem'
     root_certificates:
-    - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
+    - '{{ remote_tmp_dir }}/files/cert2-chain.pem'
   register: cert2_infinite_loop
   ignore_errors: true
 - name: Verify failure

@@ -9,19 +9,31 @@
   block:
 
   - name: Include OS-specific variables
-    include_vars: '{{ ansible_os_family }}.yml'
+    include_vars: '{{ lookup("first_found", search) }}'
+    vars:
+      search:
+        files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        paths:
+        - vars
 
-  - name: Install pyOpenSSL (Python 3 from system packages)
-    become: true
-    package:
-      name: '{{ pyopenssl_package_name_python3 }}'
-    when: ansible_python_version is version('3.0', '>=')
+  - when: has_pyopenssl
+    block:
 
-  - name: Install pyOpenSSL (Python 2 from system packages)
-    become: true
-    package:
-      name: '{{ pyopenssl_package_name }}'
-    when: ansible_python_version is version('3.0', '<')
+    - name: Install pyOpenSSL (Python 3 from system packages)
+      become: true
+      package:
+        name: '{{ pyopenssl_package_name_python3 }}'
+      when: ansible_python_version is version('3.0', '>=')
+
+    - name: Install pyOpenSSL (Python 2 from system packages)
+      become: true
+      package:
+        name: '{{ pyopenssl_package_name }}'
+      when: ansible_python_version is version('3.0', '<')
 
 - name: Install from PyPi
   when: ansible_os_family == "Darwin" or not target_system_python
@@ -34,14 +46,17 @@
       state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
       extra_args: "-c {{ remote_constraints }}"
 
-- name: Register pyOpenSSL version
-  command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
-  register: pyopenssl_version
+- when: has_pyopenssl
+  block:
 
-- name: Register pyOpenSSL debug details
-  command: "{{ ansible_python.executable }} -m OpenSSL.debug"
-  register: pyopenssl_debug_version
-  ignore_errors: yes
+  - name: Register pyOpenSSL version
+    command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
+    register: pyopenssl_version
+
+  - name: Register pyOpenSSL debug details
+    command: "{{ ansible_python.executable }} -m OpenSSL.debug"
+    register: pyopenssl_debug_version
+    ignore_errors: yes
 
 # Depending on which pyOpenSSL version has been installed, it could be that cryptography has
 # been upgraded to a newer version. Make sure to register cryptography_version another time here
