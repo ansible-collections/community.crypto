@@ -1,0 +1,2 @@
+bugfixes:
+  - "certificate_complete_chain - do not stop execution if an unsupported signature algorithm is encountered; warn instead (https://github.com/ansible-collections/community.crypto/pull/457)."
