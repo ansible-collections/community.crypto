@@ -63,13 +63,13 @@
         valid_from: always
         valid_to: forever
       register: second_signature_algorithm
-      when: openssh_version is version("8.7", "<")
+      when: openssh_version is version("8.7", "!=")
 
     - name: Assert second signature algorithm update causes change
       assert:
         that:
           - second_signature_algorithm is changed
-      when: openssh_version is version("8.7", "<")
+      when: openssh_version is version("8.7", "!=")
 
     - name: Omit signature algorithm
       openssh_cert:
