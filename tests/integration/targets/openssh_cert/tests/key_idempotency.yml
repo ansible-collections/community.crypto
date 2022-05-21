@@ -53,21 +53,25 @@
         that:
           - updated_signature_algorithm_idempotent is not changed
 
-    - name: Generate cert with original signature algorithm
-      openssh_cert:
-        type: user
-        path: "{{ certificate_path }}"
-        public_key: "{{ public_key }}"
-        signing_key: "{{ signing_key }}"
-        signature_algorithm: ssh-rsa
-        valid_from: always
-        valid_to: forever
-      register: second_signature_algorithm
+    - block:
+      - name: Generate cert with original signature algorithm
+        openssh_cert:
+          type: user
+          path: "{{ certificate_path }}"
+          public_key: "{{ public_key }}"
+          signing_key: "{{ signing_key }}"
+          signature_algorithm: ssh-rsa
+          valid_from: always
+          valid_to: forever
+        register: second_signature_algorithm
 
-    - name: Assert second signature algorithm update causes change
-      assert:
-        that:
-          - second_signature_algorithm is changed
+      - name: Assert second signature algorithm update causes change
+        assert:
+          that:
+            - second_signature_algorithm is changed
+      # RHEL9 disables SHA-1 algorithms by default making this test fail with a 'libcrypt' error. Other systems which
+      # impose a similar restriction may also need to skip this block in the future.
+      when: not (ansible_facts['distribution'] == "RedHat" and (ansible_facts['distribution_major_version'] | int) >= 9)
 
     - name: Omit signature algorithm
       openssh_cert:
