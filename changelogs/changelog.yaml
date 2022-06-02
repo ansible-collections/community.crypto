@@ -873,3 +873,15 @@ releases:
     - 2.3.1.yml
     - psf-license.yml
     release_date: '2022-05-16'
+  2.3.2:
+    changes:
+      bugfixes:
+      - Include ``simplified_bsd.txt`` license file for the ECS module utils.
+      - certificate_complete_chain - do not stop execution if an unsupported signature
+        algorithm is encountered; warn instead (https://github.com/ansible-collections/community.crypto/pull/457).
+      release_summary: Maintenance and bugfix release.
+    fragments:
+    - 2.3.2.yml
+    - 457-certificate_complete_chain-unsupported-algorithm.yml
+    - simplified-bsd-license.yml
+    release_date: '2022-06-02'
