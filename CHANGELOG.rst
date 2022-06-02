@@ -5,6 +5,20 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.16
+=======
+
+Release Summary
+---------------
+
+Maintenance and bugfix release.
+
+Bugfixes
+--------
+
+- Include ``simplified_bsd.txt`` license file for the ECS module utils.
+- certificate_complete_chain - do not stop execution if an unsupported signature algorithm is encountered; warn instead (https://github.com/ansible-collections/community.crypto/pull/457).
+
 v1.9.15
 =======
 
