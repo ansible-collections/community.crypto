@@ -260,8 +260,8 @@ stages:
         parameters:
           testFormat: 2.12/{0}/1
           targets:
-            - name: macOS 11.1
-              test: macos/11.1
+            # - name: macOS 11.1
+            #   test: macos/11.1
             - name: RHEL 8.4
               test: rhel/8.4
   - stage: Remote_2_11
@@ -286,8 +286,8 @@ stages:
           targets:
             - name: OS X 10.11
               test: osx/10.11
-            - name: macOS 10.15
-              test: macos/10.15
+            # - name: macOS 10.15
+            #   test: macos/10.15
   - stage: Remote_2_9
     displayName: Remote 2.9
     dependsOn: []
