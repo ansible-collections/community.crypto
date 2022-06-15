@@ -1,3 +1,9 @@
+# This code is part of Ansible, but is an independent component.
+# This particular file snippet, and this file snippet only, is licensed under the
+# Apache 2.0 License. Modules you write using this snippet, which is embedded
+# dynamically by Ansible, still belong to the author of the module, and may assign
+# their own license to the complete work.
+
 # This excerpt is dual licensed under the terms of the Apache License, Version
 # 2.0, and the BSD License. See the LICENSE file at
 # https://github.com/pyca/cryptography/blob/master/LICENSE for complete details.
