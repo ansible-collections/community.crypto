@@ -1,0 +1,2 @@
+bugfixes:
+  - "Include ``Apache-2.0.txt`` file for ``plugins/module_utils/crypto/_obj2txt.py`` and ``plugins/module_utils/crypto/_objects_data.py``."

@@ -5,7 +5,7 @@
 # In case the following data structure has any copyrightable content, note that it is licensed as follows:
 # Copyright (c) the OpenSSL contributors
 # Licensed under the Apache License 2.0
-# https://github.com/openssl/openssl/blob/master/LICENSE
+# https://github.com/openssl/openssl/blob/master/LICENSE.txt or Apache-2.0.txt
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
