@@ -177,3 +177,23 @@
           "URI:http://gefäß.org",
           "URI:http://a:b@ä:1",
         ])
+
+- name: Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)
+  assert:
+    that:
+      - ed25519_ed448_crl.results[0] is failed
+      - ed25519_ed448_crl.results[1] is failed
+      - ed25519_ed448_crl_idempotence.results[0] is failed
+      - ed25519_ed448_crl_idempotence.results[1] is failed
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=') and cryptography_version.stdout is version('2.8', '<') and ed25519_ed448_privatekey is not failed
+
+- name: Verify Ed25519 and Ed448 tests (for cryptography >= 2.8)
+  assert:
+    that:
+      - ed25519_ed448_crl is succeeded
+      - ed25519_ed448_crl.results[0] is changed
+      - ed25519_ed448_crl.results[1] is changed
+      - ed25519_ed448_crl_idempotence is succeeded
+      - ed25519_ed448_crl_idempotence.results[0] is not changed
+      - ed25519_ed448_crl_idempotence.results[1] is not changed
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.8', '>=') and ed25519_ed448_privatekey is not failed

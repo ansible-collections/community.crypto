@@ -624,3 +624,68 @@
     name_encoding: unicode
     list_revoked_certificates: true
   register: crl_3_info_unicode
+
+- name: Ed25519 and Ed448 tests (for cryptography >= 2.6)
+  block:
+    - name: Generate private keys
+      openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/ca-{{ item }}.key'
+        type: '{{ item }}'
+      loop:
+        - Ed25519
+        - Ed448
+      register: ed25519_ed448_privatekey
+      ignore_errors: yes
+
+    - when: ed25519_ed448_privatekey is not failed
+      block:
+
+        - name: Create CRL
+          x509_crl:
+            path: '{{ remote_tmp_dir }}/ca-crl-{{ item }}.crl'
+            privatekey_path: '{{ remote_tmp_dir }}/ca-{{ item }}.key'
+            issuer:
+              CN: Ansible
+            last_update: 20191013000000Z
+            next_update: 20191113000000Z
+            revoked_certificates:
+              - path: '{{ remote_tmp_dir }}/cert-1.pem'
+                revocation_date: 20191013000000Z
+              - path: '{{ remote_tmp_dir }}/cert-2.pem'
+                revocation_date: 20191013000000Z
+                reason: key_compromise
+                reason_critical: yes
+                invalidity_date: 20191012000000Z
+              - serial_number: 1234
+                revocation_date: 20191001000000Z
+          register: ed25519_ed448_crl
+          loop:
+            - Ed25519
+            - Ed448
+          ignore_errors: yes
+
+        - name: Create CRL (idempotence)
+          x509_crl:
+            path: '{{ remote_tmp_dir }}/ca-crl-{{ item }}.crl'
+            privatekey_path: '{{ remote_tmp_dir }}/ca-{{ item }}.key'
+            issuer:
+              CN: Ansible
+            last_update: 20191013000000Z
+            next_update: 20191113000000Z
+            revoked_certificates:
+              - path: '{{ remote_tmp_dir }}/cert-1.pem'
+                revocation_date: 20191013000000Z
+              - path: '{{ remote_tmp_dir }}/cert-2.pem'
+                revocation_date: 20191013000000Z
+                reason: key_compromise
+                reason_critical: yes
+                invalidity_date: 20191012000000Z
+              - serial_number: 1234
+                revocation_date: 20191001000000Z
+          register: ed25519_ed448_crl_idempotence
+          loop:
+            - Ed25519
+            - Ed448
+          ignore_errors: yes
+
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')

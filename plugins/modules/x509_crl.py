@@ -411,6 +411,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_decode_name,
     cryptography_get_name,
+    cryptography_key_needs_digest_for_signing,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
     cryptography_serial_number_of_cert,
@@ -648,8 +649,12 @@ class CRL(OpenSSLObject):
             return False
         if self.next_update != self.crl.next_update and not self.ignore_timestamps:
             return False
-        if self.digest.name != self.crl.signature_hash_algorithm.name:
-            return False
+        if cryptography_key_needs_digest_for_signing(self.privatekey):
+            if self.crl.signature_hash_algorithm is None or self.digest.name != self.crl.signature_hash_algorithm.name:
+                return False
+        else:
+            if self.crl.signature_hash_algorithm is not None:
+                return False
 
         want_issuer = [(cryptography_name_to_oid(entry[0]), entry[1]) for entry in self.issuer]
         is_issuer = [(sub.oid, sub.value) for sub in self.crl.issuer]
@@ -719,7 +724,10 @@ class CRL(OpenSSLObject):
                 )
             crl = crl.add_revoked_certificate(revoked_cert.build(backend))
 
-        self.crl = crl.sign(self.privatekey, self.digest, backend=backend)
+        digest = None
+        if cryptography_key_needs_digest_for_signing(self.privatekey):
+            digest = self.digest
+        self.crl = crl.sign(self.privatekey, digest, backend=backend)
         if self.format == 'pem':
             return self.crl.public_bytes(Encoding.PEM)
         else:
