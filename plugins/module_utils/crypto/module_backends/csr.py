@@ -345,8 +345,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         if self.name_constraints_permitted or self.name_constraints_excluded:
             try:
                 csr = csr.add_extension(cryptography.x509.NameConstraints(
-                    [cryptography_get_name(name, 'name constraints permitted') for name in self.name_constraints_permitted],
-                    [cryptography_get_name(name, 'name constraints excluded') for name in self.name_constraints_excluded],
+                    [cryptography_get_name(name, 'name constraints permitted') for name in self.name_constraints_permitted] or None,
+                    [cryptography_get_name(name, 'name constraints excluded') for name in self.name_constraints_excluded] or None,
                 ), critical=self.name_constraints_critical)
             except TypeError as e:
                 raise OpenSSLObjectError('Error while parsing name constraint: {0}'.format(e))
@@ -498,8 +498,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
         def _check_nameConstraints(extensions):
             current_nc_ext = _find_extension(extensions, cryptography.x509.NameConstraints)
-            current_nc_perm = [to_text(altname) for altname in current_nc_ext.value.permitted_subtrees] if current_nc_ext else []
-            current_nc_excl = [to_text(altname) for altname in current_nc_ext.value.excluded_subtrees] if current_nc_ext else []
+            current_nc_perm = [to_text(altname) for altname in current_nc_ext.value.permitted_subtrees or []] if current_nc_ext else []
+            current_nc_excl = [to_text(altname) for altname in current_nc_ext.value.excluded_subtrees or []] if current_nc_ext else []
             nc_perm = [to_text(cryptography_get_name(altname, 'name constraints permitted')) for altname in self.name_constraints_permitted]
             nc_excl = [to_text(cryptography_get_name(altname, 'name constraints excluded')) for altname in self.name_constraints_excluded]
             if set(nc_perm) != set(current_nc_perm) or set(nc_excl) != set(current_nc_excl):
