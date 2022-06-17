@@ -2,6 +2,8 @@
 # 2.0, and the BSD License. See the LICENSE file at
 # https://github.com/pyca/cryptography/blob/master/LICENSE for complete details.
 #
+# The Apache 2.0 license has been included as Apache-2.0.txt in this collection.
+#
 # Adapted from cryptography's hazmat/backends/openssl/decode_asn1.py
 #
 # Copyright (c) 2015, 2016 Paul Kehrer (@reaperhulk)
