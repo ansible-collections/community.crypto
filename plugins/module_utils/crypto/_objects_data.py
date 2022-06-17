@@ -1,3 +1,9 @@
+# This code is part of Ansible, but is an independent component.
+# This particular file snippet, and this file snippet only, is licensed under the
+# Apache 2.0 License. Modules you write using this snippet, which is embedded
+# dynamically by Ansible, still belong to the author of the module, and may assign
+# their own license to the complete work.
+
 # This has been extracted from the OpenSSL project's objects.txt:
 #     https://github.com/openssl/openssl/blob/9537fe5757bb07761fa275d779bbd40bcf5530e4/crypto/objects/objects.txt
 # Extracted with https://gist.github.com/felixfontein/376748017ad65ead093d56a45a5bf376
@@ -5,7 +11,7 @@
 # In case the following data structure has any copyrightable content, note that it is licensed as follows:
 # Copyright (c) the OpenSSL contributors
 # Licensed under the Apache License 2.0
-# https://github.com/openssl/openssl/blob/master/LICENSE
+# https://github.com/openssl/openssl/blob/master/LICENSE.txt or Apache-2.0.txt
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
