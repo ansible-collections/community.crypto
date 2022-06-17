@@ -632,6 +632,23 @@ releases:
     - 457-certificate_complete_chain-unsupported-algorithm.yml
     - simplified-bsd-license.yml
     release_date: '2022-06-02'
+  1.9.17:
+    changes:
+      bugfixes:
+      - Include ``Apache-2.0.txt`` file for ``plugins/module_utils/crypto/_obj2txt.py``
+        and ``plugins/module_utils/crypto/_objects_data.py``.
+      - openssl_csr - the module no longer crashes with 'permitted_subtrees/excluded_subtrees
+        must be a non-empty list or None' if only one of ``name_constraints_permitted``
+        and ``name_constraints_excluded`` is provided (https://github.com/ansible-collections/community.crypto/issues/481).
+      - x509_crl - do not crash when signing CRL with Ed25519 or Ed448 keys (https://github.com/ansible-collections/community.crypto/issues/473,
+        https://github.com/ansible-collections/community.crypto/pull/474).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.17.yml
+    - 474-x509_crl-ed25519-ed448.yml
+    - 481-fix-excluded_subtrees-must-be-a-non-empty-list-or-None.yml
+    - apache-license.yml
+    release_date: '2022-06-17'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
