@@ -5,6 +5,23 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.3.4
+======
+
+Release Summary
+---------------
+
+Re-release of what was intended to be 2.3.3.
+
+A mistake during the release process caused the 2.3.3 tag to end up on the
+commit for 1.9.17, which caused the release pipeline to re-publish 1.9.17
+as 2.3.3.
+
+This release is identical to what should have been 2.3.3, except that the
+version number has been bumped to 2.3.4 and this changelog entry for 2.3.4
+has been added.
+
+
 v2.3.3
 ======
 
