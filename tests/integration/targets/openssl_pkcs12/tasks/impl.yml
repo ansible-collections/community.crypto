@@ -45,6 +45,18 @@
       return_content: true
     register: p12_standard_idempotency
 
+  - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (empty other_certificates)"
+    openssl_pkcs12:
+      select_crypto_backend: '{{ select_crypto_backend }}'
+      path: '{{ remote_tmp_dir }}/ansible.p12'
+      friendly_name: abracadabra
+      privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
+      certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+      state: present
+      return_content: true
+      other_certificates: []
+    register: p12_standard_idempotency_no_certs
+
   - name: "({{ select_crypto_backend }}) Read ansible_pkey1.pem"
     slurp:
       src: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
