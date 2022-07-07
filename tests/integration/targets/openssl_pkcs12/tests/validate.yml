@@ -25,6 +25,7 @@
       - p12_dumped is changed
       - p12_standard_idempotency is not changed
       - p12_standard_idempotency_check is not changed
+      - p12_standard_idempotency_no_certs is not changed
       - p12_standard_idempotency_2 is not changed
       - p12_multiple_certs_idempotency is not changed
       - p12_dumped_idempotency is not changed
