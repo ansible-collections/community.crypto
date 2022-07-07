@@ -542,6 +542,8 @@ class PkcsPyOpenSSL(Pkcs):
         return crypto.dump_certificate(crypto.FILETYPE_PEM, cert) if cert else None
 
     def _dump_other_certificates(self, pkcs12):
+        if pkcs12.get_ca_certificates() is None:
+            return []
         return [
             crypto.dump_certificate(crypto.FILETYPE_PEM, other_cert)
             for other_cert in pkcs12.get_ca_certificates()
