@@ -649,6 +649,17 @@ releases:
     - 481-fix-excluded_subtrees-must-be-a-non-empty-list-or-None.yml
     - apache-license.yml
     release_date: '2022-06-17'
+  1.9.18:
+    changes:
+      bugfixes:
+      - openssl_pkcs12 - when using the pyOpenSSL backend, do not crash when trying
+        to read non-existing other certificates (https://github.com/ansible-collections/community.crypto/issues/486,
+        https://github.com/ansible-collections/community.crypto/pull/487).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.18.yml
+    - 487-openssl_pkcs12-other-certs-crash.yml
+    release_date: '2022-07-09'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
