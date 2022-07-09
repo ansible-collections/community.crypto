@@ -924,3 +924,20 @@ releases:
     fragments:
     - 2.3.4.yml
     release_date: '2022-06-21'
+  2.4.0:
+    changes:
+      bugfixes:
+      - openssl_pkcs12 - when using the pyOpenSSL backend, do not crash when trying
+        to read non-existing other certificates (https://github.com/ansible-collections/community.crypto/issues/486,
+        https://github.com/ansible-collections/community.crypto/pull/487).
+      deprecated_features:
+      - Support for Ansible 2.9 and ansible-base 2.10 is deprecated, and will be removed
+        in the next major release (community.crypto 3.0.0). Some modules might still
+        work with these versions afterwards, but we will no longer keep compatibility
+        code that was needed to support them (https://github.com/ansible-collections/community.crypto/pull/460).
+      release_summary: Deprecation and bugfix release. No new features this time.
+    fragments:
+    - 2.4.0.yml
+    - 487-openssl_pkcs12-other-certs-crash.yml
+    - deprecate-ansible-2.9-2.10.yml
+    release_date: '2022-07-09'
