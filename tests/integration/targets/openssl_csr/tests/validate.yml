@@ -132,7 +132,13 @@
       - country_idempotent_3 is not changed
       - country_fail_4 is failed
 
-- name:
+- name: "({{ select_crypto_backend }}) Validate idempotency of privatekey_passphrase"
+  assert:
+    that:
+      - passphrase_1 is changed
+      - passphrase_1_content is not changed
+
+- name: "({{ select_crypto_backend }}) Validate private key passphrase errors"
   assert:
     that:
       - passphrase_error_1 is failed
