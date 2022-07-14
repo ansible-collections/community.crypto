@@ -4,6 +4,11 @@
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
+- name: "({{ select_crypto_backend }}) Read privatekey"
+  slurp:
+    src: '{{ remote_tmp_dir }}/privatekey.pem'
+  register: privatekey
+
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
@@ -28,7 +33,7 @@
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
-    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    privatekey_content: '{{ privatekey.content | b64decode }}'
     subject_ordered:
       - commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -264,6 +269,11 @@
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 
+- name: "({{ select_crypto_backend }}) Read privatekey"
+  slurp:
+    src: '{{ remote_tmp_dir }}/privatekeypw.pem'
+  register: privatekeypw
+
 - name: "({{ select_crypto_backend }}) Generate CSR with privatekey passphrase"
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw.csr'
@@ -271,6 +281,14 @@
     privatekey_passphrase: hunter2
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: passphrase_1
+
+- name: "({{ select_crypto_backend }}) Generate CSR with privatekey passphrase and private key content"
+  openssl_csr:
+    path: '{{ remote_tmp_dir }}/csr_pw.csr'
+    privatekey_content: '{{ privatekeypw.content | b64decode }}'
+    privatekey_passphrase: hunter2
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: passphrase_1_content
 
 - name: "({{ select_crypto_backend }}) Generate CSR (failed passphrase 1)"
   openssl_csr:
