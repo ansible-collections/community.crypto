@@ -3,6 +3,7 @@
 # Implements multiple version numbering conventions for the
 # Python Module Distribution Utilities.
 #
+# Copyright (c) 2001-2022 Python Software Foundation.  All rights reserved.
 # PSF License (see LICENSES/PSF-2.0.txt or https://opensource.org/licenses/Python-2.0)
 # SPDX-License-Identifier: PSF-2.0
 #

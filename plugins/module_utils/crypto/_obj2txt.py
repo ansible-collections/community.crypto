@@ -8,7 +8,8 @@
 # 2.0, and the BSD License. See the LICENSE file at
 # https://github.com/pyca/cryptography/blob/master/LICENSE for complete details.
 #
-# The Apache 2.0 license has been included as Apache-2.0.txt in this collection.
+# The Apache 2.0 license has been included as LICENSES/Apache-2.0.txt in this collection.
+# SPDX-License-Identifier: Apache-2.0
 #
 # Adapted from cryptography's hazmat/backends/openssl/decode_asn1.py
 #
