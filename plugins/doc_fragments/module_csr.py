@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyrigt: (c) 2017, Yanis Guenane <yanis+ansible@guenane.org>
+# Copyright (c) 2017, Yanis Guenane <yanis+ansible@guenane.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
