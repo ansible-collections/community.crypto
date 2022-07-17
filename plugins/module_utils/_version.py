@@ -3,7 +3,8 @@
 # Implements multiple version numbering conventions for the
 # Python Module Distribution Utilities.
 #
-# PSF License (see PSF-license.txt or https://opensource.org/licenses/Python-2.0)
+# PSF License (see LICENSES/PSF-2.0.txt or https://opensource.org/licenses/Python-2.0)
+# SPDX-License-Identifier: PSF-2.0
 #
 
 """Provides classes to represent module version numbers (one class for

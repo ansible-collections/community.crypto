@@ -5,7 +5,12 @@ readme: README.md
 authors:
   - Ansible (github.com/ansible)
 description: null
-license_file: COPYING
+license:
+  - GPL-3.0-or-later
+  - Apache-2.0
+  - BSD-2-Clause
+  - PSF-2.0
+#license_file: COPYING
 tags:
   - acme
   - certificate
