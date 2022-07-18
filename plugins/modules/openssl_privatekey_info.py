@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
-# Copyright: (c) 2017, Markus Teufelberger <mteufelberger+ansible@mgit.at>
+# Copyright (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
+# Copyright (c) 2017, Markus Teufelberger <mteufelberger+ansible@mgit.at>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
