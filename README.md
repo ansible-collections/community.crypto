@@ -116,7 +116,7 @@ In 2.0.0, the following notable features will be removed:
 
 This collection is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
 
-See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/GPL-3.0-or-later.txt) for the full text.
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.crypto/blob/main/COPYING) for the full text.
 
 Parts of the collection are licensed under the [Apache 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/Apache-2.0.txt) (`plugins/module_utils/crypto/_obj2txt.py` and `plugins/module_utils/crypto/_objects_data.py`), the [BSD 2-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-2-Clause.txt) (`plugins/module_utils/ecs/api.py`), the [BSD 3-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-3-Clause.txt) (`plugins/module_utils/crypto/_obj2txt.py`), and the [PSF 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/PSF-2.0.txt) (`plugins/module_utils/_version.py`). This only applies to vendored files in ``plugins/module_utils/`` and to the ECS module utils.
 
