@@ -1,3 +1,9 @@
+<!--
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Ansible Community Crypto Collection
 
 [![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
@@ -108,6 +114,10 @@ In 2.0.0, the following notable features will be removed:
 
 ## Licensing
 
-GNU General Public License v3.0 or later.
+This collection is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
 
-See [COPYING](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.crypto/blob/main/COPYING) for the full text.
+
+Parts of the collection are licensed under the [Apache 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/Apache-2.0.txt) (`plugins/module_utils/crypto/_obj2txt.py` and `plugins/module_utils/crypto/_objects_data.py`), the [BSD 2-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-2-Clause.txt) (`plugins/module_utils/ecs/api.py`), the [BSD 3-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-3-Clause.txt) (`plugins/module_utils/crypto/_obj2txt.py`), and the [PSF 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/PSF-2.0.txt) (`plugins/module_utils/_version.py`). This only applies to vendored files in ``plugins/module_utils/`` and to the ECS module utils.
+
+Most files in the collection that are not automatically generated have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s).

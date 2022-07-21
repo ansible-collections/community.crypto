@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 namespace: community
 name: crypto
 version: 2.5.0
@@ -5,7 +10,15 @@ readme: README.md
 authors:
   - Ansible (github.com/ansible)
 description: null
-license_file: COPYING
+license:
+  - GPL-3.0-or-later
+  - Apache-2.0
+  - BSD-2-Clause
+  - BSD-3-Clause
+  # TODO: galaxy-importer does not support this license type yet. Uncomment once this has been
+  #       fixed and the fix deployed (https://github.com/ansible/galaxy-importer/pull/175).
+  # - PSF-2.0
+#license_file: COPYING
 tags:
   - acme
   - certificate
