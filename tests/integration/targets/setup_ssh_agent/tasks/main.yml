@@ -9,13 +9,22 @@
 ####################################################################
 
 - name: Start an ssh agent to use for tests
-  shell: eval $(ssh-agent)>/dev/null&&echo "${SSH_AGENT_PID};${SSH_AUTH_SOCK}"
-  register: openssh_agent_env_vars
+  command: ssh-agent -c
+  register: openssh_agent_stdout
+
+- name: Convert output to dictionary
+  set_fact:
+    openssh_agent_env: >-
+      {{
+        openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\1')
+          | zip(openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\2'))
+          | community.general.dict
+      }}
 
 - name: Register ssh agent facts
   set_fact:
-    openssh_agent_pid: "{{ openssh_agent_env_vars.stdout.split(';')[0] }}"
-    openssh_agent_sock: "{{ openssh_agent_env_vars.stdout.split(';')[1] }}"
+    openssh_agent_pid: "{{ openssh_agent_env.SSH_AGENT_PID }}"
+    openssh_agent_sock: "{{ openssh_agent_env.SSH_AUTH_SOCK }}"
 
 - name: stat agent socket
   stat:
