@@ -18,7 +18,7 @@
       {{
         openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\1')
           | zip(openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\2'))
-          | items2dict(key_name=0, value_name=1)
+          | list | items2dict(key_name=0, value_name=1)
       }}
 
 - name: Register ssh agent facts

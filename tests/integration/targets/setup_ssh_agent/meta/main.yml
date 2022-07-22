@@ -5,3 +5,4 @@
 
 dependencies:
   - setup_ssh_keygen
+  - prepare_jinja2_compat
