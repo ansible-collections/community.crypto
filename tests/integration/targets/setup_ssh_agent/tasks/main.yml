@@ -9,15 +9,15 @@
 ####################################################################
 
 - name: Start an ssh agent to use for tests
-  command: ssh-agent -c
+  shell: ssh-agent -c | grep "^setenv"
   register: openssh_agent_stdout
 
 - name: Convert output to dictionary
   set_fact:
     openssh_agent_env: >-
       {{
-        openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\1')
-          | zip(openssh_agent_stdout.stdout_lines | select('match', '^setenv ') | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\2'))
+        openssh_agent_stdout.stdout_lines | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\1')
+          | zip(openssh_agent_stdout.stdout_lines | map('regex_replace', '^setenv ([^ ]+) ([^ ]+);', '\2'))
           | list | items2dict(key_name=0, value_name=1)
       }}
 
