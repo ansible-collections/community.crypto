@@ -30,7 +30,8 @@ def find_licenses(filename, relax=False):
                 print('%s: found copyright line with "Copyright:". Please remove the colon.' % (filename, ))
             idx = line.find('SPDX-License-Identifier: ')
             if idx >= 0:
-                spdx_license_identifiers.append(line[idx + len('SPDX-License-Identifier: '):])
+                lic_id = line[idx + len('SPDX-License-Identifier: '):]
+                spdx_license_identifiers.extend(lic_id.split(' OR '))
             if 'GNU General Public License' in line:
                 if 'v3.0+' in line:
                     other_license_identifiers.append('GPL-3.0-or-later')
