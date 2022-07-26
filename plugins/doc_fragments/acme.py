@@ -105,6 +105,8 @@ options:
          U(https://api.buypass.com/acme/directory)."
       - "For B(ZeroSSL), the production directory URL for ACME v2 is
          U(https://acme.zerossl.com/v2/DV90)."
+      - "For B(Sectigo), the production directory URL for ACME v2 is
+         U(https://acme-qa.secure.trust-provider.com/v2/DV)."
       - The notes for this module contain a list of ACME services this module has
         been tested against.
     required: true
