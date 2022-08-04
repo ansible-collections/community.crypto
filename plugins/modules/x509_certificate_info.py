@@ -126,7 +126,7 @@ basic_constraints:
     returned: success
     type: list
     elements: str
-    sample: [CA:TRUE, pathlen:1]
+    sample: ["CA:TRUE", "pathlen:1"]
 basic_constraints_critical:
     description: Whether the C(basic_constraints) extension is critical.
     returned: success
