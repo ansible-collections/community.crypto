@@ -215,7 +215,7 @@ headers:
       "cookies_string": "",
       "date": "Wed, 07 Nov 2018 12:34:56 GMT",
       "expires": "Wed, 07 Nov 2018 12:44:56 GMT",
-      "link": "<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel=\"terms-of-service\"",
+      "link": '<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel="terms-of-service"',
       "msg": "OK (904 bytes)",
       "pragma": "no-cache",
       "replay-nonce": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH",
