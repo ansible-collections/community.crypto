@@ -78,23 +78,23 @@ issuer:
         - Note that for repeated values, only the last one will be returned.
     returned: success
     type: dict
-    sample: '{"organizationName": "Ansible", "commonName": "ca.example.com"}'
+    sample: {"organizationName": "Ansible", "commonName": "ca.example.com"}
 issuer_ordered:
     description: The CRL's issuer as an ordered list of tuples.
     returned: success
     type: list
     elements: list
-    sample: '[["organizationName", "Ansible"], ["commonName": "ca.example.com"]]'
+    sample: [["organizationName", "Ansible"], ["commonName": "ca.example.com"]]
 last_update:
     description: The point in time from which this CRL can be trusted as ASN.1 TIME.
     returned: success
     type: str
-    sample: 20190413202428Z
+    sample: '20190413202428Z'
 next_update:
     description: The point in time from which a new CRL will be issued and the client has to check for it as ASN.1 TIME.
     returned: success
     type: str
-    sample: 20190413202428Z
+    sample: '20190413202428Z'
 digest:
     description: The signature algorithm used to sign the CRL.
     returned: success
@@ -113,12 +113,12 @@ revoked_certificates:
         revocation_date:
             description: The point in time the certificate was revoked as ASN.1 TIME.
             type: str
-            sample: 20190413202428Z
+            sample: '20190413202428Z'
         issuer:
             description: The certificate's issuer.
             type: list
             elements: str
-            sample: '["DNS:ca.example.org"]'
+            sample: ["DNS:ca.example.org"]
         issuer_critical:
             description: Whether the certificate issuer extension is critical.
             type: bool
@@ -140,7 +140,7 @@ revoked_certificates:
                 The point in time it was known/suspected that the private key was compromised
                 or that the certificate otherwise became invalid as ASN.1 TIME.
             type: str
-            sample: 20190413202428Z
+            sample: '20190413202428Z'
         invalidity_date_critical:
             description: Whether the invalidity date extension is critical.
             type: bool
