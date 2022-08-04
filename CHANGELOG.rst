@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.5.0
+======
+
+Release Summary
+---------------
+
+Maintenance release with improved licensing declaration and documentation fixes.
+
+Minor Changes
+-------------
+
+- All software licenses are now in the ``LICENSES/`` directory of the collection root. Moreover, ``SPDX-License-Identifier:`` is used to declare the applicable license for every file that is not automatically generated (https://github.com/ansible-collections/community.crypto/pull/491).
+
 v2.4.0
 ======
 

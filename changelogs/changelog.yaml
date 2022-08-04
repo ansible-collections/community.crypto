@@ -941,3 +941,15 @@ releases:
     - 487-openssl_pkcs12-other-certs-crash.yml
     - deprecate-ansible-2.9-2.10.yml
     release_date: '2022-07-09'
+  2.5.0:
+    changes:
+      minor_changes:
+      - All software licenses are now in the ``LICENSES/`` directory of the collection
+        root. Moreover, ``SPDX-License-Identifier:`` is used to declare the applicable
+        license for every file that is not automatically generated (https://github.com/ansible-collections/community.crypto/pull/491).
+      release_summary: Maintenance release with improved licensing declaration and
+        documentation fixes.
+    fragments:
+    - 2.5.0.yml
+    - 491-licenses.yml
+    release_date: '2022-08-04'
