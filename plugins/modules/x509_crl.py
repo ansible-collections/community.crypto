@@ -286,13 +286,13 @@ issuer:
         - Note that for repeated values, only the last one will be returned.
     returned: success
     type: dict
-    sample: '{"organizationName": "Ansible", "commonName": "ca.example.com"}'
+    sample: {"organizationName": "Ansible", "commonName": "ca.example.com"}
 issuer_ordered:
     description: The CRL's issuer as an ordered list of tuples.
     returned: success
     type: list
     elements: list
-    sample: '[["organizationName", "Ansible"], ["commonName": "ca.example.com"]]'
+    sample: [["organizationName", "Ansible"], ["commonName": "ca.example.com"]]
 last_update:
     description: The point in time from which this CRL can be trusted as ASN.1 TIME.
     returned: success
@@ -326,7 +326,7 @@ revoked_certificates:
             description: The certificate's issuer.
             type: list
             elements: str
-            sample: '["DNS:ca.example.org"]'
+            sample: ["DNS:ca.example.org"]
         issuer_critical:
             description: Whether the certificate issuer extension is critical.
             type: bool

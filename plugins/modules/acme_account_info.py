@@ -101,7 +101,7 @@ account:
       returned: always
       type: list
       elements: str
-      sample: "['mailto:me@example.com', 'tel:00123456789']"
+      sample: ['mailto:me@example.com', 'tel:00123456789']
     status:
       description: the account's status
       returned: always
