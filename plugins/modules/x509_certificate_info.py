@@ -126,7 +126,7 @@ basic_constraints:
     returned: success
     type: list
     elements: str
-    sample: "[CA:TRUE, pathlen:1]"
+    sample: [CA:TRUE, pathlen:1]
 basic_constraints_critical:
     description: Whether the C(basic_constraints) extension is critical.
     returned: success
@@ -136,7 +136,7 @@ extended_key_usage:
     returned: success
     type: list
     elements: str
-    sample: "[Biometric Info, DVCS, Time Stamping]"
+    sample: [Biometric Info, DVCS, Time Stamping]
 extended_key_usage_critical:
     description: Whether the C(extended_key_usage) extension is critical.
     returned: success
@@ -161,12 +161,12 @@ extensions_by_oid:
             returned: success
             type: str
             sample: "MAMCAQU="
-    sample: '{"1.3.6.1.5.5.7.1.24": { "critical": false, "value": "MAMCAQU="}}'
+    sample: {"1.3.6.1.5.5.7.1.24": { "critical": false, "value": "MAMCAQU="}}
 key_usage:
     description: Entries in the C(key_usage) extension, or C(none) if extension is not present.
     returned: success
     type: str
-    sample: "[Key Agreement, Data Encipherment]"
+    sample: [Key Agreement, Data Encipherment]
 key_usage_critical:
     description: Whether the C(key_usage) extension is critical.
     returned: success
@@ -178,7 +178,7 @@ subject_alt_name:
     returned: success
     type: list
     elements: str
-    sample: "[DNS:www.ansible.com, IP:1.2.3.4]"
+    sample: ["DNS:www.ansible.com", "IP:1.2.3.4"]
 subject_alt_name_critical:
     description: Whether the C(subject_alt_name) extension is critical.
     returned: success
@@ -197,36 +197,36 @@ issuer:
         - Note that for repeated values, only the last one will be returned.
     returned: success
     type: dict
-    sample: '{"organizationName": "Ansible", "commonName": "ca.example.com"}'
+    sample: {"organizationName": "Ansible", "commonName": "ca.example.com"}
 issuer_ordered:
     description: The certificate's issuer as an ordered list of tuples.
     returned: success
     type: list
     elements: list
-    sample: '[["organizationName", "Ansible"], ["commonName": "ca.example.com"]]'
+    sample: [["organizationName", "Ansible"], ["commonName": "ca.example.com"]]
 subject:
     description:
         - The certificate's subject as a dictionary.
         - Note that for repeated values, only the last one will be returned.
     returned: success
     type: dict
-    sample: '{"commonName": "www.example.com", "emailAddress": "test@example.com"}'
+    sample: {"commonName": "www.example.com", "emailAddress": "test@example.com"}
 subject_ordered:
     description: The certificate's subject as an ordered list of tuples.
     returned: success
     type: list
     elements: list
-    sample: '[["commonName", "www.example.com"], ["emailAddress": "test@example.com"]]'
+    sample: [["commonName", "www.example.com"], ["emailAddress": "test@example.com"]]
 not_after:
     description: C(notAfter) date as ASN.1 TIME.
     returned: success
     type: str
-    sample: 20190413202428Z
+    sample: '20190413202428Z'
 not_before:
     description: C(notBefore) date as ASN.1 TIME.
     returned: success
     type: str
-    sample: 20190331202428Z
+    sample: '20190331202428Z'
 public_key:
     description: Certificate's public key in PEM format.
     returned: success
@@ -365,14 +365,14 @@ authority_cert_issuer:
     returned: success
     type: list
     elements: str
-    sample: "[DNS:www.ansible.com, IP:1.2.3.4]"
+    sample: ["DNS:www.ansible.com", "IP:1.2.3.4"]
 authority_cert_serial_number:
     description:
         - The certificate's authority cert serial number.
         - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
     returned: success
     type: int
-    sample: '12345'
+    sample: 12345
 ocsp_uri:
     description: The OCSP responder URI, if included in the certificate. Will be
                  C(none) if no OCSP responder URI is included.

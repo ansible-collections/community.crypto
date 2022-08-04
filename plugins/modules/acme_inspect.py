@@ -184,7 +184,7 @@ directory:
   description: The ACME directory's content
   returned: always
   type: dict
-  sample: |
+  sample:
     {
       "a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
       "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
@@ -204,7 +204,7 @@ headers:
   description: The request's HTTP headers (with lowercase keys)
   returned: always
   type: dict
-  sample: |
+  sample:
     {
       "boulder-requester": "12345",
       "cache-control": "max-age=0, no-cache, no-store",

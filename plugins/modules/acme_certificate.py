@@ -468,7 +468,20 @@ authorizations:
     - Maps an identifier to ACME authorization objects. See U(https://tools.ietf.org/html/rfc8555#section-7.1.4).
   returned: changed
   type: dict
-  sample: '{"example.com":{...}}'
+  sample:
+    example.com:
+      identifier:
+        type: dns
+        value: example.com
+      status: valid
+      expires: '2022-08-04T01:02:03.45Z'
+      challenges:
+        - url: https://example.org/acme/challenge/12345
+          type: http-01
+          status: valid
+          token: A5b1C3d2E9f8G7h6
+          validated: '2022-08-01T01:01:02.34Z'
+      wildcard: false
 order_uri:
   description: ACME order URI.
   returned: changed
