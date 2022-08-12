@@ -48,6 +48,7 @@ except ImportError:
     IPADDRESS_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_IPADDRESS = True
+    IPADDRESS_IMPORT_ERROR = None
 
 
 def _assert_fetch_url_success(module, response, info, allow_redirect=False, allow_client_error=True, allow_server_error=True):

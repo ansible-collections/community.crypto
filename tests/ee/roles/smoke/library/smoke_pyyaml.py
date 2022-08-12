@@ -31,6 +31,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     import yaml
     HAS_PYYAML = True
+    PYYAML_IMP_ERR = None
 except ImportError as exc:
     PYYAML_IMP_ERR = traceback.format_exc()
     HAS_PYYAML = False

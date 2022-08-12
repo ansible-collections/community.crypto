@@ -31,6 +31,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     import ipaddress
     HAS_IPADDRESS = True
+    IPADDRESS_IMP_ERR = None
 except ImportError as exc:
     IPADDRESS_IMP_ERR = traceback.format_exc()
     HAS_IPADDRESS = False
