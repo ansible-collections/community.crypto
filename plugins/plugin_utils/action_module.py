@@ -217,7 +217,7 @@ class AnsibleActionModule(object):
 
         # this uses exceptions as it happens before we can safely call fail_json
         alias_warnings = []
-        alias_results, self._legal_inputs = handle_aliases(spec, param, alias_warnings=alias_warnings)
+        alias_results, self._legal_inputs = handle_aliases(spec, param, alias_warnings=alias_warnings)  # pylint: disable=used-before-assignment
         for option, alias in alias_warnings:
             self.warn('Both option %s and its alias %s are set.' % (option_prefix + option, option_prefix + alias))
 
@@ -241,12 +241,12 @@ class AnsibleActionModule(object):
             param = self.params
 
         try:
-            self.no_log_values.update(list_no_log_values(spec, param))
+            self.no_log_values.update(list_no_log_values(spec, param))  # pylint: disable=used-before-assignment
         except TypeError as te:
             self.fail_json(msg="Failure when processing no_log parameters. Module invocation will be hidden. "
                                "%s" % to_native(te), invocation={'module_args': 'HIDDEN DUE TO FAILURE'})
 
-        for message in list_deprecations(spec, param):
+        for message in list_deprecations(spec, param):  # pylint: disable=used-before-assignment
             self.deprecate(message['msg'], version=message.get('version'), date=message.get('date'),
                            collection_name=message.get('collection_name'))
 
