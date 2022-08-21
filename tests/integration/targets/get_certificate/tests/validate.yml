@@ -101,19 +101,14 @@
       # We got the correct response from the module
       - "'ca_cert file does not exist' == result.msg"
 
-- name: Get a temp directory
-  tempfile:
-    state: directory
-  register: my_temp_dir
-
 - name: Download CA Cert as pem from server
   get_url:
     url: "http://ansible.http.tests/cacert.pem"
-    dest: "{{ my_temp_dir.path }}/temp.pem"
+    dest: "{{ remote_tmp_dir }}/temp.pem"
 
 - name: Get servers certificate comparing it to its own ca_cert file
   get_certificate:
-    ca_cert: '{{ my_temp_dir.path }}/temp.pem'
+    ca_cert: '{{ remote_tmp_dir }}/temp.pem'
     host: "{{ httpbin_host }}"
     port: 443
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -124,14 +119,34 @@
       - result is not changed
       - result is not failed
 
-- name: Deploy the bogus_ca.pem file
-  copy:
-    src: "bogus_ca.pem"
-    dest: "{{ my_temp_dir.path }}/bogus_ca.pem"
+- name: Generate bogus CA privatekey
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/bogus_ca.key'
+    type: ECC
+    curve: secp256r1
+
+- name: Generate bogus CA CSR
+  openssl_csr:
+    path: '{{ remote_tmp_dir }}/bogus_ca.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/bogus_ca.key'
+    subject:
+      commonName: Bogus CA
+    useCommonNameForSAN: no
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: yes
+
+- name: Generate selfsigned bogus CA certificate
+  x509_certificate:
+    path: '{{ remote_tmp_dir }}/bogus_ca.pem'
+    csr_path: '{{ remote_tmp_dir }}/bogus_ca.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/bogus_ca.key'
+    provider: selfsigned
+    selfsigned_digest: sha256
 
 - name: Get servers certificate comparing it to an invalid ca_cert file
   get_certificate:
-    ca_cert: '{{ my_temp_dir.path }}/bogus_ca.pem'
+    ca_cert: '{{ remote_tmp_dir }}/bogus_ca.pem'
     host: "{{ httpbin_host }}"
     port: 443
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -141,4 +156,4 @@
 - assert:
     that:
       - result is not changed
-      - result.failed
+      - result is failed
