@@ -30,7 +30,7 @@ options:
         description:
             - Should the key be regenerated even if it already exists.
         type: bool
-        default: no
+        default: false
     path:
         description:
             - Name of the file in which the generated TLS/SSL private key will be written. It will have C(0600) mode
@@ -46,16 +46,16 @@ options:
             - Create a backup file including a timestamp so you can get
               the original private key back if you overwrote it with a new one by accident.
         type: bool
-        default: no
+        default: false
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) private key's content as I(privatekey).
+            - If set to C(true), will return the (current or generated) private key's content as I(privatekey).
             - Note that especially if the private key is not encrypted, you have to make sure that the returned
               value is treated appropriately and not accidentally written to logs etc.! Use with care!
             - Use Ansible's I(no_log) task option to avoid the output being shown. See also
               U(https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook).
         type: bool
-        default: no
+        default: false
         version_added: '1.0.0'
     regenerate:
         version_added: '1.0.0'
@@ -86,7 +86,7 @@ EXAMPLES = r'''
 - name: Force regenerate an OpenSSL private key if it already exists
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
-    force: yes
+    force: true
 
 - name: Generate an OpenSSL private key with a different algorithm (DSA)
   community.crypto.openssl_privatekey:
@@ -129,14 +129,14 @@ fingerprint:
       sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/privatekey.pem.2019-03-09@11:22~
 privatekey:
     description:
         - The (current or generated) private key's content.
         - Will be Base64-encoded if the key is in raw format.
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
     version_added: '1.0.0'
 '''

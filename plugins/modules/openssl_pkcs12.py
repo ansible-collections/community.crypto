@@ -56,7 +56,7 @@ options:
         description:
             - Should the file be regenerated even if it already exists.
         type: bool
-        default: no
+        default: false
     friendly_name:
         description:
             - Specifies the friendly name for the certificate and private key.
@@ -117,12 +117,12 @@ options:
             - Create a backup file including a timestamp so you can get the original
               output file back if you overwrote it with a new one by accident.
         type: bool
-        default: no
+        default: false
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) PKCS#12's content as I(pkcs12).
+            - If set to C(true), will return the (current or generated) PKCS#12's content as I(pkcs12).
         type: bool
-        default: no
+        default: false
         version_added: "1.0.0"
     select_crypto_backend:
         description:
@@ -203,7 +203,7 @@ EXAMPLES = r'''
     other_certificates: /opt/certs/ca.pem
     state: present
     mode: '0600'
-    force: yes
+    force: true
 
 - name: Dump/Parse PKCS#12 file
   community.crypto.openssl_pkcs12:
@@ -231,12 +231,12 @@ privatekey:
     sample: /etc/ssl/private/ansible.com.pem
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/ansible.com.pem.2019-03-09@11:22~
 pkcs12:
     description: The (current or generated) PKCS#12's content Base64 encoded.
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
     version_added: "1.0.0"
 '''

@@ -175,7 +175,7 @@ class PrivateKeyBackend:
                 return True
             self.module.fail_json(msg='Unable to read the key. The key is protected with a another passphrase / no passphrase or broken.'
                                   ' Will not proceed. To force regeneration, call the module with `generate`'
-                                  ' set to `full_idempotence` or `always`, or with `force=yes`.')
+                                  ' set to `full_idempotence` or `always`, or with `force=true`.')
         self._ensure_existing_private_key_loaded()
         if self.regenerate != 'never':
             if not self._check_size_and_type():
@@ -183,7 +183,7 @@ class PrivateKeyBackend:
                     return True
                 self.module.fail_json(msg='Key has wrong type and/or size.'
                                       ' Will not proceed. To force regeneration, call the module with `generate`'
-                                      ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`.')
+                                      ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`.')
         # During generation step, regenerate if format does not match and format_mismatch == 'regenerate'
         if self.format_mismatch == 'regenerate' and self.regenerate != 'never':
             if not self._check_format():
@@ -191,7 +191,7 @@ class PrivateKeyBackend:
                     return True
                 self.module.fail_json(msg='Key has wrong format.'
                                       ' Will not proceed. To force regeneration, call the module with `generate`'
-                                      ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`.'
+                                      ' set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`.'
                                       ' To convert the key, set `format_mismatch` to `convert`.')
         return False
 

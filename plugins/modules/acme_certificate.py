@@ -85,7 +85,7 @@ options:
     description:
       - "The email address associated with this account."
       - "It will be used for certificate expiration warnings."
-      - "Note that when C(modify_account) is not set to C(no) and you also
+      - "Note that when C(modify_account) is not set to C(false) and you also
          used the M(community.crypto.acme_account) module to specify more than one contact
          for your account, this module will update your account and restrict
          it to the (at most one) contact email address specified here."
@@ -103,17 +103,17 @@ options:
       - "ACME servers can require this to be true."
       - This option will only be used when C(acme_version) is not 1.
     type: bool
-    default: no
+    default: false
   modify_account:
     description:
       - "Boolean indicating whether the module should create the account if
          necessary, and update its contact data."
-      - "Set to C(no) if you want to use the M(community.crypto.acme_account) module to manage
+      - "Set to C(false) if you want to use the M(community.crypto.acme_account) module to manage
          your account instead, and to avoid accidental creation of a new account
          using an old key if you changed the account key with M(community.crypto.acme_account)."
-      - "If set to C(no), C(terms_agreed) and C(account_email) are ignored."
+      - "If set to C(false), C(terms_agreed) and C(account_email) are ignored."
     type: bool
-    default: yes
+    default: true
   challenge:
     description: The challenge to be performed.
     type: str
@@ -200,7 +200,7 @@ options:
          without having to re-authenticate the domain. This can be a security
          concern."
     type: bool
-    default: no
+    default: false
   force:
     description:
       - Enforces the execution of the challenge and validation, even if an
@@ -208,15 +208,15 @@ options:
       - This is especially helpful when having an updated CSR, for example with
         additional domains for which a new certificate is desired.
     type: bool
-    default: no
+    default: false
   retrieve_all_alternates:
     description:
-      - "When set to C(yes), will retrieve all alternate trust chains offered by the ACME CA.
+      - "When set to C(true), will retrieve all alternate trust chains offered by the ACME CA.
          These will not be written to disk, but will be returned together with the main
          chain as C(all_chains). See the documentation for the C(all_chains) return
          value for details."
     type: bool
-    default: no
+    default: false
   select_chain:
     description:
       - "Allows to specify criteria by which an (alternate) trust chain can be selected."
@@ -351,7 +351,7 @@ EXAMPLES = r'''
 #     type: TXT
 #     ttl: 60
 #     state: present
-#     wait: yes
+#     wait: true
 #     # Note: route53 requires TXT entries to be enclosed in quotes
 #     value: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].resource_value | regex_replace('^(.*)$', '\"\\1\"') }}"
 #   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge.challenge_data
@@ -364,7 +364,7 @@ EXAMPLES = r'''
 #     type: TXT
 #     ttl: 60
 #     state: present
-#     wait: yes
+#     wait: true
 #     # Note: item.value is a list of TXT entries, and route53
 #     # requires every entry to be enclosed in quotes
 #     value: "{{ item.value | map('regex_replace', '^(.*)$', '\"\\1\"' ) | list }}"
@@ -496,11 +496,11 @@ account_uri:
   type: str
 all_chains:
   description:
-    - When I(retrieve_all_alternates) is set to C(yes), the module will query the ACME server
+    - When I(retrieve_all_alternates) is set to C(true), the module will query the ACME server
       for alternate chains. This return value will contain a list of all chains returned,
       the first entry being the main chain returned by the server.
     - See L(Section 7.4.2 of RFC8555,https://tools.ietf.org/html/rfc8555#section-7.4.2) for details.
-  returned: when certificate was retrieved and I(retrieve_all_alternates) is set to C(yes)
+  returned: when certificate was retrieved and I(retrieve_all_alternates) is set to C(true)
   type: list
   elements: dict
   contains:

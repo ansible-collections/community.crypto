@@ -76,7 +76,7 @@ options:
       - "If I(method) is C(post) or C(get), make the module fail in case an ACME
          error is returned."
     type: bool
-    default: yes
+    default: true
 '''
 
 EXAMPLES = r'''

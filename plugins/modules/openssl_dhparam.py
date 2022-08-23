@@ -44,7 +44,7 @@ options:
         description:
             - Should the parameters be regenerated even it it already exists.
         type: bool
-        default: no
+        default: false
     path:
         description:
             - Name of the file in which the generated parameters will be saved.
@@ -55,7 +55,7 @@ options:
             - Create a backup file including a timestamp so you can get the original
               DH params back if you overwrote them with new ones by accident.
         type: bool
-        default: no
+        default: false
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
@@ -68,9 +68,9 @@ options:
         version_added: "1.0.0"
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) DH parameter's content as I(dhparams).
+            - If set to C(true), will return the (current or generated) DH parameter's content as I(dhparams).
         type: bool
-        default: no
+        default: false
         version_added: "1.0.0"
 notes:
 - Supports C(check_mode).
@@ -97,7 +97,7 @@ EXAMPLES = r'''
 - name: Force regenerate an DH parameters if they already exist
   community.crypto.openssl_dhparam:
     path: /etc/ssl/dhparams.pem
-    force: yes
+    force: true
 '''
 
 RETURN = r'''
@@ -113,12 +113,12 @@ filename:
     sample: /etc/ssl/dhparams.pem
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/dhparams.pem.2019-03-09@11:22~
 dhparams:
     description: The (current or generated) DH params' content.
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
     version_added: "1.0.0"
 '''

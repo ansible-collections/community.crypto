@@ -152,7 +152,7 @@ class KeypairBackend(OpensshModule):
             self.module.fail_json(
                 msg="Unable to read the key. The key is protected with a passphrase or broken. " +
                     "Will not proceed. To force regeneration, call the module with `generate` " +
-                    "set to `full_idempotence` or `always`, or with `force=yes`."
+                    "set to `full_idempotence` or `always`, or with `force=true`."
             )
 
     @abc.abstractmethod
@@ -167,7 +167,7 @@ class KeypairBackend(OpensshModule):
                 self.module.fail_json(
                     msg="Key has wrong type and/or size. Will not proceed. " +
                         "To force regeneration, call the module with `generate` set to " +
-                        "`partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`."
+                        "`partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
                 )
             return self.original_private_key is None
         elif self.regenerate in ('partial_idempotence', 'full_idempotence'):

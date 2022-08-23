@@ -33,7 +33,7 @@ options:
     description:
       - "The challenge type."
     type: str
-    required: yes
+    required: true
     choices:
     - tls-alpn-01
   challenge_data:
@@ -41,7 +41,7 @@ options:
       - "The C(challenge_data) entry provided by M(community.crypto.acme_certificate) for the
          challenge."
     type: dict
-    required: yes
+    required: true
   private_key_src:
     description:
       - "Path to a file containing the private key file to use for this challenge

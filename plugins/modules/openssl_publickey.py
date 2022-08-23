@@ -34,7 +34,7 @@ options:
         description:
             - Should the key be regenerated even it it already exists.
         type: bool
-        default: no
+        default: false
     format:
         description:
             - The format of the public key.
@@ -68,7 +68,7 @@ options:
             - Create a backup file including a timestamp so you can get the original
               public key back if you overwrote it with a different one by accident.
         type: bool
-        default: no
+        default: false
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
@@ -79,9 +79,9 @@ options:
         choices: [ auto, cryptography ]
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) public key's content as I(publickey).
+            - If set to C(true), will return the (current or generated) public key's content as I(publickey).
         type: bool
-        default: no
+        default: false
         version_added: '1.0.0'
 extends_documentation_fragment:
 - files
@@ -123,7 +123,7 @@ EXAMPLES = r'''
   community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     privatekey_path: /etc/ssl/private/ansible.com.pem
-    force: yes
+    force: true
 
 - name: Remove an OpenSSL public key
   community.crypto.openssl_publickey:
@@ -163,12 +163,12 @@ fingerprint:
       sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/publickey.pem.2019-03-09@11:22~
 publickey:
     description: The (current or generated) public key's content.
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
     version_added: '1.0.0'
 '''

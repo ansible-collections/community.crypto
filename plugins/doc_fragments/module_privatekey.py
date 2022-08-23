@@ -129,7 +129,7 @@ options:
               is protected by an unknown passphrase, or when they key is not protected by a passphrase,
               but a passphrase is specified. Make sure you have a B(backup) when using this option!
             - If set to C(always), the module will always regenerate the key. This is equivalent to
-              setting I(force) to C(yes).
+              setting I(force) to C(true).
             - Note that if I(format_mismatch) is set to C(convert) and everything matches except the
               format, the key will always be converted, except if I(regenerate) is set to C(always).
         type: str

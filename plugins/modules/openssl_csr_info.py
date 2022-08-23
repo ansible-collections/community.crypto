@@ -74,7 +74,7 @@ RETURN = r'''
 signature_valid:
     description:
         - Whether the CSR's signature is valid.
-        - In case the check returns C(no), the module will fail.
+        - In case the check returns C(false), the module will fail.
     returned: success
     type: bool
 basic_constraints:
@@ -140,7 +140,7 @@ subject_alt_name_critical:
     returned: success
     type: bool
 ocsp_must_staple:
-    description: C(yes) if the OCSP Must Staple extension is present, C(none) otherwise.
+    description: C(true) if the OCSP Must Staple extension is present, C(none) otherwise.
     returned: success
     type: bool
 ocsp_must_staple_critical:
