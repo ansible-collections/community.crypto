@@ -59,9 +59,9 @@ options:
 
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) certificate's content as I(certificate).
+            - If set to C(true), will return the (current or generated) certificate's content as I(certificate).
         type: bool
-        default: no
+        default: false
         version_added: '1.0.0'
 
     backup:
@@ -69,7 +69,7 @@ options:
             - Create a backup file including a timestamp so you can get the original
               certificate back if you overwrote it with a new one by accident.
         type: bool
-        default: no
+        default: false
 
     csr_content:
         version_added: '1.0.0'
@@ -128,7 +128,7 @@ EXAMPLES = r'''
     provider: acme
     acme_accountkey_path: /etc/ssl/private/ansible.com.pem
     acme_challenge_path: /etc/ssl/challenges/ansible.com/
-    force: yes
+    force: true
 
 - name: Generate an Entrust certificate via the Entrust Certificate Services (ECS) API
   community.crypto.x509_certificate:
@@ -216,12 +216,12 @@ filename:
     sample: /etc/ssl/crt/www.ansible.com.crt
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/www.ansible.com.crt.2019-03-09@11:22~
 certificate:
     description: The (current or generated) certificate's content.
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
     version_added: '1.0.0'
 '''

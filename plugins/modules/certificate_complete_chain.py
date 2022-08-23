@@ -32,7 +32,7 @@ options:
             - A concatenated set of certificates in PEM format forming a chain.
             - The module will try to complete this chain.
         type: str
-        required: yes
+        required: true
     root_certificates:
         description:
             - "A list of filenames or directories."
@@ -45,7 +45,7 @@ options:
             - "Symbolic links will be followed."
         type: list
         elements: path
-        required: yes
+        required: true
     intermediate_certificates:
         description:
             - "A list of filenames or directories."

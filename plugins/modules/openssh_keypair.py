@@ -107,7 +107,7 @@ options:
               is protected by an unknown passphrase, or when they key is not protected by a passphrase,
               but a passphrase is specified. Make sure you have a B(backup) when using this option!
             - If set to C(always), the module will always regenerate the key. This is equivalent to
-              setting I(force) to C(yes).
+              setting I(force) to C(true).
             - Note that adjusting the comment and the permissions can be changed without regeneration.
               Therefore, even for C(never), the task can result in changed.
         type: str
@@ -121,7 +121,7 @@ options:
         version_added: '1.0.0'
 notes:
     - In case the ssh key is broken or password protected, the module will fail.
-      Set the I(force) option to C(yes) if you want to regenerate the keypair.
+      Set the I(force) option to C(true) if you want to regenerate the keypair.
     - Supports C(check_mode).
     - In the case a custom C(mode), C(group), C(owner), or other file attribute is provided it will be applied to both key files.
 

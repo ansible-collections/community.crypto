@@ -57,7 +57,7 @@ options:
     description:
       - "Whether account creation is allowed (when state is C(present))."
     type: bool
-    default: yes
+    default: true
   contact:
     description:
       - "A list of contact URLs."
@@ -74,7 +74,7 @@ options:
       - "Boolean indicating whether you agree to the terms of service document."
       - "ACME servers can require this to be true."
     type: bool
-    default: no
+    default: false
   new_account_key_src:
     description:
       - "Path to a file containing the ACME account RSA or Elliptic Curve key to change to."
@@ -129,7 +129,7 @@ EXAMPLES = '''
   community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present
-    terms_agreed: yes
+    terms_agreed: true
     contact:
     - mailto:me@example.com
     - mailto:myself@example.org
@@ -138,7 +138,7 @@ EXAMPLES = '''
   community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present
-    allow_creation: no
+    allow_creation: false
     contact:
     - mailto:me@example.com
 

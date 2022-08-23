@@ -23,7 +23,7 @@ options:
         description:
             - Generate the certificate, even if it already exists.
         type: bool
-        default: no
+        default: false
 
     csr_path:
         description:
@@ -110,9 +110,9 @@ options:
             - Include the intermediate certificate to the generated certificate
             - This is only used by the C(acme) provider.
             - Note that this is only available for older versions of C(acme-tiny).
-              New versions include the chain automatically, and setting I(acme_chain) to C(yes) results in an error.
+              New versions include the chain automatically, and setting I(acme_chain) to C(true) results in an error.
         type: bool
-        default: no
+        default: false
 
     acme_directory:
         description:
@@ -314,7 +314,7 @@ options:
             - This is only used by the C(ownca) provider.
             - Note that this is only supported if the C(cryptography) backend is used!
         type: bool
-        default: yes
+        default: true
 '''
 
     BACKEND_SELFSIGNED_DOCUMENTATION = r'''

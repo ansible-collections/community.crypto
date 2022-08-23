@@ -129,7 +129,7 @@ revoked_certificates:
         issuer_critical:
             description: Whether the certificate issuer extension is critical.
             type: bool
-            sample: no
+            sample: false
         reason:
             description:
                 - The value for the revocation reason extension.
@@ -141,7 +141,7 @@ revoked_certificates:
         reason_critical:
             description: Whether the revocation reason extension is critical.
             type: bool
-            sample: no
+            sample: false
         invalidity_date:
             description: |
                 The point in time it was known/suspected that the private key was compromised
@@ -151,7 +151,7 @@ revoked_certificates:
         invalidity_date_critical:
             description: Whether the invalidity date extension is critical.
             type: bool
-            sample: no
+            sample: false
 '''
 
 

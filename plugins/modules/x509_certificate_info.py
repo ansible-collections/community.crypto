@@ -184,7 +184,7 @@ subject_alt_name_critical:
     returned: success
     type: bool
 ocsp_must_staple:
-    description: C(yes) if the OCSP Must Staple extension is present, C(none) otherwise.
+    description: C(true) if the OCSP Must Staple extension is present, C(none) otherwise.
     returned: success
     type: bool
 ocsp_must_staple_critical:

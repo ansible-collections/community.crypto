@@ -50,7 +50,7 @@ EXAMPLES = r'''
 RETURN = r'''
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/privatekey.pem.2019-03-09@11:22~
 '''

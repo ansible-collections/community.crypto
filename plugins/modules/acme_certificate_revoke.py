@@ -45,7 +45,7 @@ options:
     description:
       - "Path to the certificate to revoke."
     type: path
-    required: yes
+    required: true
   account_key_src:
     description:
       - "Path to a file containing the ACME account RSA or Elliptic Curve

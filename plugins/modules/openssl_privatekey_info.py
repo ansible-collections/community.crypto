@@ -44,11 +44,11 @@ options:
     return_private_key_data:
         description:
             - Whether to return private key data.
-            - Only set this to C(yes) when you want private information about this key to
+            - Only set this to C(true) when you want private information about this key to
               leave the remote machine.
             - "B(WARNING:) you have to make sure that private key data is not accidentally logged!"
         type: bool
-        default: no
+        default: false
     check_consistency:
         description:
             - Whether to check consistency of the private key.
@@ -104,9 +104,9 @@ can_parse_key:
     type: bool
 key_is_consistent:
     description:
-        - Whether the key is consistent. Can also return C(none) next to C(yes) and
-          C(no), to indicate that consistency could not be checked.
-        - In case the check returns C(no), the module will fail.
+        - Whether the key is consistent. Can also return C(none) next to C(true) and
+          C(false), to indicate that consistency could not be checked.
+        - In case the check returns C(false), the module will fail.
     returned: when I(check_consistency=true)
     type: bool
 public_key:
@@ -194,7 +194,7 @@ public_data:
 private_data:
     description:
         - Private key data. Depends on key type.
-    returned: success and when I(return_private_key_data) is set to C(yes)
+    returned: success and when I(return_private_key_data) is set to C(true)
     type: dict
 '''
 

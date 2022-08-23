@@ -122,10 +122,10 @@ options:
         aliases: [ subjectAltName_critical ]
     use_common_name_for_san:
         description:
-            - If set to C(yes), the module will fill the common name in for
+            - If set to C(true), the module will fill the common name in for
               C(subject_alt_name) with C(DNS:) prefix if no SAN is specified.
         type: bool
-        default: yes
+        default: true
         aliases: [ useCommonNameForSAN ]
     key_usage:
         description:
@@ -219,7 +219,7 @@ options:
                certificates or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
         type: bool
-        default: no
+        default: false
     subject_key_identifier:
         description:
             - The subject key identifier as a hex string, where two bytes are separated by colons.
@@ -227,7 +227,7 @@ options:
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
-            - Note that this option can only be used if I(create_subject_key_identifier) is C(no).
+            - Note that this option can only be used if I(create_subject_key_identifier) is C(false).
             - Note that this is only supported if the C(cryptography) backend is used!
         type: str
     authority_key_identifier:

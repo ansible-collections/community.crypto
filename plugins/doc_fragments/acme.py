@@ -114,10 +114,10 @@ options:
   validate_certs:
     description:
       - Whether calls to the ACME directory will validate TLS certificates.
-      - "B(Warning:) Should B(only ever) be set to C(no) for testing purposes,
+      - "B(Warning:) Should B(only ever) be set to C(false) for testing purposes,
          for example when testing against a local Pebble server."
     type: bool
-    default: yes
+    default: true
   select_crypto_backend:
     description:
       - Determines which crypto backend to use.

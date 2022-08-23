@@ -38,7 +38,7 @@ options:
             - If set to C(update), makes sure that the CRL contains the revoked certificates from
               I(revoked_certificates), but can also contain other revoked certificates. If the CRL file
               already exists, all entries from the existing CRL will also be included in the new CRL.
-              When using C(update), you might be interested in setting I(ignore_timestamps) to C(yes).
+              When using C(update), you might be interested in setting I(ignore_timestamps) to C(true).
         type: str
         default: generate
         choices: [ generate, update ]
@@ -47,20 +47,20 @@ options:
         description:
             - Should the CRL be forced to be regenerated.
         type: bool
-        default: no
+        default: false
 
     backup:
         description:
             - Create a backup file including a timestamp so you can get the original
               CRL back if you overwrote it with a new one by accident.
         type: bool
-        default: no
+        default: false
 
     path:
         description:
             - Remote absolute path where the generated CRL file should be created or is already located.
         type: path
-        required: yes
+        required: true
 
     format:
         description:
@@ -117,7 +117,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
-              I(ignore_timestamps) is set to C(yes).
+              I(ignore_timestamps) is set to C(true).
         type: str
         default: "+0s"
 
@@ -130,7 +130,7 @@ options:
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
               + C([w | d | h | m | s]) (for example C(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
-              I(ignore_timestamps) is set to C(yes).
+              I(ignore_timestamps) is set to C(true).
             - Required if I(state) is C(present).
         type: str
 
@@ -175,7 +175,7 @@ options:
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
                       + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent, except when
-                      I(ignore_timestamps) is set to C(yes).
+                      I(ignore_timestamps) is set to C(true).
                 type: str
                 default: "+0s"
             issuer:
@@ -188,7 +188,7 @@ options:
                 description:
                     - Whether the certificate issuer extension should be critical.
                 type: bool
-                default: no
+                default: false
             reason:
                 description:
                     - The value for the revocation reason extension.
@@ -208,7 +208,7 @@ options:
                 description:
                     - Whether the revocation reason extension should be critical.
                 type: bool
-                default: no
+                default: false
             invalidity_date:
                 description:
                     - The point in time it was known/suspected that the private key was compromised
@@ -218,13 +218,13 @@ options:
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
                       + C([w | d | h | m | s]) (for example C(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent. This will NOT
-                      change when I(ignore_timestamps) is set to C(yes).
+                      change when I(ignore_timestamps) is set to C(true).
                 type: str
             invalidity_date_critical:
                 description:
                     - Whether the invalidity date extension should be critical.
                 type: bool
-                default: no
+                default: false
 
     ignore_timestamps:
         description:
@@ -233,13 +233,13 @@ options:
               I(invalidity_date) in I(revoked_certificates) will never be ignored.
             - Use this in combination with relative timestamps for these values to get idempotency.
         type: bool
-        default: no
+        default: false
 
     return_content:
         description:
-            - If set to C(yes), will return the (current or generated) CRL's content as I(crl).
+            - If set to C(true), will return the (current or generated) CRL's content as I(crl).
         type: bool
-        default: no
+        default: false
 
 extends_documentation_fragment:
     - files
@@ -281,7 +281,7 @@ filename:
     sample: /path/to/my-ca.crl
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(yes)
+    returned: changed and if I(backup) is C(true)
     type: str
     sample: /path/to/my-ca.crl.2019-03-09@11:22~
 privatekey:
@@ -348,7 +348,7 @@ revoked_certificates:
         issuer_critical:
             description: Whether the certificate issuer extension is critical.
             type: bool
-            sample: no
+            sample: false
         reason:
             description:
                 - The value for the revocation reason extension.
@@ -360,7 +360,7 @@ revoked_certificates:
         reason_critical:
             description: Whether the revocation reason extension is critical.
             type: bool
-            sample: no
+            sample: false
         invalidity_date:
             description: |
                 The point in time it was known/suspected that the private key was compromised
@@ -370,13 +370,13 @@ revoked_certificates:
         invalidity_date_critical:
             description: Whether the invalidity date extension is critical.
             type: bool
-            sample: no
+            sample: false
 crl:
     description:
         - The (current or generated) CRL's content.
         - Will be the CRL itself if I(format) is C(pem), and Base64 of the
           CRL if I(format) is C(der).
-    returned: if I(state) is C(present) and I(return_content) is C(yes)
+    returned: if I(state) is C(present) and I(return_content) is C(true)
     type: str
 '''
 

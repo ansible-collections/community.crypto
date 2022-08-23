@@ -34,7 +34,7 @@ The following instructions show how to set up a simple self-signed CA certificat
         use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
         basic_constraints:
           - 'CA:TRUE'
-        basic_constraints_critical: yes
+        basic_constraints_critical: true
         key_usage:
           - keyCertSign
         key_usage_critical: true

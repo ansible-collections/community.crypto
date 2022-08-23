@@ -109,7 +109,7 @@ options:
               community.crypto 1.4.0. For older versions, trying to remove
               a key which no longer exists results in an error."
             - "NOTE that to remove the last key from a LUKS container, the
-              I(force_remove_last_key) option must be set to C(yes)."
+              I(force_remove_last_key) option must be set to C(true)."
             - "BEWARE that working with keyfiles in plaintext is dangerous.
               Make sure that they are protected."
         type: path
@@ -122,16 +122,16 @@ options:
               a passphrase which no longer exists results in an error."
             - "NOTE that to remove the last keyslot from a LUKS
               container, the I(force_remove_last_key) option must be set
-              to C(yes)."
+              to C(true)."
         type: str
         version_added: '1.0.0'
     force_remove_last_key:
         description:
-            - "If set to C(yes), allows removing the last key from a container."
+            - "If set to C(true), allows removing the last key from a container."
             - "BEWARE that when the last key has been removed from a container,
               the container can no longer be opened!"
         type: bool
-        default: no
+        default: false
     label:
         description:
             - "This option allow the user to create a LUKS2 format container
@@ -665,7 +665,7 @@ class CryptHandler(Handler):
             if keyslot_count < 2:
                 self._module.fail_json(msg="LUKS device %s has less than two active keyslots. "
                                            "To be able to remove a key, please set "
-                                           "`force_remove_last_key` to `yes`." % device)
+                                           "`force_remove_last_key` to `true`." % device)
 
         args = [self._cryptsetup_bin, 'luksRemoveKey', device, '-q']
         if keyfile:
