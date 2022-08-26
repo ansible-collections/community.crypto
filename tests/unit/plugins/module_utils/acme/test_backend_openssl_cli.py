@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import pytest
 
-from mock import MagicMock
+from ansible_collections.community.crypto.tests.unit.compat.mock import MagicMock
 
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
