@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from mock import MagicMock
+from ansible_collections.community.crypto.tests.unit.compat.mock import MagicMock
 
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
