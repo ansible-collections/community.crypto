@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: crypto_info
 author: "Felix Fontein (@felixfontein)"
@@ -24,7 +24,7 @@ notes:
 options: {}
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Retrieve information
   community.crypto.crypto_info:
     account_key_src: /etc/pki/cert/private/account.key
@@ -35,7 +35,7 @@ EXAMPLES = '''
     var: crypto_information
 '''
 
-RETURN = '''
+RETURN = r'''
 python_cryptography_installed:
   description: Whether the L(Python cryptography library, https://cryptography.io/) is installed.
   returned: always
