@@ -11,14 +11,7 @@
 validate_collection_refs="all"
 
 [sessions.license_check]
-run_reuse = false
-license_check_extra_ignore_paths = [
-    "tests/integration/targets/*/files/*.pem",
-    "tests/integration/targets/*/files/roots/*.pem",
-]
-# Right now we need to run the following before 'reuse lint' passes:
-#   rm -f tests/integration/targets/*/files/*.pem
-#   rm -f tests/integration/targets/*/files/roots/*.pem
+run_reuse = true
 
 [sessions.extra_checks]
 run_no_unwanted_files = true
