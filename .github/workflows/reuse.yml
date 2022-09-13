@@ -27,6 +27,8 @@ jobs:
         run: |
           pip install reuse
 
-      - name: Check REUSE compliance (currently optional)
+      - name: Check REUSE compliance (except some PEM files)
         run: |
-          reuse lint || true
+          rm -f tests/integration/targets/*/files/*.pem
+          rm -f tests/integration/targets/*/files/roots/*.pem
+          reuse lint
