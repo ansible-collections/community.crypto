@@ -75,6 +75,8 @@ def main():
         '.reuse/dep5',
         'LICENSES/*.txt',
         'COPYING',
+        'tests/integration/targets/*/files/*.pem',
+        'tests/integration/targets/*/files/roots/*.pem',
     ]
 
     no_comments_allowed = [fn for pattern in no_comments_allowed for fn in glob.glob(pattern)]
