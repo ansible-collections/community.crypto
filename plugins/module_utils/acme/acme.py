@@ -13,6 +13,7 @@ import copy
 import datetime
 import json
 import locale
+import time
 import traceback
 
 from ansible.module_utils.basic import missing_required_lib
@@ -49,6 +50,23 @@ except ImportError:
 else:
     HAS_IPADDRESS = True
     IPADDRESS_IMPORT_ERROR = None
+
+
+def _decode_retry(module, response, info, retry_count):
+    if info['status'] != 429:
+        return False
+
+    if retry_count >= 5:
+        raise ACMEProtocolException(module, msg='Giving up after 5 retries', info=info, response=response)
+
+    try:
+        retry_after = min(max(1, int(info.get('retry-after'))), 60)
+    except (TypeError, ValueError) as dummy:
+        retry_after = 10
+    module.log('Retrieved a 429 Too Many Requests on %s, retrying in %s seconds' % (info['url'], retry_after))
+
+    time.sleep(retry_after)
+    return True
 
 
 def _assert_fetch_url_success(module, response, info, allow_redirect=False, allow_client_error=True, allow_server_error=True):
@@ -107,10 +125,15 @@ class ACMEDirectory(object):
         url = self.directory_root if self.version == 1 else self.directory['newNonce']
         if resource is not None:
             url = resource
-        dummy, info = fetch_url(self.module, url, method='HEAD', timeout=self.request_timeout)
-        if info['status'] not in (200, 204):
-            raise NetworkException("Failed to get replay-nonce, got status {0}".format(info['status']))
-        return info['replay-nonce']
+        retry_count = 0
+        while True:
+            response, info = fetch_url(self.module, url, method='HEAD', timeout=self.request_timeout)
+            if _decode_retry(self.module, response, info, retry_count):
+                retry_count += 1
+                continue
+            if info['status'] not in (200, 204):
+                raise NetworkException("Failed to get replay-nonce, got status {0}".format(info['status']))
+            return info['replay-nonce']
 
 
 class ACMEClient(object):
@@ -242,6 +265,9 @@ class ACMEClient(object):
                 'Content-Type': 'application/jose+json',
             }
             resp, info = fetch_url(self.module, url, data=data, headers=headers, method='POST', timeout=self.request_timeout)
+            if _decode_retry(self.module, resp, info, failed_tries):
+                failed_tries += 1
+                continue
             _assert_fetch_url_success(self.module, resp, info)
             result = {}
 
@@ -300,7 +326,12 @@ class ACMEClient(object):
 
         if get_only:
             # Perform unauthenticated GET
-            resp, info = fetch_url(self.module, uri, method='GET', headers=headers, timeout=self.request_timeout)
+            retry_count = 0
+            while True:
+                resp, info = fetch_url(self.module, uri, method='GET', headers=headers, timeout=self.request_timeout)
+                if not _decode_retry(self.module, resp, info, retry_count):
+                    break
+                retry_count += 1
 
             _assert_fetch_url_success(self.module, resp, info)
 
