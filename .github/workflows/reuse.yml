@@ -27,6 +27,6 @@ jobs:
         run: |
           pip install reuse
 
-      - name: Check REUSE compliance
+      - name: Check REUSE compliance (currently optional)
         run: |
-          reuse lint
+          reuse lint || true
