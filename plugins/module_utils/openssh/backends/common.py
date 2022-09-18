@@ -219,10 +219,11 @@ class KeygenCommand(object):
 
 
 class PrivateKey(object):
-    def __init__(self, size, key_type, fingerprint):
+    def __init__(self, size, key_type, fingerprint, format=''):
         self._size = size
         self._type = key_type
         self._fingerprint = fingerprint
+        self._format = format
 
     @property
     def size(self):
@@ -235,6 +236,10 @@ class PrivateKey(object):
     @property
     def fingerprint(self):
         return self._fingerprint
+
+    @property
+    def format(self):
+        return self._format
 
     @classmethod
     def from_string(cls, string):
@@ -251,6 +256,7 @@ class PrivateKey(object):
             'size': self._size,
             'type': self._type,
             'fingerprint': self._fingerprint,
+            'format': self._format,
         }
 
 
@@ -324,3 +330,17 @@ class PublicKey(object):
             'comment': self._comment,
             'public_key': self._data,
         }
+
+
+def parse_private_key_format(path):
+    with open(path, 'r') as file:
+        header = file.readline().strip()
+
+    if header == '-----BEGIN OPENSSH PRIVATE KEY-----':
+        return 'SSH'
+    elif header == '-----BEGIN PRIVATE KEY-----':
+        return 'PKCS8'
+    elif header == '-----BEGIN RSA PRIVATE KEY-----':
+        return 'PKCS1'
+
+    return ''

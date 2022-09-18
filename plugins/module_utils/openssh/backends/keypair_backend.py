@@ -31,6 +31,7 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.
     OpensshModule,
     PrivateKey,
     PublicKey,
+    parse_private_key_format,
 )
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     any_in,
@@ -182,7 +183,12 @@ class KeypairBackend(OpensshModule):
         return all([
             self.size == self.original_private_key.size,
             self.type == self.original_private_key.type,
+            self._private_key_valid_backend(),
         ])
+
+    @abc.abstractmethod
+    def _private_key_valid_backend(self):
+        pass
 
     @OpensshModule.trigger_change
     @OpensshModule.skip_if_check_mode
@@ -329,6 +335,9 @@ class KeypairBackendOpensshBin(KeypairBackend):
         except (IOError, OSError) as e:
             self.module.fail_json(msg=to_native(e))
 
+    def _private_key_valid_backend(self):
+        return True
+
 
 class KeypairBackendCryptography(KeypairBackend):
     def __init__(self, module):
@@ -360,6 +369,8 @@ class KeypairBackendCryptography(KeypairBackend):
                                "or for ed25519 keys"
                     )
                 )
+        else:
+            result = key_format.upper()
 
         return result
 
@@ -386,6 +397,7 @@ class KeypairBackendCryptography(KeypairBackend):
             size=keypair.size,
             key_type=keypair.key_type,
             fingerprint=keypair.fingerprint,
+            format=parse_private_key_format(self.private_key_path)
         )
 
     def _get_public_key(self):
@@ -427,6 +439,14 @@ class KeypairBackendCryptography(KeypairBackend):
             self._safe_secure_move([(temp_public_key, self.public_key_path)])
         except (IOError, OSError) as e:
             self.module.fail_json(msg=to_native(e))
+
+    def _private_key_valid_backend(self):
+        # avoids breaking behavior and prevents
+        # automatic conversions with OpenSSH upgrades
+        if self.module.params['private_key_format'] == 'auto':
+            return True
+
+        return self.private_key_format == self.original_private_key.format
 
 
 def select_backend(module, backend):
