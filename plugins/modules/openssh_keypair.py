@@ -66,14 +66,20 @@ options:
         version_added: 1.7.0
     private_key_format:
         description:
-            - Used when a I(backend=cryptography) to select a format for the private key at the provided I(path).
-            - The only valid option currently is C(auto) which will match the key format of the installed OpenSSH version.
+            - Used when I(backend=cryptography) to select a format for the private key at the provided I(path).
+            - When set to C(auto) this module will match the key format of the installed OpenSSH version.
             - For OpenSSH < 7.8 private keys will be in PKCS1 format except ed25519 keys which will be in OpenSSH format.
             - For OpenSSH >= 7.8 all private key types will be in the OpenSSH format.
+            - Using this option when I(regenerate=partial_idempotence) or I(regenerate=full_idempotence) will cause
+              a new keypair to be generated if the private key's format does not match the value of I(private_key_format).
+              This module will not however convert existing private keys between formats.
         type: str
         default: auto
         choices:
             - auto
+            - pkcs1
+            - pkcs8
+            - ssh
         version_added: 1.7.0
     backend:
         description:
@@ -210,7 +216,11 @@ def main():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
             passphrase=dict(type='str', no_log=True),
-            private_key_format=dict(type='str', default='auto', no_log=False, choices=['auto']),
+            private_key_format=dict(
+                type='str',
+                default='auto',
+                no_log=False,
+                choices=['auto', 'pkcs1', 'pkcs8', 'ssh']),
             backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'opensshbin'])
         ),
         supports_check_mode=True,

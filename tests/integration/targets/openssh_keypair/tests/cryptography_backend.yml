@@ -94,3 +94,75 @@
     path: '{{ remote_tmp_dir }}/pem_encoded'
     backend: cryptography
     state: absent
+
+- name: Generate a private key with specified format
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: pkcs1
+    backend: cryptography
+
+- name: Generate a private key with specified format (Idempotent)
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: pkcs1
+    backend: cryptography
+  register: private_key_format_idempotent
+
+- name: Check that private key with specified format is idempotent
+  assert:
+    that:
+      - private_key_format_idempotent is not changed
+
+- name: Change to PKCS8 format
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: pkcs8
+    backend: cryptography
+  register: private_key_format_pkcs8
+
+- name: Check that format change causes regeneration
+  assert:
+    that:
+      - private_key_format_pkcs8 is changed
+
+- name: Change to PKCS8 format (Idempotent)
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: pkcs8
+    backend: cryptography
+  register: private_key_format_pkcs8_idempotent
+
+- name: Check that private key with PKCS8 format is idempotent
+  assert:
+    that:
+      - private_key_format_pkcs8_idempotent is not changed
+
+- name: Change to SSH format
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: ssh
+    backend: cryptography
+  register: private_key_format_ssh
+
+- name: Check that format change causes regeneration
+  assert:
+    that:
+      - private_key_format_ssh is changed
+
+- name: Change to SSH format (Idempotent)
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    private_key_format: ssh
+    backend: cryptography
+  register: private_key_format_ssh_idempotent
+
+- name: Check that private key with SSH format is idempotent
+  assert:
+    that:
+      - private_key_format_ssh_idempotent is not changed
+
+- name: Remove private key with specified format
+  openssh_keypair:
+    path: '{{ remote_tmp_dir }}/private_key_format'
+    backend: cryptography
+    state: absent
