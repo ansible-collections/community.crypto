@@ -312,6 +312,12 @@ class KeypairBackendOpensshBin(KeypairBackend):
     def __init__(self, module):
         super(KeypairBackendOpensshBin, self).__init__(module)
 
+        if self.module.params['private_key_format'] != 'auto':
+            self.module.fail_json(
+                msg="'auto' is the only valid option for " +
+                    "'private_key_format' when 'backend' is not 'cryptography'"
+            )
+
         self.ssh_keygen = KeygenCommand(self.module)
 
     def _generate_keypair(self, private_key_path):
