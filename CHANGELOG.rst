@@ -5,6 +5,20 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.6.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme* modules - support the HTTP 429 Too Many Requests response status (https://github.com/ansible-collections/community.crypto/pull/508).
+- openssh_keypair - added ``pkcs1``, ``pkcs8``, and ``ssh`` to the available choices for the ``private_key_format`` option (https://github.com/ansible-collections/community.crypto/pull/511).
+
 v2.5.0
 ======
 

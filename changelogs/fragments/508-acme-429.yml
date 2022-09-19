@@ -1,2 +1,0 @@
-minor_changes:
-  - "acme* modules - support the HTTP 429 Too Many Requests response status (https://github.com/ansible-collections/community.crypto/pull/508)."

@@ -953,3 +953,15 @@ releases:
     - 2.5.0.yml
     - 491-licenses.yml
     release_date: '2022-08-04'
+  2.6.0:
+    changes:
+      minor_changes:
+      - acme* modules - support the HTTP 429 Too Many Requests response status (https://github.com/ansible-collections/community.crypto/pull/508).
+      - openssh_keypair - added ``pkcs1``, ``pkcs8``, and ``ssh`` to the available
+        choices for the ``private_key_format`` option (https://github.com/ansible-collections/community.crypto/pull/511).
+      release_summary: Feature release.
+    fragments:
+    - 2.6.0.yml
+    - 508-acme-429.yml
+    - 511-openssh_keypair-private_key_format_options.yml
+    release_date: '2022-09-19'
