@@ -52,7 +52,7 @@ else:
     IPADDRESS_IMPORT_ERROR = None
 
 
-RETRY_STATUS_CODES = (429, 503)
+RETRY_STATUS_CODES = (408, 429, 503)
 
 
 def _decode_retry(module, response, info, retry_count):
@@ -62,6 +62,7 @@ def _decode_retry(module, response, info, retry_count):
     if retry_count >= 5:
         raise ACMEProtocolException(module, msg='Giving up after 5 retries', info=info, response=response)
 
+    # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
     except (TypeError, ValueError) as dummy:
