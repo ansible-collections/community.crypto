@@ -52,8 +52,11 @@ else:
     IPADDRESS_IMPORT_ERROR = None
 
 
+RETRY_STATUS_CODES = (429, 503)
+
+
 def _decode_retry(module, response, info, retry_count):
-    if info['status'] != 429:
+    if info['status'] not in RETRY_STATUS_CODES:
         return False
 
     if retry_count >= 5:
