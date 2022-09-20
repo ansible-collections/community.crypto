@@ -63,7 +63,7 @@ def _decode_retry(module, response, info, retry_count):
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
     except (TypeError, ValueError) as dummy:
         retry_after = 10
-    module.log('Retrieved a 429 Too Many Requests on %s, retrying in %s seconds' % (info['url'], retry_after))
+    module.log('Retrieved a %d HTTP status on %s, retrying in %s seconds' % (info['status'], info['url'], retry_after))
 
     time.sleep(retry_after)
     return True
