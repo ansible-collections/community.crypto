@@ -52,18 +52,22 @@ else:
     IPADDRESS_IMPORT_ERROR = None
 
 
+RETRY_STATUS_CODES = (408, 429, 503)
+
+
 def _decode_retry(module, response, info, retry_count):
-    if info['status'] != 429:
+    if info['status'] not in RETRY_STATUS_CODES:
         return False
 
     if retry_count >= 5:
         raise ACMEProtocolException(module, msg='Giving up after 5 retries', info=info, response=response)
 
+    # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
     except (TypeError, ValueError) as dummy:
         retry_after = 10
-    module.log('Retrieved a 429 Too Many Requests on %s, retrying in %s seconds' % (info['url'], retry_after))
+    module.log('Retrieved a %d HTTP status on %s, retrying in %s seconds' % (info['status'], info['url'], retry_after))
 
     time.sleep(retry_after)
     return True
