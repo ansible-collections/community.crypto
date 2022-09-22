@@ -121,7 +121,7 @@ class AnsibleActionModule(object):
         self._legal_inputs = []
         self._options_context = list()
 
-        self.params = copy.deepcopy(action_plugin._task.args)
+        self.params = copy.deepcopy(self.__action_plugin._task.args)
         self.no_log_values = set()
         if HAS_ARGSPEC_VALIDATOR:
             self._validator = ArgumentSpecValidator(
