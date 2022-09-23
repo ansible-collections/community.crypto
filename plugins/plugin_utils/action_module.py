@@ -116,13 +116,12 @@ class AnsibleActionModule(object):
         self.required_by = required_by
         self._diff = self.__action_plugin._play_context.diff
         self._verbosity = self.__action_plugin._display.verbosity
-        self._string_conversion_action = C.STRING_CONVERSION_ACTION
 
         self.aliases = {}
         self._legal_inputs = []
         self._options_context = list()
 
-        self.params = copy.deepcopy(action_plugin._task.args)
+        self.params = copy.deepcopy(self.__action_plugin._task.args)
         self.no_log_values = set()
         if HAS_ARGSPEC_VALIDATOR:
             self._validator = ArgumentSpecValidator(
@@ -445,7 +444,7 @@ class AnsibleActionModule(object):
         }
 
         # Ignore, warn, or error when converting to a string.
-        allow_conversion = opts.get(self._string_conversion_action, True)
+        allow_conversion = opts.get(C.STRING_CONVERSION_ACTION, True)
         try:
             return check_type_str(value, allow_conversion)
         except TypeError:
@@ -460,10 +459,10 @@ class AnsibleActionModule(object):
                 from_msg = '{0}: {1!r}'.format(param, value)
                 to_msg = '{0}: {1!r}'.format(param, to_text(value))
 
-            if self._string_conversion_action == 'error':
+            if C.STRING_CONVERSION_ACTION == 'error':
                 msg = common_msg.capitalize()
                 raise TypeError(to_native(msg))
-            elif self._string_conversion_action == 'warn':
+            elif C.STRING_CONVERSION_ACTION == 'warn':
                 msg = ('The value "{0}" (type {1.__class__.__name__}) was converted to "{2}" (type string). '
                        'If this does not look like what you expect, {3}').format(from_msg, value, to_msg, common_msg)
                 self.warn(to_native(msg))
