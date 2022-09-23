@@ -965,3 +965,17 @@ releases:
     - 508-acme-429.yml
     - 511-openssh_keypair-private_key_format_options.yml
     release_date: '2022-09-19'
+  2.7.0:
+    changes:
+      bugfixes:
+      - openssl_privatekey_pipe - ensure compatibility with newer versions of ansible-core
+        (https://github.com/ansible-collections/community.crypto/pull/515).
+      minor_changes:
+      - acme* modules - also support the HTTP 503 Service Unavailable and 408 Request
+        Timeout response status for automatic retries (https://github.com/ansible-collections/community.crypto/pull/513).
+      release_summary: Feature release.
+    fragments:
+    - 2.7.0.yml
+    - 513-acme-503.yml
+    - 515-action-module-compat.yml
+    release_date: '2022-09-23'

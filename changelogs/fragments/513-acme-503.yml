@@ -1,2 +1,0 @@
-minor_changes:
-  - "acme* modules - also support the HTTP 503 Service Unavailable and 408 Request Timeout response status for automatic retries (https://github.com/ansible-collections/community.crypto/pull/513)."

@@ -5,6 +5,24 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.7.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme* modules - also support the HTTP 503 Service Unavailable and 408 Request Timeout response status for automatic retries (https://github.com/ansible-collections/community.crypto/pull/513).
+
+Bugfixes
+--------
+
+- openssl_privatekey_pipe - ensure compatibility with newer versions of ansible-core (https://github.com/ansible-collections/community.crypto/pull/515).
+
 v2.6.0
 ======
 
