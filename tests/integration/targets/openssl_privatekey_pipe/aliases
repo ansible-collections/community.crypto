@@ -3,6 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 context/controller
-shippable/cloud/group1
-shippable/posix/group1
+azp/generic/1
+azp/posix/1
 destructive
