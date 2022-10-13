@@ -27,6 +27,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     CryptographyBackend,
+    CRYPTOGRAPHY_ERROR,
+    CRYPTOGRAPHY_MINIMAL_VERSION,
     CRYPTOGRAPHY_VERSION,
     HAS_CURRENT_CRYPTOGRAPHY,
 )
@@ -399,8 +401,19 @@ def create_backend(module, needs_acme_v2):
 
     # Create backend object
     if backend == 'cryptography':
+        if CRYPTOGRAPHY_ERROR is not None:
+            # Either we couldn't import cryptography at all, or there was an unexpected error
+            if CRYPTOGRAPHY_VERSION is None:
+                msg = missing_required_lib('cryptography')
+            else:
+                msg = 'Unexpected error while preparing cryptography: {0}'.format(CRYPTOGRAPHY_ERROR.splitlines()[-1])
+            module.fail_json(msg=msg, exception=CRYPTOGRAPHY_ERROR)
         if not HAS_CURRENT_CRYPTOGRAPHY:
-            module.fail_json(msg=missing_required_lib('cryptography'))
+            # We could import cryptography, but an too old version.
+            module.fail_json(
+                msg='Found cryptography, but only version {0}. {1}'.format(
+                    CRYPTOGRAPHY_VERSION,
+                    missing_required_lib('cryptography >= {0}'.format(CRYPTOGRAPHY_MINIMAL_VERSION))))
         module.debug('Using cryptography backend (library version {0})'.format(CRYPTOGRAPHY_VERSION))
         module_backend = CryptographyBackend(module)
     elif backend == 'openssl':

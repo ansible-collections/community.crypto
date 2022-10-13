@@ -1,0 +1,2 @@
+bugfixes:
+  - "acme_* modules - improve feedback when importing ``cryptography`` does not work (https://github.com/ansible-collections/community.crypto/issues/518, https://github.com/ansible-collections/community.crypto/pull/519)."
