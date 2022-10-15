@@ -409,7 +409,7 @@ def create_backend(module, needs_acme_v2):
                 msg = 'Unexpected error while preparing cryptography: {0}'.format(CRYPTOGRAPHY_ERROR.splitlines()[-1])
             module.fail_json(msg=msg, exception=CRYPTOGRAPHY_ERROR)
         if not HAS_CURRENT_CRYPTOGRAPHY:
-            # We could import cryptography, but an too old version.
+            # We succeeded importing cryptography, but its version is too old.
             module.fail_json(
                 msg='Found cryptography, but only version {0}. {1}'.format(
                     CRYPTOGRAPHY_VERSION,
