@@ -14,6 +14,7 @@ import binascii
 import datetime
 import os
 import sys
+import traceback
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 
@@ -48,6 +49,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     extract_first_pem,
 )
 
+CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
+
+CRYPTOGRAPHY_ERROR = None
 try:
     import cryptography
     import cryptography.hazmat.backends
@@ -60,13 +64,18 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-    CRYPTOGRAPHY_VERSION = cryptography.__version__
-    HAS_CURRENT_CRYPTOGRAPHY = (LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion('1.5'))
-    if HAS_CURRENT_CRYPTOGRAPHY:
-        _cryptography_backend = cryptography.hazmat.backends.default_backend()
-except Exception as dummy:
+except ImportError as dummy:
     HAS_CURRENT_CRYPTOGRAPHY = False
     CRYPTOGRAPHY_VERSION = None
+    CRYPTOGRAPHY_ERROR = traceback.format_exc()
+else:
+    CRYPTOGRAPHY_VERSION = cryptography.__version__
+    HAS_CURRENT_CRYPTOGRAPHY = (LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion(CRYPTOGRAPHY_MINIMAL_VERSION))
+    try:
+        if HAS_CURRENT_CRYPTOGRAPHY:
+            _cryptography_backend = cryptography.hazmat.backends.default_backend()
+    except Exception as dummy:
+        CRYPTOGRAPHY_ERROR = traceback.format_exc()
 
 
 if sys.version_info[0] >= 3:
