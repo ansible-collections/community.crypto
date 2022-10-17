@@ -979,3 +979,14 @@ releases:
     - 513-acme-503.yml
     - 515-action-module-compat.yml
     release_date: '2022-09-23'
+  2.7.1:
+    changes:
+      bugfixes:
+      - acme_* modules - improve feedback when importing ``cryptography`` does not
+        work (https://github.com/ansible-collections/community.crypto/issues/518,
+        https://github.com/ansible-collections/community.crypto/pull/519).
+      release_summary: Maintenance release.
+    fragments:
+    - 2.7.1.yml
+    - 519-acme-cryptography.yml
+    release_date: '2022-10-17'
