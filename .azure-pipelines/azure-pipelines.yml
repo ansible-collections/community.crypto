@@ -109,28 +109,6 @@ stages:
               test: '2.11/sanity/1'
             - name: Units
               test: '2.11/units/1'
-  - stage: Ansible_2_10
-    displayName: Sanity & Units 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.10/sanity/1'
-            - name: Units
-              test: '2.10/units/1'
-  - stage: Ansible_2_9
-    displayName: Sanity & Units 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.9/sanity/1'
-            - name: Units
-              test: '2.9/units/1'
 ### Docker
   - stage: Docker_devel
     displayName: Docker devel
@@ -206,28 +184,6 @@ stages:
               test: fedora32
             - name: Alpine 3
               test: alpine3
-  - stage: Docker_2_10
-    displayName: Docker 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.10/linux/{0}/1
-          targets:
-            - name: CentOS 6
-              test: centos6
-  - stage: Docker_2_9
-    displayName: Docker 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.9/linux/{0}/1
-          targets:
-            - name: Fedora 31
-              test: fedora31
-            - name: Ubuntu 18.04
-              test: ubuntu1804
 
 ### Community Docker
   - stage: Docker_community_devel
@@ -312,28 +268,6 @@ stages:
               test: rhel/8.3
             - name: FreeBSD 12.2
               test: freebsd/12.2
-  - stage: Remote_2_10
-    displayName: Remote 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.10/{0}/1
-          targets:
-            - name: OS X 10.11
-              test: osx/10.11
-            # - name: macOS 10.15
-            #   test: macos/10.15
-  - stage: Remote_2_9
-    displayName: Remote 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.9/{0}/1
-          targets:
-            - name: 'RHEL 7.8'
-              test: 'rhel/7.8'
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -393,26 +327,6 @@ stages:
           testFormat: 2.11/generic/{0}/1
           targets:
             - test: 3.8
-  - stage: Generic_2_10
-    displayName: Generic 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.10/generic/{0}/1
-          targets:
-            - test: 3.6
-  - stage: Generic_2_9
-    displayName: Generic 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.9/generic/{0}/1
-          targets:
-            - test: 2.7
 
   ## Finally
 
@@ -424,29 +338,21 @@ stages:
       - Ansible_2_13
       - Ansible_2_12
       - Ansible_2_11
-      - Ansible_2_10
-      - Ansible_2_9
       - Remote_devel
       - Remote_2_14
       - Remote_2_13
       - Remote_2_12
       - Remote_2_11
-      - Remote_2_10
-      - Remote_2_9
       - Docker_devel
       - Docker_2_14
       - Docker_2_13
       - Docker_2_12
       - Docker_2_11
-      - Docker_2_10
-      - Docker_2_9
       - Docker_community_devel
       - Generic_devel
       - Generic_2_14
       - Generic_2_13
       - Generic_2_12
       - Generic_2_11
-      - Generic_2_10
-      - Generic_2_9
     jobs:
       - template: templates/coverage.yml

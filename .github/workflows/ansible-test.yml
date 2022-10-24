@@ -1,0 +1,109 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# For the comprehensive list of the inputs supported by the ansible-community/ansible-test-gh-action GitHub Action, see
+# https://github.com/marketplace/actions/ansible-test
+
+name: EOL CI
+on:
+  # Run EOL CI against all pushes (direct commits, also merged PRs), Pull Requests
+  push:
+    branches:
+      - main
+      - stable-*
+  pull_request:
+  # Run EOL CI once per day (at 09:00 UTC)
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  sanity:
+    name: EOL Sanity (Ⓐ${{ matrix.ansible }})
+    strategy:
+      matrix:
+        ansible:
+          - '2.9'
+          - '2.10'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Perform sanity testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: stable-${{ matrix.ansible }}
+          testing-type: sanity
+
+  units:
+    runs-on: ubuntu-latest
+    name: EOL Units (Ⓐ${{ matrix.ansible }})
+    strategy:
+      # As soon as the first unit test fails, cancel the others to free up the CI queue
+      fail-fast: true
+      matrix:
+        ansible:
+          - '2.9'
+          - '2.10'
+
+    steps:
+      - name: >-
+          Perform unit testing against
+          Ansible version ${{ matrix.ansible }}
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: stable-${{ matrix.ansible }}
+          testing-type: units
+
+  integration:
+    runs-on: ubuntu-latest
+    name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible:
+          - ''
+        docker:
+          - ''
+        python:
+          - ''
+        exclude:
+          - ansible: ''
+        include:
+          # 2.9
+          - ansible: '2.9'
+            docker: fedora31
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.9'
+            docker: ubuntu1804
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.9'
+            docker: default
+            python: '2.7'
+            target: azp/generic/1/
+          # 2.10
+          - ansible: '2.10'
+            docker: centos6
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.10'
+            docker: default
+            python: '3.6'
+            target: azp/generic/1/
+
+    steps:
+      - name: >-
+          Perform integration testing against
+          Ansible version ${{ matrix.ansible }}
+          under Python ${{ matrix.python }}
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: stable-${{ matrix.ansible }}
+          pre-test-cmd: >-
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git ../../community/general
+          target-python-version: ${{ matrix.python }}
+          docker-image: ${{ matrix.docker }}
+          testing-type: integration
