@@ -29,9 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
-        uses: ansible-community/ansible-test-gh-action@release/v1
+        uses: felixfontein/ansible-test-gh-action@change-detection
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          pull-request-change-detection: 'true'
           testing-type: sanity
 
   units:
@@ -49,9 +50,10 @@ jobs:
       - name: >-
           Perform unit testing against
           Ansible version ${{ matrix.ansible }}
-        uses: ansible-community/ansible-test-gh-action@release/v1
+        uses: felixfontein/ansible-test-gh-action@change-detection
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          pull-request-change-detection: 'true'
           testing-type: units
 
   integration:
@@ -99,14 +101,15 @@ jobs:
           Perform integration testing against
           Ansible version ${{ matrix.ansible }}
           under Python ${{ matrix.python }}
-        uses: ansible-community/ansible-test-gh-action@release/v1
+        uses: felixfontein/ansible-test-gh-action@change-detection
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          docker-image: ${{ matrix.docker }}
           pre-test-cmd: >-
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git ../../community/general
+          pull-request-change-detection: 'true'
           target: ${{ matrix.target }}
           target-python-version: ${{ matrix.python }}
-          docker-image: ${{ matrix.docker }}
           testing-type: integration
