@@ -56,7 +56,7 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
-    name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }})
+    name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }}:${{ matrix.target }})
     strategy:
       fail-fast: false
       matrix:
@@ -65,6 +65,8 @@ jobs:
         docker:
           - ''
         python:
+          - ''
+        target:
           - ''
         exclude:
           - ansible: ''
@@ -104,6 +106,7 @@ jobs:
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git ../../community/general
+          target: ${{ matrix.target }}
           target-python-version: ${{ matrix.python }}
           docker-image: ${{ matrix.docker }}
           testing-type: integration
