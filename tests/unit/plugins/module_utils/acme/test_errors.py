@@ -166,7 +166,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             },
         },
         None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201.',
+        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.',
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -181,7 +181,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'response': create_regular_response('xxx'),
         },
         None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201. The raw error result: xxx',
+        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx',
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -196,7 +196,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'response': create_regular_response('xxx'),
         },
         create_decode_error('yyy'),
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201. The raw error result: xxx',
+        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx',
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -211,7 +211,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'response': create_regular_response('xxx'),
         },
         lambda content: dict(foo='bar'),
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201. The JSON error result: {'foo': 'bar'}",
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -226,7 +226,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'response': create_error_response(),
         },
         None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201.',
+        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.',
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -242,7 +242,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'response': create_error_response(),
         },
         lambda content: dict(foo='bar'),
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201. The JSON error result: {'foo': 'bar'}",
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -257,7 +257,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             'content': 'xxx',
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201. The raw error result: xxx",
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -277,7 +277,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             }
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with HTTP status 400. The JSON error result: {'foo': 'bar'}",
+        "ACME request failed for https://ca.example.com/foo with HTTP status 400 Bad Request. The JSON error result: {'foo': 'bar'}",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 400,
@@ -295,7 +295,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             },
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201. The JSON error result: {'type': 'foo'}",
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'type': 'foo'}",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 201,
@@ -312,7 +312,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             },
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with status 400. Error foo.",
+        "ACME request failed for https://ca.example.com/foo with status 400 Bad Request. Error foo.",
         {
             'http_url': 'https://ca.example.com/foo',
             'http_status': 400,
@@ -341,7 +341,7 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
             },
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with status 400. Error \"Foo Error\" (foo). Subproblems:\n"
+        "ACME request failed for https://ca.example.com/foo with status 400 Bad Request. Error \"Foo Error\" (foo). Subproblems:\n"
         "(0) Error bar: \"This is a bar error\".",
         {
             'http_url': 'https://ca.example.com/foo',
