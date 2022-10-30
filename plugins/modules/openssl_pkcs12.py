@@ -65,15 +65,30 @@ options:
     iter_size:
         description:
             - Number of times to repeat the encryption step.
-            - This is not considered during idempotency checks.
-            - This is only used by the C(pyopenssl) backend. When using it, the default is C(2048).
+            - This is B(not considered during idempotency checks).
+            - This is only used by the C(pyopenssl) backend, or when I(encryption_level=compatibility2022).
+            - When using it, the default is C(2048) for C(pyopenssl) and C(50000) for C(cryptography).
         type: int
     maciter_size:
         description:
             - Number of times to repeat the MAC step.
-            - This is not considered during idempotency checks.
+            - This is B(not considered during idempotency checks).
             - This is only used by the C(pyopenssl) backend. When using it, the default is C(1).
         type: int
+    encryption_level:
+        description:
+            - Determines the encryption level used.
+            - C(auto) uses the default of the selected backend. For C(cryptography), this is what the
+              cryptography library's specific version considers the best available encryption.
+            - C(compatibility2022) uses compatibility settings for older software in 2022.
+              This is only supported by the C(cryptography) backend if cryptography >= 38.0.0 is available.
+            - B(Note) that this option is B(not used for idempotency).
+        choices:
+            - auto
+            - compatibility2022
+        default: auto
+        type: str
+        version_added: 2.8.0
     passphrase:
         description:
             - The PKCS#12 password.
@@ -128,8 +143,8 @@ options:
         description:
             - Determines which crypto backend to use.
             - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-              If one of I(iter_size) or I(maciter_size) is used, C(auto) will always result in C(pyopenssl) to be chosen
-              for backwards compatibility.
+              If I(iter_size) is used together with I(encryption_level != compatibility2022), or if I(maciter_size) is used,
+              C(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
             - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
             - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
             # - Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0, and will be
@@ -302,6 +317,18 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
+CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None
+try:
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.serialization.pkcs12 import PBES
+    # Try to build encryption builder for compatibility2022
+    serialization.PrivateFormat.PKCS12.encryption_builder().key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC).hmac_hash(hashes.SHA1())
+except Exception:
+    CRYPTOGRAPHY_COMPATIBILITY2022_ERR = traceback.format_exc()
+    CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = False
+else:
+    CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
+
 
 def load_certificate_set(filename, backend):
     '''
@@ -317,7 +344,7 @@ class PkcsError(OpenSSLObjectError):
 
 
 class Pkcs(OpenSSLObject):
-    def __init__(self, module, backend):
+    def __init__(self, module, backend, iter_size_default=2048):
         super(Pkcs, self).__init__(
             module.params['path'],
             module.params['state'],
@@ -330,8 +357,9 @@ class Pkcs(OpenSSLObject):
         self.other_certificates_parse_all = module.params['other_certificates_parse_all']
         self.certificate_path = module.params['certificate_path']
         self.friendly_name = module.params['friendly_name']
-        self.iter_size = module.params['iter_size'] or 2048
+        self.iter_size = module.params['iter_size'] or iter_size_default
         self.maciter_size = module.params['maciter_size'] or 1
+        self.encryption_level = module.params['encryption_level']
         self.passphrase = module.params['passphrase']
         self.pkcs12 = None
         self.privatekey_passphrase = module.params['privatekey_passphrase']
@@ -508,6 +536,8 @@ class Pkcs(OpenSSLObject):
 class PkcsPyOpenSSL(Pkcs):
     def __init__(self, module):
         super(PkcsPyOpenSSL, self).__init__(module, 'pyopenssl')
+        if self.encryption_level != 'auto':
+            module.fail_json(msg='The PyOpenSSL backend only supports encryption_level = auto')
 
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
@@ -573,7 +603,12 @@ class PkcsPyOpenSSL(Pkcs):
 
 class PkcsCryptography(Pkcs):
     def __init__(self, module):
-        super(PkcsCryptography, self).__init__(module, 'cryptography')
+        super(PkcsCryptography, self).__init__(module, 'cryptography', iter_size_default=50000)
+        if self.encryption_level == 'compatibility2022' and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022:
+            module.fail_json(
+                msg='The installed cryptography version does not support encryption_level = compatibility2022.'
+                ' You need cryptography >= 38.0.0 and support for SHA1',
+                exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR)
 
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
@@ -593,13 +628,25 @@ class PkcsCryptography(Pkcs):
         # Store fake object which can be used to retrieve the components back
         self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
 
+        if not self.passphrase:
+            encryption = serialization.NoEncryption()
+        elif self.encryption_level == 'compatibility2022':
+            encryption = (
+                serialization.PrivateFormat.PKCS12.encryption_builder().
+                kdf_rounds(self.iter_size).
+                key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC).
+                hmac_hash(hashes.SHA1()).
+                build(to_bytes(self.passphrase))
+            )
+        else:
+            encryption = serialization.BestAvailableEncryption(to_bytes(self.passphrase))
+
         return serialize_key_and_certificates(
             friendly_name,
             pkey,
             cert,
             self.other_certificates,
-            serialization.BestAvailableEncryption(to_bytes(self.passphrase))
-            if self.passphrase else serialization.NoEncryption(),
+            encryption,
         )
 
     def parse_bytes(self, pkcs12_content):
@@ -658,8 +705,11 @@ def select_backend(module, backend):
         can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
 
         # If no restrictions are provided, first try cryptography, then pyOpenSSL
-        if module.params['iter_size'] is not None or module.params['maciter_size'] is not None:
-            # If iter_size or maciter_size is specified, use pyOpenSSL backend
+        if (
+            (module.params['iter_size'] is not None and module.params['encryption_level'] != 'compatibility2022')
+            or module.params['maciter_size'] is not None
+        ):
+            # If iter_size (for encryption_level != compatibility2022) or maciter_size is specified, use pyOpenSSL backend
             backend = 'pyopenssl'
         elif can_use_cryptography:
             backend = 'cryptography'
@@ -697,6 +747,7 @@ def main():
         certificate_path=dict(type='path'),
         force=dict(type='bool', default=False),
         friendly_name=dict(type='str', aliases=['name']),
+        encryption_level=dict(type='str', choices=['auto', 'compatibility2022'], default='auto'),
         iter_size=dict(type='int'),
         maciter_size=dict(type='int'),
         passphrase=dict(type='str', no_log=True),
