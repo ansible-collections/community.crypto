@@ -10,6 +10,14 @@ __metaclass__ = type
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six import binary_type, PY3
+from ansible.module_utils.six.moves.http_client import responses as http_responses
+
+
+def format_http_status(status_code):
+    expl = http_responses.get(status_code)
+    if not expl:
+        return str(status_code)
+    return '%d %s' % (status_code, expl)
 
 
 def format_error_problem(problem, subproblem_prefix=''):
@@ -87,9 +95,10 @@ class ACMEProtocolException(ModuleFailException):
             extras['http_status'] = code
             if code is not None and code >= 400 and content_json is not None and 'type' in content_json:
                 if 'status' in content_json and content_json['status'] != code:
-                    code = 'status {problem_code} (HTTP status: {http_code})'.format(http_code=code, problem_code=content_json['status'])
+                    code = 'status {problem_code} (HTTP status: {http_code})'.format(
+                        http_code=format_http_status(code), problem_code=content_json['status'])
                 else:
-                    code = 'status {problem_code}'.format(problem_code=code)
+                    code = 'status {problem_code}'.format(problem_code=format_http_status(code))
                 subproblems = content_json.pop('subproblems', None)
                 add_msg = ' {problem}.'.format(problem=format_error_problem(content_json))
                 extras['problem'] = content_json
@@ -103,12 +112,12 @@ class ACMEProtocolException(ModuleFailException):
                             problem=format_error_problem(problem, subproblem_prefix='{0}.'.format(index)),
                         )
             else:
-                code = 'HTTP status {code}'.format(code=code)
+                code = 'HTTP status {code}'.format(code=format_http_status(code))
                 if content_json is not None:
                     add_msg = ' The JSON error result: {content}'.format(content=content_json)
                 elif content is not None:
                     add_msg = ' The raw error result: {content}'.format(content=to_text(content))
-            msg = '{msg} for {url} with {code}'.format(msg=msg, url=url, code=code)
+            msg = '{msg} for {url} with {code}'.format(msg=msg, url=url, code=format_http_status(code))
         elif content_json is not None:
             add_msg = ' The JSON result: {content}'.format(content=content_json)
         elif content is not None:

@@ -38,6 +38,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
     NetworkException,
     ModuleFailException,
     KeyParsingError,
+    format_http_status,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
@@ -69,7 +70,7 @@ def _decode_retry(module, response, info, retry_count):
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
     except (TypeError, ValueError) as dummy:
         retry_after = 10
-    module.log('Retrieved a %d HTTP status on %s, retrying in %s seconds' % (info['status'], info['url'], retry_after))
+    module.log('Retrieved a %s HTTP status on %s, retrying in %s seconds' % (format_http_status(info['status']), info['url'], retry_after))
 
     time.sleep(retry_after)
     return True
@@ -138,7 +139,7 @@ class ACMEDirectory(object):
                 retry_count += 1
                 continue
             if info['status'] not in (200, 204):
-                raise NetworkException("Failed to get replay-nonce, got status {0}".format(info['status']))
+                raise NetworkException("Failed to get replay-nonce, got status {0}".format(format_http_status(info['status'])))
             return info['replay-nonce']
 
 
