@@ -1,0 +1,4 @@
+minor_changes:
+  - "openssl_pkcs12 - add option ``encryption_level`` which allows to chose ``compatibility2022`` when cryptography >= 38.0.0 is used
+     to enable a more backwards compatible encryption algorithm. If cryptography uses OpenSSL 3.0.0 or newer, the default algorithm
+     is not compatible with older software (https://github.com/ansible-collections/community.crypto/pull/523)."

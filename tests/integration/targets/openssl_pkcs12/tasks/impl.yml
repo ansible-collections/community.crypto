@@ -330,6 +330,25 @@
       path: '{{ remote_tmp_dir }}/ansible_empty.pem'
       action: parse
 
+  - name: "({{ select_crypto_backend }}) Generate PKCS#12 file passphrase and compatibility encryption"
+    openssl_pkcs12:
+      select_crypto_backend: '{{ select_crypto_backend }}'
+      path: '{{ remote_tmp_dir }}/ansible_compatibility2022.p12'
+      friendly_name: compat_fn
+      encryption_level: compatibility2022
+      iter_size: 3210
+      passphrase: magicpassword
+      privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
+      certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+      other_certificates:
+      - '{{ remote_tmp_dir }}/ansible2.crt'
+      - '{{ remote_tmp_dir }}/ansible3.crt'
+      state: present
+    register: p12_compatibility2022
+    when:
+      - select_crypto_backend == 'cryptography'
+      - cryptography_version.stdout is version('38.0.0', '>=')
+
   - import_tasks: ../tests/validate.yml
 
   always:
@@ -345,3 +364,4 @@
     - ansible_pw2
     - ansible_pw3
     - ansible_empty
+    - ansible_compatibility2022
