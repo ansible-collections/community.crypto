@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.19
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- openssl_privatekey_pipe - ensure compatibility with newer versions of ansible-core (https://github.com/ansible-collections/community.crypto/pull/515).
+
 v1.9.18
 =======
 

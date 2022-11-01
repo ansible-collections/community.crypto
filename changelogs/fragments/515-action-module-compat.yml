@@ -1,2 +1,0 @@
-bugfixes:
-  - "openssl_privatekey_pipe - ensure compatibility with newer versions of ansible-core (https://github.com/ansible-collections/community.crypto/pull/515)."

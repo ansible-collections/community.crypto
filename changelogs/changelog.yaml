@@ -660,6 +660,16 @@ releases:
     - 1.9.18.yml
     - 487-openssl_pkcs12-other-certs-crash.yml
     release_date: '2022-07-09'
+  1.9.19:
+    changes:
+      bugfixes:
+      - openssl_privatekey_pipe - ensure compatibility with newer versions of ansible-core
+        (https://github.com/ansible-collections/community.crypto/pull/515).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.19.yml
+    - 515-action-module-compat.yml
+    release_date: '2022-11-01'
   1.9.2:
     changes:
       release_summary: Bugfix release to fix the changelog. No other change compared
