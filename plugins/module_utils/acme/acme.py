@@ -140,7 +140,14 @@ class ACMEDirectory(object):
                 continue
             if info['status'] not in (200, 204):
                 raise NetworkException("Failed to get replay-nonce, got status {0}".format(format_http_status(info['status'])))
-            return info['replay-nonce']
+            if 'replay-nonce' in info:
+                return info['replay-nonce']
+            self.module.log(
+                'HEAD to {0} did return status {1}, but no replay-nonce header!'.format(url, format_http_status(info['status'])))
+            if retry_count >= 5:
+                raise ACMEProtocolException(
+                    self.module, msg='Was not able to obtain nonce, giving up after 5 retries', info=info, response=response)
+            retry_count += 1
 
 
 class ACMEClient(object):
