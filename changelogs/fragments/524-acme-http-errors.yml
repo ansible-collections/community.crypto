@@ -1,2 +1,0 @@
-minor_changes:
-  - "acme_* modules - include symbolic HTTP status codes in error and log messages when available (https://github.com/ansible-collections/community.crypto/pull/524)."

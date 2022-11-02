@@ -990,3 +990,21 @@ releases:
     - 2.7.1.yml
     - 519-acme-cryptography.yml
     release_date: '2022-10-17'
+  2.8.0:
+    changes:
+      minor_changes:
+      - acme_* modules - handle more gracefully if CA's new nonce call does not return
+        a nonce (https://github.com/ansible-collections/community.crypto/pull/525).
+      - acme_* modules - include symbolic HTTP status codes in error and log messages
+        when available (https://github.com/ansible-collections/community.crypto/pull/524).
+      - openssl_pkcs12 - add option ``encryption_level`` which allows to chose ``compatibility2022``
+        when cryptography >= 38.0.0 is used to enable a more backwards compatible
+        encryption algorithm. If cryptography uses OpenSSL 3.0.0 or newer, the default
+        algorithm is not compatible with older software (https://github.com/ansible-collections/community.crypto/pull/523).
+      release_summary: Feature release.
+    fragments:
+    - 2.8.0.yml
+    - 523-pkcs12-compat.yml
+    - 524-acme-http-errors.yml
+    - 525-acme-no-nonce.yml
+    release_date: '2022-11-02'

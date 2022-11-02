@@ -5,6 +5,21 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.8.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme_* modules - handle more gracefully if CA's new nonce call does not return a nonce (https://github.com/ansible-collections/community.crypto/pull/525).
+- acme_* modules - include symbolic HTTP status codes in error and log messages when available (https://github.com/ansible-collections/community.crypto/pull/524).
+- openssl_pkcs12 - add option ``encryption_level`` which allows to chose ``compatibility2022`` when cryptography >= 38.0.0 is used to enable a more backwards compatible encryption algorithm. If cryptography uses OpenSSL 3.0.0 or newer, the default algorithm is not compatible with older software (https://github.com/ansible-collections/community.crypto/pull/523).
+
 v2.7.1
 ======
 
