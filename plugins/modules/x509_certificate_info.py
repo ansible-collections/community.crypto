@@ -33,16 +33,8 @@ author:
     - Markus Teufelberger (@MarkusTeufelberger)
 extends_documentation_fragment:
     - community.crypto.attributes
+    - community.crypto.attributes.info_module
     - community.crypto.name_encoding
-attributes:
-    check_mode:
-        support: full
-        details:
-            - This action does not modify state.
-    diff_mode:
-        support: N/A
-        details:
-            - This action does not modify state.
 options:
     path:
         description:
