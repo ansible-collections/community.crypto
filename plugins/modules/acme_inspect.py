@@ -42,7 +42,8 @@ seealso:
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
 extends_documentation_fragment:
-- community.crypto.acme
+  - community.crypto.acme
+  - community.crypto.attributes.actiongroup_acme
 
 options:
   url:

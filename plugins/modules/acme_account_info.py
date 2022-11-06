@@ -25,6 +25,10 @@ notes:
    - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
       did not change."
    - Supports C(check_mode).
+extends_documentation_fragment:
+  - community.crypto.acme
+  - community.crypto.attributes.actiongroup_acme
+
 options:
   retrieve_orders:
     description:
@@ -45,8 +49,6 @@ options:
 seealso:
   - module: community.crypto.acme_account
     description: Allows to create, modify or delete an ACME account.
-extends_documentation_fragment:
-- community.crypto.acme
 
 '''
 
