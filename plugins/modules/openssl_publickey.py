@@ -23,6 +23,17 @@ requirements:
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -83,17 +94,15 @@ options:
         type: bool
         default: false
         version_added: '1.0.0'
-extends_documentation_fragment:
-- files
 seealso:
-- module: community.crypto.x509_certificate
-- module: community.crypto.x509_certificate_pipe
-- module: community.crypto.openssl_csr
-- module: community.crypto.openssl_csr_pipe
-- module: community.crypto.openssl_dhparam
-- module: community.crypto.openssl_pkcs12
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_privatekey_pipe
+    - module: community.crypto.x509_certificate
+    - module: community.crypto.x509_certificate_pipe
+    - module: community.crypto.openssl_csr
+    - module: community.crypto.openssl_csr_pipe
+    - module: community.crypto.openssl_dhparam
+    - module: community.crypto.openssl_pkcs12
+    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_privatekey_pipe
 '''
 
 EXAMPLES = r'''

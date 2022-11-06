@@ -15,20 +15,24 @@ module: acme_account_info
 author: "Felix Fontein (@felixfontein)"
 short_description: Retrieves information on ACME accounts
 description:
-   - "Allows to retrieve information on accounts a CA supporting the
-      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-      such as L(Let's Encrypt,https://letsencrypt.org/)."
-   - "This module only works with the ACME v2 protocol."
+  - "Allows to retrieve information on accounts a CA supporting the
+     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+     such as L(Let's Encrypt,https://letsencrypt.org/)."
+  - "This module only works with the ACME v2 protocol."
 notes:
-   - "The M(community.crypto.acme_account) module allows to modify, create and delete ACME
-      accounts."
-   - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
-      did not change."
-   - Supports C(check_mode).
+  - "The M(community.crypto.acme_account) module allows to modify, create and delete ACME
+     accounts."
+  - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
+     did not change."
 extends_documentation_fragment:
   - community.crypto.acme
+  - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
-
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   retrieve_orders:
     description:

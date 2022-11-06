@@ -29,8 +29,24 @@ description:
       keyword, the new name M(community.crypto.x509_certificate) should be used to avoid
       a deprecation warning.
 author:
-  - Yanis Guenane (@Spredzy)
-  - Markus Teufelberger (@MarkusTeufelberger)
+    - Yanis Guenane (@Spredzy)
+    - Markus Teufelberger (@MarkusTeufelberger)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.module_certificate
+    - community.crypto.module_certificate.backend_acme_documentation
+    - community.crypto.module_certificate.backend_entrust_documentation
+    - community.crypto.module_certificate.backend_ownca_documentation
+    - community.crypto.module_certificate.backend_selfsigned_documentation
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -82,19 +98,8 @@ options:
     ownca_privatekey_content:
         version_added: '1.0.0'
 
-notes:
-- Supports C(check_mode).
-
 seealso:
-- module: community.crypto.x509_certificate_pipe
-
-extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.module_certificate
-    - community.crypto.module_certificate.backend_acme_documentation
-    - community.crypto.module_certificate.backend_entrust_documentation
-    - community.crypto.module_certificate.backend_ownca_documentation
-    - community.crypto.module_certificate.backend_selfsigned_documentation
+    - module: community.crypto.x509_certificate_pipe
 '''
 
 EXAMPLES = r'''

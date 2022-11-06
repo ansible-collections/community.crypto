@@ -26,6 +26,13 @@ description:
        generated chain is valid, please use C(openssl verify ...)."
 requirements:
     - "cryptography >= 1.5"
+extends_documentation_fragment:
+    - community.crypto.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     input_chain:
         description:

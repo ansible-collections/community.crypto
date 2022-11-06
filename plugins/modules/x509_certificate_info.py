@@ -28,9 +28,17 @@ description:
 requirements:
     - cryptography >= 1.6
 author:
-  - Felix Fontein (@felixfontein)
-  - Yanis Guenane (@Spredzy)
-  - Markus Teufelberger (@MarkusTeufelberger)
+    - Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+    - Markus Teufelberger (@MarkusTeufelberger)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.name_encoding
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     path:
         description:
@@ -63,16 +71,12 @@ options:
         default: auto
         choices: [ auto, cryptography ]
 
-extends_documentation_fragment:
-    - community.crypto.name_encoding
-
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
-    - Supports C(check_mode).
 seealso:
-- module: community.crypto.x509_certificate
-- module: community.crypto.x509_certificate_pipe
+    - module: community.crypto.x509_certificate
+    - module: community.crypto.x509_certificate_pipe
 '''
 
 EXAMPLES = r'''

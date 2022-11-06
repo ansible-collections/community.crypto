@@ -24,8 +24,15 @@ description:
 requirements:
     - cryptography >= 1.2.3
 author:
-  - Felix Fontein (@felixfontein)
-  - Yanis Guenane (@Spredzy)
+    - Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+extends_documentation_fragment:
+    - community.crypto.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     path:
         description:
@@ -70,12 +77,9 @@ options:
         default: auto
         choices: [ auto, cryptography ]
 
-notes:
-- Supports C(check_mode).
-
 seealso:
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_privatekey_pipe
+    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_privatekey_pipe
 '''
 
 EXAMPLES = r'''

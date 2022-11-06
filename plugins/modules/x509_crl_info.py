@@ -20,6 +20,14 @@ requirements:
     - cryptography >= 1.2
 author:
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.name_encoding
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     path:
         description:
@@ -41,13 +49,9 @@ options:
         default: true
         version_added: 1.7.0
 
-extends_documentation_fragment:
-    - community.crypto.name_encoding
-
 notes:
     - All timestamp values are provided in ASN.1 TIME format, in other words, following the C(YYYYMMDDHHMMSSZ) pattern.
       They are all in UTC.
-    - Supports C(check_mode).
 seealso:
     - module: community.crypto.x509_crl
 '''

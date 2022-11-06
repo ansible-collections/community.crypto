@@ -33,6 +33,14 @@ description:
 notes:
     - There is a small delay (typically about 5 seconds, but can be as long as 60 seconds) before obtaining the random values when requesting a validation
       while C(verification_method=dns) or C(verification_method=web_server). Be aware of that if doing many domain validation requests.
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.ecs_credential
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     client_id:
         description:
@@ -79,9 +87,6 @@ seealso:
       description: Can be used to request certificates from ECS, with C(provider=entrust).
     - module: community.crypto.ecs_certificate
       description: Can be used to request a Certificate from ECS using a verified domain.
-extends_documentation_fragment:
-- community.crypto.ecs_credential
-
 '''
 
 EXAMPLES = r'''

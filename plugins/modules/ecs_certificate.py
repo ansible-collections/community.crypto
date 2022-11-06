@@ -24,6 +24,19 @@ notes:
     - C(path) must be specified as the output location of the certificate.
 requirements:
     - cryptography >= 1.6
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.ecs_credential
+attributes:
+    check_mode:
+        support: partial
+        details:
+            - Check mode is only supported if I(request_type=new).
+    diff_mode:
+        support: none
+    safe_file_operations:
+        support: full
 options:
     backup:
         description:
@@ -337,9 +350,6 @@ seealso:
       description: Can be used to create private keys (both for certificates and accounts).
     - module: community.crypto.openssl_csr
       description: Can be used to create a Certificate Signing Request (CSR).
-extends_documentation_fragment:
-- community.crypto.ecs_credential
-
 '''
 
 EXAMPLES = r'''

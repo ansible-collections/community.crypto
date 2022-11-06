@@ -18,9 +18,6 @@ attributes:
       description: Can run in C(check_mode) and return changed status prediction without modifying target.
     diff_mode:
       description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
-    platform:
-      description: Target OS/families that can be operated against.
-      support: N/A
 '''
 
     ACTIONGROUP_ACME = r'''
@@ -32,17 +29,6 @@ attributes:
       membership:
         - community.crypto.acme
         - acme
-'''
-
-    CONN = r'''
-options: {}
-attributes:
-    become:
-      description: Is usable alongside C(become) keywords.
-    connection:
-      description: Uses the target's configured connection information to execute code on it.
-    delegation:
-      description: Can be used in conjunction with C(delegate_to) and related keywords.
 '''
 
     FACTS = r'''

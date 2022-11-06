@@ -27,6 +27,17 @@ requirements:
     - Or OpenSSL binary C(openssl)
 author:
     - Thom Wiggers (@thomwiggers)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -72,16 +83,12 @@ options:
         type: bool
         default: false
         version_added: "1.0.0"
-notes:
-- Supports C(check_mode).
-extends_documentation_fragment:
-- files
 seealso:
-- module: community.crypto.x509_certificate
-- module: community.crypto.openssl_csr
-- module: community.crypto.openssl_pkcs12
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_publickey
+    - module: community.crypto.x509_certificate
+    - module: community.crypto.openssl_csr
+    - module: community.crypto.openssl_pkcs12
+    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_publickey
 '''
 
 EXAMPLES = r'''

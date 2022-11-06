@@ -19,6 +19,18 @@ description:
     - The default mode for the private key file will be C(0600) if I(mode) is not explicitly set.
 author:
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.module_privatekey_convert
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+    safe_file_operations:
+        support: full
 options:
     dest_path:
         description:
@@ -32,9 +44,6 @@ options:
               the original private key back if you overwrote it with a new one by accident.
         type: bool
         default: false
-extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.module_privatekey_convert
 seealso: []
 '''
 

@@ -23,9 +23,20 @@ description:
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing certificate, consider using the I(backup) option."
 author:
-  - Yanis Guenane (@Spredzy)
-  - Markus Teufelberger (@MarkusTeufelberger)
-  - Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+    - Markus Teufelberger (@MarkusTeufelberger)
+    - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.module_certificate
+    - community.crypto.module_certificate.backend_entrust_documentation
+    - community.crypto.module_certificate.backend_ownca_documentation
+    - community.crypto.module_certificate.backend_selfsigned_documentation
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     provider:
         description:
@@ -42,16 +53,7 @@ options:
         type: str
 
 seealso:
-- module: community.crypto.x509_certificate
-
-notes:
-- Supports C(check_mode).
-
-extends_documentation_fragment:
-    - community.crypto.module_certificate
-    - community.crypto.module_certificate.backend_entrust_documentation
-    - community.crypto.module_certificate.backend_ownca_documentation
-    - community.crypto.module_certificate.backend_selfsigned_documentation
+    - module: community.crypto.x509_certificate
 '''
 
 EXAMPLES = r'''

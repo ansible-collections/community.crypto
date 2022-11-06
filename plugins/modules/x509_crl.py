@@ -22,6 +22,18 @@ requirements:
     - cryptography >= 1.2
 author:
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.name_encoding
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -241,14 +253,9 @@ options:
         type: bool
         default: false
 
-extends_documentation_fragment:
-    - files
-    - community.crypto.name_encoding
-
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
-    - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''

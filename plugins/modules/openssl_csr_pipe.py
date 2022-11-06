@@ -19,15 +19,21 @@ description:
     - "Please note that the module regenerates an existing CSR if it does not match the module's
       options, or if it seems to be corrupt."
 author:
-- Yanis Guenane (@Spredzy)
-- Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+    - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.module_csr
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     content:
         description:
             - The existing CSR.
         type: str
-extends_documentation_fragment:
-- community.crypto.module_csr
 seealso:
 - module: community.crypto.openssl_csr
 '''

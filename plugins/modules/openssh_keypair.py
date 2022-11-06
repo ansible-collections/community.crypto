@@ -21,6 +21,17 @@ requirements:
     - ssh-keygen (if I(backend=openssh))
     - cryptography >= 2.6 (if I(backend=cryptography) and OpenSSH < 7.8 is installed)
     - cryptography >= 3.0 (if I(backend=cryptography) and OpenSSH >= 7.8 is installed)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -128,10 +139,7 @@ options:
 notes:
     - In case the ssh key is broken or password protected, the module will fail.
       Set the I(force) option to C(true) if you want to regenerate the keypair.
-    - Supports C(check_mode).
     - In the case a custom C(mode), C(group), C(owner), or other file attribute is provided it will be applied to both key files.
-
-extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''

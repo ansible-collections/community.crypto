@@ -25,6 +25,17 @@ description:
     # and will be removed in community.crypto (x+1).0.0.
 requirements:
     - PyOpenSSL >= 0.15 or cryptography >= 3.0
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+    safe_file_operations:
+        support: full
 options:
     action:
         description:
@@ -154,14 +165,12 @@ options:
         default: auto
         choices: [ auto, cryptography, pyopenssl ]
         version_added: 1.7.0
-extends_documentation_fragment:
-    - files
 seealso:
-- module: community.crypto.x509_certificate
-- module: community.crypto.openssl_csr
-- module: community.crypto.openssl_dhparam
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_publickey
+    - module: community.crypto.x509_certificate
+    - module: community.crypto.openssl_csr
+    - module: community.crypto.openssl_dhparam
+    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_publickey
 '''
 
 EXAMPLES = r'''
