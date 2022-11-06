@@ -1008,3 +1008,9 @@ releases:
     - 524-acme-http-errors.yml
     - 525-acme-no-nonce.yml
     release_date: '2022-11-02'
+  2.8.1:
+    changes:
+      release_summary: Maintenance release with improved documentation.
+    fragments:
+    - 2.8.1.yml
+    release_date: '2022-11-06'
