@@ -13,11 +13,19 @@ module: luks_device
 
 short_description: Manage encrypted (LUKS) devices
 
-
 description:
     - "Module manages L(LUKS,https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup)
       on given device. Supports creating, destroying, opening and closing of
       LUKS container and adding or removing new keys and passphrases."
+
+extends_documentation_fragment:
+    - community.crypto.attributes
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 
 options:
     device:

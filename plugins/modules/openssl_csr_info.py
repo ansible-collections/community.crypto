@@ -22,8 +22,12 @@ description:
 requirements:
     - cryptography >= 1.3
 author:
-  - Felix Fontein (@felixfontein)
-  - Yanis Guenane (@Spredzy)
+    - Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.attributes.info_module
+    - community.crypto.name_encoding
 options:
     path:
         description:
@@ -44,9 +48,6 @@ options:
         type: str
         default: auto
         choices: [ auto, cryptography ]
-
-extends_documentation_fragment:
-    - community.crypto.name_encoding
 
 seealso:
 - module: community.crypto.openssl_csr

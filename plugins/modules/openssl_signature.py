@@ -22,6 +22,15 @@ requirements:
 author:
     - Patrick Pichler (@aveexy)
     - Markus Teufelberger (@MarkusTeufelberger)
+extends_documentation_fragment:
+    - community.crypto.attributes
+attributes:
+    check_mode:
+        support: full
+        details:
+            - This action does not modify state.
+    diff_mode:
+        support: none
 options:
     privatekey_path:
         description:

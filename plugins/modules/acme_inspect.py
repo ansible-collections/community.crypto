@@ -15,25 +15,25 @@ module: acme_inspect
 author: "Felix Fontein (@felixfontein)"
 short_description: Send direct requests to an ACME server
 description:
-   - "Allows to send direct requests to an ACME server with the
-      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-      which is supported by CAs such as L(Let's Encrypt,https://letsencrypt.org/)."
-   - "This module can be used to debug failed certificate request attempts,
-      for example when M(community.crypto.acme_certificate) fails or encounters a problem which
-      you wish to investigate."
-   - "The module can also be used to directly access features of an ACME servers
-      which are not yet supported by the Ansible ACME modules."
+  - "Allows to send direct requests to an ACME server with the
+     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+     which is supported by CAs such as L(Let's Encrypt,https://letsencrypt.org/)."
+  - "This module can be used to debug failed certificate request attempts,
+     for example when M(community.crypto.acme_certificate) fails or encounters a problem which
+     you wish to investigate."
+  - "The module can also be used to directly access features of an ACME servers
+     which are not yet supported by the Ansible ACME modules."
 notes:
-   - "The I(account_uri) option must be specified for properly authenticated
-      ACME v2 requests (except a C(new-account) request)."
-   - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute
-      ACME requests without the need of writing a playbook. For example, the
-      following command retrieves the ACME account with ID 1 from Let's Encrypt
-      (assuming C(/path/to/key) is the correct private account key):
-      C(ansible localhost -m acme_inspect -a \"account_key_src=/path/to/key
-      acme_directory=https://acme-v02.api.letsencrypt.org/directory acme_version=2
-      account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1 method=get
-      url=https://acme-v02.api.letsencrypt.org/acme/acct/1\")"
+  - "The I(account_uri) option must be specified for properly authenticated
+     ACME v2 requests (except a C(new-account) request)."
+  - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute
+     ACME requests without the need of writing a playbook. For example, the
+     following command retrieves the ACME account with ID 1 from Let's Encrypt
+     (assuming C(/path/to/key) is the correct private account key):
+     C(ansible localhost -m acme_inspect -a \"account_key_src=/path/to/key
+     acme_directory=https://acme-v02.api.letsencrypt.org/directory acme_version=2
+     account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1 method=get
+     url=https://acme-v02.api.letsencrypt.org/acme/acct/1\")"
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -42,8 +42,14 @@ seealso:
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
 extends_documentation_fragment:
-- community.crypto.acme
-
+  - community.crypto.acme
+  - community.crypto.attributes
+  - community.crypto.attributes.actiongroup_acme
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   url:
     description:

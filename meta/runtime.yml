@@ -7,12 +7,11 @@ requires_ansible: '>=2.9.10'
 
 action_groups:
   acme:
-  - acme_inspect
-  - acme_certificate_revoke
-  - acme_certificate
-  - acme_account
-  - acme_account_facts
-  - acme_account_info
+    - acme_inspect
+    - acme_certificate_revoke
+    - acme_certificate
+    - acme_account
+    - acme_account_info
 
 plugin_routing:
   modules:

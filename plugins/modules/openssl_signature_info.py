@@ -22,6 +22,9 @@ requirements:
 author:
     - Patrick Pichler (@aveexy)
     - Markus Teufelberger (@MarkusTeufelberger)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.attributes.info_module
 options:
     path:
         description:
@@ -57,7 +60,6 @@ notes:
       RSA keys: C(cryptography) >= 1.4
       DSA and ECDSA keys: C(cryptography) >= 1.5
       ed448 and ed25519 keys: C(cryptography) >= 2.6
-    - Supports C(check_mode).
 seealso:
     - module: community.crypto.openssl_signature
     - module: community.crypto.x509_certificate

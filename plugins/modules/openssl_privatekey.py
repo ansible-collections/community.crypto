@@ -19,6 +19,18 @@ description:
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.module_privatekey
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -59,12 +71,9 @@ options:
         version_added: '1.0.0'
     regenerate:
         version_added: '1.0.0'
-extends_documentation_fragment:
-- ansible.builtin.files
-- community.crypto.module_privatekey
 seealso:
-- module: community.crypto.openssl_privatekey_pipe
-- module: community.crypto.openssl_privatekey_info
+    - module: community.crypto.openssl_privatekey_pipe
+    - module: community.crypto.openssl_privatekey_info
 '''
 
 EXAMPLES = r'''

@@ -16,11 +16,12 @@ author: "Felix Fontein (@felixfontein)"
 short_description: Retrieve cryptographic capabilities
 version_added: 2.1.0
 description:
-   - Retrieve information on cryptographic capabilities.
-   - The current version retrieves information on the L(Python cryptography library, https://cryptography.io/) available to
-     Ansible modules, and on the OpenSSL binary C(openssl) found in the path.
-notes:
-   - Supports C(check_mode).
+  - Retrieve information on cryptographic capabilities.
+  - The current version retrieves information on the L(Python cryptography library, https://cryptography.io/) available to
+    Ansible modules, and on the OpenSSL binary C(openssl) found in the path.
+extends_documentation_fragment:
+  - community.crypto.attributes
+  - community.crypto.attributes.info_module
 options: {}
 '''
 

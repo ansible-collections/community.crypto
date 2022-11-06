@@ -15,15 +15,15 @@ module: acme_account
 author: "Felix Fontein (@felixfontein)"
 short_description: Create, modify or delete ACME accounts
 description:
-   - "Allows to create, modify or delete accounts with a CA supporting the
-      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-      such as L(Let's Encrypt,https://letsencrypt.org/)."
-   - "This module only works with the ACME v2 protocol."
+  - "Allows to create, modify or delete accounts with a CA supporting the
+     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+     such as L(Let's Encrypt,https://letsencrypt.org/)."
+  - "This module only works with the ACME v2 protocol."
 notes:
-   - "The M(community.crypto.acme_certificate) module also allows to do basic account management.
-      When using both modules, it is recommended to disable account management
-      for M(community.crypto.acme_certificate). For that, use the C(modify_account) option of
-      M(community.crypto.acme_certificate)."
+  - "The M(community.crypto.acme_certificate) module also allows to do basic account management.
+     When using both modules, it is recommended to disable account management
+     for M(community.crypto.acme_certificate). For that, use the C(modify_account) option of
+     M(community.crypto.acme_certificate)."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -37,8 +37,14 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-- community.crypto.acme
-
+  - community.crypto.acme
+  - community.crypto.attributes
+  - community.crypto.attributes.actiongroup_acme
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   state:
     description:

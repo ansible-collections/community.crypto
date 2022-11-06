@@ -15,35 +15,35 @@ module: acme_certificate
 author: "Michael Gruener (@mgruener)"
 short_description: Create SSL/TLS certificates with the ACME protocol
 description:
-   - "Create and renew SSL/TLS certificates with a CA supporting the
-      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-      such as L(Let's Encrypt,https://letsencrypt.org/) or
-      L(Buypass,https://www.buypass.com/). The current implementation
-      supports the C(http-01), C(dns-01) and C(tls-alpn-01) challenges."
-   - "To use this module, it has to be executed twice. Either as two
-      different tasks in the same run or during two runs. Note that the output
-      of the first run needs to be recorded and passed to the second run as the
-      module argument C(data)."
-   - "Between these two tasks you have to fulfill the required steps for the
-      chosen challenge by whatever means necessary. For C(http-01) that means
-      creating the necessary challenge file on the destination webserver. For
-      C(dns-01) the necessary dns record has to be created. For C(tls-alpn-01)
-      the necessary certificate has to be created and served.
-      It is I(not) the responsibility of this module to perform these steps."
-   - "For details on how to fulfill these challenges, you might have to read through
-      L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
-      and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3).
-      Also, consider the examples provided for this module."
-   - "The module includes experimental support for IP identifiers according to
-      the L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html)."
+  - "Create and renew SSL/TLS certificates with a CA supporting the
+     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+     such as L(Let's Encrypt,https://letsencrypt.org/) or
+     L(Buypass,https://www.buypass.com/). The current implementation
+     supports the C(http-01), C(dns-01) and C(tls-alpn-01) challenges."
+  - "To use this module, it has to be executed twice. Either as two
+     different tasks in the same run or during two runs. Note that the output
+     of the first run needs to be recorded and passed to the second run as the
+     module argument C(data)."
+  - "Between these two tasks you have to fulfill the required steps for the
+     chosen challenge by whatever means necessary. For C(http-01) that means
+     creating the necessary challenge file on the destination webserver. For
+     C(dns-01) the necessary dns record has to be created. For C(tls-alpn-01)
+     the necessary certificate has to be created and served.
+     It is I(not) the responsibility of this module to perform these steps."
+  - "For details on how to fulfill these challenges, you might have to read through
+     L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
+     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3).
+     Also, consider the examples provided for this module."
+  - "The module includes experimental support for IP identifiers according to
+     the L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html)."
 notes:
-   - "At least one of C(dest) and C(fullchain_dest) must be specified."
-   - "This module includes basic account management functionality.
-      If you want to have more control over your ACME account, use the
-      M(community.crypto.acme_account) module and disable account management
-      for this module using the C(modify_account) option."
-   - "This module was called C(letsencrypt) before Ansible 2.6. The usage
-      did not change."
+  - "At least one of C(dest) and C(fullchain_dest) must be specified."
+  - "This module includes basic account management functionality.
+     If you want to have more control over your ACME account, use the
+     M(community.crypto.acme_account) module and disable account management
+     for this module using the C(modify_account) option."
+  - "This module was called C(letsencrypt) before Ansible 2.6. The usage
+     did not change."
 seealso:
   - name: The Let's Encrypt documentation
     description: Documentation for the Let's Encrypt Certification Authority.
@@ -78,8 +78,17 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-- community.crypto.acme
-
+  - community.crypto.acme
+  - community.crypto.attributes
+  - community.crypto.attributes.files
+  - community.crypto.attributes.actiongroup_acme
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  safe_file_operations:
+    support: full
 options:
   account_email:
     description:

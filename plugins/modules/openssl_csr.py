@@ -19,8 +19,20 @@ description:
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
       your existing CSR, consider using the I(backup) option."
 author:
-- Yanis Guenane (@Spredzy)
-- Felix Fontein (@felixfontein)
+    - Yanis Guenane (@Spredzy)
+    - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+    - community.crypto.module_csr
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -58,11 +70,8 @@ options:
         version_added: 1.1.0
     name_constraints_critical:
         version_added: 1.1.0
-extends_documentation_fragment:
-- ansible.builtin.files
-- community.crypto.module_csr
 seealso:
-- module: community.crypto.openssl_csr_pipe
+    - module: community.crypto.openssl_csr_pipe
 '''
 
 EXAMPLES = r'''

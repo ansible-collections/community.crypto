@@ -15,18 +15,17 @@ module: acme_certificate_revoke
 author: "Felix Fontein (@felixfontein)"
 short_description: Revoke certificates with the ACME protocol
 description:
-   - "Allows to revoke certificates issued by a CA supporting the
-      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-      such as L(Let's Encrypt,https://letsencrypt.org/)."
+  - "Allows to revoke certificates issued by a CA supporting the
+     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+     such as L(Let's Encrypt,https://letsencrypt.org/)."
 notes:
-   - "Exactly one of C(account_key_src), C(account_key_content),
-      C(private_key_src) or C(private_key_content) must be specified."
-   - "Trying to revoke an already revoked certificate
-      should result in an unchanged status, even if the revocation reason
-      was different than the one specified here. Also, depending on the
-      server, it can happen that some other error is returned if the
-      certificate has already been revoked."
-   - Does not support C(check_mode).
+  - "Exactly one of C(account_key_src), C(account_key_content),
+     C(private_key_src) or C(private_key_content) must be specified."
+  - "Trying to revoke an already revoked certificate
+     should result in an unchanged status, even if the revocation reason
+     was different than the one specified here. Also, depending on the
+     server, it can happen that some other error is returned if the
+     certificate has already been revoked."
 seealso:
   - name: The Let's Encrypt documentation
     description: Documentation for the Let's Encrypt Certification Authority.
@@ -38,8 +37,14 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-- community.crypto.acme
-
+  - community.crypto.acme
+  - community.crypto.attributes
+  - community.crypto.attributes.actiongroup_acme
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   certificate:
     description:

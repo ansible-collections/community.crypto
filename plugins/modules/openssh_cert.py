@@ -18,6 +18,17 @@ description:
     - Generate and regenerate OpenSSH host or user certificates.
 requirements:
     - "ssh-keygen"
+extends_documentation_fragment:
+    - ansible.builtin.files
+    - community.crypto.attributes
+    - community.crypto.attributes.files
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+    safe_file_operations:
+        support: full
 options:
     state:
         description:
@@ -180,8 +191,6 @@ options:
                The serial number may be omitted for checks, but must be specified again for a new certificate.
                Note: The default value set by ssh-keygen is 0."
         type: int
-
-extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''

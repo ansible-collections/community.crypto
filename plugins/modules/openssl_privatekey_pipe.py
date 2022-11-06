@@ -23,6 +23,21 @@ description:
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+    - community.crypto.attributes
+    - community.crypto.attributes.flow
+    - community.crypto.module_privatekey
+attributes:
+    action:
+        support: full
+    async:
+        support: none
+        details:
+            - This action runs completely on the controller.
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     content:
         description:
@@ -42,11 +57,9 @@ options:
               current key (if it was provided) and Ansible will replace it by C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
         type: bool
         default: false
-extends_documentation_fragment:
-- community.crypto.module_privatekey
 seealso:
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_privatekey_info
+    - module: community.crypto.openssl_privatekey
+    - module: community.crypto.openssl_privatekey_info
 '''
 
 EXAMPLES = r'''

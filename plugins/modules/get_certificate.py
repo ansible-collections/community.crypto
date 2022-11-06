@@ -18,6 +18,17 @@ description:
     - Makes a secure connection and returns information about the presented certificate
     - The module uses the cryptography Python library.
     - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with python >= 2.7.
+extends_documentation_fragment:
+    - community.crypto.attributes
+attributes:
+    check_mode:
+        support: none
+        details:
+            - This action does not modify state.
+    diff_mode:
+        support: N/A
+        details:
+            - This action does not modify state.
 options:
     host:
       description:
@@ -72,11 +83,11 @@ options:
       choices: [ auto, cryptography ]
 
 notes:
-  - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
+    - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 
 requirements:
-  - "python >= 2.7 when using C(proxy_host)"
-  - "cryptography >= 1.6"
+    - "python >= 2.7 when using C(proxy_host)"
+    - "cryptography >= 1.6"
 '''
 
 RETURN = '''

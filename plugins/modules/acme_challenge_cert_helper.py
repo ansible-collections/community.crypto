@@ -15,10 +15,10 @@ module: acme_challenge_cert_helper
 author: "Felix Fontein (@felixfontein)"
 short_description: Prepare certificates required for ACME challenges such as C(tls-alpn-01)
 description:
-   - "Prepares certificates for ACME challenges such as C(tls-alpn-01)."
-   - "The raw data is provided by the M(community.crypto.acme_certificate) module, and needs to be
-      converted to a certificate to be used for challenge validation. This module
-      provides a simple way to generate the required certificates."
+  - "Prepares certificates for ACME challenges such as C(tls-alpn-01)."
+  - "The raw data is provided by the M(community.crypto.acme_certificate) module, and needs to be
+     converted to a certificate to be used for challenge validation. This module
+     provides a simple way to generate the required certificates."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -27,7 +27,18 @@ seealso:
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
 requirements:
-   - "cryptography >= 1.3"
+  - "cryptography >= 1.3"
+extends_documentation_fragment:
+  - community.crypto.attributes
+attributes:
+  check_mode:
+    support: none
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
   challenge:
     description:
@@ -58,8 +69,6 @@ options:
       - Phassphrase to use to decode the private key.
     type: str
     version_added: 1.6.0
-notes:
-  - Does not support C(check_mode).
 '''
 
 EXAMPLES = '''
