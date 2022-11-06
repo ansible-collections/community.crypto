@@ -33,8 +33,12 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: none
+    details:
+      - This action does not modify state.
   diff_mode:
-    support: none
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
   challenge:
     description:

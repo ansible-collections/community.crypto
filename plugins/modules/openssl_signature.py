@@ -27,8 +27,10 @@ extends_documentation_fragment:
 attributes:
     check_mode:
         support: full
+        details:
+            - This action does not modify state.
     diff_mode:
-        support: full
+        support: none
 options:
     privatekey_path:
         description:
