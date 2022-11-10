@@ -85,7 +85,7 @@ EXAMPLES = r'''
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     passphrase: ansible
-    cipher: aes256
+    cipher: auto
 
 - name: Generate an OpenSSL private key with a different size (2048 bits)
   community.crypto.openssl_privatekey:
