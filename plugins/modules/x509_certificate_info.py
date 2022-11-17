@@ -378,6 +378,12 @@ ocsp_uri:
                  C(none) if no OCSP responder URI is included.
     returned: success
     type: str
+issuer_uri:
+    description: The Issuer URI, if included in the certificate. Will be
+                 C(none) if no issuer URI is included.
+    returned: success
+    type: str
+    version_added: 2.9.0
 '''
 
 

@@ -139,6 +139,10 @@ class CertificateInfoRetrieval(object):
     def _get_ocsp_uri(self):
         pass
 
+    @abc.abstractmethod
+    def _get_issuer_uri(self):
+        pass
+
     def get_info(self, prefer_one_fingerprint=False):
         result = dict()
         self.cert = load_certificate(None, content=self.content, backend=self.backend)
@@ -200,6 +204,7 @@ class CertificateInfoRetrieval(object):
         result['serial_number'] = self._get_serial_number()
         result['extensions_by_oid'] = self._get_all_extensions()
         result['ocsp_uri'] = self._get_ocsp_uri()
+        result['issuer_uri'] = self._get_issuer_uri()
 
         return result
 
@@ -359,6 +364,17 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             ext = self.cert.extensions.get_extension_for_class(x509.AuthorityInformationAccess)
             for desc in ext.value:
                 if desc.access_method == x509.oid.AuthorityInformationAccessOID.OCSP:
+                    if isinstance(desc.access_location, x509.UniformResourceIdentifier):
+                        return desc.access_location.value
+        except x509.ExtensionNotFound as dummy:
+            pass
+        return None
+
+    def _get_issuer_uri(self):
+        try:
+            ext = self.cert.extensions.get_extension_for_class(x509.AuthorityInformationAccess)
+            for desc in ext.value:
+                if desc.access_method == x509.oid.AuthorityInformationAccessOID.CA_ISSUERS:
                     if isinstance(desc.access_location, x509.UniformResourceIdentifier):
                         return desc.access_location.value
         except x509.ExtensionNotFound as dummy:
