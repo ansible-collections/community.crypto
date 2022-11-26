@@ -26,6 +26,16 @@ The exact requirements for every module are listed in the module documentation.
 
 Most modules require a recent enough version of [the Python cryptography library](https://pypi.org/project/cryptography/). See the module documentations for the minimal version supported for each module.
 
+## Collection Documentation
+
+Browsing the [**latest** collection documentation](https://docs.ansible.com/ansible/latest/collections/community/crypto) will show docs for the _latest version released in the Ansible package_, not the latest version of the collection released on Galaxy.
+
+Browsing the [**devel** collection documentation](https://docs.ansible.com/ansible/devel/collections/community/crypto) shows docs for the _latest version released on Galaxy_.
+
+We also separately publish [**latest commit** collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/) which shows docs for the _latest commit in the `main` branch_.
+
+If you use the Ansible package and do not update collections independently, use **latest**. If you install or update this collection directly from Galaxy, use **devel**. If you are looking to contribute, use **latest commit**.
+
 ## Included content
 
 - OpenSSL / PKI modules:
