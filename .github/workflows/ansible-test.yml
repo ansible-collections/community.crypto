@@ -26,6 +26,7 @@ jobs:
         ansible:
           - '2.9'
           - '2.10'
+          - '2.11'
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
@@ -45,6 +46,7 @@ jobs:
         ansible:
           - '2.9'
           - '2.10'
+          - '2.11'
 
     steps:
       - name: >-
@@ -94,6 +96,19 @@ jobs:
           - ansible: '2.10'
             docker: default
             python: '3.6'
+            target: azp/generic/1/
+          # 2.11
+          - ansible: '2.11'
+            docker: fedora32
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.11'
+            docker: alpine3
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.11'
+            docker: default
+            python: '3.8'
             target: azp/generic/1/
 
     steps:
