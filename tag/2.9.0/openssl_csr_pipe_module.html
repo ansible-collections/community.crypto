@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR) &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/ansible.css" type="text/css" />
+      <link rel="stylesheet" href="_static/antsibull-minimal.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/rtd-ethical-ads.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters" href="openssl_dhparam_module.html" />
+    <link rel="prev" title="community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)" href="openssl_csr_info_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/ansiblefest" target="_blank">AnsibleFest</a></li>
+    <li><a href="https://www.ansible.com/tower" target="_blank">Products</a></li>
+    <li><a href="https://www.ansible.com/community" target="_blank">Community</a></li>
+    <li><a href="https://www.ansible.com/webinars-training" target="_blank">Webinars & Training</a></li>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_selfsigned.html">How to create self-signed certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_ownca.html">How to create a small CA</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecs_certificate_module.html">community.crypto.ecs_certificate module – Request SSL/TLS certificates with the Entrust Certificate Services (ECS) API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_dhparam_module.html">community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_module.html">community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_module.html">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_module.html">community.crypto.x509_certificate module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_module.html">community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_pipe_module.html">community.crypto.x509_certificate_pipe module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_module.html">community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/openssl_csr_pipe.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-community-crypto-openssl-csr-pipe-module"></span><section id="community-crypto-openssl-csr-pipe-module-generate-openssl-certificate-signing-request-csr">
+<h1>community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)<a class="headerlink" href="#community-crypto-openssl-csr-pipe-module-generate-openssl-certificate-signing-request-csr" title="Permalink to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.9.0).</p>
+<p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
+You need further requirements to be able to use this module,
+see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.openssl_csr_pipe</span></code>.</p>
+</div>
+<p class="ansible-version-added">New in community.crypto 1.3.0</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id3">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#attributes" id="id4">Attributes</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id5">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id6">See Also</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id7">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id8">Return Values</a></p></li>
+</ul>
+</div>
+<section id="synopsis">
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Please note that the module regenerates an existing CSR if it does not match the module’s options, or if it seems to be corrupt.</p></li>
+<li><p>This module allows one to (re)generate OpenSSL certificate signing requests.</p></li>
+<li><p>This module supports the subjectAltName, keyUsage, extendedKeyUsage, basicConstraints and OCSP Must Staple extensions.</p></li>
+</ul>
+</section>
+<section id="requirements">
+<span id="ansible-collections-community-crypto-openssl-csr-pipe-module-requirements"></span><h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>The below requirements are needed on the host that executes this module.</p>
+<ul class="simple">
+<li><p>cryptography &gt;= 1.3</p></li>
+</ul>
+</section>
+<section id="parameters">
+<h2><a class="toc-backref" href="#id3">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<table class="colwidths-auto ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-authority_cert_issuer"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-issuer"><strong>authority_cert_issuer</strong></p>
+<a class="ansibleOptionLink" href="#parameter-authority_cert_issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Names that will be present in the authority cert issuer field of the certificate signing request.</p>
+<p>Values must be prefixed by their options. (i.e., <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code> and the ones specific to your CA)</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code></p>
+<p>If specified, <em>authority_cert_serial_number</em> must also be specified.</p>
+<p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
+<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension will only be added if at least one of <em>authority_key_identifier</em>, <em>authority_cert_issuer</em> and <em>authority_cert_serial_number</em> is specified.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-authority_cert_serial_number"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-serial-number"><strong>authority_cert_serial_number</strong></p>
+<a class="ansibleOptionLink" href="#parameter-authority_cert_serial_number" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The authority cert serial number.</p>
+<p>If specified, <em>authority_cert_issuer</em> must also be specified.</p>
+<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
+<p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension will only be added if at least one of <em>authority_key_identifier</em>, <em>authority_cert_issuer</em> and <em>authority_cert_serial_number</em> is specified.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-authority_key_identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-key-identifier"><strong>authority_key_identifier</strong></p>
+<a class="ansibleOptionLink" href="#parameter-authority_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The authority key identifier as a hex string, where two bytes are separated by colons.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code></p>
+<p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
+<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension will only be added if at least one of <em>authority_key_identifier</em>, <em>authority_cert_issuer</em> and <em>authority_cert_serial_number</em> is specified.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-basic_constraints"></div>
+<div class="ansibleOptionAnchor" id="parameter-basicConstraints"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-basicconstraints"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-basic-constraints"></span><strong>basic_constraints</strong></p>
+<a class="ansibleOptionLink" href="#parameter-basic_constraints" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: basicConstraints</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Indicates basic constraints, such as if the certificate is a CA.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-basic_constraints_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-basicConstraints_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-basicconstraints-critical"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-basic-constraints-critical"></span><strong>basic_constraints_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-basic_constraints_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: basicConstraints_critical</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the basicConstraints extension be considered as critical.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-common_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-CN"></div>
+<div class="ansibleOptionAnchor" id="parameter-commonName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-commonname"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-common-name"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-cn"></span><strong>common_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-common_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: CN, commonName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The commonName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-content"><strong>content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The existing CSR.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-country_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-C"></div>
+<div class="ansibleOptionAnchor" id="parameter-countryName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-countryname"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-country-name"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-c"></span><strong>country_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-country_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: C, countryName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The countryName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-create_subject_key_identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-create-subject-key-identifier"><strong>create_subject_key_identifier</strong></p>
+<a class="ansibleOptionLink" href="#parameter-create_subject_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Create the Subject Key Identifier from the public key.</p>
+<p>Please note that commercial CAs can ignore the value, respectively use a value of their own choice instead. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
+<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_distribution_points"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-crl-distribution-points"><strong>crl_distribution_points</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_distribution_points" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
+<p><span class="ansible-option-versionadded">added in community.crypto 1.4.0</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Allows to specify one or multiple CRL distribution points.</p>
+<p>Only supported by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_distribution_points/crl_issuer"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-crl-distribution-points-crl-issuer"><strong>crl_issuer</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_distribution_points/crl_issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Information about the issuer of the CRL.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_distribution_points/full_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-crl-distribution-points-full-name"><strong>full_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_distribution_points/full_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Describes how the CRL can be retrieved.</p>
+<p>Mutually exclusive with <em>relative_name</em>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">URI:https://ca.example.com/revocations.crl</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_distribution_points/reasons"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-crl-distribution-points-reasons"><strong>reasons</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_distribution_points/reasons" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>List of reasons that this distribution point can be used for when performing revocation checks.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;key_compromise&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ca_compromise&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;affiliation_changed&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;superseded&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cessation_of_operation&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;certificate_hold&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;privilege_withdrawn&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;aa_compromise&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_distribution_points/relative_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-crl-distribution-points-relative-name"><strong>relative_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_distribution_points/relative_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Describes how the CRL can be retrieved relative to the CRL issuer.</p>
+<p>Mutually exclusive with <em>full_name</em>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">/CN=example.com</span></code>.</p>
+<p>Can only be used when cryptography &gt;= 1.6 is installed.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-digest"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-digest"><strong>digest</strong></p>
+<a class="ansibleOptionLink" href="#parameter-digest" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The digest used when signing the certificate signing request with the private key.</p>
+<p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;sha256&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-email_address"></div>
+<div class="ansibleOptionAnchor" id="parameter-E"></div>
+<div class="ansibleOptionAnchor" id="parameter-emailAddress"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-emailaddress"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-email-address"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-e"></span><strong>email_address</strong></p>
+<a class="ansibleOptionLink" href="#parameter-email_address" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: E, emailAddress</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The emailAddress field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-extended_key_usage"></div>
+<div class="ansibleOptionAnchor" id="parameter-extKeyUsage"></div>
+<div class="ansibleOptionAnchor" id="parameter-extendedKeyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extkeyusage"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extendedkeyusage"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extended-key-usage"></span><strong>extended_key_usage</strong></p>
+<a class="ansibleOptionLink" href="#parameter-extended_key_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: extKeyUsage, extendedKeyUsage</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Additional restrictions (for example client authentication, server authentication) on the allowed purposes for which the public key may be used.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-extended_key_usage_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-extKeyUsage_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-extendedKeyUsage_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extkeyusage-critical"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extendedkeyusage-critical"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-extended-key-usage-critical"></span><strong>extended_key_usage_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-extended_key_usage_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: extKeyUsage_critical, extendedKeyUsage_critical</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the extkeyUsage extension be considered as critical.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-key_usage"></div>
+<div class="ansibleOptionAnchor" id="parameter-keyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-keyusage"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-key-usage"></span><strong>key_usage</strong></p>
+<a class="ansibleOptionLink" href="#parameter-key_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: keyUsage</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>This defines the purpose (for example encipherment, signature, certificate signing) of the key contained in the certificate.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-key_usage_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-keyUsage_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-keyusage-critical"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-key-usage-critical"></span><strong>key_usage_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-key_usage_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: keyUsage_critical</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the keyUsage extension be considered as critical.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-locality_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-L"></div>
+<div class="ansibleOptionAnchor" id="parameter-localityName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-localityname"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-locality-name"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-l"></span><strong>locality_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-locality_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: L, localityName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The localityName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-name_constraints_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-name-constraints-critical"><strong>name_constraints_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-name_constraints_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the Name Constraints extension be considered as critical.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-name_constraints_excluded"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-name-constraints-excluded"><strong>name_constraints_excluded</strong></p>
+<a class="ansibleOptionLink" href="#parameter-name_constraints_excluded" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>For CA certificates, this specifies a list of identifiers which describe subtrees of names that this CA is <strong>not</strong> allowed to issue certificates for.</p>
+<p>Values must be prefixed by their options. (i.e., <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code> and the ones specific to your CA).</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-name_constraints_permitted"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-name-constraints-permitted"><strong>name_constraints_permitted</strong></p>
+<a class="ansibleOptionLink" href="#parameter-name_constraints_permitted" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>For CA certificates, this specifies a list of identifiers which describe subtrees of names that this CA is allowed to issue certificates for.</p>
+<p>Values must be prefixed by their options. (i.e., <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code> and the ones specific to your CA).</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ocsp_must_staple"></div>
+<div class="ansibleOptionAnchor" id="parameter-ocspMustStaple"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-ocspmuststaple"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-ocsp-must-staple"></span><strong>ocsp_must_staple</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ocsp_must_staple" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: ocspMustStaple</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Indicates that the certificate should contain the OCSP Must Staple extension (<a class="reference external" href="https://tools.ietf.org/html/rfc7633">https://tools.ietf.org/html/rfc7633</a>).</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ocsp_must_staple_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-ocspMustStaple_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-ocspmuststaple-critical"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-ocsp-must-staple-critical"></span><strong>ocsp_must_staple_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ocsp_must_staple_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: ocspMustStaple_critical</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the OCSP Must Staple extension be considered as critical.</p>
+<p>Note that according to the RFC, this extension should not be marked as critical, as old clients not knowing about OCSP Must Staple are required to reject such certificates (see <a class="reference external" href="https://tools.ietf.org/html/rfc7633#section-4">https://tools.ietf.org/html/rfc7633#section-4</a>).</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-organization_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-O"></div>
+<div class="ansibleOptionAnchor" id="parameter-organizationName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-organizationname"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-organization-name"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-o"></span><strong>organization_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-organization_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: O, organizationName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The organizationName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-organizational_unit_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-OU"></div>
+<div class="ansibleOptionAnchor" id="parameter-organizationalUnitName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-ou"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-organizationalunitname"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-organizational-unit-name"></span><strong>organizational_unit_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-organizational_unit_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: OU, organizationalUnitName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The organizationalUnitName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-privatekey_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-privatekey-content"><strong>privatekey_content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-privatekey_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The content of the private key to use when signing the certificate signing request.</p>
+<p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>, but not both.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-privatekey_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-privatekey-passphrase"><strong>privatekey_passphrase</strong></p>
+<a class="ansibleOptionLink" href="#parameter-privatekey_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The passphrase for the private key.</p>
+<p>This is required if the private key is password protected.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-privatekey_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-privatekey-path"><strong>privatekey_path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-privatekey_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The path to the private key to use when signing the certificate signing request.</p>
+<p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>, but not both.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
+<a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
+<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
+<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cryptography&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-state_or_province_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-ST"></div>
+<div class="ansibleOptionAnchor" id="parameter-stateOrProvinceName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-stateorprovincename"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-state-or-province-name"></span><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-st"></span><strong>state_or_province_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-state_or_province_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: ST, stateOrProvinceName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The stateOrProvinceName field of the certificate signing request subject.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-subject"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subject"><strong>subject</strong></p>
+<a class="ansibleOptionLink" href="#parameter-subject" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Key/value pairs that will be present in the subject name field of the certificate signing request.</p>
+<p>If you need to specify more than one value with the same key, use a list as value.</p>
+<p>If the order of the components is important, use <em>subject_ordered</em>.</p>
+<p>Mutually exclusive with <em>subject_ordered</em>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-subject_alt_name"></div>
+<div class="ansibleOptionAnchor" id="parameter-subjectAltName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subjectaltname"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subject-alt-name"></span><strong>subject_alt_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-subject_alt_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: subjectAltName</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Subject Alternative Name (SAN) extension to attach to the certificate signing request.</p>
+<p>Values must be prefixed by their options. (These are <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code>, and the ones specific to your CA).</p>
+<p>Note that if no SAN is specified, but a common name, the common name will be added as a SAN except if <code class="docutils literal notranslate"><span class="pre">useCommonNameForSAN</span></code> is set to <em>false</em>.</p>
+<p>More at <a class="reference external" href="https://tools.ietf.org/html/rfc5280#section-4.2.1.6">https://tools.ietf.org/html/rfc5280#section-4.2.1.6</a>.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-subject_alt_name_critical"></div>
+<div class="ansibleOptionAnchor" id="parameter-subjectAltName_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subjectaltname-critical"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subject-alt-name-critical"></span><strong>subject_alt_name_critical</strong></p>
+<a class="ansibleOptionLink" href="#parameter-subject_alt_name_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: subjectAltName_critical</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the subjectAltName extension be considered as critical.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-subject_key_identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subject-key-identifier"><strong>subject_key_identifier</strong></p>
+<a class="ansibleOptionLink" href="#parameter-subject_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The subject key identifier as a hex string, where two bytes are separated by colons.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code></p>
+<p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
+<p>Note that this option can only be used if <em>create_subject_key_identifier</em> is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-subject_ordered"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-subject-ordered"><strong>subject_ordered</strong></p>
+<a class="ansibleOptionLink" href="#parameter-subject_ordered" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
+<p><span class="ansible-option-versionadded">added in community.crypto 2.0.0</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>A list of dictionaries, where every dictionary must contain one key/value pair. This key/value pair will be present in the subject name field of the certificate signing request.</p>
+<p>If you want to specify more than one value with the same key in a row, you can use a list as value.</p>
+<p>Mutually exclusive with <em>subject</em>, and any other subject field option, such as <em>country_name</em>, <em>state_or_province_name</em>, <em>locality_name</em>, <em>organization_name</em>, <em>organizational_unit_name</em>, <em>common_name</em>, or <em>email_address</em>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-use_common_name_for_san"></div>
+<div class="ansibleOptionAnchor" id="parameter-useCommonNameForSAN"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-usecommonnameforsan"><span id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-use-common-name-for-san"></span><strong>use_common_name_for_san</strong></p>
+<a class="ansibleOptionLink" href="#parameter-use_common_name_for_san" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: useCommonNameForSAN</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the module will fill the common name in for <code class="docutils literal notranslate"><span class="pre">subject_alt_name</span></code> with <code class="docutils literal notranslate"><span class="pre">DNS:</span></code> prefix if no SAN is specified.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">true</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-version"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-version"><strong>version</strong></p>
+<a class="ansibleOptionLink" href="#parameter-version" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The version of the certificate signing request.</p>
+<p>The only allowed value according to <a class="reference external" href="https://tools.ietf.org/html/rfc2986#section-4.1">RFC 2986</a> is 1.</p>
+<p>This option no longer accepts unsupported values since community.crypto 2.0.0.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">1</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h2><a class="toc-backref" href="#id4">Attributes</a><a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h2>
+<table class="colwidths-auto ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Support</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-check_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-attribute-check-mode"><strong>check_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-check_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><span class="ansible-attribute-support-label">Support: </span><span class="ansible-attribute-support-full">full</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Can run in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code> and return changed status prediction without modifying target.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-diff_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-attribute-diff-mode"><strong>diff_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-diff_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><span class="ansible-attribute-support-label">Support: </span><span class="ansible-attribute-support-full">full</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>If the certificate signing request already exists it will be checked whether subjectAltName, keyUsage, extendedKeyUsage and basicConstraints only contain the requested values, whether OCSP Must Staple is as requested, and if the request was signed by the given private key.</p></li>
+</ul>
+</div>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id6">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_csr</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.x509_certificate</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="x509_certificate_pipe_module.html#ansible-collections-community-crypto-x509-certificate-pipe-module"><span class="std std-ref">community.crypto.x509_certificate_pipe</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.x509_certificate_pipe</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_dhparam_module.html#ansible-collections-community-crypto-openssl-dhparam-module"><span class="std std-ref">community.crypto.openssl_dhparam</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_dhparam</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_pkcs12_module.html#ansible-collections-community-crypto-openssl-pkcs12-module"><span class="std std-ref">community.crypto.openssl_pkcs12</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_pkcs12</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_privatekey</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_privatekey_pipe</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_publickey</strong> module.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_csr_info_module.html#ansible-collections-community-crypto-openssl-csr-info-module"><span class="std std-ref">community.crypto.openssl_csr_info</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_csr_info</strong> module.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id7">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request</span><span class="w"></span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.csr</span><span class="w"></span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with an inline CSR</span><span class="w"></span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/ssl/csr/www.ansible.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">private_key_content</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Store CSR</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.csr</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result is changed</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="return-values">
+<h2><a class="toc-backref" href="#id8">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
+<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
+<table class="colwidths-auto ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-basicConstraints"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-basicconstraints"><strong>basicConstraints</strong></p>
+<a class="ansibleOptionLink" href="#return-basicConstraints" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Indicates if the certificate belongs to a CA</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;CA:TRUE&quot;,</span> <span class="pre">&quot;pathLenConstraint:0&quot;]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-csr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-csr"><strong>csr</strong></p>
+<a class="ansibleOptionLink" href="#return-csr" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The (current or generated) CSR’s content.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-extendedKeyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-extendedkeyusage"><strong>extendedKeyUsage</strong></p>
+<a class="ansibleOptionLink" href="#return-extendedKeyUsage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Additional restriction on the public key purposes</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;clientAuth&quot;]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-keyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-keyusage"><strong>keyUsage</strong></p>
+<a class="ansibleOptionLink" href="#return-keyUsage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Purpose for which the public key may be used</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;digitalSignature&quot;,</span> <span class="pre">&quot;keyAgreement&quot;]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-name_constraints_excluded"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-name-constraints-excluded"><strong>name_constraints_excluded</strong></p>
+<a class="ansibleOptionLink" href="#return-name_constraints_excluded" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>List of excluded subtrees the CA cannot sign certificates for.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;email:.com&quot;]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-name_constraints_permitted"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-name-constraints-permitted"><strong>name_constraints_permitted</strong></p>
+<a class="ansibleOptionLink" href="#return-name_constraints_permitted" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>List of permitted subtrees to sign certificates for.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;email:.somedomain.com&quot;]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-ocsp_must_staple"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-ocsp-must-staple"><strong>ocsp_must_staple</strong></p>
+<a class="ansibleOptionLink" href="#return-ocsp_must_staple" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Indicates whether the certificate has the OCSP Must Staple feature enabled</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">false</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-privatekey"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-privatekey"><strong>privatekey</strong></p>
+<a class="ansibleOptionLink" href="#return-privatekey" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to the TLS/SSL private key the CSR was generated for</p>
+<p>Will be <code class="docutils literal notranslate"><span class="pre">none</span></code> if the private key has been provided in <em>privatekey_content</em>.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/etc/ssl/private/ansible.com.pem&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-subject"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-subject"><strong>subject</strong></p>
+<a class="ansibleOptionLink" href="#return-subject" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=list</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>A list of the subject tuples attached to the CSR</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[[&quot;CN&quot;,</span> <span class="pre">&quot;www.ansible.com&quot;],</span> <span class="pre">[&quot;O&quot;,</span> <span class="pre">&quot;Ansible&quot;]]</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-subjectAltName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-subjectaltname"><strong>subjectAltName</strong></p>
+<a class="ansibleOptionLink" href="#return-subjectAltName" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The alternative names this CSR is valid for</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;DNS:www.ansible.com&quot;,</span> <span class="pre">&quot;DNS:m.ansible.com&quot;]</span></code></p>
+</div></td>
+</tr>
+</tbody>
+</table>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Yanis Guenane (&#64;Spredzy)</p></li>
+<li><p>Felix Fontein (&#64;felixfontein)</p></li>
+</ul>
+</section>
+<section id="collection-links">
+<h3>Collection links<a class="headerlink" href="#collection-links" title="Permalink to this heading"></a></h3>
+<p class="ansible-links">
+  <a href="https://github.com/ansible-collections/community.crypto/issues" aria-role="button" target="_blank" rel="noopener external">Issue Tracker</a>
+  <a href="https://github.com/ansible-collections/community.crypto" aria-role="button" target="_blank" rel="noopener external">Repository (Sources)</a>
+  <a href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" aria-role="button" target="_blank" rel="noopener external">Submit a bug report</a>
+  <a href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" aria-role="button" target="_blank" rel="noopener external">Request a feature</a>
+  <a href="./#communication-for-community-crypto" aria-role="button" target="_blank">Communication</a>
+</p></section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="openssl_csr_info_module.html" class="btn btn-neutral float-left" title="community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="openssl_dhparam_module.html" class="btn btn-neutral float-right" title="community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
