@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.9.0
+======
+
+Release Summary
+---------------
+
+Regular feature release.
+
+Minor Changes
+-------------
+
+- x509_certificate_info - adds ``issuer_uri`` field in return value based on Authority Information Access data (https://github.com/ansible-collections/community.crypto/pull/530).
+
 v2.8.1
 ======
 

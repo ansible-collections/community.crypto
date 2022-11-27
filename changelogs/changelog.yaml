@@ -1014,3 +1014,13 @@ releases:
     fragments:
     - 2.8.1.yml
     release_date: '2022-11-06'
+  2.9.0:
+    changes:
+      minor_changes:
+      - x509_certificate_info - adds ``issuer_uri`` field in return value based on
+        Authority Information Access data (https://github.com/ansible-collections/community.crypto/pull/530).
+      release_summary: Regular feature release.
+    fragments:
+    - 2.9.0.yml
+    - aia_issuer.yaml
+    release_date: '2022-11-27'

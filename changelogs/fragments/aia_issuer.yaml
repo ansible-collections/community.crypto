@@ -1,2 +1,0 @@
-minor_changes:
-  - x509_certificate_info - adds ``issuer_uri`` field in return value based on Authority Information Access data (https://github.com/ansible-collections/community.crypto/pull/530).
