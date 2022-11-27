@@ -29,9 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
-        uses: felixfontein/ansible-test-gh-action@change-detection
+        uses: felixfontein/ansible-test-gh-action@integration-error-behavior
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
 
@@ -50,9 +51,10 @@ jobs:
       - name: >-
           Perform unit testing against
           Ansible version ${{ matrix.ansible }}
-        uses: felixfontein/ansible-test-gh-action@change-detection
+        uses: felixfontein/ansible-test-gh-action@integration-error-behavior
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: units
 
@@ -101,10 +103,12 @@ jobs:
           Perform integration testing against
           Ansible version ${{ matrix.ansible }}
           under Python ${{ matrix.python }}
-        uses: felixfontein/ansible-test-gh-action@change-detection
+        uses: felixfontein/ansible-test-gh-action@integration-error-behavior
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           docker-image: ${{ matrix.docker }}
+          integration-continue-on-error: 'false'
           pre-test-cmd: >-
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
             ;
