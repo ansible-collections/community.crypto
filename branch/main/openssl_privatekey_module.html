@@ -203,7 +203,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-attr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-attributes"><span id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-attr"></span><strong>attributes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-attributes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: attr</span></p>
 <p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-<p><span class="ansible-option-versionadded">added in Ansible 2.3</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
 <p>To get supported flags look at the man page for <em>chattr</em> on the target system.</p>
@@ -478,7 +477,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
-<p><span class="ansible-option-versionadded">added in Ansible 2.2</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.</p>
 <p>By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.</p>
@@ -536,23 +534,23 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_privatekey_pipe</strong> module.</p>
+<dt><a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a></dt><dd><p>Generate OpenSSL private keys without disk access.</p>
 </dd>
-<dt><a class="reference internal" href="openssl_privatekey_info_module.html#ansible-collections-community-crypto-openssl-privatekey-info-module"><span class="std std-ref">community.crypto.openssl_privatekey_info</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_privatekey_info</strong> module.</p>
+<dt><a class="reference internal" href="openssl_privatekey_info_module.html#ansible-collections-community-crypto-openssl-privatekey-info-module"><span class="std std-ref">community.crypto.openssl_privatekey_info</span></a></dt><dd><p>Provide information for OpenSSL private keys.</p>
 </dd>
-<dt><a class="reference internal" href="x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.x509_certificate</strong> module.</p>
+<dt><a class="reference internal" href="x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a></dt><dd><p>Generate and/or check OpenSSL certificates.</p>
 </dd>
-<dt><a class="reference internal" href="x509_certificate_pipe_module.html#ansible-collections-community-crypto-x509-certificate-pipe-module"><span class="std std-ref">community.crypto.x509_certificate_pipe</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.x509_certificate_pipe</strong> module.</p>
+<dt><a class="reference internal" href="x509_certificate_pipe_module.html#ansible-collections-community-crypto-x509-certificate-pipe-module"><span class="std std-ref">community.crypto.x509_certificate_pipe</span></a></dt><dd><p>Generate and/or check OpenSSL certificates.</p>
 </dd>
-<dt><a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_csr</strong> module.</p>
+<dt><a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a></dt><dd><p>Generate OpenSSL Certificate Signing Request (CSR).</p>
 </dd>
-<dt><a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_csr_pipe</strong> module.</p>
+<dt><a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a></dt><dd><p>Generate OpenSSL Certificate Signing Request (CSR).</p>
 </dd>
-<dt><a class="reference internal" href="openssl_dhparam_module.html#ansible-collections-community-crypto-openssl-dhparam-module"><span class="std std-ref">community.crypto.openssl_dhparam</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_dhparam</strong> module.</p>
+<dt><a class="reference internal" href="openssl_dhparam_module.html#ansible-collections-community-crypto-openssl-dhparam-module"><span class="std std-ref">community.crypto.openssl_dhparam</span></a></dt><dd><p>Generate OpenSSL Diffie-Hellman Parameters.</p>
 </dd>
-<dt><a class="reference internal" href="openssl_pkcs12_module.html#ansible-collections-community-crypto-openssl-pkcs12-module"><span class="std std-ref">community.crypto.openssl_pkcs12</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_pkcs12</strong> module.</p>
+<dt><a class="reference internal" href="openssl_pkcs12_module.html#ansible-collections-community-crypto-openssl-pkcs12-module"><span class="std std-ref">community.crypto.openssl_pkcs12</span></a></dt><dd><p>Generate OpenSSL PKCS#12 archive.</p>
 </dd>
-<dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>The official documentation on the <strong>community.crypto.openssl_publickey</strong> module.</p>
+<dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>Generate an OpenSSL public key from its private key.</p>
 </dd>
 </dl>
 </div>

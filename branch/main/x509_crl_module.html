@@ -202,7 +202,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="parameter-attr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-attributes"><span id="ansible-collections-community-crypto-x509-crl-module-parameter-attr"></span><strong>attributes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-attributes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: attr</span></p>
 <p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-<p><span class="ansible-option-versionadded">added in Ansible 2.3</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
 <p>To get supported flags look at the man page for <em>chattr</em> on the target system.</p>
@@ -574,7 +573,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
-<p><span class="ansible-option-versionadded">added in Ansible 2.2</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.</p>
 <p>By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.</p>
