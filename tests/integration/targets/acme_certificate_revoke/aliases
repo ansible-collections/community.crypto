@@ -8,7 +8,10 @@ cloud/acme
 
 # Skip all VMs, since we cannot talk to the ACME simulator from these:
 skip/aix
+skip/alpine
+skip/fedora
 skip/freebsd
 skip/macos
 skip/osx
 skip/rhel
+skip/ubuntu
