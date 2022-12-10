@@ -25,4 +25,4 @@
   set_fact:
     bcrypt_version:
       stdout: 0.0
-  when: bcrypt_version is not defined
+  when: bcrypt_version is failed
