@@ -7,5 +7,5 @@ azp/posix/1
 destructive
 needs/httptester
 
-# For some reason the httptester image does not work on the Alpine VMs
+# For some reason connecting to helper containers does not work on the Alpine VMs
 skip/alpine

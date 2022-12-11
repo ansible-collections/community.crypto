@@ -6,5 +6,5 @@ azp/generic/1
 azp/posix/1
 cloud/acme
 
-# Skip most VMs, since we cannot talk to the ACME simulator from these:
+# For some reason connecting to helper containers does not work on the Alpine VMs
 skip/alpine
