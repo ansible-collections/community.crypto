@@ -7,9 +7,4 @@ azp/posix/1
 cloud/acme
 
 # Skip most VMs, since we cannot talk to the ACME simulator from these:
-skip/aix
 skip/alpine
-skip/freebsd
-skip/macos
-skip/osx
-skip/rhel
