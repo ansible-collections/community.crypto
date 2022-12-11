@@ -95,6 +95,12 @@
       except ImportError:
           from urllib2 import Request # Python 2
 
+- name: "Monkey-patch acme-tiny: adjust shebang"
+  replace:
+    path: "{{ remote_tmp_dir }}/acme-tiny"
+    regexp: '^\#\!/usr/bin/env .*$'
+    replace: '#!{{ ansible_python_interpreter }}'
+
 - name: "Monkey-patch acme-tiny: Disable check that challenge file is reachable via HTTP"
   replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"

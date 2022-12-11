@@ -3,10 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Gather package facts
-  package_facts:
-    manager: auto
-
 - name: On kernel >= 5.9 use performance flags
   block:
     - name: Create and open (check)
@@ -104,4 +100,4 @@
 
   when:
     - ansible_facts.kernel is version('5.9.0', '>=')
-    - ansible_facts.packages['cryptsetup'][0].version is version('2.3.4', '>=')
+    - cryptsetup_version is version('2.3.4', '>=')

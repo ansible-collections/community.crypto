@@ -15,29 +15,66 @@
   loop:
     - keyfile1
     - keyfile2
+
+- name: Include OS-specific variables
+  include_vars: '{{ lookup("first_found", search) }}'
+  vars:
+    search:
+      files:
+      - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+      - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+      - '{{ ansible_distribution }}.yml'
+      - '{{ ansible_os_family }}.yml'
+      - default.yml
+      paths:
+      - vars
+
 - name: Make sure cryptsetup is installed
   package:
     name: cryptsetup
     state: present
-  become: yes
+  become: true
+
+- name: Install additionally required packages
+  package:
+    name: '{{ luks_extra_packages }}'
+    state: present
+  become: true
+  when: luks_extra_packages | length > 0
+
+- name: Determine cryptsetup version
+  command: cryptsetup --version
+  register: cryptsetup_version
+
+- name: Extract cryptsetup version
+  set_fact:
+    cryptsetup_version: >-
+      {{ cryptsetup_version.stdout_lines[0] | regex_search('cryptsetup ([0-9]+\.[0-9]+\.[0-9]+)') | split | last }}
+
 - name: Create cryptfile
   command: dd if=/dev/zero of={{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile bs=1M count=32
+
+- name: Figure out next loopback device
+  command: losetup -f
+  become: true
+  register: cryptfile_device_output
+
 - name: Create lookback device
   command: losetup -f {{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile
-  become: yes
-- name: Determine loop device name
-  command: losetup -j {{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile --output name
-  become: yes
-  register: cryptfile_device_output
-- set_fact:
-    cryptfile_device: "{{ cryptfile_device_output.stdout_lines[1] }}"
+  become: true
+
+- name: Store some common data for tests
+  set_fact:
+    cryptfile_device: "{{ cryptfile_device_output.stdout_lines[0] }}"
     cryptfile_passphrase1: "uNiJ9vKG2mUOEWDiQVuBHJlfMHE"
     cryptfile_passphrase2: "HW4Ak2HtE2vvne0qjJMPTtmbV4M"
     cryptfile_passphrase3: "qQJqsjabO9pItV792k90VvX84MM"
+
 - block:
   - include_tasks: run-test.yml
     with_fileglob:
     - "tests/*.yml"
+
   always:
   - name: Make sure LUKS device is gone
     luks_device:
@@ -45,8 +82,10 @@
       state: absent
     become: yes
     ignore_errors: yes
+
   - command: losetup -d "{{ cryptfile_device }}"
     become: yes
+
   - file:
-      dest: "{{ remote_tmp_dir }}/cryptfile"
+      dest: "{{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile"
       state: absent
