@@ -111,11 +111,11 @@ stages:
               test: centos7
             - name: openSUSE 15
               test: opensuse15
+            - name: Ubuntu 20.04
+              test: ubuntu2004
             # The following are already tested as VMs with devel:
             # - name: Fedora 36
             #   test: fedora36
-            # - name: Ubuntu 20.04
-            #   test: ubuntu2004
             # - name: Ubuntu 22.04
             #   test: ubuntu2204
             # - name: Alpine 3
@@ -202,8 +202,9 @@ stages:
               test: alpine/3.16
             - name: Fedora 36
               test: fedora/36
-            - name: Ubuntu 20.04
-              test: ubuntu/20.04
+            # Does not work yet: https://github.com/ansible/ansible/issues/79575
+            # - name: Ubuntu 20.04
+            #   test: ubuntu/20.04
             - name: Ubuntu 22.04
               test: ubuntu/22.04
   - stage: Remote_2_14
