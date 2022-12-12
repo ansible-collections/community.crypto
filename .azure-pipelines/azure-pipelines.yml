@@ -173,7 +173,7 @@ stages:
               test: debian-bullseye/3.9
             - name: ArchLinux
               test: archlinux/3.10
-            - name: CentOS Stream 8 w/ Python 3.9
+            - name: CentOS Stream 8 with Python 3.9
               test: centos-stream8/3.9
 
 ### Remote
