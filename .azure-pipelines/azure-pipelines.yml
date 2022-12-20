@@ -121,6 +121,7 @@ stages:
               test: alpine3
           groups:
             - 1
+            - 2
   - stage: Docker_2_14
     displayName: Docker 2.14
     dependsOn: []
@@ -133,6 +134,7 @@ stages:
               test: ubuntu2204
           groups:
             - 1
+            - 2
   - stage: Docker_2_13
     displayName: Docker 2.13
     dependsOn: []
@@ -153,6 +155,7 @@ stages:
               test: alpine3
           groups:
             - 1
+            - 2
   - stage: Docker_2_12
     displayName: Docker 2.12
     dependsOn: []
@@ -167,6 +170,7 @@ stages:
               test: fedora33
           groups:
             - 1
+            - 2
 
 ### Community Docker
   - stage: Docker_community_devel
@@ -187,6 +191,7 @@ stages:
               test: centos-stream8/3.6
           groups:
             - 1
+            - 2
 
 ### Remote
   - stage: Remote_devel
@@ -209,6 +214,7 @@ stages:
               test: freebsd/13.1
           groups:
             - 1
+            - 2
   - stage: Remote_2_14
     displayName: Remote 2.14
     dependsOn: []
@@ -221,6 +227,7 @@ stages:
               test: rhel/9.0
           groups:
             - 1
+            - 2
   - stage: Remote_2_13
     displayName: Remote 2.13
     dependsOn: []
@@ -237,6 +244,7 @@ stages:
               test: freebsd/13.0
           groups:
             - 1
+            - 2
   - stage: Remote_2_12
     displayName: Remote 2.12
     dependsOn: []
@@ -254,6 +262,7 @@ stages:
               test: freebsd/12.2
           groups:
             - 1
+            - 2
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -274,6 +283,7 @@ stages:
             - test: "3.11"
           groups:
             - 1
+            - 2
   - stage: Generic_2_14
     displayName: Generic 2.14
     dependsOn: []
@@ -286,6 +296,7 @@ stages:
             - test: 3.9
           groups:
             - 1
+            - 2
   - stage: Generic_2_13
     displayName: Generic 2.13
     dependsOn: []
@@ -298,6 +309,7 @@ stages:
             - test: 3.8
           groups:
             - 1
+            - 2
   - stage: Generic_2_12
     displayName: Generic 2.12
     dependsOn: []
@@ -311,6 +323,7 @@ stages:
             - test: 3.9
           groups:
             - 1
+            - 2
 
   ## Finally
 
