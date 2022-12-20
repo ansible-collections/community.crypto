@@ -105,7 +105,7 @@ stages:
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux/{0}/1
+          testFormat: devel/linux/{0}
           targets:
             - name: CentOS 7
               test: centos7
@@ -119,23 +119,27 @@ stages:
               test: ubuntu2204
             - name: Alpine 3
               test: alpine3
+          groups:
+            - 1
   - stage: Docker_2_14
     displayName: Docker 2.14
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.14/linux/{0}/1
+          testFormat: 2.14/linux/{0}
           targets:
             - name: Ubuntu 22.04
               test: ubuntu2204
+          groups:
+            - 1
   - stage: Docker_2_13
     displayName: Docker 2.13
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.13/linux/{0}/1
+          testFormat: 2.13/linux/{0}
           targets:
             - name: openSUSE 15 py2
               test: opensuse15py2
@@ -147,18 +151,22 @@ stages:
               test: ubuntu1804
             - name: Alpine 3
               test: alpine3
+          groups:
+            - 1
   - stage: Docker_2_12
     displayName: Docker 2.12
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.12/linux/{0}/1
+          testFormat: 2.12/linux/{0}
           targets:
             - name: CentOS 6
               test: centos6
             - name: Fedora 33
               test: fedora33
+          groups:
+            - 1
 
 ### Community Docker
   - stage: Docker_community_devel
@@ -167,7 +175,7 @@ stages:
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux-community/{0}/1
+          testFormat: devel/linux-community/{0}
           targets:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
@@ -175,6 +183,8 @@ stages:
               test: archlinux/3.10
             - name: CentOS Stream 8 with Python 3.9
               test: centos-stream8/3.9
+          groups:
+            - 1
 
 ### Remote
   - stage: Remote_devel
@@ -183,7 +193,7 @@ stages:
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}/1
+          testFormat: devel/{0}
           targets:
             - name: macOS 12.0
               test: macos/12.0
@@ -195,23 +205,27 @@ stages:
               test: freebsd/12.3
             - name: FreeBSD 13.1
               test: freebsd/13.1
+          groups:
+            - 1
   - stage: Remote_2_14
     displayName: Remote 2.14
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.14/{0}/1
+          testFormat: 2.14/{0}
           targets:
             - name: RHEL 9.0
               test: rhel/9.0
+          groups:
+            - 1
   - stage: Remote_2_13
     displayName: Remote 2.13
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.13/{0}/1
+          testFormat: 2.13/{0}
           targets:
             - name: macOS 12.0
               test: macos/12.0
@@ -219,13 +233,15 @@ stages:
               test: rhel/8.5
             - name: FreeBSD 13.0
               test: freebsd/13.0
+          groups:
+            - 1
   - stage: Remote_2_12
     displayName: Remote 2.12
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: 2.12/{0}/1
+          testFormat: 2.12/{0}
           targets:
             # - name: macOS 11.1
             #   test: macos/11.1
@@ -233,6 +249,8 @@ stages:
               test: rhel/8.4
             - name: FreeBSD 12.2
               test: freebsd/12.2
+          groups:
+            - 1
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -241,7 +259,7 @@ stages:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: devel/generic/{0}/1
+          testFormat: devel/generic/{0}
           targets:
             - test: 2.7
             - test: 3.5
@@ -251,6 +269,8 @@ stages:
             - test: 3.9
             - test: "3.10"
             - test: "3.11"
+          groups:
+            - 1
   - stage: Generic_2_14
     displayName: Generic 2.14
     dependsOn: []
@@ -258,9 +278,11 @@ stages:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: 2.14/generic/{0}/1
+          testFormat: 2.14/generic/{0}
           targets:
             - test: 3.9
+          groups:
+            - 1
   - stage: Generic_2_13
     displayName: Generic 2.13
     dependsOn: []
@@ -268,9 +290,11 @@ stages:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: 2.13/generic/{0}/1
+          testFormat: 2.13/generic/{0}
           targets:
             - test: 3.8
+          groups:
+            - 1
   - stage: Generic_2_12
     displayName: Generic 2.12
     dependsOn: []
@@ -278,10 +302,12 @@ stages:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: 2.12/generic/{0}/1
+          testFormat: 2.12/generic/{0}
           targets:
             - test: 2.6
             - test: 3.9
+          groups:
+            - 1
 
   ## Finally
 
