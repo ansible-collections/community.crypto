@@ -71,39 +71,6 @@ stages:
               test: '2.12/sanity/1'
             - name: Units
               test: '2.12/units/1'
-  - stage: Ansible_2_11
-    displayName: Sanity & Units 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.11/sanity/1'
-            - name: Units
-              test: '2.11/units/1'
-  - stage: Ansible_2_10
-    displayName: Sanity & Units 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.10/sanity/1'
-            - name: Units
-              test: '2.10/units/1'
-  - stage: Ansible_2_9
-    displayName: Sanity & Units 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.9/sanity/1'
-            - name: Units
-              test: '2.9/units/1'
 ### Docker
   - stage: Docker_2_13
     displayName: Docker 2.13
@@ -143,36 +110,6 @@ stages:
               test: opensuse15
             - name: Ubuntu 20.04
               test: ubuntu2004
-  - stage: Docker_2_11
-    displayName: Docker 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.11/linux/{0}/1
-          targets:
-            - name: CentOS 7
-              test: centos7
-            - name: Fedora 32
-              test: fedora32
-            - name: openSUSE 15 py2
-              test: opensuse15py2
-            - name: Ubuntu 18.04
-              test: ubuntu1804
-  - stage: Docker_2_10
-    displayName: Docker 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.10/linux/{0}/1
-          targets:
-            - name: CentOS 6
-              test: centos6
-            - name: Fedora 31
-              test: fedora31
-            - name: Ubuntu 16.04
-              test: ubuntu1604
   - stage: Docker_2_9
     displayName: Docker 2.9
     dependsOn: []
@@ -219,48 +156,12 @@ stages:
         parameters:
           testFormat: 2.12/{0}/1
           targets:
-            # - name: macOS 11.1
-            #   test: macos/11.1
+            - name: macOS 11.1
+              test: macos/11.1
             - name: RHEL 8.4
               test: rhel/8.4
             - name: FreeBSD 13.0
               test: freebsd/13.0
-  - stage: Remote_2_11
-    displayName: Remote 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.11/{0}/1
-          targets:
-            - name: RHEL 7.9
-              test: rhel/7.9
-            - name: RHEL 8.3
-              test: rhel/8.3
-            - name: FreeBSD 12.2
-              test: freebsd/12.2
-  - stage: Remote_2_10
-    displayName: Remote 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.10/{0}/1
-          targets:
-            - name: OS X 10.11
-              test: osx/10.11
-            # - name: macOS 10.15
-            #   test: macos/10.15
-  - stage: Remote_2_9
-    displayName: Remote 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.9/{0}/1
-          targets:
-            - name: 'RHEL 7.8'
-              test: 'rhel/7.8'
 ### cloud
   - stage: Cloud_2_13
     displayName: Cloud 2.13
@@ -289,36 +190,6 @@ stages:
           targets:
             - test: 2.6
             - test: 3.9
-  - stage: Cloud_2_11
-    displayName: Cloud 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.11/cloud/{0}/1
-          targets:
-            - test: 3.8
-  - stage: Cloud_2_10
-    displayName: Cloud 2.10
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.10/cloud/{0}/1
-          targets:
-            - test: 3.6
-  - stage: Cloud_2_9
-    displayName: Cloud 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.9/cloud/{0}/1
-          targets:
-            - test: 2.7
 
   ## Finally
 
@@ -327,23 +198,11 @@ stages:
     dependsOn:
       - Ansible_2_13
       - Ansible_2_12
-      - Ansible_2_11
-      - Ansible_2_10
-      - Ansible_2_9
       - Remote_2_13
       - Remote_2_12
-      - Remote_2_11
-      - Remote_2_10
-      - Remote_2_9
       - Docker_2_13
       - Docker_2_12
-      - Docker_2_11
-      - Docker_2_10
-      - Docker_2_9
       - Cloud_2_13
       - Cloud_2_12
-      - Cloud_2_11
-      - Cloud_2_10
-      - Cloud_2_9
     jobs:
       - template: templates/coverage.yml
