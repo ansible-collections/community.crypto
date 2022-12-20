@@ -18,5 +18,5 @@ else
 fi
 
 # shellcheck disable=SC2086
-ansible-test integration --color -v --retry-on-error "${target}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} ${UNSTABLE:+"$UNSTABLE"} \
+ansible-test integration --show-timings --color -v --retry-on-error "${target}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} ${UNSTABLE:+"$UNSTABLE"} \
     --docker "quay.io/ansible-community/test-image:${image}" --python "${python}"
