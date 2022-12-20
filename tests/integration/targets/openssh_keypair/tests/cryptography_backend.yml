@@ -82,6 +82,7 @@
     path: '{{ remote_tmp_dir }}/pem_encoded'
     passphrase: "{{ passphrase }}"
     backend: cryptography
+    size: 1280
   register: pem_encoded_output
 
 - name: Check that PEM encoded file is read without errors
