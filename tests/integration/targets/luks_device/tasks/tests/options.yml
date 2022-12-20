@@ -6,6 +6,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 256
     pbkdf:
+      algorithm: pbkdf2
       iteration_count: 1000
   become: yes
   register: create_with_keysize
@@ -16,6 +17,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 256
     pbkdf:
+      algorithm: pbkdf2
       iteration_count: 1000
   become: yes
   register: create_idem_with_keysize
@@ -26,6 +28,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     keysize: 512
     pbkdf:
+      algorithm: pbkdf2
       iteration_count: 1000
   become: yes
   register: create_idem_with_diff_keysize
@@ -36,6 +39,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     passphrase: "{{ cryptfile_passphrase1 }}"
     pbkdf:
+      algorithm: pbkdf2
       iteration_count: 1000
   ignore_errors: yes
   become: yes
