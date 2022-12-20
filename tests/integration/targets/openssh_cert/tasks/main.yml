@@ -18,7 +18,7 @@
   openssh_keypair:
     path: "{{ signing_key }}"
     type: rsa
-    size: 2048
+    size: 1024
 
 - block:
     - name: Import idempotency tests

@@ -11,7 +11,7 @@
 - name: "({{ backend }}) Generate key (check mode)"
   openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
   register: check_core_output
   check_mode: true
@@ -19,14 +19,14 @@
 - name: "({{ backend }}) Generate key"
   openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
   register: core_output
 
 - name: "({{ backend }}) Generate key (check mode idempotent)"
   openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
   register: idempotency_check_core_output
   check_mode: true
@@ -34,7 +34,7 @@
 - name: "({{ backend }}) Generate key (idempotent)"
   openssh_keypair:
     path: '{{ remote_tmp_dir }}/core'
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
   register: idempotency_core_output
 
@@ -69,7 +69,7 @@
   assert:
     that:
       - core_output['size']|type_debug == 'int'
-      - core_output['size'] == 2048
+      - core_output['size'] == 1280
 
 - name: "({{ backend }}) Assert key returns key type"
   assert:
@@ -84,7 +84,7 @@
 - name: "({{ backend }}) Assert key size matches 'ssh-keygen' output"
   assert:
     that:
-      - core_size_ssh_keygen.stdout == '2048'
+      - core_size_ssh_keygen.stdout == '1280'
 
 - name: "({{ backend }}) Read core.pub"
   slurp:

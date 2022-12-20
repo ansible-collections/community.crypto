@@ -47,7 +47,7 @@
 - name: Modify unprotected key with passphrase
   openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
-    size: 2048
+    size: 1280
     passphrase: "{{ passphrase }}"
     backend: cryptography
   ignore_errors: true
@@ -56,7 +56,7 @@
 - name: Modify unprotected key with passphrase (force)
   openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
-    size: 2048
+    size: 1280
     passphrase: "{{ passphrase }}"
     force: true
     backend: cryptography
@@ -75,7 +75,7 @@
     state: absent
 
 - name: Generate PEM encoded key with passphrase
-  command: 'ssh-keygen -b 4096 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+  command: 'ssh-keygen -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
