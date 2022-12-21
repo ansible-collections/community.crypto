@@ -104,7 +104,7 @@
 - name: "({{ backend }}) Modify key - password_protected"
   openssh_keypair:
     path: "{{ remote_tmp_dir }}/password_protected"
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
   register: password_protected_output
   ignore_errors: true
@@ -118,7 +118,7 @@
 - name: "({{ backend }}) Modify key with 'force=true' - password_protected"
   openssh_keypair:
     path: "{{ remote_tmp_dir }}/password_protected"
-    size: 2048
+    size: 1280
     backend: "{{ backend }}"
     force: true
   register: force_password_protected_output
