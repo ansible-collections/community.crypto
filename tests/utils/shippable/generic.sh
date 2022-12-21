@@ -17,6 +17,6 @@ stage="${S:-prod}"
 
 # shellcheck disable=SC2086
 export ANSIBLE_ACME_CONTAINER=quay.io/ansible/acme-test-container:2.0.0  # use new container until
-ansible-test integration --show-timings --color -v --retry-on-error "${target}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} ${UNSTABLE:+"$UNSTABLE"} \
+ansible-test integration --color -v --retry-on-error "${target}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} ${UNSTABLE:+"$UNSTABLE"} \
     --remote-terminate always --remote-stage "${stage}" \
     --docker --python "${python}"
