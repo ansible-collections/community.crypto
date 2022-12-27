@@ -1,0 +1,64 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Run tests that raise no errors
+  assert:
+    that:
+      - >-
+        '' | community.crypto.split_pem == []
+      - >-
+        (pem_1 + pem_2 + pem_3) | community.crypto.split_pem == [pem_1, pem_2, pem_3]
+      - >-
+        (pem_3 + pem_2 + pem_1) | community.crypto.split_pem == [pem_3, pem_2, pem_1]
+      - >-
+        (crap_1 + pem_3 + crap_2 + pem_2 + crap_3 + pem_1 + crap_2) | community.crypto.split_pem == [pem_3, pem_2, pem_1]
+      - >-
+        (crap_1 + pem_1 + crap_2 + pem_1 + crap_3 + crap_4 + crap_4) | community.crypto.split_pem == [pem_1, pem_1]
+  vars:
+    pem_1: |
+      -----BEGIN CERTIFICATE-----
+      AAb=
+      -----END CERTIFICATE-----
+    pem_2: |
+      -----BEGIN PRIVATE KEY-----
+      Foo
+      Bar
+      Baz
+      Bam
+      -----END PRIVATE KEY-----
+    pem_3: |
+      -----BEGIN 
+      foo
+      -----END 
+    crap_1: |
+      # Comment
+    crap_2: |
+      Random text
+      In multiple
+      Lines
+    crap_3: |
+      ----BEGIN CERTIFICATE----
+      Certificate with too few dashes
+      ----END CERTIFICATE----
+    crap_4: |
+      -----BEGIN CERTIFICATE-----
+      AAb=
+
+- name: Invalid input
+  debug:
+    msg: "{{ [] | community.crypto.split_pem }}"
+  ignore_errors: true
+  register: output
+
+- name: Validate error
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^The community.crypto.split_pem input must be a text type, not <(?:class|type) 'list'>$")
