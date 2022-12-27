@@ -61,5 +61,4 @@
   assert:
     that:
       - output is failed
-      - output.msg == "The community.crypto.split_pem input must be a text type, not <class 'list'>" or
-        output.msg == "The community.crypto.split_pem input must be a text type, not <type 'list'>"
+      - output.msg is search("^The community.crypto.split_pem input must be a text type, not <(?:class|type) 'list'>$")
