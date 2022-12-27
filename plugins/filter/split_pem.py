@@ -9,16 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 name: split_pem
-short_description: Split PEM file into multiple objects
+short_description: Split PEM file contents into multiple objects
 version_added: 2.10.0
 author:
     - Felix Fontein (@felixfontein)
 description:
-    - Decrypt sops encrypted data.
-    - Allows to decrypt data that has been provided by an arbitrary source.
-    - Note that due to Ansible lazy-evaluating expressions, it is better to use M(ansible.builtin.set_fact)
-      to store the result of an evaluation in a fact to avoid recomputing the value every time the expression
-      is used.
+    - Split PEM file contents into multiple PEM objects. Comments or invalid parts are ignored.
 options:
     _input:
         description:
