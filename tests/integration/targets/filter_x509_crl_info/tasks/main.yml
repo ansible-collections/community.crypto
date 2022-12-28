@@ -1,0 +1,91 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Make sure the Python idna library is installed
+  pip:
+    name: idna
+    state: present
+
+- set_fact:
+    certificates:
+      - name: ca
+        subject:
+          commonName: Ansible
+        is_ca: yes
+      - name: ca-2
+        subject:
+          commonName: Ansible Other CA
+        is_ca: yes
+      - name: cert-1
+        subject_alt_name:
+          - DNS:ansible.com
+      - name: cert-2
+        subject_alt_name:
+          - DNS:example.com
+      - name: cert-3
+        subject_alt_name:
+          - DNS:example.org
+          - IP:1.2.3.4
+      - name: cert-4
+        subject_alt_name:
+          - DNS:test.ansible.com
+          - DNS:b64.ansible.com
+
+- name: Generate private keys
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
+    type: ECC
+    curve: secp256r1
+  loop: "{{ certificates }}"
+
+- name: Generate CSRs
+  openssl_csr:
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
+    subject: "{{ item.subject | default(omit) }}"
+    subject_alt_name: "{{ item.subject_alt_name | default(omit) }}"
+    basic_constraints: "{{ 'CA:TRUE' if item.is_ca | default(false) else omit }}"
+    use_common_name_for_san: no
+  loop: "{{ certificates }}"
+
+- name: Generate CA certificates
+  x509_certificate:
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
+    provider: selfsigned
+  loop: "{{ certificates }}"
+  when: item.is_ca | default(false)
+
+- name: Generate other certificates
+  x509_certificate:
+    path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
+    provider: ownca
+    ownca_path: '{{ remote_tmp_dir }}/ca.pem'
+    ownca_privatekey_path: '{{ remote_tmp_dir }}/ca.key'
+  loop: "{{ certificates }}"
+  when: not (item.is_ca | default(false))
+
+- name: Get certificate infos
+  x509_certificate_info:
+    path: '{{ remote_tmp_dir }}/{{ item }}.pem'
+  loop:
+  - cert-1
+  - cert-2
+  - cert-3
+  - cert-4
+  register: certificate_infos
+
+- block:
+  - name: Running tests
+    include_tasks: impl.yml
+
+  when: cryptography_version.stdout is version('1.2', '>=')
