@@ -1,0 +1,95 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get key 1 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/publickey_1.pem') | community.crypto.openssl_publickey_info }}
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+
+- name: Get key 2 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/publickey_2.pem') | community.crypto.openssl_publickey_info }}
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "result.public_data.size == default_rsa_key_size"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+
+- name: Get key 3 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/publickey_3.pem') | community.crypto.openssl_publickey_info }}
+
+- name: Check that ECC key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'ECC'"
+      - "'public_data' in result"
+      - "result.public_data.curve is string"
+      - "result.public_data.x != 0"
+      - "result.public_data.y != 0"
+      - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
+
+- name: Get key 4 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/publickey_4.pem') | community.crypto.openssl_publickey_info }}
+
+- name: Check that DSA key info is ok
+  assert:
+    that:
+      - "'fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'DSA'"
+      - "'public_data' in result"
+      - "result.public_data.p > 2"
+      - "result.public_data.q > 2"
+      - "result.public_data.g >= 2"
+      - "result.public_data.y > 2"
+
+- name: Get invalid key info
+  set_fact:
+    result: >-
+      {{ [] | community.crypto.openssl_publickey_info }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^The community.crypto.openssl_publickey_info input must be a text type, not <(?:class|type) 'list'>$")
+
+- name: Get invalid key info
+  set_fact:
+    result: >-
+      {{ 'foo' | community.crypto.openssl_publickey_info }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - 'output.msg is search("^Error while deserializing key: ")'
