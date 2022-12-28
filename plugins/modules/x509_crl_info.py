@@ -50,6 +50,10 @@ notes:
       They are all in UTC.
 seealso:
     - module: community.crypto.x509_crl
+    - ref: community.crypto.x509_crl_info filter <ansible_collections.community.crypto.x509_crl_info_filter>
+    # - plugin: community.crypto.x509_crl_info
+    #   plugin_type: filter
+      description: A filter variant of this module.
 '''
 
 EXAMPLES = r'''
