@@ -1,0 +1,2 @@
+bugfixes:
+  - "openssl_publickey_info - do not crash with internal error when public key cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551)."
