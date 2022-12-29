@@ -50,8 +50,12 @@ options:
         choices: [ auto, cryptography ]
 
 seealso:
-- module: community.crypto.openssl_csr
-- module: community.crypto.openssl_csr_pipe
+    - module: community.crypto.openssl_csr
+    - module: community.crypto.openssl_csr_pipe
+    - ref: community.crypto.openssl_csr_info filter <ansible_collections.community.crypto.openssl_csr_info_filter>
+    # - plugin: community.crypto.openssl_csr_info
+    #   plugin_type: filter
+      description: A filter variant of this module.
 '''
 
 EXAMPLES = r'''
