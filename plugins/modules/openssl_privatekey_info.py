@@ -76,6 +76,10 @@ options:
 seealso:
     - module: community.crypto.openssl_privatekey
     - module: community.crypto.openssl_privatekey_pipe
+    - ref: community.crypto.openssl_privatekey_info filter <ansible_collections.community.crypto.openssl_privatekey_info_filter>
+    # - plugin: community.crypto.openssl_privatekey_info
+    #   plugin_type: filter
+      description: A filter variant of this module.
 '''
 
 EXAMPLES = r'''

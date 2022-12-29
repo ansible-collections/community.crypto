@@ -1,0 +1,113 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get key 1 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_1.pem') | community.crypto.openssl_privatekey_info }}
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'public_key' in result"
+      - "'public_key_fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+      - "'private_data' not in result"
+
+- name: Get key 2 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_2.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'public_key' in result"
+      - "'public_key_fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "result.public_data.size == default_rsa_key_size"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+      - "'private_data' in result"
+      - "result.public_data.modulus == result.private_data.p * result.private_data.q"
+      - "result.private_data.exponent > 5"
+
+- name: Get key 3 info (without passphrase)
+  set_fact:
+    result_: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_3.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
+  ignore_errors: yes
+  register: result
+
+- name: Check that loading passphrase protected key without passphrase failed
+  assert:
+    that:
+      - result is failed
+      - result.msg == 'Wrong or empty passphrase provided for private key'
+
+- name: Get key 3 info (with passphrase)
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_3.pem') | community.crypto.openssl_privatekey_info(passphrase='hunter2', return_private_key_data=true) }}
+
+- name: Check that RSA key info is ok
+  assert:
+    that:
+      - "'public_key' in result"
+      - "'public_key_fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'RSA'"
+      - "'public_data' in result"
+      - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
+      - "result.public_data.exponent > 5"
+      - "'private_data' in result"
+      - "result.public_data.modulus == result.private_data.p * result.private_data.q"
+      - "result.private_data.exponent > 5"
+
+- name: Get key 4 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_4.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
+
+- name: Check that ECC key info is ok
+  assert:
+    that:
+      - "'public_key' in result"
+      - "'public_key_fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'ECC'"
+      - "'public_data' in result"
+      - "result.public_data.curve is string"
+      - "result.public_data.x != 0"
+      - "result.public_data.y != 0"
+      - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
+      - "'private_data' in result"
+      - "result.private_data.multiplier > 1024"
+
+- name: Get key 5 info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/privatekey_5.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
+
+- name: Check that DSA key info is ok
+  assert:
+    that:
+      - "'public_key' in result"
+      - "'public_key_fingerprints' in result"
+      - "'type' in result"
+      - "result.type == 'DSA'"
+      - "'public_data' in result"
+      - "result.public_data.p > 2"
+      - "result.public_data.q > 2"
+      - "result.public_data.g >= 2"
+      - "result.public_data.y > 2"
+      - "'private_data' in result"
+      - "result.private_data.x > 2"

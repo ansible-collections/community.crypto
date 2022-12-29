@@ -1,0 +1,43 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Generate privatekey 1
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/privatekey_1.pem'
+
+- name: Generate privatekey 2 (less bits)
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/privatekey_2.pem'
+    type: RSA
+    size: '{{ default_rsa_key_size }}'
+
+- name: Generate privatekey 3 (with password)
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/privatekey_3.pem'
+    passphrase: hunter2
+    cipher: auto
+    size: '{{ default_rsa_key_size }}'
+
+- name: Generate privatekey 4 (ECC)
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/privatekey_4.pem'
+    type: ECC
+    curve: "{{ (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') | ternary('secp521r1', 'secp256k1') }}"
+    # ^ cryptography on CentOS6 doesn't support secp256k1, so we use secp521r1 instead
+
+- name: Generate privatekey 5 (DSA)
+  openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/privatekey_5.pem'
+    type: DSA
+    size: 1024
+
+- name: Running tests
+  include_tasks: impl.yml
+  when: cryptography_version.stdout is version('1.2.3', '>=')
