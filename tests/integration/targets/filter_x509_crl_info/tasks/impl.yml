@@ -94,19 +94,24 @@
     src: "{{ remote_tmp_dir }}/ca-crl1.crl"
   register: content
 
-- name: Retrieve CRL 1 infos from DER
+- name: Retrieve CRL 1 infos from DER (raw bytes)
   set_fact:
     crl_1_info_4: >-
       {{ content.content | b64decode | community.crypto.x509_crl_info }}
+  # Ansible 2.9 and ansible-base 2.10 on Python 2 mangle bytes, so do not run this on these versions
+  when: ansible_version.string is version('2.11', '>=') or ansible_python.version.major > 2
+
+- name: Retrieve CRL 1 infos from DER (Base64 encoded)
+  set_fact:
     crl_1_info_5: >-
       {{ content.content | community.crypto.x509_crl_info }}
 
 - name: Validate CRL 1
   assert:
     that:
-      - crl_1_info_4.format == 'der'
+      - crl_1_info_4 is not defined or crl_1_info_4.format == 'der'
       - crl_1_info_5.format == 'der'
-      - crl_1_info_4 == crl_1_info_5
+      - crl_1_info_4 is not defined or crl_1_info_4 == crl_1_info_5
 
 - name: Create CRL 2
   x509_crl:
