@@ -133,7 +133,7 @@ class CSRInfoRetrieval(object):
             result['name_constraints_critical'],
         ) = self._get_name_constraints()
 
-        result['public_key'] = self._get_public_key_pem()
+        result['public_key'] = to_native(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
             self.module,

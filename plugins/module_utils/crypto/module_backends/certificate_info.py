@@ -171,7 +171,7 @@ class CertificateInfoRetrieval(object):
         result['not_after'] = not_after.strftime(TIMESTAMP_FORMAT)
         result['expired'] = not_after < datetime.datetime.utcnow()
 
-        result['public_key'] = self._get_public_key_pem()
+        result['public_key'] = to_native(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
             self.module,

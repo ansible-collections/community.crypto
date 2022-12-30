@@ -214,7 +214,7 @@ class PrivateKeyInfoRetrieval(object):
         except OpenSSLObjectError as exc:
             raise PrivateKeyParseError(to_native(exc), result)
 
-        result['public_key'] = self._get_public_key(binary=False)
+        result['public_key'] = to_native(self._get_public_key(binary=False))
         pk = self._get_public_key(binary=True)
         result['public_key_fingerprints'] = get_fingerprint_of_bytes(
             pk, prefer_one=prefer_one_fingerprint) if pk is not None else dict()
