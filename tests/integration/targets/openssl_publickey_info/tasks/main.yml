@@ -42,10 +42,6 @@
     - 3
     - 4
 
-- name: Prepare result list
-  set_fact:
-    info_results: {}
-
 - name: Running tests with cryptography backend
   include_tasks: impl.yml
   vars:

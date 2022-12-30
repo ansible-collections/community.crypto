@@ -54,7 +54,7 @@
     path: '{{ remote_tmp_dir }}/ca-crl1.crl'
   register: crl_1_info_1
 
-- name: ({{select_crypto_backend}}) Read ca-crl1.crl
+- name: Read ca-crl1.crl
   slurp:
     src: '{{ remote_tmp_dir }}/ca-crl1.crl'
   register: slurp
@@ -110,7 +110,7 @@
         revocation_date: 20191001000000Z
   register: crl_1_idem
 
-- name: ({{select_crypto_backend}}) Read file
+- name: Read file
   slurp:
     src: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
@@ -692,4 +692,4 @@
             - Ed448
           ignore_errors: yes
 
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')
+  when: cryptography_version.stdout is version('2.6', '>=')

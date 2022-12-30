@@ -14,7 +14,7 @@ import re
 import sys
 import traceback
 
-from ansible.module_utils.common.text.converters import to_text, to_bytes
+from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
 from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse, ParseResult
 
 from ._asn1 import serialize_asn1_string_as_der
@@ -138,7 +138,7 @@ def cryptography_get_extensions_from_cert(cert):
             der = backend._ffi.buffer(data.data, data.length)[:]
             entry = dict(
                 critical=(crit == 1),
-                value=base64.b64encode(der),
+                value=to_native(base64.b64encode(der)),
             )
             try:
                 oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
@@ -155,7 +155,7 @@ def cryptography_get_extensions_from_cert(cert):
         for ext in cert.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()),
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
             )
 
     return result
@@ -198,7 +198,7 @@ def cryptography_get_extensions_from_csr(csr):
             der = backend._ffi.buffer(data.data, data.length)[:]
             entry = dict(
                 critical=(crit == 1),
-                value=base64.b64encode(der),
+                value=to_native(base64.b64encode(der)),
             )
             try:
                 oid = obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
@@ -215,7 +215,7 @@ def cryptography_get_extensions_from_csr(csr):
         for ext in csr.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()),
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
             )
 
     return result
