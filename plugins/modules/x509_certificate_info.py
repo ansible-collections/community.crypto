@@ -73,6 +73,10 @@ notes:
 seealso:
     - module: community.crypto.x509_certificate
     - module: community.crypto.x509_certificate_pipe
+    - ref: community.crypto.x509_certificate_info filter <ansible_collections.community.crypto.x509_certificate_info_filter>
+    # - plugin: community.crypto.x509_certificate_info
+    #   plugin_type: filter
+      description: A filter variant of this module.
 '''
 
 EXAMPLES = r'''

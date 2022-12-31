@@ -1,0 +1,221 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get certificate info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_1.pem') | community.crypto.x509_certificate_info }}
+    result_idna: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_1.pem') | community.crypto.x509_certificate_info(name_encoding='idna') }}
+    result_unicode: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_1.pem') | community.crypto.x509_certificate_info(name_encoding='unicode') }}
+
+- name: Check whether issuer and subject and extensions behave as expected
+  assert:
+    that:
+      - result.issuer.organizationalUnitName == 'ACME Department'
+      - "['organizationalUnitName', 'Crypto Department'] in result.issuer_ordered"
+      - "['organizationalUnitName', 'ACME Department'] in result.issuer_ordered"
+      - result.subject.organizationalUnitName == 'ACME Department'
+      - "['organizationalUnitName', 'Crypto Department'] in result.subject_ordered"
+      - "['organizationalUnitName', 'ACME Department'] in result.subject_ordered"
+      - result.public_key_type == 'RSA'
+      - result.public_key_data.size == (default_rsa_key_size_certifiates | int)
+      - "result.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--7ca3a') ~ '.com',
+          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
+      - "result_idna.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:xn--7ca3a.com',
+          'DNS:' ~ ('www.xn--7ca3a' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
+      - "result_unicode.subject_alt_name == [
+          'DNS:www.ansible.com',
+          'DNS:öç.com',
+          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else '☺') ~ '.com',
+          'IP:1.2.3.4',
+          'IP:::1',
+          'email:test@example.org',
+          'URI:https://example.org/test/index.html'
+        ]"
+      # TLS Feature
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.24'].critical == false
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.24'].value == 'MAMCAQU='
+      # Key Usage
+      - result.extensions_by_oid['2.5.29.15'].critical == true
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
+      # Subject Alternative Names
+      - result.extensions_by_oid['2.5.29.17'].critical == false
+      - >
+        result.extensions_by_oid['2.5.29.17'].value == (
+          'MIGCgg93d3cuYW5zaWJsZS5jb22CDXhuLS03Y2EzYS5jb22CEXd3dy54bi0tN2NhM2EuY29thwQBAgMEhxAAAAAAAAAAAAAAAAAAAAABgRB0ZXN0QGV4YW1wbGUub3JnhiNodHRwczovL2V4YW1wbGUub3JnL3Rlc3QvaW5kZXguaHRtbA=='
+          if cryptography_version.stdout is version('2.1', '<') else
+          'MHyCD3d3dy5hbnNpYmxlLmNvbYINeG4tLTdjYTNhLmNvbYILeG4tLTc0aC5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
+        )
+      # Basic Constraints
+      - result.extensions_by_oid['2.5.29.19'].critical == true
+      - result.extensions_by_oid['2.5.29.19'].value == 'MAYBAf8CARc='
+      # Extended Key Usage
+      - result.extensions_by_oid['2.5.29.37'].critical == false
+      - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
+
+- name: Check SubjectKeyIdentifier and AuthorityKeyIdentifier
+  assert:
+    that:
+      - result.subject_key_identifier == "00:11:22:33"
+      - result.authority_key_identifier == "44:55:66:77"
+      - result.authority_cert_issuer == expected_authority_cert_issuer
+      - result.authority_cert_serial_number == 12345
+      # Subject Key Identifier
+      - result.extensions_by_oid['2.5.29.14'].critical == false
+      # Authority Key Identifier
+      - result.extensions_by_oid['2.5.29.35'].critical == false
+  vars:
+    expected_authority_cert_issuer:
+      - "DNS:ca.example.org"
+      - "IP:1.2.3.4"
+  when: cryptography_version.stdout is version('1.3', '>=')
+
+- name: Get certificate info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_2.pem') | community.crypto.x509_certificate_info }}
+
+- name: Get certificate info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_3.pem') | community.crypto.x509_certificate_info }}
+
+- name: Check AuthorityKeyIdentifier
+  assert:
+    that:
+      - result.authority_key_identifier is none
+      - result.authority_cert_issuer == expected_authority_cert_issuer
+      - result.authority_cert_serial_number == 12345
+  vars:
+    expected_authority_cert_issuer:
+      - "DNS:ca.example.org"
+      - "IP:1.2.3.4"
+  when: cryptography_version.stdout is version('1.3', '>=')
+
+- name: Get certificate info
+  set_fact:
+    result: >-
+      {{ lookup('file', remote_tmp_dir ~ '/cert_4.pem') | community.crypto.x509_certificate_info }}
+
+- name: Check AuthorityKeyIdentifier
+  assert:
+    that:
+      - result.authority_key_identifier == "44:55:66:77"
+      - result.authority_cert_issuer is none
+      - result.authority_cert_serial_number is none
+  when: cryptography_version.stdout is version('1.3', '>=')
+
+- name: Get certificate info for packaged cert 1
+  set_fact:
+    result: >-
+      {{ lookup('file', role_path ~ '/../x509_certificate_info/files/cert1.pem') | community.crypto.x509_certificate_info }}
+- name: Check extensions
+  assert:
+    that:
+      - "'ocsp_uri' in result"
+      - "result.ocsp_uri == 'http://ocsp.int-x3.letsencrypt.org'"
+      - "'issuer_uri' in result"
+      - "result.issuer_uri == 'http://cert.int-x3.letsencrypt.org/'"
+      - result.extensions_by_oid | length == 9
+      # Precert Signed Certificate Timestamps
+      - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].critical == false
+      - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].value == 'BIHyAPAAdgDBFkrgp3LS1DktyArBB3DU8MSb3pkaSEDB+gdRZPYzYAAAAWTdAoU6AAAEAwBHMEUCIG5WpfKF536KKa9fnVlYbwcfrKh09Hi2MSRwU2kad49UAiEA4RUKjJOgw11IHFNdit+sy1RcCU3QCSOEQYrJ1/oPltAAdgApPFGWVMg5ZbqqUPxYB9S3b79Yeily3KTDDPTlRUf0eAAAAWTdAoc+AAAEAwBHMEUCIQCJjo75K4rVDSiWQe3XFLY6MiG3zcHQrKb0YhM17r1UKAIgGa8qMoN03DLp+Rm9nRJ9XLbTJz1vbuu9PyXUY741P8E='
+      # Authority Information Access
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].critical == false
+      - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].value == 'MGEwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLmludC14My5sZXRzZW5jcnlwdC5vcmcwLwYIKwYBBQUHMAKGI2h0dHA6Ly9jZXJ0LmludC14My5sZXRzZW5jcnlwdC5vcmcv'
+      # Subject Key Identifier
+      - result.extensions_by_oid['2.5.29.14'].critical == false
+      - result.extensions_by_oid['2.5.29.14'].value == 'BBRtcOI/yg62Ehbu5vQzxMUUdBOYMw=='
+      # Key Usage (The certificate has 'AwIFoA==', while de-serializing and re-serializing yields 'AwIAoA=='!)
+      - result.extensions_by_oid['2.5.29.15'].critical == true
+      - result.extensions_by_oid['2.5.29.15'].value in ['AwIFoA==', 'AwIAoA==']
+      # Subject Alternative Names
+      - result.extensions_by_oid['2.5.29.17'].critical == false
+      - result.extensions_by_oid['2.5.29.17'].value == 'MIIB5IIbY2VydC5pbnQteDEubGV0c2VuY3J5cHQub3JnghtjZXJ0LmludC14Mi5sZXRzZW5jcnlwdC5vcmeCG2NlcnQuaW50LXgzLmxldHNlbmNyeXB0Lm9yZ4IbY2VydC5pbnQteDQubGV0c2VuY3J5cHQub3JnghxjZXJ0LnJvb3QteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0YWdpbmcteDEubGV0c2VuY3J5cHQub3Jngh9jZXJ0LnN0Zy1pbnQteDEubGV0c2VuY3J5cHQub3JngiBjZXJ0LnN0Zy1yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ISY3AubGV0c2VuY3J5cHQub3JnghpjcC5yb290LXgxLmxldHNlbmNyeXB0Lm9yZ4ITY3BzLmxldHNlbmNyeXB0Lm9yZ4IbY3BzLnJvb3QteDEubGV0c2VuY3J5cHQub3Jnghtjcmwucm9vdC14MS5sZXRzZW5jcnlwdC5vcmeCD2xldHNlbmNyeXB0Lm9yZ4IWb3JpZ2luLmxldHNlbmNyeXB0Lm9yZ4IXb3JpZ2luMi5sZXRzZW5jcnlwdC5vcmeCFnN0YXR1cy5sZXRzZW5jcnlwdC5vcmeCE3d3dy5sZXRzZW5jcnlwdC5vcmc='
+      # Basic Constraints
+      - result.extensions_by_oid['2.5.29.19'].critical == true
+      - result.extensions_by_oid['2.5.29.19'].value == 'MAA='
+      # Certificate Policies
+      - result.extensions_by_oid['2.5.29.32'].critical == false
+      - result.extensions_by_oid['2.5.29.32'].value == 'MIHzMAgGBmeBDAECATCB5gYLKwYBBAGC3xMBAQEwgdYwJgYIKwYBBQUHAgEWGmh0dHA6Ly9jcHMubGV0c2VuY3J5cHQub3JnMIGrBggrBgEFBQcCAjCBngyBm1RoaXMgQ2VydGlmaWNhdGUgbWF5IG9ubHkgYmUgcmVsaWVkIHVwb24gYnkgUmVseWluZyBQYXJ0aWVzIGFuZCBvbmx5IGluIGFjY29yZGFuY2Ugd2l0aCB0aGUgQ2VydGlmaWNhdGUgUG9saWN5IGZvdW5kIGF0IGh0dHBzOi8vbGV0c2VuY3J5cHQub3JnL3JlcG9zaXRvcnkv'
+      # Authority Key Identifier
+      - result.extensions_by_oid['2.5.29.35'].critical == false
+      - result.extensions_by_oid['2.5.29.35'].value == 'MBaAFKhKamMEfd265tE5t6ZFZe/zqOyh'
+      # Extended Key Usage
+      - result.extensions_by_oid['2.5.29.37'].critical == false
+      - result.extensions_by_oid['2.5.29.37'].value == 'MBQGCCsGAQUFBwMBBggrBgEFBQcDAg=='
+- name: Check fingerprints
+  assert:
+    that:
+      - (result.fingerprints.sha256 == '57:7c:f1:f5:dd:cc:6e:e9:f3:17:28:73:17:e4:25:c7:69:74:3e:f7:9a:df:58:20:7a:5a:e4:aa:de:bf:24:5b' if result.fingerprints.sha256 is defined else true)
+      - (result.fingerprints.sha1 == 'b7:79:64:f4:2b:e0:ae:45:74:d4:f3:08:f6:53:cb:39:26:fa:52:6b' if result.fingerprints.sha1 is defined else true)
+
+- name: Get invalid certificate info
+  set_fact:
+    result: >-
+      {{ [] | community.crypto.x509_certificate_info }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^The community.crypto.x509_certificate_info input must be a text type, not <(?:class|type) 'list'>$")
+
+- name: Get invalid certificate info
+  set_fact:
+    result: >-
+      {{ 'foo' | community.crypto.x509_certificate_info }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^Unable to load (?:certificate|PEM file)(?:\.|$)")
+
+- name: Get invalid certificate info
+  set_fact:
+    result: >-
+      {{ 'foo' | community.crypto.x509_certificate_info(name_encoding=[]) }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^The name_encoding option must be of a text type, not <(?:class|type) 'list'>$")
+
+- name: Get invalid name_encoding parameter
+  set_fact:
+    result: >-
+      {{ 'bar' | community.crypto.x509_certificate_info(name_encoding='foo') }}
+  ignore_errors: true
+  register: output
+
+- name: Check that task failed and error message is OK
+  assert:
+    that:
+      - output is failed
+      - output.msg is search("^The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")
