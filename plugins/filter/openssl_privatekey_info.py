@@ -30,7 +30,7 @@ options:
         description:
             - Whether to return private key data.
             - Only set this to C(true) when you want private information about this key to
-              leave the remote machine.
+              be extracted.
             - "B(WARNING:) you have to make sure that private key data is not accidentally logged!"
         type: bool
         default: false
