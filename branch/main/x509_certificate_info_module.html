@@ -324,44 +324,44 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a Self Signed OpenSSL certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">csr_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a Self Signed OpenSSL certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">csr_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span>
 
 
-<span class="c1"># Get information on the certificate</span><span class="w"></span>
+<span class="c1"># Get information on the certificate</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get information on generated certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate_info</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get information on generated certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate_info</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dump information</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dump information</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
 
-<span class="c1"># Check whether the certificate is valid or not valid at certain times, fail</span><span class="w"></span>
-<span class="c1"># if this is not the case. The first task (x509_certificate_info) collects</span><span class="w"></span>
-<span class="c1"># the information, and the second task (assert) validates the result and</span><span class="w"></span>
-<span class="c1"># makes the playbook fail in case something is not as expected.</span><span class="w"></span>
+<span class="c1"># Check whether the certificate is valid or not valid at certain times, fail</span>
+<span class="c1"># if this is not the case. The first task (x509_certificate_info) collects</span>
+<span class="c1"># the information, and the second task (assert) validates the result and</span>
+<span class="c1"># makes the playbook fail in case something is not as expected.</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test whether that certificate is valid tomorrow and/or in three weeks</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate_info</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">valid_at</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">point_1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+1d&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">point_2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+3w&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test whether that certificate is valid tomorrow and/or in three weeks</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate_info</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
+<span class="w">    </span><span class="nt">valid_at</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">point_1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+1d&quot;</span>
+<span class="w">      </span><span class="nt">point_2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+3w&quot;</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Validate that certificate is valid tomorrow, but not in three weeks</span><span class="w"></span>
-<span class="w">  </span><span class="nt">assert</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">that</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.valid_at.point_1</span><span class="w">      </span><span class="c1"># valid in one day</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">not result.valid_at.point_2</span><span class="w">  </span><span class="c1"># not valid in three weeks</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Validate that certificate is valid tomorrow, but not in three weeks</span>
+<span class="w">  </span><span class="nt">assert</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">that</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.valid_at.point_1</span><span class="w">      </span><span class="c1"># valid in one day</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">not result.valid_at.point_2</span><span class="w">  </span><span class="c1"># not valid in three weeks</span>
 </pre></div>
 </div>
 </section>

@@ -687,65 +687,65 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a Self Signed OpenSSL certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">csr_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Print the certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.certificate</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a Self Signed OpenSSL certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">csr_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Print the certificate</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.certificate</span>
 
-<span class="c1"># In the following example, both CSR and certificate file are stored on the</span><span class="w"></span>
-<span class="c1"># machine where ansible-playbook is executed, while the OwnCA data (certificate,</span><span class="w"></span>
-<span class="c1"># private key) are stored on the remote machine.</span><span class="w"></span>
+<span class="c1"># In the following example, both CSR and certificate file are stored on the</span>
+<span class="c1"># machine where ansible-playbook is executed, while the OwnCA data (certificate,</span>
+<span class="c1"># private key) are stored on the remote machine.</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(1/2) Generate an OpenSSL Certificate with the CSR provided inline</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/ssl/csr/www.ansible.com.crt&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/ssl/csr/www.ansible.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_cert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_privatekey</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hunter2</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(1/2) Generate an OpenSSL Certificate with the CSR provided inline</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/ssl/csr/www.ansible.com.crt&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/ssl/csr/www.ansible.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">ownca_cert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.crt</span>
+<span class="w">    </span><span class="nt">ownca_privatekey</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.key</span>
+<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hunter2</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(2/2) Store certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
-<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result is changed</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(2/2) Store certificate</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result is changed</span>
 
-<span class="c1"># In the following example, the certificate from another machine is signed by</span><span class="w"></span>
-<span class="c1"># our OwnCA whose private key and certificate are only available on this</span><span class="w"></span>
-<span class="c1"># machine (where ansible-playbook is executed), without having to write</span><span class="w"></span>
-<span class="c1"># the certificate file to disk on localhost. The CSR could have been</span><span class="w"></span>
-<span class="c1"># provided by community.crypto.openssl_csr_pipe earlier, or also have been</span><span class="w"></span>
-<span class="c1"># read from the remote machine.</span><span class="w"></span>
+<span class="c1"># In the following example, the certificate from another machine is signed by</span>
+<span class="c1"># our OwnCA whose private key and certificate are only available on this</span>
+<span class="c1"># machine (where ansible-playbook is executed), without having to write</span>
+<span class="c1"># the certificate file to disk on localhost. The CSR could have been</span>
+<span class="c1"># provided by community.crypto.openssl_csr_pipe earlier, or also have been</span>
+<span class="c1"># read from the remote machine.</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(1/3) Read certificate&#39;s contents from remote machine</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ansible.builtin.slurp</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certificate_content</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(1/3) Read certificate&#39;s contents from remote machine</span>
+<span class="w">  </span><span class="nt">ansible.builtin.slurp</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certificate_content</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(2/3) Generate an OpenSSL Certificate with the CSR provided inline</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">certificate_content.content</span> <span class="o">|</span> <span class="nf">b64decode</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">the_csr</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_cert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_privatekey</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hunter2</span><span class="w"></span>
-<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(2/3) Generate an OpenSSL Certificate with the CSR provided inline</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">certificate_content.content</span> <span class="o">|</span> <span class="nf">b64decode</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">the_csr</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">ownca_cert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.crt</span>
+<span class="w">    </span><span class="nt">ownca_privatekey</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca_cert.key</span>
+<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hunter2</span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(3/3) Store certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result is changed</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(3/3) Store certificate</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.crt</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result is changed</span>
 </pre></div>
 </div>
 </section>

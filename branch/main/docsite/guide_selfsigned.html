@@ -148,47 +148,47 @@
 <span id="ansible-collections-community-crypto-docsite-guide-selfsigned"></span><h1>How to create self-signed certificates<a class="headerlink" href="#how-to-create-self-signed-certificates" title="Permalink to this heading"></a></h1>
 <p>The <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create self-signed certificates.</p>
 <p>For creating any kind of certificate, you always have to start with a private key. You can use the <a class="reference internal" href="../openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey module</span></a> to create a private key. If you only specify <code class="docutils literal notranslate"><span class="pre">path</span></code>, the default parameters will be used. This will result in a 4096 bit RSA private key:</p>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create private key (RSA, 4096 bits)</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create private key (RSA, 4096 bits)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
 </pre></div>
 </div>
 <p>You can specify <code class="docutils literal notranslate"><span class="pre">type</span></code> to select another key type, <code class="docutils literal notranslate"><span class="pre">size</span></code> to select a different key size (only available for RSA and DSA keys), or <code class="docutils literal notranslate"><span class="pre">passphrase</span></code> if you want to store the key password-protected:</p>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create private key (X25519) with password protection</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X25519</span><span class="w"></span>
-<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">changeme</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create private key (X25519) with password protection</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X25519</span>
+<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">changeme</span>
 </pre></div>
 </div>
 <p>To create a very simple self-signed certificate with no specific information, you can proceed directly with the <a class="reference internal" href="../x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate module</span></a>:</p>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create simple self-signed certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create simple self-signed certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span>
 </pre></div>
 </div>
 <p>(If you used <code class="docutils literal notranslate"><span class="pre">passphrase</span></code> for the private key, you have to provide <code class="docutils literal notranslate"><span class="pre">privatekey_passphrase</span></code>.)</p>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">selfsigned_not_after</span></code> to define when the certificate expires (default: in roughly 10 years), and <code class="docutils literal notranslate"><span class="pre">selfsigned_not_before</span></code> to define from when the certificate is valid (default: now).</p>
 <p>To define further properties of the certificate, like the subject, Subject Alternative Names (SANs), key usages, name constraints, etc., you need to first create a Certificate Signing Request (CSR) and provide it to the <a class="reference internal" href="../x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate module</span></a>. If you do not need the CSR file, you can use the <a class="reference internal" href="../openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe module</span></a> as in the example below. (To store it to disk, use the <a class="reference internal" href="../openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr module</span></a> instead.)</p>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create certificate signing request (CSR) for self-signed certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="nt">organization_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ansible, Inc.</span><span class="w"></span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:ansible.com&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:www.ansible.com&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:docs.ansible.com&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csr</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create certificate signing request (CSR) for self-signed certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible.com</span>
+<span class="w">    </span><span class="nt">organization_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ansible, Inc.</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:ansible.com&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:www.ansible.com&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:docs.ansible.com&quot;</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csr</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create self-signed certificate from CSR</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span><span class="w"></span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create self-signed certificate from CSR</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span>
 </pre></div>
 </div>
 </section>

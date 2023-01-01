@@ -863,98 +863,98 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with an inline key</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">private_key_content</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with an inline key</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">private_key_content</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with a passphrase protected private key</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with a passphrase protected private key</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with Subject information</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">country_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FR</span><span class="w"></span>
-<span class="w">    </span><span class="nt">organization_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ansible</span><span class="w"></span>
-<span class="w">    </span><span class="nt">email_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdoe@ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with Subject information</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">country_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FR</span>
+<span class="w">    </span><span class="nt">organization_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ansible</span>
+<span class="w">    </span><span class="nt">email_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdoe@ansible.com</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with subjectAltName extension</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;DNS:www.ansible.com,DNS:m.ansible.com&#39;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with subjectAltName extension</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;DNS:www.ansible.com,DNS:m.ansible.com&#39;</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL CSR with subjectAltName extension with dynamic list</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;regex_replace&#39;</span><span class="o">,</span> <span class="s1">&#39;^&#39;</span><span class="o">,</span> <span class="s1">&#39;DNS:&#39;</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">with_dict</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dns_server</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">m.ansible.com</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL CSR with subjectAltName extension with dynamic list</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;regex_replace&#39;</span><span class="o">,</span> <span class="s1">&#39;^&#39;</span><span class="o">,</span> <span class="s1">&#39;DNS:&#39;</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">  </span><span class="nt">with_dict</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dns_server</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">m.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Force regenerate an OpenSSL Certificate Signing Request</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Force regenerate an OpenSSL Certificate Signing Request</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with special key usages</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="nt">key_usage</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">digitalSignature</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keyAgreement</span><span class="w"></span>
-<span class="w">    </span><span class="nt">extended_key_usage</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clientAuth</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with special key usages</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
+<span class="w">    </span><span class="nt">key_usage</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">digitalSignature</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keyAgreement</span>
+<span class="w">    </span><span class="nt">extended_key_usage</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clientAuth</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with OCSP Must Staple</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ocsp_must_staple</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with OCSP Must Staple</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
+<span class="w">    </span><span class="nt">ocsp_must_staple</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request for WinRM Certificate authentication</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/winrm.auth.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/winrm.auth.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username</span><span class="w"></span>
-<span class="w">    </span><span class="nt">extended_key_usage</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clientAuth</span><span class="w"></span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">otherName:1.3.6.1.4.1.311.20.2.3;UTF8:username@localhost</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request for WinRM Certificate authentication</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/winrm.auth.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/winrm.auth.pem</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username</span>
+<span class="w">    </span><span class="nt">extended_key_usage</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clientAuth</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">otherName:1.3.6.1.4.1.311.20.2.3;UTF8:username@localhost</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with a CRL distribution point</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span><span class="w"></span>
-<span class="w">    </span><span class="nt">crl_distribution_points</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">full_name</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/revocations.crl&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">crl_issuer</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">reasons</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_compromise</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ca_compromise</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cessation_of_operation</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with a CRL distribution point</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
+<span class="w">    </span><span class="nt">crl_distribution_points</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">full_name</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/revocations.crl&quot;</span>
+<span class="w">        </span><span class="nt">crl_issuer</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/&quot;</span>
+<span class="w">        </span><span class="nt">reasons</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_compromise</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ca_compromise</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cessation_of_operation</span>
 </pre></div>
 </div>
 </section>

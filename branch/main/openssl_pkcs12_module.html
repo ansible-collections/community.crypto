@@ -552,72 +552,72 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id6">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PKCS#12 file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># Note that if /opt/certs/ca.pem contains multiple certificates,</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># only the first one will be used. See the other_certificates_parse_all</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># option for changing this behavior.</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PKCS#12 file</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span>
+<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span>
+<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span>
+<span class="w">    </span><span class="c1"># Note that if /opt/certs/ca.pem contains multiple certificates,</span>
+<span class="w">    </span><span class="c1"># only the first one will be used. See the other_certificates_parse_all</span>
+<span class="w">    </span><span class="c1"># option for changing this behavior.</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PKCS#12 file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">private_key_contents</span> <span class="cp">}}</span><span class="s">&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">other_certificates_parse_all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca_bundle.pem</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># Since we set other_certificates_parse_all to true, all</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># certificates in the CA bundle are included and not just</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># the first one.</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/intermediate.pem</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># In case this file has multiple certificates in it,</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># all will be included as well.</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PKCS#12 file</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span>
+<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">private_key_contents</span> <span class="cp">}}</span><span class="s">&#39;</span>
+<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span>
+<span class="w">    </span><span class="nt">other_certificates_parse_all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca_bundle.pem</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># Since we set other_certificates_parse_all to true, all</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># certificates in the CA bundle are included and not just</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># the first one.</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/intermediate.pem</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># In case this file has multiple certificates in it,</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># all will be included as well.</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Change PKCS#12 file permission</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
-<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0600&#39;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Change PKCS#12 file permission</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span>
+<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span>
+<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0600&#39;</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Regen PKCS#12 file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span><span class="w"></span>
-<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
-<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0600&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Regen PKCS#12 file</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export</span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">friendly_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raclette</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span>
+<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span>
+<span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0600&#39;</span>
+<span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dump/Parse PKCS#12 file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">parse</span><span class="w"></span>
-<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dump/Parse PKCS#12 file</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">parse</span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.pem</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove PKCS#12 file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove PKCS#12 file</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_pkcs12</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ansible.p12</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
 </section>

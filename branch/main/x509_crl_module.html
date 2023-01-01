@@ -645,25 +645,25 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id6">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a CRL</span><span class="w"></span>
-<span class="w">  </span><span class="nt">community.crypto.x509_crl</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/my-ca.crl</span><span class="w"></span>
-<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/my-ca.pem</span><span class="w"></span>
-<span class="w">    </span><span class="nt">issuer</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">CN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My CA</span><span class="w"></span>
-<span class="w">    </span><span class="nt">last_update</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+0s&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">next_update</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+7d&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">revoked_certificates</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">serial_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1234</span><span class="w"></span>
-<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20190331202428Z</span><span class="w"></span>
-<span class="w">        </span><span class="nt">issuer</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">CN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My CA</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">serial_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2345</span><span class="w"></span>
-<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191013152910Z</span><span class="w"></span>
-<span class="w">        </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">affiliation_changed</span><span class="w"></span>
-<span class="w">        </span><span class="nt">invalidity_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191001000000Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/revoked-cert.pem</span><span class="w"></span>
-<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191010010203Z</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a CRL</span>
+<span class="w">  </span><span class="nt">community.crypto.x509_crl</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/my-ca.crl</span>
+<span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/my-ca.pem</span>
+<span class="w">    </span><span class="nt">issuer</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">CN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My CA</span>
+<span class="w">    </span><span class="nt">last_update</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+0s&quot;</span>
+<span class="w">    </span><span class="nt">next_update</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+7d&quot;</span>
+<span class="w">    </span><span class="nt">revoked_certificates</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">serial_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1234</span>
+<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20190331202428Z</span>
+<span class="w">        </span><span class="nt">issuer</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">CN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My CA</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">serial_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2345</span>
+<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191013152910Z</span>
+<span class="w">        </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">affiliation_changed</span>
+<span class="w">        </span><span class="nt">invalidity_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191001000000Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/revoked-cert.pem</span>
+<span class="w">        </span><span class="nt">revocation_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20191010010203Z</span>
 </pre></div>
 </div>
 </section>
