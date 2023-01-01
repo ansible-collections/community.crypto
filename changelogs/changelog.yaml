@@ -677,6 +677,16 @@ releases:
     fragments:
     - 1.9.2.yml
     release_date: '2021-08-30'
+  1.9.20:
+    changes:
+      bugfixes:
+      - openssl_publickey_info - do not crash with internal error when public key
+        cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.20.yml
+    - 551-publickey-info.yml
+    release_date: '2023-01-01'
   1.9.3:
     changes:
       bugfixes:
