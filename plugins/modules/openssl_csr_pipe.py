@@ -160,9 +160,10 @@ def main():
         supports_check_mode=True,
     )
 
-    backend = module.params['select_crypto_backend']
-    backend, module_backend = select_backend(module, backend)
     try:
+        backend = module.params['select_crypto_backend']
+        backend, module_backend = select_backend(module, backend)
+
         csr = CertificateSigningRequestModule(module, module_backend)
         csr.generate(module)
         result = csr.dump()

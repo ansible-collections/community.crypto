@@ -924,7 +924,6 @@
               - CN=ca.example.com
             reasons:
               - certificate_hold
-          - {}
         select_crypto_backend: '{{ select_crypto_backend }}'
       register: crl_distribution_endpoints_1
 
@@ -947,7 +946,6 @@
               - CN=ca.example.com
             reasons:
               - certificate_hold
-          - {}
         select_crypto_backend: '{{ select_crypto_backend }}'
       register: crl_distribution_endpoints_2
 
@@ -958,9 +956,7 @@
         subject:
           commonName: www.ansible.com
         crl_distribution_points:
-          - full_name:
-              - "URI:https://ca.example.com/revocations.crl"
-            crl_issuer:
+          - crl_issuer:
               - "URI:https://ca.example.com/"
             reasons:
               - key_compromise
