@@ -274,6 +274,8 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                     raise OpenSSLObjectError('full_name must not be empty')
                 params['full_name'] = [cryptography_get_name(name, 'full name') for name in parse_crl_distribution_point['full_name']]
             if parse_crl_distribution_point['relative_name'] is not None:
+                if not parse_crl_distribution_point['relative_name']:
+                    raise OpenSSLObjectError('relative_name must not be empty')
                 try:
                     params['relative_name'] = cryptography_parse_relative_distinguished_name(parse_crl_distribution_point['relative_name'])
                 except Exception:
@@ -282,6 +284,8 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                         raise OpenSSLObjectError('Cannot specify relative_name for cryptography < 1.6')
                     raise
             if parse_crl_distribution_point['crl_issuer'] is not None:
+                if not parse_crl_distribution_point['crl_issuer']:
+                    raise OpenSSLObjectError('crl_issuer must not be empty')
                 params['crl_issuer'] = [cryptography_get_name(name, 'CRL issuer') for name in parse_crl_distribution_point['crl_issuer']]
             if parse_crl_distribution_point['reasons'] is not None:
                 reasons = []
