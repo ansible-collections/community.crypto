@@ -452,8 +452,12 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                 reasons=None,
             )
             if parse_crl_distribution_point['full_name'] is not None:
+                if not parse_crl_distribution_point['full_name']:
+                    raise OpenSSLObjectError('full_name must not be empty')
                 params['full_name'] = [cryptography_get_name(name, 'full name') for name in parse_crl_distribution_point['full_name']]
             if parse_crl_distribution_point['relative_name'] is not None:
+                if not parse_crl_distribution_point['relative_name']:
+                    raise OpenSSLObjectError('relative_name must not be empty')
                 try:
                     params['relative_name'] = cryptography_parse_relative_distinguished_name(parse_crl_distribution_point['relative_name'])
                 except Exception:
@@ -462,6 +466,8 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                         raise OpenSSLObjectError('Cannot specify relative_name for cryptography < 1.6')
                     raise
             if parse_crl_distribution_point['crl_issuer'] is not None:
+                if not parse_crl_distribution_point['crl_issuer']:
+                    raise OpenSSLObjectError('crl_issuer must not be empty')
                 params['crl_issuer'] = [cryptography_get_name(name, 'CRL issuer') for name in parse_crl_distribution_point['crl_issuer']]
             if parse_crl_distribution_point['reasons'] is not None:
                 reasons = []
@@ -469,7 +475,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                     reasons.append(REVOCATION_REASON_MAP[reason])
                 params['reasons'] = frozenset(reasons)
             result.append(cryptography.x509.DistributionPoint(**params))
-        except OpenSSLObjectError as e:
+        except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
     return result
 
@@ -851,7 +857,8 @@ def get_csr_argument_spec():
                         'aa_compromise',
                     ]),
                 ),
-                mutually_exclusive=[('full_name', 'relative_name')]
+                mutually_exclusive=[('full_name', 'relative_name')],
+                required_one_of=[('full_name', 'relative_name', 'crl_issuer')],
             ),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
         ),
