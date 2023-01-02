@@ -982,9 +982,7 @@
         subject:
           commonName: www.ansible.com
         crl_distribution_points:
-          - full_name:
-              - "URI:https://ca.example.com/revocations.crl"
-            crl_issuer:
+          - crl_issuer:
               - "URI:https://ca.example.com/"
             reasons:
               - key_compromise
