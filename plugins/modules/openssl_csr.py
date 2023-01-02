@@ -339,9 +339,10 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(name=base_dir, msg='The directory %s does not exist or the file is not a directory' % base_dir)
 
-    backend = module.params['select_crypto_backend']
-    backend, module_backend = select_backend(module, backend)
     try:
+        backend = module.params['select_crypto_backend']
+        backend, module_backend = select_backend(module, backend)
+
         csr = CertificateSigningRequestModule(module, module_backend)
         if module.params['state'] == 'present':
             csr.generate(module)
