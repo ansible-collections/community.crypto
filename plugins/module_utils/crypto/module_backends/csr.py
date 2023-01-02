@@ -270,7 +270,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                 reasons=None,
             )
             if parse_crl_distribution_point['full_name'] is not None:
-                if not params['full_name']:
+                if not parse_crl_distribution_point['full_name']:
                     raise OpenSSLObjectError('full_name must not be empty')
                 params['full_name'] = [cryptography_get_name(name, 'full name') for name in parse_crl_distribution_point['full_name']]
             if parse_crl_distribution_point['relative_name'] is not None:
