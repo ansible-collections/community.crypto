@@ -289,6 +289,8 @@ def parse_crl_distribution_points(module, crl_distribution_points):
             result.append(cryptography.x509.DistributionPoint(**params))
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
+        except ValueError as e:
+            raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
     return result
 
 
@@ -651,7 +653,8 @@ def get_csr_argument_spec():
                         'aa_compromise',
                     ]),
                 ),
-                mutually_exclusive=[('full_name', 'relative_name')]
+                mutually_exclusive=[('full_name', 'relative_name')],
+                required_one_of=[('full_name', 'relative_name', 'crl_issuer')],
             ),
             select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
         ),
