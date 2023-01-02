@@ -5,6 +5,33 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.10.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+
+Bugfixes
+--------
+
+- openssl_csr, openssl_csr_pipe - prevent invalid values for ``crl_distribution_points`` that do not have one of ``full_name``, ``relative_name``, and ``crl_issuer`` (https://github.com/ansible-collections/community.crypto/pull/560).
+- openssl_publickey_info - do not crash with internal error when public key cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- openssl_csr_info - Retrieve information from OpenSSL Certificate Signing Requests (CSR)
+- openssl_privatekey_info - Retrieve information from OpenSSL private keys
+- openssl_publickey_info - Retrieve information from OpenSSL public keys in PEM format
+- split_pem - Split PEM file contents into multiple objects
+- x509_certificate_info - Retrieve information from X.509 certificates in PEM format
+- x509_crl_info - Retrieve information from X.509 CRLs in PEM format
+
 v2.9.0
 ======
 

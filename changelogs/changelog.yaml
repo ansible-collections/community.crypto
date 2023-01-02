@@ -737,6 +737,41 @@ releases:
       name: openssl_privatekey_convert
       namespace: ''
     release_date: '2022-01-10'
+  2.10.0:
+    changes:
+      bugfixes:
+      - openssl_csr, openssl_csr_pipe - prevent invalid values for ``crl_distribution_points``
+        that do not have one of ``full_name``, ``relative_name``, and ``crl_issuer``
+        (https://github.com/ansible-collections/community.crypto/pull/560).
+      - openssl_publickey_info - do not crash with internal error when public key
+        cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551).
+      release_summary: Bugfix and feature release.
+    fragments:
+    - 2.10.0.yml
+    - 551-publickey-info.yml
+    - 560-openssl_csr-crl_distribution_points.yml
+    plugins:
+      filter:
+      - description: Retrieve information from OpenSSL Certificate Signing Requests
+          (CSR)
+        name: openssl_csr_info
+        namespace: null
+      - description: Retrieve information from OpenSSL private keys
+        name: openssl_privatekey_info
+        namespace: null
+      - description: Retrieve information from OpenSSL public keys in PEM format
+        name: openssl_publickey_info
+        namespace: null
+      - description: Split PEM file contents into multiple objects
+        name: split_pem
+        namespace: null
+      - description: Retrieve information from X.509 certificates in PEM format
+        name: x509_certificate_info
+        namespace: null
+      - description: Retrieve information from X.509 CRLs in PEM format
+        name: x509_crl_info
+        namespace: null
+    release_date: '2023-01-02'
   2.2.0:
     changes:
       bugfixes:
