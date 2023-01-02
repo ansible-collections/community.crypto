@@ -287,9 +287,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
                     reasons.append(REVOCATION_REASON_MAP[reason])
                 params['reasons'] = frozenset(reasons)
             result.append(cryptography.x509.DistributionPoint(**params))
-        except OpenSSLObjectError as e:
-            raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
-        except ValueError as e:
+        except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError('Error while parsing CRL distribution point #{index}: {error}'.format(index=index, error=e))
     return result
 
