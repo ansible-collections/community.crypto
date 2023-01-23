@@ -158,7 +158,7 @@
     method: get
   register: validation_result
   loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
-  until: "validation_result.output_json.status != 'pending'"
+  until: "validation_result.output_json.status not in ['pending', 'processing']"
   retries: 20
   delay: 1
 - debug: var=validation_result
