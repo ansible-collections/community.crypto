@@ -15,9 +15,7 @@ license:
   - Apache-2.0
   - BSD-2-Clause
   - BSD-3-Clause
-  # TODO: galaxy-importer does not support this license type yet. Uncomment once this has been
-  #       fixed and the fix deployed (https://github.com/ansible/galaxy-importer/pull/175).
-  # - PSF-2.0
+  - PSF-2.0
 #license_file: COPYING
 tags:
   - acme
