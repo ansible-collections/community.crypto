@@ -353,6 +353,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <em>chown</em>.</p>
 <p>When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.</p>
+<p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
