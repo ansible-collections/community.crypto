@@ -69,9 +69,9 @@ try:
     # For ansible-core 2.11, we can use the ArgumentSpecValidator. We also import
     # ModuleArgumentSpecValidator since that indicates that the 'classical' approach
     # will no longer work.
-    from ansible.module_utils.common.arg_spec import (
+    from ansible.module_utils.common.arg_spec import (  # pylint: disable=unused-import
         ArgumentSpecValidator,
-        ModuleArgumentSpecValidator,  # noqa
+        ModuleArgumentSpecValidator,
     )
     from ansible.module_utils.errors import UnsupportedError
     HAS_ARGSPEC_VALIDATOR = True

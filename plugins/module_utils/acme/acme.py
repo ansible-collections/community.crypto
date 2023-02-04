@@ -46,7 +46,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 try:
-    import ipaddress
+    import ipaddress  # pylint: disable=unused-import
 except ImportError:
     HAS_IPADDRESS = False
     IPADDRESS_IMPORT_ERROR = traceback.format_exc()
