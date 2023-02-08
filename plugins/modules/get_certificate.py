@@ -90,6 +90,7 @@ options:
         - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
       elements: str
+      version_added: 2.11.0
 
 notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
