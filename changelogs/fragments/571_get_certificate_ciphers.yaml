@@ -1,0 +1,2 @@
+minor_changes:
+- get_certificate - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.crypto/pull/571).
