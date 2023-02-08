@@ -306,6 +306,9 @@ def main():
         if proxy_host:
             module.fail_json(msg='To use proxy_host, you must run the get_certificate module with Python 2.7 or newer.',
                              exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+        if ciphers:
+            module.fail_json(msg='To use ciphers, you must run the get_certificate module with Python 2.7 or newer.',
+                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
         try:
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
