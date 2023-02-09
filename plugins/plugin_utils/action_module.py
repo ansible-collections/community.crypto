@@ -145,9 +145,14 @@ class AnsibleActionModule(object):
             # warnings and deprecations that do not work in plugins. This is a copy of that code adjusted
             # for our use-case:
             for d in self._validation_result._deprecations:
-                self.deprecate(
-                    "Alias '{name}' is deprecated. See the module docs for more information".format(name=d['name']),
-                    version=d.get('version'), date=d.get('date'), collection_name=d.get('collection_name'))
+                # Before ansible-core 2.14.2, deprecations were always for aliases:
+                if 'name' in d:
+                    self.deprecate(
+                        "Alias '{name}' is deprecated. See the module docs for more information".format(name=d['name']),
+                        version=d.get('version'), date=d.get('date'), collection_name=d.get('collection_name'))
+                # Since ansible-core 2.14.2, a message is present that can be directly printed:
+                if 'msg' in d:
+                    self.deprecate(d['msg'], version=d.get('version'), date=d.get('date'), collection_name=d.get('collection_name'))
 
             for w in self._validation_result._warnings:
                 self.warn('Both option {option} and its alias {alias} are set.'.format(option=w['option'], alias=w['alias']))
