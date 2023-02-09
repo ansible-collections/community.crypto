@@ -15,4 +15,4 @@ __metaclass__ = type
 #
 #     from ansible.module_utils.compat.version import LooseVersion
 
-from ._version import LooseVersion
+from ._version import LooseVersion  # noqa: F401, pylint: disable=unused-import
