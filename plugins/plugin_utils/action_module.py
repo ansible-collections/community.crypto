@@ -71,7 +71,7 @@ try:
     # will no longer work.
     from ansible.module_utils.common.arg_spec import (  # noqa: F401, pylint: disable=unused-import
         ArgumentSpecValidator,
-        ModuleArgumentSpecValidator,
+        ModuleArgumentSpecValidator,  # ModuleArgumentSpecValidator is not used
     )
     from ansible.module_utils.errors import UnsupportedError
     HAS_ARGSPEC_VALIDATOR = True
