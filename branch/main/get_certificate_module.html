@@ -216,27 +216,38 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ciphers"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-ciphers"><strong>ciphers</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ciphers" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+<p><span class="ansible-option-versionadded">added in community.crypto 2.11.0</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>SSL/TLS Ciphers to use for the request.</p>
+<p>When a list is provided, all ciphers are joined in order with <code class="docutils literal notranslate"><span class="pre">:</span></code>.</p>
+<p>See the <a class="reference external" href="https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT">OpenSSL Cipher List Format</a> for more details.</p>
+<p>The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-host"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-host"><strong>host</strong></p>
 <a class="ansibleOptionLink" href="#parameter-host" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The host to get the cert for (IP is fine)</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-port"><strong>port</strong></p>
 <a class="ansibleOptionLink" href="#parameter-port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The port to connect to</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-proxy_host"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-proxy-host"><strong>proxy_host</strong></p>
 <a class="ansibleOptionLink" href="#parameter-proxy_host" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Proxy host used when get a certificate.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-proxy_port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-proxy-port"><strong>proxy_port</strong></p>
 <a class="ansibleOptionLink" href="#parameter-proxy_port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -244,7 +255,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">8080</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -258,7 +269,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-server_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-server-name"><strong>server_name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-server_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.4.0</span></p>
@@ -266,7 +277,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <td><div class="ansible-option-cell"><p>Server name used for SNI (<a class="reference external" href="https://en.wikipedia.org/wiki/Server_Name_Indication">Server Name Indication</a>) when hostname is an IP or is different from server name.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-starttls"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-starttls"><strong>starttls</strong></p>
 <a class="ansibleOptionLink" href="#parameter-starttls" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.9.0</span></p>
@@ -279,7 +290,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-timeout"><strong>timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
