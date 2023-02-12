@@ -7,8 +7,6 @@ __metaclass__ = type
 
 import pytest
 from ansible_collections.community.crypto.plugins.modules import luks_device
-from ansible_collections.community.crypto.tests.unit.compat.mock import patch
-from ansible.module_utils import basic
 
 
 class DummyModule(object):

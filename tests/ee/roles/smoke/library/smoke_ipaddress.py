@@ -29,7 +29,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 try:
-    import ipaddress
+    import ipaddress  # noqa: F401, pylint: disable=unused-import
     HAS_IPADDRESS = True
     IPADDRESS_IMP_ERR = None
 except ImportError as exc:

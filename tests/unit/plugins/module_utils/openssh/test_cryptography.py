@@ -16,7 +16,6 @@ from socket import gethostname
 from tempfile import mkdtemp
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
-    AsymmetricKeypair,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPrivateKeyFileError,
