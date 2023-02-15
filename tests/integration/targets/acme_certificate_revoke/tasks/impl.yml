@@ -38,14 +38,14 @@
     key_type: rsa
     rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: http-01
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
+    modify_account: true
+    deactivate_authzs: false
+    force: false
     remaining_days: 10
-    terms_agreed: yes
+    terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 2
   include_tasks: obtain-cert.yml
@@ -55,14 +55,14 @@
     certificate_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
     key_type: ec256
     subject_alt_name: "DNS:*.example.com"
-    subject_alt_name_critical: yes
+    subject_alt_name_critical: true
     account_key: account-ec384
     challenge: dns-01
-    modify_account: yes
-    deactivate_authzs: yes
-    force: no
+    modify_account: true
+    deactivate_authzs: true
+    force: false
     remaining_days: 10
-    terms_agreed: yes
+    terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 3
   include_tasks: obtain-cert.yml
@@ -71,14 +71,14 @@
     certificate_name: cert-3
     key_type: ec384
     subject_alt_name: "DNS:t1.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-rsa
     challenge: dns-01
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
+    modify_account: true
+    deactivate_authzs: false
+    force: false
     remaining_days: 10
-    terms_agreed: yes
+    terms_agreed: true
     account_email: "example@example.org"
 ## REVOKE CERTIFICATES ########################################################################
 - name: Revoke certificate 1 via account key
@@ -88,8 +88,8 @@
     certificate: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
-  ignore_errors: yes
+    validate_certs: false
+  ignore_errors: true
   register: cert_1_revoke
 - name: Revoke certificate 2 via certificate private key
   acme_certificate_revoke:
@@ -99,8 +99,8 @@
     certificate: "{{ remote_tmp_dir }}/cert-2.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
-  ignore_errors: yes
+    validate_certs: false
+  ignore_errors: true
   register: cert_2_revoke
 - name: Read account key (RSA)
   slurp:
@@ -113,6 +113,6 @@
     certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
-  ignore_errors: yes
+    validate_certs: false
+  ignore_errors: true
   register: cert_3_revoke

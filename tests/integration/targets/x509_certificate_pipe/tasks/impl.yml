@@ -42,7 +42,7 @@
     selfsigned_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_certificate_check
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate"
@@ -75,7 +75,7 @@
     selfsigned_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_certificate_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (changed)"
@@ -98,7 +98,7 @@
     selfsigned_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert-2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
@@ -144,7 +144,7 @@
     ownca_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: ownca_generate_certificate_check
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate"
@@ -180,7 +180,7 @@
     ownca_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert-3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: ownca_generate_certificate_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (changed)"
@@ -205,7 +205,7 @@
     ownca_not_after: 20191023133742Z
     csr_path: '{{ remote_tmp_dir }}/cert-4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: ownca_generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"

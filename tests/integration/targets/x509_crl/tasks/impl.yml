@@ -17,7 +17,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -38,7 +38,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -83,11 +83,11 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-  check_mode: yes
+  check_mode: true
   register: crl_1_idem_check
 
 - name: Create CRL 1 (idempotent)
@@ -104,7 +104,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -133,11 +133,11 @@
       - content: "{{ slurp.results[2].content | b64decode }}"
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-  check_mode: yes
+  check_mode: true
   register: crl_1_idem_content_check
 
 - name: Create CRL 1 (idempotent with content)
@@ -154,7 +154,7 @@
       - content: "{{ slurp.results[2].content | b64decode }}"
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -175,11 +175,11 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-  check_mode: yes
+  check_mode: true
   register: crl_1_format_check
 
 - name: Create CRL 1 (format)
@@ -197,7 +197,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -218,11 +218,11 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-  check_mode: yes
+  check_mode: true
   register: crl_1_format_idem_check
 
 - name: Create CRL 1 (format, idempotent)
@@ -240,11 +240,11 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
-    return_content: yes
+    return_content: true
   register: crl_1_format_idem
 
 - name: Retrieve CRL 1 infos via file
@@ -277,10 +277,10 @@
       - path: '{{ remote_tmp_dir }}/cert-1.pem'
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
-  check_mode: yes
+  check_mode: true
   register: crl_2_check
 
 - name: Create CRL 2
@@ -298,7 +298,7 @@
       - path: '{{ remote_tmp_dir }}/cert-1.pem'
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
   register: crl_2
@@ -318,11 +318,11 @@
       - path: '{{ remote_tmp_dir }}/cert-1.pem'
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
-    ignore_timestamps: yes
-  check_mode: yes
+    ignore_timestamps: true
+  check_mode: true
   register: crl_2_idem_check
 
 - name: Create CRL 2 (idempotent)
@@ -340,10 +340,10 @@
       - path: '{{ remote_tmp_dir }}/cert-1.pem'
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
-    ignore_timestamps: yes
+    ignore_timestamps: true
   register: crl_2_idem
 
 - name: Create CRL 2 (idempotent update, check mode)
@@ -359,9 +359,9 @@
     next_update: +0d
     revoked_certificates:
       - serial_number: 1235
-    ignore_timestamps: yes
+    ignore_timestamps: true
     mode: update
-  check_mode: yes
+  check_mode: true
   register: crl_2_idem_update_change_check
 
 - name: Create CRL 2 (idempotent update)
@@ -377,7 +377,7 @@
     next_update: +0d
     revoked_certificates:
       - serial_number: 1235
-    ignore_timestamps: yes
+    ignore_timestamps: true
     mode: update
   register: crl_2_idem_update_change
 
@@ -395,11 +395,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
-    ignore_timestamps: yes
+    ignore_timestamps: true
     mode: update
-  check_mode: yes
+  check_mode: true
   register: crl_2_idem_update_check
 
 - name: Create CRL 2 (idempotent update)
@@ -416,9 +416,9 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
-    ignore_timestamps: yes
+    ignore_timestamps: true
     mode: update
   register: crl_2_idem_update
 
@@ -436,11 +436,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
-    ignore_timestamps: no
+    ignore_timestamps: false
     mode: update
-  check_mode: yes
+  check_mode: true
   register: crl_2_change_check
 
 - name: Create CRL 2 (changed timestamps)
@@ -457,11 +457,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
-    ignore_timestamps: no
+    ignore_timestamps: false
     mode: update
-    return_content: yes
+    return_content: true
   register: crl_2_change
 
 - name: Read ca-crl2.crl
@@ -490,11 +490,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
     mode: update
-    return_content: yes
+    return_content: true
   register: crl_2_change_order_ignore
 
 - name: Create CRL 2 (changed order)
@@ -511,11 +511,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
     mode: update
-    return_content: yes
+    return_content: true
   register: crl_2_change_order
 
 - name: Read ca-crl2.crl
@@ -639,7 +639,7 @@
         - Ed25519
         - Ed448
       register: ed25519_ed448_privatekey
-      ignore_errors: yes
+      ignore_errors: true
 
     - when: ed25519_ed448_privatekey is not failed
       block:
@@ -658,7 +658,7 @@
               - path: '{{ remote_tmp_dir }}/cert-2.pem'
                 revocation_date: 20191013000000Z
                 reason: key_compromise
-                reason_critical: yes
+                reason_critical: true
                 invalidity_date: 20191012000000Z
               - serial_number: 1234
                 revocation_date: 20191001000000Z
@@ -666,7 +666,7 @@
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: Create CRL (idempotence)
           x509_crl:
@@ -682,7 +682,7 @@
               - path: '{{ remote_tmp_dir }}/cert-2.pem'
                 revocation_date: 20191013000000Z
                 reason: key_compromise
-                reason_critical: yes
+                reason_critical: true
                 invalidity_date: 20191012000000Z
               - serial_number: 1234
                 revocation_date: 20191001000000Z
@@ -690,6 +690,6 @@
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
   when: cryptography_version.stdout is version('2.6', '>=')

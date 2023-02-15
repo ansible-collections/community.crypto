@@ -10,9 +10,9 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  check_mode: yes
-  ignore_errors: yes
-  become: yes
+  check_mode: true
+  ignore_errors: true
+  become: true
   register: create_check
 - name: Create with invalid device name
   luks_device:
@@ -21,8 +21,8 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  ignore_errors: yes
-  become: yes
+  ignore_errors: true
+  become: true
   register: create
 - assert:
     that:
@@ -38,9 +38,9 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  check_mode: yes
-  ignore_errors: yes
-  become: yes
+  check_mode: true
+  ignore_errors: true
+  become: true
   register: create_check
 - name: Create with something which is not a device
   luks_device:
@@ -49,8 +49,8 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  ignore_errors: yes
-  become: yes
+  ignore_errors: true
+  become: true
   register: create
 - assert:
     that:

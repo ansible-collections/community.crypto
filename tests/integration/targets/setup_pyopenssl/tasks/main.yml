@@ -60,7 +60,7 @@
   - name: Register pyOpenSSL debug details
     command: "{{ ansible_python.executable }} -m OpenSSL.debug"
     register: pyopenssl_debug_version
-    ignore_errors: yes
+    ignore_errors: true
 
 # Depending on which pyOpenSSL version has been installed, it could be that cryptography has
 # been upgraded to a newer version. Make sure to register cryptography_version another time here
@@ -68,4 +68,4 @@
 - name: Register cryptography version
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: cryptography_version
-  ignore_errors: yes  # in case cryptography was not installed, and setup_openssl hasn't been run before, ignore errors
+  ignore_errors: true  # in case cryptography was not installed, and setup_openssl hasn't been run before, ignore errors

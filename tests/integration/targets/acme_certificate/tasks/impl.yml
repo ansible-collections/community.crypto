@@ -31,7 +31,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     state: absent
 - name: Read account key (EC384)
@@ -43,11 +43,11 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     account_key_content: "{{ slurp.content | b64decode }}"
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact:
     - mailto:example@example.org
     - mailto:example@example.com
@@ -56,11 +56,11 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact: []
 ## OBTAIN CERTIFICATES ########################################################################
 - name: Obtain cert 1
@@ -71,16 +71,16 @@
     key_type: rsa
     rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-ec256
     challenge: http-01
-    modify_account: yes
-    deactivate_authzs: no
-    force: no
+    modify_account: true
+    deactivate_authzs: false
+    force: false
     remaining_days: 10
-    terms_agreed: yes
+    terms_agreed: true
     account_email: "example@example.org"
-    retrieve_all_alternates: yes
+    retrieve_all_alternates: true
     acme_expected_root_number: 1
     select_chain:
       - test_certificates: last
@@ -98,17 +98,17 @@
     certificate_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else '' }}"
     key_type: ec256
     subject_alt_name: "DNS:*.example.com,DNS:example.com"
-    subject_alt_name_critical: yes
+    subject_alt_name_critical: true
     account_key: account-ec384
     challenge: dns-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: no
+    modify_account: false
+    deactivate_authzs: true
+    force: false
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     acme_expected_root_number: 0
-    retrieve_all_alternates: yes
+    retrieve_all_alternates: true
     select_chain:
       # All intermediates have the same subject, so always the first
       # chain will be found, and we need a second condition to make sure
@@ -134,17 +134,17 @@
     certificate_name: cert-3
     key_type: ec384
     subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: dns-01
-    modify_account: no
-    deactivate_authzs: no
-    force: no
+    modify_account: false
+    deactivate_authzs: false
+    force: false
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     acme_expected_root_number: 0
-    retrieve_all_alternates: yes
+    retrieve_all_alternates: true
     select_chain:
       - test_certificates: last
         subject: "{{ acme_roots[1].subject }}"
@@ -161,14 +161,14 @@
     key_type: rsa
     rsa_bits: "{{ default_rsa_key_size }}"
     subject_alt_name: "DNS:example.com,DNS:t1.example.com,DNS:test.t2.example.com,DNS:example.org,DNS:test.example.org"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-rsa
     challenge: http-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: yes
+    modify_account: false
+    deactivate_authzs: true
+    force: true
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     acme_expected_root_number: 2
     select_chain:
@@ -188,14 +188,14 @@
     certificate_name: cert-5
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-ec384
     challenge: http-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: yes
+    modify_account: false
+    deactivate_authzs: true
+    force: true
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     use_csr_content: true
 - name: Store obtain results for cert 5a
@@ -209,14 +209,14 @@
     certificate_name: cert-5
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-ec384
     challenge: http-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: no
+    modify_account: false
+    deactivate_authzs: true
+    force: false
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     use_csr_content: false
 - name: Store obtain results for cert 5b
@@ -229,14 +229,14 @@
     certificate_name: cert-5
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key: account-ec384
     challenge: http-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: yes
+    modify_account: false
+    deactivate_authzs: true
+    force: true
     remaining_days: 1000
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     use_csr_content: true
 - name: Store obtain results for cert 5c
@@ -254,14 +254,14 @@
     certificate_name: cert-5
     key_type: ec521
     subject_alt_name: "DNS:t2.example.com"
-    subject_alt_name_critical: no
+    subject_alt_name_critical: false
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: http-01
-    modify_account: no
-    deactivate_authzs: yes
-    force: yes
+    modify_account: false
+    deactivate_authzs: true
+    force: true
     remaining_days: 10
-    terms_agreed: no
+    terms_agreed: false
     account_email: ""
     use_csr_content: false
 - name: Store obtain results for cert 5d
@@ -277,14 +277,14 @@
       key_type: rsa
       rsa_bits: "{{ default_rsa_key_size }}"
       subject_alt_name: "DNS:example.org"
-      subject_alt_name_critical: no
+      subject_alt_name_critical: false
       account_key: account-ec256
       challenge: tls-alpn-01
-      modify_account: yes
-      deactivate_authzs: no
-      force: no
+      modify_account: true
+      deactivate_authzs: false
+      force: false
       remaining_days: 10
-      terms_agreed: yes
+      terms_agreed: true
       account_email: "example@example.org"
       acme_expected_root_number: 0
       select_chain:
@@ -313,14 +313,14 @@
       subject_alt_name:
       - "IP:127.0.0.1"
       # - "IP:::1"
-      subject_alt_name_critical: no
+      subject_alt_name_critical: false
       account_key: account-ec256
       challenge: http-01
-      modify_account: yes
-      deactivate_authzs: no
-      force: no
+      modify_account: true
+      deactivate_authzs: false
+      force: false
       remaining_days: 10
-      terms_agreed: yes
+      terms_agreed: true
       account_email: "example@example.org"
       acme_expected_root_number: 2
       select_chain:
@@ -344,15 +344,15 @@
       - "IP:127.0.0.1"
       # IPv4 only since our test validation server doesn't work
       # with IPv6 (thanks to Python's socketserver).
-      subject_alt_name_critical: no
+      subject_alt_name_critical: false
       account_key: account-ec256
       challenge: tls-alpn-01
       challenge_alpn_tls: acme_challenge_cert_helper
-      modify_account: yes
-      deactivate_authzs: no
-      force: no
+      modify_account: true
+      deactivate_authzs: false
+      force: false
       remaining_days: 10
-      terms_agreed: yes
+      terms_agreed: true
       account_email: "example@example.org"
       use_csr_content: true
   - name: Store obtain results for cert 8
@@ -364,37 +364,37 @@
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
 - name: Verifying cert 1
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-1-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-1-chain.pem" "{{ remote_tmp_dir }}/cert-1.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_1_valid
 - name: Verifying cert 2
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-2-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-2-chain.pem" "{{ remote_tmp_dir }}/cert-2.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_2_valid
 - name: Verifying cert 3
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-3-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-3-chain.pem" "{{ remote_tmp_dir }}/cert-3.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_3_valid
 - name: Verifying cert 4
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-4-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-4-chain.pem" "{{ remote_tmp_dir }}/cert-4.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_4_valid
 - name: Verifying cert 5
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-5-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-5-chain.pem" "{{ remote_tmp_dir }}/cert-5.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_5_valid
 - name: Verifying cert 6
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-6-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-6-chain.pem" "{{ remote_tmp_dir }}/cert-6.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_6_valid
   when: acme_intermediates[0].subject_key_identifier is defined
 - name: Verifying cert 7
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-7-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-7-chain.pem" "{{ remote_tmp_dir }}/cert-7.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_7_valid
   when: acme_roots[2].subject_key_identifier is defined
 - name: Verifying cert 8
   command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
-  ignore_errors: yes
+  ignore_errors: true
   register: cert_8_valid
   when: cryptography_version.stdout is version('1.3', '>=')
 # Dump certificate info
@@ -468,7 +468,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     retrieve_orders: ignore
   register: account_orders_not
 - name: Retrieve orders as URL list (1/2)
@@ -477,7 +477,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     retrieve_orders: url_list
   register: account_orders_urls
 - name: Retrieve orders as URL list (2/2)
@@ -486,7 +486,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     retrieve_orders: url_list
   register: account_orders_urls2
 - name: Retrieve orders as object list (1/2)
@@ -495,7 +495,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     retrieve_orders: object_list
   register: account_orders_full
 - name: Retrieve orders as object list (2/2)
@@ -504,6 +504,6 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     retrieve_orders: object_list
   register: account_orders_full2

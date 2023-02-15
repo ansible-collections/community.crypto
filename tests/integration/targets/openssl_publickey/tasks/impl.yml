@@ -13,7 +13,7 @@
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   check_mode: true
   register: publickey_check
 
@@ -22,7 +22,7 @@
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: publickey
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (check mode, idempotence)"
@@ -30,7 +30,7 @@
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   check_mode: true
   register: publickey_check2
 
@@ -39,7 +39,7 @@
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: publickey_idempotence
 
 - name: "({{ select_crypto_backend }}) Verify check mode"
@@ -79,7 +79,7 @@
     path: '{{ remote_tmp_dir }}/publickey2.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: publickey2_absent
 
 - name: "({{ select_crypto_backend }}) Delete publickey2 - standard (idempotence)"
@@ -134,21 +134,21 @@
   openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_1
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format (idempotent)"
   openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_2
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format (different private key)"
   openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey5.pem'
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_3
 
@@ -166,7 +166,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     privatekey_passphrase: hunter2
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_1
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 2)"
@@ -175,7 +175,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: wrong_password
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_2
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 3)"
@@ -183,7 +183,7 @@
     path: '{{ remote_tmp_dir }}/publickey_pw3.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_3
 
 - name: "({{ select_crypto_backend }}) Create broken key"
@@ -207,7 +207,7 @@
     state: absent
     path: '{{ remote_tmp_dir }}/publickey_removal.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: remove_1
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (removal, idempotent)"
@@ -215,6 +215,6 @@
     state: absent
     path: '{{ remote_tmp_dir }}/publickey_removal.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: remove_2

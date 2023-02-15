@@ -18,11 +18,11 @@
       - name: ca
         subject:
           commonName: Ansible
-        is_ca: yes
+        is_ca: true
       - name: ca-2
         subject:
           commonName: Ansible Other CA
-        is_ca: yes
+        is_ca: true
       - name: cert-1
         subject_alt_name:
           - DNS:ansible.com
@@ -52,7 +52,7 @@
     subject: "{{ item.subject | default(omit) }}"
     subject_alt_name: "{{ item.subject_alt_name | default(omit) }}"
     basic_constraints: "{{ 'CA:TRUE' if item.is_ca | default(false) else omit }}"
-    use_common_name_for_san: no
+    use_common_name_for_san: false
   loop: "{{ certificates }}"
 
 - name: Generate CA certificates

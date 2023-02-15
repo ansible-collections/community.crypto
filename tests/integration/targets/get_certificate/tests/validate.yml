@@ -131,10 +131,10 @@
     privatekey_path: '{{ remote_tmp_dir }}/bogus_ca.key'
     subject:
       commonName: Bogus CA
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     basic_constraints:
       - 'CA:TRUE'
-    basic_constraints_critical: yes
+    basic_constraints_critical: true
 
 - name: Generate selfsigned bogus CA certificate
   x509_certificate:

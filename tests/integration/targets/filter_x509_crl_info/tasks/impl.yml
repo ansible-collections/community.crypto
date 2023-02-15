@@ -17,7 +17,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -84,7 +84,7 @@
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         revocation_date: 20191013000000Z
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
       - serial_number: 1234
         revocation_date: 20191001000000Z
@@ -127,11 +127,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
-    ignore_timestamps: no
+    ignore_timestamps: false
     mode: update
-    return_content: yes
+    return_content: true
   register: crl_2_change
 
 - name: Retrieve CRL 2 infos
@@ -153,11 +153,11 @@
     revoked_certificates:
       - path: '{{ remote_tmp_dir }}/cert-2.pem'
         reason: key_compromise
-        reason_critical: yes
+        reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
     mode: update
-    return_content: yes
+    return_content: true
   register: crl_2_change_order
 
 - name: Retrieve CRL 2 infos again

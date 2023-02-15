@@ -7,6 +7,6 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: absent
-  become: yes
+  become: true
 - name: "Loading tasks from {{ item }}"
   include_tasks: "{{ item }}"
