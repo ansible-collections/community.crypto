@@ -21,10 +21,10 @@
     path: '{{ item.path }}'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     subject: '{{ item.subject }}'
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     basic_constraints:
     - 'CA:TRUE'
-    basic_constraints_critical: yes
+    basic_constraints_critical: true
   loop:
     - path: '{{ remote_tmp_dir }}/ca_csr.csr'
       subject:
@@ -40,10 +40,10 @@
     privatekey_passphrase: hunter2
     subject:
       commonName: Example CA
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     basic_constraints:
     - 'CA:TRUE'
-    basic_constraints_critical: yes
+    basic_constraints_critical: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (check mode)
   x509_certificate:
@@ -101,7 +101,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: ownca_certificate
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
@@ -114,7 +114,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: ownca_certificate_idempotence
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (check mode)
@@ -127,7 +127,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Copy ownca certificate to new file to check regeneration
   copy:
@@ -148,7 +148,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: ownca_certificate_ca_subject_changed
 
 - name: (OwnCA, {{select_crypto_backend}}) Regenerate ownca certificate with different CA key
@@ -162,7 +162,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: ownca_certificate_ca_key_changed
 
 - name: (OwnCA, {{select_crypto_backend}}) Get certificate information
@@ -300,7 +300,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (failed passphrase 2)
@@ -313,7 +313,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (failed passphrase 3)
@@ -325,7 +325,7 @@
     provider: ownca
     ownca_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create broken certificate
@@ -351,7 +351,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_1
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (idempotent)
@@ -362,7 +362,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_2
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (change)
@@ -373,7 +373,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_3
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (remove)
@@ -381,7 +381,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     state: absent
     provider: ownca
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_4
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (remove, idempotent)
@@ -389,7 +389,7 @@
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     state: absent
     provider: ownca
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_5
 
@@ -461,7 +461,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    ownca_create_authority_key_identifier: yes
+    ownca_create_authority_key_identifier: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_1
 
@@ -473,7 +473,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    ownca_create_authority_key_identifier: yes
+    ownca_create_authority_key_identifier: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_2
 
@@ -485,7 +485,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    ownca_create_authority_key_identifier: no
+    ownca_create_authority_key_identifier: false
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_3
 
@@ -497,7 +497,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    ownca_create_authority_key_identifier: no
+    ownca_create_authority_key_identifier: false
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_4
 
@@ -509,7 +509,7 @@
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     provider: ownca
     ownca_digest: sha256
-    ownca_create_authority_key_identifier: yes
+    ownca_create_authority_key_identifier: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_5
 
@@ -523,7 +523,7 @@
         - Ed25519
         - Ed448
       register: ownca_certificate_ed25519_ed448_privatekey
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: (OwnCA, {{select_crypto_backend}}) Generate CSR etc. if private key generation succeeded
       when: ownca_certificate_ed25519_ed448_privatekey is not failed
@@ -539,7 +539,7 @@
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate
           x509_certificate:
@@ -554,7 +554,7 @@
             - Ed25519
             - Ed448
           register: ownca_certificate_ed25519_ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
           x509_certificate:
@@ -569,7 +569,7 @@
             - Ed25519
             - Ed448
           register: ownca_certificate_ed25519_ed448_idempotence
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey
           openssl_privatekey:
@@ -577,7 +577,7 @@
             type: '{{ item }}'
             cipher: auto
             passphrase: Test123
-          ignore_errors: yes
+          ignore_errors: true
           loop:
             - Ed25519
             - Ed448
@@ -589,17 +589,17 @@
             privatekey_passphrase: Test123
             subject:
               commonName: Example CA
-            useCommonNameForSAN: no
+            useCommonNameForSAN: false
             basic_constraints:
             - 'CA:TRUE'
-            basic_constraints_critical: yes
+            basic_constraints_critical: true
             key_usage:
             - cRLSign
             - keyCertSign
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate
           x509_certificate:
@@ -612,7 +612,7 @@
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate
           x509_certificate:
@@ -628,7 +628,7 @@
             - Ed25519
             - Ed448
           register: ownca_certificate_ed25519_ed448_2
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
           x509_certificate:
@@ -644,7 +644,7 @@
             - Ed25519
             - Ed448
           register: ownca_certificate_ed25519_ed448_2_idempotence
-          ignore_errors: yes
+          ignore_errors: true
 
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')
 

@@ -49,7 +49,7 @@
       emailAddress: test@example.com
       postalAddress: 1234 Somewhere
       postalCode: "1234"
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     key_usage:
       - digitalSignature
       - keyAgreement
@@ -60,7 +60,7 @@
       - cRLSign
       - Encipher Only
       - decipherOnly
-    key_usage_critical: yes
+    key_usage_critical: true
     extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
       - TLS Web Server Authentication
@@ -84,8 +84,8 @@
     basic_constraints:
       - "CA:TRUE"
       - "pathlen:23"
-    basic_constraints_critical: yes
-    ocsp_must_staple: yes
+    basic_constraints_critical: true
+    ocsp_must_staple: true
     subject_key_identifier: '{{ "00:11:22:33" if cryptography_version.stdout is version("1.3", ">=") else omit }}'
     authority_key_identifier: '{{ "44:55:66:77" if cryptography_version.stdout is version("1.3", ">=") else omit }}'
     authority_cert_issuer: '{{ value_for_authority_cert_issuer if cryptography_version.stdout is version("1.3", ">=") else omit }}'
@@ -100,7 +100,7 @@
     path: '{{ remote_tmp_dir }}/csr_2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     basic_constraints:
       - "CA:TRUE"
 
@@ -108,7 +108,7 @@
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_3.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     subject_alt_name:
       - "DNS:*.ansible.com"
       - "DNS:*.example.org"
@@ -126,7 +126,7 @@
   openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-    useCommonNameForSAN: no
+    useCommonNameForSAN: false
     authority_key_identifier: '{{ "44:55:66:77" if cryptography_version.stdout is version("1.3", ">=") else omit }}'
 
 - name: Running tests with cryptography backend

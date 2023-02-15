@@ -80,11 +80,11 @@
     luks_device:
       device: "{{ cryptfile_device }}"
       state: absent
-    become: yes
-    ignore_errors: yes
+    become: true
+    ignore_errors: true
 
   - command: losetup -d "{{ cryptfile_device }}"
-    become: yes
+    become: true
 
   - file:
       dest: "{{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile"

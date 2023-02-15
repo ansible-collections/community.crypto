@@ -10,7 +10,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  become: yes
+  become: true
 
 # Access: keyfile1
 
@@ -19,8 +19,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -29,15 +29,15 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
 
 - name: Try to open with keyfile2
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -51,7 +51,7 @@
     new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
     pbkdf:
       iteration_time: 0.1
-  become: yes
+  become: true
   register: result_1
 
 - name: Give access to keyfile2 (idempotent)
@@ -60,7 +60,7 @@
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
+  become: true
   register: result_2
 
 - assert:
@@ -75,8 +75,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -85,11 +85,11 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
 
 - name: Dump LUKS header
   command: "cryptsetup luksDump {{ cryptfile_device }}"
-  become: yes
+  become: true
 
 - name: Remove access from keyfile1
   luks_device:
@@ -97,7 +97,7 @@
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
   register: result_1
 
 - name: Remove access from keyfile1 (idempotent)
@@ -106,7 +106,7 @@
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
   register: result_2
 
 - assert:
@@ -121,8 +121,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -133,8 +133,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -143,11 +143,11 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
 
 - name: Dump LUKS header
   command: "cryptsetup luksDump {{ cryptfile_device }}"
-  become: yes
+  become: true
 
 - name: Remove access from keyfile2
   luks_device:
@@ -155,8 +155,8 @@
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: remove_last_key
 - assert:
     that:
@@ -170,8 +170,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:
@@ -180,7 +180,7 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
 
 - name: Remove access from keyfile2
   luks_device:
@@ -188,8 +188,8 @@
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyfile: "{{ remote_tmp_dir }}/keyfile2"
-    force_remove_last_key: yes
-  become: yes
+    force_remove_last_key: true
+  become: true
 
 # Access: none
 
@@ -198,8 +198,8 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   register: open_try
 - assert:
     that:

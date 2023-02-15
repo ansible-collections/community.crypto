@@ -12,7 +12,7 @@
     pbkdf:
       algorithm: pbkdf2
       iteration_count: 1000
-  become: yes
+  become: true
   register: create_with_keysize
 - name: Create with keysize (idempotent)
   luks_device:
@@ -23,7 +23,7 @@
     pbkdf:
       algorithm: pbkdf2
       iteration_count: 1000
-  become: yes
+  become: true
   register: create_idem_with_keysize
 - name: Create with different keysize (idempotent since we do not update keysize)
   luks_device:
@@ -34,7 +34,7 @@
     pbkdf:
       algorithm: pbkdf2
       iteration_count: 1000
-  become: yes
+  become: true
   register: create_idem_with_diff_keysize
 - name: Create with ambiguous arguments
   luks_device:
@@ -45,8 +45,8 @@
     pbkdf:
       algorithm: pbkdf2
       iteration_count: 1000
-  ignore_errors: yes
-  become: yes
+  ignore_errors: true
+  become: true
   register: create_with_ambiguous
 
 - assert:

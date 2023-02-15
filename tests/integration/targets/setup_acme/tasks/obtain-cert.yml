@@ -34,7 +34,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
     account_key_passphrase: "{{ account_key_passphrase | default(omit) | default(omit, true) }}"
@@ -112,7 +112,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
     account_key_passphrase: "{{ account_key_passphrase | default(omit) | default(omit, true) }}"

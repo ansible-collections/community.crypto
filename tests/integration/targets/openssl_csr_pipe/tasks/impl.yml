@@ -14,7 +14,7 @@
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_csr_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR"
@@ -41,7 +41,7 @@
     subject:
       commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_csr_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR (changed)"
@@ -60,7 +60,7 @@
     subject:
       commonName: ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: generate_csr_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"

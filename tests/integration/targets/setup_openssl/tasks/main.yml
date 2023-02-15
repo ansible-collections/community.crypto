@@ -59,7 +59,7 @@
       homebrew:
         name: openssl
         state: present
-      become: yes
+      become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
     - name: MACOS | Locale openssl binary

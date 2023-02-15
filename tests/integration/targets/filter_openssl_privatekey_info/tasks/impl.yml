@@ -44,7 +44,7 @@
   set_fact:
     result_: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_3.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
-  ignore_errors: yes
+  ignore_errors: true
   register: result
 
 - name: Check that loading passphrase protected key without passphrase failed

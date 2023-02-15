@@ -10,7 +10,7 @@
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
-    return_content: yes
+    return_content: true
   check_mode: true
   register: dhparam_check
 
@@ -19,7 +19,7 @@
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
-    return_content: yes
+    return_content: true
   register: dhparam
 
 - name: "[{{ select_crypto_backend }}] Don't regenerate parameters with no change (check mode)"
@@ -27,7 +27,7 @@
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
-    return_content: yes
+    return_content: true
   check_mode: true
   register: dhparam_changed_check
 
@@ -36,7 +36,7 @@
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
-    return_content: yes
+    return_content: true
   register: dhparam_changed
 
 - name: "[{{ select_crypto_backend }}] Generate parameters with size option"
@@ -54,7 +54,7 @@
 
 - copy:
     src: '{{ remote_tmp_dir }}/dh768.pem'
-    remote_src: yes
+    remote_src: true
     dest: '{{ remote_tmp_dir }}/dh512.pem'
 
 - name: "[{{ select_crypto_backend }}] Re-generate if size is different"
@@ -68,7 +68,7 @@
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh512.pem'
     size: 512
-    force: yes
+    force: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_changed_force
 
@@ -80,7 +80,7 @@
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dhbroken.pem'
     size: 512
-    force: yes
+    force: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: output_broken
 
@@ -88,36 +88,36 @@
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
-    backup: yes
+    backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_1
 - name: "[{{ select_crypto_backend }}] Generate params (idempotent)"
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
-    backup: yes
+    backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_2
 - name: "[{{ select_crypto_backend }}] Generate params (change)"
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
-    force: yes
-    backup: yes
+    force: true
+    backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_3
 - name: "[{{ select_crypto_backend }}] Generate params (remove)"
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     state: absent
-    backup: yes
+    backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
-    return_content: yes
+    return_content: true
   register: dhparam_backup_4
 - name: "[{{ select_crypto_backend }}] Generate params (remove, idempotent)"
   openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     state: absent
-    backup: yes
+    backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_5

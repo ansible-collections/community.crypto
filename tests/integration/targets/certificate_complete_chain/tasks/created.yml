@@ -17,7 +17,7 @@
     - '{{ remote_tmp_dir }}/a-root.pem'
 
 - name: Case B => doesn't work, but this is expected
-  failed_when: no
+  failed_when: false
   register: caseb
   certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"

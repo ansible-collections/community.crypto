@@ -26,7 +26,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     method: directory-only
   register: directory
 - debug: var=directory
@@ -35,7 +35,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     url: "{{ directory.directory.newAccount}}"
     method: post
@@ -49,7 +49,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
@@ -61,7 +61,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
@@ -80,7 +80,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ directory.directory.newOrder }}"
@@ -103,7 +103,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ new_order.headers.location }}"
@@ -115,7 +115,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item }}"
@@ -128,7 +128,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ (item.challenges | selectattr('type', 'equalto', 'http-01') | list)[0].url }}"
@@ -141,7 +141,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item.url }}"
@@ -155,7 +155,7 @@
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
-    validate_certs: no
+    validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item.url }}"

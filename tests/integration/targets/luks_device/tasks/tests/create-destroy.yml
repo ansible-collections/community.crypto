@@ -10,8 +10,8 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: create_check
 - name: Create
   luks_device:
@@ -20,7 +20,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  become: yes
+  become: true
   register: create
 - name: Create (idempotent)
   luks_device:
@@ -29,7 +29,7 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  become: yes
+  become: true
   register: create_idem
 - name: Create (idempotent, check)
   luks_device:
@@ -38,8 +38,8 @@
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     pbkdf:
       iteration_time: 0.1
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: create_idem_check
 - assert:
     that:
@@ -53,30 +53,30 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: open_check
 - name: Open
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
   register: open
 - name: Open (idempotent)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
   register: open_idem
 - name: Open (idempotent, check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: open_idem_check
 - assert:
     that:
@@ -89,27 +89,27 @@
   luks_device:
     name: "{{ open.name }}"
     state: closed
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: close_check
 - name: Closed (via name)
   luks_device:
     name: "{{ open.name }}"
     state: closed
-  become: yes
+  become: true
   register: close
 - name: Closed (via name, idempotent)
   luks_device:
     name: "{{ open.name }}"
     state: closed
-  become: yes
+  become: true
   register: close_idem
 - name: Closed (via name, idempotent, check)
   luks_device:
     name: "{{ open.name }}"
     state: closed
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: close_idem_check
 - assert:
     that:
@@ -123,33 +123,33 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
 
 - name: Closed (via device, check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: close_check
 - name: Closed (via device)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
   register: close
 - name: Closed (via device, idempotent)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  become: yes
+  become: true
   register: close_idem
 - name: Closed (via device, idempotent, check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: close_idem_check
 - assert:
     that:
@@ -163,33 +163,33 @@
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  become: yes
+  become: true
 
 - name: Absent (check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: absent
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: absent_check
 - name: Absent
   luks_device:
     device: "{{ cryptfile_device }}"
     state: absent
-  become: yes
+  become: true
   register: absent
 - name: Absent (idempotence)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: absent
-  become: yes
+  become: true
   register: absent_idem
 - name: Absent (idempotence, check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: absent
-  check_mode: yes
-  become: yes
+  check_mode: true
+  become: true
   register: absent_idem_check
 - assert:
     that:

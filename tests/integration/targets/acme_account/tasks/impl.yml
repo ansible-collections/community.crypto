@@ -36,10 +36,10 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: no
-  ignore_errors: yes
+    allow_creation: false
+  ignore_errors: true
   register: account_not_created
 
 - name: Create it now (check mode, diff)
@@ -48,14 +48,14 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact:
     - mailto:example@example.org
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: account_created_check
 
 - name: Create it now
@@ -64,10 +64,10 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact:
     - mailto:example@example.org
   register: account_created
@@ -78,10 +78,10 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact:
     - mailto:example@example.org
   register: account_created_idempotent
@@ -97,13 +97,13 @@
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact:
     - mailto:example@example.com
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: account_modified_check
 
 - name: Change email address
@@ -112,9 +112,9 @@
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact:
     - mailto:example@example.com
   register: account_modified
@@ -126,9 +126,9 @@
     account_uri: "{{ account_created.account_uri }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact:
     - mailto:example@example.com
   register: account_modified_idempotent
@@ -140,10 +140,10 @@
     account_uri: "{{ account_created.account_uri ~ '12345thisdoesnotexist' }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
     contact: []
-  ignore_errors: yes
+  ignore_errors: true
   register: account_modified_wrong_uri
 
 - name: Clear contact email addresses (check mode, diff)
@@ -152,12 +152,12 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact: []
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: account_modified_2_check
 
 - name: Clear contact email addresses
@@ -166,9 +166,9 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact: []
   register: account_modified_2
 
@@ -178,9 +178,9 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    # allow_creation: no
+    # allow_creation: false
     contact: []
   register: account_modified_2_idempotent
 
@@ -190,14 +190,14 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
     - mailto:example@example.com
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: account_change_key_check
 
 - name: Change account key
@@ -206,7 +206,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
@@ -221,10 +221,10 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: absent
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: account_deactivate_check
 
 - name: Deactivate account
@@ -234,7 +234,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: absent
   register: account_deactivate
 
@@ -245,7 +245,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: absent
   register: account_deactivate_idempotent
 
@@ -256,10 +256,10 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: no
-  ignore_errors: yes
+    allow_creation: false
+  ignore_errors: true
   register: account_not_created_2
 
 - name: Do not try to create account III
@@ -268,10 +268,10 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: no
-  ignore_errors: yes
+    allow_creation: false
+  ignore_errors: true
   register: account_not_created_3
 
 - name: Create account with External Account Binding
@@ -280,10 +280,10 @@
     account_key_src: "{{ remote_tmp_dir }}/{{ item.account }}.pem"
     acme_version: 2
     acme_directory: https://{{ acme_host }}:14000/dir
-    validate_certs: no
+    validate_certs: false
     state: present
-    allow_creation: yes
-    terms_agreed: yes
+    allow_creation: true
+    terms_agreed: true
     contact:
     - mailto:example@example.org
     external_account_binding:
@@ -291,7 +291,7 @@
       alg: "{{ item.alg }}"
       key: "{{ item.key }}"
   register: account_created_eab
-  ignore_errors: yes
+  ignore_errors: true
   loop:
     - account: accountkey3
       kid: kid-1

@@ -23,7 +23,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: selfsigned_certificate_no_csr
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR - idempotency
@@ -33,7 +33,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: selfsigned_certificate_no_csr_idempotence
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR (check mode)
@@ -43,7 +43,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: selfsigned_certificate_no_csr_idempotence_check
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
@@ -68,7 +68,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: selfsigned_certificate
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
@@ -79,7 +79,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-    return_content: yes
+    return_content: true
   register: selfsigned_certificate_idempotence
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode)
@@ -90,7 +90,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode, other CSR)
   x509_certificate:
@@ -100,7 +100,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  check_mode: yes
+  check_mode: true
   register: selfsigned_certificate_csr_minimal_change
 
 - name: (Selfsigned, {{select_crypto_backend}}) Get certificate information
@@ -272,7 +272,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_1
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 2)
@@ -284,7 +284,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_2
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 3)
@@ -295,7 +295,7 @@
     provider: selfsigned
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
-  ignore_errors: yes
+  ignore_errors: true
   register: passphrase_error_3
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
@@ -318,7 +318,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_1
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (idempotent)
@@ -328,7 +328,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     provider: selfsigned
     selfsigned_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_2
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (change)
@@ -338,7 +338,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     provider: selfsigned
     selfsigned_digest: sha256
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_3
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove)
@@ -346,7 +346,7 @@
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_4
 - name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove, idempotent)
@@ -354,7 +354,7 @@
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
     provider: selfsigned
-    backup: yes
+    backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_5
 
@@ -423,7 +423,7 @@
         - Ed25519
         - Ed448
       register: selfsigned_certificate_ed25519_ed448_privatekey
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR etc. if private key generation succeeded
       when: selfsigned_certificate_ed25519_ed448_privatekey is not failed
@@ -439,7 +439,7 @@
           loop:
             - Ed25519
             - Ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
           x509_certificate:
@@ -453,7 +453,7 @@
             - Ed25519
             - Ed448
           register: selfsigned_certificate_ed25519_ed448
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
           x509_certificate:
@@ -467,7 +467,7 @@
             - Ed25519
             - Ed448
           register: selfsigned_certificate_ed25519_ed448_idempotence
-          ignore_errors: yes
+          ignore_errors: true
 
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')
 
