@@ -1,2 +1,2 @@
 bugfixes:
-  - "bindep - Fix `python3-pyOpenSSL` dependency resolution on el9 platforms (https://github.com/ansible-collections/community.crypto/pull/575)."
+  - "execution environment binary dependencies (bindep.txt) - fix ``python3-pyOpenSSL`` dependency resolution on RHEL 9+ / CentOS Stream 9+ platforms (https://github.com/ansible-collections/community.crypto/pull/575)."
