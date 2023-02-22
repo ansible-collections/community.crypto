@@ -11,4 +11,7 @@ openssl [platform:rpm]
 python3-cryptography [platform:dpkg]
 python3-cryptography [platform:rpm]
 python3-openssl [platform:dpkg]
-python3-pyOpenSSL [platform:rpm]
+# On RHEL 9+ and CentOS Stream 9+, python3-pyOpenSSL is part of EPEL
+python3-pyOpenSSL [platform:rpm !platform:rhel !platform:centos]
+python3-pyOpenSSL [platform:rhel-6 platform:centos-6 platform:rhel-7 platform:centos-7 platform:rhel-8 platform:centos-8]
+python3-pyOpenSSL [platform:rhel platform:centos !platform:rhel-6 !platform:centos-6 !platform:rhel-7 !platform:centos-7 !platform:rhel-8 !platform:centos-8 epel]
