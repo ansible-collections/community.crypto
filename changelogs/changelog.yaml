@@ -772,6 +772,24 @@ releases:
         name: x509_crl_info
         namespace: null
     release_date: '2023-01-02'
+  2.11.0:
+    changes:
+      bugfixes:
+      - action plugin helper - fix handling of deprecations for ansible-core 2.14.2
+        (https://github.com/ansible-collections/community.crypto/pull/572).
+      - execution environment binary dependencies (bindep.txt) - fix ``python3-pyOpenSSL``
+        dependency resolution on RHEL 9+ / CentOS Stream 9+ platforms (https://github.com/ansible-collections/community.crypto/pull/575).
+      - various plugins - remove unnecessary imports (https://github.com/ansible-collections/community.crypto/pull/569).
+      minor_changes:
+      - get_certificate - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.crypto/pull/571).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 2.11.0.yml
+    - 571_get_certificate_ciphers.yaml
+    - 572-action-module.yml
+    - 575-bindep-python3-pyOpenSSL.yml
+    - remove-unneeded-imports.yml
+    release_date: '2023-02-23'
   2.2.0:
     changes:
       bugfixes:

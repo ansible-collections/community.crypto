@@ -5,6 +5,26 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.11.0
+=======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+Minor Changes
+-------------
+
+- get_certificate - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.crypto/pull/571).
+
+Bugfixes
+--------
+
+- action plugin helper - fix handling of deprecations for ansible-core 2.14.2 (https://github.com/ansible-collections/community.crypto/pull/572).
+- execution environment binary dependencies (bindep.txt) - fix ``python3-pyOpenSSL`` dependency resolution on RHEL 9+ / CentOS Stream 9+ platforms (https://github.com/ansible-collections/community.crypto/pull/575).
+- various plugins - remove unnecessary imports (https://github.com/ansible-collections/community.crypto/pull/569).
+
 v2.10.0
 =======
 

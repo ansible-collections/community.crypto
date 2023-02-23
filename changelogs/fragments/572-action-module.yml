@@ -1,2 +1,0 @@
-bugfixes:
-  - "action plugin helper - fix handling of deprecations for ansible-core 2.14.2 (https://github.com/ansible-collections/community.crypto/pull/572)."
