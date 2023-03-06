@@ -160,7 +160,7 @@ EXAMPLES = '''
 - name: Force regenerate an OpenSSH keypair if it already exists
   community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
-    force: True
+    force: true
 
 - name: Generate an OpenSSH keypair with a different algorithm (dsa)
   community.crypto.openssh_keypair:

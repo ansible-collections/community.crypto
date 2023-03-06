@@ -87,7 +87,7 @@
 - block:
   - name: Have ECS generate a signed certificate
     ecs_certificate:
-      backup: True
+      backup: true
       path: '{{ example1_cert_path }}'
       full_chain_path: '{{ example1_chain_path }}'
       csr: '{{ csr_path }}'
@@ -115,7 +115,7 @@
 
   - name: Attempt to have ECS generate a signed certificate, but existing one is valid
     ecs_certificate:
-      backup: True
+      backup: true
       path: '{{ example1_cert_path }}'
       full_chain_path: '{{ example1_chain_path }}'
       csr: '{{ csr_path }}'
@@ -145,8 +145,8 @@
 
   - name: Force a reissue with no CSR, verify that contents changed
     ecs_certificate:
-      backup: True
-      force: True
+      backup: true
+      force: true
       path: '{{ example1_cert_path }}'
       full_chain_path: '{{ example1_chain_path }}'
       cert_type: '{{ example1_cert_type }}'
@@ -182,7 +182,7 @@
       csr: '{{ csr_path }}'
       subject_alt_name: '{{ example4_subject_alt_name }}'
       eku: '{{ example4_eku }}'
-      ct_log: True
+      ct_log: true
       cert_type: '{{ example4_cert_type }}'
       org: '{{ example4_org }}'
       ou: '{{ example4_ou }}'
