@@ -64,6 +64,8 @@
 
     - name: MACOS | Locale openssl binary
       command: brew --prefix openssl
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
       register: brew_openssl_prefix
 
     - name: MACOS | Point to OpenSSL binary
