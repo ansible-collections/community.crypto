@@ -202,10 +202,10 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: Alpine 3.16
-              test: alpine/3.16
-            - name: Fedora 36
-              test: fedora/36
+            - name: Alpine 3.17
+              test: alpine/3.17
+            - name: Fedora 37
+              test: fedora/37
             - name: Ubuntu 20.04
               test: ubuntu/20.04
             - name: Ubuntu 22.04
