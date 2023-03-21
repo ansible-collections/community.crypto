@@ -43,7 +43,7 @@ options:
         type: path
     privatekey_content:
         description:
-            - Path to the private key to use when signing the certificate.
+            - Content of the private key to use when signing the certificate.
             - This is mutually exclusive with I(privatekey_path).
         type: str
 
