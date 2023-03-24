@@ -790,6 +790,12 @@ releases:
     - 575-bindep-python3-pyOpenSSL.yml
     - remove-unneeded-imports.yml
     release_date: '2023-02-23'
+  2.11.1:
+    changes:
+      release_summary: Maintenance release with improved documentation.
+    fragments:
+    - 2.11.1.yml
+    release_date: '2023-03-24'
   2.2.0:
     changes:
       bugfixes:
