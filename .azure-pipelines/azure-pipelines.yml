@@ -110,24 +110,6 @@ stages:
               test: opensuse15
             - name: Ubuntu 20.04
               test: ubuntu2004
-  - stage: Docker_2_9
-    displayName: Docker 2.9
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.9/linux/{0}/1
-          targets:
-            - name: CentOS 6
-              test: centos6
-            - name: CentOS 7
-              test: centos7
-            - name: Fedora 31
-              test: fedora31
-            - name: Ubuntu 16.04
-              test: ubuntu1604
-            - name: Ubuntu 18.04
-              test: ubuntu1804
 
 ### Remote
   - stage: Remote_2_13
