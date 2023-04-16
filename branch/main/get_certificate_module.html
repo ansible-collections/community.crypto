@@ -207,6 +207,20 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-asn1_base64"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-asn1-base64"><strong>asn1_base64</strong></p>
+<a class="ansibleOptionLink" href="#parameter-asn1_base64" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><span class="ansible-option-versionadded">added in community.crypto 2.12.0</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Whether to encode the ASN.1 values in the <code class="docutils literal notranslate"><span class="pre">extensions</span></code> return value with Base64 or not.</p>
+<p>The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility this option is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, but that value will eventually be deprecated and changed to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-ca_cert"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-ca-cert"><strong>ca_cert</strong></p>
 <a class="ansibleOptionLink" href="#parameter-ca_cert" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -214,7 +228,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p>Note that this only validates the certificate is signed by the chain; not that the cert is valid for the host presenting it.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-ciphers"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-ciphers"><strong>ciphers</strong></p>
 <a class="ansibleOptionLink" href="#parameter-ciphers" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 2.11.0</span></p>
@@ -225,28 +239,28 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p>The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-host"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-host"><strong>host</strong></p>
 <a class="ansibleOptionLink" href="#parameter-host" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The host to get the cert for (IP is fine)</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-port"><strong>port</strong></p>
 <a class="ansibleOptionLink" href="#parameter-port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The port to connect to</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-proxy_host"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-proxy-host"><strong>proxy_host</strong></p>
 <a class="ansibleOptionLink" href="#parameter-proxy_host" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Proxy host used when get a certificate.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-proxy_port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-proxy-port"><strong>proxy_port</strong></p>
 <a class="ansibleOptionLink" href="#parameter-proxy_port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -254,7 +268,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">8080</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -268,7 +282,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-server_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-server-name"><strong>server_name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-server_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.4.0</span></p>
@@ -276,7 +290,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <td><div class="ansible-option-cell"><p>Server name used for SNI (<a class="reference external" href="https://en.wikipedia.org/wiki/Server_Name_Indication">Server Name Indication</a>) when hostname is an IP or is different from server name.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-starttls"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-starttls"><strong>starttls</strong></p>
 <a class="ansibleOptionLink" href="#parameter-starttls" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.9.0</span></p>
@@ -289,7 +303,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-timeout"><strong>timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -404,7 +418,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <div class="ansibleOptionAnchor" id="return-extensions/asn1_data"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-return-extensions-asn1-data"><strong>asn1_data</strong></p>
 <a class="ansibleOptionLink" href="#return-extensions/asn1_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The Base64 encoded ASN.1 content of the extension.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The ASN.1 content of the extension.</p>
+<p>If <em>asn1_base64=true</em> this will be Base64 encoded, otherwise the raw binary value will be returned.</p>
+<p>Please note that the raw binary value might not survive JSON serialization to the Ansible controller, and also might cause failures when displaying it. See <a class="reference external" href="https://github.com/ansible/ansible/issues/80258">https://github.com/ansible/ansible/issues/80258</a> for more information.</p>
 <p><strong>Note</strong> that depending on the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> version used, it is not possible to extract the ASN.1 content of the extension, but only to provide the re-encoded content of the extension in case it was parsed by <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>. This should usually result in exactly the same value, except if the original extension value was malformed.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 </div></td>
