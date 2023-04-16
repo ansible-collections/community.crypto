@@ -19,7 +19,6 @@ description:
   - Retrieve information on cryptographic capabilities.
   - The current version retrieves information on the L(Python cryptography library, https://cryptography.io/) available to
     Ansible modules, and on the OpenSSL binary C(openssl) found in the path.
-  - M(foo).
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
