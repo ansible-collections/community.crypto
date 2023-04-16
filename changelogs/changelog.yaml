@@ -687,6 +687,20 @@ releases:
     - 1.9.20.yml
     - 551-publickey-info.yml
     release_date: '2023-01-01'
+  1.9.21:
+    changes:
+      bugfixes:
+      - action plugin helper - fix handling of deprecations for ansible-core 2.14.2
+        (https://github.com/ansible-collections/community.crypto/pull/572).
+      - openssl_csr, openssl_csr_pipe - prevent invalid values for ``crl_distribution_points``
+        that do not have one of ``full_name``, ``relative_name``, and ``crl_issuer``
+        (https://github.com/ansible-collections/community.crypto/pull/560).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.21.yml
+    - 560-openssl_csr-crl_distribution_points.yml
+    - 572-action-module.yml
+    release_date: '2023-04-16'
   1.9.3:
     changes:
       bugfixes:
