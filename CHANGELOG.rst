@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.12.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- get_certificate - add ``asn1_base64`` option to control whether the ASN.1 included in the ``extensions`` return value is binary data or Base64 encoded (https://github.com/ansible-collections/community.crypto/pull/592).
+
 v2.11.1
 =======
 
