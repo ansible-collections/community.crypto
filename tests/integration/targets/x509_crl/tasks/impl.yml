@@ -360,7 +360,7 @@
     revoked_certificates:
       - serial_number: 1235
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
   check_mode: true
   register: crl_2_idem_update_change_check
 
@@ -378,7 +378,7 @@
     revoked_certificates:
       - serial_number: 1235
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
   register: crl_2_idem_update_change
 
 - name: Create CRL 2 (idempotent update, check mode)
@@ -398,7 +398,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
   check_mode: true
   register: crl_2_idem_update_check
 
@@ -419,7 +419,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
   register: crl_2_idem_update
 
 - name: Create CRL 2 (changed timestamps, check mode)
@@ -439,7 +439,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: false
-    mode: update
+    crl_mode: update
   check_mode: true
   register: crl_2_change_check
 
@@ -460,7 +460,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: false
-    mode: update
+    crl_mode: update
     return_content: true
   register: crl_2_change
 
@@ -493,7 +493,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
     return_content: true
   register: crl_2_change_order_ignore
 
@@ -514,7 +514,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
     return_content: true
   register: crl_2_change_order
 

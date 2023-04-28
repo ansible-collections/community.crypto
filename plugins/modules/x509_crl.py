@@ -42,7 +42,7 @@ options:
         default: present
         choices: [ absent, present ]
 
-    mode:
+    crl_mode:
         description:
             - Defines how to process entries of existing CRLs.
             - If set to C(generate), makes sure that the CRL has the exact set of revoked certificates
@@ -51,8 +51,17 @@ options:
               I(revoked_certificates), but can also contain other revoked certificates. If the CRL file
               already exists, all entries from the existing CRL will also be included in the new CRL.
               When using C(update), you might be interested in setting I(ignore_timestamps) to C(true).
+            - The default value is C(generate).
         type: str
-        default: generate
+        # default: generate
+        choices: [ generate, update ]
+        version_added: 2.13.0
+    mode:
+        description:
+            - This parameter is deprecated and will be removed in community.crypto 3.0.0. Use I(crl_mode) instead.
+            - Note that from community.crypto 3.0.0 on, I(mode) will be used for the CRL file's mode.
+        type: str
+        # default: generate
         choices: [ generate, update ]
 
     force:
@@ -479,7 +488,7 @@ class CRL(OpenSSLObject):
 
         self.format = module.params['format']
 
-        self.update = module.params['mode'] == 'update'
+        self.update = module.params['crl_mode'] == 'update'
         self.ignore_timestamps = module.params['ignore_timestamps']
         self.return_content = module.params['return_content']
         self.name_encoding = module.params['name_encoding']
@@ -827,7 +836,18 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            mode=dict(type='str', default='generate', choices=['generate', 'update']),
+            crl_mode=dict(
+                type='str',
+                # default='generate',
+                choices=['generate', 'update'],
+            ),
+            mode=dict(
+                type='str',
+                # default='generate',
+                choices=['generate', 'update'],
+                removed_in_version='3.0.0',
+                removed_from_collection='community.crypto',
+            ),
             force=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             path=dict(type='path', required=True),
@@ -881,6 +901,14 @@ def main():
         supports_check_mode=True,
         add_file_common_args=True,
     )
+
+    if module.params['mode']:
+        if module.params['crl_mode']:
+            module.fail_json('You cannot use both `mode` and `crl_mode`. Use `crl_mode`.')
+        module.params['crl_mode'] = module.params['mode']
+    # TODO: in 3.0.0, once the option `mode` has been removed, remove this:
+    module.params.pop('mode', None)
+    # From then on, `mode` will be the file mode of the CRL file
 
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
