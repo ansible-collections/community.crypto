@@ -52,13 +52,16 @@ options:
               already exists, all entries from the existing CRL will also be included in the new CRL.
               When using C(update), you might be interested in setting I(ignore_timestamps) to C(true).
             - The default value is C(generate).
+            - This parameter was called I(mode) before community.crypto 2.13.0. It has been renamed to avoid
+              a collision with the common I(mode) parameter for setting the CRL file's access mode.
         type: str
         # default: generate
         choices: [ generate, update ]
         version_added: 2.13.0
     mode:
         description:
-            - This parameter is deprecated and will be removed in community.crypto 3.0.0. Use I(crl_mode) instead.
+            - This parameter has been renamed to I(crl_mode). The old name I(mode) is now deprecated and will
+              be removed in community.crypto 3.0.0. Replace usage of this parameter with I(crl_mode).
             - Note that from community.crypto 3.0.0 on, I(mode) will be used for the CRL file's mode.
         type: str
         # default: generate
