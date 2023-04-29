@@ -239,6 +239,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>If set to <code class="docutils literal notranslate"><span class="pre">generate</span></code>, makes sure that the CRL has the exact set of revoked certificates as specified in <em>revoked_certificates</em>.</p>
 <p>If set to <code class="docutils literal notranslate"><span class="pre">update</span></code>, makes sure that the CRL contains the revoked certificates from <em>revoked_certificates</em>, but can also contain other revoked certificates. If the CRL file already exists, all entries from the existing CRL will also be included in the new CRL. When using <code class="docutils literal notranslate"><span class="pre">update</span></code>, you might be interested in setting <em>ignore_timestamps</em> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <p>The default value is <code class="docutils literal notranslate"><span class="pre">generate</span></code>.</p>
+<p>This parameter was called <em>mode</em> before community.crypto 2.13.0. It has been renamed to avoid a collision with the common <em>mode</em> parameter for setting the CRL file’s access mode.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code></p></li>
@@ -338,7 +339,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="parameter-mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-mode"><strong>mode</strong></p>
 <a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>This parameter is deprecated and will be removed in community.crypto 3.0.0. Use <em>crl_mode</em> instead.</p>
+<td><div class="ansible-option-cell"><p>This parameter has been renamed to <em>crl_mode</em>. The old name <em>mode</em> is now deprecated and will be removed in community.crypto 3.0.0. Replace usage of this parameter with <em>crl_mode</em>.</p>
 <p>Note that from community.crypto 3.0.0 on, <em>mode</em> will be used for the CRL file’s mode.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
