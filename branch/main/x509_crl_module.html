@@ -231,6 +231,23 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-crl_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-crl-mode"><strong>crl_mode</strong></p>
+<a class="ansibleOptionLink" href="#parameter-crl_mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><span class="ansible-option-versionadded">added in community.crypto 2.13.0</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Defines how to process entries of existing CRLs.</p>
+<p>If set to <code class="docutils literal notranslate"><span class="pre">generate</span></code>, makes sure that the CRL has the exact set of revoked certificates as specified in <em>revoked_certificates</em>.</p>
+<p>If set to <code class="docutils literal notranslate"><span class="pre">update</span></code>, makes sure that the CRL contains the revoked certificates from <em>revoked_certificates</em>, but can also contain other revoked certificates. If the CRL file already exists, all entries from the existing CRL will also be included in the new CRL. When using <code class="docutils literal notranslate"><span class="pre">update</span></code>, you might be interested in setting <em>ignore_timestamps</em> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>The default value is <code class="docutils literal notranslate"><span class="pre">generate</span></code>.</p>
+<p>This parameter was called <em>mode</em> before community.crypto 2.13.0. It has been renamed to avoid a collision with the common <em>mode</em> parameter for setting the CRL file’s access mode.</p>
+<p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;update&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-digest"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-digest"><strong>digest</strong></p>
 <a class="ansibleOptionLink" href="#parameter-digest" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -238,7 +255,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;sha256&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-force"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-force"><strong>force</strong></p>
 <a class="ansibleOptionLink" href="#parameter-force" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -250,7 +267,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-format"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-format"><strong>format</strong></p>
 <a class="ansibleOptionLink" href="#parameter-format" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -263,7 +280,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-group"><strong>group</strong></p>
 <a class="ansibleOptionLink" href="#parameter-group" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -271,7 +288,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-ignore_timestamps"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-ignore-timestamps"><strong>ignore_timestamps</strong></p>
 <a class="ansibleOptionLink" href="#parameter-ignore_timestamps" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -284,7 +301,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-issuer"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-issuer"><strong>issuer</strong></p>
 <a class="ansibleOptionLink" href="#parameter-issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
@@ -295,7 +312,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Mutually exclusive with <em>issuer_ordered</em>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-issuer_ordered"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-issuer-ordered"><strong>issuer_ordered</strong></p>
 <a class="ansibleOptionLink" href="#parameter-issuer_ordered" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 2.0.0</span></p>
@@ -306,7 +323,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Mutually exclusive with <em>issuer</em>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-last_update"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-last-update"><strong>last_update</strong></p>
 <a class="ansibleOptionLink" href="#parameter-last_update" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -318,21 +335,20 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;+0s&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-mode"><strong>mode</strong></p>
 <a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Defines how to process entries of existing CRLs.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">generate</span></code>, makes sure that the CRL has the exact set of revoked certificates as specified in <em>revoked_certificates</em>.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">update</span></code>, makes sure that the CRL contains the revoked certificates from <em>revoked_certificates</em>, but can also contain other revoked certificates. If the CRL file already exists, all entries from the existing CRL will also be included in the new CRL. When using <code class="docutils literal notranslate"><span class="pre">update</span></code>, you might be interested in setting <em>ignore_timestamps</em> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<td><div class="ansible-option-cell"><p>This parameter has been renamed to <em>crl_mode</em>. The old name <em>mode</em> is now deprecated and will be removed in community.crypto 3.0.0. Replace usage of this parameter with <em>crl_mode</em>.</p>
+<p>Note that from community.crypto 3.0.0 on, <em>mode</em> will be used for the CRL file’s mode.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;update&quot;</span></code></p></li>
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name_encoding"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-name-encoding"><strong>name_encoding</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name_encoding" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -349,7 +365,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-next_update"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-next-update"><strong>next_update</strong></p>
 <a class="ansibleOptionLink" href="#parameter-next_update" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -361,7 +377,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Required if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-owner"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-owner"><strong>owner</strong></p>
 <a class="ansibleOptionLink" href="#parameter-owner" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -370,14 +386,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-path"><strong>path</strong></p>
 <a class="ansibleOptionLink" href="#parameter-path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Remote absolute path where the generated CRL file should be created or is already located.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-privatekey_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-privatekey-content"><strong>privatekey_content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-privatekey_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -385,7 +401,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>, but not both.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-privatekey_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-privatekey-passphrase"><strong>privatekey_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-privatekey_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -393,7 +409,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>This is required if the private key is password protected.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-privatekey_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-privatekey-path"><strong>privatekey_path</strong></p>
 <a class="ansibleOptionLink" href="#parameter-privatekey_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -401,7 +417,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>, but not both.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-return_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-return-content"><strong>return_content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-return_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -413,7 +429,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates"><strong>revoked_certificates</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 </div></td>
@@ -421,7 +437,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Required if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-content"><strong>content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -430,7 +446,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Mutually exclusive with <em>path</em> and <em>serial_number</em>. One of these three options must be specified.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/invalidity_date"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-invalidity-date"><strong>invalidity_date</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/invalidity_date" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -441,7 +457,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Note that if using relative time this module is NOT idempotent. This will NOT change when <em>ignore_timestamps</em> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/invalidity_date_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-invalidity-date-critical"><strong>invalidity_date_critical</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/invalidity_date_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -453,7 +469,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/issuer"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-issuer"><strong>issuer</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
@@ -461,7 +477,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Example: <code class="docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/issuer_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-issuer-critical"><strong>issuer_critical</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/issuer_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -473,7 +489,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-path"><strong>path</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -482,7 +498,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Mutually exclusive with <em>content</em> and <em>serial_number</em>. One of these three options must be specified.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/reason"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-reason"><strong>reason</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/reason" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -502,7 +518,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/reason_critical"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-reason-critical"><strong>reason_critical</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/reason_critical" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -514,7 +530,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/revocation_date"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-revocation-date"><strong>revocation_date</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/revocation_date" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -526,7 +542,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p class="ansible-option-line"><span class="ansible-option-default-bold">Default:</span> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;+0s&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/serial_number"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-serial-number"><strong>serial_number</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/serial_number" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -534,7 +550,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>Mutually exclusive with <em>path</em> and <em>content</em>. One of these three options must be specified.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-selevel"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-selevel"><strong>selevel</strong></p>
 <a class="ansibleOptionLink" href="#parameter-selevel" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -543,7 +559,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-serole"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-serole"><strong>serole</strong></p>
 <a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -551,7 +567,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-setype"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-setype"><strong>setype</strong></p>
 <a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -559,7 +575,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-seuser"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-seuser"><strong>seuser</strong></p>
 <a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -568,7 +584,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -580,7 +596,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
