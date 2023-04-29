@@ -130,7 +130,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: false
-    mode: update
+    crl_mode: update
     return_content: true
   register: crl_2_change
 
@@ -156,7 +156,7 @@
         reason_critical: true
         invalidity_date: 20191012000000Z
     ignore_timestamps: true
-    mode: update
+    crl_mode: update
     return_content: true
   register: crl_2_change_order
 
