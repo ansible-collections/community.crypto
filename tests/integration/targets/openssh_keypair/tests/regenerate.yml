@@ -28,6 +28,7 @@
     type: rsa
     size: 1024
     backend: "{{ backend }}"
+    regenerate: "{{ item }}"
   loop: "{{ regenerate_values }}"
 - name: "({{ backend }}) Regenerate - setup password protected keys"
   command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
