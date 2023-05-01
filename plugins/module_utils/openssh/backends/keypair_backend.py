@@ -171,8 +171,10 @@ class KeypairBackend(OpensshModule):
         pass
 
     def _should_generate(self):
-        if self.regenerate == 'never':
-            return self.original_private_key is None
+        if self.original_private_key is None:
+            return True
+        elif self.regenerate == 'never':
+            return False
         elif self.regenerate == 'fail':
             if not self._private_key_valid():
                 self.module.fail_json(
@@ -180,7 +182,7 @@ class KeypairBackend(OpensshModule):
                         "To force regeneration, call the module with `generate` set to " +
                         "`partial_idempotence`, `full_idempotence` or `always`, or with `force=yes`."
                 )
-            return self.original_private_key is None
+            return False
         elif self.regenerate in ('partial_idempotence', 'full_idempotence'):
             return not self._private_key_valid()
         else:
