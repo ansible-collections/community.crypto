@@ -807,6 +807,27 @@ releases:
     - 2.12.0.yml
     - 592-get_certificate-base64.yml
     release_date: '2023-04-16'
+  2.13.0:
+    changes:
+      bugfixes:
+      - openssh_keypair - always generate a new key pair if the private key does not
+        exist. Previously, the module would fail when ``regenerate=fail`` without
+        an existing key, contradicting the documentation (https://github.com/ansible-collections/community.crypto/pull/598).
+      - x509_crl - remove problem with ansible-core 2.16 due to ``AnsibleModule``
+        is now validating the ``mode`` parameter's values (https://github.com/ansible-collections/community.crypto/issues/596).
+      deprecated_features:
+      - x509_crl - the ``mode`` option is deprecated; use ``crl_mode`` instead. The
+        ``mode`` option will change its meaning in community.crypto 3.0.0, and will
+        refer to the CRL file's mode instead (https://github.com/ansible-collections/community.crypto/issues/596).
+      minor_changes:
+      - x509_crl - the ``crl_mode`` option has been added to replace the existing
+        ``mode`` option (https://github.com/ansible-collections/community.crypto/issues/596).
+      release_summary: Bugfix and maintenance release.
+    fragments:
+    - 2.13.0.yml
+    - 596-x509_crl-mode.yml
+    - 598-openssh_keypair-generate-new-key.yml
+    release_date: '2023-05-01'
   2.2.0:
     changes:
       bugfixes:

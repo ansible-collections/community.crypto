@@ -5,6 +5,30 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.13.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and maintenance release.
+
+Minor Changes
+-------------
+
+- x509_crl - the ``crl_mode`` option has been added to replace the existing ``mode`` option (https://github.com/ansible-collections/community.crypto/issues/596).
+
+Deprecated Features
+-------------------
+
+- x509_crl - the ``mode`` option is deprecated; use ``crl_mode`` instead. The ``mode`` option will change its meaning in community.crypto 3.0.0, and will refer to the CRL file's mode instead (https://github.com/ansible-collections/community.crypto/issues/596).
+
+Bugfixes
+--------
+
+- openssh_keypair - always generate a new key pair if the private key does not exist. Previously, the module would fail when ``regenerate=fail`` without an existing key, contradicting the documentation (https://github.com/ansible-collections/community.crypto/pull/598).
+- x509_crl - remove problem with ansible-core 2.16 due to ``AnsibleModule`` is now validating the ``mode`` parameter's values (https://github.com/ansible-collections/community.crypto/issues/596).
+
 v2.12.0
 =======
 
