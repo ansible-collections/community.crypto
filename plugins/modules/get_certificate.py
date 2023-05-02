@@ -95,10 +95,9 @@ options:
       description:
         - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
         - The documentation claimed for a long time that the values are Base64 encoded, but they
-          never were. For compatibility this option is set to V(false), but that value will eventually
-          be deprecated and changed to V(true).
+          never were. For compatibility this option is set to V(false).
+        - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
       type: bool
-      default: false
       version_added: 2.12.0
 
 notes:
@@ -272,7 +271,7 @@ def main():
             select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
             starttls=dict(type='str', choices=['mysql']),
             ciphers=dict(type='list', elements='str'),
-            asn1_base64=dict(type='bool', default=False),
+            asn1_base64=dict(type='bool'),
         ),
     )
 
@@ -286,6 +285,15 @@ def main():
     start_tls_server_type = module.params.get('starttls')
     ciphers = module.params.get('ciphers')
     asn1_base64 = module.params['asn1_base64']
+    if asn1_base64 is None:
+        module.deprecate(
+            'The default value `false` for asn1_base64 is deprecated and will change to `true` in '
+            'community.crypto 3.0.0. If you need this value, it is best to set the value explicitly '
+            'and adjust your roles/playbooks to use `asn1_base64=true` as soon as possible',
+            version='3.0.0',
+            collection_name='community.crypto',
+        )
+        asn1_base64 = False
 
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':

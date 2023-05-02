@@ -1,0 +1,2 @@
+deprecated_features:
+  - "get_certificate - the default ``false`` of the ``asn1_base64`` option is deprecated and will change to ``true`` in community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/pull/600)."
