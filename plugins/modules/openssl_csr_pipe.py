@@ -44,7 +44,8 @@ EXAMPLES = r'''
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
   register: result
-- debug:
+- name: Print CSR
+  ansible.builtin.debug:
     var: result.csr
 
 - name: Generate an OpenSSL Certificate Signing Request with an inline CSR

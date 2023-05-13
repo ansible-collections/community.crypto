@@ -69,11 +69,13 @@ EXAMPLES = r'''
   register: output
   no_log: true  # make sure that private key data is not accidentally revealed in logs!
 - name: Show generated key
-  debug:
+  ansible.builtin.debug:
     msg: "{{ output.privatekey }}"
   # DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
 
-- block:
+
+- name: Generate/update Mozilla sops encrypted key.
+  block:
     - name: Update sops-encrypted key with the community.sops collection
       community.crypto.openssl_privatekey_pipe:
         content: "{{ lookup('community.sops.sops', 'private_key.pem.sops') }}"
@@ -88,7 +90,7 @@ EXAMPLES = r'''
       when: output is changed
   always:
     - name: Make sure that output (which contains the private key) is overwritten
-      set_fact:
+      ansible.builtin.set_fact:
         output: ''
 '''
 

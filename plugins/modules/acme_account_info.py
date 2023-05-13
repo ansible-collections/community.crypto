@@ -58,7 +58,7 @@ EXAMPLES = '''
     account_key_src: /etc/pki/cert/private/account.key
   register: account_data
 - name: Verify that account exists
-  assert:
+  ansible.builtin.assert:
     that:
       - account_data.exists
 - name: Print account URI
@@ -74,7 +74,7 @@ EXAMPLES = '''
     account_uri: "{{ acme_account_uri }}"
   register: account_data
 - name: Verify that account exists
-  assert:
+  ansible.builtin.assert:
     that:
       - account_data.exists
 - name: Print account contacts

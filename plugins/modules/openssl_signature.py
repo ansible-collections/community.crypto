@@ -87,7 +87,7 @@ EXAMPLES = r'''
   register: verify
 
 - name: Make sure the signature is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - verify.valid
 '''

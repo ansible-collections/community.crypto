@@ -175,7 +175,8 @@ EXAMPLES = r'''
     path: /etc/ssl/csr/ansible.com.key
   register: result_privatekey
 
-- assert:
+- name: Check conditions on certificate, CSR, and private key
+  ansible.builtin.assert:
     that:
       # When private key was specified for assertonly, this was checked:
       - result.public_key == result_privatekey.public_key

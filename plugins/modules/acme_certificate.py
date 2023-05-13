@@ -315,14 +315,16 @@ EXAMPLES = r'''
 # perform the necessary steps to fulfill the challenge
 # for example:
 #
-# - copy:
+# - name: Copy http-01 challenge for sample.com
+#   ansible.builtin.copy:
 #     dest: /var/www/html/{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource'] }}
 #     content: "{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource_value'] }}"
 #   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge['challenge_data']
 #
 # Alternative way:
 #
-# - copy:
+# - name: Copy http-01 challenges
+#   ansible.builtin.copy:
 #     dest: /var/www/{{ item.key }}/{{ item.value['http-01']['resource'] }}
 #     content: "{{ item.value['http-01']['resource_value'] }}"
 #   loop: "{{ sample_com_challenge.challenge_data | dict2items }}"
@@ -354,7 +356,8 @@ EXAMPLES = r'''
 # perform the necessary steps to fulfill the challenge
 # for example:
 #
-# - community.aws.route53:
+# - name: Create DNS record for sample.com dns-01 challenge
+#   community.aws.route53:
 #     zone: sample.com
 #     record: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].record }}"
 #     type: TXT
@@ -367,7 +370,8 @@ EXAMPLES = r'''
 #
 # Alternative way:
 #
-# - community.aws.route53:
+# - name: Create DNS records for dns-01 challenges
+#   community.aws.route53:
 #     zone: sample.com
 #     record: "{{ item.key }}"
 #     type: TXT
