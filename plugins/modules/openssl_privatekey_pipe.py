@@ -74,7 +74,7 @@ EXAMPLES = r'''
   # DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
 
 
-- name: Generate or update a Mozilla sops encrypted key.
+- name: Generate or update a Mozilla sops encrypted key
   block:
     - name: Update sops-encrypted key with the community.sops collection
       community.crypto.openssl_privatekey_pipe:
