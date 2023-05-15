@@ -71,7 +71,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Dump information
-  debug:
+  ansible.builtin.debug:
     var: result
 '''
 

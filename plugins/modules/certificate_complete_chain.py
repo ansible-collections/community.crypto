@@ -83,7 +83,7 @@ EXAMPLES = '''
     - /etc/ca-certificates/
   register: www_ansible_com
 - name: Write root certificate to disk
-  copy:
+  ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com-root.pem
     content: "{{ www_ansible_com.root }}"
 
@@ -98,11 +98,11 @@ EXAMPLES = '''
     - /etc/ca-certificates/
   register: www_ansible_com
 - name: Write complete chain to disk
-  copy:
+  ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com-completechain.pem
     content: "{{ ''.join(www_ansible_com.complete_chain) }}"
 - name: Write root chain (intermediates and root) to disk
-  copy:
+  ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com-rootchain.pem
     content: "{{ ''.join(www_ansible_com.chain) }}"
 '''

@@ -114,7 +114,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Validate that certificate is valid tomorrow, but not in three weeks
-  assert:
+  ansible.builtin.assert:
     that:
       - result.valid_at.point_1      # valid in one day
       - not result.valid_at.point_2  # not valid in three weeks
