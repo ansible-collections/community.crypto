@@ -943,7 +943,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.key</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result_privatekey</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">assert</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check conditions on certificate, CSR, and private key</span>
+<span class="w">  </span><span class="nt">ansible.builtin.assert</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">that</span><span class="p">:</span>
 <span class="w">      </span><span class="c1"># When private key was specified for assertonly, this was checked:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.public_key == result_privatekey.public_key</span>

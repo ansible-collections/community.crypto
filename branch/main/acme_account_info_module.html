@@ -401,7 +401,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">account_data</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Verify that account exists</span>
-<span class="w">  </span><span class="nt">assert</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.assert</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">that</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">account_data.exists</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Print account URI</span>
@@ -417,7 +417,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">account_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">acme_account_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">account_data</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Verify that account exists</span>
-<span class="w">  </span><span class="nt">assert</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.assert</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">that</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">account_data.exists</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Print account contacts</span>

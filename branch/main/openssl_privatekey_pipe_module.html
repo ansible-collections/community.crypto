@@ -470,11 +470,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
 <span class="w">  </span><span class="nt">no_log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># make sure that private key data is not accidentally revealed in logs!</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Show generated key</span>
-<span class="w">  </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">output.privatekey</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">  </span><span class="c1"># DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">block</span><span class="p">:</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate or update a Mozilla sops encrypted key</span>
+<span class="w">  </span><span class="nt">block</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Update sops-encrypted key with the community.sops collection</span>
 <span class="w">      </span><span class="nt">community.crypto.openssl_privatekey_pipe</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.sops.sops&#39;</span><span class="o">,</span> <span class="s1">&#39;private_key.pem.sops&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -489,7 +491,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">      </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output is changed</span>
 <span class="w">  </span><span class="nt">always</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Make sure that output (which contains the private key) is overwritten</span>
-<span class="w">      </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">ansible.builtin.set_fact</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
 </pre></div>
 </div>

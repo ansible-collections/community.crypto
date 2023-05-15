@@ -277,7 +277,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ce
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ca-certificates/</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www_ansible_com</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write root certificate to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-root.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">www_ansible_com.root</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
@@ -292,11 +292,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ce
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ca-certificates/</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www_ansible_com</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write complete chain to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-completechain.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;&#39;</span><span class="nv">.join</span><span class="o">(</span><span class="nv">www_ansible_com.complete_chain</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write root chain (intermediates and root) to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-rootchain.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;&#39;</span><span class="nv">.join</span><span class="o">(</span><span class="nv">www_ansible_com.chain</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 </pre></div>

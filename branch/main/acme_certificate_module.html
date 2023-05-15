@@ -675,14 +675,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1"># perform the necessary steps to fulfill the challenge</span>
 <span class="c1"># for example:</span>
 <span class="c1">#</span>
-<span class="c1"># - copy:</span>
+<span class="c1"># - name: Copy http-01 challenge for sample.com</span>
+<span class="c1">#   ansible.builtin.copy:</span>
 <span class="c1">#     dest: /var/www/html/</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">&#39;challenge_data&#39;</span><span class="o">][</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource&#39;</span><span class="o">]</span> <span class="cp">}}</span>
 <span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">&#39;challenge_data&#39;</span><span class="o">][</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource_value&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#   when: sample_com_challenge is changed and &#39;sample.com&#39; in sample_com_challenge[&#39;challenge_data&#39;]</span>
 <span class="c1">#</span>
 <span class="c1"># Alternative way:</span>
 <span class="c1">#</span>
-<span class="c1"># - copy:</span>
+<span class="c1"># - name: Copy http-01 challenges</span>
+<span class="c1">#   ansible.builtin.copy:</span>
 <span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource&#39;</span><span class="o">]</span> <span class="cp">}}</span>
 <span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource_value&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
@@ -714,7 +716,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1"># perform the necessary steps to fulfill the challenge</span>
 <span class="c1"># for example:</span>
 <span class="c1">#</span>
-<span class="c1"># - community.aws.route53:</span>
+<span class="c1"># - name: Create DNS record for sample.com dns-01 challenge</span>
+<span class="c1">#   community.aws.route53:</span>
 <span class="c1">#     zone: sample.com</span>
 <span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;dns-01&#39;</span><span class="o">]</span><span class="nv">.record</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#     type: TXT</span>
@@ -727,7 +730,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1">#</span>
 <span class="c1"># Alternative way:</span>
 <span class="c1">#</span>
-<span class="c1"># - community.aws.route53:</span>
+<span class="c1"># - name: Create DNS records for dns-01 challenges</span>
+<span class="c1">#   community.aws.route53:</span>
 <span class="c1">#     zone: sample.com</span>
 <span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#     type: TXT</span>
