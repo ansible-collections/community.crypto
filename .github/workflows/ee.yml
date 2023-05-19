@@ -136,7 +136,7 @@ jobs:
           cat requirements.yml
           echo "::endgroup::"
 
-      - name: Build image based on ${{ matrix.runner_tag }}
+      - name: Build image based on ${{ matrix.base_image }}
         run: |
           ansible-builder build --verbosity 3 --tag test-ee:latest --container-runtime docker
 
