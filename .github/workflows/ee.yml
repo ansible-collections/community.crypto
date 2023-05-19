@@ -53,6 +53,10 @@ jobs:
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.13.tar.gz
             base_image: quay.io/centos/centos:stream8
             pre_base: RUN yum install --allowerasing -y python39 python39-pip python39-wheel
+          - name: ansible-core 2.12 @ CentOS Stream 9
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.12.tar.gz
+            base_image: quay.io/centos/centos:stream9
+            pre_base: '"#"'
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
