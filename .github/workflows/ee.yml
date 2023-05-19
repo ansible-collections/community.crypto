@@ -22,14 +22,37 @@ env:
 
 jobs:
   build:
-    name: Build and test EE (Ⓐ${{ matrix.runner_tag }})
+    name: Build and test EE (${{ matrix.name }})
     strategy:
+      fail-fast: false
       matrix:
-        runner_tag:
-          - devel
-          - stable-2.12-latest
-          - stable-2.11-latest
-          - stable-2.9-latest
+        name:
+          - ''
+        ansible_core:
+          - ''
+        base_image:
+          - ''
+        pre_base:
+          - ''
+        exclude:
+          - ansible_core: ''
+        include:
+          - name: ansible-core devel @ RHEL UBI 9
+            ansible_core: https://github.com/ansible/ansible/archive/devel.tar.gz
+            base_image: docker.io/redhat/ubi9:latest
+            pre_base: '"#"'
+          - name: ansible-core 2.15 @ Rocky Linux 9
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.15.tar.gz
+            base_image: quay.io/rockylinux/rockylinux:9
+            pre_base: '"#"'
+          - name: ansible-core 2.14 @ RHEL UBI 8
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.14.tar.gz
+            base_image: docker.io/redhat/ubi8:latest
+            pre_base: RUN yum install --allowerasing -y python39 python39-pip python39-wheel
+          - name: ansible-core 2.13 @ CentOS Stream 8
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.13.tar.gz
+            base_image: quay.io/centos/centos:stream8
+            pre_base: RUN yum install --allowerasing -y python39 python39-pip python39-wheel
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -40,7 +63,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install ansible-builder and ansible-navigator
         run: pip install ansible-builder ansible-navigator
@@ -74,11 +97,25 @@ jobs:
           # EE config
           cat > execution-environment.yml <<EOF
           ---
-          version: 1
-          build_arg_defaults:
-            EE_BASE_IMAGE: 'quay.io/ansible/ansible-runner:${{ matrix.runner_tag }}'
+          version: 3
           dependencies:
+            ansible_core:
+              package_pip: ${{ matrix.ansible_core }}
+            ansible_runner:
+              package_pip: ansible-runner
             galaxy: requirements.yml
+
+          images:
+            base_image:
+              name: ${{ matrix.base_image }}
+
+          additional_build_files:
+            - src: ${COLLECTION_FILENAME}
+              dest: src
+
+          additional_build_steps:
+            prepend_base:
+              - ${{ matrix.pre_base }}
           EOF
           echo "::group::execution-environment.yml"
           cat execution-environment.yml
@@ -88,7 +125,7 @@ jobs:
           cat > requirements.yml <<EOF
           ---
           collections:
-            - name: ${COLLECTION_FILENAME}
+            - name: src/${COLLECTION_FILENAME}
               type: file
           EOF
           echo "::group::requirements.yml"
@@ -97,8 +134,6 @@ jobs:
 
       - name: Build image based on ${{ matrix.runner_tag }}
         run: |
-          mkdir -p context/_build/
-          cp "${{ env.NAMESPACE }}-${{ env.COLLECTION_NAME }}"-*.tar.gz context/_build/
           ansible-builder build -v 3 -t test-ee:latest --container-runtime=podman
 
       - name: Run basic tests
