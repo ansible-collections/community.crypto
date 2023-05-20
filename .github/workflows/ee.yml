@@ -48,13 +48,13 @@ jobs:
           - name: ansible-core 2.15 @ Rocky Linux 9
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.15.tar.gz
             base_image: quay.io/rockylinux/rockylinux:9
-            pre_base: '"#"'
+            pre_base: RUN dnf install -y epel-release
             # For some reason ansible-builder will not install EPEL dependencies on Rocky Linux
             extra_vars: -e has_no_pyopenssl=true
           - name: ansible-core 2.14 @ CentOS Stream 9
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.14.tar.gz
             base_image: quay.io/centos/centos:stream9
-            pre_base: RUN dnf install -y epel-release
+            pre_base: RUN dnf install -y epel-release epel-next-release
           - name: ansible-core 2.11 @ RHEL UBI 8
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.11.tar.gz
             base_image: docker.io/redhat/ubi8:latest
