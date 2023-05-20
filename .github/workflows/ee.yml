@@ -166,16 +166,16 @@ jobs:
 
       - name: Build image based on ${{ matrix.base_image }}
         run: |
-          ansible-builder build --verbosity 3 --tag test-ee:latest --container-runtime docker
+          ansible-builder build --verbosity 3 --tag test-ee:latest --container-runtime podman
 
       - name: Show images
-        run: docker image ls
+        run: podman image ls
 
       - name: Run basic tests
         run: >
           ansible-navigator run
           --mode stdout
-          --container-engine docker
+          --container-engine podman
           --pull-policy never
           --set-environment-variable ANSIBLE_PRIVATE_ROLE_VARS=true
           --execution-environment-image test-ee:latest
