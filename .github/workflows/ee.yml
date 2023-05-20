@@ -30,6 +30,8 @@ jobs:
           - ''
         ansible_core:
           - ''
+        ansible_runner:
+          - ''
         base_image:
           - ''
         pre_base:
@@ -41,28 +43,33 @@ jobs:
         include:
           - name: ansible-core devel @ RHEL UBI 9
             ansible_core: https://github.com/ansible/ansible/archive/devel.tar.gz
+            ansible_runner: ansible-runner
             base_image: docker.io/redhat/ubi9:latest
             pre_base: '"#"'
             # For some reason ansible-builder will not install EPEL dependencies on RHEL
             extra_vars: -e has_no_pyopenssl=true
           - name: ansible-core 2.15 @ Rocky Linux 9
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.15.tar.gz
+            ansible_runner: ansible-runner
             base_image: quay.io/rockylinux/rockylinux:9
             pre_base: RUN dnf install -y epel-release
             # For some reason ansible-builder will not install EPEL dependencies on Rocky Linux
             extra_vars: -e has_no_pyopenssl=true
           - name: ansible-core 2.14 @ CentOS Stream 9
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.14.tar.gz
+            ansible_runner: ansible-runner
             base_image: quay.io/centos/centos:stream9
             pre_base: RUN dnf install -y epel-release epel-next-release
           - name: ansible-core 2.11 @ RHEL UBI 8
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.11.tar.gz
+            ansible_runner: ansible-runner<2.0.0
             base_image: docker.io/redhat/ubi8:latest
             pre_base: RUN dnf install -y python3 python3-pip python3-wheel python3-cryptography
             # For some reason ansible-builder will not install EPEL dependencies on RHEL
             extra_vars: -e has_no_pyopenssl=true
           - name: ansible-core 2.11 @ CentOS Stream 8
             ansible_core: https://github.com/ansible/ansible/archive/stable-2.11.tar.gz
+            ansible_runner: ansible-runner<2.0.0
             base_image: quay.io/centos/centos:stream8
             pre_base: RUN dnf install -y python3 python3-pip python3-wheel python3-cryptography
     runs-on: ubuntu-latest
@@ -114,7 +121,7 @@ jobs:
             ansible_core:
               package_pip: ${{ matrix.ansible_core }}
             ansible_runner:
-              package_pip: ansible-runner
+              package_pip: ${{ matrix.ansible_runner }}
             galaxy: requirements.yml
 
           images:
