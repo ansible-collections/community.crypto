@@ -64,20 +64,20 @@ jobs:
             pre_base: RUN dnf install -y epel-release epel-next-release
             # For some reason, PyOpenSSL is **broken** on CentOS Stream 9 / EPEL
             extra_vars: -e has_no_pyopenssl=true
-          - name: ansible-core 2.11 @ RHEL UBI 8
-            ansible_core: https://github.com/ansible/ansible/archive/stable-2.11.tar.gz
-            ansible_runner: ansible-runner<2.0.0 python-daemon<3.0.0
+          - name: ansible-core 2.13 @ RHEL UBI 8
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.13.tar.gz
+            ansible_runner: ansible-runner
             other_deps: |2
                 python_interpreter:
-                  package_system: python3 python3-pip python3-wheel python3-cryptography python3-psutil
+                  package_system: python39 python39-pip python39-wheel python39-cryptography python39-PyOpenSSL
             base_image: docker.io/redhat/ubi8:latest
             pre_base: '"#"'
-          - name: ansible-core 2.11 @ CentOS Stream 8
-            ansible_core: https://github.com/ansible/ansible/archive/stable-2.11.tar.gz
-            ansible_runner: ansible-runner<2.0.0 python-daemon<3.0.0
+          - name: ansible-core 2.12 @ CentOS Stream 8
+            ansible_core: https://github.com/ansible/ansible/archive/stable-2.12.tar.gz
+            ansible_runner: ansible-runner
             other_deps: |2
                 python_interpreter:
-                  package_system: python3 python3-pip python3-wheel python3-cryptography python3-psutil
+                  package_system: python39 python39-pip python39-wheel python39-cryptography python39-PyOpenSSL
             base_image: quay.io/centos/centos:stream8
             pre_base: '"#"'
     runs-on: ubuntu-latest
