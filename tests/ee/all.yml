@@ -5,9 +5,18 @@
 
 - hosts: localhost
   tasks:
+    - name: Show Python info
+      debug:
+        var: ansible_python
+
     - name: Register cryptography version
       command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
       register: cryptography_version
+
+    - name: Register pyOpenSSL version
+      command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
+      ignore_errors: true
+      register: pyopenssl_version
 
     - name: Determine output directory
       set_fact:

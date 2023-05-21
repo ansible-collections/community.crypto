@@ -43,3 +43,4 @@
     certificate_path: "{{ output_path }}/pkcs12-cert.pem"
     state: present
     select_crypto_backend: pyopenssl
+  when: not (has_no_pyopenssl | default(false))
