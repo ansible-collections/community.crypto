@@ -828,6 +828,18 @@ releases:
     - 596-x509_crl-mode.yml
     - 598-openssh_keypair-generate-new-key.yml
     release_date: '2023-05-01'
+  2.13.1:
+    changes:
+      bugfixes:
+      - execution environment definition - fix installation of ``python3-pyOpenSSL``
+        package on CentOS and RHEL (https://github.com/ansible-collections/community.crypto/pull/606).
+      - execution environment definition - fix source of ``python3-pyOpenSSL`` package
+        for Rocky Linux 9+ (https://github.com/ansible-collections/community.crypto/pull/606).
+      release_summary: Bugfix release.
+    fragments:
+    - 2.13.1.yml
+    - 606-ee-rocky.yml
+    release_date: '2023-05-21'
   2.2.0:
     changes:
       bugfixes:
