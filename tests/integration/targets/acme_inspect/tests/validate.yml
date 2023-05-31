@@ -65,16 +65,16 @@
     - new_order.output_json.status == 'pending'
     - "'finalize' in new_order.output_json"
 
-- name: Check get order output
+- name: Check get cert_order output
   assert:
     that:
-    - order is not changed
-    - "'directory' in order"
-    - "'headers' in order"
-    - "'output_text' in order"
-    - "'output_json' in order"
+    - cert_order is not changed
+    - "'directory' in cert_order"
+    - "'headers' in cert_order"
+    - "'output_text' in cert_order"
+    - "'output_json' in cert_order"
     # The order of identifiers and authorizations is randomized!
-    # - new_order.output_json == order.output_json
+    # - new_order.output_json == cert_order.output_json
 
 - name: Check get authz output
   assert:

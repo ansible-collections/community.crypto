@@ -108,10 +108,10 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ new_order.headers.location }}"
     method: get
-  register: order
-- debug: var=order
+  register: cert_order
+- debug: var=cert_order
 
-- name: Get authzs for order
+- name: Get authzs for cert_order
   acme_inspect:
     acme_directory: https://{{ acme_host }}:14000/dir
     acme_version: 2
@@ -120,7 +120,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item }}"
     method: get
-  loop: "{{ order.output_json.authorizations }}"
+  loop: "{{ cert_order.output_json.authorizations }}"
   register: authz
 - debug: var=authz
 
