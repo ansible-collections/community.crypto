@@ -33,3 +33,5 @@ skip_list:
   - no-handler
   - sanity[cannot-ignore]
   - fqcn[action-core]
+  - jinja[invalid]
+  - fqcn[action]
