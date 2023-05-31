@@ -1,0 +1,31 @@
+---
+skip_list:
+  # TODO: Fix and enable one-by-one over time
+  - command-instead-of-module
+  - command-instead-of-shell
+  - key-order[task]
+  - jinja[spacing]
+  - no-free-form
+  - schema[galaxy]
+  - schema[tasks]
+  - name[missing]
+  - name[play]
+  - var-naming[no-role-prefix]
+  - var-naming[pattern]
+  - yaml[brackets]
+  - yaml[comments]
+  - yaml[empty-lines]
+  - yaml[indentation]
+  - yaml[line-length]
+  - yaml[new-line-at-end-of-file]
+  - yaml[trailing-spaces]
+  - name[template]
+  - name[casing]
+  - risky-file-permissions
+  - risky-shell-pipe
+  - galaxy[tags]
+  - ignore-errors
+  - no-changed-when
+  - no-handler
+  - sanity[cannot-ignore]
+  - fqcn[action-core]
