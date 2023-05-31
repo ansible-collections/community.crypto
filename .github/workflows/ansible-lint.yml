@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: ansible-lint
-on:
+on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ["main", "stable-*"]
 jobs:
