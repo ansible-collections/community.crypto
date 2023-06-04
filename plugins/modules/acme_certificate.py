@@ -756,7 +756,7 @@ class ACMECertificateClient(object):
                 elif authz.status != 'valid':
                     authz.raise_error(
                         'Status is not "valid", even though no challenge should be necessary',
-                        module=client.module,
+                        module=self.client.module,
                     )
                 self.changed = True
 
