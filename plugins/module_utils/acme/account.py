@@ -62,7 +62,7 @@ class ACMEAccount(object):
                 # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
                 # to see whether the account already exists.
 
-                # Note that we pass contact here: ZeroSSL does not accept regisration calls without contacts, even
+                # Note that we pass contact here: ZeroSSL does not accept registration calls without contacts, even
                 # if onlyReturnExisting is set to true.
                 created, data = self._new_reg(contact=contact, allow_creation=False)
                 if data:
