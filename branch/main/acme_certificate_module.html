@@ -311,11 +311,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-challenge" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The challenge to be performed.</p>
+<p>If set to <code class="docutils literal notranslate"><span class="pre">no</span> <span class="pre">challenge</span></code>, no challenge will be used. This is necessary for some private CAs which use External Account Binding and other means of validating certificate assurance. For example, an account could be allowed to issue certificates for <code class="docutils literal notranslate"><span class="pre">foo.example.com</span></code> without any further validation for a certain period of time.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;http-01&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;tls-alpn-01&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;no</span> <span class="pre">challenge&quot;</span></code></p></li>
 </ul>
 </div></td>
 </tr>
