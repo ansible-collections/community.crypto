@@ -70,24 +70,24 @@
       - subject_key_identifier
       - issuer
       - subject
-      #- serial_number
-      #- public_key_fingerprints
+      # - serial_number
+      # - public_key_fingerprints
 
 - name: ACME root certificate info
   debug:
     var: acme_roots
 
-#- name: ACME root certificates as PEM
-#  debug:
-#    var: acme_root_certs
+# - name: ACME root certificates as PEM
+#   debug:
+#     var: acme_root_certs
 
 - name: ACME intermediate certificate info
   debug:
     var: acme_intermediates
 
-#- name: ACME intermediate certificates as PEM
-#  debug:
-#    var: acme_intermediate_certs
+# - name: ACME intermediate certificates as PEM
+#   debug:
+#     var: acme_intermediate_certs
 
 - block:
   - name: Running tests with OpenSSL backend
