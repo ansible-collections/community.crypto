@@ -21,7 +21,6 @@ skip_list:
   - yaml[empty-lines]
   - yaml[indentation]
   - yaml[line-length]
-  - yaml[new-line-at-end-of-file]
   - yaml[trailing-spaces]
   - name[template]
   - name[casing]
