@@ -17,7 +17,6 @@ skip_list:
   - var-naming[no-role-prefix]
   - var-naming[pattern]
   - yaml[brackets]
-  - yaml[empty-lines]
   - yaml[indentation]
   - yaml[line-length]
   - yaml[trailing-spaces]

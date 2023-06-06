@@ -541,7 +541,6 @@
   when: 'select_crypto_backend == "cryptography" and cryptography_version.stdout is version("2.6", ">=")'
 
 
-
 # Test regenerate option
 
 - name: "({{ select_crypto_backend }}) Regenerate - setup simple keys"
