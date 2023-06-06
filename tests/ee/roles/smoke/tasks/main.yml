@@ -7,7 +7,7 @@
   smoke_ipaddress:
   register: result
 
-- name: Validate result 
+- name: Validate result
   assert:
     that:
       - result.msg == 'Everything is ok'
@@ -16,7 +16,7 @@
   smoke_pyyaml:
   register: result
 
-- name: Validate result 
+- name: Validate result
   assert:
     that:
       - result.msg == 'Everything is ok'
