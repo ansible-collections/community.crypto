@@ -285,7 +285,6 @@ stages:
           testFormat: devel/generic/{0}
           targets:
             - test: 2.7
-            - test: 3.5
             - test: 3.6
             - test: 3.7
             # - test: 3.8
@@ -304,6 +303,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.15/generic/{0}
           targets:
+            - test: 3.5
             - test: "3.10"
           groups:
             - 1
