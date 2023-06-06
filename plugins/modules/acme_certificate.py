@@ -561,6 +561,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     combine_identifier,
     split_identifier,
+    wait_for_validation,
     Authorization,
 )
 
@@ -747,11 +748,12 @@ class ACMECertificateClient(object):
             self.authorizations.update(self.order.authorizations)
 
         # Step 2: validate pending challenges
+        authzs_to_wait_for = []
         for type_identifier, authz in self.authorizations.items():
             if authz.status == 'pending':
-                identifier_type, identifier = split_identifier(type_identifier)
                 if self.challenge is not None:
-                    authz.call_validate(self.client, self.challenge)
+                    authz.call_validate(self.client, self.challenge, wait=False)
+                    authzs_to_wait_for.append(authz)
                 # If there is no challenge, we must check whether the authz is valid
                 elif authz.status != 'valid':
                     authz.raise_error(
@@ -759,6 +761,9 @@ class ACMECertificateClient(object):
                         module=self.client.module,
                     )
                 self.changed = True
+
+        # Step 3: wait for authzs to validate
+        wait_for_validation(authzs_to_wait_for, self.client)
 
     def download_alternate_chains(self, cert):
         alternate_chains = []

@@ -301,3 +301,21 @@ class Authorization(object):
             self.status = 'deactivated'
             return True
         return False
+
+
+def wait_for_validation(authzs, client):
+    '''
+    Wait until a list of authz is valid. Fail if at least one of them is invalid or revoked.
+    '''
+    while authzs:
+        authzs_next = []
+        for authz in authzs:
+            authz.refresh(client)
+            if authz.status in ['valid', 'invalid', 'revoked']:
+                if authz.status != 'valid':
+                    authz.raise_error('Status is not "valid"', module=client.module)
+            else:
+                authzs_next.append(authz)
+        if authzs_next:
+            time.sleep(2)
+        authzs = authzs_next
