@@ -15,7 +15,6 @@ skip_list:
   - name[missing]
   - var-naming[no-role-prefix]
   - var-naming[pattern]
-  - yaml[brackets]
   - yaml[indentation]
   - yaml[line-length]
   - yaml[trailing-spaces]
