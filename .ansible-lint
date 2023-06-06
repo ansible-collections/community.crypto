@@ -13,7 +13,6 @@ skip_list:
   - schema[galaxy]
   - schema[tasks]
   - name[missing]
-  - name[play]
   - var-naming[no-role-prefix]
   - var-naming[pattern]
   - yaml[brackets]
