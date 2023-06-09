@@ -65,7 +65,6 @@ seealso:
 EXAMPLES = r'''
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
   community.crypto.openssl_privatekey_pipe:
-    path: /etc/ssl/private/ansible.com.pem
   register: output
   no_log: true  # make sure that private key data is not accidentally revealed in logs!
 - name: Show generated key
