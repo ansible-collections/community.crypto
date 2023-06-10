@@ -40,10 +40,11 @@ options:
         description:
             - Remote absolute path where the certificate file is loaded from.
             - Either I(path) or I(content) must be specified, but not both.
+            - PEM and DER formats are supported.
         type: path
     content:
         description:
-            - Content of the X.509 certificate in PEM or DER format.
+            - Content of the X.509 certificate in PEM format.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
         version_added: '1.0.0'
