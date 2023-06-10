@@ -203,10 +203,16 @@ def load_certificate(path, content=None, backend='cryptography'):
     if backend == 'pyopenssl':
         return crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
     elif backend == 'cryptography':
-        try:
-            return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
-        except ValueError as exc:
-            raise OpenSSLObjectError(exc)
+        if any([x in cert_content for x in [b'-----BEGIN CERTIFICATE-----', b'-----END CERTIFICATE-----\n']]):
+            try:
+                return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
+            except ValueError as exc:
+                raise OpenSSLObjectError(exc)
+        else:
+            try:
+                return x509.load_der_x509_certificate(cert_content, cryptography_backend())
+            except ValueError as exc:
+                raise OpenSSLObjectError('Cannot parse DER certificate: {0}'.format(exc))
 
 
 def load_certificate_request(path, content=None, backend='cryptography'):
