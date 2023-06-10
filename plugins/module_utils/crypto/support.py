@@ -203,7 +203,7 @@ def load_certificate(path, content=None, backend='cryptography'):
     if backend == 'pyopenssl':
         return crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
     elif backend == 'cryptography':
-        if any([x in cert_content for x in [b'-----BEGIN CERTIFICATE-----', b'-----END CERTIFICATE-----\n']]):
+        if any([x in cert_content for x in [b'-----BEGIN CERTIFICATE-----', b'-----END CERTIFICATE-----']]):
             try:
                 return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
             except ValueError as exc:
