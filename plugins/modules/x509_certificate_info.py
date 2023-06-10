@@ -43,7 +43,7 @@ options:
         type: path
     content:
         description:
-            - Content of the X.509 certificate in PEM format.
+            - Content of the X.509 certificate in PEM or DER format.
             - Either I(path) or I(content) must be specified, but not both.
         type: str
         version_added: '1.0.0'
