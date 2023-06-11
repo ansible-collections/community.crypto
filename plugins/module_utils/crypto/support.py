@@ -18,6 +18,10 @@ import re
 from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    identify_pem_format,
+)
+
 try:
     from OpenSSL import crypto
     HAS_PYOPENSSL = True
