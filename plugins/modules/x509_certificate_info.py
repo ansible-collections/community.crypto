@@ -448,7 +448,7 @@ def main():
             valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k))
 
     try:
-        result = module_backend.get_info()
+        result = module_backend.get_info(der_support_enabled=True)
 
         not_before = module_backend.get_not_before()
         not_after = module_backend.get_not_after()
