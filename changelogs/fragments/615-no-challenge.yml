@@ -1,4 +1,0 @@
-minor_changes:
-  - "acme_certificate - allow to use no challenge by providing ``no challenge`` for the ``challenge`` option.
-     This is needed for ACME servers where validation is done without challenges
-     (https://github.com/ansible-collections/community.crypto/issues/613, https://github.com/ansible-collections/community.crypto/pull/615)."

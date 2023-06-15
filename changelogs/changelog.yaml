@@ -840,6 +840,24 @@ releases:
     - 2.13.1.yml
     - 606-ee-rocky.yml
     release_date: '2023-05-21'
+  2.14.0:
+    changes:
+      minor_changes:
+      - acme_certificate - allow to use no challenge by providing ``no challenge``
+        for the ``challenge`` option. This is needed for ACME servers where validation
+        is done without challenges (https://github.com/ansible-collections/community.crypto/issues/613,
+        https://github.com/ansible-collections/community.crypto/pull/615).
+      - acme_certificate - validate and wait for challenges in parallel instead handling
+        them one after another (https://github.com/ansible-collections/community.crypto/pull/617).
+      - x509_certificate_info - added support for certificates in DER format when
+        using ``path`` parameter (https://github.com/ansible-collections/community.crypto/issues/603).
+      release_summary: Feature release.
+    fragments:
+    - 2.14.0.yml
+    - 615-no-challenge.yml
+    - 617-acme_certificate-parallel.yml
+    - 622-der-format-support.yml
+    release_date: '2023-06-15'
   2.2.0:
     changes:
       bugfixes:

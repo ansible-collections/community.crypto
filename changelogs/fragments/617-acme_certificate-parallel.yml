@@ -1,2 +1,0 @@
-minor_changes:
-  - "acme_certificate - validate and wait for challenges in parallel instead handling them one after another (https://github.com/ansible-collections/community.crypto/pull/617)."

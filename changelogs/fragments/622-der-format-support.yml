@@ -1,2 +1,0 @@
-minor_changes:
-  - "x509_certificate_info - added support for certificates in DER format when using ``path`` parameter (https://github.com/ansible-collections/community.crypto/issues/603)."
