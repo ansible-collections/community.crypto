@@ -18,6 +18,10 @@ import re
 from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    identify_pem_format,
+)
+
 try:
     from OpenSSL import crypto
     HAS_PYOPENSSL = True
@@ -189,7 +193,7 @@ def load_publickey(path=None, content=None, backend=None):
             raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
 
 
-def load_certificate(path, content=None, backend='cryptography'):
+def load_certificate(path, content=None, backend='cryptography', der_support_enabled=False):
     """Load the specified certificate."""
 
     try:
@@ -201,12 +205,21 @@ def load_certificate(path, content=None, backend='cryptography'):
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
     if backend == 'pyopenssl':
-        return crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
+        if der_support_enabled is False or identify_pem_format(cert_content):
+            return crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
+        elif der_support_enabled:
+            raise OpenSSLObjectError('Certificate in DER format is not supported by the pyopenssl backend.')
     elif backend == 'cryptography':
-        try:
-            return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
-        except ValueError as exc:
-            raise OpenSSLObjectError(exc)
+        if der_support_enabled is False or identify_pem_format(cert_content):
+            try:
+                return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
+            except ValueError as exc:
+                raise OpenSSLObjectError(exc)
+        elif der_support_enabled:
+            try:
+                return x509.load_der_x509_certificate(cert_content, cryptography_backend())
+            except ValueError as exc:
+                raise OpenSSLObjectError('Cannot parse DER certificate: {0}'.format(exc))
 
 
 def load_certificate_request(path, content=None, backend='cryptography'):
