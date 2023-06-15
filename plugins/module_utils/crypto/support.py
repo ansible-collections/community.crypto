@@ -210,7 +210,7 @@ def load_certificate(path, content=None, backend='cryptography', der_support_ena
         elif der_support_enabled:
             raise OpenSSLObjectError('Certificate in DER format is not supported by the pyopenssl backend.')
     elif backend == 'cryptography':
-        if identify_pem_format(cert_content) or der_support_enabled is False:
+        if der_support_enabled is False or identify_pem_format(cert_content):
             try:
                 return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
             except ValueError as exc:
