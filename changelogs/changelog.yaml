@@ -701,6 +701,17 @@ releases:
     - 560-openssl_csr-crl_distribution_points.yml
     - 572-action-module.yml
     release_date: '2023-04-16'
+  1.9.22:
+    changes:
+      bugfixes:
+      - openssh_keypair - always generate a new key pair if the private key does not
+        exist. Previously, the module would fail when ``regenerate=fail`` without
+        an existing key, contradicting the documentation (https://github.com/ansible-collections/community.crypto/pull/598).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.22.yml
+    - 598-openssh_keypair-generate-new-key.yml
+    release_date: '2023-06-15'
   1.9.3:
     changes:
       bugfixes:
