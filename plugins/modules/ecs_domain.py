@@ -22,8 +22,8 @@ description:
     - If the domain is already in the validation process, no new validation will be requested, but the validation data (if applicable) will be returned.
     - If the domain is already in the validation process but the O(verification_method) specified is different than the current O(verification_method),
       the O(verification_method) will be updated and validation data (if applicable) will be returned.
-    - If the domain is an active, validated domain, the return value of C(changed) will be false, unless RV(domain_status=EXPIRED), in which case a re-validation
-      will be performed.
+    - If the domain is an active, validated domain, the return value of C(changed) will be false, unless RV(domain_status=EXPIRED), in which case a
+      re-validation will be performed.
     - If O(verification_method=dns), details about the required DNS entry will be specified in the return parameters RV(dns_contents), RV(dns_location), and
       RV(dns_resource_type).
     - If O(verification_method=web_server), details about the required file details will be specified in the return parameters RV(file_contents) and

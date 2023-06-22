@@ -337,8 +337,8 @@ options:
             - Applies to all certificates for accounts with a non-pooling inventory model.
             - O(cert_lifetime) is only supported for requests of O(request_type=new) or O(request_type=renew). If O(request_type=reissue), O(cert_lifetime) will
               be used for the first certificate issuance, but subsequent issuances will have the same expiry as the initial certificate.
-            - Applies to certificates of O(cert_type=CDS_INDIVIDUAL), V(CDS_GROUP), V(CDS_ENT_LITE), V(CDS_ENT_PRO), or V(SMIME_ENT) for accounts with a pooling inventory
-              model.
+            - Applies to certificates of O(cert_type=CDS_INDIVIDUAL), V(CDS_GROUP), V(CDS_ENT_LITE), V(CDS_ENT_PRO), or V(SMIME_ENT)
+              for accounts with a pooling inventory model.
             - V(P1Y) is a certificate with a 1 year lifetime.
             - V(P2Y) is a certificate with a 2 year lifetime.
             - V(P3Y) is a certificate with a 3 year lifetime.
