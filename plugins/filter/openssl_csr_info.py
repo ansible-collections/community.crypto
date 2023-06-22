@@ -49,11 +49,11 @@ _value:
         signature_valid:
             description:
                 - Whether the CSR's signature is valid.
-                - In case the check returns C(false), the module will fail.
+                - In case the check returns V(false), the module will fail.
             returned: success
             type: bool
         basic_constraints:
-            description: Entries in the C(basic_constraints) extension, or C(none) if extension is not present.
+            description: Entries in the C(basic_constraints) extension, or V(none) if extension is not present.
             returned: success
             type: list
             elements: str
@@ -63,7 +63,7 @@ _value:
             returned: success
             type: bool
         extended_key_usage:
-            description: Entries in the C(extended_key_usage) extension, or C(none) if extension is not present.
+            description: Entries in the C(extended_key_usage) extension, or V(none) if extension is not present.
             returned: success
             type: list
             elements: str
@@ -94,7 +94,7 @@ _value:
                     sample: "MAMCAQU="
             sample: {"1.3.6.1.5.5.7.1.24": { "critical": false, "value": "MAMCAQU="}}
         key_usage:
-            description: Entries in the C(key_usage) extension, or C(none) if extension is not present.
+            description: Entries in the C(key_usage) extension, or V(none) if extension is not present.
             returned: success
             type: str
             sample: [Key Agreement, Data Encipherment]
@@ -104,8 +104,8 @@ _value:
             type: bool
         subject_alt_name:
             description:
-                - Entries in the C(subject_alt_name) extension, or C(none) if extension is not present.
-                - See I(name_encoding) for how IDNs are handled.
+                - Entries in the C(subject_alt_name) extension, or V(none) if extension is not present.
+                - See O(name_encoding) for how IDNs are handled.
             returned: success
             type: list
             elements: str
@@ -115,7 +115,7 @@ _value:
             returned: success
             type: bool
         ocsp_must_staple:
-            description: C(true) if the OCSP Must Staple extension is present, C(none) otherwise.
+            description: V(true) if the OCSP Must Staple extension is present, V(none) otherwise.
             returned: success
             type: bool
         ocsp_must_staple_critical:
@@ -131,8 +131,8 @@ _value:
         name_constraints_excluded:
             description:
                 - List of excluded subtrees the CA cannot sign certificates for.
-                - Is C(none) if extension is not present.
-                - See I(name_encoding) for how IDNs are handled.
+                - Is V(none) if extension is not present.
+                - See O(name_encoding) for how IDNs are handled.
             returned: success
             type: list
             elements: str
@@ -140,7 +140,7 @@ _value:
         name_constraints_critical:
             description:
                 - Whether the C(name_constraints) extension is critical.
-                - Is C(none) if extension is not present.
+                - Is V(none) if extension is not present.
             returned: success
             type: bool
         subject:
@@ -164,7 +164,7 @@ _value:
         public_key_type:
             description:
                 - The CSR's public key's type.
-                - One of C(RSA), C(DSA), C(ECC), C(Ed25519), C(X25519), C(Ed448), or C(X448).
+                - One of V(RSA), V(DSA), V(ECC), V(Ed25519), V(X25519), V(Ed448), or V(X448).
                 - Will start with C(unknown) if the key type cannot be determined.
             returned: success
             type: str
@@ -179,57 +179,58 @@ _value:
                     description:
                         - Bit size of modulus (RSA) or prime number (DSA).
                     type: int
-                    returned: When C(public_key_type=RSA) or C(public_key_type=DSA)
+                    returned: When RV(_value.public_key_type=RSA) or RV(_value.public_key_type=DSA)
                 modulus:
                     description:
                         - The RSA key's modulus.
                     type: int
-                    returned: When C(public_key_type=RSA)
+                    returned: When RV(_value.public_key_type=RSA)
                 exponent:
                     description:
                         - The RSA key's public exponent.
                     type: int
-                    returned: When C(public_key_type=RSA)
+                    returned: When RV(_value.public_key_type=RSA)
                 p:
                     description:
                         - The C(p) value for DSA.
                         - This is the prime modulus upon which arithmetic takes place.
                     type: int
-                    returned: When C(public_key_type=DSA)
+                    returned: When RV(_value.public_key_type=DSA)
                 q:
                     description:
                         - The C(q) value for DSA.
                         - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
                           multiplicative group of the prime field used.
                     type: int
-                    returned: When C(public_key_type=DSA)
+                    returned: When RV(_value.public_key_type=DSA)
                 g:
                     description:
                         - The C(g) value for DSA.
                         - This is the element spanning the subgroup of the multiplicative group of the prime field used.
                     type: int
-                    returned: When C(public_key_type=DSA)
+                    returned: When RV(_value.public_key_type=DSA)
                 curve:
                     description:
                         - The curve's name for ECC.
                     type: str
-                    returned: When C(public_key_type=ECC)
+                    returned: When RV(_value.public_key_type=ECC)
                 exponent_size:
                     description:
                         - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
                     type: int
-                    returned: When C(public_key_type=ECC)
+                    returned: When RV(_value.public_key_type=ECC)
                 x:
                     description:
                         - The C(x) coordinate for the public point on the elliptic curve.
                     type: int
-                    returned: When C(public_key_type=ECC)
+                    returned: When RV(_value.public_key_type=ECC)
                 y:
                     description:
-                        - For C(public_key_type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
-                        - For C(public_key_type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
+                        - For RV(_value.public_key_type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
+                        - For RV(_value.public_key_type=DSA), this is the publicly known group element whose discrete logarithm with
+                          respect to C(g) is the private key.
                     type: int
-                    returned: When C(public_key_type=DSA) or C(public_key_type=ECC)
+                    returned: When RV(_value.public_key_type=DSA) or RV(_value.public_key_type=ECC)
         public_key_fingerprints:
             description:
                 - Fingerprints of CSR's public key.
@@ -241,24 +242,24 @@ _value:
         subject_key_identifier:
             description:
                 - The CSR's subject key identifier.
-                - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
-                - Is C(none) if the C(SubjectKeyIdentifier) extension is not present.
+                - The identifier is returned in hexadecimal, with V(:) used to separate bytes.
+                - Is V(none) if the C(SubjectKeyIdentifier) extension is not present.
             returned: success
             type: str
             sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
         authority_key_identifier:
             description:
                 - The CSR's authority key identifier.
-                - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
-                - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
+                - The identifier is returned in hexadecimal, with V(:) used to separate bytes.
+                - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
             returned: success
             type: str
             sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
         authority_cert_issuer:
             description:
                 - The CSR's authority cert issuer as a list of general names.
-                - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-                - See I(name_encoding) for how IDNs are handled.
+                - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
+                - See O(name_encoding) for how IDNs are handled.
             returned: success
             type: list
             elements: str
@@ -266,7 +267,7 @@ _value:
         authority_cert_serial_number:
             description:
                 - The CSR's authority cert serial number.
-                - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
+                - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
             returned: success
             type: int
             sample: 12345

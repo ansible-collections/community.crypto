@@ -45,12 +45,12 @@ python_cryptography_installed:
 
 python_cryptography_import_error:
   description: Import error when trying to import the L(Python cryptography library, https://cryptography.io/).
-  returned: when I(python_cryptography_installed=false)
+  returned: when RV(python_cryptography_installed=false)
   type: str
 
 python_cryptography_capabilities:
   description: Information on the installed L(Python cryptography library, https://cryptography.io/).
-  returned: when I(python_cryptography_installed=true)
+  returned: when RV(python_cryptography_installed=true)
   type: dict
   contains:
     version:
@@ -136,7 +136,7 @@ openssl_present:
 
 openssl:
   description: Information on the installed OpenSSL binary.
-  returned: when I(openssl_present=true)
+  returned: when RV(openssl_present=true)
   type: dict
   contains:
     path:

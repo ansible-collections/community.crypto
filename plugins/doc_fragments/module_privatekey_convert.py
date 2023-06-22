@@ -18,12 +18,12 @@ options:
     src_path:
         description:
             - Name of the file containing the OpenSSL private key to convert.
-            - Exactly one of I(src_path) or I(src_content) must be specified.
+            - Exactly one of O(src_path) or O(src_content) must be specified.
         type: path
     src_content:
         description:
             - The content of the file containing the OpenSSL private key to convert.
-            - Exactly one of I(src_path) or I(src_content) must be specified.
+            - Exactly one of O(src_path) or O(src_content) must be specified.
         type: str
     src_passphrase:
         description:

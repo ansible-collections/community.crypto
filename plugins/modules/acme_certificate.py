@@ -19,15 +19,15 @@ description:
      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
      such as L(Let's Encrypt,https://letsencrypt.org/) or
      L(Buypass,https://www.buypass.com/). The current implementation
-     supports the C(http-01), C(dns-01) and C(tls-alpn-01) challenges."
+     supports the V(http-01), V(dns-01) and V(tls-alpn-01) challenges."
   - "To use this module, it has to be executed twice. Either as two
      different tasks in the same run or during two runs. Note that the output
      of the first run needs to be recorded and passed to the second run as the
-     module argument C(data)."
+     module argument O(data)."
   - "Between these two tasks you have to fulfill the required steps for the
-     chosen challenge by whatever means necessary. For C(http-01) that means
+     chosen challenge by whatever means necessary. For V(http-01) that means
      creating the necessary challenge file on the destination webserver. For
-     C(dns-01) the necessary dns record has to be created. For C(tls-alpn-01)
+     V(dns-01) the necessary dns record has to be created. For V(tls-alpn-01)
      the necessary certificate has to be created and served.
      It is I(not) the responsibility of this module to perform these steps."
   - "For details on how to fulfill these challenges, you might have to read through
@@ -37,11 +37,11 @@ description:
   - "The module includes experimental support for IP identifiers according to
      the L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html)."
 notes:
-  - "At least one of C(dest) and C(fullchain_dest) must be specified."
+  - "At least one of O(dest) and O(fullchain_dest) must be specified."
   - "This module includes basic account management functionality.
      If you want to have more control over your ACME account, use the
      M(community.crypto.acme_account) module and disable account management
-     for this module using the C(modify_account) option."
+     for this module using the O(modify_account) option."
   - "This module was called C(letsencrypt) before Ansible 2.6. The usage
      did not change."
 seealso:
@@ -57,10 +57,10 @@ seealso:
     description: The specification of the ACME protocol (RFC 8555).
     link: https://tools.ietf.org/html/rfc8555
   - name: ACME TLS ALPN Challenge Extension
-    description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
+    description: The specification of the V(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html-05
   - module: community.crypto.acme_challenge_cert_helper
-    description: Helps preparing C(tls-alpn-01) challenges.
+    description: Helps preparing V(tls-alpn-01) challenges.
   - module: community.crypto.openssl_privatekey
     description: Can be used to create private keys (both for certificates and accounts).
   - module: community.crypto.openssl_privatekey_pipe
@@ -94,7 +94,7 @@ options:
     description:
       - "The email address associated with this account."
       - "It will be used for certificate expiration warnings."
-      - "Note that when C(modify_account) is not set to C(false) and you also
+      - "Note that when O(modify_account) is not set to V(false) and you also
          used the M(community.crypto.acme_account) module to specify more than one contact
          for your account, this module will update your account and restrict
          it to the (at most one) contact email address specified here."
@@ -102,31 +102,31 @@ options:
   agreement:
     description:
       - "URI to a terms of service document you agree to when using the
-         ACME v1 service at C(acme_directory)."
-      - Default is latest gathered from C(acme_directory) URL.
-      - This option will only be used when C(acme_version) is 1.
+         ACME v1 service at O(acme_directory)."
+      - Default is latest gathered from O(acme_directory) URL.
+      - This option will only be used when O(acme_version) is 1.
     type: str
   terms_agreed:
     description:
       - "Boolean indicating whether you agree to the terms of service document."
       - "ACME servers can require this to be true."
-      - This option will only be used when C(acme_version) is not 1.
+      - This option will only be used when O(acme_version) is not 1.
     type: bool
     default: false
   modify_account:
     description:
       - "Boolean indicating whether the module should create the account if
          necessary, and update its contact data."
-      - "Set to C(false) if you want to use the M(community.crypto.acme_account) module to manage
+      - "Set to V(false) if you want to use the M(community.crypto.acme_account) module to manage
          your account instead, and to avoid accidental creation of a new account
          using an old key if you changed the account key with M(community.crypto.acme_account)."
-      - "If set to C(false), C(terms_agreed) and C(account_email) are ignored."
+      - "If set to V(false), O(terms_agreed) and O(account_email) are ignored."
     type: bool
     default: true
   challenge:
     description:
       - The challenge to be performed.
-      - If set to C(no challenge), no challenge will be used. This is necessary for some private
+      - If set to V(no challenge), no challenge will be used. This is necessary for some private
         CAs which use External Account Binding and other means of validating certificate assurance.
         For example, an account could be allowed to issue certificates for C(foo.example.com)
         without any further validation for a certain period of time.
@@ -148,7 +148,7 @@ options:
          account key. This is a bad idea from a security point of view, and
          the CA should not accept the CSR. The ACME server should return an
          error in this case."
-      - Precisely one of I(csr) or I(csr_content) must be specified.
+      - Precisely one of O(csr) or O(csr_content) must be specified.
     type: path
     aliases: ['src']
   csr_content:
@@ -162,7 +162,7 @@ options:
          account key. This is a bad idea from a security point of view, and
          the CA should not accept the CSR. The ACME server should return an
          error in this case."
-      - Precisely one of I(csr) or I(csr_content) must be specified.
+      - Precisely one of O(csr) or O(csr_content) must be specified.
     type: str
     version_added: 1.2.0
   data:
@@ -171,27 +171,27 @@ options:
          the second run of the module only."
       - "The value that must be used here will be provided by a previous use
          of this module. See the examples for more details."
-      - "Note that for ACME v2, only the C(order_uri) entry of C(data) will
-         be used. For ACME v1, C(data) must be non-empty to indicate the
+      - "Note that for ACME v2, only the C(order_uri) entry of O(data) will
+         be used. For ACME v1, O(data) must be non-empty to indicate the
          second stage is active; all needed data will be taken from the
          CSR."
-      - "I(Note): the C(data) option was marked as C(no_log) up to
+      - "I(Note): the O(data) option was marked as C(no_log) up to
          Ansible 2.5. From Ansible 2.6 on, it is no longer marked this way
-         as it causes error messages to be come unusable, and C(data) does
+         as it causes error messages to be come unusable, and O(data) does
          not contain any information which can be used without having
          access to the account key or which are not public anyway."
     type: dict
   dest:
     description:
       - "The destination file for the certificate."
-      - "Required if C(fullchain_dest) is not specified."
+      - "Required if O(fullchain_dest) is not specified."
     type: path
     aliases: ['cert']
   fullchain_dest:
     description:
       - "The destination file for the full chain (that is, a certificate followed
          by chain of intermediate certificates)."
-      - "Required if C(dest) is not specified."
+      - "Required if O(dest) is not specified."
     type: path
     aliases: ['fullchain']
   chain_dest:
@@ -202,11 +202,11 @@ options:
   remaining_days:
     description:
       - "The number of days the certificate must have left being valid.
-         If C(cert_days < remaining_days), then it will be renewed.
+         If RV(cert_days) < O(remaining_days), then it will be renewed.
          If the certificate is not renewed, module return values will not
-         include C(challenge_data)."
+         include RV(challenge_data)."
       - "To make sure that the certificate is renewed in any case, you can
-         use the C(force) option."
+         use the O(force) option."
     type: int
     default: 10
   deactivate_authzs:
@@ -222,16 +222,16 @@ options:
   force:
     description:
       - Enforces the execution of the challenge and validation, even if an
-        existing certificate is still valid for more than C(remaining_days).
+        existing certificate is still valid for more than O(remaining_days).
       - This is especially helpful when having an updated CSR, for example with
         additional domains for which a new certificate is desired.
     type: bool
     default: false
   retrieve_all_alternates:
     description:
-      - "When set to C(true), will retrieve all alternate trust chains offered by the ACME CA.
+      - "When set to V(true), will retrieve all alternate trust chains offered by the ACME CA.
          These will not be written to disk, but will be returned together with the main
-         chain as C(all_chains). See the documentation for the C(all_chains) return
+         chain as RV(all_chains). See the documentation for the RV(all_chains) return
          value for details."
     type: bool
     default: false
@@ -244,8 +244,8 @@ options:
       - "If a criterium matches multiple chains, the first one matching will be
          returned. The order is determined by the ordering of the C(Link) headers
          returned by the ACME server and might not be deterministic."
-      - "Every criterium can consist of multiple different conditions, like I(issuer)
-         and I(subject). For the criterium to match a chain, all conditions must apply
+      - "Every criterium can consist of multiple different conditions, like O(select_chain[].issuer)
+         and O(select_chain[].subject). For the criterium to match a chain, all conditions must apply
          to the same certificate in the chain."
       - "This option can only be used with the C(cryptography) backend."
     type: list
@@ -255,11 +255,11 @@ options:
       test_certificates:
         description:
           - "Determines which certificates in the chain will be tested."
-          - "I(all) tests all certificates in the chain (excluding the leaf, which is
+          - "V(all) tests all certificates in the chain (excluding the leaf, which is
              identical in all chains)."
-          - "I(first) only tests the first certificate in the chain, that is the one which
+          - "V(first) only tests the first certificate in the chain, that is the one which
              signed the leaf."
-          - "I(last) only tests the last certificate in the chain, that is the one furthest
+          - "V(last) only tests the last certificate in the chain, that is the one furthest
              away from the leaf. Its issuer is the root certificate of this chain."
         type: str
         default: all
@@ -268,29 +268,29 @@ options:
         description:
           - "Allows to specify parts of the issuer of a certificate in the chain must
              have to be selected."
-          - "If I(issuer) is empty, any certificate will match."
-          - 'An example value would be C({"commonName": "My Preferred CA Root"}).'
+          - "If O(select_chain[].issuer) is empty, any certificate will match."
+          - 'An example value would be V({"commonName": "My Preferred CA Root"}).'
         type: dict
       subject:
         description:
           - "Allows to specify parts of the subject of a certificate in the chain must
              have to be selected."
-          - "If I(subject) is empty, any certificate will match."
-          - 'An example value would be C({"CN": "My Preferred CA Intermediate"})'
+          - "If O(select_chain[].subject) is empty, any certificate will match."
+          - 'An example value would be V({"CN": "My Preferred CA Intermediate"})'
         type: dict
       subject_key_identifier:
         description:
           - "Checks for the SubjectKeyIdentifier extension. This is an identifier based
              on the private key of the intermediate certificate."
           - "The identifier must be of the form
-             C(A8:4A:6A:63:04:7D:DD:BA:E6:D1:39:B7:A6:45:65:EF:F3:A8:EC:A1)."
+             V(A8:4A:6A:63:04:7D:DD:BA:E6:D1:39:B7:A6:45:65:EF:F3:A8:EC:A1)."
         type: str
       authority_key_identifier:
         description:
           - "Checks for the AuthorityKeyIdentifier extension. This is an identifier based
              on the private key of the issuer of the intermediate certificate."
           - "The identifier must be of the form
-             C(C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10)."
+             V(C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10)."
         type: str
 '''
 
@@ -455,32 +455,32 @@ challenge_data:
       sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
     resource_original:
       description:
-        - The original challenge resource including type identifier for C(tls-alpn-01)
+        - The original challenge resource including type identifier for V(tls-alpn-01)
           challenges.
-      returned: changed and challenge is C(tls-alpn-01)
+      returned: changed and O(challenge) is V(tls-alpn-01)
       type: str
       sample: DNS:example.com
     resource_value:
       description:
         - The value the resource has to produce for the validation.
-        - For C(http-01) and C(dns-01) challenges, the value can be used as-is.
-        - "For C(tls-alpn-01) challenges, note that this return value contains a
+        - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
+        - "For V(tls-alpn-01) challenges, note that this return value contains a
            Base64 encoded version of the correct binary blob which has to be put
            into the acmeValidation x509 extension; see
            U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
-           for details. To do this, you might need the C(b64decode) Jinja filter
+           for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter
            to extract the binary blob from this return value."
       returned: changed
       type: str
       sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
     record:
       description: The full DNS record's name for the challenge.
-      returned: changed and challenge is C(dns-01)
+      returned: changed and challenge is V(dns-01)
       type: str
       sample: _acme-challenge.example.com
 challenge_data_dns:
   description:
-    - List of TXT values per DNS record, in case challenge is C(dns-01).
+    - List of TXT values per DNS record, in case challenge is V(dns-01).
     - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
   returned: changed
   type: dict
@@ -518,11 +518,11 @@ account_uri:
   type: str
 all_chains:
   description:
-    - When I(retrieve_all_alternates) is set to C(true), the module will query the ACME server
+    - When O(retrieve_all_alternates) is set to V(true), the module will query the ACME server
       for alternate chains. This return value will contain a list of all chains returned,
       the first entry being the main chain returned by the server.
     - See L(Section 7.4.2 of RFC8555,https://tools.ietf.org/html/rfc8555#section-7.4.2) for details.
-  returned: when certificate was retrieved and I(retrieve_all_alternates) is set to C(true)
+  returned: when certificate was retrieved and O(retrieve_all_alternates) is set to V(true)
   type: list
   elements: dict
   contains:

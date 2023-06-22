@@ -16,10 +16,10 @@ notes:
   - "If a new enough version of the C(cryptography) library
      is available (see Requirements for details), it will be used
      instead of the C(openssl) binary. This can be explicitly disabled
-     or enabled with the C(select_crypto_backend) option. Note that using
+     or enabled with the O(select_crypto_backend) option. Note that using
      the C(openssl) binary will be slower and less secure, as private key
      contents always have to be stored on disk (see
-     C(account_key_content))."
+     O(account_key_content))."
   - "Although the defaults are chosen so that the module can be used with
      the L(Let's Encrypt,https://letsencrypt.org/) CA, the module can in
      principle be used with any CA providing an ACME endpoint, such as
@@ -47,15 +47,15 @@ options:
          RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys
          can be created with C(openssl ecparam -genkey ...). Any other tool creating
          private keys in PEM format can be used as well."
-      - "Mutually exclusive with C(account_key_content)."
-      - "Required if C(account_key_content) is not used."
+      - "Mutually exclusive with O(account_key_content)."
+      - "Required if O(account_key_content) is not used."
     type: path
     aliases: [ account_key ]
   account_key_content:
     description:
       - "Content of the ACME account RSA or Elliptic Curve key."
-      - "Mutually exclusive with C(account_key_src)."
-      - "Required if C(account_key_src) is not used."
+      - "Mutually exclusive with O(account_key_src)."
+      - "Required if O(account_key_src) is not used."
       - "B(Warning:) the content will be written into a temporary file, which will
          be deleted by Ansible when the module completes. Since this is an
          important private key — it can be used to change the account key,
@@ -81,9 +81,9 @@ options:
   acme_version:
     description:
       - "The ACME version of the endpoint."
-      - "Must be C(1) for the classic Let's Encrypt and Buypass ACME endpoints,
-         or C(2) for standardized ACME v2 endpoints."
-      - "The value C(1) is deprecated since community.crypto 2.0.0 and will be
+      - "Must be V(1) for the classic Let's Encrypt and Buypass ACME endpoints,
+         or V(2) for standardized ACME v2 endpoints."
+      - "The value V(1) is deprecated since community.crypto 2.0.0 and will be
          removed from community.crypto 3.0.0."
     required: true
     type: int
@@ -114,17 +114,17 @@ options:
   validate_certs:
     description:
       - Whether calls to the ACME directory will validate TLS certificates.
-      - "B(Warning:) Should B(only ever) be set to C(false) for testing purposes,
+      - "B(Warning:) Should B(only ever) be set to V(false) for testing purposes,
          for example when testing against a local Pebble server."
     type: bool
     default: true
   select_crypto_backend:
     description:
       - Determines which crypto backend to use.
-      - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to
+      - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to
         C(openssl).
-      - If set to C(openssl), will try to use the C(openssl) binary.
-      - If set to C(cryptography), will try to use the
+      - If set to V(openssl), will try to use the C(openssl) binary.
+      - If set to V(cryptography), will try to use the
         L(cryptography,https://cryptography.io/) library.
     type: str
     default: auto

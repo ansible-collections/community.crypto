@@ -45,24 +45,24 @@ options:
     crl_mode:
         description:
             - Defines how to process entries of existing CRLs.
-            - If set to C(generate), makes sure that the CRL has the exact set of revoked certificates
-              as specified in I(revoked_certificates).
-            - If set to C(update), makes sure that the CRL contains the revoked certificates from
-              I(revoked_certificates), but can also contain other revoked certificates. If the CRL file
+            - If set to V(generate), makes sure that the CRL has the exact set of revoked certificates
+              as specified in O(revoked_certificates).
+            - If set to V(update), makes sure that the CRL contains the revoked certificates from
+              O(revoked_certificates), but can also contain other revoked certificates. If the CRL file
               already exists, all entries from the existing CRL will also be included in the new CRL.
-              When using C(update), you might be interested in setting I(ignore_timestamps) to C(true).
-            - The default value is C(generate).
-            - This parameter was called I(mode) before community.crypto 2.13.0. It has been renamed to avoid
-              a collision with the common I(mode) parameter for setting the CRL file's access mode.
+              When using V(update), you might be interested in setting O(ignore_timestamps) to V(true).
+            - The default value is V(generate).
+            - This parameter was called O(mode) before community.crypto 2.13.0. It has been renamed to avoid
+              a collision with the common O(mode) parameter for setting the CRL file's access mode.
         type: str
         # default: generate
         choices: [ generate, update ]
         version_added: 2.13.0
     mode:
         description:
-            - This parameter has been renamed to I(crl_mode). The old name I(mode) is now deprecated and will
-              be removed in community.crypto 3.0.0. Replace usage of this parameter with I(crl_mode).
-            - Note that from community.crypto 3.0.0 on, I(mode) will be used for the CRL file's mode.
+            - This parameter has been renamed to O(crl_mode). The old name O(mode) is now deprecated and will
+              be removed in community.crypto 3.0.0. Replace usage of this parameter with O(crl_mode).
+            - Note that from community.crypto 3.0.0 on, O(mode) will be used for the CRL file's mode.
         type: str
         # default: generate
         choices: [ generate, update ]
@@ -89,7 +89,7 @@ options:
     format:
         description:
             - Whether the CRL file should be in PEM or DER format.
-            - If an existing CRL file does match everything but I(format), it will be converted to the correct format
+            - If an existing CRL file does match everything but O(format), it will be converted to the correct format
               instead of regenerated.
         type: str
         choices: [pem, der]
@@ -98,18 +98,18 @@ options:
     privatekey_path:
         description:
             - Path to the CA's private key to use when signing the CRL.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified if I(state) is C(present), but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified if O(state) is V(present), but not both.
         type: path
 
     privatekey_content:
         description:
             - The content of the CA's private key to use when signing the CRL.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified if I(state) is C(present), but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified if O(state) is V(present), but not both.
         type: str
 
     privatekey_passphrase:
         description:
-            - The passphrase for the I(privatekey_path).
+            - The passphrase for the O(privatekey_path).
             - This is required if the private key is password protected.
         type: str
 
@@ -117,9 +117,9 @@ options:
         description:
             - Key/value pairs that will be present in the issuer name field of the CRL.
             - If you need to specify more than one value with the same key, use a list as value.
-            - If the order of the components is important, use I(issuer_ordered).
-            - One of I(issuer) and I(issuer_ordered) is required if I(state) is C(present).
-            - Mutually exclusive with I(issuer_ordered).
+            - If the order of the components is important, use O(issuer_ordered).
+            - One of O(issuer) and O(issuer_ordered) is required if O(state) is V(present).
+            - Mutually exclusive with O(issuer_ordered).
         type: dict
     issuer_ordered:
         description:
@@ -127,8 +127,8 @@ options:
               This key/value pair will be present in the issuer name field of the CRL.
             - If you want to specify more than one value with the same key in a row, you can
               use a list as value.
-            - One of I(issuer) and I(issuer_ordered) is required if I(state) is C(present).
-            - Mutually exclusive with I(issuer).
+            - One of O(issuer) and O(issuer_ordered) is required if O(state) is V(present).
+            - Mutually exclusive with O(issuer).
         type: list
         elements: dict
         version_added: 2.0.0
@@ -139,23 +139,23 @@ options:
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+              + C([w | d | h | m | s]) (for example V(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
-              I(ignore_timestamps) is set to C(true).
+              O(ignore_timestamps) is set to V(true).
         type: str
         default: "+0s"
 
     next_update:
         description:
-            - "The absolute latest point in time by which this I(issuer) is expected to have issued
-               another CRL. Many clients will treat a CRL as expired once I(next_update) occurs."
+            - "The absolute latest point in time by which this O(issuer) is expected to have issued
+               another CRL. Many clients will treat a CRL as expired once O(next_update) occurs."
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+              + C([w | d | h | m | s]) (for example V(+32w1d2h)).
             - Note that if using relative time this module is NOT idempotent, except when
-              I(ignore_timestamps) is set to C(true).
-            - Required if I(state) is C(present).
+              O(ignore_timestamps) is set to V(true).
+            - Required if O(state) is V(present).
         type: str
 
     digest:
@@ -167,7 +167,7 @@ options:
     revoked_certificates:
         description:
             - List of certificates to be revoked.
-            - Required if I(state) is C(present).
+            - Required if O(state) is V(present).
         type: list
         elements: dict
         suboptions:
@@ -175,20 +175,23 @@ options:
                 description:
                     - Path to a certificate in PEM format.
                     - The serial number and issuer will be extracted from the certificate.
-                    - Mutually exclusive with I(content) and I(serial_number). One of these three options
+                    - Mutually exclusive with O(revoked_certificates[].content) and
+                      O(revoked_certificates[].serial_number). One of these three options
                       must be specified.
                 type: path
             content:
                 description:
                     - Content of a certificate in PEM format.
                     - The serial number and issuer will be extracted from the certificate.
-                    - Mutually exclusive with I(path) and I(serial_number). One of these three options
+                    - Mutually exclusive with O(revoked_certificates[].path) and
+                      O(revoked_certificates[].serial_number). One of these three options
                       must be specified.
                 type: str
             serial_number:
                 description:
                     - Serial number of the certificate.
-                    - Mutually exclusive with I(path) and I(content). One of these three options must
+                    - Mutually exclusive with O(revoked_certificates[].path) and
+                      O(revoked_certificates[].content). One of these three options must
                       be specified.
                 type: int
             revocation_date:
@@ -197,15 +200,15 @@ options:
                     - Time can be specified either as relative time or as absolute timestamp.
                     - Time will always be interpreted as UTC.
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-                      + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+                      + C([w | d | h | m | s]) (for example V(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent, except when
-                      I(ignore_timestamps) is set to C(true).
+                      O(ignore_timestamps) is set to V(true).
                 type: str
                 default: "+0s"
             issuer:
                 description:
                     - The certificate's issuer.
-                    - "Example: C(DNS:ca.example.org)"
+                    - "Example: V(DNS:ca.example.org)"
                 type: list
                 elements: str
             issuer_critical:
@@ -240,9 +243,9 @@ options:
                     - Time can be specified either as relative time or as absolute timestamp.
                     - Time will always be interpreted as UTC.
                     - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-                      + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+                      + C([w | d | h | m | s]) (for example V(+32w1d2h)).
                     - Note that if using relative time this module is NOT idempotent. This will NOT
-                      change when I(ignore_timestamps) is set to C(true).
+                      change when O(ignore_timestamps) is set to V(true).
                 type: str
             invalidity_date_critical:
                 description:
@@ -252,16 +255,16 @@ options:
 
     ignore_timestamps:
         description:
-            - Whether the timestamps I(last_update), I(next_update) and I(revocation_date) (in
-              I(revoked_certificates)) should be ignored for idempotency checks. The timestamp
-              I(invalidity_date) in I(revoked_certificates) will never be ignored.
+            - Whether the timestamps O(last_update), O(next_update) and
+              O(revoked_certificates[].revocation_date) should be ignored for idempotency checks.
+              The timestamp O(revoked_certificates[].invalidity_date) will never be ignored.
             - Use this in combination with relative timestamps for these values to get idempotency.
         type: bool
         default: false
 
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) CRL's content as I(crl).
+            - If set to V(true), will return the (current or generated) CRL's content as RV(crl).
         type: bool
         default: false
 
@@ -300,7 +303,7 @@ filename:
     sample: /path/to/my-ca.crl
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/my-ca.crl.2019-03-09@11:22~
 privatekey:
@@ -310,15 +313,18 @@ privatekey:
     sample: /path/to/my-ca.pem
 format:
     description:
-        - Whether the CRL is in PEM format (C(pem)) or in DER format (C(der)).
+        - Whether the CRL is in PEM format (V(pem)) or in DER format (V(der)).
     returned: success
     type: str
     sample: pem
+    choices:
+        - pem
+        - der
 issuer:
     description:
         - The CRL's issuer.
         - Note that for repeated values, only the last one will be returned.
-        - See I(name_encoding) for how IDNs are handled.
+        - See O(name_encoding) for how IDNs are handled.
     returned: success
     type: dict
     sample: {"organizationName": "Ansible", "commonName": "ca.example.com"}
@@ -360,7 +366,7 @@ revoked_certificates:
         issuer:
             description:
                 - The certificate's issuer.
-                - See I(name_encoding) for how IDNs are handled.
+                - See O(name_encoding) for how IDNs are handled.
             type: list
             elements: str
             sample: ["DNS:ca.example.org"]
@@ -371,11 +377,19 @@ revoked_certificates:
         reason:
             description:
                 - The value for the revocation reason extension.
-                - One of C(unspecified), C(key_compromise), C(ca_compromise), C(affiliation_changed), C(superseded),
-                  C(cessation_of_operation), C(certificate_hold), C(privilege_withdrawn), C(aa_compromise), and
-                  C(remove_from_crl).
             type: str
             sample: key_compromise
+            choices:
+                - unspecified
+                - key_compromise
+                - ca_compromise
+                - affiliation_changed
+                - superseded
+                - cessation_of_operation
+                - certificate_hold
+                - privilege_withdrawn
+                - aa_compromise
+                - remove_from_crl
         reason_critical:
             description: Whether the revocation reason extension is critical.
             type: bool
@@ -393,9 +407,9 @@ revoked_certificates:
 crl:
     description:
         - The (current or generated) CRL's content.
-        - Will be the CRL itself if I(format) is C(pem), and Base64 of the
-          CRL if I(format) is C(der).
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+        - Will be the CRL itself if O(format) is V(pem), and Base64 of the
+          CRL if O(format) is V(der).
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
 '''
 

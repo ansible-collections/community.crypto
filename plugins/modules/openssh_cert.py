@@ -40,13 +40,13 @@ options:
     type:
         description:
             - Whether the module should generate a host or a user certificate.
-            - Required if I(state) is C(present).
+            - Required if O(state) is V(present).
         type: str
         choices: ['host', 'user']
     force:
         description:
             - Should the certificate be regenerated even if it already exists and is valid.
-            - Equivalent to I(regenerate=always).
+            - Equivalent to O(regenerate=always).
         type: bool
         default: false
     path:
@@ -56,16 +56,16 @@ options:
         required: true
     regenerate:
         description:
-            - When C(never) the task will fail if a certificate already exists at I(path) and is unreadable
+            - When V(never) the task will fail if a certificate already exists at O(path) and is unreadable
               otherwise a new certificate will only be generated if there is no existing certificate.
-            - When C(fail) the task will fail if a certificate already exists at I(path) and does not
+            - When V(fail) the task will fail if a certificate already exists at O(path) and does not
               match the module's options.
-            - When C(partial_idempotence) an existing certificate will be regenerated based on
-              I(serial), I(signature_algorithm), I(type), I(valid_from), I(valid_to), I(valid_at), and I(principals).
-              I(valid_from) and I(valid_to) can be excluded by I(ignore_timestamps=true).
-            - When C(full_idempotence) I(identifier), I(options), I(public_key), and I(signing_key)
+            - When V(partial_idempotence) an existing certificate will be regenerated based on
+              O(serial_number), O(signature_algorithm), O(type), O(valid_from), O(valid_to), O(valid_at), and O(principals).
+              O(valid_from) and O(valid_to) can be excluded by O(ignore_timestamps=true).
+            - When V(full_idempotence) O(identifier), O(options), O(public_key), and O(signing_key)
               are also considered when compared against an existing certificate.
-            - C(always) is equivalent to I(force=true).
+            - V(always) is equivalent to O(force=true).
         type: str
         choices:
             - never
@@ -78,14 +78,14 @@ options:
     signature_algorithm:
         description:
             - As of OpenSSH 8.2 the SHA-1 signature algorithm for RSA keys has been disabled and C(ssh) will refuse
-              host certificates signed with the SHA-1 algorithm. OpenSSH 8.1 made C(rsa-sha2-512) the default algorithm
+              host certificates signed with the SHA-1 algorithm. OpenSSH 8.1 made V(rsa-sha2-512) the default algorithm
               when acting as a CA and signing certificates with a RSA key. However, for OpenSSH versions less than 8.1
-              the SHA-2 signature algorithms, C(rsa-sha2-256) or C(rsa-sha2-512), must be specified using this option
+              the SHA-2 signature algorithms, V(rsa-sha2-256) or V(rsa-sha2-512), must be specified using this option
               if compatibility with newer C(ssh) clients is required. Conversely if hosts using OpenSSH version 8.2
-              or greater must remain compatible with C(ssh) clients using OpenSSH less than 7.2, then C(ssh-rsa)
-              can be used when generating host certificates (a corresponding change to the sshd_config to add C(ssh-rsa)
+              or greater must remain compatible with C(ssh) clients using OpenSSH less than 7.2, then V(ssh-rsa)
+              can be used when generating host certificates (a corresponding change to the sshd_config to add V(ssh-rsa)
               to the C(CASignatureAlgorithms) keyword is also required).
-            - Using any value for this option with a non-RSA I(signing_key) will cause this module to fail.
+            - Using any value for this option with a non-RSA O(signing_key) will cause this module to fail.
             - "Note: OpenSSH versions prior to 7.2 do not support SHA-2 signature algorithms for RSA keys and OpenSSH
                versions prior to 7.3 do not support SHA-2 signature algorithms for certificates."
             - See U(https://www.openssh.com/txt/release-8.2) for more information.
@@ -98,14 +98,14 @@ options:
     signing_key:
         description:
             - The path to the private openssh key that is used for signing the public key in order to generate the certificate.
-            - If the private key is on a PKCS#11 token (I(pkcs11_provider)), set this to the path to the public key instead.
-            - Required if I(state) is C(present).
+            - If the private key is on a PKCS#11 token (O(pkcs11_provider)), set this to the path to the public key instead.
+            - Required if O(state) is V(present).
         type: path
     pkcs11_provider:
         description:
             - To use a signing key that resides on a PKCS#11 token, set this to the name (or full path) of the shared library to use with the token.
               Usually C(libpkcs11.so).
-            - If this is set, I(signing_key) needs to point to a file containing the public key of the CA.
+            - If this is set, O(signing_key) needs to point to a file containing the public key of the CA.
         type: str
         version_added: 1.1.0
     use_agent:
@@ -117,37 +117,37 @@ options:
     public_key:
         description:
             - The path to the public key that will be signed with the signing key in order to generate the certificate.
-            - Required if I(state) is C(present).
+            - Required if O(state) is V(present).
         type: path
     valid_from:
         description:
             - "The point in time the certificate is valid from. Time can be specified either as relative time or as absolute timestamp.
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | always)
-               where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+               where timespec can be an integer + C([w | d | h | m | s]) (for example V(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
-            - "The value C(always) is only supported for OpenSSH 7.7 and greater, however, the value C(1970-01-01T00:00:01)
+            - "The value V(always) is only supported for OpenSSH 7.7 and greater, however, the value V(1970-01-01T00:00:01)
                can be used with earlier versions as an equivalent expression."
-            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
-            - Required if I(state) is C(present).
+            - "To ignore this value during comparison with an existing certificate set O(ignore_timestamps=true)."
+            - Required if O(state) is V(present).
         type: str
     valid_to:
         description:
             - "The point in time the certificate is valid to. Time can be specified either as relative time or as absolute timestamp.
                Time will always be interpreted as UTC. Valid formats are: C([+-]timespec | YYYY-MM-DD | YYYY-MM-DDTHH:MM:SS | YYYY-MM-DD HH:MM:SS | forever)
-               where timespec can be an integer + C([w | d | h | m | s]) (for example C(+32w1d2h)).
+               where timespec can be an integer + C([w | d | h | m | s]) (for example V(+32w1d2h)).
                Note that if using relative time this module is NOT idempotent."
-            - "To ignore this value during comparison with an existing certificate set I(ignore_timestamps=true)."
-            - Required if I(state) is C(present).
+            - "To ignore this value during comparison with an existing certificate set O(ignore_timestamps=true)."
+            - Required if O(state) is V(present).
         type: str
     valid_at:
         description:
             - "Check if the certificate is valid at a certain point in time. If it is not the certificate will be regenerated.
-               Time will always be interpreted as UTC. Mainly to be used with relative timespec for I(valid_from) and / or I(valid_to).
+               Time will always be interpreted as UTC. Mainly to be used with relative timespec for O(valid_from) and / or O(valid_to).
                Note that if using relative time this module is NOT idempotent."
         type: str
     ignore_timestamps:
         description:
-            - "Whether the I(valid_from) and I(valid_to) timestamps should be ignored for idempotency checks."
+            - "Whether the O(valid_from) and O(valid_to) timestamps should be ignored for idempotency checks."
             - "However, the values will still be applied to a new certificate if it meets any other necessary conditions for generation/regeneration."
         type: bool
         default: false
@@ -161,20 +161,20 @@ options:
     options:
         description:
             - "Specify certificate options when signing a key. The option that are valid for user certificates are:"
-            - "C(clear): Clear all enabled permissions.  This is useful for clearing the default set of permissions so permissions may be added individually."
-            - "C(force-command=command): Forces the execution of command instead of any shell or
+            - "V(clear): Clear all enabled permissions.  This is useful for clearing the default set of permissions so permissions may be added individually."
+            - "V(force-command=command): Forces the execution of command instead of any shell or
                command specified by the user when the certificate is used for authentication."
-            - "C(no-agent-forwarding): Disable ssh-agent forwarding (permitted by default)."
-            - "C(no-port-forwarding): Disable port forwarding (permitted by default)."
-            - "C(no-pty): Disable PTY allocation (permitted by default)."
-            - "C(no-user-rc): Disable execution of C(~/.ssh/rc) by sshd (permitted by default)."
-            - "C(no-x11-forwarding): Disable X11 forwarding (permitted by default)"
-            - "C(permit-agent-forwarding): Allows ssh-agent forwarding."
-            - "C(permit-port-forwarding): Allows port forwarding."
-            - "C(permit-pty): Allows PTY allocation."
-            - "C(permit-user-rc): Allows execution of C(~/.ssh/rc) by sshd."
-            - "C(permit-x11-forwarding): Allows X11 forwarding."
-            - "C(source-address=address_list): Restrict the source addresses from which the certificate is considered valid.
+            - "V(no-agent-forwarding): Disable ssh-agent forwarding (permitted by default)."
+            - "V(no-port-forwarding): Disable port forwarding (permitted by default)."
+            - "V(no-pty): Disable PTY allocation (permitted by default)."
+            - "V(no-user-rc): Disable execution of C(~/.ssh/rc) by sshd (permitted by default)."
+            - "V(no-x11-forwarding): Disable X11 forwarding (permitted by default)"
+            - "V(permit-agent-forwarding): Allows ssh-agent forwarding."
+            - "V(permit-port-forwarding): Allows port forwarding."
+            - "V(permit-pty): Allows PTY allocation."
+            - "V(permit-user-rc): Allows execution of C(~/.ssh/rc) by sshd."
+            - "V(permit-x11-forwarding): Allows X11 forwarding."
+            - "V(source-address=address_list): Restrict the source addresses from which the certificate is considered valid.
                The C(address_list) is a comma-separated list of one or more address/netmask pairs in CIDR format."
             - "At present, no options are valid for host keys."
         type: list

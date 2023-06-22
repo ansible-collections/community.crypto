@@ -17,7 +17,7 @@ short_description: Generate OpenSSL Certificate Signing Request (CSR)
 description:
     - "Please note that the module regenerates an existing CSR if it does not match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
-      your existing CSR, consider using the I(backup) option."
+      your existing CSR, consider using the O(backup) option."
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
@@ -58,7 +58,7 @@ options:
         default: false
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) CSR's content as I(csr).
+            - If set to V(true), will return the (current or generated) CSR's content as RV(csr).
         type: bool
         default: false
         version_added: "1.0.0"
@@ -173,7 +173,7 @@ RETURN = r'''
 privatekey:
     description:
     - Path to the TLS/SSL private key the CSR was generated for
-    - Will be C(none) if the private key has been provided in I(privatekey_content).
+    - Will be V(none) if the private key has been provided in O(privatekey_content).
     returned: changed or success
     type: str
     sample: /etc/ssl/private/ansible.com.pem
@@ -234,12 +234,12 @@ name_constraints_excluded:
     version_added: 1.1.0
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/www.ansible.com.csr.2019-03-09@11:22~
 csr:
     description: The (current or generated) CSR's content.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: "1.0.0"
 '''

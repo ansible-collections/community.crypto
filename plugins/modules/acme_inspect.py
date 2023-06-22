@@ -24,7 +24,7 @@ description:
   - "The module can also be used to directly access features of an ACME servers
      which are not yet supported by the Ansible ACME modules."
 notes:
-  - "The I(account_uri) option must be specified for properly authenticated
+  - "The O(account_uri) option must be specified for properly authenticated
      ACME v2 requests (except a C(new-account) request)."
   - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute
      ACME requests without the need of writing a playbook. For example, the
@@ -54,16 +54,16 @@ options:
   url:
     description:
       - "The URL to send the request to."
-      - "Must be specified if I(method) is not C(directory-only)."
+      - "Must be specified if O(method) is not V(directory-only)."
     type: str
   method:
     description:
       - "The method to use to access the given URL on the ACME server."
-      - "The value C(post) executes an authenticated POST request. The content
-         must be specified in the I(content) option."
-      - "The value C(get) executes an authenticated POST-as-GET request for ACME v2,
+      - "The value V(post) executes an authenticated POST request. The content
+         must be specified in the O(content) option."
+      - "The value V(get) executes an authenticated POST-as-GET request for ACME v2,
          and a regular GET request for ACME v1."
-      - "The value C(directory-only) only retrieves the directory, without doing
+      - "The value V(directory-only) only retrieves the directory, without doing
          a request."
     type: str
     default: get
@@ -73,13 +73,13 @@ options:
     - directory-only
   content:
     description:
-      - "An encoded JSON object which will be sent as the content if I(method)
-         is C(post)."
-      - "Required when I(method) is C(post), and not allowed otherwise."
+      - "An encoded JSON object which will be sent as the content if O(method)
+         is V(post)."
+      - "Required when O(method) is V(post), and not allowed otherwise."
     type: str
   fail_on_acme_error:
     description:
-      - "If I(method) is C(post) or C(get), make the module fail in case an ACME
+      - "If O(method) is V(post) or V(get), make the module fail in case an ACME
          error is returned."
     type: bool
     default: true

@@ -30,52 +30,52 @@ attributes:
 options:
     device:
         description:
-            - "Device to work with (for example C(/dev/sda1)). Needed in most cases.
-              Can be omitted only when I(state=closed) together with I(name)
+            - "Device to work with (for example V(/dev/sda1)). Needed in most cases.
+              Can be omitted only when O(state=closed) together with O(name)
               is provided."
         type: str
     state:
         description:
             - "Desired state of the LUKS container. Based on its value creates,
               destroys, opens or closes the LUKS container on a given device."
-            - "I(present) will create LUKS container unless already present.
-              Requires I(device) and either I(keyfile) or I(passphrase) options
+            - "V(present) will create LUKS container unless already present.
+              Requires O(device) and either O(keyfile) or O(passphrase) options
               to be provided."
-            - "I(absent) will remove existing LUKS container if it exists.
-              Requires I(device) or I(name) to be specified."
-            - "I(opened) will unlock the LUKS container. If it does not exist
+            - "V(absent) will remove existing LUKS container if it exists.
+              Requires O(device) or O(name) to be specified."
+            - "V(opened) will unlock the LUKS container. If it does not exist
               it will be created first.
-              Requires I(device) and either I(keyfile) or I(passphrase)
-              to be specified. Use the I(name) option to set the name of
+              Requires O(device) and either O(keyfile) or O(passphrase)
+              to be specified. Use the O(name) option to set the name of
               the opened container.  Otherwise the name will be
               generated automatically and returned as a part of the
               result."
-            - "I(closed) will lock the LUKS container. However if the container
+            - "V(closed) will lock the LUKS container. However if the container
               does not exist it will be created.
-              Requires I(device) and either I(keyfile) or I(passphrase)
+              Requires O(device) and either O(keyfile) or O(passphrase)
               options to be provided. If container does already exist
-              I(device) or I(name) will suffice."
+              O(device) or O(name) will suffice."
         type: str
         default: present
         choices: [present, absent, opened, closed]
     name:
         description:
-            - "Sets container name when I(state=opened). Can be used
-              instead of I(device) when closing the existing container
-              (that is, when I(state=closed))."
+            - "Sets container name when O(state=opened). Can be used
+              instead of O(device) when closing the existing container
+              (that is, when O(state=closed))."
         type: str
     keyfile:
         description:
-            - "Used to unlock the container. Either a I(keyfile) or a
-              I(passphrase) is needed for most of the operations. Parameter
+            - "Used to unlock the container. Either a O(keyfile) or a
+              O(passphrase) is needed for most of the operations. Parameter
               value is the path to the keyfile with the passphrase."
             - "BEWARE that working with keyfiles in plaintext is dangerous.
               Make sure that they are protected."
         type: path
     passphrase:
         description:
-            - "Used to unlock the container. Either a I(passphrase) or a
-              I(keyfile) is needed for most of the operations. Parameter
+            - "Used to unlock the container. Either a O(passphrase) or a
+              O(keyfile) is needed for most of the operations. Parameter
               value is a string with the passphrase."
         type: str
         version_added: '1.0.0'
@@ -86,8 +86,8 @@ options:
         version_added: '1.0.0'
     new_keyfile:
         description:
-            - "Adds additional key to given container on I(device).
-              Needs I(keyfile) or I(passphrase) option for authorization.
+            - "Adds additional key to given container on O(device).
+              Needs O(keyfile) or O(passphrase) option for authorization.
               LUKS container supports up to 8 keyslots. Parameter value
               is the path to the keyfile with the passphrase."
             - "NOTE that adding additional keys is idempotent only since
@@ -99,8 +99,8 @@ options:
         type: path
     new_passphrase:
         description:
-            - "Adds additional passphrase to given container on I(device).
-              Needs I(keyfile) or I(passphrase) option for authorization. LUKS
+            - "Adds additional passphrase to given container on O(device).
+              Needs O(keyfile) or O(passphrase) option for authorization. LUKS
               container supports up to 8 keyslots. Parameter value is a string
               with the new passphrase."
             - "NOTE that adding additional passphrase is idempotent only since
@@ -110,32 +110,32 @@ options:
         version_added: '1.0.0'
     remove_keyfile:
         description:
-            - "Removes given key from the container on I(device). Does not
+            - "Removes given key from the container on O(device). Does not
               remove the keyfile from filesystem.
               Parameter value is the path to the keyfile with the passphrase."
             - "NOTE that removing keys is idempotent only since
               community.crypto 1.4.0. For older versions, trying to remove
               a key which no longer exists results in an error."
             - "NOTE that to remove the last key from a LUKS container, the
-              I(force_remove_last_key) option must be set to C(true)."
+              O(force_remove_last_key) option must be set to V(true)."
             - "BEWARE that working with keyfiles in plaintext is dangerous.
               Make sure that they are protected."
         type: path
     remove_passphrase:
         description:
-            - "Removes given passphrase from the container on I(device).
+            - "Removes given passphrase from the container on O(device).
               Parameter value is a string with the passphrase to remove."
             - "NOTE that removing passphrases is idempotent only since
               community.crypto 1.4.0. For older versions, trying to remove
               a passphrase which no longer exists results in an error."
             - "NOTE that to remove the last keyslot from a LUKS
-              container, the I(force_remove_last_key) option must be set
-              to C(true)."
+              container, the O(force_remove_last_key) option must be set
+              to V(true)."
         type: str
         version_added: '1.0.0'
     force_remove_last_key:
         description:
-            - "If set to C(true), allows removing the last key from a container."
+            - "If set to V(true), allows removing the last key from a container."
             - "BEWARE that when the last key has been removed from a container,
               the container can no longer be opened!"
         type: bool
@@ -145,21 +145,21 @@ options:
             - "This option allow the user to create a LUKS2 format container
               with label support, respectively to identify the container by
               label on later usages."
-            - "Will only be used on container creation, or when I(device) is
+            - "Will only be used on container creation, or when O(device) is
               not specified."
-            - "This cannot be specified if I(type) is set to C(luks1)."
+            - "This cannot be specified if O(type) is set to V(luks1)."
         type: str
         version_added: '1.0.0'
     uuid:
         description:
             - "With this option user can identify the LUKS container by UUID."
-            - "Will only be used when I(device) and I(label) are not specified."
+            - "Will only be used when O(device) and O(label) are not specified."
         type: str
         version_added: '1.0.0'
     type:
         description:
             - "This option allow the user explicit define the format of LUKS
-              container that wants to work with. Options are C(luks1) or C(luks2)"
+              container that wants to work with. Options are V(luks1) or V(luks2)"
         type: str
         choices: [luks1, luks2]
         version_added: '1.0.0'
@@ -168,8 +168,8 @@ options:
             - "This option allows the user to define the cipher specification
               string for the LUKS container."
             - "Will only be used on container creation."
-            - "For pre-2.6.10 kernels, use C(aes-plain) as they do not understand
-              the new cipher spec strings. To use ESSIV, use C(aes-cbc-essiv:sha256)."
+            - "For pre-2.6.10 kernels, use V(aes-plain) as they do not understand
+              the new cipher spec strings. To use ESSIV, use V(aes-cbc-essiv:sha256)."
         type: str
         version_added: '1.1.0'
     hash:
@@ -193,12 +193,12 @@ options:
                     - Specify the iteration time used for the PBKDF.
                     - Note that this is in B(seconds), not in milliseconds as on the
                       command line.
-                    - Mutually exclusive with I(iteration_count).
+                    - Mutually exclusive with O(pbkdf.iteration_count).
                 type: float
             iteration_count:
                 description:
                     - Specify the iteration count used for the PBKDF.
-                    - Mutually exclusive with I(iteration_time).
+                    - Mutually exclusive with O(pbkdf.iteration_time).
                 type: int
             algorithm:
                 description:
@@ -261,7 +261,7 @@ options:
     persistent:
         description:
             - "Allows the user to store options into container's metadata persistently and automatically use them next time.
-              Only I(perf_same_cpu_crypt), I(perf_submit_from_crypt_cpus), I(perf_no_read_workqueue), and I(perf_no_write_workqueue)
+              Only O(perf_same_cpu_crypt), O(perf_submit_from_crypt_cpus), O(perf_no_read_workqueue), and O(perf_no_write_workqueue)
               can be stored persistently."
             - "Will only work with LUKS2 containers."
             - "Will only be used when opening containers."
@@ -271,9 +271,9 @@ options:
 
 requirements:
     - "cryptsetup"
-    - "wipefs (when I(state) is C(absent))"
+    - "wipefs (when O(state) is V(absent))"
     - "lsblk"
-    - "blkid (when I(label) or I(uuid) options are used)"
+    - "blkid (when O(label) or O(uuid) options are used)"
 
 author: Jan Pokorny (@japokorn)
 '''
@@ -382,7 +382,7 @@ EXAMPLES = '''
 RETURN = '''
 name:
     description:
-        When I(state=opened) returns (generated or given) name
+        When O(state=opened) returns (generated or given) name
         of LUKS container. Returns None if no name is supplied.
     returned: success
     type: str

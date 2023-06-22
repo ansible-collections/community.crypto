@@ -19,8 +19,8 @@ description:
      L(ACME protocol,https://tools.ietf.org/html/rfc8555),
      such as L(Let's Encrypt,https://letsencrypt.org/)."
 notes:
-  - "Exactly one of C(account_key_src), C(account_key_content),
-     C(private_key_src) or C(private_key_content) must be specified."
+  - "Exactly one of O(account_key_src), O(account_key_content),
+     O(private_key_src), or O(private_key_content) must be specified."
   - "Trying to revoke an already revoked certificate
      should result in an unchanged status, even if the revocation reason
      was different than the one specified here. Also, depending on the
@@ -58,13 +58,13 @@ options:
       - "RSA keys can be created with C(openssl rsa ...). Elliptic curve keys can
          be created with C(openssl ecparam -genkey ...). Any other tool creating
          private keys in PEM format can be used as well."
-      - "Mutually exclusive with C(account_key_content)."
-      - "Required if C(account_key_content) is not used."
+      - "Mutually exclusive with O(account_key_content)."
+      - "Required if O(account_key_content) is not used."
   account_key_content:
     description:
       - "Content of the ACME account RSA or Elliptic Curve key."
-      - "Note that exactly one of C(account_key_src), C(account_key_content),
-         C(private_key_src) or C(private_key_content) must be specified."
+      - "Note that exactly one of O(account_key_src), O(account_key_content),
+         O(private_key_src), or O(private_key_content) must be specified."
       - "I(Warning): the content will be written into a temporary file, which will
          be deleted by Ansible when the module completes. Since this is an
          important private key — it can be used to change the account key,
@@ -77,14 +77,14 @@ options:
   private_key_src:
     description:
       - "Path to the certificate's private key."
-      - "Note that exactly one of C(account_key_src), C(account_key_content),
-         C(private_key_src) or C(private_key_content) must be specified."
+      - "Note that exactly one of O(account_key_src), O(account_key_content),
+         O(private_key_src), or O(private_key_content) must be specified."
     type: path
   private_key_content:
     description:
       - "Content of the certificate's private key."
-      - "Note that exactly one of C(account_key_src), C(account_key_content),
-         C(private_key_src) or C(private_key_content) must be specified."
+      - "Note that exactly one of O(account_key_src), O(account_key_content),
+         O(private_key_src), or O(private_key_content) must be specified."
       - "I(Warning): the content will be written into a temporary file, which will
          be deleted by Ansible when the module completes. Since this is an
          important private key — it can be used to change the account key,
@@ -105,11 +105,11 @@ options:
     description:
       - "One of the revocation reasonCodes defined in
          L(Section 5.3.1 of RFC5280,https://tools.ietf.org/html/rfc5280#section-5.3.1)."
-      - "Possible values are C(0) (unspecified), C(1) (keyCompromise),
-         C(2) (cACompromise), C(3) (affiliationChanged), C(4) (superseded),
-         C(5) (cessationOfOperation), C(6) (certificateHold),
-         C(8) (removeFromCRL), C(9) (privilegeWithdrawn),
-         C(10) (aACompromise)."
+      - "Possible values are V(0) (unspecified), V(1) (keyCompromise),
+         V(2) (cACompromise), V(3) (affiliationChanged), V(4) (superseded),
+         V(5) (cessationOfOperation), V(6) (certificateHold),
+         V(8) (removeFromCRL), V(9) (privilegeWithdrawn),
+         V(10) (aACompromise)."
     type: int
 '''
 

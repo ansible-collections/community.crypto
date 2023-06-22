@@ -19,8 +19,8 @@ description:
     - This module allows one to (re-)generate PKCS#12.
     - The module can use the cryptography Python library, or the pyOpenSSL Python
       library. By default, it tries to detect which one is available, assuming none of the
-      I(iter_size) and I(maciter_size) options are used. This can be overridden with the
-      I(select_crypto_backend) option.
+      O(iter_size) and O(maciter_size) options are used. This can be overridden with the
+      O(select_crypto_backend) option.
     # Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0,
     # and will be removed in community.crypto (x+1).0.0.
 requirements:
@@ -39,21 +39,21 @@ attributes:
 options:
     action:
         description:
-            - C(export) or C(parse) a PKCS#12.
+            - V(export) or V(parse) a PKCS#12.
         type: str
         default: export
         choices: [ export, parse ]
     other_certificates:
         description:
-            - List of other certificates to include. Pre Ansible 2.8 this parameter was called I(ca_certificates).
+            - List of other certificates to include. Pre Ansible 2.8 this parameter was called O(ca_certificates).
             - Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates,
-              set I(other_certificates_parse_all) to C(true).
+              set O(other_certificates_parse_all) to V(true).
         type: list
         elements: path
         aliases: [ ca_certificates ]
     other_certificates_parse_all:
         description:
-            - If set to C(true), assumes that the files mentioned in I(other_certificates) can contain more than one
+            - If set to V(true), assumes that the files mentioned in O(other_certificates) can contain more than one
               certificate per file (or even none per file).
         type: bool
         default: false
@@ -77,21 +77,21 @@ options:
         description:
             - Number of times to repeat the encryption step.
             - This is B(not considered during idempotency checks).
-            - This is only used by the C(pyopenssl) backend, or when I(encryption_level=compatibility2022).
-            - When using it, the default is C(2048) for C(pyopenssl) and C(50000) for C(cryptography).
+            - This is only used by the C(pyopenssl) backend, or when O(encryption_level=compatibility2022).
+            - When using it, the default is V(2048) for C(pyopenssl) and V(50000) for C(cryptography).
         type: int
     maciter_size:
         description:
             - Number of times to repeat the MAC step.
             - This is B(not considered during idempotency checks).
-            - This is only used by the C(pyopenssl) backend. When using it, the default is C(1).
+            - This is only used by the C(pyopenssl) backend. When using it, the default is V(1).
         type: int
     encryption_level:
         description:
             - Determines the encryption level used.
-            - C(auto) uses the default of the selected backend. For C(cryptography), this is what the
+            - V(auto) uses the default of the selected backend. For C(cryptography), this is what the
               cryptography library's specific version considers the best available encryption.
-            - C(compatibility2022) uses compatibility settings for older software in 2022.
+            - V(compatibility2022) uses compatibility settings for older software in 2022.
               This is only supported by the C(cryptography) backend if cryptography >= 38.0.0 is available.
             - B(Note) that this option is B(not used for idempotency).
         choices:
@@ -119,18 +119,18 @@ options:
     privatekey_path:
         description:
             - File to read private key from.
-            - Mutually exclusive with I(privatekey_content).
+            - Mutually exclusive with O(privatekey_content).
         type: path
     privatekey_content:
         description:
             - Content of the private key file.
-            - Mutually exclusive with I(privatekey_path).
+            - Mutually exclusive with O(privatekey_path).
         type: str
         version_added: "2.3.0"
     state:
         description:
             - Whether the file should exist or not.
-              All parameters except C(path) are ignored when state is C(absent).
+              All parameters except O(path) are ignored when state is V(absent).
         choices: [ absent, present ]
         default: present
         type: str
@@ -146,18 +146,18 @@ options:
         default: false
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) PKCS#12's content as I(pkcs12).
+            - If set to V(true), will return the (current or generated) PKCS#12's content as RV(pkcs12).
         type: bool
         default: false
         version_added: "1.0.0"
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-              If I(iter_size) is used together with I(encryption_level != compatibility2022), or if I(maciter_size) is used,
-              C(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
-            - If set to C(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
+              If O(iter_size) is used together with O(encryption_level) is not V(compatibility2022), or if O(maciter_size) is used,
+              V(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
+            - If set to V(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
             # - Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0, and will be
             #   removed in community.crypto (x+1).0.0.
             #   From that point on, only the C(cryptography) backend will be available.
@@ -255,12 +255,12 @@ privatekey:
     sample: /etc/ssl/private/ansible.com.pem
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/ansible.com.pem.2019-03-09@11:22~
 pkcs12:
     description: The (current or generated) PKCS#12's content Base64 encoded.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: "1.0.0"
 '''

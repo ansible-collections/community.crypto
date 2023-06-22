@@ -15,7 +15,12 @@ module: openssl_privatekey
 short_description: Generate OpenSSL private keys
 description:
     - This module allows one to (re)generate OpenSSL private keys.
-    - The default mode for the private key file will be C(0600) if I(mode) is not explicitly set.
+    - The default mode for the private key file will be V(0600) if O(mode) is not explicitly set.
+    - "Please note that the module regenerates private keys if they do not match
+      the module's options. In particular, if you provide another passphrase
+      (or specify none), change the keysize, etc., the private key will be
+      regenerated. If you are concerned that this could B(overwrite your private key),
+      consider using the O(backup) option."
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
@@ -45,8 +50,8 @@ options:
         default: false
     path:
         description:
-            - Name of the file in which the generated TLS/SSL private key will be written. It will have C(0600) mode
-              if I(mode) is not explicitly set.
+            - Name of the file in which the generated TLS/SSL private key will be written. It will have V(0600) mode
+              if O(mode) is not explicitly set.
         type: path
         required: true
     format:
@@ -61,10 +66,10 @@ options:
         default: false
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) private key's content as I(privatekey).
+            - If set to V(true), will return the (current or generated) private key's content as RV(privatekey).
             - Note that especially if the private key is not encrypted, you have to make sure that the returned
               value is treated appropriately and not accidentally written to logs etc.! Use with care!
-            - Use Ansible's I(no_log) task option to avoid the output being shown. See also
+            - Use Ansible's C(no_log) task option to avoid the output being shown. See also
               U(https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook).
         type: bool
         default: false
@@ -116,7 +121,7 @@ type:
     sample: RSA
 curve:
     description: Elliptic curve used to generate the TLS/SSL private key.
-    returned: changed or success, and I(type) is C(ECC)
+    returned: changed or success, and O(type) is V(ECC)
     type: str
     sample: secp256r1
 filename:
@@ -138,14 +143,14 @@ fingerprint:
       sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/privatekey.pem.2019-03-09@11:22~
 privatekey:
     description:
         - The (current or generated) private key's content.
         - Will be Base64-encoded if the key is in raw format.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: '1.0.0'
 '''

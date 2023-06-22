@@ -27,12 +27,12 @@ options:
     privatekey_path:
         description:
             - The path to the private key to use when signing the certificate signing request.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified if I(state) is C(present), but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified if O(state) is V(present), but not both.
         type: path
     privatekey_content:
         description:
             - The content of the private key to use when signing the certificate signing request.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified if I(state) is C(present), but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified if O(state) is V(present), but not both.
         type: str
     privatekey_passphrase:
         description:
@@ -53,17 +53,17 @@ options:
         description:
             - Key/value pairs that will be present in the subject name field of the certificate signing request.
             - If you need to specify more than one value with the same key, use a list as value.
-            - If the order of the components is important, use I(subject_ordered).
-            - Mutually exclusive with I(subject_ordered).
+            - If the order of the components is important, use O(subject_ordered).
+            - Mutually exclusive with O(subject_ordered).
         type: dict
     subject_ordered:
         description:
             - A list of dictionaries, where every dictionary must contain one key/value pair. This key/value pair
               will be present in the subject name field of the certificate signing request.
             - If you want to specify more than one value with the same key in a row, you can use a list as value.
-            - Mutually exclusive with I(subject), and any other subject field option, such as I(country_name),
-              I(state_or_province_name), I(locality_name), I(organization_name), I(organizational_unit_name),
-              I(common_name), or I(email_address).
+            - Mutually exclusive with O(subject), and any other subject field option, such as O(country_name),
+              O(state_or_province_name), O(locality_name), O(organization_name), O(organizational_unit_name),
+              O(common_name), or O(email_address).
         type: list
         elements: dict
         version_added: 2.0.0
@@ -108,8 +108,8 @@ options:
             - Values must be prefixed by their options. (These are C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName), and the ones specific to your CA).
             - Note that if no SAN is specified, but a common name, the common
-              name will be added as a SAN except if C(useCommonNameForSAN) is
-              set to I(false).
+              name will be added as a SAN except if O(useCommonNameForSAN) is
+              set to V(false).
             - More at U(https://tools.ietf.org/html/rfc5280#section-4.2.1.6).
         type: list
         elements: str
@@ -122,8 +122,8 @@ options:
         aliases: [ subjectAltName_critical ]
     use_common_name_for_san:
         description:
-            - If set to C(true), the module will fill the common name in for
-              C(subject_alt_name) with C(DNS:) prefix if no SAN is specified.
+            - If set to V(true), the module will fill the common name in for
+              O(subject_alt_name) with C(DNS:) prefix if no SAN is specified.
         type: bool
         default: true
         aliases: [ useCommonNameForSAN ]
@@ -186,16 +186,16 @@ options:
         description:
             - For CA certificates, this specifies a list of identifiers which describe
               subtrees of names that this CA is allowed to issue certificates for.
-            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
-              C(otherName) and the ones specific to your CA).
+            - Values must be prefixed by their options. (That is, C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName), and the ones specific to your CA).
         type: list
         elements: str
     name_constraints_excluded:
         description:
             - For CA certificates, this specifies a list of identifiers which describe
               subtrees of names that this CA is B(not) allowed to issue certificates for.
-            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
-              C(otherName) and the ones specific to your CA).
+            - Values must be prefixed by their options. (That is, C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName), and the ones specific to your CA).
         type: list
         elements: str
     name_constraints_critical:
@@ -206,8 +206,8 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
@@ -223,49 +223,49 @@ options:
     subject_key_identifier:
         description:
             - The subject key identifier as a hex string, where two bytes are separated by colons.
-            - "Example: C(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33)"
+            - "Example: V(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33)"
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
-            - Note that this option can only be used if I(create_subject_key_identifier) is C(false).
+            - Note that this option can only be used if O(create_subject_key_identifier) is V(false).
             - Note that this is only supported if the C(cryptography) backend is used!
         type: str
     authority_key_identifier:
         description:
             - The authority key identifier as a hex string, where two bytes are separated by colons.
-            - "Example: C(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33)"
+            - "Example: V(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33)"
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
-              I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier),
+              O(authority_cert_issuer) and O(authority_cert_serial_number) is specified.
         type: str
     authority_cert_issuer:
         description:
             - Names that will be present in the authority cert issuer field of the certificate signing request.
-            - Values must be prefixed by their options. (i.e., C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
-              C(otherName) and the ones specific to your CA)
-            - "Example: C(DNS:ca.example.org)"
-            - If specified, I(authority_cert_serial_number) must also be specified.
+            - Values must be prefixed by their options. (That is, C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
+              C(otherName), and the ones specific to your CA)
+            - "Example: V(DNS:ca.example.org)"
+            - If specified, O(authority_cert_serial_number) must also be specified.
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
             - Note that this is only supported if the C(cryptography) backend is used!
-            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
-              I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier),
+              O(authority_cert_issuer) and O(authority_cert_serial_number) is specified.
         type: list
         elements: str
     authority_cert_serial_number:
         description:
             - The authority cert serial number.
-            - If specified, I(authority_cert_issuer) must also be specified.
+            - If specified, O(authority_cert_issuer) must also be specified.
             - Note that this is only supported if the C(cryptography) backend is used!
             - "Please note that commercial CAs ignore this value, respectively use a value of their
                own choice. Specifying this option is mostly useful for self-signed certificates
                or for own CAs."
-            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of I(authority_key_identifier),
-              I(authority_cert_issuer) and I(authority_cert_serial_number) is specified.
+            - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier),
+              O(authority_cert_issuer) and O(authority_cert_serial_number) is specified.
         type: int
     crl_distribution_points:
         description:
@@ -277,15 +277,15 @@ options:
             full_name:
                 description:
                     - Describes how the CRL can be retrieved.
-                    - Mutually exclusive with I(relative_name).
-                    - "Example: C(URI:https://ca.example.com/revocations.crl)."
+                    - Mutually exclusive with O(crl_distribution_points[].relative_name).
+                    - "Example: V(URI:https://ca.example.com/revocations.crl)."
                 type: list
                 elements: str
             relative_name:
                 description:
                     - Describes how the CRL can be retrieved relative to the CRL issuer.
-                    - Mutually exclusive with I(full_name).
-                    - "Example: C(/CN=example.com)."
+                    - Mutually exclusive with O(crl_distribution_points[].full_name).
+                    - "Example: V(/CN=example.com)."
                     - Can only be used when cryptography >= 1.6 is installed.
                 type: list
                 elements: str

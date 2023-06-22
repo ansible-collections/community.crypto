@@ -34,6 +34,14 @@ options:
         description:
             - The existing CSR.
         type: str
+    privatekey_path:
+        description:
+            - The path to the private key to use when signing the certificate signing request.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
+    privatekey_content:
+        description:
+            - The content of the private key to use when signing the certificate signing request.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
 seealso:
 - module: community.crypto.openssl_csr
 '''
@@ -65,7 +73,7 @@ RETURN = r'''
 privatekey:
     description:
     - Path to the TLS/SSL private key the CSR was generated for
-    - Will be C(none) if the private key has been provided in I(privatekey_content).
+    - Will be V(none) if the private key has been provided in O(privatekey_content).
     returned: changed or success
     type: str
     sample: /etc/ssl/private/ansible.com.pem

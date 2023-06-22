@@ -17,7 +17,7 @@ version_added: 1.3.0
 description:
     - This module allows one to (re)generate OpenSSL private keys without disk access.
     - This allows to read and write keys to vaults without having to write intermediate versions to disk.
-    - Make sure to not write the result of this module into logs or to the console, as it contains private key data! Use the I(no_log) task option to be sure.
+    - Make sure to not write the result of this module into logs or to the console, as it contains private key data! Use the C(no_log) task option to be sure.
     - Note that this module is implemented as an L(action plugin,https://docs.ansible.com/ansible/latest/plugins/action.html)
       and will always be executed on the controller.
 author:
@@ -47,16 +47,39 @@ options:
         type: str
     content_base64:
         description:
-            - Set to C(true) if the content is base64 encoded.
+            - Set to V(true) if the content is base64 encoded.
         type: bool
         default: false
     return_current_key:
         description:
-            - Set to C(true) to return the current private key when the module did not generate a new one.
-            - Note that in case of check mode, when this option is not set to C(true), the module always returns the
+            - Set to V(true) to return the current private key when the module did not generate a new one.
+            - Note that in case of check mode, when this option is not set to V(true), the module always returns the
               current key (if it was provided) and Ansible will replace it by C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
         type: bool
         default: false
+    regenerate:
+        description:
+            - Allows to configure in which situations the module is allowed to regenerate private keys.
+              The module will always generate a new key if the destination file does not exist.
+            - By default, the key will be regenerated when it does not match the module's options,
+              except when the key cannot be read or the passphrase does not match. Please note that
+              this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if V(full_idempotence)
+              is specified.
+            - If set to V(never), the module will fail if the key cannot be read or the passphrase
+              is not matching, and will never regenerate an existing key.
+            - If set to V(fail), the module will fail if the key does not correspond to the module's
+              options.
+            - If set to V(partial_idempotence), the key will be regenerated if it does not conform to
+              the module's options. The key is B(not) regenerated if it cannot be read (broken file),
+              the key is protected by an unknown passphrase, or when they key is not protected by a
+              passphrase, but a passphrase is specified.
+            - If set to V(full_idempotence), the key will be regenerated if it does not conform to the
+              module's options. This is also the case if the key cannot be read (broken file), the key
+              is protected by an unknown passphrase, or when they key is not protected by a passphrase,
+              but a passphrase is specified. Make sure you have a B(backup) when using this option!
+            - If set to V(always), the module will always regenerate the key.
+            - Note that if O(format_mismatch) is set to V(convert) and everything matches except the
+              format, the key will always be converted, except if O(regenerate) is set to V(always).
 seealso:
     - module: community.crypto.openssl_privatekey
     - module: community.crypto.openssl_privatekey_info
@@ -106,7 +129,7 @@ type:
     sample: RSA
 curve:
     description: Elliptic curve used to generate the TLS/SSL private key.
-    returned: changed or success, and I(type) is C(ECC)
+    returned: changed or success, and O(type) is V(ECC)
     type: str
     sample: secp256r1
 fingerprint:
@@ -125,8 +148,8 @@ privatekey:
     description:
         - The generated private key's content.
         - Please note that if the result is not changed, the current private key will only be returned
-          if the I(return_current_key) option is set to C(true).
+          if the O(return_current_key) option is set to V(true).
         - Will be Base64-encoded if the key is in raw format.
-    returned: changed, or I(return_current_key) is C(true)
+    returned: changed, or O(return_current_key) is V(true)
     type: str
 '''

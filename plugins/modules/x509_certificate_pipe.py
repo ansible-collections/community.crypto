@@ -17,11 +17,8 @@ module: x509_certificate_pipe
 short_description: Generate and/or check OpenSSL certificates
 version_added: 1.3.0
 description:
-    - It implements a notion of provider (ie. C(selfsigned), C(ownca), C(entrust))
+    - It implements a notion of provider (one of V(selfsigned), V(ownca), V(entrust))
       for your certificate.
-    - "Please note that the module regenerates an existing certificate if it does not match the module's
-      options, or if it seems to be corrupt. If you are concerned that this could overwrite
-      your existing certificate, consider using the I(backup) option."
 author:
     - Yanis Guenane (@Spredzy)
     - Markus Teufelberger (@MarkusTeufelberger)
@@ -41,7 +38,7 @@ options:
     provider:
         description:
             - Name of the provider to use to generate/retrieve the OpenSSL certificate.
-            - "The C(entrust) provider requires credentials for the
+            - "The V(entrust) provider requires credentials for the
                L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
         type: str
         choices: [ entrust, ownca, selfsigned ]
