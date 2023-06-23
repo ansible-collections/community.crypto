@@ -108,7 +108,7 @@ options:
             - Values must be prefixed by their options. (These are C(email), C(URI), C(DNS), C(RID), C(IP), C(dirName),
               C(otherName), and the ones specific to your CA).
             - Note that if no SAN is specified, but a common name, the common
-              name will be added as a SAN except if O(useCommonNameForSAN) is
+              name will be added as a SAN except if O(use_common_name_for_san) is
               set to V(false).
             - More at U(https://tools.ietf.org/html/rfc5280#section-4.2.1.6).
         type: list
