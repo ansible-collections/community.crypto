@@ -72,6 +72,8 @@ system_python_version_data:
   Debian:
     '11':
       - '3.9'
+    '12':
+      - '3.11'
   Alpine:
     '3.16':
       - '3.10'
