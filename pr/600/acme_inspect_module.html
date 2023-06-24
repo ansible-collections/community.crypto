@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -165,7 +167,7 @@
 <h1>community.crypto.acme_inspect module – Send direct requests to an ACME server<a class="headerlink" href="#community-crypto-acme-inspect-module-send-direct-requests-to-an-acme-server" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -213,8 +215,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-account_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Content of the ACME account RSA or Elliptic Curve key.</p>
-<p>Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">account_key_src</span></code>.</p>
-<p>Required if <code class="docutils literal notranslate"><span class="pre">account_key_src</span></code> is not used.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>.</p>
+<p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code> is not used.</p>
 <p><strong>Warning:</strong> the content will be written into a temporary file, which will be deleted by Ansible when the module completes. Since this is an important private key — it can be used to change the account key, or to revoke your certificates without knowing their private keys —, this might not be acceptable.</p>
 <p>In case <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> is used, the content is not written into a temporary file. It can still happen that it is written to disk by Ansible in the process of moving the module with its argument to the node where it is executed.</p>
 </div></td>
@@ -236,8 +238,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to a file containing the ACME account RSA or Elliptic Curve key.</p>
 <p>Private keys can be created with the <a class="reference internal" href="openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey</span></a> or <a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a> modules. If the requisite (cryptography) is not available, keys can also be created directly with the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> command line tool: RSA keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">genrsa</span> <span class="pre">...</span></code>. Elliptic curve keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">ecparam</span> <span class="pre">-genkey</span> <span class="pre">...</span></code>. Any other tool creating private keys in PEM format can be used as well.</p>
-<p>Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">account_key_content</span></code>.</p>
-<p>Required if <code class="docutils literal notranslate"><span class="pre">account_key_content</span></code> is not used.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>.</p>
+<p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code> is not used.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -266,8 +268,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-acme_version" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The ACME version of the endpoint.</p>
-<p>Must be <code class="docutils literal notranslate"><span class="pre">1</span></code> for the classic Let’s Encrypt and Buypass ACME endpoints, or <code class="docutils literal notranslate"><span class="pre">2</span></code> for standardized ACME v2 endpoints.</p>
-<p>The value <code class="docutils literal notranslate"><span class="pre">1</span></code> is deprecated since community.crypto 2.0.0 and will be removed from community.crypto 3.0.0.</p>
+<p>Must be <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code> for the classic Let’s Encrypt and Buypass ACME endpoints, or <code class="ansible-value docutils literal notranslate"><span class="pre">2</span></code> for standardized ACME v2 endpoints.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code> is deprecated since community.crypto 2.0.0 and will be removed from community.crypto 3.0.0.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">1</span></code></p></li>
@@ -279,15 +281,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="parameter-content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-parameter-content"><strong>content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>An encoded JSON object which will be sent as the content if <em>method</em> is <code class="docutils literal notranslate"><span class="pre">post</span></code>.</p>
-<p>Required when <em>method</em> is <code class="docutils literal notranslate"><span class="pre">post</span></code>, and not allowed otherwise.</p>
+<td><div class="ansible-option-cell"><p>An encoded JSON object which will be sent as the content if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-method"><span class="std std-ref"><span class="pre">method</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">post</span></code>.</p>
+<p>Required when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-method"><span class="std std-ref"><span class="pre">method</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">post</span></code>, and not allowed otherwise.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-fail_on_acme_error"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-parameter-fail-on-acme-error"><strong>fail_on_acme_error</strong></p>
 <a class="ansibleOptionLink" href="#parameter-fail_on_acme_error" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If <em>method</em> is <code class="docutils literal notranslate"><span class="pre">post</span></code> or <code class="docutils literal notranslate"><span class="pre">get</span></code>, make the module fail in case an ACME error is returned.</p>
+<td><div class="ansible-option-cell"><p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-method"><span class="std std-ref"><span class="pre">method</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">post</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">get</span></code>, make the module fail in case an ACME error is returned.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -300,9 +302,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-method" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The method to use to access the given URL on the ACME server.</p>
-<p>The value <code class="docutils literal notranslate"><span class="pre">post</span></code> executes an authenticated POST request. The content must be specified in the <em>content</em> option.</p>
-<p>The value <code class="docutils literal notranslate"><span class="pre">get</span></code> executes an authenticated POST-as-GET request for ACME v2, and a regular GET request for ACME v1.</p>
-<p>The value <code class="docutils literal notranslate"><span class="pre">directory-only</span></code> only retrieves the directory, without doing a request.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">post</span></code> executes an authenticated POST request. The content must be specified in the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-content"><span class="std std-ref"><span class="pre">content</span></span></a></strong></code> option.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">get</span></code> executes an authenticated POST-as-GET request for ACME v2, and a regular GET request for ACME v1.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">directory-only</span></code> only retrieves the directory, without doing a request.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;get&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -326,9 +328,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -342,7 +344,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-url" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The URL to send the request to.</p>
-<p>Must be specified if <em>method</em> is not <code class="docutils literal notranslate"><span class="pre">directory-only</span></code>.</p>
+<p>Must be specified if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-method"><span class="std std-ref"><span class="pre">method</span></span></a></strong></code> is not <code class="ansible-value docutils literal notranslate"><span class="pre">directory-only</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -350,7 +352,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether calls to the ACME directory will validate TLS certificates.</p>
-<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server.</p>
+<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -403,9 +405,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>The <em>account_uri</em> option must be specified for properly authenticated ACME v2 requests (except a <code class="docutils literal notranslate"><span class="pre">new-account</span></code> request).</p></li>
+<li><p>The <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-uri"><span class="std std-ref"><span class="pre">account_uri</span></span></a></strong></code> option must be specified for properly authenticated ACME v2 requests (except a <code class="docutils literal notranslate"><span class="pre">new-account</span></code> request).</p></li>
 <li><p>Using the <code class="docutils literal notranslate"><span class="pre">ansible</span></code> tool, <a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a> can be used to directly execute ACME requests without the need of writing a playbook. For example, the following command retrieves the ACME account with ID 1 from Let’s Encrypt (assuming <code class="docutils literal notranslate"><span class="pre">/path/to/key</span></code> is the correct private account key): <code class="docutils literal notranslate"><span class="pre">ansible</span> <span class="pre">localhost</span> <span class="pre">-m</span> <span class="pre">acme_inspect</span> <span class="pre">-a</span> <span class="pre">&quot;account_key_src=/path/to/key</span> <span class="pre">acme_directory=https://acme-v02.api.letsencrypt.org/directory</span> <span class="pre">acme_version=2</span> <span class="pre">account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1</span> <span class="pre">method=get</span> <span class="pre">url=https://acme-v02.api.letsencrypt.org/acme/acct/1&quot;</span></code></p></li>
-<li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="docutils literal notranslate"><span class="pre">select_crypto_backend</span></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower and less secure, as private key contents always have to be stored on disk (see <code class="docutils literal notranslate"><span class="pre">account_key_content</span></code>).</p></li>
+<li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower and less secure, as private key contents always have to be stored on disk (see <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>).</p></li>
 <li><p>Although the defaults are chosen so that the module can be used with the <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a> CA, the module can in principle be used with any CA providing an ACME endpoint, such as <a class="reference external" href="https://www.buypass.com/ssl/products/acme">Buypass Go SSL</a>.</p></li>
 <li><p>So far, the ACME modules have only been tested by the developers against Let’s Encrypt (staging and production), Buypass (staging and production), ZeroSSL (production), and <a class="reference external" href="https://github.com/letsencrypt/Pebble">Pebble testing server</a>. We have got community feedback that they also work with Sectigo ACME Service for InCommon. If you experience problems with another ACME server, please <a class="reference external" href="https://github.com/ansible-collections/community.crypto/issues/new/choose">create an issue</a> to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.</p></li>
 </ul>

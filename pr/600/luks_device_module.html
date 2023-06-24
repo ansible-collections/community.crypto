@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -163,7 +165,7 @@
 <h1>community.crypto.luks_device module – Manage encrypted (LUKS) devices<a class="headerlink" href="#community-crypto-luks-device-module-manage-encrypted-luks-devices" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -190,9 +192,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
 <li><p>cryptsetup</p></li>
-<li><p>wipefs (when <em>state</em> is <code class="docutils literal notranslate"><span class="pre">absent</span></code>)</p></li>
+<li><p>wipefs (when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">absent</span></code>)</p></li>
 <li><p>lsblk</p></li>
-<li><p>blkid (when <em>label</em> or <em>uuid</em> options are used)</p></li>
+<li><p>blkid (when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-label"><span class="std std-ref"><span class="pre">label</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-uuid"><span class="std std-ref"><span class="pre">uuid</span></span></a></strong></code> options are used)</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -211,21 +213,21 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </div></td>
 <td><div class="ansible-option-cell"><p>This option allows the user to define the cipher specification string for the LUKS container.</p>
 <p>Will only be used on container creation.</p>
-<p>For pre-2.6.10 kernels, use <code class="docutils literal notranslate"><span class="pre">aes-plain</span></code> as they do not understand the new cipher spec strings. To use ESSIV, use <code class="docutils literal notranslate"><span class="pre">aes-cbc-essiv:sha256</span></code>.</p>
+<p>For pre-2.6.10 kernels, use <code class="ansible-value docutils literal notranslate"><span class="pre">aes-plain</span></code> as they do not understand the new cipher spec strings. To use ESSIV, use <code class="ansible-value docutils literal notranslate"><span class="pre">aes-cbc-essiv:sha256</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-device"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-device"><strong>device</strong></p>
 <a class="ansibleOptionLink" href="#parameter-device" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Device to work with (for example <code class="docutils literal notranslate"><span class="pre">/dev/sda1</span></code>). Needed in most cases. Can be omitted only when <em>state=closed</em> together with <em>name</em> is provided.</p>
+<td><div class="ansible-option-cell"><p>Device to work with (for example <code class="ansible-value docutils literal notranslate"><span class="pre">/dev/sda1</span></code>). Needed in most cases. Can be omitted only when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=closed</span></span></a></code> together with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> is provided.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-force_remove_last_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><strong>force_remove_last_key</strong></p>
 <a class="ansibleOptionLink" href="#parameter-force_remove_last_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, allows removing the last key from a container.</p>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, allows removing the last key from a container.</p>
 <p>BEWARE that when the last key has been removed from a container, the container can no longer be opened!</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
@@ -247,7 +249,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <div class="ansibleOptionAnchor" id="parameter-keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><strong>keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Used to unlock the container. Either a <em>keyfile</em> or a <em>passphrase</em> is needed for most of the operations. Parameter value is the path to the keyfile with the passphrase.</p>
+<td><div class="ansible-option-cell"><p>Used to unlock the container. Either a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> is needed for most of the operations. Parameter value is the path to the keyfile with the passphrase.</p>
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
 </tr>
@@ -265,22 +267,22 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>This option allow the user to create a LUKS2 format container with label support, respectively to identify the container by label on later usages.</p>
-<p>Will only be used on container creation, or when <em>device</em> is not specified.</p>
-<p>This cannot be specified if <em>type</em> is set to <code class="docutils literal notranslate"><span class="pre">luks1</span></code>.</p>
+<p>Will only be used on container creation, or when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> is not specified.</p>
+<p>This cannot be specified if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">luks1</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Sets container name when <em>state=opened</em>. Can be used instead of <em>device</em> when closing the existing container (that is, when <em>state=closed</em>).</p>
+<td><div class="ansible-option-cell"><p>Sets container name when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=opened</span></span></a></code>. Can be used instead of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> when closing the existing container (that is, when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=closed</span></span></a></code>).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-keyfile"><strong>new_keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Adds additional key to given container on <em>device</em>. Needs <em>keyfile</em> or <em>passphrase</em> option for authorization. LUKS container supports up to 8 keyslots. Parameter value is the path to the keyfile with the passphrase.</p>
+<td><div class="ansible-option-cell"><p>Adds additional key to given container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Needs <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> option for authorization. LUKS container supports up to 8 keyslots. Parameter value is the path to the keyfile with the passphrase.</p>
 <p>NOTE that adding additional keys is idempotent only since community.crypto 1.4.0. For older versions, a new keyslot will be used even if another keyslot already exists for this keyfile.</p>
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
@@ -290,7 +292,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-new_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Adds additional passphrase to given container on <em>device</em>. Needs <em>keyfile</em> or <em>passphrase</em> option for authorization. LUKS container supports up to 8 keyslots. Parameter value is a string with the new passphrase.</p>
+<td><div class="ansible-option-cell"><p>Adds additional passphrase to given container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Needs <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> option for authorization. LUKS container supports up to 8 keyslots. Parameter value is a string with the new passphrase.</p>
 <p>NOTE that adding additional passphrase is idempotent only since community.crypto 1.4.0. For older versions, a new keyslot will be used even if another keyslot already exists for this passphrase.</p>
 </div></td>
 </tr>
@@ -299,7 +301,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Used to unlock the container. Either a <em>passphrase</em> or a <em>keyfile</em> is needed for most of the operations. Parameter value is a string with the passphrase.</p>
+<td><div class="ansible-option-cell"><p>Used to unlock the container. Either a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> or a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> is needed for most of the operations. Parameter value is a string with the passphrase.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -330,7 +332,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-pbkdf/iteration_count" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Specify the iteration count used for the PBKDF.</p>
-<p>Mutually exclusive with <em>iteration_time</em>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-time"><span class="std std-ref"><span class="pre">pbkdf.iteration_time</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -339,7 +341,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Specify the iteration time used for the PBKDF.</p>
 <p>Note that this is in <strong>seconds</strong>, not in milliseconds as on the command line.</p>
-<p>Mutually exclusive with <em>iteration_count</em>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-count"><span class="std std-ref"><span class="pre">pbkdf.iteration_count</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -422,7 +424,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-persistent" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 2.3.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Allows the user to store options into container’s metadata persistently and automatically use them next time. Only <em>perf_same_cpu_crypt</em>, <em>perf_submit_from_crypt_cpus</em>, <em>perf_no_read_workqueue</em>, and <em>perf_no_write_workqueue</em> can be stored persistently.</p>
+<td><div class="ansible-option-cell"><p>Allows the user to store options into container’s metadata persistently and automatically use them next time. Only <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-same-cpu-crypt"><span class="std std-ref"><span class="pre">perf_same_cpu_crypt</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-submit-from-crypt-cpus"><span class="std std-ref"><span class="pre">perf_submit_from_crypt_cpus</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-read-workqueue"><span class="std std-ref"><span class="pre">perf_no_read_workqueue</span></span></a></strong></code>, and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-write-workqueue"><span class="std std-ref"><span class="pre">perf_no_write_workqueue</span></span></a></strong></code> can be stored persistently.</p>
 <p>Will only work with LUKS2 containers.</p>
 <p>Will only be used when opening containers.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
@@ -436,9 +438,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <div class="ansibleOptionAnchor" id="parameter-remove_keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-keyfile"><strong>remove_keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remove_keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Removes given key from the container on <em>device</em>. Does not remove the keyfile from filesystem. Parameter value is the path to the keyfile with the passphrase.</p>
+<td><div class="ansible-option-cell"><p>Removes given key from the container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Does not remove the keyfile from filesystem. Parameter value is the path to the keyfile with the passphrase.</p>
 <p>NOTE that removing keys is idempotent only since community.crypto 1.4.0. For older versions, trying to remove a key which no longer exists results in an error.</p>
-<p>NOTE that to remove the last key from a LUKS container, the <em>force_remove_last_key</em> option must be set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>NOTE that to remove the last key from a LUKS container, the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><span class="std std-ref"><span class="pre">force_remove_last_key</span></span></a></strong></code> option must be set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
 </tr>
@@ -447,9 +449,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-remove_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Removes given passphrase from the container on <em>device</em>. Parameter value is a string with the passphrase to remove.</p>
+<td><div class="ansible-option-cell"><p>Removes given passphrase from the container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Parameter value is a string with the passphrase to remove.</p>
 <p>NOTE that removing passphrases is idempotent only since community.crypto 1.4.0. For older versions, trying to remove a passphrase which no longer exists results in an error.</p>
-<p>NOTE that to remove the last keyslot from a LUKS container, the <em>force_remove_last_key</em> option must be set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>NOTE that to remove the last keyslot from a LUKS container, the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><span class="std std-ref"><span class="pre">force_remove_last_key</span></span></a></strong></code> option must be set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -466,10 +468,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Desired state of the LUKS container. Based on its value creates, destroys, opens or closes the LUKS container on a given device.</p>
-<p><em>present</em> will create LUKS container unless already present. Requires <em>device</em> and either <em>keyfile</em> or <em>passphrase</em> options to be provided.</p>
-<p><em>absent</em> will remove existing LUKS container if it exists. Requires <em>device</em> or <em>name</em> to be specified.</p>
-<p><em>opened</em> will unlock the LUKS container. If it does not exist it will be created first. Requires <em>device</em> and either <em>keyfile</em> or <em>passphrase</em> to be specified. Use the <em>name</em> option to set the name of the opened container.  Otherwise the name will be generated automatically and returned as a part of the result.</p>
-<p><em>closed</em> will lock the LUKS container. However if the container does not exist it will be created. Requires <em>device</em> and either <em>keyfile</em> or <em>passphrase</em> options to be provided. If container does already exist <em>device</em> or <em>name</em> will suffice.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">present</span></code> will create LUKS container unless already present. Requires <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> and either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> options to be provided.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">absent</span></code> will remove existing LUKS container if it exists. Requires <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> to be specified.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">opened</span></code> will unlock the LUKS container. If it does not exist it will be created first. Requires <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> and either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> to be specified. Use the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> option to set the name of the opened container.  Otherwise the name will be generated automatically and returned as a part of the result.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">closed</span></code> will lock the LUKS container. However if the container does not exist it will be created. Requires <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> and either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> options to be provided. If container does already exist <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> will suffice.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;present&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -484,7 +486,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>This option allow the user explicit define the format of LUKS container that wants to work with. Options are <code class="docutils literal notranslate"><span class="pre">luks1</span></code> or <code class="docutils literal notranslate"><span class="pre">luks2</span></code></p>
+<td><div class="ansible-option-cell"><p>This option allow the user explicit define the format of LUKS container that wants to work with. Options are <code class="ansible-value docutils literal notranslate"><span class="pre">luks1</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">luks2</span></code></p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;luks1&quot;</span></code></p></li>
@@ -498,7 +500,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>With this option user can identify the LUKS container by UUID.</p>
-<p>Will only be used when <em>device</em> and <em>label</em> are not specified.</p>
+<p>Will only be used when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-label"><span class="std std-ref"><span class="pre">label</span></span></a></strong></code> are not specified.</p>
 </div></td>
 </tr>
 </tbody>
@@ -649,7 +651,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <div class="ansibleOptionAnchor" id="return-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-return-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#return-name" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>When <em>state=opened</em> returns (generated or given) name of LUKS container. Returns None if no name is supplied.</p>
+<td><div class="ansible-option-cell"><p>When <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=opened</span></span></a></code> returns (generated or given) name of LUKS container. Returns None if no name is supplied.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;luks-c1da9a58-2fde-4256-9d9f-6ab008b4dd1b&quot;</span></code></p>
 </div></td>

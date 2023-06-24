@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -163,7 +165,7 @@
 <h1>community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates<a class="headerlink" href="#community-crypto-certificate-complete-chain-module-complete-certificate-chain-given-a-set-of-untrusted-and-root-certificates" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-certificate-complete-chain-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -277,7 +279,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ce
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ca-certificates/</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www_ansible_com</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write root certificate to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-root.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">www_ansible_com.root</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
@@ -292,11 +294,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ce
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ca-certificates/</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www_ansible_com</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write complete chain to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-completechain.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;&#39;</span><span class="nv">.join</span><span class="o">(</span><span class="nv">www_ansible_com.complete_chain</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write root chain (intermediates and root) to disk</span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com-rootchain.pem</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;&#39;</span><span class="nv">.join</span><span class="o">(</span><span class="nv">www_ansible_com.chain</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 </pre></div>

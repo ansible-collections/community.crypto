@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -164,7 +166,7 @@
 <h1>community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters<a class="headerlink" href="#community-crypto-openssl-dhparam-module-generate-openssl-diffie-hellman-parameters" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -186,8 +188,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <ul class="simple">
 <li><p>This module allows one to (re)generate OpenSSL DH-params.</p></li>
 <li><p>This module uses file common arguments to specify generated file permissions.</p></li>
-<li><p>Please note that the module regenerates existing DH params if they do not match the module’s options. If you are concerned that this could overwrite your existing DH params, consider using the <em>backup</em> option.</p></li>
-<li><p>The module can use the cryptography Python library, or the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> executable. By default, it tries to detect which one is available. This can be overridden with the <em>select_crypto_backend</em> option.</p></li>
+<li><p>Please note that the module regenerates existing DH params if they do not match the module’s options. If you are concerned that this could overwrite your existing DH params, consider using the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> option.</p></li>
+<li><p>The module can use the cryptography Python library, or the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> executable. By default, it tries to detect which one is available. This can be overridden with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option.</p></li>
 </ul>
 </section>
 <section id="requirements">
@@ -285,7 +287,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-return_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, will return the (current or generated) DH parameter’s content as <em>dhparams</em>.</p>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, will return the (current or generated) DH parameter’s content as <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-return-dhparams"><span class="std std-ref"><span class="pre">dhparams</span></span></a></code>.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -299,9 +301,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the OpenSSL <code class="docutils literal notranslate"><span class="pre">openssl</span></code> executable.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the OpenSSL <code class="docutils literal notranslate"><span class="pre">openssl</span></code> executable.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -470,7 +472,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#return-backup_file" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of backup file created.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <em>backup</em> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/path/to/dhparams.pem.2019-03-09&#64;11:22~&quot;</span></code></p>
 </div></td>
 </tr>
@@ -480,7 +482,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The (current or generated) DH params’ content.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code> and <em>return_content</em> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">present</span></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-dhparam-module-parameter-return-content"><span class="std std-ref"><span class="pre">return_content</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">

@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -164,7 +166,7 @@
 <h1>community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys<a class="headerlink" href="#community-crypto-openssl-privatekey-convert-module-convert-openssl-private-keys" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -186,7 +188,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>This module allows one to convert OpenSSL private keys.</p></li>
-<li><p>The default mode for the private key file will be <code class="docutils literal notranslate"><span class="pre">0600</span></code> if <em>mode</em> is not explicitly set.</p></li>
+<li><p>The default mode for the private key file will be <code class="ansible-value docutils literal notranslate"><span class="pre">0600</span></code> if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not explicitly set.</p></li>
 </ul>
 </section>
 <section id="requirements">
@@ -240,7 +242,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-dest_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-dest-path"><strong>dest_path</strong></p>
 <a class="ansibleOptionLink" href="#parameter-dest_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Name of the file in which the generated TLS/SSL private key will be written. It will have <code class="docutils literal notranslate"><span class="pre">0600</span></code> mode if <em>mode</em> is not explicitly set.</p>
+<td><div class="ansible-option-cell"><p>Name of the file in which the generated TLS/SSL private key will be written. It will have <code class="ansible-value docutils literal notranslate"><span class="pre">0600</span></code> mode if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not explicitly set.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -326,7 +328,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-src_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The content of the file containing the OpenSSL private key to convert.</p>
-<p>Exactly one of <em>src_path</em> or <em>src_content</em> must be specified.</p>
+<p>Exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-src-path"><span class="std std-ref"><span class="pre">src_path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-src-content"><span class="std std-ref"><span class="pre">src_content</span></span></a></strong></code> must be specified.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -341,7 +343,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-src_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of the file containing the OpenSSL private key to convert.</p>
-<p>Exactly one of <em>src_path</em> or <em>src_content</em> must be specified.</p>
+<p>Exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-src-path"><span class="std std-ref"><span class="pre">src_path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-src-content"><span class="std std-ref"><span class="pre">src_content</span></span></a></strong></code> must be specified.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -439,7 +441,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#return-backup_file" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of backup file created.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <em>backup</em> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-convert-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/path/to/privatekey.pem.2019-03-09&#64;11:22~&quot;</span></code></p>
 </div></td>
 </tr>

@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -164,7 +166,7 @@
 <h1>community.crypto.openssh_keypair module – Generate OpenSSH private and public keys<a class="headerlink" href="#community-crypto-openssh-keypair-module-generate-openssh-private-and-public-keys" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -184,16 +186,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate <code class="docutils literal notranslate"><span class="pre">rsa</span></code>, <code class="docutils literal notranslate"><span class="pre">dsa</span></code>, <code class="docutils literal notranslate"><span class="pre">rsa1</span></code>, <code class="docutils literal notranslate"><span class="pre">ed25519</span></code> or <code class="docutils literal notranslate"><span class="pre">ecdsa</span></code> private keys.</p></li>
+<li><p>This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate <code class="ansible-value docutils literal notranslate"><span class="pre">rsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ed25519</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ecdsa</span></code> private keys.</p></li>
 </ul>
 </section>
 <section id="requirements">
 <span id="ansible-collections-community-crypto-openssh-keypair-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>ssh-keygen (if <em>backend=openssh</em>)</p></li>
-<li><p>cryptography &gt;= 2.6 (if <em>backend=cryptography</em> and OpenSSH &lt; 7.8 is installed)</p></li>
-<li><p>cryptography &gt;= 3.0 (if <em>backend=cryptography</em> and OpenSSH &gt;= 7.8 is installed)</p></li>
+<li><p>ssh-keygen (if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=openssh</span></span></a></code>)</p></li>
+<li><p>cryptography &gt;= 2.6 (if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=cryptography</span></span></a></code> and OpenSSH &lt; 7.8 is installed)</p></li>
+<li><p>cryptography &gt;= 3.0 (if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=cryptography</span></span></a></code> and OpenSSH &gt;= 7.8 is installed)</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -222,8 +224,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.7.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Selects between the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library or the OpenSSH binary <code class="docutils literal notranslate"><span class="pre">opensshbin</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">auto</span></code> will default to <code class="docutils literal notranslate"><span class="pre">opensshbin</span></code> unless the OpenSSH binary is not installed or when using <em>passphrase</em>.</p>
+<td><div class="ansible-option-cell"><p>Selects between the <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code> library or the OpenSSH binary <code class="ansible-value docutils literal notranslate"><span class="pre">opensshbin</span></code>.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> will default to <code class="ansible-value docutils literal notranslate"><span class="pre">opensshbin</span></code> unless the OpenSSH binary is not installed or when using <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -287,8 +289,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.7.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encrypt a newly generated private key.</p>
-<p>Passphrases are not supported for <em>type=rsa1</em>.</p>
-<p>Can only be used when <em>backend=cryptography</em>, or when <em>backend=auto</em> and a required <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> version is installed.</p>
+<p>Passphrases are not supported for <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-type"><span class="std std-ref"><span class="pre">type=rsa1</span></span></a></code>.</p>
+<p>Can only be used when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=cryptography</span></span></a></code>, or when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=auto</span></span></a></code> and a required <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> version is installed.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -303,11 +305,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-private_key_format" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.7.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Used when <em>backend=cryptography</em> to select a format for the private key at the provided <em>path</em>.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">auto</span></code> this module will match the key format of the installed OpenSSH version.</p>
+<td><div class="ansible-option-cell"><p>Used when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-backend"><span class="std std-ref"><span class="pre">backend=cryptography</span></span></a></code> to select a format for the private key at the provided <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-path"><span class="std std-ref"><span class="pre">path</span></span></a></strong></code>.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> this module will match the key format of the installed OpenSSH version.</p>
 <p>For OpenSSH &lt; 7.8 private keys will be in PKCS1 format except ed25519 keys which will be in OpenSSH format.</p>
 <p>For OpenSSH &gt;= 7.8 all private key types will be in the OpenSSH format.</p>
-<p>Using this option when <em>regenerate=partial_idempotence</em> or <em>regenerate=full_idempotence</em> will cause a new keypair to be generated if the private key’s format does not match the value of <em>private_key_format</em>. This module will not however convert existing private keys between formats.</p>
+<p>Using this option when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-regenerate"><span class="std std-ref"><span class="pre">regenerate=partial_idempotence</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-regenerate"><span class="std std-ref"><span class="pre">regenerate=full_idempotence</span></span></a></code> will cause a new keypair to be generated if the private key’s format does not match the value of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-private-key-format"><span class="std std-ref"><span class="pre">private_key_format</span></span></a></strong></code>. This module will not however convert existing private keys between formats.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -323,13 +325,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Allows to configure in which situations the module is allowed to regenerate private keys. The module will always generate a new key if the destination file does not exist.</p>
-<p>By default, the key will be regenerated when it does not match the module’s options, except when the key cannot be read or the passphrase does not match. Please note that this <strong>changed</strong> for Ansible 2.10. For Ansible 2.9, the behavior was as if <code class="docutils literal notranslate"><span class="pre">full_idempotence</span></code> is specified.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">never</span></code>, the module will fail if the key cannot be read or the passphrase is not matching, and will never regenerate an existing key.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">fail</span></code>, the module will fail if the key does not correspond to the module’s options.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">partial_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. The key is <strong>not</strong> regenerated if it cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">full_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. This is also the case if the key cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified. Make sure you have a <strong>backup</strong> when using this option!</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">always</span></code>, the module will always regenerate the key. This is equivalent to setting <em>force</em> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
-<p>Note that adjusting the comment and the permissions can be changed without regeneration. Therefore, even for <code class="docutils literal notranslate"><span class="pre">never</span></code>, the task can result in changed.</p>
+<p>By default, the key will be regenerated when it does not match the module’s options, except when the key cannot be read or the passphrase does not match. Please note that this <strong>changed</strong> for Ansible 2.10. For Ansible 2.9, the behavior was as if <code class="ansible-value docutils literal notranslate"><span class="pre">full_idempotence</span></code> is specified.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code>, the module will fail if the key cannot be read or the passphrase is not matching, and will never regenerate an existing key.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">fail</span></code>, the module will fail if the key does not correspond to the module’s options.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">partial_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. The key is <strong>not</strong> regenerated if it cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">full_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. This is also the case if the key cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified. Make sure you have a <strong>backup</strong> when using this option!</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code>, the module will always regenerate the key. This is equivalent to setting <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-force"><span class="std std-ref"><span class="pre">force</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>Note that adjusting the comment and the permissions can be changed without regeneration. Therefore, even for <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code>, the task can result in changed.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;never&quot;</span></code></p></li>
@@ -397,7 +399,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-keypair-module-parameter-type"><strong>type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The algorithm used to generate the SSH private key. <code class="docutils literal notranslate"><span class="pre">rsa1</span></code> is for protocol version 1. <code class="docutils literal notranslate"><span class="pre">rsa1</span></code> is deprecated and may not be supported by every version of ssh-keygen.</p>
+<td><div class="ansible-option-cell"><p>The algorithm used to generate the SSH private key. <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code> is for protocol version 1. <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code> is deprecated and may not be supported by every version of ssh-keygen.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;rsa&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -468,8 +470,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>In case the ssh key is broken or password protected, the module will fail. Set the <em>force</em> option to <code class="docutils literal notranslate"><span class="pre">true</span></code> if you want to regenerate the keypair.</p></li>
-<li><p>In the case a custom <code class="docutils literal notranslate"><span class="pre">mode</span></code>, <code class="docutils literal notranslate"><span class="pre">group</span></code>, <code class="docutils literal notranslate"><span class="pre">owner</span></code>, or other file attribute is provided it will be applied to both key files.</p></li>
+<li><p>In case the ssh key is broken or password protected, the module will fail. Set the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-force"><span class="std std-ref"><span class="pre">force</span></span></a></strong></code> option to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> if you want to regenerate the keypair.</p></li>
+<li><p>In the case a custom <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-group"><span class="std std-ref"><span class="pre">group</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-keypair-module-parameter-owner"><span class="std std-ref"><span class="pre">owner</span></span></a></strong></code>, or other file attribute is provided it will be applied to both key files.</p></li>
 </ul>
 </div>
 </section>

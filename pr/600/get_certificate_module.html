@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -164,7 +166,7 @@
 <h1>community.crypto.get_certificate module – Get a certificate from a host:port<a class="headerlink" href="#community-crypto-get-certificate-module-get-a-certificate-from-a-host-port" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-get-certificate-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -193,7 +195,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <span id="ansible-collections-community-crypto-get-certificate-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>python &gt;= 2.7 when using <code class="docutils literal notranslate"><span class="pre">proxy_host</span></code></p></li>
+<li><p>python &gt;= 2.7 when using <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-get-certificate-module-parameter-proxy-host"><span class="std std-ref"><span class="pre">proxy_host</span></span></a></strong></code></p></li>
 <li><p>cryptography &gt;= 1.6</p></li>
 </ul>
 </section>
@@ -211,9 +213,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <a class="ansibleOptionLink" href="#parameter-asn1_base64" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 2.12.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Whether to encode the ASN.1 values in the <code class="docutils literal notranslate"><span class="pre">extensions</span></code> return value with Base64 or not.</p>
-<p>The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility this option is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
-<p>The default value <code class="docutils literal notranslate"><span class="pre">false</span></code> is <strong>deprecated</strong> and will change to <code class="docutils literal notranslate"><span class="pre">true</span></code> in community.crypto 3.0.0.</p>
+<td><div class="ansible-option-cell"><p>Whether to encode the ASN.1 values in the <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-get-certificate-module-return-extensions"><span class="std std-ref"><span class="pre">extensions</span></span></a></code> return value with Base64 or not.</p>
+<p>The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility this option is set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<p>The default value <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> is <strong>deprecated</strong> and will change to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> in community.crypto 3.0.0.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -235,7 +237,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p><span class="ansible-option-versionadded">added in community.crypto 2.11.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>SSL/TLS Ciphers to use for the request.</p>
-<p>When a list is provided, all ciphers are joined in order with <code class="docutils literal notranslate"><span class="pre">:</span></code>.</p>
+<p>When a list is provided, all ciphers are joined in order with <code class="ansible-value docutils literal notranslate"><span class="pre">:</span></code>.</p>
 <p>See the <a class="reference external" href="https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT">OpenSSL Cipher List Format</a> for more details.</p>
 <p>The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.</p>
 </div></td>
@@ -274,8 +276,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -297,7 +299,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <p><span class="ansible-option-versionadded">added in community.crypto 1.9.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Requests a secure connection for protocols which require clients to initiate encryption.</p>
-<p>Only available for <code class="docutils literal notranslate"><span class="pre">mysql</span></code> currently.</p>
+<p>Only available for <code class="ansible-value docutils literal notranslate"><span class="pre">mysql</span></code> currently.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;mysql&quot;</span></code></p></li>
@@ -374,7 +376,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cert</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">How many days until cert expires</span>
-<span class="w">  </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cert</span><span class="nv"> </span><span class="s">expires</span><span class="nv"> </span><span class="s">in:</span><span class="nv"> </span><span class="cp">{{</span> <span class="nv">expire_days</span> <span class="cp">}}</span><span class="nv"> </span><span class="s">days.&quot;</span>
 <span class="w">  </span><span class="nt">vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">expire_days</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="o">((</span> <span class="nv">cert.not_after</span> <span class="o">|</span> <span class="nf">to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y%m%d%H%M%SZ&#39;</span><span class="o">))</span> <span class="o">-</span> <span class="o">(</span><span class="nv">ansible_date_time.iso8601</span> <span class="o">|</span> <span class="nf">to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y-%m-%dT%H:%M:%SZ&#39;</span><span class="o">))</span> <span class="o">)</span><span class="nv">.days</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -420,7 +422,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <a class="ansibleOptionLink" href="#return-extensions/asn1_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The ASN.1 content of the extension.</p>
-<p>If <em>asn1_base64=true</em> this will be Base64 encoded, otherwise the raw binary value will be returned.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-get-certificate-module-parameter-asn1-base64"><span class="std std-ref"><span class="pre">asn1_base64=true</span></span></a></code> this will be Base64 encoded, otherwise the raw binary value will be returned.</p>
 <p>Please note that the raw binary value might not survive JSON serialization to the Ansible controller, and also might cause failures when displaying it. See <a class="reference external" href="https://github.com/ansible/ansible/issues/80258">https://github.com/ansible/ansible/issues/80258</a> for more information.</p>
 <p><strong>Note</strong> that depending on the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> version used, it is not possible to extract the ASN.1 content of the extension, but only to provide the re-encoded content of the extension in case it was parsed by <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>. This should usually result in exactly the same value, except if the original extension value was malformed.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
