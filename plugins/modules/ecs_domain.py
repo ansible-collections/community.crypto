@@ -20,19 +20,19 @@ description:
     - Request validation or re-validation of a domain with the Entrust Certificate Services (ECS) API.
     - Requires credentials for the L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API.
     - If the domain is already in the validation process, no new validation will be requested, but the validation data (if applicable) will be returned.
-    - If the domain is already in the validation process but the I(verification_method) specified is different than the current I(verification_method),
-      the I(verification_method) will be updated and validation data (if applicable) will be returned.
-    - If the domain is an active, validated domain, the return value of I(changed) will be false, unless C(domain_status=EXPIRED), in which case a re-validation
-      will be performed.
-    - If C(verification_method=dns), details about the required DNS entry will be specified in the return parameters I(dns_contents), I(dns_location), and
-      I(dns_resource_type).
-    - If C(verification_method=web_server), details about the required file details will be specified in the return parameters I(file_contents) and
-      I(file_location).
-    - If C(verification_method=email), the email address(es) that the validation email(s) were sent to will be in the return parameter I(emails). This is
+    - If the domain is already in the validation process but the O(verification_method) specified is different than the current O(verification_method),
+      the O(verification_method) will be updated and validation data (if applicable) will be returned.
+    - If the domain is an active, validated domain, the return value of C(changed) will be false, unless RV(domain_status=EXPIRED), in which case a
+      re-validation will be performed.
+    - If O(verification_method=dns), details about the required DNS entry will be specified in the return parameters RV(dns_contents), RV(dns_location), and
+      RV(dns_resource_type).
+    - If O(verification_method=web_server), details about the required file details will be specified in the return parameters RV(file_contents) and
+      RV(file_location).
+    - If O(verification_method=email), the email address(es) that the validation email(s) were sent to will be in the return parameter RV(emails). This is
       purely informational. For domains requested using this module, this will always be a list of size 1.
 notes:
     - There is a small delay (typically about 5 seconds, but can be as long as 60 seconds) before obtaining the random values when requesting a validation
-      while C(verification_method=dns) or C(verification_method=web_server). Be aware of that if doing many domain validation requests.
+      while O(verification_method=dns) or O(verification_method=web_server). Be aware of that if doing many domain validation requests.
 extends_documentation_fragment:
     - community.crypto.attributes
     - community.crypto.ecs_credential
@@ -56,35 +56,35 @@ options:
     verification_method:
         description:
             - The verification method to be used to prove control of the domain.
-            - If C(verification_method=email) and the value I(verification_email) is specified, that value is used for the email validation. If
-              I(verification_email) is not provided, the first value present in WHOIS data will be used. An email will be sent to the address in
-              I(verification_email) with instructions on how to verify control of the domain.
-            - If C(verification_method=dns), the value I(dns_contents) must be stored in location I(dns_location), with a DNS record type of
-              I(verification_dns_record_type). To prove domain ownership, update your DNS records so the text string returned by I(dns_contents) is available at
-              I(dns_location).
-            - If C(verification_method=web_server), the contents of return value I(file_contents) must be made available on a web server accessible at location
-              I(file_location).
-            - If C(verification_method=manual), the domain will be validated with a manual process. This is not recommended.
+            - If O(verification_method=email) and the value O(verification_email) is specified, that value is used for the email validation. If
+              O(verification_email) is not provided, the first value present in WHOIS data will be used. An email will be sent to the address in
+              O(verification_email) with instructions on how to verify control of the domain.
+            - If O(verification_method=dns), the value RV(dns_contents) must be stored in location RV(dns_location), with a DNS record type of
+              RV(dns_resource_type). To prove domain ownership, update your DNS records so the text string returned by RV(dns_contents) is available at
+              RV(dns_location).
+            - If O(verification_method=web_server), the contents of return value RV(file_contents) must be made available on a web server accessible at location
+              RV(file_location).
+            - If O(verification_method=manual), the domain will be validated with a manual process. This is not recommended.
         type: str
         choices: [ 'dns', 'email', 'manual', 'web_server']
         required: true
     verification_email:
         description:
             - Email address to be used to verify domain ownership.
-            - 'Email address must be either an email address present in the WHOIS data for I(domain_name), or one of the following constructed emails:
-              admin@I(domain_name), administrator@I(domain_name), webmaster@I(domain_name), hostmaster@I(domain_name), postmaster@I(domain_name).'
-            - 'Note that if I(domain_name) includes subdomains, the top level domain should be used. For example, if requesting validation of
+            - 'Email address must be either an email address present in the WHOIS data for O(domain_name), or one of the following constructed emails:
+              admin@O(domain_name), administrator@O(domain_name), webmaster@O(domain_name), hostmaster@O(domain_name), postmaster@O(domain_name).'
+            - 'Note that if O(domain_name) includes subdomains, the top level domain should be used. For example, if requesting validation of
               example1.ansible.com, or test.example2.ansible.com, and you want to use the "admin" preconstructed name, the email address should be
               admin@ansible.com.'
             - If using the email values from the WHOIS data for the domain or its top level namespace, they must be exact matches.
-            - If C(verification_method=email) but I(verification_email) is not provided, the first email address found in WHOIS data for the domain will be
+            - If O(verification_method=email) but O(verification_email) is not provided, the first email address found in WHOIS data for the domain will be
               used.
             - To verify domain ownership, domain owner must follow the instructions in the email they receive.
-            - Only allowed if C(verification_method=email)
+            - Only allowed if O(verification_method=email)
         type: str
 seealso:
     - module: community.crypto.x509_certificate
-      description: Can be used to request certificates from ECS, with C(provider=entrust).
+      description: Can be used to request certificates from ECS, with O(community.crypto.x509_certificate#module:provider=entrust).
     - module: community.crypto.ecs_certificate
       description: Can be used to request a Certificate from ECS using a verified domain.
 '''
@@ -133,72 +133,72 @@ EXAMPLES = r'''
 
 RETURN = '''
 domain_status:
-    description: Status of the current domain. Will be one of C(APPROVED), C(DECLINED), C(CANCELLED), C(INITIAL_VERIFICATION), C(DECLINED), C(CANCELLED),
-                 C(RE_VERIFICATION), C(EXPIRED), C(EXPIRING)
+    description: Status of the current domain. Will be one of V(APPROVED), V(DECLINED), V(CANCELLED), V(INITIAL_VERIFICATION), V(DECLINED), V(CANCELLED),
+                 V(RE_VERIFICATION), V(EXPIRED), V(EXPIRING)
     returned: changed or success
     type: str
     sample: APPROVED
 verification_method:
-    description: Verification method used to request the domain validation. If C(changed) will be the same as I(verification_method) input parameter.
+    description: Verification method used to request the domain validation. If C(changed) will be the same as O(verification_method) input parameter.
     returned: changed or success
     type: str
     sample: dns
 file_location:
-    description: The location that ECS will be expecting to be able to find the file for domain verification, containing the contents of I(file_contents).
-    returned: I(verification_method) is C(web_server)
+    description: The location that ECS will be expecting to be able to find the file for domain verification, containing the contents of RV(file_contents).
+    returned: O(verification_method) is V(web_server)
     type: str
     sample: http://ansible.com/.well-known/pki-validation/abcd.txt
 file_contents:
-    description: The contents of the file that ECS will be expecting to find at C(file_location).
-    returned: I(verification_method) is C(web_server)
+    description: The contents of the file that ECS will be expecting to find at RV(file_location).
+    returned: O(verification_method) is V(web_server)
     type: str
     sample: AB23CD41432522FF2526920393982FAB
 emails:
     description:
         - The list of emails used to request validation of this domain.
         - Domains requested using this module will only have a list of size 1.
-    returned: I(verification_method) is C(email)
+    returned: O(verification_method) is V(email)
     type: list
     sample: [ admin@ansible.com, administrator@ansible.com ]
 dns_location:
-    description: The location that ECS will be expecting to be able to find the DNS entry for domain verification, containing the contents of I(dns_contents).
-    returned: changed and if I(verification_method) is C(dns)
+    description: The location that ECS will be expecting to be able to find the DNS entry for domain verification, containing the contents of RV(dns_contents).
+    returned: changed and if O(verification_method) is V(dns)
     type: str
     sample: _pki-validation.ansible.com
 dns_contents:
-    description: The value that ECS will be expecting to find in the DNS record located at I(dns_location).
-    returned: changed and if I(verification_method) is C(dns)
+    description: The value that ECS will be expecting to find in the DNS record located at RV(dns_location).
+    returned: changed and if O(verification_method) is V(dns)
     type: str
     sample: AB23CD41432522FF2526920393982FAB
 dns_resource_type:
-    description: The type of resource record that ECS will be expecting for the DNS record located at I(dns_location).
-    returned: changed and if I(verification_method) is C(dns)
+    description: The type of resource record that ECS will be expecting for the DNS record located at RV(dns_location).
+    returned: changed and if O(verification_method) is V(dns)
     type: str
     sample: TXT
 client_id:
-    description: Client ID that the domain belongs to. If the input value I(client_id) is specified, this will always be the same as I(client_id)
+    description: Client ID that the domain belongs to. If the input value O(client_id) is specified, this will always be the same as O(client_id)
     returned: changed or success
     type: int
     sample: 1
 ov_eligible:
-    description: Whether the domain is eligible for submission of "OV" certificates. Will never be C(false) if I(ov_eligible) is C(true)
-    returned: success and I(domain_status) is C(APPROVED), C(RE_VERIFICATION), C(EXPIRING), or C(EXPIRED).
+    description: Whether the domain is eligible for submission of "OV" certificates. Will never be V(false) if RV(ev_eligible) is V(true)
+    returned: success and RV(domain_status) is V(APPROVED), V(RE_VERIFICATION), V(EXPIRING), or V(EXPIRED).
     type: bool
     sample: true
 ov_days_remaining:
-    description: The number of days the domain remains eligible for submission of "OV" certificates. Will never be less than the value of I(ev_days_remaining)
-    returned: success and I(ov_eligible) is C(true) and I(domain_status) is C(APPROVED), C(RE_VERIFICATION) or C(EXPIRING).
+    description: The number of days the domain remains eligible for submission of "OV" certificates. Will never be less than the value of RV(ev_days_remaining)
+    returned: success and RV(ov_eligible) is V(true) and RV(domain_status) is V(APPROVED), V(RE_VERIFICATION) or V(EXPIRING).
     type: int
     sample: 129
 ev_eligible:
-    description: Whether the domain is eligible for submission of "EV" certificates. Will never be C(true) if I(ov_eligible) is C(false)
-    returned: success and I(domain_status) is C(APPROVED), C(RE_VERIFICATION) or C(EXPIRING), or C(EXPIRED).
+    description: Whether the domain is eligible for submission of "EV" certificates. Will never be V(true) if RV(ov_eligible) is V(false)
+    returned: success and RV(domain_status) is V(APPROVED), V(RE_VERIFICATION) or V(EXPIRING), or V(EXPIRED).
     type: bool
     sample: true
 ev_days_remaining:
     description: The number of days the domain remains eligible for submission of "EV" certificates. Will never be greater than the value of
-                 I(ov_days_remaining)
-    returned: success and I(ev_eligible) is C(true) and I(domain_status) is C(APPROVED), C(RE_VERIFICATION) or C(EXPIRING).
+                 RV(ov_days_remaining)
+    returned: success and RV(ev_eligible) is V(true) and RV(domain_status) is V(APPROVED), V(RE_VERIFICATION) or V(EXPIRING).
     type: int
     sample: 94
 

@@ -20,7 +20,7 @@ description:
     - The module uses the cryptography Python library.
 requirements:
     - cryptography >= 1.2.3 (older versions might work as well)
-    - Needs cryptography >= 1.4 if I(format) is C(OpenSSH)
+    - Needs cryptography >= 1.4 if O(format) is C(OpenSSH)
 author:
     - Yanis Guenane (@Spredzy)
     - Felix Fontein (@felixfontein)
@@ -61,14 +61,14 @@ options:
     privatekey_path:
         description:
             - Path to the TLS/SSL private key from which to generate the public key.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
-              If I(state) is C(present), one of them is required.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
+              If O(state) is V(present), one of them is required.
         type: path
     privatekey_content:
         description:
             - The content of the TLS/SSL private key from which to generate the public key.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
-              If I(state) is C(present), one of them is required.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
+              If O(state) is V(present), one of them is required.
         type: str
         version_added: '1.0.0'
     privatekey_passphrase:
@@ -84,14 +84,14 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) public key's content as I(publickey).
+            - If set to V(true), will return the (current or generated) public key's content as RV(publickey).
         type: bool
         default: false
         version_added: '1.0.0'
@@ -145,7 +145,7 @@ RETURN = r'''
 privatekey:
     description:
     - Path to the TLS/SSL private key the public key was generated from.
-    - Will be C(none) if the private key has been provided in I(privatekey_content).
+    - Will be V(none) if the private key has been provided in O(privatekey_content).
     returned: changed or success
     type: str
     sample: /etc/ssl/private/ansible.com.pem
@@ -173,12 +173,12 @@ fingerprint:
       sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/publickey.pem.2019-03-09@11:22~
 publickey:
     description: The (current or generated) public key's content.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: '1.0.0'
 '''

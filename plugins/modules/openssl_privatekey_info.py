@@ -18,8 +18,8 @@ description:
     - This module allows one to query information on OpenSSL private keys.
     - In case the key consistency checks fail, the module will fail as this indicates a faked
       private key. In this case, all return variables are still returned. Note that key consistency
-      checks are not available all key types; if none is available, C(none) is returned for
-      C(key_is_consistent).
+      checks are not available all key types; if none is available, V(none) is returned for
+      RV(key_is_consistent).
     - It uses the cryptography python library to interact with OpenSSL.
 requirements:
     - cryptography >= 1.2.3
@@ -37,7 +37,7 @@ options:
     content:
         description:
             - Content of the private key file.
-            - Either I(path) or I(content) must be specified, but not both.
+            - Either O(path) or O(content) must be specified, but not both.
         type: str
         version_added: '1.0.0'
     passphrase:
@@ -47,7 +47,7 @@ options:
     return_private_key_data:
         description:
             - Whether to return private key data.
-            - Only set this to C(true) when you want private information about this key to
+            - Only set this to V(true) when you want private information about this key to
               leave the remote machine.
             - "B(WARNING:) you have to make sure that private key data is not accidentally logged!"
         type: bool
@@ -67,8 +67,8 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
@@ -76,9 +76,8 @@ options:
 seealso:
     - module: community.crypto.openssl_privatekey
     - module: community.crypto.openssl_privatekey_pipe
-    - ref: community.crypto.openssl_privatekey_info filter <ansible_collections.community.crypto.openssl_privatekey_info_filter>
-    # - plugin: community.crypto.openssl_privatekey_info
-    #   plugin_type: filter
+    - plugin: community.crypto.openssl_privatekey_info
+      plugin_type: filter
       description: A filter variant of this module.
 '''
 
@@ -108,10 +107,10 @@ can_parse_key:
     type: bool
 key_is_consistent:
     description:
-        - Whether the key is consistent. Can also return C(none) next to C(true) and
-          C(false), to indicate that consistency could not be checked.
-        - In case the check returns C(false), the module will fail.
-    returned: when I(check_consistency=true)
+        - Whether the key is consistent. Can also return V(none) next to V(true) and
+          V(false), to indicate that consistency could not be checked.
+        - In case the check returns V(false), the module will fail.
+    returned: when O(check_consistency=true)
     type: bool
 public_key:
     description: Private key's public key in PEM format.
@@ -129,8 +128,8 @@ public_key_fingerprints:
 type:
     description:
         - The key's type.
-        - One of C(RSA), C(DSA), C(ECC), C(Ed25519), C(X25519), C(Ed448), or C(X448).
-        - Will start with C(unknown) if the key type cannot be determined.
+        - One of V(RSA), V(DSA), V(ECC), V(Ed25519), V(X25519), V(Ed448), or V(X448).
+        - Will start with V(unknown) if the key type cannot be determined.
     returned: success
     type: str
     sample: RSA
@@ -144,61 +143,61 @@ public_data:
             description:
                 - Bit size of modulus (RSA) or prime number (DSA).
             type: int
-            returned: When C(type=RSA) or C(type=DSA)
+            returned: When RV(type=RSA) or RV(type=DSA)
         modulus:
             description:
                 - The RSA key's modulus.
             type: int
-            returned: When C(type=RSA)
+            returned: When RV(type=RSA)
         exponent:
             description:
                 - The RSA key's public exponent.
             type: int
-            returned: When C(type=RSA)
+            returned: When RV(type=RSA)
         p:
             description:
                 - The C(p) value for DSA.
                 - This is the prime modulus upon which arithmetic takes place.
             type: int
-            returned: When C(type=DSA)
+            returned: When RV(type=DSA)
         q:
             description:
                 - The C(q) value for DSA.
                 - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
                   multiplicative group of the prime field used.
             type: int
-            returned: When C(type=DSA)
+            returned: When RV(type=DSA)
         g:
             description:
                 - The C(g) value for DSA.
                 - This is the element spanning the subgroup of the multiplicative group of the prime field used.
             type: int
-            returned: When C(type=DSA)
+            returned: When RV(type=DSA)
         curve:
             description:
                 - The curve's name for ECC.
             type: str
-            returned: When C(type=ECC)
+            returned: When RV(type=ECC)
         exponent_size:
             description:
                 - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
             type: int
-            returned: When C(type=ECC)
+            returned: When RV(type=ECC)
         x:
             description:
                 - The C(x) coordinate for the public point on the elliptic curve.
             type: int
-            returned: When C(type=ECC)
+            returned: When RV(type=ECC)
         y:
             description:
-                - For C(type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
-                - For C(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
+                - For RV(type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
+                - For RV(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
             type: int
-            returned: When C(type=DSA) or C(type=ECC)
+            returned: When RV(type=DSA) or RV(type=ECC)
 private_data:
     description:
         - Private key data. Depends on key type.
-    returned: success and when I(return_private_key_data) is set to C(true)
+    returned: success and when O(return_private_key_data) is set to V(true)
     type: dict
 '''
 

@@ -35,12 +35,12 @@ options:
     certificate_path:
         description:
             - The path to the certificate used to verify the signature.
-            - Either I(certificate_path) or I(certificate_content) must be specified, but not both.
+            - Either O(certificate_path) or O(certificate_content) must be specified, but not both.
         type: path
     certificate_content:
         description:
             - The content of the certificate used to verify the signature.
-            - Either I(certificate_path) or I(certificate_content) must be specified, but not both.
+            - Either O(certificate_path) or O(certificate_content) must be specified, but not both.
         type: str
     signature:
         description: Base64 encoded signature.
@@ -49,8 +49,8 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
@@ -87,7 +87,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 valid:
-    description: C(true) means the signature was valid for the given file, C(false) means it was not.
+    description: V(true) means the signature was valid for the given file, V(false) means it was not.
     returned: success
     type: bool
 '''

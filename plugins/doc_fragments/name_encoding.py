@@ -14,12 +14,12 @@ options:
     name_encoding:
         description:
             - How to encode names (DNS names, URIs, email addresses) in return values.
-            - C(ignore) will use the encoding returned by the backend.
-            - C(idna) will convert all labels of domain names to IDNA encoding.
+            - V(ignore) will use the encoding returned by the backend.
+            - V(idna) will convert all labels of domain names to IDNA encoding.
               IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 encoding fails.
-            - C(unicode) will convert all labels of domain names to Unicode.
+            - V(unicode) will convert all labels of domain names to Unicode.
               IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 decoding fails.
-            - B(Note) that C(idna) and C(unicode) require the L(idna Python library,https://pypi.org/project/idna/) to be installed.
+            - B(Note) that V(idna) and V(unicode) require the L(idna Python library,https://pypi.org/project/idna/) to be installed.
         type: str
         default: ignore
         choices:
@@ -27,5 +27,5 @@ options:
             - idna
             - unicode
 requirements:
-    - If I(name_encoding) is set to another value than C(ignore), the L(idna Python library,https://pypi.org/project/idna/) needs to be installed.
+    - If O(name_encoding) is set to another value than V(ignore), the L(idna Python library,https://pypi.org/project/idna/) needs to be installed.
 '''

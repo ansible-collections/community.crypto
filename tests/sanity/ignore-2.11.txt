@@ -5,5 +5,13 @@
 .azure-pipelines/scripts/publish-codecov.py future-import-boilerplate
 .azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
+plugins/modules/acme_challenge_cert_helper.py validate-modules:return-syntax-error
+plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
+plugins/modules/openssl_privatekey_info.py validate-modules:invalid-documentation
+plugins/modules/openssl_publickey_info.py validate-modules:invalid-documentation
+plugins/modules/x509_certificate_info.py validate-modules:invalid-documentation
+plugins/modules/x509_crl.py validate-modules:return-syntax-error
+plugins/modules/x509_crl_info.py validate-modules:invalid-documentation
+plugins/modules/x509_crl_info.py validate-modules:return-syntax-error
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

@@ -28,16 +28,16 @@ options:
     path:
         description:
             - Remote absolute path where the generated CRL file should be created or is already located.
-            - Either I(path) or I(content) must be specified, but not both.
+            - Either O(path) or O(content) must be specified, but not both.
         type: path
     content:
         description:
             - Content of the X.509 CRL in PEM format, or Base64-encoded X.509 CRL.
-            - Either I(path) or I(content) must be specified, but not both.
+            - Either O(path) or O(content) must be specified, but not both.
         type: str
     list_revoked_certificates:
         description:
-            - If set to C(false), the list of revoked certificates is not included in the result.
+            - If set to V(false), the list of revoked certificates is not included in the result.
             - This is useful when retrieving information on large CRL files. Enumerating all revoked
               certificates can take some time, including serializing the result as JSON, sending it to
               the Ansible controller, and decoding it again.
@@ -50,9 +50,8 @@ notes:
       They are all in UTC.
 seealso:
     - module: community.crypto.x509_crl
-    - ref: community.crypto.x509_crl_info filter <ansible_collections.community.crypto.x509_crl_info_filter>
-    # - plugin: community.crypto.x509_crl_info
-    #   plugin_type: filter
+    - plugin: community.crypto.x509_crl_info
+      plugin_type: filter
       description: A filter variant of this module.
 '''
 
@@ -76,15 +75,18 @@ EXAMPLES = r'''
 RETURN = r'''
 format:
     description:
-        - Whether the CRL is in PEM format (C(pem)) or in DER format (C(der)).
+        - Whether the CRL is in PEM format (V(pem)) or in DER format (V(der)).
     returned: success
     type: str
     sample: pem
+    choices:
+        - pem
+        - der
 issuer:
     description:
         - The CRL's issuer.
         - Note that for repeated values, only the last one will be returned.
-        - See I(name_encoding) for how IDNs are handled.
+        - See O(name_encoding) for how IDNs are handled.
     returned: success
     type: dict
     sample: {"organizationName": "Ansible", "commonName": "ca.example.com"}
@@ -111,7 +113,7 @@ digest:
     sample: sha256WithRSAEncryption
 revoked_certificates:
     description: List of certificates to be revoked.
-    returned: success if I(list_revoked_certificates=true)
+    returned: success if O(list_revoked_certificates=true)
     type: list
     elements: dict
     contains:
@@ -126,7 +128,7 @@ revoked_certificates:
         issuer:
             description:
                 - The certificate's issuer.
-                - See I(name_encoding) for how IDNs are handled.
+                - See O(name_encoding) for how IDNs are handled.
             type: list
             elements: str
             sample: ["DNS:ca.example.org"]
@@ -137,11 +139,19 @@ revoked_certificates:
         reason:
             description:
                 - The value for the revocation reason extension.
-                - One of C(unspecified), C(key_compromise), C(ca_compromise), C(affiliation_changed), C(superseded),
-                  C(cessation_of_operation), C(certificate_hold), C(privilege_withdrawn), C(aa_compromise), and
-                  C(remove_from_crl).
             type: str
             sample: key_compromise
+            choices:
+                - unspecified
+                - key_compromise
+                - ca_compromise
+                - affiliation_changed
+                - superseded
+                - cessation_of_operation
+                - certificate_hold
+                - privilege_withdrawn
+                - aa_compromise
+                - remove_from_crl
         reason_critical:
             description: Whether the revocation reason extension is critical.
             type: bool

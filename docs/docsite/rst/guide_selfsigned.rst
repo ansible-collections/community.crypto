@@ -10,7 +10,7 @@ How to create self-signed certificates
 
 The `community.crypto collection <https://galaxy.ansible.com/community/crypto>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create self-signed certificates.
 
-For creating any kind of certificate, you always have to start with a private key. You can use the :ref:`community.crypto.openssl_privatekey module <ansible_collections.community.crypto.openssl_privatekey_module>` to create a private key. If you only specify ``path``, the default parameters will be used. This will result in a 4096 bit RSA private key:
+For creating any kind of certificate, you always have to start with a private key. You can use the :ref:`community.crypto.openssl_privatekey module <ansible_collections.community.crypto.openssl_privatekey_module>` to create a private key. If you only specify :ansopt:`community.crypto.openssl_privatekey#module:path`, the default parameters will be used. This will result in a 4096 bit RSA private key:
 
 .. code-block:: yaml+jinja
 
@@ -18,7 +18,7 @@ For creating any kind of certificate, you always have to start with a private ke
       community.crypto.openssl_privatekey:
         path: /path/to/certificate.key
 
-You can specify ``type`` to select another key type, ``size`` to select a different key size (only available for RSA and DSA keys), or ``passphrase`` if you want to store the key password-protected:
+You can specify :ansopt:`community.crypto.openssl_privatekey#module:type` to select another key type, :ansopt:`community.crypto.openssl_privatekey#module:size` to select a different key size (only available for RSA and DSA keys), or :ansopt:`community.crypto.openssl_privatekey#module:passphrase` if you want to store the key password-protected:
 
 .. code-block:: yaml+jinja
 
@@ -38,9 +38,9 @@ To create a very simple self-signed certificate with no specific information, yo
         privatekey_path: /path/to/certificate.key
         provider: selfsigned
 
-(If you used ``passphrase`` for the private key, you have to provide ``privatekey_passphrase``.)
+(If you used :ansopt:`community.crypto.openssl_privatekey#module:passphrase` for the private key, you have to provide :ansopt:`community.crypto.x509_certificate#module:privatekey_passphrase`.)
 
-You can use ``selfsigned_not_after`` to define when the certificate expires (default: in roughly 10 years), and ``selfsigned_not_before`` to define from when the certificate is valid (default: now).
+You can use :ansopt:`community.crypto.x509_certificate#module:selfsigned_not_after` to define when the certificate expires (default: in roughly 10 years), and :ansopt:`community.crypto.x509_certificate#module:selfsigned_not_before` to define from when the certificate is valid (default: now).
 
 To define further properties of the certificate, like the subject, Subject Alternative Names (SANs), key usages, name constraints, etc., you need to first create a Certificate Signing Request (CSR) and provide it to the :ref:`community.crypto.x509_certificate module <ansible_collections.community.crypto.x509_certificate_module>`. If you do not need the CSR file, you can use the :ref:`community.crypto.openssl_csr_pipe module <ansible_collections.community.crypto.openssl_csr_pipe_module>` as in the example below. (To store it to disk, use the :ref:`community.crypto.openssl_csr module <ansible_collections.community.crypto.openssl_csr_module>` instead.)
 

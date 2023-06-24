@@ -16,7 +16,7 @@ short_description: Convert OpenSSL private keys
 version_added: 2.1.0
 description:
     - This module allows one to convert OpenSSL private keys.
-    - The default mode for the private key file will be C(0600) if I(mode) is not explicitly set.
+    - The default mode for the private key file will be V(0600) if O(mode) is not explicitly set.
 author:
     - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
@@ -34,8 +34,8 @@ attributes:
 options:
     dest_path:
         description:
-            - Name of the file in which the generated TLS/SSL private key will be written. It will have C(0600) mode
-              if I(mode) is not explicitly set.
+            - Name of the file in which the generated TLS/SSL private key will be written. It will have V(0600) mode
+              if O(mode) is not explicitly set.
         type: path
         required: true
     backup:
@@ -59,7 +59,7 @@ EXAMPLES = r'''
 RETURN = r'''
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/privatekey.pem.2019-03-09@11:22~
 '''

@@ -49,7 +49,7 @@ options:
     - tls-alpn-01
   challenge_data:
     description:
-      - "The C(challenge_data) entry provided by M(community.crypto.acme_certificate) for the
+      - "The RV(community.crypto.acme_certificate#module:challenge_data) entry provided by M(community.crypto.acme_certificate) for the
          challenge."
     type: dict
     required: true
@@ -57,12 +57,12 @@ options:
     description:
       - "Path to a file containing the private key file to use for this challenge
          certificate."
-      - "Mutually exclusive with C(private_key_content)."
+      - "Mutually exclusive with O(private_key_content)."
     type: path
   private_key_content:
     description:
       - "Content of the private key to use for this challenge certificate."
-      - "Mutually exclusive with C(private_key_src)."
+      - "Mutually exclusive with O(private_key_src)."
     type: str
   private_key_passphrase:
     description:
@@ -122,14 +122,16 @@ domain:
   type: str
 identifier_type:
   description:
-    - "The identifier type for the actual resource identifier. Will be C(dns)
-       or C(ip)."
+    - "The identifier type for the actual resource identifier."
   returned: always
   type: str
+  choices:
+    - dns
+    - ip
 identifier:
   description:
-    - "The identifier for the actual resource. Will be a domain name if the
-       type is C(dns), or an IP address if the type is C(ip)."
+    - "The identifier for the actual resource. Will be a domain name if
+       RV(identifier_type=dns), or an IP address if RV(identifier_type=ip)."
   returned: always
   type: str
 challenge_certificate:

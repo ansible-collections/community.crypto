@@ -18,10 +18,10 @@ description:
     - This module uses file common arguments to specify generated file permissions.
     - "Please note that the module regenerates existing DH params if they do not
       match the module's options. If you are concerned that this could overwrite
-      your existing DH params, consider using the I(backup) option."
+      your existing DH params, consider using the O(backup) option."
     - The module can use the cryptography Python library, or the C(openssl) executable.
       By default, it tries to detect which one is available. This can be overridden
-      with the I(select_crypto_backend) option.
+      with the O(select_crypto_backend) option.
 requirements:
     - Either cryptography >= 2.0
     - Or OpenSSL binary C(openssl)
@@ -70,16 +70,16 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available, and falls back to C(openssl).
-            - If set to C(openssl), will try to use the OpenSSL C(openssl) executable.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(openssl).
+            - If set to V(openssl), will try to use the OpenSSL C(openssl) executable.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography, openssl ]
         version_added: "1.0.0"
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) DH parameter's content as I(dhparams).
+            - If set to V(true), will return the (current or generated) DH parameter's content as RV(dhparams).
         type: bool
         default: false
         version_added: "1.0.0"
@@ -120,12 +120,12 @@ filename:
     sample: /etc/ssl/dhparams.pem
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/dhparams.pem.2019-03-09@11:22~
 dhparams:
     description: The (current or generated) DH params' content.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: "1.0.0"
 '''

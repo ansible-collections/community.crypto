@@ -35,12 +35,12 @@ options:
     privatekey_path:
         description:
             - The path to the private key to use when signing.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
         type: path
     privatekey_content:
         description:
             - The content of the private key to use when signing the certificate signing request.
-            - Either I(privatekey_path) or I(privatekey_content) must be specified, but not both.
+            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
         type: str
     privatekey_passphrase:
         description:
@@ -56,8 +56,8 @@ options:
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]

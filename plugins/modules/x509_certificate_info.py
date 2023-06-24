@@ -21,7 +21,7 @@ description:
       up to version 2.9.  When moved to the collection C(community.crypto), it was renamed to
       M(community.crypto.x509_certificate_info). From Ansible 2.10 on, it can still be used by the
       old short name (or by C(ansible.builtin.openssl_certificate_info)), which redirects to
-      C(community.crypto.x509_certificate_info). When using FQCNs or when using the
+      M(community.crypto.x509_certificate_info). When using FQCNs or when using the
       L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
       keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid
       a deprecation warning.
@@ -39,31 +39,31 @@ options:
     path:
         description:
             - Remote absolute path where the certificate file is loaded from.
-            - Either I(path) or I(content) must be specified, but not both.
+            - Either O(path) or O(content) must be specified, but not both.
             - PEM and DER formats are supported.
         type: path
     content:
         description:
             - Content of the X.509 certificate in PEM format.
-            - Either I(path) or I(content) must be specified, but not both.
+            - Either O(path) or O(content) must be specified, but not both.
         type: str
         version_added: '1.0.0'
     valid_at:
         description:
             - A dict of names mapping to time specifications. Every time specified here
               will be checked whether the certificate is valid at this point. See the
-              C(valid_at) return value for informations on the result.
+              RV(valid_at) return value for informations on the result.
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-              + C([w | d | h | m | s]) (for example C(+32w1d2h)), and ASN.1 TIME (in other words, pattern C(YYYYMMDDHHMMSSZ)).
+              + C([w | d | h | m | s]) (for example V(+32w1d2h)), and ASN.1 TIME (in other words, pattern C(YYYYMMDDHHMMSSZ)).
               Note that all timestamps will be treated as being in UTC.
         type: dict
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
@@ -74,9 +74,8 @@ notes:
 seealso:
     - module: community.crypto.x509_certificate
     - module: community.crypto.x509_certificate_pipe
-    - ref: community.crypto.x509_certificate_info filter <ansible_collections.community.crypto.x509_certificate_info_filter>
-    # - plugin: community.crypto.x509_certificate_info
-    #   plugin_type: filter
+    - plugin: community.crypto.x509_certificate_info
+      plugin_type: filter
       description: A filter variant of this module.
 '''
 
@@ -127,7 +126,7 @@ expired:
     returned: success
     type: bool
 basic_constraints:
-    description: Entries in the C(basic_constraints) extension, or C(none) if extension is not present.
+    description: Entries in the C(basic_constraints) extension, or V(none) if extension is not present.
     returned: success
     type: list
     elements: str
@@ -137,7 +136,7 @@ basic_constraints_critical:
     returned: success
     type: bool
 extended_key_usage:
-    description: Entries in the C(extended_key_usage) extension, or C(none) if extension is not present.
+    description: Entries in the C(extended_key_usage) extension, or V(none) if extension is not present.
     returned: success
     type: list
     elements: str
@@ -168,7 +167,7 @@ extensions_by_oid:
             sample: "MAMCAQU="
     sample: {"1.3.6.1.5.5.7.1.24": { "critical": false, "value": "MAMCAQU="}}
 key_usage:
-    description: Entries in the C(key_usage) extension, or C(none) if extension is not present.
+    description: Entries in the C(key_usage) extension, or V(none) if extension is not present.
     returned: success
     type: str
     sample: [Key Agreement, Data Encipherment]
@@ -178,8 +177,8 @@ key_usage_critical:
     type: bool
 subject_alt_name:
     description:
-        - Entries in the C(subject_alt_name) extension, or C(none) if extension is not present.
-        - See I(name_encoding) for how IDNs are handled.
+        - Entries in the C(subject_alt_name) extension, or V(none) if extension is not present.
+        - See O(name_encoding) for how IDNs are handled.
     returned: success
     type: list
     elements: str
@@ -189,7 +188,7 @@ subject_alt_name_critical:
     returned: success
     type: bool
 ocsp_must_staple:
-    description: C(true) if the OCSP Must Staple extension is present, C(none) otherwise.
+    description: V(true) if the OCSP Must Staple extension is present, V(none) otherwise.
     returned: success
     type: bool
 ocsp_must_staple_critical:
@@ -240,8 +239,8 @@ public_key:
 public_key_type:
     description:
         - The certificate's public key's type.
-        - One of C(RSA), C(DSA), C(ECC), C(Ed25519), C(X25519), C(Ed448), or C(X448).
-        - Will start with C(unknown) if the key type cannot be determined.
+        - One of V(RSA), V(DSA), V(ECC), V(Ed25519), V(X25519), V(Ed448), or V(X448).
+        - Will start with V(unknown) if the key type cannot be determined.
     returned: success
     type: str
     version_added: 1.7.0
@@ -257,57 +256,57 @@ public_key_data:
             description:
                 - Bit size of modulus (RSA) or prime number (DSA).
             type: int
-            returned: When C(public_key_type=RSA) or C(public_key_type=DSA)
+            returned: When RV(public_key_type=RSA) or RV(public_key_type=DSA)
         modulus:
             description:
                 - The RSA key's modulus.
             type: int
-            returned: When C(public_key_type=RSA)
+            returned: When RV(public_key_type=RSA)
         exponent:
             description:
                 - The RSA key's public exponent.
             type: int
-            returned: When C(public_key_type=RSA)
+            returned: When RV(public_key_type=RSA)
         p:
             description:
                 - The C(p) value for DSA.
                 - This is the prime modulus upon which arithmetic takes place.
             type: int
-            returned: When C(public_key_type=DSA)
+            returned: When RV(public_key_type=DSA)
         q:
             description:
                 - The C(q) value for DSA.
                 - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
                   multiplicative group of the prime field used.
             type: int
-            returned: When C(public_key_type=DSA)
+            returned: When RV(public_key_type=DSA)
         g:
             description:
                 - The C(g) value for DSA.
                 - This is the element spanning the subgroup of the multiplicative group of the prime field used.
             type: int
-            returned: When C(public_key_type=DSA)
+            returned: When RV(public_key_type=DSA)
         curve:
             description:
                 - The curve's name for ECC.
             type: str
-            returned: When C(public_key_type=ECC)
+            returned: When RV(public_key_type=ECC)
         exponent_size:
             description:
                 - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
             type: int
-            returned: When C(public_key_type=ECC)
+            returned: When RV(public_key_type=ECC)
         x:
             description:
                 - The C(x) coordinate for the public point on the elliptic curve.
             type: int
-            returned: When C(public_key_type=ECC)
+            returned: When RV(public_key_type=ECC)
         y:
             description:
-                - For C(public_key_type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
-                - For C(public_key_type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
+                - For RV(public_key_type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
+                - For RV(public_key_type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
             type: int
-            returned: When C(public_key_type=DSA) or C(public_key_type=ECC)
+            returned: When RV(public_key_type=DSA) or RV(public_key_type=ECC)
 public_key_fingerprints:
     description:
         - Fingerprints of certificate's public key.
@@ -341,7 +340,7 @@ version:
     type: int
     sample: 3
 valid_at:
-    description: For every time stamp provided in the I(valid_at) option, a
+    description: For every time stamp provided in the O(valid_at) option, a
                  boolean whether the certificate is valid at that point in time
                  or not.
     returned: success
@@ -349,24 +348,24 @@ valid_at:
 subject_key_identifier:
     description:
         - The certificate's subject key identifier.
-        - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
-        - Is C(none) if the C(SubjectKeyIdentifier) extension is not present.
+        - The identifier is returned in hexadecimal, with V(:) used to separate bytes.
+        - Is V(none) if the C(SubjectKeyIdentifier) extension is not present.
     returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_key_identifier:
     description:
         - The certificate's authority key identifier.
-        - The identifier is returned in hexadecimal, with C(:) used to separate bytes.
-        - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
+        - The identifier is returned in hexadecimal, with V(:) used to separate bytes.
+        - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
     returned: success
     type: str
     sample: '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33'
 authority_cert_issuer:
     description:
         - The certificate's authority cert issuer as a list of general names.
-        - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
-        - See I(name_encoding) for how IDNs are handled.
+        - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
+        - See O(name_encoding) for how IDNs are handled.
     returned: success
     type: list
     elements: str
@@ -374,18 +373,18 @@ authority_cert_issuer:
 authority_cert_serial_number:
     description:
         - The certificate's authority cert serial number.
-        - Is C(none) if the C(AuthorityKeyIdentifier) extension is not present.
+        - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
     returned: success
     type: int
     sample: 12345
 ocsp_uri:
     description: The OCSP responder URI, if included in the certificate. Will be
-                 C(none) if no OCSP responder URI is included.
+                 V(none) if no OCSP responder URI is included.
     returned: success
     type: str
 issuer_uri:
     description: The Issuer URI, if included in the certificate. Will be
-                 C(none) if no issuer URI is included.
+                 V(none) if no issuer URI is included.
     returned: success
     type: str
     version_added: 2.9.0

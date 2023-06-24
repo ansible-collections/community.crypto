@@ -18,11 +18,6 @@ description:
       L(ECC,https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) or
       L(EdDSA,https://en.wikipedia.org/wiki/EdDSA) private keys.
     - Keys are generated in PEM format.
-    - "Please note that the module regenerates private keys if they do not match
-      the module's options. In particular, if you provide another passphrase
-      (or specify none), change the keysize, etc., the private key will be
-      regenerated. If you are concerned that this could B(overwrite your private key),
-      consider using the I(backup) option."
 requirements:
     - cryptography >= 1.2.3 (older versions might work as well)
 options:
@@ -34,20 +29,20 @@ options:
     type:
         description:
             - The algorithm used to generate the TLS/SSL private key.
-            - Note that C(ECC), C(X25519), C(X448), C(Ed25519) and C(Ed448) require the C(cryptography) backend.
-              C(X25519) needs cryptography 2.5 or newer, while C(X448), C(Ed25519) and C(Ed448) require
-              cryptography 2.6 or newer. For C(ECC), the minimal cryptography version required depends on the
-              I(curve) option.
+            - Note that V(ECC), V(X25519), V(X448), V(Ed25519), and V(Ed448) require the C(cryptography) backend.
+              V(X25519) needs cryptography 2.5 or newer, while V(X448), V(Ed25519), and V(Ed448) require
+              cryptography 2.6 or newer. For V(ECC), the minimal cryptography version required depends on the
+              O(curve) option.
         type: str
         default: RSA
         choices: [ DSA, ECC, Ed25519, Ed448, RSA, X25519, X448 ]
     curve:
         description:
             - Note that not all curves are supported by all versions of C(cryptography).
-            - For maximal interoperability, C(secp384r1) or C(secp256r1) should be used.
+            - For maximal interoperability, V(secp384r1) or V(secp256r1) should be used.
             - We use the curve names as defined in the
               L(IANA registry for TLS,https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8).
-            - Please note that all curves except C(secp224r1), C(secp256k1), C(secp256r1), C(secp384r1) and C(secp521r1)
+            - Please note that all curves except V(secp224r1), V(secp256k1), V(secp256r1), V(secp384r1), and V(secp521r1)
               are discouraged for new private keys.
         type: str
         choices:
@@ -76,13 +71,13 @@ options:
         type: str
     cipher:
         description:
-            - The cipher to encrypt the private key. Must be C(auto).
+            - The cipher to encrypt the private key. Must be V(auto).
         type: str
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
-            - The default choice is C(auto), which tries to use C(cryptography) if available.
-            - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+            - The default choice is V(auto), which tries to use C(cryptography) if available.
+            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
         type: str
         default: auto
         choices: [ auto, cryptography ]
@@ -90,11 +85,11 @@ options:
         description:
             - Determines which format the private key is written in. By default, PKCS1 (traditional OpenSSL format)
               is used for all keys which support it. Please note that not every key can be exported in any format.
-            - The value C(auto) selects a format based on the key format. The value C(auto_ignore) does the same,
+            - The value V(auto) selects a format based on the key format. The value V(auto_ignore) does the same,
               but for existing private key files, it will not force a regenerate when its format is not the automatically
               selected one for generation.
             - Note that if the format for an existing private key mismatches, the key is B(regenerated) by default.
-              To change this behavior, use the I(format_mismatch) option.
+              To change this behavior, use the O(format_mismatch) option.
         type: str
         default: auto_ignore
         choices: [ pkcs1, pkcs8, raw, auto, auto_ignore ]
@@ -102,8 +97,8 @@ options:
         description:
             - Determines behavior of the module if the format of a private key does not match the expected format, but all
               other parameters are as expected.
-            - If set to C(regenerate) (default), generates a new private key.
-            - If set to C(convert), the key will be converted to the new format instead.
+            - If set to V(regenerate) (default), generates a new private key.
+            - If set to V(convert), the key will be converted to the new format instead.
             - Only supported by the C(cryptography) backend.
         type: str
         default: regenerate
@@ -114,24 +109,24 @@ options:
               The module will always generate a new key if the destination file does not exist.
             - By default, the key will be regenerated when it does not match the module's options,
               except when the key cannot be read or the passphrase does not match. Please note that
-              this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if C(full_idempotence)
+              this B(changed) for Ansible 2.10. For Ansible 2.9, the behavior was as if V(full_idempotence)
               is specified.
-            - If set to C(never), the module will fail if the key cannot be read or the passphrase
+            - If set to V(never), the module will fail if the key cannot be read or the passphrase
               is not matching, and will never regenerate an existing key.
-            - If set to C(fail), the module will fail if the key does not correspond to the module's
+            - If set to V(fail), the module will fail if the key does not correspond to the module's
               options.
-            - If set to C(partial_idempotence), the key will be regenerated if it does not conform to
+            - If set to V(partial_idempotence), the key will be regenerated if it does not conform to
               the module's options. The key is B(not) regenerated if it cannot be read (broken file),
               the key is protected by an unknown passphrase, or when they key is not protected by a
               passphrase, but a passphrase is specified.
-            - If set to C(full_idempotence), the key will be regenerated if it does not conform to the
+            - If set to V(full_idempotence), the key will be regenerated if it does not conform to the
               module's options. This is also the case if the key cannot be read (broken file), the key
               is protected by an unknown passphrase, or when they key is not protected by a passphrase,
               but a passphrase is specified. Make sure you have a B(backup) when using this option!
-            - If set to C(always), the module will always regenerate the key. This is equivalent to
-              setting I(force) to C(true).
-            - Note that if I(format_mismatch) is set to C(convert) and everything matches except the
-              format, the key will always be converted, except if I(regenerate) is set to C(always).
+            - If set to V(always), the module will always regenerate the key. This is equivalent to
+              setting O(force) to V(true).
+            - Note that if O(format_mismatch) is set to V(convert) and everything matches except the
+              format, the key will always be converted, except if O(regenerate) is set to V(always).
         type: str
         choices:
             - never

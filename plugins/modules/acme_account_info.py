@@ -34,11 +34,11 @@ options:
     description:
       - "Whether to retrieve the list of order URLs or order objects, if provided
          by the ACME server."
-      - "A value of C(ignore) will not fetch the list of orders."
-      - "If the value is not C(ignore) and the ACME server supports orders, the C(order_uris)
-         return value is always populated. The C(orders) return value is only returned
-         if this option is set to C(object_list)."
-      - "Currently, Let's Encrypt does not return orders, so the C(orders) result
+      - "A value of V(ignore) will not fetch the list of orders."
+      - "If the value is not V(ignore) and the ACME server supports orders, the RV(order_uris)
+         return value is always populated. The RV(orders) return value is only returned
+         if this option is set to V(object_list)."
+      - "Currently, Let's Encrypt does not return orders, so the RV(orders) result
          will always be empty."
     type: str
     choices:
@@ -113,7 +113,7 @@ account:
     orders:
       description:
         - A URL where a list of orders can be retrieved for this account.
-        - Use the I(retrieve_orders) option to query this URL and retrieve the
+        - Use the O(retrieve_orders) option to query this URL and retrieve the
           complete list of orders.
       returned: always
       type: str
@@ -129,7 +129,7 @@ orders:
     - "The list of orders."
   type: list
   elements: dict
-  returned: if account exists, I(retrieve_orders) is C(object_list), and server supports order listing
+  returned: if account exists, O(retrieve_orders) is V(object_list), and server supports order listing
   contains:
     status:
       description: The order's status.
@@ -144,7 +144,7 @@ orders:
       description:
         - When the order expires.
         - Timestamp should be formatted as described in RFC3339.
-        - Only required to be included in result when I(status) is C(pending) or C(valid).
+        - Only required to be included in result when RV(orders[].status) is V(pending) or V(valid).
       type: str
       returned: when server gives expiry date
     identifiers:
@@ -154,14 +154,17 @@ orders:
       elements: dict
       contains:
         type:
-          description: Type of identifier. C(dns) or C(ip).
+          description: Type of identifier.
           type: str
+          choices:
+            - dns
+            - ip
         value:
           description: Name of identifier. Hostname or IP address.
           type: str
         wildcard:
-          description: "Whether I(value) is actually a wildcard. The wildcard
-                        prefix C(*.) is not included in I(value) if this is C(true)."
+          description: "Whether RV(orders[].identifiers[].value) is actually a wildcard. The wildcard
+                        prefix C(*.) is not included in RV(orders[].identifiers[].value) if this is V(true)."
           type: bool
           returned: required to be included if the identifier is wildcarded
     notBefore:
@@ -202,11 +205,11 @@ orders:
 order_uris:
   description:
     - "The list of orders."
-    - "If I(retrieve_orders) is C(url_list), this will be a list of URLs."
-    - "If I(retrieve_orders) is C(object_list), this will be a list of objects."
+    - "If O(retrieve_orders) is V(url_list), this will be a list of URLs."
+    - "If O(retrieve_orders) is V(object_list), this will be a list of objects."
   type: list
   elements: str
-  returned: if account exists, I(retrieve_orders) is not C(ignore), and server supports order listing
+  returned: if account exists, O(retrieve_orders) is not V(ignore), and server supports order listing
   version_added: 1.5.0
 '''
 

@@ -63,7 +63,7 @@ options:
     starttls:
       description:
         - Requests a secure connection for protocols which require clients to initiate encryption.
-        - Only available for C(mysql) currently.
+        - Only available for V(mysql) currently.
       type: str
       choices:
         - mysql
@@ -76,15 +76,15 @@ options:
     select_crypto_backend:
       description:
         - Determines which crypto backend to use.
-        - The default choice is C(auto), which tries to use C(cryptography) if available.
-        - If set to C(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+        - The default choice is V(auto), which tries to use C(cryptography) if available.
+        - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
       type: str
       default: auto
       choices: [ auto, cryptography ]
     ciphers:
       description:
         - SSL/TLS Ciphers to use for the request.
-        - 'When a list is provided, all ciphers are joined in order with C(:).'
+        - 'When a list is provided, all ciphers are joined in order with V(:).'
         - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
           for more details.
         - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
@@ -93,10 +93,10 @@ options:
       version_added: 2.11.0
     asn1_base64:
       description:
-        - Whether to encode the ASN.1 values in the C(extensions) return value with Base64 or not.
+        - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
         - The documentation claimed for a long time that the values are Base64 encoded, but they
-          never were. For compatibility this option is set to C(false), but that value will eventually
-          be deprecated and changed to C(true).
+          never were. For compatibility this option is set to V(false), but that value will eventually
+          be deprecated and changed to V(true).
       type: bool
       default: false
       version_added: 2.12.0
@@ -105,7 +105,7 @@ notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 
 requirements:
-    - "python >= 2.7 when using C(proxy_host)"
+    - "python >= 2.7 when using O(proxy_host)"
     - "cryptography >= 1.6"
 '''
 
@@ -133,7 +133,7 @@ extensions:
             type: str
             description:
               - The ASN.1 content of the extension.
-              - If I(asn1_base64=true) this will be Base64 encoded, otherwise the raw
+              - If O(asn1_base64=true) this will be Base64 encoded, otherwise the raw
                 binary value will be returned.
               - Please note that the raw binary value might not survive JSON serialization
                 to the Ansible controller, and also might cause failures when displaying it.

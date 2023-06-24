@@ -22,7 +22,7 @@ description:
 notes:
   - "The M(community.crypto.acme_certificate) module also allows to do basic account management.
      When using both modules, it is recommended to disable account management
-     for M(community.crypto.acme_certificate). For that, use the C(modify_account) option of
+     for M(community.crypto.acme_certificate). For that, use the O(community.crypto.acme_certificate#module:modify_account) option of
      M(community.crypto.acme_certificate)."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
@@ -49,9 +49,9 @@ options:
   state:
     description:
       - "The state of the account, to be identified by its account key."
-      - "If the state is C(absent), the account will either not exist or be
+      - "If the state is V(absent), the account will either not exist or be
          deactivated."
-      - "If the state is C(changed_key), the account must exist. The account
+      - "If the state is V(changed_key), the account must exist. The account
          key will be changed; no other information will be touched."
     type: str
     required: true
@@ -61,7 +61,7 @@ options:
     - changed_key
   allow_creation:
     description:
-      - "Whether account creation is allowed (when state is C(present))."
+      - "Whether account creation is allowed (when state is V(present))."
     type: bool
     default: true
   contact:
@@ -70,30 +70,30 @@ options:
       - "Email addresses must be prefixed with C(mailto:)."
       - "See U(https://tools.ietf.org/html/rfc8555#section-7.3)
          for what is allowed."
-      - "Must be specified when state is C(present). Will be ignored
-         if state is C(absent) or C(changed_key)."
+      - "Must be specified when state is V(present). Will be ignored
+         if state is V(absent) or V(changed_key)."
     type: list
     elements: str
     default: []
   terms_agreed:
     description:
       - "Boolean indicating whether you agree to the terms of service document."
-      - "ACME servers can require this to be true."
+      - "ACME servers can require this to be V(true)."
     type: bool
     default: false
   new_account_key_src:
     description:
       - "Path to a file containing the ACME account RSA or Elliptic Curve key to change to."
-      - "Same restrictions apply as to C(account_key_src)."
-      - "Mutually exclusive with C(new_account_key_content)."
-      - "Required if C(new_account_key_content) is not used and state is C(changed_key)."
+      - "Same restrictions apply as to O(account_key_src)."
+      - "Mutually exclusive with O(new_account_key_content)."
+      - "Required if O(new_account_key_content) is not used and O(state) is V(changed_key)."
     type: path
   new_account_key_content:
     description:
       - "Content of the ACME account RSA or Elliptic Curve key to change to."
-      - "Same restrictions apply as to C(account_key_content)."
-      - "Mutually exclusive with C(new_account_key_src)."
-      - "Required if C(new_account_key_src) is not used and state is C(changed_key)."
+      - "Same restrictions apply as to O(account_key_content)."
+      - "Mutually exclusive with O(new_account_key_src)."
+      - "Required if O(new_account_key_src) is not used and O(state) is V(changed_key)."
     type: str
   new_account_key_passphrase:
     description:
@@ -117,14 +117,14 @@ options:
       alg:
         description:
           - The MAC algorithm provided by the CA.
-          - If not specified by the CA, this is probably C(HS256).
+          - If not specified by the CA, this is probably V(HS256).
         type: str
         required: true
         choices: [ HS256, HS384, HS512 ]
       key:
         description:
           - Base64 URL encoded value of the MAC key provided by the CA.
-          - Padding (C(=) symbols at the end) can be omitted.
+          - Padding (V(=) symbols at the end) can be omitted.
         type: str
         required: true
     version_added: 1.1.0

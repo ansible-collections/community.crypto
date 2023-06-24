@@ -15,16 +15,16 @@ DOCUMENTATION = r'''
 module: x509_certificate
 short_description: Generate and/or check OpenSSL certificates
 description:
-    - It implements a notion of provider (one of C(selfsigned), C(ownca), C(acme), and C(entrust))
+    - It implements a notion of provider (one of V(selfsigned), V(ownca), V(acme), and V(entrust))
       for your certificate.
     - "Please note that the module regenerates existing certificate if it does not match the module's
       options, or if it seems to be corrupt. If you are concerned that this could overwrite
-      your existing certificate, consider using the I(backup) option."
+      your existing certificate, consider using the O(backup) option."
     - Note that this module was called C(openssl_certificate) when included directly in Ansible up to version 2.9.
       When moved to the collection C(community.crypto), it was renamed to
       M(community.crypto.x509_certificate). From Ansible 2.10 on, it can still be used by the
       old short name (or by C(ansible.builtin.openssl_certificate)), which redirects to
-      C(community.crypto.x509_certificate). When using FQCNs or when using the
+      M(community.crypto.x509_certificate). When using FQCNs or when using the
       L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
       keyword, the new name M(community.crypto.x509_certificate) should be used to avoid
       a deprecation warning.
@@ -67,15 +67,15 @@ options:
               Please see the examples on how to emulate it with
               M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info),
               M(community.crypto.openssl_privatekey_info) and M(ansible.builtin.assert).
-            - "The C(entrust) provider was added for Ansible 2.9 and requires credentials for the
+            - "The V(entrust) provider was added for Ansible 2.9 and requires credentials for the
                L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
-            - Required if I(state) is C(present).
+            - Required if O(state) is V(present).
         type: str
         choices: [ acme, entrust, ownca, selfsigned ]
 
     return_content:
         description:
-            - If set to C(true), will return the (current or generated) certificate's content as I(certificate).
+            - If set to V(true), will return the (current or generated) certificate's content as RV(certificate).
         type: bool
         default: false
         version_added: '1.0.0'
@@ -222,12 +222,12 @@ filename:
     sample: /etc/ssl/crt/www.ansible.com.crt
 backup_file:
     description: Name of backup file created.
-    returned: changed and if I(backup) is C(true)
+    returned: changed and if O(backup) is V(true)
     type: str
     sample: /path/to/www.ansible.com.crt.2019-03-09@11:22~
 certificate:
     description: The (current or generated) certificate's content.
-    returned: if I(state) is C(present) and I(return_content) is C(true)
+    returned: if O(state) is V(present) and O(return_content) is V(true)
     type: str
     version_added: '1.0.0'
 '''
