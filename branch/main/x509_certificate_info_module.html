@@ -167,7 +167,7 @@
 <h1>community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates<a class="headerlink" href="#community-crypto-x509-certificate-info-module-provide-information-of-openssl-x-509-certificates" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.15.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -190,14 +190,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <ul class="simple">
 <li><p>This module allows one to query information on OpenSSL certificates.</p></li>
 <li><p>It uses the cryptography python library to interact with OpenSSL.</p></li>
-<li><p>Note that this module was called <code class="docutils literal notranslate"><span class="pre">openssl_certificate_info</span></code> when included directly in Ansible up to version 2.9.  When moved to the collection <code class="docutils literal notranslate"><span class="pre">community.crypto</span></code>, it was renamed to <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a>. From Ansible 2.10 on, it can still be used by the old short name (or by <code class="docutils literal notranslate"><span class="pre">ansible.builtin.openssl_certificate_info</span></code>), which redirects to <code class="docutils literal notranslate"><span class="pre">community.crypto.x509_certificate_info</span></code>. When using FQCNs or when using the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook">collections</a> keyword, the new name <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a> should be used to avoid a deprecation warning.</p></li>
+<li><p>Note that this module was called <code class="docutils literal notranslate"><span class="pre">openssl_certificate_info</span></code> when included directly in Ansible up to version 2.9.  When moved to the collection <code class="docutils literal notranslate"><span class="pre">community.crypto</span></code>, it was renamed to <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a>. From Ansible 2.10 on, it can still be used by the old short name (or by <code class="docutils literal notranslate"><span class="pre">ansible.builtin.openssl_certificate_info</span></code>), which redirects to <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a>. When using FQCNs or when using the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook">collections</a> keyword, the new name <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a> should be used to avoid a deprecation warning.</p></li>
 </ul>
 </section>
 <section id="requirements">
 <span id="ansible-collections-community-crypto-x509-certificate-info-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>If <em>name_encoding</em> is set to another value than <code class="docutils literal notranslate"><span class="pre">ignore</span></code>, the <a class="reference external" href="https://pypi.org/project/idna/">idna Python library</a> needs to be installed.</p></li>
+<li><p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-name-encoding"><span class="std std-ref"><span class="pre">name_encoding</span></span></a></strong></code> is set to another value than <code class="ansible-value docutils literal notranslate"><span class="pre">ignore</span></code>, the <a class="reference external" href="https://pypi.org/project/idna/">idna Python library</a> needs to be installed.</p></li>
 <li><p>cryptography &gt;= 1.6</p></li>
 </ul>
 </section>
@@ -216,7 +216,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Content of the X.509 certificate in PEM format.</p>
-<p>Either <em>path</em> or <em>content</em> must be specified, but not both.</p>
+<p>Either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-path"><span class="std std-ref"><span class="pre">path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-content"><span class="std std-ref"><span class="pre">content</span></span></a></strong></code> must be specified, but not both.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -224,10 +224,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-name_encoding" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>How to encode names (DNS names, URIs, email addresses) in return values.</p>
-<p><code class="docutils literal notranslate"><span class="pre">ignore</span></code> will use the encoding returned by the backend.</p>
-<p><code class="docutils literal notranslate"><span class="pre">idna</span></code> will convert all labels of domain names to IDNA encoding. IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 encoding fails.</p>
-<p><code class="docutils literal notranslate"><span class="pre">unicode</span></code> will convert all labels of domain names to Unicode. IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 decoding fails.</p>
-<p><strong>Note</strong> that <code class="docutils literal notranslate"><span class="pre">idna</span></code> and <code class="docutils literal notranslate"><span class="pre">unicode</span></code> require the <a class="reference external" href="https://pypi.org/project/idna/">idna Python library</a> to be installed.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">ignore</span></code> will use the encoding returned by the backend.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">idna</span></code> will convert all labels of domain names to IDNA encoding. IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 encoding fails.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">unicode</span></code> will convert all labels of domain names to Unicode. IDNA2008 will be preferred, and IDNA2003 will be used if IDNA2008 decoding fails.</p>
+<p><strong>Note</strong> that <code class="ansible-value docutils literal notranslate"><span class="pre">idna</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">unicode</span></code> require the <a class="reference external" href="https://pypi.org/project/idna/">idna Python library</a> to be installed.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;ignore&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -241,7 +241,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Remote absolute path where the certificate file is loaded from.</p>
-<p>Either <em>path</em> or <em>content</em> must be specified, but not both.</p>
+<p>Either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-path"><span class="std std-ref"><span class="pre">path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-content"><span class="std std-ref"><span class="pre">content</span></span></a></strong></code> must be specified, but not both.</p>
 <p>PEM and DER formats are supported.</p>
 </div></td>
 </tr>
@@ -250,8 +250,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -263,10 +263,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="parameter-valid_at"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-parameter-valid-at"><strong>valid_at</strong></p>
 <a class="ansibleOptionLink" href="#parameter-valid_at" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>A dict of names mapping to time specifications. Every time specified here will be checked whether the certificate is valid at this point. See the <code class="docutils literal notranslate"><span class="pre">valid_at</span></code> return value for informations on the result.</p>
+<td><div class="ansible-option-cell"><p>A dict of names mapping to time specifications. Every time specified here will be checked whether the certificate is valid at this point. See the <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-valid-at"><span class="std std-ref"><span class="pre">valid_at</span></span></a></code> return value for informations on the result.</p>
 <p>Time can be specified either as relative time or as absolute timestamp.</p>
 <p>Time will always be interpreted as UTC.</p>
-<p>Valid format is <code class="docutils literal notranslate"><span class="pre">[+-]timespec</span> <span class="pre">|</span> <span class="pre">ASN.1</span> <span class="pre">TIME</span></code> where timespec can be an integer + <code class="docutils literal notranslate"><span class="pre">[w</span> <span class="pre">|</span> <span class="pre">d</span> <span class="pre">|</span> <span class="pre">h</span> <span class="pre">|</span> <span class="pre">m</span> <span class="pre">|</span> <span class="pre">s]</span></code> (for example <code class="docutils literal notranslate"><span class="pre">+32w1d2h</span></code>), and ASN.1 TIME (in other words, pattern <code class="docutils literal notranslate"><span class="pre">YYYYMMDDHHMMSSZ</span></code>). Note that all timestamps will be treated as being in UTC.</p>
+<p>Valid format is <code class="docutils literal notranslate"><span class="pre">[+-]timespec</span> <span class="pre">|</span> <span class="pre">ASN.1</span> <span class="pre">TIME</span></code> where timespec can be an integer + <code class="docutils literal notranslate"><span class="pre">[w</span> <span class="pre">|</span> <span class="pre">d</span> <span class="pre">|</span> <span class="pre">h</span> <span class="pre">|</span> <span class="pre">m</span> <span class="pre">|</span> <span class="pre">s]</span></code> (for example <code class="ansible-value docutils literal notranslate"><span class="pre">+32w1d2h</span></code>), and ASN.1 TIME (in other words, pattern <code class="docutils literal notranslate"><span class="pre">YYYYMMDDHHMMSSZ</span></code>). Note that all timestamps will be treated as being in UTC.</p>
 </div></td>
 </tr>
 </tbody>
@@ -321,7 +321,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </dd>
 <dt><a class="reference internal" href="x509_certificate_pipe_module.html#ansible-collections-community-crypto-x509-certificate-pipe-module"><span class="std std-ref">community.crypto.x509_certificate_pipe</span></a></dt><dd><p>Generate and/or check OpenSSL certificates.</p>
 </dd>
-<dt><a class="reference internal" href="x509_certificate_info_filter.html#ansible-collections-community-crypto-x509-certificate-info-filter"><span class="std std-ref">community.crypto.x509_certificate_info filter</span></a></dt><dd><p>A filter variant of this module.</p>
+<dt><a class="reference internal" href="x509_certificate_info_filter.html#ansible-collections-community-crypto-x509-certificate-info-filter"><span class="std std-ref">community.crypto.x509_certificate_info</span></a> filter plugin</dt><dd><p>A filter variant of this module.</p>
 </dd>
 </dl>
 </div>
@@ -384,8 +384,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-authority_cert_issuer" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate’s authority cert issuer as a list of general names.</p>
-<p>Is <code class="docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
-<p>See <em>name_encoding</em> for how IDNs are handled.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
+<p>See <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-name-encoding"><span class="std std-ref"><span class="pre">name_encoding</span></span></a></strong></code> for how IDNs are handled.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;DNS:www.ansible.com&quot;,</span> <span class="pre">&quot;IP:1.2.3.4&quot;]</span></code></p>
 </div></td>
@@ -395,7 +395,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-authority_cert_serial_number" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate’s authority cert serial number.</p>
-<p>Is <code class="docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">12345</span></code></p>
 </div></td>
@@ -405,8 +405,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-authority_key_identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate’s authority key identifier.</p>
-<p>The identifier is returned in hexadecimal, with <code class="docutils literal notranslate"><span class="pre">:</span></code> used to separate bytes.</p>
-<p>Is <code class="docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
+<p>The identifier is returned in hexadecimal, with <code class="ansible-value docutils literal notranslate"><span class="pre">:</span></code> used to separate bytes.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33&quot;</span></code></p>
 </div></td>
@@ -415,7 +415,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-basic_constraints"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-basic-constraints"><strong>basic_constraints</strong></p>
 <a class="ansibleOptionLink" href="#return-basic_constraints" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">basic_constraints</span></code> extension, or <code class="docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
+<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">basic_constraints</span></code> extension, or <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;CA:TRUE&quot;,</span> <span class="pre">&quot;pathlen:1&quot;]</span></code></p>
 </div></td>
@@ -440,7 +440,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-extended_key_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-extended-key-usage"><strong>extended_key_usage</strong></p>
 <a class="ansibleOptionLink" href="#return-extended_key_usage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">extended_key_usage</span></code> extension, or <code class="docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
+<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">extended_key_usage</span></code> extension, or <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;Biometric</span> <span class="pre">Info&quot;,</span> <span class="pre">&quot;DVCS&quot;,</span> <span class="pre">&quot;Time</span> <span class="pre">Stamping&quot;]</span></code></p>
 </div></td>
@@ -515,7 +515,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-issuer_uri" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 2.9.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The Issuer URI, if included in the certificate. Will be <code class="docutils literal notranslate"><span class="pre">none</span></code> if no issuer URI is included.</p>
+<td><div class="ansible-option-cell"><p>The Issuer URI, if included in the certificate. Will be <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if no issuer URI is included.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 </div></td>
 </tr>
@@ -523,7 +523,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-key_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-key-usage"><strong>key_usage</strong></p>
 <a class="ansibleOptionLink" href="#return-key_usage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">key_usage</span></code> extension, or <code class="docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
+<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">key_usage</span></code> extension, or <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;['Key</span> <span class="pre">Agreement',</span> <span class="pre">'Data</span> <span class="pre">Encipherment']&quot;</span></code></p>
 </div></td>
@@ -558,7 +558,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-ocsp_must_staple"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-ocsp-must-staple"><strong>ocsp_must_staple</strong></p>
 <a class="ansibleOptionLink" href="#return-ocsp_must_staple" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the OCSP Must Staple extension is present, <code class="docutils literal notranslate"><span class="pre">none</span></code> otherwise.</p>
+<td><div class="ansible-option-cell"><p><code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> if the OCSP Must Staple extension is present, <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> otherwise.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 </div></td>
 </tr>
@@ -574,7 +574,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-ocsp_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-ocsp-uri"><strong>ocsp_uri</strong></p>
 <a class="ansibleOptionLink" href="#return-ocsp_uri" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The OCSP responder URI, if included in the certificate. Will be <code class="docutils literal notranslate"><span class="pre">none</span></code> if no OCSP responder URI is included.</p>
+<td><div class="ansible-option-cell"><p>The OCSP responder URI, if included in the certificate. Will be <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if no OCSP responder URI is included.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 </div></td>
 </tr>
@@ -601,7 +601,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/curve" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The curve’s name for ECC.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -609,7 +609,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/exponent" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The RSA key’s public exponent.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=RSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=RSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -617,7 +617,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/exponent_size" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The maximum number of bits of a private key. This is basically the bit size of the subgroup used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -626,7 +626,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">g</span></code> value for DSA.</p>
 <p>This is the element spanning the subgroup of the multiplicative group of the prime field used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -634,7 +634,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/modulus" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The RSA key’s modulus.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=RSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=RSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -643,7 +643,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">p</span></code> value for DSA.</p>
 <p>This is the prime modulus upon which arithmetic takes place.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -652,7 +652,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">q</span></code> value for DSA.</p>
 <p>This is a prime that divides <code class="docutils literal notranslate"><span class="pre">p</span> <span class="pre">-</span> <span class="pre">1</span></code>, and at the same time the order of the subgroup of the multiplicative group of the prime field used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -660,7 +660,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/size" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Bit size of modulus (RSA) or prime number (DSA).</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=RSA</span></code> or <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=RSA</span></span></a></code> or <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -668,16 +668,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-public_key_data/x" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">x</span></code> coordinate for the public point on the elliptic curve.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-public_key_data/y"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-data-y"><strong>y</strong></p>
 <a class="ansibleOptionLink" href="#return-public_key_data/y" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For <code class="docutils literal notranslate"><span class="pre">public_key_type=ECC</span></code>, this is the <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinate for the public point on the elliptic curve.</p>
-<p>For <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code>, this is the publicly known group element whose discrete logarithm w.r.t. <code class="docutils literal notranslate"><span class="pre">g</span></code> is the private key.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">public_key_type=DSA</span></code> or <code class="docutils literal notranslate"><span class="pre">public_key_type=ECC</span></code></p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=ECC</span></span></a></code>, this is the <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinate for the public point on the elliptic curve.</p>
+<p>For <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code>, this is the publicly known group element whose discrete logarithm w.r.t. <code class="docutils literal notranslate"><span class="pre">g</span></code> is the private key.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=DSA</span></span></a></code> or <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-return-public-key-type"><span class="std std-ref"><span class="pre">public_key_type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -696,8 +696,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p><span class="ansible-option-versionadded">added in community.crypto 1.7.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate’s public key’s type.</p>
-<p>One of <code class="docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="docutils literal notranslate"><span class="pre">DSA</span></code>, <code class="docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="docutils literal notranslate"><span class="pre">Ed25519</span></code>, <code class="docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="docutils literal notranslate"><span class="pre">Ed448</span></code>, or <code class="docutils literal notranslate"><span class="pre">X448</span></code>.</p>
-<p>Will start with <code class="docutils literal notranslate"><span class="pre">unknown</span></code> if the key type cannot be determined.</p>
+<p>One of <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>.</p>
+<p>Will start with <code class="ansible-value docutils literal notranslate"><span class="pre">unknown</span></code> if the key type cannot be determined.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;RSA&quot;</span></code></p>
 </div></td>
@@ -734,8 +734,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-subject_alt_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-subject-alt-name"><strong>subject_alt_name</strong></p>
 <a class="ansibleOptionLink" href="#return-subject_alt_name" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">subject_alt_name</span></code> extension, or <code class="docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
-<p>See <em>name_encoding</em> for how IDNs are handled.</p>
+<td><div class="ansible-option-cell"><p>Entries in the <code class="docutils literal notranslate"><span class="pre">subject_alt_name</span></code> extension, or <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if extension is not present.</p>
+<p>See <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-name-encoding"><span class="std std-ref"><span class="pre">name_encoding</span></span></a></strong></code> for how IDNs are handled.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;DNS:www.ansible.com&quot;,</span> <span class="pre">&quot;IP:1.2.3.4&quot;]</span></code></p>
 </div></td>
@@ -753,8 +753,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#return-subject_key_identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate’s subject key identifier.</p>
-<p>The identifier is returned in hexadecimal, with <code class="docutils literal notranslate"><span class="pre">:</span></code> used to separate bytes.</p>
-<p>Is <code class="docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">SubjectKeyIdentifier</span></code> extension is not present.</p>
+<p>The identifier is returned in hexadecimal, with <code class="ansible-value docutils literal notranslate"><span class="pre">:</span></code> used to separate bytes.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">SubjectKeyIdentifier</span></code> extension is not present.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33&quot;</span></code></p>
 </div></td>
@@ -772,7 +772,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="return-valid_at"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-info-module-return-valid-at"><strong>valid_at</strong></p>
 <a class="ansibleOptionLink" href="#return-valid_at" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>For every time stamp provided in the <em>valid_at</em> option, a boolean whether the certificate is valid at that point in time or not.</p>
+<td><div class="ansible-option-cell"><p>For every time stamp provided in the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-info-module-parameter-valid-at"><span class="std std-ref"><span class="pre">valid_at</span></span></a></strong></code> option, a boolean whether the certificate is valid at that point in time or not.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 </div></td>
 </tr>

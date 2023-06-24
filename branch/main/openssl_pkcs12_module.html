@@ -166,7 +166,7 @@
 <h1>community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive<a class="headerlink" href="#community-crypto-openssl-pkcs12-module-generate-openssl-pkcs-12-archive" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.15.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -187,7 +187,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>This module allows one to (re-)generate PKCS#12.</p></li>
-<li><p>The module can use the cryptography Python library, or the pyOpenSSL Python library. By default, it tries to detect which one is available, assuming none of the <em>iter_size</em> and <em>maciter_size</em> options are used. This can be overridden with the <em>select_crypto_backend</em> option.</p></li>
+<li><p>The module can use the cryptography Python library, or the pyOpenSSL Python library. By default, it tries to detect which one is available, assuming none of the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-iter-size"><span class="std std-ref"><span class="pre">iter_size</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-maciter-size"><span class="std std-ref"><span class="pre">maciter_size</span></span></a></strong></code> options are used. This can be overridden with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option.</p></li>
 </ul>
 </section>
 <section id="requirements">
@@ -210,7 +210,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-action"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-pkcs12-module-parameter-action"><strong>action</strong></p>
 <a class="ansibleOptionLink" href="#parameter-action" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p><code class="docutils literal notranslate"><span class="pre">export</span></code> or <code class="docutils literal notranslate"><span class="pre">parse</span></code> a PKCS#12.</p>
+<td><div class="ansible-option-cell"><p><code class="ansible-value docutils literal notranslate"><span class="pre">export</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">parse</span></code> a PKCS#12.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;export&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -256,8 +256,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 2.8.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines the encryption level used.</p>
-<p><code class="docutils literal notranslate"><span class="pre">auto</span></code> uses the default of the selected backend. For <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, this is what the cryptography library’s specific version considers the best available encryption.</p>
-<p><code class="docutils literal notranslate"><span class="pre">compatibility2022</span></code> uses compatibility settings for older software in 2022. This is only supported by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend if cryptography &gt;= 38.0.0 is available.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> uses the default of the selected backend. For <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, this is what the cryptography library’s specific version considers the best available encryption.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">compatibility2022</span></code> uses compatibility settings for older software in 2022. This is only supported by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend if cryptography &gt;= 38.0.0 is available.</p>
 <p><strong>Note</strong> that this option is <strong>not used for idempotency</strong>.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
@@ -301,8 +301,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>Number of times to repeat the encryption step.</p>
 <p>This is <strong>not considered during idempotency checks</strong>.</p>
-<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend, or when <em>encryption_level=compatibility2022</em>.</p>
-<p>When using it, the default is <code class="docutils literal notranslate"><span class="pre">2048</span></code> for <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> and <code class="docutils literal notranslate"><span class="pre">50000</span></code> for <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>.</p>
+<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend, or when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-encryption-level"><span class="std std-ref"><span class="pre">encryption_level=compatibility2022</span></span></a></code>.</p>
+<p>When using it, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">2048</span></code> for <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">50000</span></code> for <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -311,7 +311,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>Number of times to repeat the MAC step.</p>
 <p>This is <strong>not considered during idempotency checks</strong>.</p>
-<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend. When using it, the default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend. When using it, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -333,8 +333,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-other_certificates" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: ca_certificates</span></p>
 <p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>List of other certificates to include. Pre Ansible 2.8 this parameter was called <em>ca_certificates</em>.</p>
-<p>Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates, set <em>other_certificates_parse_all</em> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<td><div class="ansible-option-cell"><p>List of other certificates to include. Pre Ansible 2.8 this parameter was called <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-ca-certificates"><span class="std std-ref"><span class="pre">ca_certificates</span></span></a></strong></code>.</p>
+<p>Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates, set <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-parse-all"><span class="std std-ref"><span class="pre">other_certificates_parse_all</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -342,7 +342,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-other_certificates_parse_all" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.4.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, assumes that the files mentioned in <em>other_certificates</em> can contain more than one certificate per file (or even none per file).</p>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, assumes that the files mentioned in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates"><span class="std std-ref"><span class="pre">other_certificates</span></span></a></strong></code> can contain more than one certificate per file (or even none per file).</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -380,7 +380,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 2.3.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Content of the private key file.</p>
-<p>Mutually exclusive with <em>privatekey_path</em>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-privatekey-path"><span class="std std-ref"><span class="pre">privatekey_path</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -395,7 +395,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-privatekey_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>File to read private key from.</p>
-<p>Mutually exclusive with <em>privatekey_content</em>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-privatekey-content"><span class="std std-ref"><span class="pre">privatekey_content</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -403,7 +403,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-return_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, will return the (current or generated) PKCS#12’s content as <em>pkcs12</em>.</p>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, will return the (current or generated) PKCS#12’s content as <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-return-pkcs12"><span class="std std-ref"><span class="pre">pkcs12</span></span></a></code>.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">false</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -417,9 +417,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.7.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code>. If <em>iter_size</em> is used together with <em>encryption_level != compatibility2022</em>, or if <em>maciter_size</em> is used, <code class="docutils literal notranslate"><span class="pre">auto</span></code> will always result in <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> to be chosen for backwards compatibility.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code>, will try to use the <a class="reference external" href="https://pypi.org/project/pyOpenSSL/">pyOpenSSL</a> library.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code>. If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-iter-size"><span class="std std-ref"><span class="pre">iter_size</span></span></a></strong></code> is used together with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-encryption-level"><span class="std std-ref"><span class="pre">encryption_level</span></span></a></strong></code> is not <code class="ansible-value docutils literal notranslate"><span class="pre">compatibility2022</span></code>, or if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-maciter-size"><span class="std std-ref"><span class="pre">maciter_size</span></span></a></strong></code> is used, <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> will always result in <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> to be chosen for backwards compatibility.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">pyopenssl</span></code>, will try to use the <a class="reference external" href="https://pypi.org/project/pyOpenSSL/">pyOpenSSL</a> library.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -473,7 +473,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-pkcs12-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Whether the file should exist or not. All parameters except <code class="docutils literal notranslate"><span class="pre">path</span></code> are ignored when state is <code class="docutils literal notranslate"><span class="pre">absent</span></code>.</p>
+<td><div class="ansible-option-cell"><p>Whether the file should exist or not. All parameters except <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-path"><span class="std std-ref"><span class="pre">path</span></span></a></strong></code> are ignored when state is <code class="ansible-value docutils literal notranslate"><span class="pre">absent</span></code>.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;absent&quot;</span></code></p></li>
@@ -640,7 +640,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#return-backup_file" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of backup file created.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <em>backup</em> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> changed and if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/path/to/ansible.com.pem.2019-03-09&#64;11:22~&quot;</span></code></p>
 </div></td>
 </tr>
@@ -659,7 +659,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><span class="ansible-option-versionadded">added in community.crypto 1.0.0</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The (current or generated) PKCS#12’s content Base64 encoded.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> if <em>state</em> is <code class="docutils literal notranslate"><span class="pre">present</span></code> and <em>return_content</em> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">present</span></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-return-content"><span class="std std-ref"><span class="pre">return_content</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">

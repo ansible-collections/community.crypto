@@ -164,7 +164,7 @@
 <h1>community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format<a class="headerlink" href="#community-crypto-openssl-publickey-info-filter-retrieve-information-from-openssl-public-keys-in-pem-format" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This filter plugin is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.15.0).</p>
+<p>This filter plugin is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.</p>
 <p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.openssl_publickey_info</span></code>.</p>
 </div>
@@ -269,7 +269,7 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/curve" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The curve’s name for ECC.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -277,7 +277,7 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/exponent" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The RSA key’s public exponent.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=RSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=RSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -285,7 +285,7 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/exponent_size" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The maximum number of bits of a private key. This is basically the bit size of the subgroup used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -294,7 +294,7 @@
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">g</span></code> value for DSA.</p>
 <p>This is the element spanning the subgroup of the multiplicative group of the prime field used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -302,7 +302,7 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/modulus" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The RSA key’s modulus.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=RSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=RSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -311,7 +311,7 @@
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">p</span></code> value for DSA.</p>
 <p>This is the prime modulus upon which arithmetic takes place.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -320,7 +320,7 @@
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">q</span></code> value for DSA.</p>
 <p>This is a prime that divides <code class="docutils literal notranslate"><span class="pre">p</span> <span class="pre">-</span> <span class="pre">1</span></code>, and at the same time the order of the subgroup of the multiplicative group of the prime field used.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -328,7 +328,7 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/size" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Bit size of modulus (RSA) or prime number (DSA).</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=RSA</span></code> or <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=RSA</span></span></a></code> or <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -336,16 +336,16 @@
 <a class="ansibleOptionLink" href="#return-_value/public_data/x" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The <code class="docutils literal notranslate"><span class="pre">x</span></code> coordinate for the public point on the elliptic curve.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=ECC</span></code></p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-_value/public_data/y"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-public-data-y"><strong>y</strong></p>
 <a class="ansibleOptionLink" href="#return-_value/public_data/y" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For <code class="docutils literal notranslate"><span class="pre">type=ECC</span></code>, this is the <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinate for the public point on the elliptic curve.</p>
-<p>For <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code>, this is the publicly known group element whose discrete logarithm w.r.t. <code class="docutils literal notranslate"><span class="pre">g</span></code> is the private key.</p>
-<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="docutils literal notranslate"><span class="pre">type=DSA</span></code> or <code class="docutils literal notranslate"><span class="pre">type=ECC</span></code></p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=ECC</span></span></a></code>, this is the <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinate for the public point on the elliptic curve.</p>
+<p>For <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code>, this is the publicly known group element whose discrete logarithm with respect to <code class="docutils literal notranslate"><span class="pre">g</span></code> is the private key.</p>
+<p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> When <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=DSA</span></span></a></code> or <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-publickey-info-filter-return-value-type"><span class="std std-ref"><span class="pre">_value.type=ECC</span></span></a></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -353,8 +353,8 @@
 <a class="ansibleOptionLink" href="#return-_value/type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The key’s type.</p>
-<p>One of <code class="docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="docutils literal notranslate"><span class="pre">DSA</span></code>, <code class="docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="docutils literal notranslate"><span class="pre">Ed25519</span></code>, <code class="docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="docutils literal notranslate"><span class="pre">Ed448</span></code>, or <code class="docutils literal notranslate"><span class="pre">X448</span></code>.</p>
-<p>Will start with <code class="docutils literal notranslate"><span class="pre">unknown</span></code> if the key type cannot be determined.</p>
+<p>One of <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>.</p>
+<p>Will start with <code class="ansible-value docutils literal notranslate"><span class="pre">unknown</span></code> if the key type cannot be determined.</p>
 <p class="ansible-option-line"><span class="ansible-option-returned-bold">Returned:</span> success</p>
 <p class="ansible-option-line ansible-option-sample"><span class="ansible-option-sample-bold">Sample:</span> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;RSA&quot;</span></code></p>
 </div></td>

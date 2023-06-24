@@ -167,7 +167,7 @@
 <h1>community.crypto.openssl_signature module – Sign data with openssl<a class="headerlink" href="#community-crypto-openssl-signature-module-sign-data-with-openssl" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.15.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/community/crypto">community.crypto collection</a> (version 2.14.1).</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-signature-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
@@ -222,7 +222,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-privatekey_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The content of the private key to use when signing the certificate signing request.</p>
-<p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified, but not both.</p>
+<p>Either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-signature-module-parameter-privatekey-path"><span class="std std-ref"><span class="pre">privatekey_path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-signature-module-parameter-privatekey-content"><span class="std std-ref"><span class="pre">privatekey_content</span></span></a></strong></code> must be specified, but not both.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -238,7 +238,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-privatekey_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The path to the private key to use when signing.</p>
-<p>Either <em>privatekey_path</em> or <em>privatekey_content</em> must be specified, but not both.</p>
+<p>Either <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-signature-module-parameter-privatekey-path"><span class="std std-ref"><span class="pre">privatekey_path</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-signature-module-parameter-privatekey-content"><span class="std std-ref"><span class="pre">privatekey_content</span></span></a></strong></code> must be specified, but not both.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -246,8 +246,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
-<p>If set to <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
 <p class="ansible-option-line"><span class="ansible-option-choices">Choices:</span></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
