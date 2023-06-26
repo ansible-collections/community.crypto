@@ -4,28 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 skip_list:
-  # TODO: Fix and enable one-by-one over time
-  - command-instead-of-module
-  - command-instead-of-shell
-  - key-order[task]
-  - jinja[spacing]
-  - no-free-form
-  - schema[galaxy]
-  - name[missing]
-  - var-naming[no-role-prefix]
-  - var-naming[pattern]
-  - yaml[indentation]
-  - yaml[line-length]
-  - yaml[trailing-spaces]
-  - name[template]
-  - name[casing]
-  - risky-file-permissions
-  - risky-shell-pipe
-  - galaxy[tags]
+  # Docs: https://ansible.readthedocs.io/projects/lint/rules/ignore-errors/
+  # Disabled for this collection because we mostly lint test code that has deliberate errors in places and isn't intended to be directly used outside of tests.
   - ignore-errors
-  - no-changed-when
-  - no-handler
+  # Docs: https://ansible.readthedocs.io/projects/lint/rules/sanity/
+  # Disabled for this collection because our ignores are deliberate. There is also no way of applying this check in a more granular way.
   - sanity[cannot-ignore]
-  - fqcn[action-core]
-  - jinja[invalid]
-  - fqcn[action]
