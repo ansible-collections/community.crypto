@@ -1,2 +1,0 @@
-bugfixes:
-  - "Fix PEM detection/identification to also accept random other lines before the line starting with ``-----BEGIN`` (https://github.com/ansible-collections/community.crypto/issues/627, https://github.com/ansible-collections/community.crypto/pull/628)."

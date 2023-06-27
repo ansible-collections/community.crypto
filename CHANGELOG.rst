@@ -5,6 +5,34 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.14.1
+=======
+
+Release Summary
+---------------
+
+Bugfix and maintenance release with updated documentation.
+
+From this version on, community.crypto is using the new `Ansible semantic markup
+<https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_documenting.html#semantic-markup-within-module-documentation>`__
+in its documentation. If you look at documentation with the ansible-doc CLI tool
+from ansible-core before 2.15, please note that it does not render the markup
+correctly. You should be still able to read it in most cases, but you need
+ansible-core 2.15 or later to see it as it is intended. Alternatively you can
+look at `the devel docsite <https://docs.ansible.com/ansible/devel/collections/community/crypto/>`__
+for the rendered HTML version of the documentation of the latest release.
+
+
+Bugfixes
+--------
+
+- Fix PEM detection/identification to also accept random other lines before the line starting with ``-----BEGIN`` (https://github.com/ansible-collections/community.crypto/issues/627, https://github.com/ansible-collections/community.crypto/pull/628).
+
+Known Issues
+------------
+
+- Ansible markup will show up in raw form on ansible-doc text output for ansible-core before 2.15. If you have trouble deciphering the documentation markup, please upgrade to ansible-core 2.15 (or newer), or read the HTML documentation on https://docs.ansible.com/ansible/devel/collections/community/crypto/.
+
 v2.14.0
 =======
 
