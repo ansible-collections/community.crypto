@@ -1,0 +1,18 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Include distribution specific variables
+  ansible.builtin.include_vars: '{{ lookup("ansible.builtin.first_found", params) }}'
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.os_family }}.yml'
+        - default.yml
+      paths:
+        - '{{ role_path }}/vars'
+
+- name: Install GnuPG
+  ansible.builtin.package:
+    name: '{{ gnupg_package_name }}'
