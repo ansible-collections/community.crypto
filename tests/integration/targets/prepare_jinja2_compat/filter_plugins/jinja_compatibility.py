@@ -1,6 +1,11 @@
-# Copyright (c) Ansible Project
-# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-# SPDX-License-Identifier: GPL-3.0-or-later
+# This code is part of Ansible, but is an independent component.
+# This particular file snippet, and this file snippet only, is licensed under the
+# BSD-3-Clause  License. Modules you write using this snippet, which is embedded
+# dynamically by Ansible, still belong to the author of the module, and may assign
+# their own license to the complete work.
+
+# The BSD License license has been included as LICENSES/BSD-3-Clause.txt in this collection.
+# SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright 2007 Pallets
 #
