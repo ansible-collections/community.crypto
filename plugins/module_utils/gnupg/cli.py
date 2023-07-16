@@ -39,7 +39,7 @@ def get_fingerprint_from_stdout(stdout):
             if len(parts) <= 9 or not parts[9]:
                 raise GPGError('Result line "{line}" does not have fingerprint as 10th component'.format(line=line))
             return parts[9]
-    raise GPGError('Cannot extract fingerprint from stdout "{stdout}"'.format(path=path, stdout=stdout))
+    raise GPGError('Cannot extract fingerprint from stdout "{stdout}"'.format(stdout=stdout))
 
 
 def get_fingerprint_from_file(gpg_runner, path):

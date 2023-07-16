@@ -90,4 +90,4 @@
           - >-
             'Running ' in result.msg
           - >-
-            ('/gpg --with-colons --import-options show-only --import ' ~ remote_tmp_dir ~ '/garbage yielded return code ') in result.msg
+            ('/gpg --no-keyring --with-colons --import-options show-only --import ' ~ remote_tmp_dir ~ '/garbage yielded return code ') in result.msg
