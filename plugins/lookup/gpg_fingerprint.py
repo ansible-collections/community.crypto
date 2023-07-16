@@ -21,6 +21,8 @@ options:
       - A path to a GPG public or private key.
     type: path
     required: true
+requirements:
+  - GnuPG (C(gpg) executable)
 """
 
 EXAMPLES = """
@@ -42,12 +44,13 @@ from subprocess import Popen, PIPE
 
 from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError
+from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_native
 
 
 class LookupModule(LookupBase):
     def get_fingerprint(self, path):
-        command = ['gpg', '--with-colons', '--import-options', 'show-only', '--import', path]
+        command = [self.gpg, '--with-colons', '--import-options', 'show-only', '--import', path]
         p = Popen(command, shell=False, cwd=self._loader.get_basedir(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
@@ -65,6 +68,11 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         self.set_options(direct=kwargs)
+
+        try:
+            self.gpg = get_bin_path('gpg')
+        except ValueError as e:
+            raise AnsibleLookupError('Cannot find the `gpg` executable on the controller')
 
         result = []
         for path in terms:
