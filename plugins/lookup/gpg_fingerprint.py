@@ -40,45 +40,23 @@ RETURN = """
     elements: string
 """
 
-import os
-
-from subprocess import Popen, PIPE
-
 from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError, get_fingerprint_from_file
+from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import PluginGPGRunner
 
 
 class LookupModule(LookupBase):
-    def get_fingerprint(self, path):
-        if not os.path.exists(path):
-            raise AnsibleLookupError('{path} does not exist'.format(path=path))
-        command = [self.gpg, '--with-colons', '--import-options', 'show-only', '--import', path]
-        p = Popen(command, shell=False, cwd=self._loader.get_basedir(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = p.communicate()
-        if p.returncode != 0:
-            raise AnsibleLookupError('Running {cmd} yielded return code {rc} with stdout: "{stdout}" and stderr: "{stderr}")'.format(
-                cmd=' '.join(command),
-                rc=p.returncode,
-                stdout=to_native(stdout, errors='surrogate_or_replace'),
-                stderr=to_native(stderr, errors='surrogate_or_replace'),
-            ))
-        lines = to_native(stdout, errors='surrogate_or_replace').splitlines(False)
-        for line in lines:
-            if line.startswith('fpr:'):
-                return line.split(':')[9]
-        raise AnsibleLookupError('Cannot extract fingerprint for {path} from stdout "{stdout}"'.format(path=path, stdout=stdout))
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(direct=kwargs)
 
         try:
-            self.gpg = get_bin_path('gpg')
-        except ValueError as e:
-            raise AnsibleLookupError('Cannot find the `gpg` executable on the controller')
-
-        result = []
-        for path in terms:
-            result.append(self.get_fingerprint(path))
-        return result
+            gpg = PluginGPGRunner(cwd=self._loader.get_basedir())
+            result = []
+            for path in terms:
+                result.append(get_fingerprint_from_file(gpg, path))
+            return result
+        except GPGError as exc:
+            raise AnsibleLookupError(to_native(exc))
