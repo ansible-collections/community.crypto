@@ -58,3 +58,36 @@
         that:
           - public_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
           - private_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
+
+    - name: Error scenario - file does not exist
+      ansible.builtin.set_fact:
+        failing_result: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/does-not-exist') }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            (remote_tmp_dir ~ '/does-not-exist does not exist') in result.msg
+
+    - name: Write garbage to disk
+      ansible.builtin.copy:
+        dest: "{{ remote_tmp_dir }}/garbage"
+        content: gargabe
+
+    - name: Error scenario - file contains garbage
+      ansible.builtin.set_fact:
+        failing_result: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/garbage') }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            'Running ' in result.msg
+          - >-
+            ('/gpg --with-colons --import-options show-only --import ' ~ remote_tmp_dir ~ '/garbage yielded return code ') in result.msg
