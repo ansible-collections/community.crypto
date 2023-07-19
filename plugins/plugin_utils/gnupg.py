@@ -24,9 +24,12 @@ class PluginGPGRunner(GPGRunner):
         self.executable = executable
         self.cwd = cwd
 
-    def run_command(self, command, check_rc=True):
+    def run_command(self, command, check_rc=True, data=None):
         """
         Run ``[gpg] + command`` and return ``(rc, stdout, stderr)``.
+
+        If ``data`` is not ``None``, it will be provided as stdin.
+        The code assumes it is a bytes string.
 
         Returned stdout and stderr are native Python strings.
         Pass ``check_rc=False`` to allow return codes != 0.
@@ -35,7 +38,7 @@ class PluginGPGRunner(GPGRunner):
         """
         command = [self.executable] + command
         p = Popen(command, shell=False, cwd=self.cwd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(input=data)
         stdout = to_native(stdout, errors='surrogate_or_replace')
         stderr = to_native(stderr, errors='surrogate_or_replace')
         if check_rc and p.returncode != 0:

@@ -22,6 +22,9 @@ options:
     required: true
 requirements:
   - GnuPG (C(gpg) executable)
+seealso:
+  - plugin: community.crypto.gpg_fingerprint
+    plugin_type: filter
 """
 
 EXAMPLES = """

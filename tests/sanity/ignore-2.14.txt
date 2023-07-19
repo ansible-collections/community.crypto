@@ -1,4 +1,5 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/lookup/gpg_fingerprint.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_privatekey_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_publickey_info.py validate-modules:invalid-documentation
