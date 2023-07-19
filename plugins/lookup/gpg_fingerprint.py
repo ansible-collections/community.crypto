@@ -17,7 +17,8 @@ options:
   _terms:
     description:
       - A path to a GPG public or private key.
-    type: path
+    type: list
+    elements: path
     required: true
 requirements:
   - GnuPG (C(gpg) executable)
@@ -32,8 +33,8 @@ EXAMPLES = """
 RETURN = """
   _value:
     description:
-      - The fingerprint of the provided public or private GPG key.
-      - The list as entry for every path provided.
+      - The fingerprints of the provided public or private GPG keys.
+      - The list has one entry for every path provided.
     type: list
     elements: string
 """
