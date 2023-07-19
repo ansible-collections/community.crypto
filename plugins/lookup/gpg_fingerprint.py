@@ -12,9 +12,7 @@ short_description: Retrieve a GPG fingerprint from a GPG public or private key f
 author: Felix Fontein (@felixfontein)
 version_added: 2.15.0
 description:
-  - "Takes the input lists and returns a list with elements that are lists, dictionaries,
-     or template expressions which evaluate to lists or dicts, composed of the elements of
-     the input evaluated lists and dictionaries."
+  - "Takes a list of filenames pointing to GPG public or private key files. Returns the fingerprint for every of these keys."
 options:
   _terms:
     description:
