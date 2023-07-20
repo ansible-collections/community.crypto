@@ -222,8 +222,6 @@ stages:
               test: rhel/9.2
             - name: RHEL 8.8
               test: rhel/8.8
-            - name: FreeBSD 12.4
-              test: freebsd/12.4
             - name: FreeBSD 13.2
               test: freebsd/13.2
           groups:
@@ -245,6 +243,8 @@ stages:
               test: rhel/7.9
             - name: FreeBSD 13.1
               test: freebsd/13.1
+            - name: FreeBSD 12.4
+              test: freebsd/12.4
           groups:
             - 1
             - 2
