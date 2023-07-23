@@ -12,7 +12,7 @@ short_description: Retrieve a GPG fingerprint from a GPG public or private key f
 author: Felix Fontein (@felixfontein)
 version_added: 2.15.0
 description:
-  - "Takes a list of filenames pointing to GPG public or private key files. Returns the fingerprint for every of these keys."
+  - "Takes a list of filenames pointing to GPG public or private key files. Returns the fingerprints for each of these keys."
 options:
   _terms:
     description:
