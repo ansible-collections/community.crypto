@@ -38,39 +38,48 @@ If you use the Ansible package and do not update collections independently, use 
 
 ## Included content
 
-- OpenSSL / PKI modules:
-  - openssl_csr_info
-  - openssl_csr
-  - openssl_dhparam
-  - openssl_pkcs12
-  - openssl_privatekey_info
-  - openssl_privatekey
-  - openssl_publickey
-  - openssl_signature_info
-  - openssl_signature
-  - x509_certificate_info
-  - x509_certificate
-  - x509_crl_info
-  - x509_crl
-  - certificate_complete_chain
-- OpenSSH modules:
-  - openssh_cert
-  - openssh_keypair
-- ACME modules:
-  - acme_account_info
-  - acme_account
-  - acme_certificate
-  - acme_certificate_revoke
-  - acme_challenge_cert_helper
-  - acme_inspect
-- ECS modules:
-  - ecs_certificate
-  - ecs_domain
-- Miscellaneous modules:
-  - get_certificate
-  - luks_device
+- OpenSSL / PKI modules and plugins:
+  - certificate_complete_chain module
+  - openssl_csr_info module and filter
+  - openssl_csr_pipe module
+  - openssl_csr module
+  - openssl_dhparam module
+  - openssl_pkcs12 module
+  - openssl_privatekey_convert module
+  - openssl_privatekey_info module and filter
+  - openssl_privatekey_pipe module
+  - openssl_privatekey module
+  - openssl_publickey_info module and filter
+  - openssl_publickey module
+  - openssl_signature_info module
+  - openssl_signature module
+  - split_pem filter
+  - x509_certificate_info module and filter
+  - x509_certificate_pipe module
+  - x509_certificate module
+  - x509_crl_info module and filter
+  - x509_crl module
+- OpenSSH modules and plugins:
+  - openssh_cert module
+  - openssh_keypair module
+- ACME modules and plugins:
+  - acme_account_info module
+  - acme_account module
+  - acme_certificate module
+  - acme_certificate_revoke module
+  - acme_challenge_cert_helper module
+  - acme_inspect module
+- ECS modules and plugins:
+  - ecs_certificate module
+  - ecs_domain module
+- GnuPG modules and plugins:
+  - gpg_fingerprint lookup and filter
+- Miscellaneous modules and plugins:
+  - crypto_info module
+  - get_certificate module
+  - luks_device module
 
-You can also find a list of all modules with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/).
+You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/).
 
 ## Using this collection
 
