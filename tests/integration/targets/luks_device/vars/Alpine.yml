@@ -7,4 +7,5 @@ cryptsetup_package: cryptsetup
 
 luks_extra_packages:
   - device-mapper
+  - lsblk
   - wipefs
