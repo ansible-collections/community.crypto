@@ -1,0 +1,93 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests if GPG is available
+  when: has_gnupg
+  block:
+    - name: Create GPG key
+      ansible.builtin.command:
+        cmd: gpg --homedir "{{ remote_tmp_dir }}" --batch --generate-key
+        stdin: |
+          %echo Generating a basic OpenPGP key
+          %no-ask-passphrase
+          %no-protection
+          Key-Type: RSA
+          Key-Length: 4096
+          Name-Real: Foo Bar
+          Name-Email: foo@bar.com
+          Expire-Date: 0
+          %commit
+          %echo done
+      register: result
+
+    - name: Extract fingerprint
+      ansible.builtin.shell: gpg --homedir "{{ remote_tmp_dir }}" --with-colons --fingerprint foo@bar.com | grep '^fpr:'
+      register: fingerprints
+
+    - name: Show fingerprints
+      ansible.builtin.debug:
+        msg: "{{ fingerprints.stdout_lines | map('split', ':') | list }}"
+
+    - name: Export public key
+      ansible.builtin.command: gpg --homedir "{{ remote_tmp_dir }}" --export --armor foo@bar.com
+      register: public_key
+
+    - name: Export private key
+      ansible.builtin.command: gpg --homedir "{{ remote_tmp_dir }}" --export-secret-key --armor foo@bar.com
+      register: private_key
+
+    - name: Write public key to disk
+      ansible.builtin.copy:
+        dest: "{{ remote_tmp_dir }}/public-key"
+        content: "{{ public_key.stdout }}"
+
+    - name: Write private key to disk
+      ansible.builtin.copy:
+        dest: "{{ remote_tmp_dir }}/private-key"
+        content: "{{ private_key.stdout }}"
+
+    - name: Gather fingerprints
+      ansible.builtin.set_fact:
+        public_key_fingerprint: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/public-key') }}"
+        private_key_fingerprint: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/private-key') }}"
+
+    - name: Check whether fingerprints match
+      ansible.builtin.assert:
+        that:
+          - public_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
+          - private_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
+
+    - name: Error scenario - file does not exist
+      ansible.builtin.set_fact:
+        failing_result: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/does-not-exist') }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            (remote_tmp_dir ~ '/does-not-exist does not exist') in result.msg
+
+    - name: Write garbage to disk
+      ansible.builtin.copy:
+        dest: "{{ remote_tmp_dir }}/garbage"
+        content: gargabe
+
+    - name: Error scenario - file contains garbage
+      ansible.builtin.set_fact:
+        failing_result: "{{ lookup('community.crypto.gpg_fingerprint', remote_tmp_dir ~ '/garbage') }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            'Running ' in result.msg
+          - >-
+            ('/gpg --no-keyring --with-colons --import-options show-only --import ' ~ remote_tmp_dir ~ '/garbage yielded return code ') in result.msg

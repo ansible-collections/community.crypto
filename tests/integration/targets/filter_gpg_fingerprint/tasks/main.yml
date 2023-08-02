@@ -1,0 +1,80 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests if GPG is available
+  when: has_gnupg
+  block:
+    - name: Create GPG key
+      ansible.builtin.command:
+        cmd: gpg --homedir "{{ remote_tmp_dir }}" --batch --generate-key
+        stdin: |
+          %echo Generating a basic OpenPGP key
+          %no-ask-passphrase
+          %no-protection
+          Key-Type: RSA
+          Key-Length: 4096
+          Name-Real: Foo Bar
+          Name-Email: foo@bar.com
+          Expire-Date: 0
+          %commit
+          %echo done
+      register: result
+
+    - name: Extract fingerprint
+      ansible.builtin.shell: gpg --homedir "{{ remote_tmp_dir }}" --with-colons --fingerprint foo@bar.com | grep '^fpr:'
+      register: fingerprints
+
+    - name: Show fingerprints
+      ansible.builtin.debug:
+        msg: "{{ fingerprints.stdout_lines | map('split', ':') | list }}"
+
+    - name: Export public key
+      ansible.builtin.command: gpg --homedir "{{ remote_tmp_dir }}" --export --armor foo@bar.com
+      register: public_key
+
+    - name: Export private key
+      ansible.builtin.command: gpg --homedir "{{ remote_tmp_dir }}" --export-secret-key --armor foo@bar.com
+      register: private_key
+
+    - name: Gather fingerprints
+      ansible.builtin.set_fact:
+        public_key_fingerprint: "{{ public_key.stdout | community.crypto.gpg_fingerprint }}"
+        private_key_fingerprint: "{{ private_key.stdout | community.crypto.gpg_fingerprint }}"
+
+    - name: Check whether fingerprints match
+      ansible.builtin.assert:
+        that:
+          - public_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
+          - private_key_fingerprint == (fingerprints.stdout_lines[0] | split(':'))[9]
+
+    - name: Error scenario - wrong input type
+      ansible.builtin.set_fact:
+        failing_result: "{{ 42 | community.crypto.gpg_fingerprint }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            'The input for the community.crypto.gpg_fingerprint filter must be a string; got ' in result.msg
+          - >-
+            'int' in result.msg
+
+    - name: Error scenario - garbage input
+      ansible.builtin.set_fact:
+        failing_result: "{{ 'garbage' | community.crypto.gpg_fingerprint }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check result
+      ansible.builtin.assert:
+        that:
+          - result is failed
+          - >-
+            'Running ' in result.msg
+          - >-
+            ('/gpg --no-keyring --with-colons --import-options show-only --import /dev/stdin yielded return code ') in result.msg
