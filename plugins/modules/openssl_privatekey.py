@@ -106,6 +106,12 @@ EXAMPLES = r'''
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
     type: DSA
+
+- name: Generate an OpenSSL private key with elliptic curve cryptography (ECC)
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/private/ansible.com.pem
+    type: ECC
+    curve: secp256r1
 '''
 
 RETURN = r'''
