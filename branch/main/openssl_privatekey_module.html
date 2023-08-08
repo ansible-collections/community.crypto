@@ -597,6 +597,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DSA</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with elliptic curve cryptography (ECC)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECC</span>
+<span class="w">    </span><span class="nt">curve</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">secp256r1</span>
 </pre></div>
 </div>
 </section>
