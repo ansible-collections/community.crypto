@@ -326,7 +326,9 @@ class KeypairBackendOpensshBin(KeypairBackend):
         self.ssh_keygen.generate_keypair(private_key_path, self.size, self.type, self.comment, check_rc=True)
 
     def _get_private_key(self):
-        private_key_content = self.ssh_keygen.get_private_key(self.private_key_path, check_rc=True)[1]
+        rc, private_key_content, err = self.ssh_keygen.get_private_key(self.private_key_path, check_rc=False)
+        if rc != 0:
+            raise ValueError(err)
         return PrivateKey.from_string(private_key_content)
 
     def _get_public_key(self):
