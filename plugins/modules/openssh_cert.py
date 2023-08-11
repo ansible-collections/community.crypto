@@ -497,7 +497,7 @@ class Certificate(OpensshModule):
         if self.state != 'present':
             return {}
 
-        certificate_info = self.ssh_keygen.get_certificate_info(self.path)[1]
+        certificate_info = self.ssh_keygen.get_certificate_info(self.path, check_rc=True)[1]
 
         return {
             'type': self.type,

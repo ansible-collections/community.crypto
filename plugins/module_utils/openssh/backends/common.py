@@ -127,7 +127,7 @@ class OpensshModule(object):
         ssh_bin = self.module.get_bin_path('ssh')
         if not ssh_bin:
             return ""
-        return parse_openssh_version(self.module.run_command([ssh_bin, '-V', '-q'])[2].strip())
+        return parse_openssh_version(self.module.run_command([ssh_bin, '-V', '-q'], check_rc=True)[2].strip())
 
     @_restore_all_on_failure
     def _safe_secure_move(self, sources_and_destinations):
