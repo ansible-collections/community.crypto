@@ -40,6 +40,10 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.utils imp
 )
 
 
+class BackendError(Exception):
+    pass
+
+
 @six.add_metaclass(abc.ABCMeta)
 class KeypairBackend(OpensshModule):
 
@@ -208,7 +212,7 @@ class KeypairBackend(OpensshModule):
 
         try:
             self._generate_keypair(temp_private_key)
-        except (IOError, OSError) as e:
+        except (IOError, OSError, BackendError) as e:
             self.module.fail_json(msg=to_native(e))
 
         for f in (temp_private_key, temp_public_key):
@@ -323,7 +327,11 @@ class KeypairBackendOpensshBin(KeypairBackend):
         self.ssh_keygen = KeygenCommand(self.module)
 
     def _generate_keypair(self, private_key_path):
-        self.ssh_keygen.generate_keypair(private_key_path, self.size, self.type, self.comment)
+        rc, stdout, stderr = self.ssh_keygen.generate_keypair(private_key_path, self.size, self.type, self.comment)
+        if rc < 1:
+            return
+
+        raise BackendError(stderr)
 
     def _get_private_key(self):
         private_key_content = self.ssh_keygen.get_private_key(self.private_key_path)[1]
