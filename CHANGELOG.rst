@@ -5,6 +5,43 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.15.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+
+Minor Changes
+-------------
+
+- openssh_keypair - fail when comment cannot be updated (https://github.com/ansible-collections/community.crypto/pull/646).
+
+Deprecated Features
+-------------------
+
+- get_certificate - the default ``false`` of the ``asn1_base64`` option is deprecated and will change to ``true`` in community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/pull/600).
+
+Bugfixes
+--------
+
+- openssh_cert, openssh_keypair - the modules ignored return codes of ``ssh`` and ``ssh-keygen`` in some cases (https://github.com/ansible-collections/community.crypto/issues/645, https://github.com/ansible-collections/community.crypto/pull/646).
+- openssh_keypair - fix comment updating for OpenSSH before 6.5 (https://github.com/ansible-collections/community.crypto/pull/646).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key
+
+Lookup
+~~~~~~
+
+- gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key file
+
 v2.14.1
 =======
 
