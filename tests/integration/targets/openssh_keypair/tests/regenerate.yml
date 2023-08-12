@@ -329,22 +329,25 @@
     that:
       - result is changed
 
-- name: "({{ backend }}) Regenerate - adjust comment"
-  openssh_keypair:
-    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
-    type: dsa
-    size: 1024
-    comment: test comment
-    regenerate: '{{ item }}'
-    backend: "{{ backend }}"
-  loop: "{{ regenerate_values }}"
-  register: result
-- assert:
-    that:
-      - result is changed
-      # for all values but 'always', the key should not be regenerated.
-      # verify this by comparing fingerprints:
-      - result.results[0].fingerprint == result.results[1].fingerprint
-      - result.results[0].fingerprint == result.results[2].fingerprint
-      - result.results[0].fingerprint == result.results[3].fingerprint
-      - result.results[0].fingerprint != result.results[4].fingerprint
+# Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
+- when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
+  block:
+  - name: "({{ backend }}) Regenerate - adjust comment"
+    openssh_keypair:
+      path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
+      type: dsa
+      size: 1024
+      comment: test comment
+      regenerate: '{{ item }}'
+      backend: "{{ backend }}"
+    loop: "{{ regenerate_values }}"
+    register: result
+  - assert:
+      that:
+        - result is changed
+        # for all values but 'always', the key should not be regenerated.
+        # verify this by comparing fingerprints:
+        - result.results[0].fingerprint == result.results[1].fingerprint
+        - result.results[0].fingerprint == result.results[2].fingerprint
+        - result.results[0].fingerprint == result.results[3].fingerprint
+        - result.results[0].fingerprint != result.results[4].fingerprint
