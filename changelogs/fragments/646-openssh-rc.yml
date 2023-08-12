@@ -1,0 +1,5 @@
+bugfixes:
+  - "openssh_cert, openssh_keypair - the modules ignored return codes of ``ssh`` and ``ssh-keygen`` in some cases (https://github.com/ansible-collections/community.crypto/issues/645, https://github.com/ansible-collections/community.crypto/pull/646)."
+  - "openssh_keypair - fix comment updating for OpenSSH before 6.5 (https://github.com/ansible-collections/community.crypto/pull/646)."
+minor_changes:
+  - "openssh_keypair - fail when comment cannot be updated (https://github.com/ansible-collections/community.crypto/pull/646)."

@@ -100,8 +100,10 @@
     comment: "test_modified@comment"
     backend: "{{ backend }}"
   register: modified_comment_output
+  ignore_errors: true
 
 - name: "({{ backend }}) Assert comment preserved public key - comment"
+  when: modified_comment_output is succeeded
   assert:
     that:
       - comment_output.public_key == modified_comment_output.public_key
@@ -111,8 +113,16 @@
   assert:
     that:
       - modified_comment_output.comment == 'test_modified@comment'
+      - modified_comment_output is succeeded
   # Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
   when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
+
+- name: "({{ backend }}) Assert comment not changed - comment"
+  assert:
+    that:
+      - modified_comment_output is failed
+  # Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
+  when: backend == 'opensshbin' and openssh_version is version('7.2', '<')
 
 - name: "({{ backend }}) Remove key - comment"
   openssh_keypair:
