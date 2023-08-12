@@ -341,7 +341,9 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
     def _update_comment(self):
         try:
-            self.ssh_keygen.update_comment(self.private_key_path, self.comment, check_rc=True)
+            ssh_version = self._get_ssh_version() or "7.8"
+            force_new_format = LooseVersion('6.5') <= LooseVersion(ssh_version) < LooseVersion('7.8')
+            self.ssh_keygen.update_comment(self.private_key_path, self.comment, force_new_format=force_new_format, check_rc=True)
         except (IOError, OSError) as e:
             self.module.fail_json(msg=to_native(e))
 

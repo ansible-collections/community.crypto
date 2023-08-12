@@ -208,14 +208,18 @@ class KeygenCommand(object):
     def get_private_key(self, private_key_path, **kwargs):
         return self._run_command([self._bin_path, '-l', '-f', private_key_path], **kwargs)
 
-    def update_comment(self, private_key_path, comment, **kwargs):
+    def update_comment(self, private_key_path, comment, force_new_format=True, **kwargs):
         if os.path.exists(private_key_path) and not os.access(private_key_path, os.W_OK):
             try:
                 os.chmod(private_key_path, stat.S_IWUSR + stat.S_IRUSR)
             except (IOError, OSError) as e:
                 raise e("The private key at %s is not writeable preventing a comment update" % private_key_path)
 
-        return self._run_command([self._bin_path, '-q', '-o', '-c', '-C', comment, '-f', private_key_path], **kwargs)
+        command = [self._bin_path, '-q']
+        if force_new_format:
+            command.append('-o')
+        command.extend(['-c', '-C', comment, '-f', private_key_path])
+        return self._run_command(command, **kwargs)
 
 
 class PrivateKey(object):
