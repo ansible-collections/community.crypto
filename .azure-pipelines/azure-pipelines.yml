@@ -99,10 +99,10 @@ stages:
               test: rhel/7.9
             - name: RHEL 8.5
               test: rhel/8.5
-            - name: FreeBSD 12.3
-              test: freebsd/12.3
-            - name: FreeBSD 13.0
-              test: freebsd/13.0
+            - name: FreeBSD 12.4
+              test: freebsd/12.4
+            - name: FreeBSD 13.1
+              test: freebsd/13.1
 ### cloud
   - stage: Cloud_2_13
     displayName: Cloud 2.13
