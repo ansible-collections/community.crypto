@@ -21,13 +21,14 @@ def format_http_status(status_code):
 
 
 def format_error_problem(problem, subproblem_prefix=''):
+    error_type = problem.get('type', 'about:blank')  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
     if 'title' in problem:
         msg = 'Error "{title}" ({type})'.format(
-            type=problem['type'],
+            type=error_type,
             title=problem['title'],
         )
     else:
-        msg = 'Error {type}'.format(type=problem['type'])
+        msg = 'Error {type}'.format(type=error_type)
     if 'detail' in problem:
         msg += ': "{detail}"'.format(detail=problem['detail'])
     subproblems = problem.get('subproblems')
