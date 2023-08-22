@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.15.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- acme_* modules - correctly handle error documents without ``type`` (https://github.com/ansible-collections/community.crypto/issues/651, https://github.com/ansible-collections/community.crypto/pull/652).
+
 v2.15.0
 =======
 

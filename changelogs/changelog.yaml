@@ -924,6 +924,16 @@ releases:
         name: gpg_fingerprint
         namespace: null
     release_date: '2023-08-12'
+  2.15.1:
+    changes:
+      bugfixes:
+      - acme_* modules - correctly handle error documents without ``type`` (https://github.com/ansible-collections/community.crypto/issues/651,
+        https://github.com/ansible-collections/community.crypto/pull/652).
+      release_summary: Bugfix release.
+    fragments:
+    - 2.15.1.yml
+    - 652-problem-type.yml
+    release_date: '2023-08-22'
   2.2.0:
     changes:
       bugfixes:
