@@ -3,7 +3,7 @@
 How to create a small CA
 ========================
 
-The `community.crypto collection <https://galaxy.ansible.com/community/crypto>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create your own small CA and how to use it to sign certificates.
+The `community.crypto collection <https://galaxy.ansible.com/ui/repo/published/community/crypto/>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create your own small CA and how to use it to sign certificates.
 
 In all examples, we assume that the CA's private key is password protected, where the password is provided in the ``secret_ca_passphrase`` variable.
 
