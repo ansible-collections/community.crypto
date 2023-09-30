@@ -3,7 +3,7 @@
 How to create self-signed certificates
 ======================================
 
-The `community.crypto collection <https://galaxy.ansible.com/community/crypto>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create self-signed certificates.
+The `community.crypto collection <https://galaxy.ansible.com/ui/repo/published/community/crypto/>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create self-signed certificates.
 
 For creating any kind of certificate, you always have to start with a private key. You can use the :ref:`community.crypto.openssl_privatekey module <ansible_collections.community.crypto.openssl_privatekey_module>` to create a private key. If you only specify ``path``, the default parameters will be used. This will result in a 4096 bit RSA private key:
 
