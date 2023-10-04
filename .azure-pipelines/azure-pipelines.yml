@@ -107,10 +107,8 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            #- name: Fedora 38
-            #  test: fedora38
-            - name: openSUSE 15
-              test: opensuse15
+            - name: Fedora 38
+              test: fedora38
             - name: Ubuntu 22.04
               test: ubuntu2204
             - name: Alpine 3
@@ -126,8 +124,8 @@ stages:
         parameters:
           testFormat: 2.16/linux/{0}
           targets:
-            - name: Fedora 38
-              test: fedora38
+            - name: openSUSE 15
+              test: opensuse15
           groups:
             - 1
             - 2
@@ -175,10 +173,6 @@ stages:
               test: debian-bookworm/3.11
             - name: ArchLinux
               test: archlinux/3.11
-            - name: CentOS Stream 8 with Python 3.9
-              test: centos-stream8/3.9
-            - name: CentOS Stream 8 with Python 3.6
-              test: centos-stream8/3.6
           groups:
             - 1
             - 2
@@ -210,10 +204,8 @@ stages:
           targets:
             - name: macOS 13.2
               test: macos/13.2
-            #- name: RHEL 9.2
-            #  test: rhel/9.2
-            - name: RHEL 8.8
-              test: rhel/8.8
+            - name: RHEL 9.2
+              test: rhel/9.2
             - name: FreeBSD 13.2
               test: freebsd/13.2
           groups:
@@ -227,8 +219,8 @@ stages:
         parameters:
           testFormat: 2.16/{0}
           targets:
-            - name: RHEL 9.2
-              test: rhel/9.2
+            - name: RHEL 8.8
+              test: rhel/8.8
           groups:
             - 1
             - 2
@@ -280,13 +272,12 @@ stages:
           nameFormat: Python {0}
           testFormat: devel/generic/{0}
           targets:
-            - test: 2.7
-            - test: 3.6
             - test: 3.7
             # - test: 3.8
             # - test: 3.9
             # - test: "3.10"
             - test: "3.11"
+            - test: "3.12"
           groups:
             - 1
             - 2
@@ -299,7 +290,8 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.16/generic/{0}
           targets:
-            - test: 2.7
+            - test: "2.7"
+            - test: "3.6"
             - test: "3.11"
           groups:
             - 1
