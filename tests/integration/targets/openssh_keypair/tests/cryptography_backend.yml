@@ -75,7 +75,7 @@
     state: absent
 
 - name: Generate PEM encoded key with passphrase
-  command: 'ssh-keygen -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+  command: 'ssh-keygen -t rsa -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
