@@ -589,8 +589,8 @@ class CryptHandler(Handler):
         luks_header = result = self._run_command([self._cryptsetup_bin, 'luksDump', device])
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while dumping LUKS header from %s' % (device, ))
-        result_luks1 = f'Key Slot {keyslot}: ENABLED' in luks_header[STDOUT]
-        result_luks2 = f'{keyslot}: luks2' in luks_header[STDOUT]
+        result_luks1 = 'Key Slot %d: ENABLED' % (keyslot) in luks_header[STDOUT]
+        result_luks2 = '%d: luks2' % (keyslot) in luks_header[STDOUT]
         return result_luks1 or result_luks2
 
     def _add_pbkdf_options(self, options, pbkdf):
@@ -777,7 +777,6 @@ class CryptHandler(Handler):
             args.extend(['--key-slot', str(keyslot)])
 
         result = self._run_command(args, data=data)
-        print(f'test_keyslot_result: {result}')
         if result[RETURN_CODE] == 0:
             return True
         for output in (STDOUT, STDERR):
@@ -948,9 +947,9 @@ def run_module():
         passphrase=dict(type='str', no_log=True),
         new_passphrase=dict(type='str', no_log=True),
         remove_passphrase=dict(type='str', no_log=True),
-        keyslot=dict(type='int'),
-        new_keyslot=dict(type='int'),
-        remove_keyslot=dict(type='int'),
+        keyslot=dict(type='int', no_log=False),
+        new_keyslot=dict(type='int', no_log=False),
+        remove_keyslot=dict(type='int', no_log=False),
         force_remove_last_key=dict(type='bool', default=False),
         keysize=dict(type='int'),
         label=dict(type='str'),
@@ -1018,9 +1017,9 @@ def run_module():
     for parameter in ['keyslot', 'new_keyslot', 'remove_keyslot']:
         if module.params[parameter] is not None and not validate_keyslot(module.params[parameter], luks_type):
             if luks_type == 'luks1':
-                module.fail_json(msg=f'{parameter} must be between 0 and 7 when using luks1')
+                module.fail_json(msg='%s must be between 0 and 7 when using luks1' % (parameter))
             else:
-                module.fail_json(msg=f'{parameter} must be between 0 and 31 when using luks2')
+                module.fail_json(msg='%s must be between 0 and 31 when using luks2' % (parameter))
     if conditions.luks_create() and module.params['keyslot'] is not None and module.params['type'] is None:
         keyslot = module.params['keyslot']
         if validate_keyslot(keyslot, 'luks2') and not validate_keyslot(keyslot, 'luks1'):
@@ -1118,7 +1117,6 @@ def run_module():
             module.exit_json(**result)
 
     # luks remove key
-    print(f'cond_luks_remove_key: {conditions.luks_remove_key()}')
     if conditions.luks_remove_key():
         if not module.check_mode:
             try:
