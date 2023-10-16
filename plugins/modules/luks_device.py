@@ -576,11 +576,13 @@ class CryptHandler(Handler):
         ''' get the luks type of a device
         '''
         if self.is_luks(device):
-            result = self._run_command([self._cryptsetup_bin, 'luksDump', device])
-            for line in result[STDOUT].splitlines():
-                if 'Version' in line:
-                    version = line.split()[1]
-                    return 'luks2' if version == '2' else 'luks1'
+            with open(device, 'rb') as f:
+                f.seek(LUKS2_HEADER_OFFSETS[0])
+                data = f.read(LUKS_HEADER_L)
+                if data == LUKS2_HEADER2:
+                    return 'luks2'
+                else:
+                    return 'luks1'
         return None
 
     def is_luks_slot_set(self, device, keyslot):
