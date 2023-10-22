@@ -86,7 +86,7 @@ options:
               number of the keyslot."
             - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
               V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(32). In order to use the keyslots V(8)-V(31) when creating a new
+              V(0)-V(31). In order to use the keyslots V(8)-V(31) when creating a new
               container, setting O(type) to V(luks2) is required."
         type: int
         version_added: '2.16.0'
@@ -126,7 +126,7 @@ options:
               of the keyslot."
             - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
               V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(32)."
+              V(0)-V(31)."
         type: int
         version_added: '2.16.0'
     remove_keyfile:
@@ -160,7 +160,7 @@ options:
               O(keyfile) or O(passphrase) for authorization."
             - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
               V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(32)."
+              V(0)-V(31)."
             - "B(Note) that the given O(keyfile) or O(passphrase) must not be
               in the slot to be removed."
         type: int
@@ -580,12 +580,12 @@ class CryptHandler(Handler):
         '''
         if self.is_luks(device):
             with open(device, 'rb') as f:
-                f.seek(LUKS2_HEADER_OFFSETS[0])
-                data = f.read(LUKS_HEADER_L)
-                if data == LUKS2_HEADER2:
-                    return 'luks2'
-                else:
-                    return 'luks1'
+                for offset in LUKS2_HEADER_OFFSETS:
+                    f.seek(offset)
+                    data = f.read(LUKS_HEADER_L)
+                    if data == LUKS2_HEADER2:
+                        return 'luks2'
+                return 'luks1'
         return None
 
     def is_luks_slot_set(self, device, keyslot):
@@ -934,14 +934,14 @@ class ConditionsHandler(Handler):
         if self._module.params[param] is not None:
             if luks_type is None and param == 'keyslot':
                 if 8 <= self._module.params[param] <= 31:
-                    self._module.fail_json(msg="You must specify type=luks2 when creating a new luks device to use keyslots 8-31.")
+                    self._module.fail_json(msg="You must specify type=luks2 when creating a new LUKS device to use keyslots 8-31.")
                 elif not (0 <= self._module.params[param] <= 7):
                     self._module.fail_json(msg="When not specifying a type, only the keyslots 0-7 are allowed.")
 
             if luks_type == 'luks1' and not 0 <= self._module.params[param] <= 7:
-                self._module.fail_json(msg="%s must be between 0 and 7 when using luks1." % self._module.params[param])
+                self._module.fail_json(msg="%s must be between 0 and 7 when using LUKS1." % self._module.params[param])
             elif luks_type == 'luks2' and not 0 <= self._module.params[param] <= 31:
-                self._module.fail_json(msg="%s must be between 0 and 31 when using luks2." % self._module.params[param])
+                self._module.fail_json(msg="%s must be between 0 and 31 when using LUKS2." % self._module.params[param])
 
 
 def run_module():
@@ -1027,7 +1027,7 @@ def run_module():
 
     for param in ['new_keyslot', 'remove_keyslot']:
         if module.params[param] is not None and module.params['keyfile'] is None and module.params['passphrase'] is None:
-            module.fail_json(msg="Removing a keyslot requires the passphrase or keyfile of antoher slot.")
+            module.fail_json(msg="Removing a keyslot requires the passphrase or keyfile of another slot.")
 
     # The conditions are in order to allow more operations in one run.
     # (e.g. create luks and add a key to it)
