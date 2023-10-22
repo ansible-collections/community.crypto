@@ -84,11 +84,12 @@ options:
             - "Adds the O(keyfile) or O(passphrase) to a specific keyslot when
               creating a new container on O(device). Parameter value is the
               number of the keyslot."
-            - "NOTE that a device of O(type) luks1 supports the keyslot numbers
-              0-7 and a device of O(type) luks2 supports the keyslot numbers
-              0-32. In order to use the keyslots 8-31 when creating a new
-              container, setting O(type) to luks2 is required."
+            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
+              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
+              V(0)-V(32). In order to use the keyslots V(8)-V(31) when creating a new
+              container, setting O(type) to V(luks2) is required."
         type: int
+        version_added: '2.16.0'
     keysize:
         description:
             - "Sets the key size only if LUKS container does not exist."
@@ -123,10 +124,11 @@ options:
             - "Adds the additional O(new_keyfile) or O(new_passphrase) to a
               specific keyslot on the given O(device). Parameter value is the number
               of the keyslot."
-            - "NOTE that a device of O(type) luks1 supports the keyslot numbers
-              0-7 and a device of O(type) luks2 supports the keyslot numbers
-              0-32."
+            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
+              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
+              V(0)-V(32)."
         type: int
+        version_added: '2.16.0'
     remove_keyfile:
         description:
             - "Removes given key from the container on O(device). Does not
@@ -156,12 +158,13 @@ options:
         description:
             - "Removes the key in the given slot on O(device). Needs
               O(keyfile) or O(passphrase) for authorization."
-            - "NOTE that a device of O(type) luks1 supports the keyslot numbers
-              0-7 and a device of O(type) luks2 supports the keyslot numbers
-              0-32."
-            - "NOTE that the given O(keyfile) or O(passphrase) must not be
-              in the slot to be removed"
+            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
+              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
+              V(0)-V(32)."
+            - "B(Note) that the given O(keyfile) or O(passphrase) must not be
+              in the slot to be removed."
         type: int
+        version_added: '2.16.0'
     force_remove_last_key:
         description:
             - "If set to V(true), allows removing the last key from a container."
@@ -588,11 +591,11 @@ class CryptHandler(Handler):
     def is_luks_slot_set(self, device, keyslot):
         ''' check if a keyslot is set
         '''
-        luks_header = result = self._run_command([self._cryptsetup_bin, 'luksDump', device])
+        result = self._run_command([self._cryptsetup_bin, 'luksDump', device])
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while dumping LUKS header from %s' % (device, ))
-        result_luks1 = 'Key Slot %d: ENABLED' % (keyslot) in luks_header[STDOUT]
-        result_luks2 = '%d: luks2' % (keyslot) in luks_header[STDOUT]
+        result_luks1 = 'Key Slot %d: ENABLED' % (keyslot) in result[STDOUT]
+        result_luks2 = ' %d: luks2' % (keyslot) in result[STDOUT]
         return result_luks1 or result_luks2
 
     def _add_pbkdf_options(self, options, pbkdf):
