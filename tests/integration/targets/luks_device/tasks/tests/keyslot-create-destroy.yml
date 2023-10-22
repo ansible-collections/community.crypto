@@ -115,6 +115,26 @@
     - add_luks_slot2_idem_check is not changed
     - "'Key Slot 2: ENABLED' in luks_header_slot2.stdout or '2: luks2' in luks_header_slot2.stdout"
 
+- name: Check remove slot 4 without key
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    remove_keyslot: 4
+  ignore_errors: true
+  become: true
+  register: kill_slot4_nokey
+- name: Check remove slot 4 with slot 4 key
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    remove_keyslot: 4
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+  ignore_errors: true
+  become: true
+  register: kill_slot4_key_slot4
+- assert:
+    that:
+    - kill_slot4_nokey is failed
+    - kill_slot4_key_slot4 is failed
+
 - name: Remove key in slot 4 (check)
   luks_device:
     device: "{{ cryptfile_device }}"

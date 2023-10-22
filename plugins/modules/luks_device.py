@@ -920,7 +920,7 @@ class ConditionsHandler(Handler):
             result = self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'])
             if self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'],
                                                 self._module.params['remove_keyslot']):
-                self._module.fail_json(msg='Cannot remove keyslot with keyfile or passphrase in same slot')
+                self._module.fail_json(msg='Cannot remove keyslot with keyfile or passphrase in same slot.')
             return result
 
         return self._crypthandler.luks_test_key(self.device, self._module.params['remove_keyfile'], self._module.params['remove_passphrase'])
@@ -930,14 +930,18 @@ class ConditionsHandler(Handler):
                 self._module.params['state'] == 'absent' and
                 self._crypthandler.is_luks(self.device))
 
+    def validate_keyslot(self, param, luks_type):
+        if self._module.params[param] is not None:
+            if luks_type is None and param == 'keyslot':
+                if 8 <= self._module.params[param] <= 31:
+                    self._module.fail_json(msg="You must specify type=luks2 when creating a new luks device to use keyslots 8-31.")
+                elif not (0 <= self._module.params[param] <= 7):
+                    self._module.fail_json(msg="When not specifying a type, only the keyslots 0-7 are allowed.")
 
-def validate_keyslot(keyslot, luks_type):
-    if luks_type == 'luks1' and not 0 <= keyslot <= 7:
-        return False
-    elif luks_type == 'luks2' and not 0 <= keyslot <= 31:
-        return False
-    else:
-        return True
+            if luks_type == 'luks1' and not 0 <= self._module.params[param] <= 7:
+                self._module.fail_json(msg="%s must be between 0 and 7 when using luks1." % self._module.params[param])
+            elif luks_type == 'luks2' and not 0 <= self._module.params[param] <= 31:
+                self._module.fail_json(msg="%s must be between 0 and 31 when using luks2." % self._module.params[param])
 
 
 def run_module():
@@ -1014,21 +1018,16 @@ def run_module():
     if module.params['label'] is not None and module.params['type'] == 'luks1':
         module.fail_json(msg='You cannot combine type luks1 with the label option.')
 
-    if module.params['remove_keyslot'] is not None:
-        if module.params['keyfile'] is None and module.params['passphrase'] is None:
-            module.fail_json(msg='Removing a keyslot requires the passphrase or keyfile of another slot')
+    if module.params['keyslot'] is not None or module.params['new_keyslot'] is not None or module.params['remove_keyslot'] is not None:
+        luks_type = crypt.get_luks_type(conditions.get_device_name())
+        if luks_type is None and module.params['type'] is not None:
+            luks_type = module.params['type']
+        for param in ['keyslot', 'new_keyslot', 'remove_keyslot']:
+            conditions.validate_keyslot(param, luks_type)
 
-    luks_type = crypt.get_luks_type(conditions.get_device_name())
-    for parameter in ['keyslot', 'new_keyslot', 'remove_keyslot']:
-        if module.params[parameter] is not None and not validate_keyslot(module.params[parameter], luks_type):
-            if luks_type == 'luks1':
-                module.fail_json(msg='%s must be between 0 and 7 when using luks1' % (parameter))
-            else:
-                module.fail_json(msg='%s must be between 0 and 31 when using luks2' % (parameter))
-    if conditions.luks_create() and module.params['keyslot'] is not None and module.params['type'] is None:
-        keyslot = module.params['keyslot']
-        if validate_keyslot(keyslot, 'luks2') and not validate_keyslot(keyslot, 'luks1'):
-            module.fail_json(msg='You must specify type=luks2 when creating a new luks device to use keyslots 8-31')
+    for param in ['new_keyslot', 'remove_keyslot']:
+        if module.params[param] is not None and module.params['keyfile'] is None and module.params['passphrase'] is None:
+            module.fail_json(msg="Removing a keyslot requires the passphrase or keyfile of antoher slot.")
 
     # The conditions are in order to allow more operations in one run.
     # (e.g. create luks and add a key to it)

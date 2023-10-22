@@ -38,6 +38,12 @@
   ignore_errors: true
   become: true
   register: create_luks_slot8
+- assert:
+    that:
+    - create_luks1_slot8 is failed
+    - create_luks2_slot32 is failed
+    - create_luks_slot8 is failed
+
 - name: Check valid slot (luks2, 8)
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -48,7 +54,13 @@
     pbkdf:
       iteration_time: 0.1
   become: true
+  ignore_errors: true
   register: create_luks2_slot8
+- name: Make sure that the previous task only fails if LUKS2 is not supported
+  assert:
+    that:
+    - "'Unknown option --type' in create_luks2_slot8.msg"
+  when: create_luks2_slot8 is failed
 - name: Check add valid slot (no luks type, 10)
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -60,32 +72,8 @@
       iteration_time: 0.1
   become: true
   register: create_luks_slot10
+  when: create_luks2_slot8 is changed
 - assert:
     that:
-    - create_luks1_slot8 is failed
-    - create_luks2_slot32 is failed
-    - create_luks_slot8 is failed
-    - create_luks2_slot8 is changed
     - create_luks_slot10 is changed
-
-- name: Check remove slot 8 without key
-  luks_device:
-    device: "{{ cryptfile_device }}"
-    state: absent
-    remove_keyslot: 8
-  ignore_errors: true
-  become: true
-  register: kill_slot8_nokey
-- name: Check remove slot 8 with slot 8 key
-  luks_device:
-    device: "{{ cryptfile_device }}"
-    state: absent
-    remove_keyslot: 8
-    keyfile: "{{ remote_tmp_dir }}/keyfile1"
-  ignore_errors: true
-  become: true
-  register: kill_slot8_key_slot8
-- assert:
-    that:
-    - kill_slot8_nokey is failed
-    - kill_slot8_key_slot8 is failed
+  when: create_luks2_slot8 is changed
