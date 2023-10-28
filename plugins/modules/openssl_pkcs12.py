@@ -23,7 +23,7 @@ description:
     # Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0,
     # and will be removed in community.crypto (x+1).0.0.
 requirements:
-    - PyOpenSSL >= 0.15 or cryptography >= 3.0
+    - PyOpenSSL >= 0.15, < 23.3.0 or cryptography >= 3.0
 options:
     action:
         description:
@@ -270,11 +270,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '3.0'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
+MAXIMAL_PYOPENSSL_VERSION = '23.3.0'
 
 PYOPENSSL_IMP_ERR = None
 try:
     import OpenSSL
     from OpenSSL import crypto
+    from OpenSSL.crypto import load_pkcs12 as _load_pkcs12  # this got removed in pyOpenSSL 23.3.0
     PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
 except (ImportError, AttributeError):
     PYOPENSSL_IMP_ERR = traceback.format_exc()
@@ -637,7 +639,11 @@ def select_backend(module, backend):
     if backend == 'auto':
         # Detection what is possible
         can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        can_use_pyopenssl = PYOPENSSL_FOUND and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
+        can_use_pyopenssl = (
+            PYOPENSSL_FOUND and
+            PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION) and
+            PYOPENSSL_VERSION < LooseVersion(MAXIMAL_PYOPENSSL_VERSION)
+        )
 
         # If no restrictions are provided, first try cryptography, then pyOpenSSL
         if module.params['iter_size'] is not None or module.params['maciter_size'] is not None:
@@ -651,14 +657,17 @@ def select_backend(module, backend):
         # Success?
         if backend == 'auto':
             module.fail_json(msg=("Can't detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1})").format(
+                                  "cryptography (>= {0}) or PyOpenSSL (>= {1}, < {2})").format(
                                       MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION))
+                                      MINIMAL_PYOPENSSL_VERSION,
+                                      MAXIMAL_PYOPENSSL_VERSION))
 
     if backend == 'pyopenssl':
         if not PYOPENSSL_FOUND:
-            module.fail_json(msg=missing_required_lib('pyOpenSSL >= {0}'.format(MINIMAL_PYOPENSSL_VERSION)),
-                             exception=PYOPENSSL_IMP_ERR)
+            msg = missing_required_lib(
+                'pyOpenSSL >= {0}, < {1}'.format(MINIMAL_PYOPENSSL_VERSION, MAXIMAL_PYOPENSSL_VERSION)
+            )
+            module.fail_json(msg=msg, exception=PYOPENSSL_IMP_ERR)
         # module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
         #                  version='x.0.0', collection_name='community.crypto')
         return backend, PkcsPyOpenSSL(module)
