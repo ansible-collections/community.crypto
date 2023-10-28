@@ -305,7 +305,7 @@ EXAMPLES = r'''
   register: sample_com_challenge
 
 # Alternative first step:
-- name: Create a challenge for sample.com using a account key from hashi vault.
+- name: Create a challenge for sample.com using a account key from Hashi Vault.
   community.crypto.acme_certificate:
     account_key_content: "{{ lookup('hashi_vault', 'secret=secret/account_private_key:value') }}"
     csr: /etc/pki/cert/csr/sample.com.csr

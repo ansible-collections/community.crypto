@@ -114,7 +114,7 @@ def cryptography_get_extensions_from_cert(cert):
     try:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
-        # the extension parsing outselves.
+        # the extension parsing ourselves.
         backend = default_backend()
         try:
             # For certain old versions of cryptography, backend is a MultiBackend object,
@@ -166,7 +166,7 @@ def cryptography_get_extensions_from_csr(csr):
     try:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
-        # the extension parsing outselves.
+        # the extension parsing ourselves.
         backend = default_backend()
         try:
             # For certain old versions of cryptography, backend is a MultiBackend object,

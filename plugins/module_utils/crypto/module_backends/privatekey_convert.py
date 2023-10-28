@@ -106,7 +106,7 @@ class PrivateKeyConvertBackend:
 
     @abc.abstractmethod
     def _load_private_key(self, data, passphrase, current_hint=None):
-        """Check whether data cna be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
+        """Check whether data can be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
         pass
 
     def needs_conversion(self):

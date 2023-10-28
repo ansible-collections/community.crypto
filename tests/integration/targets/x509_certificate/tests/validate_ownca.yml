@@ -15,7 +15,7 @@
   shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_cert_issuer
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certficate version == default == 3)
+- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certificate version == default == 3)
   shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert_version
 

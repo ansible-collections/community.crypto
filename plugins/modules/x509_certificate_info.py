@@ -52,7 +52,7 @@ options:
         description:
             - A dict of names mapping to time specifications. Every time specified here
               will be checked whether the certificate is valid at this point. See the
-              RV(valid_at) return value for informations on the result.
+              RV(valid_at) return value for information on the result.
             - Time can be specified either as relative time or as absolute timestamp.
             - Time will always be interpreted as UTC.
             - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer

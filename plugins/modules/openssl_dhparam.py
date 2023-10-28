@@ -193,7 +193,7 @@ class DHParameterBase(object):
         """Generate DH params."""
         changed = False
 
-        # ony generate when necessary
+        # only generate when necessary
         if self.force or not self._check_params_valid(module):
             self._do_generate(module)
             changed = True
