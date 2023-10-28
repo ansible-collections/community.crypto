@@ -96,7 +96,7 @@ options:
               obtained using O(request_type).
             - If O(request_type=renew), a renewal will fail if the certificate being renewed has been issued within the past 30 days, so do not set a
               O(remaining_days) value that is within 30 days of the full lifetime of the certificate being acted upon.
-            - For exmaple, if you are requesting Certificates with a 90 day lifetime, do not set O(remaining_days) to a value V(60) or higher).
+            - For example, if you are requesting Certificates with a 90 day lifetime, do not set O(remaining_days) to a value V(60) or higher).
             - The O(force) option may be used to ensure that a new certificate is always obtained.
         type: int
         default: 30

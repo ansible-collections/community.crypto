@@ -71,8 +71,8 @@ EXAMPLES = r'''
 - name: (1/2) Generate an OpenSSL Certificate with the CSR provided inline
   community.crypto.x509_certificate_pipe:
     provider: ownca
-    content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.crt') }}"
-    csr_content: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.csr') }}"
+    content: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com.crt') }}"
+    csr_content: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com.csr') }}"
     ownca_cert: /path/to/ca_cert.crt
     ownca_privatekey: /path/to/ca_cert.key
     ownca_privatekey_passphrase: hunter2

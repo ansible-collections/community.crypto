@@ -31,7 +31,7 @@
         valid_to: forever
         check_mode: true
         changed: true
-      - test_name: Generate cert - force option (idemopotent, check mode)
+      - test_name: Generate cert - force option (idempotent, check mode)
         force: true
         type: user
         valid_from: always

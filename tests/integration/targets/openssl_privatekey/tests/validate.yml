@@ -74,7 +74,7 @@
   shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey5
   # Current version of OS/X that runs in the CI (10.11) does not have an up to date version of the OpenSSL library
-  # leading to this test to fail when run in the CI. However, this test has been run for 10.12 and has returned succesfully.
+  # leading to this test to fail when run in the CI. However, this test has been run for 10.12 and has returned successfully.
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (assert - Passphrase protected key + idempotence)"

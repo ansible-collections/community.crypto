@@ -56,7 +56,7 @@ releases:
       - openssl_certificate - Add option for changing which ACME directory to use
         with acme-tiny. Set the default ACME directory to Let's Encrypt instead of
         using acme-tiny's default. (acme-tiny also uses Let's Encrypt at the time
-        being, so no action should be neccessary.)
+        being, so no action should be necessary.)
       - openssl_certificate - Change the required version of acme-tiny to >= 4.0.0
       - openssl_certificate - allow to provide content of some input files via the
         ``csr_content``, ``privatekey_content``, ``ownca_privatekey_content`` and
@@ -247,8 +247,8 @@ releases:
       minor_changes:
       - openssh_cert - add module parameter ``use_agent`` to enable using signing
         keys stored in ssh-agent (https://github.com/ansible-collections/community.crypto/issues/116).
-      - openssl_csr - refactor module to allow code re-use by openssl_csr_pipe (https://github.com/ansible-collections/community.crypto/pull/123).
-      - openssl_privatekey - refactor module to allow code re-use by openssl_privatekey_pipe
+      - openssl_csr - refactor module to allow code reuse by openssl_csr_pipe (https://github.com/ansible-collections/community.crypto/pull/123).
+      - openssl_privatekey - refactor module to allow code reuse by openssl_privatekey_pipe
         (https://github.com/ansible-collections/community.crypto/pull/119).
       - openssl_privatekey - the elliptic curve ``secp192r1`` now triggers a security
         warning. Elliptic curves of at least 224 bits should be used for new keys;
@@ -258,7 +258,7 @@ releases:
         anymore. If no CSR is provided, the module behaves as if a minimal CSR which
         only contains the public key has been provided (https://github.com/ansible-collections/community.crypto/issues/32,
         https://github.com/ansible-collections/community.crypto/pull/129).
-      - x509_certificate - refactor module to allow code re-use by x509_certificate_pipe
+      - x509_certificate - refactor module to allow code reuse by x509_certificate_pipe
         (https://github.com/ansible-collections/community.crypto/pull/135).
       release_summary: 'Contains new modules ``openssl_privatekey_pipe``, ``openssl_csr_pipe``
         and ``x509_certificate_pipe`` which allow to create or update private keys,
@@ -419,7 +419,7 @@ releases:
         https://github.com/ansible-collections/community.crypto/pull/150).
       - openssl_csr_info - now returns ``public_key_type`` and ``public_key_data``
         (https://github.com/ansible-collections/community.crypto/pull/233).
-      - openssl_csr_info - refactor module to allow code re-use for diff mode (https://github.com/ansible-collections/community.crypto/pull/204).
+      - openssl_csr_info - refactor module to allow code reuse for diff mode (https://github.com/ansible-collections/community.crypto/pull/204).
       - openssl_csr_pipe - add diff mode (https://github.com/ansible-collections/community.crypto/issues/38,
         https://github.com/ansible-collections/community.crypto/pull/150).
       - openssl_pkcs12 - added option ``select_crypto_backend`` and a ``cryptography``
@@ -427,7 +427,7 @@ releases:
         ``iter_size`` and ``maciter_size`` options (https://github.com/ansible-collections/community.crypto/pull/234).
       - openssl_privatekey - add diff mode (https://github.com/ansible-collections/community.crypto/issues/38,
         https://github.com/ansible-collections/community.crypto/pull/150).
-      - openssl_privatekey_info - refactor module to allow code re-use for diff mode
+      - openssl_privatekey_info - refactor module to allow code reuse for diff mode
         (https://github.com/ansible-collections/community.crypto/pull/205).
       - openssl_privatekey_pipe - add diff mode (https://github.com/ansible-collections/community.crypto/issues/38,
         https://github.com/ansible-collections/community.crypto/pull/150).
@@ -437,7 +437,7 @@ releases:
         https://github.com/ansible-collections/community.crypto/pull/150).
       - x509_certificate_info - now returns ``public_key_type`` and ``public_key_data``
         (https://github.com/ansible-collections/community.crypto/pull/233).
-      - x509_certificate_info - refactor module to allow code re-use for diff mode
+      - x509_certificate_info - refactor module to allow code reuse for diff mode
         (https://github.com/ansible-collections/community.crypto/pull/206).
       - x509_certificate_pipe - add diff mode (https://github.com/ansible-collections/community.crypto/issues/38,
         https://github.com/ansible-collections/community.crypto/pull/150).
@@ -445,7 +445,7 @@ releases:
         https://github.com/ansible-collections/community.crypto/pull/150).
       - x509_crl_info - add ``list_revoked_certificates`` option to avoid enumerating
         all revoked certificates (https://github.com/ansible-collections/community.crypto/pull/232).
-      - x509_crl_info - refactor module to allow code re-use for diff mode (https://github.com/ansible-collections/community.crypto/pull/203).
+      - x509_crl_info - refactor module to allow code reuse for diff mode (https://github.com/ansible-collections/community.crypto/pull/203).
       release_summary: Regular feature and bugfix release.
     fragments:
     - 1.7.0.yml
@@ -1023,7 +1023,7 @@ releases:
         be installed by pip by specifying something like ``cryptography >= 37.0.0``
         in your Execution Environment's Python dependencies file (https://github.com/ansible-collections/community.crypto/pull/440).
       - Support automatic conversion for Internalionalized Domain Names (IDNs). When
-        passing general names, for example Subject Altenative Names to ``community.crypto.openssl_csr``,
+        passing general names, for example Subject Alternative Names to ``community.crypto.openssl_csr``,
         these will automatically be converted to IDNA. Conversion will be done per
         label to IDNA2008 if possible, and IDNA2003 if IDNA2008 conversion fails for
         that label. Note that IDNA conversion requires `the Python idna library <https://pypi.org/project/idna/>`_
