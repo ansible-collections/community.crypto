@@ -78,7 +78,7 @@ EXAMPLES = '''
 # certificates, finds the associated root certificate.
 - name: Find root certificate
   community.crypto.certificate_complete_chain:
-    input_chain: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com-fullchain.pem') }}"
+    input_chain: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com-fullchain.pem') }}"
     root_certificates:
     - /etc/ca-certificates/
   register: www_ansible_com
@@ -91,7 +91,7 @@ EXAMPLES = '''
 # certificates, finds the associated root certificate.
 - name: Find root certificate
   community.crypto.certificate_complete_chain:
-    input_chain: "{{ lookup('file', '/etc/ssl/csr/www.ansible.com.pem') }}"
+    input_chain: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com.pem') }}"
     intermediate_certificates:
     - /etc/ssl/csr/www.ansible.com-chain.pem
     root_certificates:
