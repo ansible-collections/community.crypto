@@ -712,6 +712,16 @@ releases:
     - 1.9.22.yml
     - 598-openssh_keypair-generate-new-key.yml
     release_date: '2023-06-15'
+  1.9.23:
+    changes:
+      bugfixes:
+      - openssl_pkcs12 - modify autodetect to not detect pyOpenSSL >= 23.3.0, which
+        removed PKCS#12 support (https://github.com/ansible-collections/community.crypto/pull/666).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.23.yml
+    - pkcs12.yml
+    release_date: '2023-10-29'
   1.9.3:
     changes:
       bugfixes:

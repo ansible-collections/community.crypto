@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.23
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- openssl_pkcs12 - modify autodetect to not detect pyOpenSSL >= 23.3.0, which removed PKCS#12 support (https://github.com/ansible-collections/community.crypto/pull/666).
+
 v1.9.22
 =======
 
