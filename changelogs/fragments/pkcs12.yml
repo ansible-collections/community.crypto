@@ -1,2 +1,0 @@
-bugfixes:
-  - "openssl_pkcs12 - modify autodetect to not detect pyOpenSSL >= 23.3.0, which removed PKCS#12 support (https://github.com/ansible-collections/community.crypto/pull/666)."
