@@ -269,6 +269,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-keyslot"><strong>keyslot</strong></p>
+<a class="ansibleOptionLink" href="#parameter-keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Adds the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> to a specific keyslot when creating a new container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Parameter value is the number of the keyslot.</p>
+<p><strong>Note</strong> that a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks1</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">7</span></code> and a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks2</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code>. In order to use the keyslots <code class="ansible-value docutils literal notranslate"><span class="pre">8</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code> when creating a new container, setting <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">luks2</span></code> is required.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-label"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-label"><strong>label</strong></p>
 <a class="ansibleOptionLink" href="#parameter-label" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -278,20 +287,29 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>This cannot be specified if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">luks1</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Sets container name when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=opened</span></span></a></code>. Can be used instead of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> when closing the existing container (that is, when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=closed</span></span></a></code>).</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-keyfile"><strong>new_keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Adds additional key to given container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Needs <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> option for authorization. LUKS container supports up to 8 keyslots. Parameter value is the path to the keyfile with the passphrase.</p>
 <p>NOTE that adding additional keys is idempotent only since community.crypto 1.4.0. For older versions, a new keyslot will be used even if another keyslot already exists for this keyfile.</p>
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-new_keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-keyslot"><strong>new_keyslot</strong></p>
+<a class="ansibleOptionLink" href="#parameter-new_keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Adds the additional <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-new-keyfile"><span class="std std-ref"><span class="pre">new_keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-new-passphrase"><span class="std std-ref"><span class="pre">new_passphrase</span></span></a></strong></code> to a specific keyslot on the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Parameter value is the number of the keyslot.</p>
+<p><strong>Note</strong> that a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks1</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">7</span></code> and a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks2</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -452,6 +470,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-remove_keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-keyslot"><strong>remove_keyslot</strong></p>
+<a class="ansibleOptionLink" href="#parameter-remove_keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Removes the key in the given slot on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Needs <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> for authorization.</p>
+<p><strong>Note</strong> that a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks1</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">7</span></code> and a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks2</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code>.</p>
+<p><strong>Note</strong> that the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> must not be in the slot to be removed.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-remove_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-passphrase"><strong>remove_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remove_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -461,7 +489,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>NOTE that to remove the last keyslot from a LUKS container, the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><span class="std std-ref"><span class="pre">force_remove_last_key</span></span></a></strong></code> option must be set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-sector_size"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-sector-size"><strong>sector_size</strong></p>
 <a class="ansibleOptionLink" href="#parameter-sector_size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.5.0</em></p>
@@ -470,7 +498,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Will only be used on container creation.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -488,7 +516,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-type"><strong>type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -501,7 +529,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-uuid"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-uuid"><strong>uuid</strong></p>
 <a class="ansibleOptionLink" href="#parameter-uuid" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -641,6 +669,26 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
 <span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">luks2</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a container with key in slot 4</span>
+<span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Add a new key in slot 5</span>
+<span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">new_keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove the key from slot 4 (given keyfile must not be slot 4)</span>
+<span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">remove_keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 </pre></div>
 </div>
 </section>
