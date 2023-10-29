@@ -148,16 +148,16 @@ LUKS_ADD_KEY_DATA = (
 
 # device, remove_key, remove_passphrase, state, label, expected
 LUKS_REMOVE_KEY_DATA = (
-    ("dummy", "key", None, "present", None, True),
-    (None, "key", None, "present", None, False),
-    (None, "key", None, "present", "labelName", True),
-    ("dummy", None, None, "present", None, False),
-    ("dummy", "key", None, "absent", None, "exception"),
-    ("dummy", None, "foo", "present", None, True),
-    (None, None, "foo", "present", None, False),
-    (None, None, "foo", "present", "labelName", True),
-    ("dummy", None, None, "present", None, False),
-    ("dummy", None, "foo", "absent", None, "exception"))
+    ("dummy", "key", None, None, "present", None, True),
+    (None, "key", None, None, "present", None, False),
+    (None, "key", None, None, "present", "labelName", True),
+    ("dummy", None, None, None, "present", None, False),
+    ("dummy", "key", None, None, "absent", None, "exception"),
+    ("dummy", None, "foo", None, "present", None, True),
+    (None, None, "foo", None, "present", None, False),
+    (None, None, "foo", None, "present", "labelName", True),
+    ("dummy", None, None, None, "present", None, False),
+    ("dummy", None, "foo", None, "absent", None, "exception"))
 
 
 @pytest.mark.parametrize("device, keyfile, passphrase, state, is_luks, " +
@@ -291,17 +291,18 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, remove_keyfile, remove_passphrase, state, " +
-                         "label, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5])
+@pytest.mark.parametrize("device, remove_keyfile, remove_passphrase, remove_keyslot, " +
+                         "state, label, expected",
+                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6])
                           for d in LUKS_REMOVE_KEY_DATA))
-def test_luks_remove_key(device, remove_keyfile, remove_passphrase, state,
+def test_luks_remove_key(device, remove_keyfile, remove_passphrase, remove_keyslot, state,
                          label, expected, monkeypatch):
 
     module = DummyModule()
     module.params["device"] = device
     module.params["remove_keyfile"] = remove_keyfile
     module.params["remove_passphrase"] = remove_passphrase
+    module.params["remove_keyslot"] = remove_keyslot
     module.params["state"] = state
     module.params["label"] = label
 

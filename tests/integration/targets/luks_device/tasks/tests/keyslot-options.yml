@@ -1,0 +1,79 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check invalid slot (luks1, 8)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    type: luks1
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 8
+    pbkdf:
+      iteration_time: 0.1
+  ignore_errors: true
+  become: true
+  register: create_luks1_slot8
+- name: Check invalid slot (luks2, 32)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    type: luks2
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 32
+    pbkdf:
+      iteration_time: 0.1
+  ignore_errors: true
+  become: true
+  register: create_luks2_slot32
+- name: Check invalid slot (no luks type, 8)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 8
+    pbkdf:
+      iteration_time: 0.1
+  ignore_errors: true
+  become: true
+  register: create_luks_slot8
+- assert:
+    that:
+    - create_luks1_slot8 is failed
+    - create_luks2_slot32 is failed
+    - create_luks_slot8 is failed
+
+- name: Check valid slot (luks2, 8)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    type: luks2
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 8
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  ignore_errors: true
+  register: create_luks2_slot8
+- name: Make sure that the previous task only fails if LUKS2 is not supported
+  assert:
+    that:
+    - "'Unknown option --type' in create_luks2_slot8.msg"
+  when: create_luks2_slot8 is failed
+- name: Check add valid slot (no luks type, 10)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyslot: 10
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: create_luks_slot10
+  when: create_luks2_slot8 is changed
+- assert:
+    that:
+    - create_luks_slot10 is changed
+  when: create_luks2_slot8 is changed

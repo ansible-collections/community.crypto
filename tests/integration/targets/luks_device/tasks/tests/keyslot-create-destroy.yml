@@ -1,0 +1,178 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create luks with keyslot 4 (check)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 4
+    pbkdf:
+      iteration_time: 0.1
+  check_mode: true
+  become: true
+  register: create_luks_slot4_check
+- name: Create luks with keyslot 4
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 4
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: create_luks_slot4
+- name: Create luks with keyslot 4 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 4
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: create_luks_slot4_idem
+- name: Create luks with keyslot 4 (idempotent, check)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    keyslot: 4
+    pbkdf:
+      iteration_time: 0.1
+  check_mode: true
+  become: true
+  register: create_luks_slot4_idem_check
+- name: Dump luks header
+  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  become: true
+  register: luks_header_slot4
+- assert:
+    that:
+    - create_luks_slot4_check is changed
+    - create_luks_slot4 is changed
+    - create_luks_slot4_idem is not changed
+    - create_luks_slot4_idem_check is not changed
+    - "'Key Slot 4: ENABLED' in luks_header_slot4.stdout or '4: luks2' in luks_header_slot4.stdout"
+
+- name: Add key in slot 2 (check)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyslot: 2
+    pbkdf:
+      iteration_time: 0.1
+  check_mode: true
+  become: true
+  register: add_luks_slot2_check
+- name: Add key in slot 2
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyslot: 2
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: add_luks_slot2
+- name: Add key in slot 2 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyslot: 2
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: add_luks_slot2_idem
+- name: Add key in slot 2 (idempotent, check)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyslot: 2
+    pbkdf:
+      iteration_time: 0.1
+  check_mode: true
+  become: true
+  register: add_luks_slot2_idem_check
+- name: Dump luks header
+  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  become: true
+  register: luks_header_slot2
+- assert:
+    that:
+    - add_luks_slot2_check is changed
+    - add_luks_slot2 is changed
+    - add_luks_slot2_idem is not changed
+    - add_luks_slot2_idem_check is not changed
+    - "'Key Slot 2: ENABLED' in luks_header_slot2.stdout or '2: luks2' in luks_header_slot2.stdout"
+
+- name: Check remove slot 4 without key
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    remove_keyslot: 4
+  ignore_errors: true
+  become: true
+  register: kill_slot4_nokey
+- name: Check remove slot 4 with slot 4 key
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    remove_keyslot: 4
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+  ignore_errors: true
+  become: true
+  register: kill_slot4_key_slot4
+- assert:
+    that:
+    - kill_slot4_nokey is failed
+    - kill_slot4_key_slot4 is failed
+
+- name: Remove key in slot 4 (check)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyslot: 4
+  check_mode: true
+  become: true
+  register: kill_luks_slot4_check
+- name: Remove key in slot 4
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyslot: 4
+  become: true
+  register: kill_luks_slot4
+- name: Remove key in slot 4 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyslot: 4
+  become: true
+  register: kill_luks_slot4_idem
+- name: Remove key in slot 4 (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyslot: 4
+  check_mode: true
+  become: true
+  register: kill_luks_slot4_idem_check
+- name: Dump luks header
+  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  become: true
+  register: luks_header_slot4_removed
+- assert:
+    that:
+    - kill_luks_slot4_check is changed
+    - kill_luks_slot4 is changed
+    - kill_luks_slot4_idem is not changed
+    - kill_luks_slot4_idem_check is not changed
+    - "'Key Slot 4: DISABLED' in luks_header_slot4_removed.stdout or not '4: luks' in luks_header_slot4_removed.stdout"
