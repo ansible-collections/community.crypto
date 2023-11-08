@@ -1,0 +1,341 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+## Verify that integration_config was specified
+- block:
+  - assert:
+      that:
+        - cagw_api_client_cert_path is defined
+        - cagw_api_client_cert_key_path is defined
+        - entrust_cagw_api_specification_path is defined
+
+## SET UP TEST ENVIRONMENT ########################################################################
+- name: Clear out the temporary directory for storing the API connection information
+  file:
+    path: '{{ tmpdir_path }}'
+    state: absent
+
+- name: Create a directory for storing the API connection Information
+  file:
+    path: '{{ tmpdir_path }}'
+    state: directory
+
+- name: Copy the files needed for the connection to entrust API to the host
+  copy:
+    src: '{{ cagw_api_client_cert_path }}'
+    dest: '{{ entrust_cagw_api_cert }}'
+
+- name: Copy the files needed for the connection to entrust API to the host
+  copy:
+    src: '{{ cagw_api_client_cert_key_path }}'
+    dest: '{{ entrust_cagw_api_cert_key }}'
+
+- name: Copy the files needed for the connection to entrust API to the host
+  copy:
+    src: '{{ entrust_cagw_api_specification_path }}'
+    dest: '{{ cagw_api_specification_path }}'
+
+## SETUP CSR TO REQUEST
+- name: Generate a 2048 bit RSA private key
+  openssl_privatekey:
+    path: '{{ privatekey_path }}'
+    passphrase: '{{ privatekey_passphrase }}'
+    cipher: auto
+    type: RSA
+    size: 2048
+
+- name: Generate a certificate signing request using the generated key
+  openssl_csr:
+    path: '{{ csr_path }}'
+    privatekey_path: '{{ privatekey_path }}'
+    privatekey_passphrase: '{{ privatekey_passphrase }}'
+    common_name: '{{ common_name }}'
+    organization_name: '{{ organization_name | default(omit) }}'
+    locality_name: '{{ locality_name }}'
+    country_name: '{{ country_name | default(omit) }}'
+    state_or_province_name: '{{ state_or_province_name | default(omit) }}'
+    digest: sha256
+
+- name: Generate a certificate signing request for Microsoft CA using the generated key
+  openssl_csr:
+    path: '{{ example11_csr_path }}'
+    privatekey_path: '{{ privatekey_path }}'
+    privatekey_passphrase: '{{ privatekey_passphrase }}'
+    subject: 'CN=sapnaMSCA,DC=igqatestca,DC=dev,DC=datacard,DC=com'
+    digest: sha256
+
+- block:
+  - name: Request a signed certificate from SM via Entrust CAGW with bare minimum parameters
+    entrust_cagw_certificate:
+      path: '{{ example1_cert_path }}'
+      csr: '{{ csr_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      certificate_profile_id: '{{ example1_profile_id }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      request_type: '{{ example1_request_type }}'
+      enrollment_format: '{{ example1_enrollment_format }}'
+      connector_name: SM
+      force: '{{ force }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example1_result
+
+  - assert:
+      that:
+        - example1_result is not failed
+        - example1_result.changed
+        - example1_result.serialNumber is string
+        - example1_result.message.message is match("Enrollment was successful.")
+
+  - name: Request a signed certificate from SM via Entrust CAGW with subjectAltName and custom_field parameters
+    entrust_cagw_certificate:
+      path: '{{ example2_cert_path }}'
+      csr: '{{ csr_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      certificate_profile_id: '{{ example1_profile_id }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      request_type: '{{ example1_request_type }}'
+      enrollment_format: '{{ example1_enrollment_format }}'
+      connector_name: SM
+      subject_alt_name:
+        dNSName: '{{ example2_dNSName }}'
+        iPAddress: '{{ example2_iPAddress }}'
+        directoryName: '{{ example2_directoryName }}'
+        uniformResourceIdentifier: '{{ example2_uniformResourceIdentifier }}'
+      custom_fields:
+        text1: '{{ entrust_text1 }}'
+        text2: '{{ entrust_text2 }}'
+        number1: '{{ entrust_number1 }}'
+        date1: '{{ entrust_date1 }}'
+        email1: '{{ entrust_email1 }}'
+      force: '{{ force }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example2_result
+
+  - assert:
+      that:
+        - example2_result is not failed
+        - example2_result.changed
+        - example2_result.serialNumber is string
+        - example2_result.message.message is match("Enrollment was successful.")
+
+  - name: Get an already issued certificate from CAGW with valid serial num in hexadecimal format
+    entrust_cagw_certificate:
+      path: '{{ example3_cert_path }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      request_type: '{{ example3_request_type }}'
+      serial_no: "{{ example2_result['serialNumber'] }}"
+      validate_certs: '{{ validate_certs }}'
+    register: example3_result
+
+  - assert:
+      that:
+        - example3_result is not failed
+        - example3_result.cert_details.status is match("normal")
+
+
+  - name: Request a PKCS12 from Entrust CAGW
+    entrust_cagw_certificate:
+      path: '{{ example4_cert_path }}'
+      dn: '{{ example4_dn }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example4_ca_id }}'
+      certificate_profile_id: '{{ example4_profile_id }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      request_type: '{{ example4_request_type }}'
+      enrollment_format: '{{ example4_enrollment_format }}'
+      connector_name: SM
+      p12_protection_password: '{{ example4_p12_password }}'
+      force: '{{ force }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example4_result
+
+  - assert:
+      that:
+        - example4_result is not failed
+        - example4_result.changed
+        - example4_result.cert_status is match("ACCEPTED")
+        - example4_result.message.message is match("Enrollment was successful.")
+
+  - name: Request a new SSL certificate from ECS via CAGW with bare minimum parameters.  Will request a new certificate
+    entrust_cagw_certificate:
+      path: '{{ example5_cert_path }}'
+      csr: '{{ csr_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example5_ca_id }}'
+      certificate_profile_id: '{{ example5_profile_id }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      request_type: '{{ example5_request_type }}'
+      enrollment_format: '{{ example5_enrollment_format }}'
+      connector_name: ECS
+      requester_name: '{{ entrust_requester_name }}'
+      requester_email: '{{ entrust_requester_email }}'
+      requester_phone: '{{ entrust_requester_phone }}'
+      force: '{{ force }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example5_result
+
+  - assert:
+      that:
+        - example5_result is not failed
+        - example5_result.changed
+        - example5_result.serialNumber is string
+        - example5_result.message.message is match("Enrollment was successful.")
+
+  - name: Take an action(HoldAction) on certificate already recieved from CAGW
+    entrust_cagw_certificate:
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      request_type: '{{ example6_request_type }}'
+      action_type: '{{ example6_action_type }}'
+      action_reason: '{{ example6_action_reason }}'
+      serial_no: "{{ example2_result['serialNumber'] }}"
+      validate_certs: '{{ validate_certs }}'
+    register: example6_result
+
+  - assert:
+      that:
+        - example6_result is not failed
+        - example6_result.cert_details.status is match("COMPLETED")
+
+  - name: Take an action(UnholdAction) on certificate already recieved from CAGW
+    entrust_cagw_certificate:
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      request_type: '{{ example7_request_type }}'
+      action_type: '{{ example7_action_type }}'
+      action_reason: '{{ example7_action_reason }}'
+      serial_no: "{{ example2_result['serialNumber'] }}"
+      validate_certs: '{{ validate_certs }}'
+    register: example7_result
+
+  - assert:
+      that:
+        - example7_result is not failed
+        - example7_result.cert_details.status is match("COMPLETED")
+
+  - name: Take an action(RevokeAction) on certificate already recieved from CAGW
+    entrust_cagw_certificate:
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      request_type: '{{ example8_request_type }}'
+      action_type: '{{ example8_action_type }}'
+      action_reason: '{{ example8_action_reason }}'
+      serial_no: "{{ example1_result['serialNumber'] }}"
+      validate_certs: '{{ validate_certs }}'
+    register: example8_result
+
+  - assert:
+      that:
+        - example8_result is not failed
+        - example8_result.cert_details.status is match("COMPLETED")
+
+  - name: Get a revoked certificate from CAGW
+    entrust_cagw_certificate:
+      path: '{{ example9_cert_path }}'
+      cagw_api_client_cert_path: '{{ entrust_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ entrust_cagw_api_cert_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      host: '{{ entrust_host }}'
+      port: '{{ entrust_port }}'
+      certificate_authority_id: '{{ example1_ca_id }}'
+      request_type: '{{ example9_request_type }}'
+      serial_no: "{{ example1_result['serialNumber'] }}"
+      validate_certs: '{{ validate_certs }}'
+    register: example9_result
+
+  - assert:
+      that:
+        - example9_result is not failed
+        - example9_result.cert_details.status is match("revoked")
+
+  - name: Enroll a certificate from PKIaas CA via Entrust CAGW
+    entrust_cagw_certificate:
+      path: '{{ example10_cert_path }}'
+      csr: '{{ csr_path }}'
+      host: '{{ example10_entrust_host }}'
+      certificate_authority_id: '{{ example10_ca_id }}'
+      certificate_profile_id: '{{ example10_profile_id }}'
+      request_type: '{{ example10_request_type }}'
+      enrollment_format: '{{ example10_enrollment_format }}'
+      connector_name: PKIaaS
+      dn: 'CN=SapnaTestCert,O=FG Corp,OU=CHUB DEV,L=Gander,ST=Newfoundland and Labrador,C=CA'
+      cagw_api_client_cert_path: '{{ example10_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ example10_cagw_api_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example10_result
+
+  - assert:
+      that:
+        - example10_result is not failed
+        - example10_result.changed
+        - example10_result.serialNumber is string
+        - example10_result.message.message is match("Enrollment was successful.")
+
+  - name: Enroll a certificate from Microsoft CA via Entrust CAGW
+    entrust_cagw_certificate:
+      path: '{{ example11_cert_path }}'
+      csr: '{{ example11_csr_path }}'
+      host: '{{ example11_entrust_host }}'
+      port: '{{ example11_entrust_port }}'
+      certificate_authority_id: '{{ example11_ca_id }}'
+      certificate_profile_id: '{{ example11_profile_id }}'
+      request_type: '{{ example11_request_type }}'
+      enrollment_format: '{{ example11_enrollment_format }}'
+      connector_name: MSCA
+      cagw_api_client_cert_path: '{{ example11_cagw_api_cert }}'
+      cagw_api_client_cert_key_path: '{{ example11_cagw_api_key }}'
+      cagw_api_specification_path: '{{ cagw_api_specification_path }}'
+      validate_certs: '{{ validate_certs }}'
+    register: example11_result
+
+  - assert:
+      that:
+        - example11_result is not failed
+        - example11_result.changed
+        - example11_result.serialNumber is string
+        - example11_result.message.message is match("Enrollment was successful.")
+
+  always:
+    - name: clean-up temporary folder
+      file:
+        path: '{{ tmpdir_path }}'
+        state: absent
