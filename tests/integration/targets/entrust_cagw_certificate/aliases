@@ -1,0 +1,9 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Example integation_config.yml
+# ---
+# cagw_api_client_cert_path: /var/integration-testing/publicCert.pem
+# cagw_api_client_cert_key_path: /var/integration-testing/privateKey.pem
+# entrust_cagw_api_specification_path: /var/integration-testing/cagw-api.yml
