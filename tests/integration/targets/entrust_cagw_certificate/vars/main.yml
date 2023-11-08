@@ -1,0 +1,118 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# vars file for test_entrust_cagw_certificate
+
+# Path on various hosts that cacerts need to be put as a prerequisite to API server cert validation.
+# May need to be customized for some environments based on SSL implementations
+# that ansible "urls" module utility is using as a backing.
+cacerts_bundle_path: /etc/pki/tls/certs
+
+common_name: Default Company Ltd
+organization_name: CEG
+locality_name: Kanata
+country_name: CA
+state_or_province_name: ontario
+privatekey_passphrase: Passphrase2525!
+tmpdir_path: /tmp/entrust_cagw_cert_test/{{ ansible_date_time.epoch }}
+privatekey_path: '{{ tmpdir_path }}/testcertificates.key'
+entrust_cagw_api_cert: '{{ tmpdir_path }}/authcert.cer'
+entrust_cagw_api_cert_key: '{{ tmpdir_path }}/authkey.cer'
+csr_path: '{{ tmpdir_path }}/request.csr'
+cagw_api_specification_path: '{{ tmpdir_path }}/api_spec.yml'
+
+
+entrust_requester_name: Sapna Jain
+entrust_requester_email: sapna.jain@entrust.com
+entrust_requester_phone: 1-613-555-5555  # e.g. 16135555555
+entrust_tracking_info: 3-232-32
+remaining_days: 30
+force: true
+entrust_text1: Admin
+entrust_text2: Invoice 25
+entrust_number1: 342
+entrust_date1: 2018-01-01
+entrust_email1: sales@ansible.testcertificates.com
+validate_certs: False
+entrust_host: 10.1.188.25
+entrust_port: 8080
+
+# TEST 1
+example1_cert_path: '{{ tmpdir_path }}/issuedcert_1.pem'
+example1_request_type: new
+example1_enrollment_format: X509
+#example1_ca_id: cafedbf4a48d40dd99c3ce9fba7e14e0
+#example1_profile_id: c7a08b56-5aa0-11eb-ae93-0242ac130002
+example1_ca_id: CA02
+example1_profile_id: ent_wstep_sig
+
+# TEST 2
+example2_cert_path: '{{ tmpdir_path }}/issuedcert_2.pem'
+example2_dNSName: dmspsjAnsibleSSL.idm.dev.entrust.com
+example2_iPAddress: 10.1.140.145
+example2_directoryName: cn=john doe,o=example inc,c=us
+example2_uniformResourceIdentifier: http://example.com/
+
+# TEST 3
+example3_cert_path: '{{ tmpdir_path }}/issuedcert_3.pem'
+example3_request_type: get
+
+# TEST 4
+example4_cert_path: '{{ tmpdir_path }}/issuedcert_4.pem'
+example4_request_type: new
+example4_enrollment_format: PKCS12
+example4_ca_id: CA02
+example4_profile_id: ent_mdm_p12_enc
+example4_p12_password: Entrust@2018
+example4_dn: CN=dmspsjAnsibleSSL.idm.dev.entrust.com,O=entrust,C=CA
+
+#TEST 5
+example5_cert_path: '{{ tmpdir_path }}/issuedcert_5.pem'
+example5_request_type: new
+example5_enrollment_format: X509
+example5_ca_id: ecs-ca-class3
+example5_profile_id: class3-ecs-cds-ent-lite
+
+#TEST 6
+example6_request_type: action
+example6_action_type: HoldAction
+example6_action_reason: Certificate is not valid anymore
+
+#TEST 7
+example7_request_type: action
+example7_action_type: UnholdAction
+example7_action_reason: Certificate can be unheld
+
+#TEST 8
+example8_request_type: action
+example8_action_type: RevokeAction
+example8_action_reason: unspecified
+
+#TEST 9
+example9_request_type: get
+example9_cert_path: '{{ tmpdir_path }}/issuedcert_9.pem'
+
+# TEST 10
+example10_entrust_host: cagw.pkiaas.entrust.com
+example10_dn: /C=CA/ST=Newfoundland\ and\ Labrador/L=Gander/O=FG\ Corp/OU=CHUB\ DEV/CN=QATestRunCreate
+example10_cert_path: '{{ tmpdir_path }}/issuedcert_10.pem'
+example10_request_type: new
+example10_enrollment_format: X509
+example10_ca_id: ecsyv8zyvohnb7~odegsifgpbupnc
+example10_profile_id: privatessl-tls-server
+example10_cagw_api_cert: /tmp/cert_pkiaas.pem
+example10_cagw_api_key: /tmp/key_pkiaas.pem
+
+# TEST 11
+example11_entrust_host: 10.1.140.40
+example11_entrust_port: 8080
+example11_csr_path: '{{ tmpdir_path }}/msca.csr'
+example11_cert_path: '{{ tmpdir_path }}/issuedcert_11.pem'
+example11_request_type: new
+example11_enrollment_format: X509
+example11_ca_id: msca-zuosheng
+example11_profile_id: IG-Dual-Usage
+example11_cagw_api_cert: /tmp/cert_msca.pem
+example11_cagw_api_key: /tmp/key_msca.pem
