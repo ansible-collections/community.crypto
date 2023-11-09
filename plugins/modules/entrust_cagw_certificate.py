@@ -32,13 +32,11 @@ options:
             - If there is already an Entrust certificate at this location, it will be replaced always.
             - If enrollment_format is PKCS12 then it will have Base64 encoded PKCS12 body
         type: path
-        required: true when request_type is new or get
     csr:
         description:
             - Base-64 encoded Certificate Signing Request (CSR). csr is accepted without PEM formatting around the Base-64 string.
             - If no csr is provided when request_type=new and enrollment_format=X509, the certificate will not be generated and module will be failed
         type: str
-        required: true(when request_type = new and enrollment_format = X509)
 
     cagw_api_client_cert_path:
         description:
@@ -74,7 +72,6 @@ options:
         description:
             - Profile id for the Certificate Authority
         type: string
-        required: true when request_type is new
 
     request_type:
         description:
@@ -86,7 +83,6 @@ options:
         description:
             - enrollment_format i.e. X509 or PKCS12
         type: string
-        required: true when request_type is new
 
     validate_certs:
         description:
@@ -98,37 +94,31 @@ options:
         description:
             - what action has to be taken on the certificate i.e. RevokeAction, HoldAction, UnholdAction
         type: string
-        required: true when request_type is action
 
     action_reason:
         description:
             - reason has to be given for the action
         type: string
-        required: true when request_type is action
 
     serial_no:
         description:
             - serial number of the already issued certificate
         type: string
-        required: true when request_type is action or get
 
     p12_protection_password:
         description:
             - p12 password for server side generation of the private key and CSR
         type: string
-        required: true when request_type is new and enrollment format is PKCS12
 
     dn:
         description:
             - distinguished name used either for generation for CSR or given in the CAGW enrollment api when enrollment format is PKCS12
         type: string
-        required: true when request_type is new and enrollment format is PKCS12
 
     cagw_api_specification_path:
         description:
             - path for CAGW api specification doc
         type: path
-        required: false either doc should be available on HTTP server or copy has to be saved locally
 
     remaining_days:
         description:
@@ -142,7 +132,6 @@ options:
         description:
             - This parameter defines which CA type connected at the backend. Supported list of CAs include ECS, SM, PKIaaS, MSCA
         type: str
-        required: True if I(request_type) is new
 
     subject_alt_name:
         description:
@@ -171,15 +160,12 @@ options:
     requester_name:
         description: The requester name to associate with certificate tracking information.
         type: str
-        required: true if I(connector_name) is ECS
     requester_email:
         description: The requester email to associate with certificate tracking information and receive delivery and expiry notices for the certificate.
         type: str
-        required: true if I(connector_name) is ECS
     requester_phone:
         description: The requester phone number to associate with certificate tracking information.
         type: str
-        required: true if I(connector_name) is ECS
     additional_emails:
         description: A list of additional email addresses to receive the delivery notice and expiry notification for the certificate.
         type: list
