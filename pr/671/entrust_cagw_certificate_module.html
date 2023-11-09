@@ -226,6 +226,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-action_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>what action has to be taken on the certificate i.e. RevokeAction, HoldAction, UnholdAction</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;RevokeAction&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;HoldAction&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;UnholdAction&quot;</span></code></p></li>
+</ul>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -275,11 +281,18 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-connector_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>This parameter defines which CA type connected at the backend. Supported list of CAs include ECS, SM, PKIaaS, MSCA</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;SM&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ECS&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;PKIaaS&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;MSCA&quot;</span></code></p></li>
+</ul>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-csr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-csr"><strong>csr</strong></p>
-<a class="ansibleOptionLink" href="#parameter-csr" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<a class="ansibleOptionLink" href="#parameter-csr" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Base-64 encoded Certificate Signing Request (CSR). csr is accepted without PEM formatting around the Base-64 string.</p>
 <p>If no csr is provided when request_type=new and enrollment_format=X509, the certificate will not be generated and module will be failed</p>
@@ -361,7 +374,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/dropdown5"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-custom-fields-dropdown5"><strong>dropdown5</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/dropdown5" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom email field.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom dropdown field.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -375,7 +388,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/email2"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-custom-fields-email2"><strong>email2</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/email2" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"></div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom email field.</p>
+</div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/email3"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-custom-fields-email3"><strong>email3</strong></p>
@@ -550,6 +564,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-enrollment_format" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>enrollment_format i.e. X509 or PKCS12</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;X509&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;PKCS12&quot;</span></code></p></li>
+</ul>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -589,9 +608,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-port"><strong>port</strong></p>
-<a class="ansibleOptionLink" href="#parameter-port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
+<a class="ansibleOptionLink" href="#parameter-port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>port for Entrust CAGW</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;443&quot;</span></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -608,6 +628,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-request_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>request type i.e. new (stands for enrollment), get (stands for get certificate), action (stands for action to be taken on the certificate)</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;new&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;action&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;get&quot;</span></code></p></li>
+</ul>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
