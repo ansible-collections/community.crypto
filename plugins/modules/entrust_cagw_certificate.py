@@ -25,7 +25,7 @@ options:
         description:
             - If force is used, a certificate is requested regardless of whether I(path) points to an existing valid certificate.
         type: bool
-        default: false
+        default: False
     path:
         description:
             - The destination path for the generated certificate as a PEM encoded cert.
@@ -36,7 +36,7 @@ options:
         description:
             - Base-64 encoded Certificate Signing Request (CSR). csr is accepted without PEM formatting around the Base-64 string.
             - If no csr is provided when request_type=new and enrollment_format=X509, the certificate will not be generated and module will be failed
-        type: str
+        type: path
 
     cagw_api_client_cert_path:
         description:
@@ -53,36 +53,38 @@ options:
     host:
         description:
             - Host or ip address for Entrust CAGW
-        type: string
+        type: str
         required: true
 
     port:
         description:
             - port for Entrust CAGW
-        type: string
-        required: true
+        type: str
+        default: 443
 
     certificate_authority_id:
         description:
             - Unique id for the Certificate Authority
-        type: string
+        type: str
         required: true
 
     certificate_profile_id:
         description:
             - Profile id for the Certificate Authority
-        type: string
+        type: str
 
     request_type:
         description:
             - request type i.e. new (stands for enrollment), get (stands for get certificate), action (stands for action to be taken on the certificate)
-        type: string
+        type: str
+        choices: [ 'new', 'action', 'get' ]
         required: true
 
     enrollment_format:
         description:
             - enrollment_format i.e. X509 or PKCS12
-        type: string
+        type: str
+        choices: [ 'X509', 'PKCS12' ]
 
     validate_certs:
         description:
@@ -93,27 +95,28 @@ options:
     action_type:
         description:
             - what action has to be taken on the certificate i.e. RevokeAction, HoldAction, UnholdAction
-        type: string
+        type: str
+        choices: [ 'RevokeAction', 'HoldAction', 'UnholdAction']
 
     action_reason:
         description:
             - reason has to be given for the action
-        type: string
+        type: str
 
     serial_no:
         description:
             - serial number of the already issued certificate
-        type: string
+        type: str
 
     p12_protection_password:
         description:
             - p12 password for server side generation of the private key and CSR
-        type: string
+        type: str
 
     dn:
         description:
             - distinguished name used either for generation for CSR or given in the CAGW enrollment api when enrollment format is PKCS12
-        type: string
+        type: str
 
     cagw_api_specification_path:
         description:
@@ -132,6 +135,7 @@ options:
         description:
             - This parameter defines which CA type connected at the backend. Supported list of CAs include ECS, SM, PKIaaS, MSCA
         type: str
+        choices: [ 'SM', 'ECS', 'PKIaaS', 'MSCA' ]
 
     subject_alt_name:
         description:
@@ -258,6 +262,7 @@ options:
                 type: str
             email2:
                 type: str
+                description: Custom email field.
             email3:
                 description: Custom email field.
                 type: str
@@ -282,7 +287,6 @@ options:
             dropdown5:
                 description: Custom dropdown field.
                 type: str
-                description: Custom email field.
 
 seealso:
     - module: community.crypto.openssl_privatekey
@@ -804,7 +808,7 @@ def entrust_cagw_certificate_argument_spec():
         port=dict(type='str', default=443),
         certificate_authority_id=dict(type='str', required=True),
         serial_no=dict(type='str'),
-        p12_protection_password=dict(type='str'),
+        p12_protection_password=dict(type='str', no_log=True),
         dn=dict(type='str'),
         certificate_profile_id=dict(type='str'),
         csr=dict(type='path'),
