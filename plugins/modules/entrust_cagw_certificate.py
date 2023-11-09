@@ -434,7 +434,7 @@ filename:
 serial_number:
     description: The serial number of the issued certificate.
     returned: success
-    type: hexadecimal
+    type: str
     sample: 5b9ba13d
 
 cert_days:
