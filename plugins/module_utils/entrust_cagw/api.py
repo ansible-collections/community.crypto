@@ -78,6 +78,7 @@ class RestOperationException(Exception):
         self.errors = [to_native(err.get("message")) for err in error.get("errors", {})]
         self.message = to_native(" ".join(self.errors))
 
+
 def generate_docstring(operation_spec):
     """Generate a docstring for an operation defined in operation_spec (swagger)"""
     # Description of the operation
@@ -121,14 +122,19 @@ class RestOperation(object):
             self.parameters = {}
         else:
             self.parameters = parameters
-        self.url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https", host=("example.com"), port=("443"), base_path=session._spec.get("basePath"), uri=uri)
+        self.url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https", host=("example.com"),
+                                                                     port=("443"),
+                                                                     base_path=session._spec.get("basePath"), uri=uri)
 
     def restmethod(self, *args, **kwargs):
         """Do the hard work of making the request here"""
         validate_certs_val = kwargs.get("validate_certs", True)
         host = kwargs.get("host", None)
         port = kwargs.get("port", None)
-        url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https", host=host, port=port, base_path=self.session._spec.get("basePath"), uri=self.uri)
+        url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https",
+                                                                host=host, port=port,
+                                                                base_path=self.session._spec.get("basePath"),
+                                                                uri=self.uri)
         # gather named path parameters and do substitution on the URL
         if self.parameters:
             path_parameters = {}
@@ -257,7 +263,6 @@ class CAGWSession(object):
         if self._config is None:
             raise SessionConfigurationException(to_native("No Configuration Found."))
 
-
         # set up client certificate if passed (support all-in one or cert + key)
         cagw_api_cert = self.get_config("cagw_api_cert")
         cagw_api_cert_key = self.get_config("cagw_api_cert_key")
@@ -335,10 +340,6 @@ def CAGWClient(cagw_api_cert=None, cagw_api_cert_key=None, cagw_api_specificatio
     if not YAML_FOUND:
         raise SessionConfigurationException(missing_required_lib("PyYAML"), exception=YAML_IMP_ERR)
 
-    #if cagw_api_specification_path is None:
-    #    cagw_api_specification_path = "https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml"
-
-    # Not functionally necessary with current uses of this module_util, but better to be explicit for future use cases
     cagw_api_cert_key = to_text(cagw_api_cert_key)
     cagw_api_specification_path = to_text(cagw_api_specification_path)
 
