@@ -373,7 +373,7 @@ EXAMPLES = r'''
     cagw_api_specification_path: /etc/ssl/entrust/cagw-api.yaml
     connector_name: ECS
     requester_name: Sapna-CAGW-server
-    requester_email: sapna.jain@entrustdatacard.com 
+    requester_email: sapna.jain@entrustdatacard.com
     requester_phone: 613-222-2222
 
 - name: Request a new SSL certificate from ECS via CAGW with optional custom_field parameters.  Will request a new certificate
@@ -515,8 +515,9 @@ else:
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 
+
 def calculate_cert_days(validityPeriod):
-    expiry = validityPeriod.split("/")            
+    expiry = validityPeriod.split("/")
     expiresAfter = expiry[1]
     cert_days = 0
     if expiresAfter:
@@ -563,21 +564,21 @@ class CagwCertificate(object):
     def write_cert_to_file(self):
         fh = open(self.path, "w")
         try:
-           fh.write(self.cert)
+            fh.write(self.cert)
         finally:
-           fh.close()
+            fh.close()
 
     def update_csr(self, module):
         body = {}
         csr = ''
         with open(module.params['csr']) as csr_file:
-          lines = csr_file.readlines()
-          # Remove first line
-          lines = lines[1:]
-          # Remove last line
-          lines = lines[:-1]
-          # Remove all linespaces
-          csr = "".join(line.rstrip("\n") for line in lines) 
+            lines = csr_file.readlines()
+            # Remove first line
+            lines = lines[1:]
+            # Remove last line
+            lines = lines[:-1]
+            # Remove all linespaces
+            csr = "".join(line.rstrip("\n") for line in lines)
         body['csr'] = csr
         return body
 
@@ -638,8 +639,8 @@ class CagwCertificate(object):
             for k, v in module.params['subject_alt_name'].items():
                 if v is not None:
                     options = {}
-                    options['type'] = k 
-                    options['value'] = v 
+                    options['type'] = k
+                    options['value'] = v
                     subjectAltNames.append(options)
             body['subjectAltNames'] = subjectAltNames
         return body
@@ -660,7 +661,7 @@ class CagwCertificate(object):
             self.cert_days = calculate_cert_days(self.cert_details.get('validityPeriod'))
 
         if self.request_type == 'new':
-           self.cert = self.cert_details.get('body')
+            self.cert = self.cert_details.get('body')
         elif self.request_type == 'get':
             self.cert = self.cert_details.get('certificateData')
 
@@ -680,16 +681,19 @@ class CagwCertificate(object):
             self.request_type = 'new'
 
             module_params_connector_name = module.params['connector_name']
-            #ECS CA getCertificate api through CAGW doesn't return status of the certificate
+            # ECS CA getCertificate api through CAGW doesn't return status of the certificate
             if module_params_connector_name == 'SM':
-               self.cert_status = self.cert_details.get('status')
-               if self.cert_status == 'EXPIRED' or self.cert_status == 'expired' or self.cert_status == 'SUSPENDED' or self.cert_status == 'suspended' or self.cert_status == 'REVOKED' or self.cert_status == 'revoked' or self.cert_status == 'held':
-
+                self.cert_status = self.cert_details.get('status')
+                if self.cert_status == 'EXPIRED' or self.cert_status == 'expired' or \
+                   self.cert_status == 'SUSPENDED' or self.cert_status == 'suspended' or \
+                   self.cert_status == 'REVOKED' or self.cert_status == 'revoked' or self.cert_status == 'held':
                     return False
 
             if self.cert_days < module.params['remaining_days']:
                 return False
+
             return True
+
         return False
 
     def request_cert(self, module):
@@ -723,15 +727,15 @@ class CagwCertificate(object):
             elif self.request_type == 'action':
                 body.update(self.update_action(module))
                 result = self.cagw_client.ActionOnCertificate(Body=body, ca_id=module.params['certificate_authority_id'],
-                                                         serial_no=module.params['serial_no'],
-                                                         validate_certs=module.params['validate_certs'],
-                                                         host=module.params['host'], port=module.params['port'])
+                                                              serial_no=module.params['serial_no'],
+                                                              validate_certs=module.params['validate_certs'],
+                                                              host=module.params['host'], port=module.params['port'])
                 self.cert_details = result.get('action')
             elif self.request_type == 'get':
                 result = self.cagw_client.GetCertificate(ca_id=module.params['certificate_authority_id'],
-                                                      serial_no=module.params['serial_no'],
-                                                      validate_certs=module.params['validate_certs'],
-                                                      host=module.params['host'], port=module.params['port'])
+                                                         serial_no=module.params['serial_no'],
+                                                         validate_certs=module.params['validate_certs'],
+                                                         host=module.params['host'], port=module.params['port'])
                 self.cert_details = result.get('certificate')
                 self.set_cert_details(module)
                 self.cert = begin_line + self.cert + end_line
@@ -754,6 +758,7 @@ class CagwCertificate(object):
             'message': self.message,
         }
         return result
+
 
 def custom_fields_spec():
     return dict(
@@ -794,6 +799,7 @@ def custom_fields_spec():
         dropdown5=dict(type='str'),
     )
 
+
 def subject_alt_name_spec():
     return dict(
         dNSName=dict(type='str'),
@@ -803,8 +809,9 @@ def subject_alt_name_spec():
         rfc822Name=dict(type='str'),
     )
 
+
 def entrust_cagw_certificate_argument_spec():
-        return dict(
+    return dict(
         force=dict(type='bool', default=False),
         path=dict(type='path'),
         request_type=dict(type='str', required=True, choices=['new', 'action', 'get']),
@@ -831,37 +838,38 @@ def entrust_cagw_certificate_argument_spec():
         validate_certs=dict(type='bool', default=True),
     )
 
+
 def main():
-        cagw_argument_spec = cagw_client_argument_spec()
-        cagw_argument_spec.update(entrust_cagw_certificate_argument_spec())
-        module = AnsibleModule(
-            argument_spec=cagw_argument_spec,
-            required_if=(
-                ['request_type', 'new', ['path', 'enrollment_format', 'certificate_profile_id', 'connector_name']],
-                ['request_type', 'action', ['action_type', 'serial_no', 'action_reason']],
-                ['request_type', 'get', ['path', 'serial_no']],
-                ['enrollment_format', 'X509', ['csr']],
-                ['enrollment_format', 'PKCS12', ['p12_protection_password', 'dn']],
-                ['connector_name', 'ECS', ['requester_name', 'requester_email', 'requester_phone']],
-            )
+    cagw_argument_spec = cagw_client_argument_spec()
+    cagw_argument_spec.update(entrust_cagw_certificate_argument_spec())
+    module = AnsibleModule(
+        argument_spec=cagw_argument_spec,
+        required_if=(
+            ['request_type', 'new', ['path', 'enrollment_format', 'certificate_profile_id', 'connector_name']],
+            ['request_type', 'action', ['action_type', 'serial_no', 'action_reason']],
+            ['request_type', 'get', ['path', 'serial_no']],
+            ['enrollment_format', 'X509', ['csr']],
+            ['enrollment_format', 'PKCS12', ['p12_protection_password', 'dn']],
+            ['connector_name', 'ECS', ['requester_name', 'requester_email', 'requester_phone']],
         )
-        if not CRYPTOGRAPHY_FOUND or CRYPTOGRAPHY_VERSION < LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION):
-            module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
-                             exception=CRYPTOGRAPHY_IMP_ERR)
+    )
+    if not CRYPTOGRAPHY_FOUND or CRYPTOGRAPHY_VERSION < LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION):
+        module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
+                         exception=CRYPTOGRAPHY_IMP_ERR)
 
-        # A new x509 based enrollment request must have the csr field
-        if module.params['request_type'] == 'new':
-            module_params_format = module.params['enrollment_format']
-            if module_params_format == "X509":
-                module_params_csr = module.params['csr']
-                if not os.path.exists(module_params_csr):
-                    module.fail_json(msg='The csr field of {0} was not a valid path. csr is required when request_type={1} with enrollment_format={2}' .format(
-                                 module_params_csr, module.params['request_type'], module_params_format))
+    # A new x509 based enrollment request must have the csr field
+    if module.params['request_type'] == 'new':
+        module_params_format = module.params['enrollment_format']
+        if module_params_format == "X509":
+            module_params_csr = module.params['csr']
+            if not os.path.exists(module_params_csr):
+                module.fail_json(msg='The csr field of {0} was not a valid path.'.format(module_params_csr))
 
-        certificate = CagwCertificate(module)
-        certificate.request_cert(module)
-        result = certificate.dump()
-        module.exit_json(**result)
+    certificate = CagwCertificate(module)
+    certificate.request_cert(module)
+    result = certificate.dump()
+    module.exit_json(**result)
+
 
 if __name__ == '__main__':
     main()
