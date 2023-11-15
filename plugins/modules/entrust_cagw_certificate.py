@@ -53,7 +53,7 @@ options:
 
     host:
         description:
-            - Host or ip address for Entrust CAGW
+            - Host or IP address for Entrust CAGW.
         type: str
         required: true
 
