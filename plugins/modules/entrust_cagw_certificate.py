@@ -118,7 +118,7 @@ options:
 
     dn:
         description:
-            - distinguished name used either for generation for CSR or given in the CAGW enrollment api when O(enrollment format=PKCS12).
+            - distinguished name used either for generation for CSR or given in the CAGW enrollment api when O(enrollment_format=PKCS12).
         type: str
 
     cagw_api_specification_path:
