@@ -7,7 +7,8 @@
 # their own license to the complete work.
 #
 # Copyright (c), Entrust Datacard Corporation, 2020
-# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -294,6 +295,8 @@ class CAGWSession(object):
                     self._spec = json.load(f)
                 elif ".yml" in cagw_api_specification_path or ".yaml" in cagw_api_specification_path:
                     self._spec = yaml.safe_load(f)
+                else:
+                    raise SessionConfigurationException(to_native("OpenAPI specification filename must end in .json, .yml or .yaml"))
 
     def get_config(self, item):
         return self._config.get(item, None)
