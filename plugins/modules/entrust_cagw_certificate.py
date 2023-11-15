@@ -36,18 +36,18 @@ options:
     csr:
         description:
             - Base-64 encoded Certificate Signing Request (CSR). csr is accepted without PEM formatting around the Base-64 string.
-            - If no csr is provided when request_type=new and enrollment_format=X509, the certificate will not be generated and module will be failed
+            - If no csr is provided when O(request_type=new) and O(enrollment_format=X509), the certificate will not be generated and module will be failed.
         type: path
 
     cagw_api_client_cert_path:
         description:
-            - Path for the Client cert issued by the same CA
+            - Path for the Client cert issued by the same CA.
         type: path
         required: true
 
     cagw_api_client_cert_key_path:
         description:
-            - Path for the Client cert key issued by the same CA
+            - Path for the Client cert key issued by the same CA.
         type: path
         required: true
 
@@ -59,69 +59,71 @@ options:
 
     port:
         description:
-            - port for Entrust CAGW
+            - port for Entrust CAGW.
         type: str
         default: 443
 
     certificate_authority_id:
         description:
-            - Unique id for the Certificate Authority
+            - Unique id for the Certificate Authority.
         type: str
         required: true
 
     certificate_profile_id:
         description:
-            - Profile id for the Certificate Authority
+            - Profile id for the Certificate Authority.
         type: str
 
     request_type:
         description:
-            - request type i.e. new (stands for enrollment), get (stands for get certificate), action (stands for action to be taken on the certificate)
+            - request type that is new (stands for enrollment), get (stands for get certificate),
+              action (stands for action to be taken on the certificate).
         type: str
         choices: [ 'new', 'action', 'get' ]
         required: true
 
     enrollment_format:
         description:
-            - enrollment_format i.e. X509 or PKCS12
+            - enrollment_format that is X509 or PKCS12.
         type: str
         choices: [ 'X509', 'PKCS12' ]
 
     validate_certs:
         description:
-            - if set to false then Server validation is skipped
+            - if set to false then SSL validation with Server is skipped.
+              This should be set to false only for testing purposes.
         type: bool
         default: True
 
     action_type:
         description:
-            - what action has to be taken on the certificate i.e. RevokeAction, HoldAction, UnholdAction
+            - what action has to be taken on the certificate that is RevokeAction, HoldAction, UnholdAction.
         type: str
         choices: [ 'RevokeAction', 'HoldAction', 'UnholdAction']
 
     action_reason:
         description:
-            - reason has to be given for the action
+            - reason has to be given for the action.
         type: str
 
     serial_no:
         description:
-            - serial number of the already issued certificate
+            - serial number of the already issued certificate.
         type: str
 
     p12_protection_password:
         description:
-            - p12 password for server side generation of the private key and CSR
+            - p12 password for server side generation of the private key and CSR.
         type: str
 
     dn:
         description:
-            - distinguished name used either for generation for CSR or given in the CAGW enrollment api when enrollment format is PKCS12
+            - distinguished name used either for generation for CSR or given in the CAGW enrollment api when O(enrollment format=PKCS12).
         type: str
 
     cagw_api_specification_path:
         description:
-            - path for CAGW api specification doc
+            - path for CAGW api specification doc.
         type: path
 
     remaining_days:
@@ -134,29 +136,31 @@ options:
 
     connector_name:
         description:
-            - This parameter defines which CA type connected at the backend. Supported list of CAs include ECS, SM, PKIaaS, MSCA
+            - This parameter defines which CA type connected at the backend.
+              Supported list of CAs include Entrust Certificate Solution(ECS), Entrust Security Manager(SM),
+              Entrust PKIHUB CA(PKIaaS), Microsoft CA(MSCA).
         type: str
         choices: [ 'SM', 'ECS', 'PKIaaS', 'MSCA' ]
 
     subject_alt_name:
         description:
-            - The subject alternative name identifiers, 
+            - The subject alternative name identifiers.
         type: dict
         suboptions:
             dNSName:
-                description: DNS name of the target server
+                description: DNS name of the target server.
                 type: str
             iPAddress:
-                description: ip address of the target server
+                description: IP address of the target server.
                 type: str
             uniformResourceIdentifier:
-                description:  URI of the target server
+                description:  URI of the target server.
                 type: str
             directoryName:
-                description: directoryName of the target server
+                description: directoryName of the target server.
                 type: str
             rfc822Name:
-                description: rfc822 name of the target server
+                description: rfc822 name of the target server.
                 type: str
 
     tracking_info:
@@ -166,7 +170,8 @@ options:
         description: The requester name to associate with certificate tracking information.
         type: str
     requester_email:
-        description: The requester email to associate with certificate tracking information and receive delivery and expiry notices for the certificate.
+        description: The requester email to associate with certificate tracking information and
+                     receive delivery and expiry notices for the certificate.
         type: str
     requester_phone:
         description: The requester phone number to associate with certificate tracking information.
@@ -184,49 +189,49 @@ options:
         type: dict
         suboptions:
             text1:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text2:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text3:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text4:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text5:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text6:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text7:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text8:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text9:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text10:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text11:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text12:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text13:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text14:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             text15:
-                description: Custom text field (maximum 500 characters)
+                description: Custom text field (maximum 500 characters).
                 type: str
             number1:
                 description: Custom number field.
@@ -290,9 +295,9 @@ options:
                 type: str
 
 seealso:
-    - module: community.crypto.openssl_privatekey
+    - M(community.crypto.openssl_privatekey)
       description: Can be used to create private keys (both for certificates and accounts).
-    - module: community.crypto.openssl_csr
+    - M(community.crypto.openssl_csr)
       description: Can be used to create a Certificate Signing Request (CSR).
 
 '''
@@ -464,8 +469,9 @@ message:
 cert_details:
     description:
         - The full response JSON from the New/Get Certificate call of the CAGW API.
-        - 'While the response contents are guaranteed to be forwards compatible with new CAGW API releases, Entrust recommends that you do not make any
-          playbooks take actions based on the content of this field. However it may be useful for debugging, logging, or auditing purposes.'
+        - While the response contents are guaranteed to be forwards compatible with new CAGW API releases,
+          Entrust recommends that you do not make any playbooks take actions based on the content of this field.
+          However it may be useful for debugging, logging, or auditing purposes.
     returned: success
     type: dict
 
