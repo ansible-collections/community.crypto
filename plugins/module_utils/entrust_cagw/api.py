@@ -2,7 +2,7 @@
 
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is licensed under the
-# Modified BSD License. Modules you write using this snippet, which is embedded
+# GNU General Public License v3.0+. Modules you write using this snippet, which is embedded
 # dynamically by Ansible, still belong to the author of the module, and may assign
 # their own license to the complete work.
 #
