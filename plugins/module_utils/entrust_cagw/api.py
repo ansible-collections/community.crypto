@@ -290,7 +290,7 @@ class CAGWSession(object):
                     cagw_api_specification_path, e.getcode())))
         else:
             with open(cagw_api_specification_path) as f:
-                if ".json" in cagw_api_specification_path:
+                if cagw_api_specification_path.endswith(".json"):
                     self._spec = json.load(f)
                 elif ".yml" in cagw_api_specification_path or ".yaml" in cagw_api_specification_path:
                     self._spec = yaml.safe_load(f)
