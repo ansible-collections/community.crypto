@@ -2,6 +2,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+unsupported
+
 # Example integation_config.yml
 # ---
 # cagw_api_client_cert_path: /var/integration-testing/publicCert.pem
