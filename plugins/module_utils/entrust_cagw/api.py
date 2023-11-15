@@ -122,7 +122,8 @@ class RestOperation(object):
             self.parameters = {}
         else:
             self.parameters = parameters
-        self.url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https", host=("example.com"),
+        self.url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme=session._spec.get("schemes")[0],
+                                                                     host=("example.com"),
                                                                      port=("443"),
                                                                      base_path=session._spec.get("basePath"), uri=uri)
 
@@ -131,10 +132,11 @@ class RestOperation(object):
         validate_certs_val = kwargs.get("validate_certs", True)
         host = kwargs.get("host", None)
         port = kwargs.get("port", None)
-        url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme="https",
+        url = "{scheme}://{host}:{port}{base_path}{uri}".format(scheme=self.session._spec.get("schemes")[0],
                                                                 host=host, port=port,
                                                                 base_path=self.session._spec.get("basePath"),
                                                                 uri=self.uri)
+        print(url);
         # gather named path parameters and do substitution on the URL
         if self.parameters:
             path_parameters = {}
