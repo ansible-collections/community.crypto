@@ -60,7 +60,7 @@ options:
     port:
         description:
             - port for Entrust CAGW.
-        type: str
+        type: int
         default: 443
 
     certificate_authority_id:
@@ -819,7 +819,7 @@ def entrust_cagw_certificate_argument_spec():
         action_reason=dict(type='str'),
         enrollment_format=dict(type='str', choices=['X509', 'PKCS12']),
         host=dict(type='str', required=True),
-        port=dict(type='str', default=443),
+        port=dict(type='int', default=443),
         certificate_authority_id=dict(type='str', required=True),
         serial_no=dict(type='str'),
         p12_protection_password=dict(type='str', no_log=True),
