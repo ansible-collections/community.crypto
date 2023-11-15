@@ -58,10 +58,10 @@ valid_file_format = re.compile(r".*(\.)(yml|yaml|json)$")
 
 def cagw_client_argument_spec():
     return dict(
-            cagw_api_client_cert_path=dict(type='path', required=True),
-            cagw_api_client_cert_key_path=dict(type='path', required=True),
-            cagw_api_specification_path=dict(type='path'),
-            )
+        cagw_api_client_cert_path=dict(type='path', required=True),
+        cagw_api_client_cert_key_path=dict(type='path', required=True),
+        cagw_api_specification_path=dict(type='path'),
+    )
 
 
 class SessionConfigurationException(Exception):
@@ -90,11 +90,11 @@ def generate_docstring(operation_spec):
         docs += "\tArguments:\n\n"
     for parameter in parameters:
         docs += "{0} ({1}:{2}): {3}\n".format(
-                parameter.get("name"),
-                parameter.get("type", "No Type"),
-                "Required" if parameter.get("required", False) else "Not Required",
-                parameter.get("description"),
-                )
+            parameter.get("name"),
+            parameter.get("type", "No Type"),
+            "Required" if parameter.get("required", False) else "Not Required",
+            parameter.get("description"),
+        )
 
     return docs
 
@@ -244,9 +244,9 @@ class CAGWSession(object):
 
     def _set_config(self, name, **kwargs):
         headers = {
-                "Content-Type": "application/json",
-                "Connection": "keep-alive",
-                }
+            "Content-Type": "application/json",
+            "Connection": "keep-alive",
+        }
         self.request = Request(headers=headers, timeout=120)
 
         configurators = [self._read_config_vars]
@@ -308,19 +308,19 @@ class CAGWSession(object):
         cagw_api_specification_path = kwargs.get("cagw_api_specification_path")
         if not cagw_api_specification_path or (not cagw_api_specification_path.startswith("http") and not os.path.isfile(cagw_api_specification_path)):
             raise SessionConfigurationException(
-                    to_native(
-                        "Parameter provided for cagw_api_specification_path of value '{0}' was not a valid file path or HTTPS address.".format(
-                            cagw_api_specification_path
-                            )
-                        )
+                to_native(
+                    "Parameter provided for cagw_api_specification_path of value '{0}' was not a valid file path or HTTPS address.".format(
+                        cagw_api_specification_path
                     )
+                )
+            )
 
         for required_file in ["cagw_api_cert", "cagw_api_cert_key"]:
             file_path = kwargs.get(required_file)
             if not file_path or not os.path.isfile(file_path):
                 raise SessionConfigurationException(
-                        to_native("Parameter provided for {0} of value '{1}' was not a valid file path.".format(required_file, file_path))
-                        )
+                    to_native("Parameter provided for {0} of value '{1}' was not a valid file path.".format(required_file, file_path))
+                )
 
         config["cagw_api_cert"] = kwargs.get("cagw_api_cert")
         config["cagw_api_cert_key"] = kwargs.get("cagw_api_cert_key")
@@ -343,8 +343,8 @@ def CAGWClient(cagw_api_cert=None, cagw_api_cert_key=None, cagw_api_specificatio
     cagw_api_specification_path = to_text(cagw_api_specification_path)
 
     return CAGWSession(
-            "entrust_cagw",
-            cagw_api_cert=cagw_api_cert,
-            cagw_api_cert_key=cagw_api_cert_key,
-            cagw_api_specification_path=cagw_api_specification_path,
-            ).client()
+        "entrust_cagw",
+        cagw_api_cert=cagw_api_cert,
+        cagw_api_cert_key=cagw_api_cert_key,
+        cagw_api_specification_path=cagw_api_specification_path,
+    ).client()
