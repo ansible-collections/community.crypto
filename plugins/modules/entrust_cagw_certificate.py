@@ -31,7 +31,7 @@ options:
         description:
             - The destination path for the generated certificate as a PEM encoded cert.
             - If there is already an Entrust certificate at this location, it will be replaced always.
-            - If enrollment_format is PKCS12 then it will have Base64 encoded PKCS12 body
+            - If O(enrollment_format=PKCS12) then it will have Base64 encoded PKCS12 body.
         type: path
     csr:
         description:
