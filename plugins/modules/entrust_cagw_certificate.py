@@ -295,9 +295,9 @@ options:
                 type: str
 
 seealso:
-    - M(community.crypto.openssl_privatekey)
+    - module: community.crypto.openssl_privatekey
       description: Can be used to create private keys (both for certificates and accounts).
-    - M(community.crypto.openssl_csr)
+    - module: community.crypto.openssl_csr
       description: Can be used to create a Certificate Signing Request (CSR).
 
 '''
