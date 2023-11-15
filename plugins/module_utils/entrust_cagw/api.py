@@ -136,7 +136,6 @@ class RestOperation(object):
                                                                 host=host, port=port,
                                                                 base_path=self.session._spec.get("basePath"),
                                                                 uri=self.uri)
-        print(url);
         # gather named path parameters and do substitution on the URL
         if self.parameters:
             path_parameters = {}
