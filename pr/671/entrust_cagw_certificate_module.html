@@ -218,14 +218,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-action_reason"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-action-reason"><strong>action_reason</strong></p>
 <a class="ansibleOptionLink" href="#parameter-action_reason" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>reason has to be given for the action.</p>
+<td><div class="ansible-option-cell"><p>Reason has to be given for the action.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-action_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-action-type"><strong>action_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-action_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>what action has to be taken on the certificate that is RevokeAction, HoldAction, UnholdAction.</p>
+<td><div class="ansible-option-cell"><p>What action has to be taken on the certificate that is RevokeAction, HoldAction, UnholdAction.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;RevokeAction&quot;</span></code></p></li>
@@ -259,7 +259,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-cagw_api_specification_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-cagw-api-specification-path"><strong>cagw_api_specification_path</strong></p>
 <a class="ansibleOptionLink" href="#parameter-cagw_api_specification_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>path for CAGW api specification doc.</p>
+<td><div class="ansible-option-cell"><p>Path for CAGW api specification doc.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -281,6 +281,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-connector_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>This parameter defines which CA type connected at the backend. Supported list of CAs include Entrust Certificate Solution(ECS), Entrust Security Manager(SM), Entrust PKIHUB CA(PKIaaS), Microsoft CA(MSCA).</p>
+<p>If connector_name is not provided when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-request-type"><span class="std std-ref"><span class="pre">request_type=new</span></span></a></code>, module will be failed.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;SM&quot;</span></code></p></li>
@@ -556,7 +557,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-dn"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-dn"><strong>dn</strong></p>
 <a class="ansibleOptionLink" href="#parameter-dn" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>distinguished name used either for generation for CSR or given in the CAGW enrollment api when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-enrollment-format"><span class="std std-ref"><span class="pre">enrollment_format=PKCS12</span></span></a></code>.</p>
+<td><div class="ansible-option-cell"><p>Distinguished name given for the enrollment.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -575,7 +576,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-force"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-force"><strong>force</strong></p>
 <a class="ansibleOptionLink" href="#parameter-force" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If force is used, a certificate is requested regardless of whether <em>path</em> points to an existing valid certificate.</p>
+<td><div class="ansible-option-cell"><p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-force"><span class="std std-ref"><span class="pre">force=True</span></span></a></code> then a certificate is requested regardless of whether <em>path</em> points to an existing valid certificate.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -594,7 +595,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-p12_protection_password"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-p12-protection-password"><strong>p12_protection_password</strong></p>
 <a class="ansibleOptionLink" href="#parameter-p12_protection_password" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>p12 password for server side generation of the private key and CSR.</p>
+<td><div class="ansible-option-cell"><p>PKCS12 password for server side generation of the private key and CSR.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -602,7 +603,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <a class="ansibleOptionLink" href="#parameter-path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The destination path for the generated certificate as a PEM encoded cert.</p>
-<p>If there is already an Entrust certificate at this location, it will be replaced always.</p>
+<p>If there is already a certificate at the <em>path</em> and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-force"><span class="std std-ref"><span class="pre">force=True</span></span></a></code> then it will be replaced always. but if <em>force</em> is not specified then we get the certificate validity for existing certificate from Entrust CAGW. If <code class="docutils literal notranslate"><span class="pre">cert_days</span> <span class="pre">&lt;</span> <span class="pre">remaining_days</span></code> then only a new certificate will be obtained.</p>
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-enrollment-format"><span class="std std-ref"><span class="pre">enrollment_format=PKCS12</span></span></a></code> then it will have Base64 encoded PKCS12 body.</p>
 </div></td>
 </tr>
@@ -610,7 +611,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-port"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-port"><strong>port</strong></p>
 <a class="ansibleOptionLink" href="#parameter-port" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>port for Entrust CAGW.</p>
+<td><div class="ansible-option-cell"><p>Port for Entrust CAGW.</p>
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">443</span></code></p>
 </div></td>
 </tr>
@@ -618,8 +619,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-remaining_days"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-remaining-days"><strong>remaining_days</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remaining_days" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The number of days the certificate must have left being valid. If <code class="docutils literal notranslate"><span class="pre">cert_days</span> <span class="pre">&lt;</span> <span class="pre">remaining_days</span></code> then a new certificate will be obtained using <em>request_type</em>.</p>
-<p>The <em>force</em> option may be used to ensure that a new certificate is always obtained.</p>
+<td><div class="ansible-option-cell"><p>The number of days the certificate must have left being valid. If a certificate is already present at the <em>path</em> and <em>force</em> is not specified then we get the certificate validity for existing certificate from Entrust CAGW. If <code class="docutils literal notranslate"><span class="pre">cert_days</span> <span class="pre">&lt;</span> <span class="pre">remaining_days</span></code> then a new certificate will be obtained.</p>
+<p>The <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-force"><span class="std std-ref"><span class="pre">force=True</span></span></a></code> option may be used to ensure that a new certificate is always obtained.</p>
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">30</span></code></p>
 </div></td>
 </tr>
@@ -627,7 +628,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-request_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-request-type"><strong>request_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>request type that is new (stands for enrollment), get (stands for get certificate), action (stands for action to be taken on the certificate).</p>
+<td><div class="ansible-option-cell"><p>Request type that is new (stands for enrollment), get (stands for get certificate), action (stands for action to be taken on the certificate).</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;new&quot;</span></code></p></li>
@@ -661,7 +662,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-serial_no"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-serial-no"><strong>serial_no</strong></p>
 <a class="ansibleOptionLink" href="#parameter-serial_no" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>serial number of the already issued certificate.</p>
+<td><div class="ansible-option-cell"><p>Serial number of the already issued certificate.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -717,7 +718,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-entrust-cagw-certificate-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>if set to false then SSL validation with Server is skipped. This should be set to false only for testing purposes.</p>
+<td><div class="ansible-option-cell"><p>If set to false then SSL validation with Server is skipped. This should be set to false only for testing purposes.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -820,8 +821,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <span class="w">    </span><span class="nt">enrollment_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X509</span>
 <span class="w">    </span><span class="nt">cagw_api_specification_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/cagw-api.yaml</span>
 <span class="w">    </span><span class="nt">connector_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECS</span>
-<span class="w">    </span><span class="nt">requester_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sapna-CAGW-server</span>
-<span class="w">    </span><span class="nt">requester_email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sapna.jain@entrustdatacard.com</span>
+<span class="w">    </span><span class="nt">requester_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sapna-Jain</span>
+<span class="w">    </span><span class="nt">requester_email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sapna.jain@entrust.com</span>
 <span class="w">    </span><span class="nt">requester_phone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">613-222-2222</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new SSL certificate from ECS via CAGW with optional custom_field parameters.  Will request a new certificate</span>
@@ -836,8 +837,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-en
 <span class="w">    </span><span class="nt">enrollment_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X509</span>
 <span class="w">    </span><span class="nt">cagw_api_specification_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/cagw-api.yaml</span>
 <span class="w">    </span><span class="nt">connector_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECS</span>
-<span class="w">    </span><span class="nt">requester_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sapna-CAGW-server</span>
-<span class="w">    </span><span class="nt">requester_email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sapna.jain@entrustdatacard.com</span>
+<span class="w">    </span><span class="nt">requester_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sapna-Jain</span>
+<span class="w">    </span><span class="nt">requester_email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sapna.jain@entrust.com</span>
 <span class="w">    </span><span class="nt">requester_phone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">613-222-2222</span>
 <span class="w">    </span><span class="nt">custom_fields</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">text1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Admin</span>
