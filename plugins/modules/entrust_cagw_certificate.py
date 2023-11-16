@@ -30,7 +30,7 @@ options:
     path:
         description:
             - The destination path for the generated certificate as a PEM encoded cert.
-            - If there is already a certificate at the I(path) and O(force=True) then it will be replaced always.
+            - If there is already a certificate at this location and O(force=True) then it will be replaced always.
               but if I(force) is not specified then we get the certificate validity for existing certificate from Entrust CAGW.
               If C(cert_days < remaining_days) then only a new certificate will be obtained.
             - If O(enrollment_format=PKCS12) then it will have Base64 encoded PKCS12 body.
