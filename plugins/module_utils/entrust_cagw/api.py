@@ -58,8 +58,8 @@ valid_file_format = re.compile(r".*(\.)(yml|yaml|json)$")
 def cagw_client_argument_spec():
     return dict(
         cagw_api_client_cert_path=dict(type='path', required=True),
-        cagw_api_client_cert_key_path=dict(type='path', required=True),
-        cagw_api_specification_path=dict(type='path'),
+        cagw_api_client_cert_key_path=dict(type='path', required=True, no_log=True),
+        cagw_api_specification_path=dict(type='path', required=True),
     )
 
 
