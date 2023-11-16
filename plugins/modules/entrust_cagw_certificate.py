@@ -24,13 +24,13 @@ requirements:
 options:
     force:
         description:
-            - If O(force=True) then a certificate is requested regardless of whether I(path) points to an existing valid certificate.
+            - If O(force=true) then a certificate is requested regardless of whether I(path) points to an existing valid certificate.
         type: bool
         default: False
     path:
         description:
             - The destination path for the generated certificate as a PEM encoded cert.
-            - If there is already a certificate at this location and O(force=True) then it will be replaced always.
+            - If there is already a certificate at this location and O(force=true) then it will be replaced always.
               but if I(force) is not specified then we get the certificate validity for existing certificate from Entrust CAGW.
               If C(cert_days < remaining_days) then only a new certificate will be obtained.
             - If O(enrollment_format=PKCS12) then it will have Base64 encoded PKCS12 body.
@@ -135,7 +135,7 @@ options:
               If a certificate is already present at the I(path) and I(force) is not specified then
               we get the certificate validity for existing certificate from Entrust CAGW.
               If C(cert_days < remaining_days) then a new certificate will be obtained.
-            - The O(force=True) option may be used to ensure that a new certificate is always obtained.
+            - The O(force=true) option may be used to ensure that a new certificate is always obtained.
         type: int
         default: 30
 
