@@ -24,19 +24,22 @@ requirements:
 options:
     force:
         description:
-            - If force is used, a certificate is requested regardless of whether I(path) points to an existing valid certificate.
+            - If O(force=True) then a certificate is requested regardless of whether I(path) points to an existing valid certificate.
         type: bool
         default: False
     path:
         description:
             - The destination path for the generated certificate as a PEM encoded cert.
-            - If there is already an Entrust certificate at this location, it will be replaced always.
+            - If there is already a certificate at the I(path) and O(force=True) then it will be replaced always.
+              but if I(force) is not specified then we get the certificate validity for existing certificate from Entrust CAGW.
+              If C(cert_days < remaining_days) then only a new certificate will be obtained.
             - If O(enrollment_format=PKCS12) then it will have Base64 encoded PKCS12 body.
         type: path
     csr:
         description:
             - Base-64 encoded Certificate Signing Request (CSR). csr is accepted without PEM formatting around the Base-64 string.
-            - If no csr is provided when O(request_type=new) and O(enrollment_format=X509), the certificate will not be generated and module will be failed.
+            - If no csr is provided when O(request_type=new) and O(enrollment_format=X509),
+              the certificate will not be generated and module will be failed.
         type: path
 
     cagw_api_client_cert_path:
@@ -59,7 +62,7 @@ options:
 
     port:
         description:
-            - port for Entrust CAGW.
+            - Port for Entrust CAGW.
         type: int
         default: 443
 
@@ -76,7 +79,7 @@ options:
 
     request_type:
         description:
-            - request type that is new (stands for enrollment), get (stands for get certificate),
+            - Request type that is new (stands for enrollment), get (stands for get certificate),
               action (stands for action to be taken on the certificate).
         type: str
         choices: [ 'new', 'action', 'get' ]
@@ -90,47 +93,49 @@ options:
 
     validate_certs:
         description:
-            - if set to false then SSL validation with Server is skipped.
+            - If set to false then SSL validation with Server is skipped.
               This should be set to false only for testing purposes.
         type: bool
         default: True
 
     action_type:
         description:
-            - what action has to be taken on the certificate that is RevokeAction, HoldAction, UnholdAction.
+            - What action has to be taken on the certificate that is RevokeAction, HoldAction, UnholdAction.
         type: str
         choices: [ 'RevokeAction', 'HoldAction', 'UnholdAction']
 
     action_reason:
         description:
-            - reason has to be given for the action.
+            - Reason has to be given for the action.
         type: str
 
     serial_no:
         description:
-            - serial number of the already issued certificate.
+            - Serial number of the already issued certificate.
         type: str
 
     p12_protection_password:
         description:
-            - p12 password for server side generation of the private key and CSR.
+            - PKCS12 password for server side generation of the private key and CSR.
         type: str
 
     dn:
         description:
-            - distinguished name used either for generation for CSR or given in the CAGW enrollment api when O(enrollment_format=PKCS12).
+            - Distinguished name given for the enrollment.
         type: str
 
     cagw_api_specification_path:
         description:
-            - path for CAGW api specification doc.
+            - Path for CAGW api specification doc.
         type: path
 
     remaining_days:
         description:
             - The number of days the certificate must have left being valid.
-              If C(cert_days < remaining_days) then a new certificate will be obtained using I(request_type).
-            - The I(force) option may be used to ensure that a new certificate is always obtained.
+              If a certificate is already present at the I(path) and I(force) is not specified then
+              we get the certificate validity for existing certificate from Entrust CAGW.
+              If C(cert_days < remaining_days) then a new certificate will be obtained.
+            - The O(force=True) option may be used to ensure that a new certificate is always obtained.
         type: int
         default: 30
 
@@ -139,6 +144,7 @@ options:
             - This parameter defines which CA type connected at the backend.
               Supported list of CAs include Entrust Certificate Solution(ECS), Entrust Security Manager(SM),
               Entrust PKIHUB CA(PKIaaS), Microsoft CA(MSCA).
+            - If connector_name is not provided when O(request_type=new), module will be failed.
         type: str
         choices: [ 'SM', 'ECS', 'PKIaaS', 'MSCA' ]
 
@@ -372,8 +378,8 @@ EXAMPLES = r'''
     enrollment_format: X509
     cagw_api_specification_path: /etc/ssl/entrust/cagw-api.yaml
     connector_name: ECS
-    requester_name: Sapna-CAGW-server
-    requester_email: sapna.jain@entrustdatacard.com
+    requester_name: Sapna-Jain
+    requester_email: sapna.jain@entrust.com
     requester_phone: 613-222-2222
 
 - name: Request a new SSL certificate from ECS via CAGW with optional custom_field parameters.  Will request a new certificate
@@ -388,8 +394,8 @@ EXAMPLES = r'''
     enrollment_format: X509
     cagw_api_specification_path: /etc/ssl/entrust/cagw-api.yaml
     connector_name: ECS
-    requester_name: Sapna-CAGW-server
-    requester_email: sapna.jain@entrustdatacard.com
+    requester_name: Sapna-Jain
+    requester_email: sapna.jain@entrust.com
     requester_phone: 613-222-2222
     custom_fields:
       text1: Admin
