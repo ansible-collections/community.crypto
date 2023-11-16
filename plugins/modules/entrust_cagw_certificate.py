@@ -128,6 +128,7 @@ options:
         description:
             - Path for CAGW api specification doc.
         type: path
+        required: true
 
     remaining_days:
         description:
