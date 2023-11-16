@@ -492,18 +492,12 @@ from ansible_collections.community.crypto.plugins.module_utils.entrust_cagw.api 
 
 import datetime
 import os
-import re
-import time
 import traceback
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.io import (
-    write_file,
-)
+from ansible.module_utils._text import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
