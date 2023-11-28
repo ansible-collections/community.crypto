@@ -43,7 +43,7 @@
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format (assert)"
   assert:
     that:
-      - privatekey_publickey.stdout == '{{ publickey.content|b64decode }}'
+      - privatekey_publickey.stdout == publickey.content | b64decode
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format - test idempotence (issue 33256)"
