@@ -100,6 +100,8 @@ class ACMEProtocolException(ModuleFailException):
                         http_code=format_http_status(code), problem_code=content_json['status'])
                 else:
                     code = 'status {problem_code}'.format(problem_code=format_http_status(code))
+                    if code == -1 and info.get('msg'):
+                        code += ' ({msg})'.format(msg=info['msg'])
                 subproblems = content_json.pop('subproblems', None)
                 add_msg = ' {problem}.'.format(problem=format_error_problem(content_json))
                 extras['problem'] = content_json
@@ -114,6 +116,8 @@ class ACMEProtocolException(ModuleFailException):
                         )
             else:
                 code = 'HTTP status {code}'.format(code=format_http_status(code))
+                if code == -1 and info.get('msg'):
+                    code += ' ({msg})'.format(msg=info['msg'])
                 if content_json is not None:
                     add_msg = ' The JSON error result: {content}'.format(content=content_json)
                 elif content is not None:
