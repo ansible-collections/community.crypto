@@ -55,7 +55,8 @@ else:
     IPADDRESS_IMPORT_ERROR = None
 
 
-RETRY_STATUS_CODES = (408, 429, 503)
+# -1 usually means connection problems
+RETRY_STATUS_CODES = (-1, 408, 429, 503)
 
 
 def _decode_retry(module, response, info, retry_count):
