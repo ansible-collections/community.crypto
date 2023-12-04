@@ -948,6 +948,17 @@ releases:
     - 664-luks_device-keyslot.yml
     - pkcs12.yml
     release_date: '2023-10-29'
+  2.16.1:
+    changes:
+      bugfixes:
+      - acme_* modules - also retry requests in case of socket errors, bad status
+        lines, and unknown connection errors; improve error messages in these cases
+        (https://github.com/ansible-collections/community.crypto/issues/680).
+      release_summary: Bugfix release.
+    fragments:
+    - 2.16.1.yml
+    - 680-acme-retry.yml
+    release_date: '2023-12-04'
   2.2.0:
     changes:
       bugfixes:
