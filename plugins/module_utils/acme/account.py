@@ -118,8 +118,10 @@ class ACMEAccount(object):
             if 'location' in info:
                 self.client.set_account_uri(info['location'])
             return False, result
-        elif info['status'] == 400 and result['type'] == 'urn:ietf:params:acme:error:accountDoesNotExist' and not allow_creation:
+        elif info['status'] in (400, 404) and result['type'] == 'urn:ietf:params:acme:error:accountDoesNotExist' and not allow_creation:
             # Account does not exist (and we did not try to create it)
+            # (According to RFC 8555, Section 7.3.1, the HTTP status code MUST be 400.
+            # Unfortunately Digicert does not care and sends 404 instead.)
             return False, None
         elif info['status'] == 403 and result['type'] == 'urn:ietf:params:acme:error:unauthorized' and 'deactivated' in (result.get('detail') or ''):
             # Account has been deactivated; currently works for Pebble; has not been
