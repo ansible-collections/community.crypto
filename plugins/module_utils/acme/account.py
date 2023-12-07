@@ -9,6 +9,8 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from ansible.module_utils.common._collections_compat import Mapping
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
@@ -96,6 +98,9 @@ class ACMEAccount(object):
                 )
 
         result, info = self.client.send_signed_request(url, new_reg, fail_on_error=False)
+        if not isinstance(result, Mapping):
+            raise ACMEProtocolException(
+                self.client.module, msg='Invalid account creation reply from ACME server', info=info, content=result)
 
         if info['status'] in ([200, 201] if self.client.version == 1 else [201]):
             # Account did not exist
@@ -154,6 +159,9 @@ class ACMEAccount(object):
                 # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
                 data = {}
                 result, info = self.client.send_signed_request(self.client.account_uri, data, fail_on_error=False)
+        if not isinstance(result, Mapping):
+            raise ACMEProtocolException(
+                self.client.module, msg='Invalid account data retrieved from ACME server', info=info, content=result)
         if info['status'] in (400, 403) and result.get('type') == 'urn:ietf:params:acme:error:unauthorized':
             # Returned when account is deactivated
             return None
@@ -248,5 +256,9 @@ class ACMEAccount(object):
         else:
             if self.client.version == 1:
                 update_request['resource'] = 'reg'
-            account_data, dummy = self.client.send_signed_request(self.client.account_uri, update_request)
+            account_data, info = self.client.send_signed_request(self.client.account_uri, update_request)
+            if not isinstance(account_data, Mapping):
+                raise ACMEProtocolException(
+                    self.client.module, msg='Invalid account updating reply from ACME server', info=info, content=account_data)
+
         return True, account_data
