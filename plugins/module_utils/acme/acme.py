@@ -58,13 +58,16 @@ else:
 # -1 usually means connection problems
 RETRY_STATUS_CODES = (-1, 408, 429, 503)
 
+RETRY_COUNT = 10
+
 
 def _decode_retry(module, response, info, retry_count):
     if info['status'] not in RETRY_STATUS_CODES:
         return False
 
-    if retry_count >= 5:
-        raise ACMEProtocolException(module, msg='Giving up after 5 retries', info=info, response=response)
+    if retry_count >= RETRY_COUNT:
+        raise ACMEProtocolException(
+            module, msg='Giving up after {retry} retries'.format(retry=RETRY_COUNT), info=info, response=response)
 
     # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
