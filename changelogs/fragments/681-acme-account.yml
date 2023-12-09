@@ -1,3 +1,0 @@
-bugfixes:
-  - "acme_* modules - make account registration handling more flexible to accept 404 instead of
-     400 send by DigiCert's ACME endpoint when an account does not exist (https://github.com/ansible-collections/community.crypto/pull/681)."

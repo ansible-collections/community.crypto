@@ -1,2 +1,0 @@
-bugfixes:
-  - "acme_* modules - fix improved error reporting in case of socket errors, bad status lines, and unknown connection errors (https://github.com/ansible-collections/community.crypto/pull/684)."

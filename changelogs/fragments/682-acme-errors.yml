@@ -1,2 +1,0 @@
-bugfixes:
-  - "acme_* modules - directly react on bad return data for account creation/retrieval/updating requests (https://github.com/ansible-collections/community.crypto/pull/682)."
