@@ -101,8 +101,8 @@ stages:
               test: rhel/8.5
             - name: FreeBSD 12.4
               test: freebsd/12.4
-            - name: FreeBSD 13.1
-              test: freebsd/13.1
+            # - name: FreeBSD 13.1
+            #   test: freebsd/13.1
 ### cloud
   - stage: Cloud_2_13
     displayName: Cloud 2.13
