@@ -33,7 +33,7 @@
 
 - name: Assert agent socket file is a socket
   assert:
-    that: 
+    that:
       - openssh_agent_socket_stat.stat.issock is defined
       - openssh_agent_socket_stat.stat.issock
     fail_msg: "{{ openssh_agent_sock }} is not a socket"

@@ -41,7 +41,7 @@
     mode: '0700'
   with_nested:
     - "{{ regenerate_values }}"
-    - [ '', '.pub' ]
+    - ['', '.pub']
 
 - name: "({{ backend }}) Regenerate - setup password protected keys for passphrse test"
   command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
@@ -261,7 +261,7 @@
     remote_src: true
   with_nested:
     - "{{ regenerate_values }}"
-    - [ '', '.pub' ]
+    - ['', '.pub']
   when: "item.0 != 'always'"
 
 - name: "({{ backend }}) Regenerate - adjust key type (check mode)"
@@ -310,7 +310,7 @@
     remote_src: true
   with_nested:
     - "{{ regenerate_values }}"
-    - [ '', '.pub' ]
+    - ['', '.pub']
   when: "item.0 != 'always'"
 
 - name: "({{ backend }}) Regenerate - adjust comment (check mode)"

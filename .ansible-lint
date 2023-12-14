@@ -1,0 +1,12 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+skip_list:
+  # Docs: https://ansible.readthedocs.io/projects/lint/rules/ignore-errors/
+  # Disabled for this collection because we mostly lint test code that has deliberate errors in places and isn't intended to be directly used outside of tests.
+  - ignore-errors
+  # Docs: https://ansible.readthedocs.io/projects/lint/rules/sanity/
+  # Disabled for this collection because our ignores are deliberate. There is also no way of applying this check in a more granular way.
+  - sanity[cannot-ignore]
