@@ -71,7 +71,11 @@
       - result is not changed
       - result is failed
       # We got the expected error message
-      - "'The handshake operation timed out' in result.msg or 'unknown protocol' in result.msg or 'wrong version number' in result.msg"
+      - >-
+        'The handshake operation timed out' in result.msg
+        or 'unknown protocol' in result.msg
+        or 'wrong version number' in result.msg
+        or 'record layer failure' in result.msg
  
 - name: Test timeout option
   get_certificate:
