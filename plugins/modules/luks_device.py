@@ -300,6 +300,14 @@ options:
         type: bool
         default: false
         version_added: '2.3.0'
+    allow_discards:
+        description:
+            - "Allow discards (aka TRIM) requests for device."
+            - "Will only work with LUKS2 containers."
+            - "Will only be used when opening containers."
+        type: bool
+        default: false
+        version_added: '2.16.3'
 
 requirements:
     - "cryptsetup"
@@ -646,7 +654,7 @@ class CryptHandler(Handler):
                              % (device, result[STDERR]))
 
     def run_luks_open(self, device, keyfile, passphrase, perf_same_cpu_crypt, perf_submit_from_crypt_cpus,
-                      perf_no_read_workqueue, perf_no_write_workqueue, persistent, name):
+                      perf_no_read_workqueue, perf_no_write_workqueue, persistent, allow_discards, name):
         args = [self._cryptsetup_bin]
         if keyfile:
             args.extend(['--key-file', keyfile])
@@ -660,6 +668,8 @@ class CryptHandler(Handler):
             args.extend(['--perf-no_write_workqueue'])
         if persistent:
             args.extend(['--persistent'])
+        if allow_discards:
+            args.extend(['--allow-discards'])
         args.extend(['open', '--type', 'luks', device, name])
 
         result = self._run_command(args, data=passphrase)
@@ -983,6 +993,7 @@ def run_module():
         perf_no_read_workqueue=dict(type='bool', default=False),
         perf_no_write_workqueue=dict(type='bool', default=False),
         persistent=dict(type='bool', default=False),
+        allow_discards=dict(type='bool', default=False),
     )
 
     mutually_exclusive = [
@@ -1075,6 +1086,7 @@ def run_module():
                                     module.params['perf_no_read_workqueue'],
                                     module.params['perf_no_write_workqueue'],
                                     module.params['persistent'],
+                                    module.params['allow_discards'],
                                     name)
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
