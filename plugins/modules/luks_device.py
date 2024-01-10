@@ -307,7 +307,7 @@ options:
             - "Will only be used when opening containers."
         type: bool
         default: false
-        version_added: '2.16.3'
+        version_added: '2.17.0'
 
 requirements:
     - "cryptsetup"
