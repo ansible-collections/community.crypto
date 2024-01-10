@@ -15,6 +15,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
+        allow_discards: true
         pbkdf:
           iteration_time: 0.1
       check_mode: true
@@ -32,6 +33,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
+        allow_discards: true
       become: true
       register: create_open
     - name: Create and open (idempotent)
@@ -46,6 +48,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
+        allow_discards: true
       become: true
       register: create_open_idem
     - name: Create and open (idempotent, check)
@@ -60,6 +63,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
+        allow_discards: true
       check_mode: true
       become: true
       register: create_open_idem_check
@@ -80,6 +84,7 @@
           - "'no-write-workqueue' in luks_header.stdout"
           - "'same-cpu-crypt' in luks_header.stdout"
           - "'submit-from-crypt-cpus' in luks_header.stdout"
+          - "'allow-discards' in luks_header.stdout"
 
     - name: Dump device mapper table
       command: "dmsetup table {{ create_open.name }}"
@@ -91,6 +96,7 @@
           - "'no_write_workqueue' in dm_table.stdout"
           - "'same_cpu_crypt' in dm_table.stdout"
           - "'submit_from_crypt_cpus' in dm_table.stdout"
+          - "'allow_discards' in dm_table.stdout"
 
     - name: Closed and Removed
       luks_device:
