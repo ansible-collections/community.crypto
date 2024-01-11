@@ -1,2 +1,2 @@
 minor_changes:
-  - luks_device - add allow discards option.
+  - luks_device - add allow discards option (https://github.com/ansible-collections/community.crypto/pull/693).
