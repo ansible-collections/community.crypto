@@ -302,7 +302,7 @@ options:
         version_added: '2.3.0'
     allow_discards:
         description:
-            - "Allow discards (aka TRIM) requests for device."
+            - "Allow discards (also known as TRIM) requests for device."
             - "Will only work with LUKS2 containers."
             - "Will only be used when opening containers."
         type: bool
