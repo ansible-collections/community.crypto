@@ -293,8 +293,8 @@ options:
     persistent:
         description:
             - "Allows the user to store options into container's metadata persistently and automatically use them next time.
-              Only O(perf_same_cpu_crypt), O(perf_submit_from_crypt_cpus), O(perf_no_read_workqueue), and O(perf_no_write_workqueue)
-              can be stored persistently."
+              Only O(perf_same_cpu_crypt), O(perf_submit_from_crypt_cpus), O(perf_no_read_workqueue), O(perf_no_write_workqueue)
+              and O(allow_discards) can be stored persistently."
             - "Will only work with LUKS2 containers."
             - "Will only be used when opening containers."
         type: bool
