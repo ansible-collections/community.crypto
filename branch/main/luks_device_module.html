@@ -214,6 +214,20 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-allow_discards"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-allow-discards"><strong>allow_discards</strong></p>
+<a class="ansibleOptionLink" href="#parameter-allow_discards" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.17.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Allow discards (also known as TRIM) requests for device.</p>
+<p>Will only be used when opening containers.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-cipher"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-cipher"><strong>cipher</strong></p>
 <a class="ansibleOptionLink" href="#parameter-cipher" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.1.0</em></p>
@@ -223,14 +237,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>For pre-2.6.10 kernels, use <code class="ansible-value docutils literal notranslate"><span class="pre">aes-plain</span></code> as they do not understand the new cipher spec strings. To use ESSIV, use <code class="ansible-value docutils literal notranslate"><span class="pre">aes-cbc-essiv:sha256</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-device"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-device"><strong>device</strong></p>
 <a class="ansibleOptionLink" href="#parameter-device" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Device to work with (for example <code class="ansible-value docutils literal notranslate"><span class="pre">/dev/sda1</span></code>). Needed in most cases. Can be omitted only when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=closed</span></span></a></code> together with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> is provided.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-force_remove_last_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><strong>force_remove_last_key</strong></p>
 <a class="ansibleOptionLink" href="#parameter-force_remove_last_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -243,7 +257,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-hash"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-hash"><strong>hash</strong></p>
 <a class="ansibleOptionLink" href="#parameter-hash" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.1.0</em></p>
@@ -252,7 +266,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Will only be used on container creation.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><strong>keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -260,7 +274,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-keysize"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-keysize"><strong>keysize</strong></p>
 <a class="ansibleOptionLink" href="#parameter-keysize" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -268,7 +282,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <td><div class="ansible-option-cell"><p>Sets the key size only if LUKS container does not exist.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-keyslot"><strong>keyslot</strong></p>
 <a class="ansibleOptionLink" href="#parameter-keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
@@ -277,7 +291,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p><strong>Note</strong> that a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks1</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">7</span></code> and a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks2</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code>. In order to use the keyslots <code class="ansible-value docutils literal notranslate"><span class="pre">8</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code> when creating a new container, setting <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">luks2</span></code> is required.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-label"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-label"><strong>label</strong></p>
 <a class="ansibleOptionLink" href="#parameter-label" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -287,14 +301,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>This cannot be specified if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">luks1</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Sets container name when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=opened</span></span></a></code>. Can be used instead of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code> when closing the existing container (that is, when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-state"><span class="std std-ref"><span class="pre">state=closed</span></span></a></code>).</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-keyfile"><strong>new_keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -303,7 +317,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-keyslot"><strong>new_keyslot</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
@@ -312,7 +326,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p><strong>Note</strong> that a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks1</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">7</span></code> and a device of <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-type"><span class="std std-ref"><span class="pre">type=luks2</span></span></a></code> supports the keyslot numbers <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code>-<code class="ansible-value docutils literal notranslate"><span class="pre">31</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-new-passphrase"><strong>new_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -321,7 +335,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>NOTE that adding additional passphrase is idempotent only since community.crypto 1.4.0. For older versions, a new keyslot will be used even if another keyslot already exists for this passphrase.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><strong>passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -329,7 +343,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <td><div class="ansible-option-cell"><p>Used to unlock the container. Either a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> or a <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> is needed for most of the operations. Parameter value is a string with the passphrase.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf"><strong>pbkdf</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.4.0</em></p>
@@ -338,7 +352,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Will only be used on container creation, and when adding keys to an existing container.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf/algorithm"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-algorithm"><strong>algorithm</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf/algorithm" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -352,7 +366,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf/iteration_count"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-count"><strong>iteration_count</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf/iteration_count" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -360,7 +374,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-time"><span class="std std-ref"><span class="pre">pbkdf.iteration_time</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf/iteration_time"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-time"><strong>iteration_time</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf/iteration_time" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">float</span></p>
 </div></td>
@@ -369,7 +383,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-iteration-count"><span class="std std-ref"><span class="pre">pbkdf.iteration_count</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf/memory"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-memory"><strong>memory</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf/memory" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -377,7 +391,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>This is not used for PBKDF2, but only for the Argon PBKDFs.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-pbkdf/parallel"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-pbkdf-parallel"><strong>parallel</strong></p>
 <a class="ansibleOptionLink" href="#parameter-pbkdf/parallel" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -385,7 +399,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>This is not used for PBKDF2, but only for the Argon PBKDFs.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-perf_no_read_workqueue"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-perf-no-read-workqueue"><strong>perf_no_read_workqueue</strong></p>
 <a class="ansibleOptionLink" href="#parameter-perf_no_read_workqueue" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -399,7 +413,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-perf_no_write_workqueue"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-perf-no-write-workqueue"><strong>perf_no_write_workqueue</strong></p>
 <a class="ansibleOptionLink" href="#parameter-perf_no_write_workqueue" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -413,7 +427,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-perf_same_cpu_crypt"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-perf-same-cpu-crypt"><strong>perf_same_cpu_crypt</strong></p>
 <a class="ansibleOptionLink" href="#parameter-perf_same_cpu_crypt" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -428,7 +442,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-perf_submit_from_crypt_cpus"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-perf-submit-from-crypt-cpus"><strong>perf_submit_from_crypt_cpus</strong></p>
 <a class="ansibleOptionLink" href="#parameter-perf_submit_from_crypt_cpus" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -444,12 +458,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-persistent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-persistent"><strong>persistent</strong></p>
 <a class="ansibleOptionLink" href="#parameter-persistent" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Allows the user to store options into container’s metadata persistently and automatically use them next time. Only <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-same-cpu-crypt"><span class="std std-ref"><span class="pre">perf_same_cpu_crypt</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-submit-from-crypt-cpus"><span class="std std-ref"><span class="pre">perf_submit_from_crypt_cpus</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-read-workqueue"><span class="std std-ref"><span class="pre">perf_no_read_workqueue</span></span></a></strong></code>, and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-write-workqueue"><span class="std std-ref"><span class="pre">perf_no_write_workqueue</span></span></a></strong></code> can be stored persistently.</p>
+<td><div class="ansible-option-cell"><p>Allows the user to store options into container’s metadata persistently and automatically use them next time. Only <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-same-cpu-crypt"><span class="std std-ref"><span class="pre">perf_same_cpu_crypt</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-submit-from-crypt-cpus"><span class="std std-ref"><span class="pre">perf_submit_from_crypt_cpus</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-read-workqueue"><span class="std std-ref"><span class="pre">perf_no_read_workqueue</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-perf-no-write-workqueue"><span class="std std-ref"><span class="pre">perf_no_write_workqueue</span></span></a></strong></code>, and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-allow-discards"><span class="std std-ref"><span class="pre">allow_discards</span></span></a></strong></code> can be stored persistently.</p>
 <p>Will only work with LUKS2 containers.</p>
 <p>Will only be used when opening containers.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
@@ -459,7 +473,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-remove_keyfile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-keyfile"><strong>remove_keyfile</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remove_keyfile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -469,7 +483,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-remove_keyslot"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-keyslot"><strong>remove_keyslot</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remove_keyslot" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.16.0</em></p>
@@ -479,7 +493,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p><strong>Note</strong> that the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-keyfile"><span class="std std-ref"><span class="pre">keyfile</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> must not be in the slot to be removed.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-remove_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-remove-passphrase"><strong>remove_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remove_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -489,7 +503,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>NOTE that to remove the last keyslot from a LUKS container, the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-force-remove-last-key"><span class="std std-ref"><span class="pre">force_remove_last_key</span></span></a></strong></code> option must be set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-sector_size"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-sector-size"><strong>sector_size</strong></p>
 <a class="ansibleOptionLink" href="#parameter-sector_size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.5.0</em></p>
@@ -498,7 +512,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <p>Will only be used on container creation.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -516,7 +530,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-type"><strong>type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -529,7 +543,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-uuid"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-luks-device-module-parameter-uuid"><strong>uuid</strong></p>
 <a class="ansibleOptionLink" href="#parameter-uuid" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
