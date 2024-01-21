@@ -979,6 +979,15 @@ releases:
     - 684-info-code.yml
     - 685-acme-retry.yml
     release_date: '2023-12-08'
+  2.17.0:
+    changes:
+      minor_changes:
+      - luks_device - add allow discards option (https://github.com/ansible-collections/community.crypto/pull/693).
+      release_summary: Feature release.
+    fragments:
+    - 2.17.0.yml
+    - 693-allow-discards.yaml
+    release_date: '2024-01-21'
   2.2.0:
     changes:
       bugfixes:

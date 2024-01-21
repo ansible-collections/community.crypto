@@ -5,6 +5,19 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.17.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- luks_device - add allow discards option (https://github.com/ansible-collections/community.crypto/pull/693).
+
 v2.16.2
 =======
 
