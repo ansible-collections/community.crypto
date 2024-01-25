@@ -1,0 +1,4 @@
+bugfixes:
+  - "openssl_dhparam - was using an internal function instead of the public API to load DH param files when using the ``cryptography`` backend.
+     The internal function was removed in cryptography 42.0.0. The module now uses the public API, which has been available since support for
+     DH params was added to cryptography (https://github.com/ansible-collections/community.crypto/pull/698)."
