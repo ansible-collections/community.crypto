@@ -333,7 +333,7 @@ class DHParameterCryptography(DHParameterBase):
         try:
             with open(self.path, 'rb') as f:
                 data = f.read()
-            params = self.crypto_backend.load_pem_parameters(data)
+            params = cryptography.hazmat.primitives.serialization.load_pem_parameters(data, backend=self.crypto_backend)
         except Exception as dummy:
             return False
         # Check parameters
