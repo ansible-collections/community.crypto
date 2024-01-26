@@ -60,6 +60,9 @@ options:
               avoid private key material to be transported around and computed with, and only do
               so when requested explicitly. This can potentially prevent
               L(side-channel attacks,https://en.wikipedia.org/wiki/Side-channel_attack).
+            - Note that consistency checks only work for certain key types, and might depend on the
+              version of the cryptography library. For example, with cryptography 42.0.0 and newer
+              consistency of RSA keys can no longer be checked.
         type: bool
         default: false
         version_added: 2.0.0
