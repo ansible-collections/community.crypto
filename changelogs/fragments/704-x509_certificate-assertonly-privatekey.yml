@@ -1,0 +1,2 @@
+bugfixes:
+  - "x509_certificate - when using the PyOpenSSL backend with ``provider=assertonly``, better handle unexpected errors when validating private keys (https://github.com/ansible-collections/community.crypto/pull/704)."
