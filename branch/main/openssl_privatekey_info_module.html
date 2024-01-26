@@ -222,6 +222,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p>Whether to check consistency of the private key.</p>
 <p>In community.crypto &lt; 2.0.0, consistency was always checked.</p>
 <p>Since community.crypto 2.0.0, the consistency check has been disabled by default to avoid private key material to be transported around and computed with, and only do so when requested explicitly. This can potentially prevent <a class="reference external" href="https://en.wikipedia.org/wiki/Side-channel_attack">side-channel attacks</a>.</p>
+<p>Note that consistency checks only work for certain key types, and might depend on the version of the cryptography library. For example, with cryptography 42.0.0 and newer consistency of RSA keys can no longer be checked.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
