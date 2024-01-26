@@ -102,6 +102,9 @@ key_is_consistent:
         - Whether the key is consistent. Can also return C(none) next to C(yes) and
           C(no), to indicate that consistency could not be checked.
         - In case the check returns C(no), the module will fail.
+        - Note that consistency checks only work for certain key types, and might depend on the
+          version of the cryptography library. For example, with cryptography 42.0.0 and newer
+          consistency of RSA keys can no longer be checked.
     returned: always
     type: bool
 public_key:
