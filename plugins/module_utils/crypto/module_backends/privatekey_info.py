@@ -119,7 +119,11 @@ def _check_dsa_consistency(key_public_data, key_private_data):
 
 def _is_cryptography_key_consistent(key, key_public_data, key_private_data):
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-        return bool(key._backend._lib.RSA_check_key(key._rsa_cdata))
+        # key._backend was removed in cryptography 42.0.0
+        backend = getattr(key, '_backend', None)
+        if backend is None:
+            return None
+        return bool(backend._lib.RSA_check_key(key._rsa_cdata))
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
         result = _check_dsa_consistency(key_public_data, key_private_data)
         if result is not None:

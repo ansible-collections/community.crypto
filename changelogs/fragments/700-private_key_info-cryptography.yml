@@ -1,0 +1,3 @@
+bugfixes:
+  - "openssl_privatekey_info - was using an internal function for determining whether a private key is consistent, that got removed in cryptography 42.0.0.
+     The code now checks whether that function exists before calling it (https://github.com/ansible-collections/community.crypto/pull/700)."
