@@ -13,6 +13,10 @@ import datetime
 
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     parse_name_field,
     get_relative_time_option,
@@ -485,8 +489,11 @@ class AssertOnlyCertificateBackendPyOpenSSL(AssertOnlyCertificateBackend):
 
     def _validate_privatekey(self):
         ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD)
-        ctx.use_privatekey(self.privatekey)
-        ctx.use_certificate(self.existing_certificate)
+        try:
+            ctx.use_privatekey(self.privatekey)
+            ctx.use_certificate(self.existing_certificate)
+        except OpenSSL.SSL.Error as exc:
+            raise OpenSSLObjectError('Unexpected error while trying to validate private key with certificate: %s' % exc)
         try:
             ctx.check_privatekey()
             return True
