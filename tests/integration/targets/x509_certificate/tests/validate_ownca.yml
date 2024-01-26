@@ -59,7 +59,7 @@
     assert:
       that:
         - ownca_cert_v2_version.stdout == '2'
-  when: "select_crypto_backend != 'cryptography'"
+  when: select_crypto_backend != 'cryptography' and pyopenssl_version.stdout is version('24.0.0', '<')
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate v2 (test - ownca certificate version == 2)
   assert:

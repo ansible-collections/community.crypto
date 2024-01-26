@@ -94,7 +94,7 @@
     assert:
       that:
         - cert_v2_version.stdout == '2'
-  when: select_crypto_backend != 'cryptography'
+  when: select_crypto_backend != 'cryptography' and pyopenssl_version.stdout is version('24.0.0', '<')
 
 - block:
   - name: (Selfsigned validateion, {{ select_crypto_backend }} Validate certificate v2 is failed
