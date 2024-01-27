@@ -1,2 +1,0 @@
-bugfixes:
-  - "openssl_privatekey_info - ``check_consistency=true`` no longer works for RSA keys with cryptography 42.0.0+ (https://github.com/ansible-collections/community.crypto/pull/701)."

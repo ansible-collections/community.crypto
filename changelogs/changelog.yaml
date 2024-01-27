@@ -988,6 +988,25 @@ releases:
     - 2.17.0.yml
     - 693-allow-discards.yaml
     release_date: '2024-01-21'
+  2.17.1:
+    changes:
+      bugfixes:
+      - openssl_dhparam - was using an internal function instead of the public API
+        to load DH param files when using the ``cryptography`` backend. The internal
+        function was removed in cryptography 42.0.0. The module now uses the public
+        API, which has been available since support for DH params was added to cryptography
+        (https://github.com/ansible-collections/community.crypto/pull/698).
+      - openssl_privatekey_info - ``check_consistency=true`` no longer works for RSA
+        keys with cryptography 42.0.0+ (https://github.com/ansible-collections/community.crypto/pull/701).
+      - openssl_privatekey_info - ``check_consistency=true`` now reports a warning
+        if it cannot determine consistency (https://github.com/ansible-collections/community.crypto/pull/705).
+      release_summary: Bugfix release for compatibility with cryptography 42.0.0.
+    fragments:
+    - 2.17.1.yml
+    - 698-openssl_dhparam-cryptography.yml
+    - 701-private_key_info-consistency.yml
+    - 705-openssl_privatekey_info-consistency.yml
+    release_date: '2024-01-27'
   2.2.0:
     changes:
       bugfixes:
