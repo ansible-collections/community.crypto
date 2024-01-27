@@ -105,7 +105,7 @@ def _check_dsa_consistency(key_public_data, key_private_data):
     return True
 
 
-def _is_cryptography_key_consistent(key, key_public_data, key_private_data):
+def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn_func=None):
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
         # key._backend was removed in cryptography 42.0.0
         backend = getattr(key, '_backend', None)
@@ -160,6 +160,8 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data):
         except cryptography.exceptions.InvalidSignature:
             return False
     # For X25519 and X448, there's no test yet.
+    if warn_func is not None:
+        warn_func('Cannot determine consistency for key of type %s' % type(key))
     return None
 
 
@@ -256,7 +258,7 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
         return _get_cryptography_private_key_info(self.key, need_private_key_data=need_private_key_data)
 
     def _is_key_consistent(self, key_public_data, key_private_data):
-        return _is_cryptography_key_consistent(self.key, key_public_data, key_private_data)
+        return _is_cryptography_key_consistent(self.key, key_public_data, key_private_data, warn_func=self.module.warn)
 
 
 def get_privatekey_info(module, backend, content, passphrase=None, return_private_key_data=False, prefer_one_fingerprint=False):
