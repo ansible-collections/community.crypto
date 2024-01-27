@@ -5,6 +5,21 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v1.9.24
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- openssl_dhparam - was using an internal function instead of the public API to load DH param files when using the ``cryptography`` backend. The internal function was removed in cryptography 42.0.0. The module now uses the public API, which has been available since support for DH params was added to cryptography (https://github.com/ansible-collections/community.crypto/pull/698).
+- openssl_privatekey_info - ``check_consistency=true`` no longer works for RSA keys with cryptography 42.0.0+ (https://github.com/ansible-collections/community.crypto/pull/701).
+- x509_certificate - when using the PyOpenSSL backend with ``provider=assertonly``, better handle unexpected errors when validating private keys (https://github.com/ansible-collections/community.crypto/pull/704).
+
 v1.9.23
 =======
 

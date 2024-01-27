@@ -722,6 +722,25 @@ releases:
     - 1.9.23.yml
     - pkcs12.yml
     release_date: '2023-10-29'
+  1.9.24:
+    changes:
+      bugfixes:
+      - openssl_dhparam - was using an internal function instead of the public API
+        to load DH param files when using the ``cryptography`` backend. The internal
+        function was removed in cryptography 42.0.0. The module now uses the public
+        API, which has been available since support for DH params was added to cryptography
+        (https://github.com/ansible-collections/community.crypto/pull/698).
+      - openssl_privatekey_info - ``check_consistency=true`` no longer works for RSA
+        keys with cryptography 42.0.0+ (https://github.com/ansible-collections/community.crypto/pull/701).
+      - x509_certificate - when using the PyOpenSSL backend with ``provider=assertonly``,
+        better handle unexpected errors when validating private keys (https://github.com/ansible-collections/community.crypto/pull/704).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.24.yml
+    - 698-openssl_dhparam-cryptography.yml
+    - 701-private_key_info-consistency.yml
+    - 704-x509_certificate-assertonly-privatekey.yml
+    release_date: '2024-01-27'
   1.9.3:
     changes:
       bugfixes:
