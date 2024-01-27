@@ -1,0 +1,2 @@
+bugfixes:
+  - "openssl_privatekey_info - ``check_consistency=true`` now reports a warning if it cannot determine consistency (https://github.com/ansible-collections/community.crypto/pull/705)."
