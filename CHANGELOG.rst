@@ -4,7 +4,6 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
-
 v1.9.24
 =======
 
@@ -541,7 +540,6 @@ Release Summary
 
 Contains new modules ``openssl_privatekey_pipe``, ``openssl_csr_pipe`` and ``x509_certificate_pipe`` which allow to create or update private keys, CSRs and X.509 certificates without having to write them to disk.
 
-
 Minor Changes
 -------------
 
@@ -617,7 +615,6 @@ Release Summary
 
 Release for Ansible 2.10.0.
 
-
 Minor Changes
 -------------
 
@@ -651,7 +648,6 @@ Release Summary
 ---------------
 
 This is the first proper release of the ``community.crypto`` collection. This changelog contains all changes to the modules in this collection that were added after the release of Ansible 2.9.0.
-
 
 Minor Changes
 -------------
