@@ -4,7 +4,6 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
-
 v2.17.1
 =======
 
@@ -146,7 +145,6 @@ correctly. You should be still able to read it in most cases, but you need
 ansible-core 2.15 or later to see it as it is intended. Alternatively you can
 look at `the devel docsite <https://docs.ansible.com/ansible/devel/collections/community/crypto/>`__
 for the rendered HTML version of the documentation of the latest release.
-
 
 Bugfixes
 --------
@@ -407,7 +405,6 @@ This release is identical to what should have been 2.3.3, except that the
 version number has been bumped to 2.3.4 and this changelog entry for 2.3.4
 has been added.
 
-
 v2.3.3
 ======
 
@@ -514,7 +511,6 @@ Regular bugfix release.
 
 In this release, we extended the test matrix to include Alpine 3, ArchLinux, Debian Bullseye, and CentOS Stream 8. CentOS 8 was removed from the test matrix.
 
-
 Bugfixes
 --------
 
@@ -617,7 +613,6 @@ Release Summary
 ---------------
 
 A new major release of the ``community.crypto`` collection. The main changes are removal of the PyOpenSSL backends for almost all modules (``openssl_pkcs12`` being the only exception), and removal of the ``assertonly`` provider in the ``x509_certificate`` provider. There are also some other breaking changes which should improve the user interface/experience of this collection long-term.
-
 
 Minor Changes
 -------------
@@ -937,7 +932,6 @@ Release Summary
 
 Contains new modules ``openssl_privatekey_pipe``, ``openssl_csr_pipe`` and ``x509_certificate_pipe`` which allow to create or update private keys, CSRs and X.509 certificates without having to write them to disk.
 
-
 Minor Changes
 -------------
 
@@ -1013,7 +1007,6 @@ Release Summary
 
 Release for Ansible 2.10.0.
 
-
 Minor Changes
 -------------
 
@@ -1047,7 +1040,6 @@ Release Summary
 ---------------
 
 This is the first proper release of the ``community.crypto`` collection. This changelog contains all changes to the modules in this collection that were added after the release of Ansible 2.9.0.
-
 
 Minor Changes
 -------------
