@@ -923,7 +923,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "remove a key from absent LUKS.")
 
-        if self._module.params['remove_keyslot']:
+        if self._module.params['remove_keyslot'] is not None:
             if not self._crypthandler.is_luks_slot_set(self.device, self._module.params['remove_keyslot']):
                 return False
             result = self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'])
