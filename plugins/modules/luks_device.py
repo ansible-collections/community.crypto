@@ -909,7 +909,14 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "add a key to absent LUKS.")
 
-        return not self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
+        key_present = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
+        if self._module.params['new_keyslot'] is not None:
+            key_present_slot = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'],
+                                                                keyslot=self._module.params['new_keyslot'])
+            if key_present and not key_present_slot:
+                self._module.fail_json(msg="Trying to add key that is already present in another slot")
+
+        return not key_present
 
     def luks_remove_key(self):
         if (self.device is None or
