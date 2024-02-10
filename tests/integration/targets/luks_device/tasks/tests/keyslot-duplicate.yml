@@ -11,15 +11,13 @@
     pbkdf:
       iteration_time: 0.1
   become: true
-- name: Add new keyslot with same keyfile
+- name: Add new keyslot with same keyfile (check)
   luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     new_keyslot: 1
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     new_keyfile: "{{ remote_tmp_dir }}/keyfile1"
-    pbkdf:
-      iteration_time: 0.1
   become: true
   ignore_errors: true
   check_mode: true
@@ -31,8 +29,6 @@
     new_keyslot: 1
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
     new_keyfile: "{{ remote_tmp_dir }}/keyfile1"
-    pbkdf:
-      iteration_time: 0.1
   become: true
   ignore_errors: true
   register: keyslot_duplicate
