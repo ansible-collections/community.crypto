@@ -799,6 +799,11 @@ class CryptHandler(Handler):
             if 'No usable keyslot is available.' in result[output]:
                 return False
 
+        # This check is necessary due to cryptsetup in version 2.0.3 not printing 'No usable keyslot is available'
+        # when using the --key-slot parameter in combination with --test-passphrase
+        if result[RETURN_CODE] == 1 and keyslot is not None and result[STDOUT] == '' and result[STDERR] == '':
+            return True
+
         raise ValueError('Error while testing whether keyslot exists on %s: %s'
                          % (device, result[STDERR]))
 
