@@ -799,6 +799,11 @@ class CryptHandler(Handler):
             if 'No usable keyslot is available.' in result[output]:
                 return False
 
+        # This check is necessary due to cryptsetup in version 2.0.3 not printing 'No usable keyslot is available'
+        # when using the --key-slot parameter in combination with --test-passphrase
+        if result[RETURN_CODE] == 1 and keyslot is not None and result[STDOUT] == '' and result[STDERR] == '':
+            return False
+
         raise ValueError('Error while testing whether keyslot exists on %s: %s'
                          % (device, result[STDERR]))
 
@@ -909,7 +914,14 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "add a key to absent LUKS.")
 
-        return not self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
+        key_present = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
+        if self._module.params['new_keyslot'] is not None:
+            key_present_slot = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'],
+                                                                self._module.params['new_keyslot'])
+            if key_present and not key_present_slot:
+                self._module.fail_json(msg="Trying to add key that is already present in another slot")
+
+        return not key_present
 
     def luks_remove_key(self):
         if (self.device is None or
@@ -923,7 +935,7 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "remove a key from absent LUKS.")
 
-        if self._module.params['remove_keyslot']:
+        if self._module.params['remove_keyslot'] is not None:
             if not self._crypthandler.is_luks_slot_set(self.device, self._module.params['remove_keyslot']):
                 return False
             result = self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'])

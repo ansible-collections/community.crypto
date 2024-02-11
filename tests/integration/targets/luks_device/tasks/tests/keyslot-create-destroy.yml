@@ -176,3 +176,31 @@
     - kill_luks_slot4_idem is not changed
     - kill_luks_slot4_idem_check is not changed
     - "'Key Slot 4: DISABLED' in luks_header_slot4_removed.stdout or not '4: luks' in luks_header_slot4_removed.stdout"
+
+- name: Add key in slot 0
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    new_keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    new_keyslot: 0
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: add_luks_slot0
+- name: Remove key in slot 0
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    keyfile: "{{ remote_tmp_dir }}/keyfile2"
+    remove_keyslot: 0
+  become: true
+  register: kill_luks_slot0
+- name: Dump luks header
+  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  become: true
+  register: luks_header_slot0_removed
+- assert:
+    that:
+    - add_luks_slot0 is changed
+    - kill_luks_slot0 is changed
+    - "'Key Slot 0: DISABLED' in luks_header_slot0_removed.stdout or not '0: luks' in luks_header_slot0_removed.stdout"

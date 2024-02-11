@@ -275,6 +275,7 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
     module.params["passphrase"] = passphrase
     module.params["new_keyfile"] = new_keyfile
     module.params["new_passphrase"] = new_passphrase
+    module.params["new_keyslot"] = None
     module.params["state"] = state
     module.params["label"] = label
 
