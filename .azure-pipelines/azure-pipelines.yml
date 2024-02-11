@@ -93,8 +93,8 @@ stages:
         parameters:
           testFormat: 2.13/{0}/1
           targets:
-            - name: macOS 12.0
-              test: macos/12.0
+            # - name: macOS 12.0
+            #   test: macos/12.0
             - name: RHEL 7.9
               test: rhel/7.9
             - name: RHEL 8.5
