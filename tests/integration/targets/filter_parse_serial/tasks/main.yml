@@ -1,0 +1,62 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test parse_serial filter
+  assert:
+    that:
+      - >-
+        '0' | community.crypto.parse_serial == 0
+      - >-
+        '00' | community.crypto.parse_serial == 0
+      - >-
+        '000' | community.crypto.parse_serial == 0
+      - >-
+        'ff' | community.crypto.parse_serial == 255
+      - >-
+        '0ff' | community.crypto.parse_serial == 255
+      - >-
+        '1:0' | community.crypto.parse_serial == 256
+      - >-
+        '1:2:3' | community.crypto.parse_serial == 66051
+
+- name: "Test error 1: empty string"
+  debug:
+    msg: >-
+      {{ '' | community.crypto.parse_serial }}
+  ignore_errors: true
+  register: error_1
+
+- name: "Test error 2: invalid type"
+  debug:
+    msg: >-
+      {{ [] | community.crypto.parse_serial }}
+  ignore_errors: true
+  register: error_2
+
+- name: "Test error 3: invalid values (range)"
+  debug:
+    msg: >-
+      {{ '100' | community.crypto.parse_serial }}
+  ignore_errors: true
+  register: error_3
+
+- name: "Test error 4: invalid values (digits)"
+  debug:
+    msg: >-
+      {{ 'abcdefg' | community.crypto.parse_serial }}
+  ignore_errors: true
+  register: error_4
+
+- name: Validate errors
+  assert:
+    that:
+      - >-
+        error_1 is failed and "The 1st part '' is not a hexadecimal number in range [0, 255]: invalid literal" in error_1.msg
+      - >-
+        error_2 is failed and "The input for the community.crypto.parse_serial filter must be a string; got " in error_2.msg
+      - >-
+        error_3 is failed and "The 1st part '100' is not a hexadecimal number in range [0, 255]: the value is not in range [0, 255]" in error_3.msg
+      - >-
+        error_4 is failed and "The 1st part 'abcdefg' is not a hexadecimal number in range [0, 255]: invalid literal" in error_4.msg

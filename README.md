@@ -78,6 +78,7 @@ If you use the Ansible package and do not update collections independently, use 
   - crypto_info module
   - get_certificate module
   - luks_device module
+  - parse_serial and to_serial filters
 
 You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/).
 

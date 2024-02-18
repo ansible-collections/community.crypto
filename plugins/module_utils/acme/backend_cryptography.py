@@ -13,7 +13,6 @@ import base64
 import binascii
 import datetime
 import os
-import sys
 import traceback
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
@@ -36,6 +35,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    convert_int_to_bytes,
+    convert_int_to_hex,
+)
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     parse_name_field,
@@ -76,40 +80,6 @@ else:
             _cryptography_backend = cryptography.hazmat.backends.default_backend()
     except Exception as dummy:
         CRYPTOGRAPHY_ERROR = traceback.format_exc()
-
-
-if sys.version_info[0] >= 3:
-    # Python 3 (and newer)
-    def _count_bytes(n):
-        return (n.bit_length() + 7) // 8 if n > 0 else 0
-
-    def _convert_int_to_bytes(count, no):
-        return no.to_bytes(count, byteorder='big')
-
-    def _pad_hex(n, digits):
-        res = hex(n)[2:]
-        if len(res) < digits:
-            res = '0' * (digits - len(res)) + res
-        return res
-else:
-    # Python 2
-    def _count_bytes(n):
-        if n <= 0:
-            return 0
-        h = '%x' % n
-        return (len(h) + 1) // 2
-
-    def _convert_int_to_bytes(count, n):
-        h = '%x' % n
-        if len(h) > 2 * count:
-            raise Exception('Number {1} needs more than {0} bytes!'.format(count, n))
-        return ('0' * (2 * count - len(h)) + h).decode('hex')
-
-    def _pad_hex(n, digits):
-        h = '%x' % n
-        if len(h) < digits:
-            h = '0' * (digits - len(h)) + h
-        return h
 
 
 class CryptographyChainMatcher(ChainMatcher):
@@ -223,8 +193,8 @@ class CryptographyBackend(CryptoBackend):
                 'alg': 'RS256',
                 'jwk': {
                     "kty": "RSA",
-                    "e": nopad_b64(_convert_int_to_bytes(_count_bytes(pk.e), pk.e)),
-                    "n": nopad_b64(_convert_int_to_bytes(_count_bytes(pk.n), pk.n)),
+                    "e": nopad_b64(convert_int_to_bytes(pk.e)),
+                    "n": nopad_b64(convert_int_to_bytes(pk.n)),
                 },
                 'hash': 'sha256',
             }
@@ -260,8 +230,8 @@ class CryptographyBackend(CryptoBackend):
                 'jwk': {
                     "kty": "EC",
                     "crv": curve,
-                    "x": nopad_b64(_convert_int_to_bytes(num_bytes, pk.x)),
-                    "y": nopad_b64(_convert_int_to_bytes(num_bytes, pk.y)),
+                    "x": nopad_b64(convert_int_to_bytes(pk.x, count=num_bytes)),
+                    "y": nopad_b64(convert_int_to_bytes(pk.y, count=num_bytes)),
                 },
                 'hash': hashalg,
                 'point_size': point_size,
@@ -288,8 +258,8 @@ class CryptographyBackend(CryptoBackend):
                 hashalg = cryptography.hazmat.primitives.hashes.SHA512
             ecdsa = cryptography.hazmat.primitives.asymmetric.ec.ECDSA(hashalg())
             r, s = cryptography.hazmat.primitives.asymmetric.utils.decode_dss_signature(key_data['key_obj'].sign(sign_payload, ecdsa))
-            rr = _pad_hex(r, 2 * key_data['point_size'])
-            ss = _pad_hex(s, 2 * key_data['point_size'])
+            rr = convert_int_to_hex(r, 2 * key_data['point_size'])
+            ss = convert_int_to_hex(s, 2 * key_data['point_size'])
             signature = binascii.unhexlify(rr) + binascii.unhexlify(ss)
 
         return {

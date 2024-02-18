@@ -193,6 +193,8 @@ options:
                     - Mutually exclusive with O(revoked_certificates[].path) and
                       O(revoked_certificates[].content). One of these three options must
                       be specified.
+                    - This option accepts an B(integer). If you want to provide serial numbers as colon-separated hex strings,
+                      such as C(11:22:33), you need to convert them to an integer with P(community.crypto.parse_serial#filter).
                 type: int
             revocation_date:
                 description:
@@ -271,6 +273,12 @@ options:
 notes:
     - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
     - Date specified should be UTC. Minutes and seconds are mandatory.
+
+seealso:
+    - plugin: community.crypto.parse_serial
+      plugin_type: filter
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = r'''
@@ -356,7 +364,10 @@ revoked_certificates:
     elements: dict
     contains:
         serial_number:
-            description: Serial number of the certificate.
+            description:
+                - Serial number of the certificate.
+                - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+                  such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
             type: int
             sample: 1234
         revocation_date:

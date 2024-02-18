@@ -1,10 +1,16 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
 plugins/modules/acme_challenge_cert_helper.py validate-modules:return-syntax-error
+plugins/modules/ecs_certificate.py validate-modules:invalid-documentation
+plugins/modules/get_certificate.py validate-modules:invalid-documentation
+plugins/modules/openssh_cert.py validate-modules:invalid-documentation
+plugins/modules/openssl_csr.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
+plugins/modules/openssl_csr_pipe.py validate-modules:invalid-documentation
 plugins/modules/openssl_privatekey_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_publickey_info.py validate-modules:invalid-documentation
 plugins/modules/x509_certificate_info.py validate-modules:invalid-documentation
+plugins/modules/x509_crl.py validate-modules:invalid-documentation
 plugins/modules/x509_crl.py validate-modules:return-syntax-error
 plugins/modules/x509_crl_info.py validate-modules:invalid-documentation
 plugins/modules/x509_crl_info.py validate-modules:return-syntax-error

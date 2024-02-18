@@ -266,6 +266,8 @@ options:
                or for own CAs."
             - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier),
               O(authority_cert_issuer) and O(authority_cert_serial_number) is specified.
+            - This option accepts an B(integer). If you want to provide serial numbers as colon-separated hex strings,
+              such as C(11:22:33), you need to convert them to an integer with P(community.crypto.parse_serial#filter).
         type: int
     crl_distribution_points:
         description:
@@ -322,4 +324,6 @@ seealso:
 - module: community.crypto.openssl_privatekey_pipe
 - module: community.crypto.openssl_publickey
 - module: community.crypto.openssl_csr_info
+- plugin: community.crypto.parse_serial
+  plugin_type: filter
 '''

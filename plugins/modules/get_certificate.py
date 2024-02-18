@@ -106,6 +106,10 @@ notes:
 requirements:
     - "python >= 2.7 when using O(proxy_host)"
     - "cryptography >= 1.6"
+
+seealso:
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 RETURN = '''
@@ -147,31 +151,34 @@ extensions:
             type: str
             description: The extension's name.
 issuer:
-    description: Information about the issuer of the cert
+    description: Information about the issuer of the cert.
     returned: success
     type: dict
 not_after:
-    description: Expiration date of the cert
+    description: Expiration date of the cert.
     returned: success
     type: str
 not_before:
-    description: Issue date of the cert
+    description: Issue date of the cert.
     returned: success
     type: str
 serial_number:
-    description: The serial number of the cert
+    description:
+        - The serial number of the cert.
+        - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+          such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
     returned: success
-    type: str
+    type: int
 signature_algorithm:
-    description: The algorithm used to sign the cert
+    description: The algorithm used to sign the cert.
     returned: success
     type: str
 subject:
-    description: Information about the subject of the cert (OU, CN, etc)
+    description: Information about the subject of the cert (C(OU), C(CN), etc).
     returned: success
     type: dict
 version:
-    description: The version number of the certificate
+    description: The version number of the certificate.
     returned: success
     type: str
 '''
