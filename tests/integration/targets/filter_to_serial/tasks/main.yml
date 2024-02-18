@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test to_serial filter
+  assert:
+    that:
+      - 0 | community.crypto.to_serial == '00'
+      - 1 | community.crypto.to_serial == '01'
+      - 255 | community.crypto.to_serial == 'FF'
+      - 256 | community.crypto.to_serial == '01:00'
+      - 65536 | community.crypto.to_serial == '01:00:00'
+
+- name: "Test error 1: negative number"
+  debug:
+    msg: >-
+      {{ (-1) | community.crypto.to_serial }}
+  ignore_errors: true
+  register: error_1
+
+- name: "Test error 2: invalid type"
+  debug:
+    msg: >-
+      {{ [] | community.crypto.to_serial }}
+  ignore_errors: true
+  register: error_2
+
+- name: Validate error
+  assert:
+    that:
+      - >-
+        error_1 is failed and "The input for the community.crypto.to_serial filter must not be negative" in error_1.msg
+      - >-
+        error_2 is failed and "The input for the community.crypto.to_serial filter must be an integer; got " in error_2.msg
