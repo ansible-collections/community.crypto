@@ -132,7 +132,9 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
 </ul>
@@ -239,6 +241,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
 <p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension will only be added if at least one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-key-identifier"><span class="std std-ref"><span class="pre">authority_key_identifier</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-issuer"><span class="std std-ref"><span class="pre">authority_cert_issuer</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-serial-number"><span class="std std-ref"><span class="pre">authority_cert_serial_number</span></span></a></strong></code> is specified.</p>
+<p>This option accepts an <strong>integer</strong>. If you want to provide serial numbers as colon-separated hex strings, such as <code class="docutils literal notranslate"><span class="pre">11:22:33</span></code>, you need to convert them to an integer with <a class="reference internal" href="parse_serial_filter.html#ansible-collections-community-crypto-parse-serial-filter"><span class="std std-ref">community.crypto.parse_serial</span></a>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -717,6 +720,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>Generate an OpenSSL public key from its private key.</p>
 </dd>
 <dt><a class="reference internal" href="openssl_csr_info_module.html#ansible-collections-community-crypto-openssl-csr-info-module"><span class="std std-ref">community.crypto.openssl_csr_info</span></a></dt><dd><p>Provide information of OpenSSL Certificate Signing Requests (CSR).</p>
+</dd>
+<dt><a class="reference internal" href="parse_serial_filter.html#ansible-collections-community-crypto-parse-serial-filter"><span class="std std-ref">community.crypto.parse_serial</span></a> filter plugin</dt><dd><p>Convert a serial number as a colon-separated list of hex numbers to an integer.</p>
 </dd>
 </dl>
 </div>

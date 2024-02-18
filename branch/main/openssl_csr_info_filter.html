@@ -131,7 +131,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
 </ul>
@@ -263,6 +265,8 @@ example: <code class="docutils literal notranslate"><span class="pre">input</spa
 <dl class="simple">
 <dt><a class="reference internal" href="openssl_csr_info_module.html#ansible-collections-community-crypto-openssl-csr-info-module"><span class="std std-ref">community.crypto.openssl_csr_info</span></a></dt><dd><p>Provide information of OpenSSL Certificate Signing Requests (CSR).</p>
 </dd>
+<dt><a class="reference internal" href="to_serial_filter.html#ansible-collections-community-crypto-to-serial-filter"><span class="std std-ref">community.crypto.to_serial</span></a> filter plugin</dt><dd><p>Convert an integer to a colon-separated list of hex numbers.</p>
+</dd>
 </dl>
 </div>
 </section>
@@ -314,6 +318,7 @@ example: <code class="docutils literal notranslate"><span class="pre">input</spa
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The CSR’s authority cert serial number.</p>
 <p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension is not present.</p>
+<p>This return value is an <strong>integer</strong>. If you need the serial numbers as a colon-separated hex string, such as <code class="docutils literal notranslate"><span class="pre">11:22:33</span></code>, you need to convert it to that form with <a class="reference internal" href="to_serial_filter.html#ansible-collections-community-crypto-to-serial-filter"><span class="std std-ref">community.crypto.to_serial</span></a>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">12345</span></code></p>
 </div></td>
