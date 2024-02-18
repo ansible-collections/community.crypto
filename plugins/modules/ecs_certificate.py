@@ -350,6 +350,8 @@ seealso:
       description: Can be used to create private keys (both for certificates and accounts).
     - module: community.crypto.openssl_csr
       description: Can be used to create a Certificate Signing Request (CSR).
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = r'''
@@ -490,7 +492,10 @@ tracking_id:
     type: int
     sample: 380079
 serial_number:
-    description: The serial number of the issued certificate.
+    description:
+        - The serial number of the issued certificate.
+        - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+          such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
     returned: success
     type: int
     sample: 1235262234164342

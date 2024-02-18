@@ -55,6 +55,8 @@ seealso:
     - plugin: community.crypto.openssl_csr_info
       plugin_type: filter
       description: A filter variant of this module.
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = r'''
@@ -301,6 +303,8 @@ authority_cert_serial_number:
     description:
         - The CSR's authority cert serial number.
         - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
+        - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+          such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
     returned: success
     type: int
     sample: 12345

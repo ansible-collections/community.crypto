@@ -26,6 +26,8 @@ extends_documentation_fragment:
     - community.crypto.name_encoding
 seealso:
     - module: community.crypto.x509_certificate_info
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = '''
@@ -253,7 +255,10 @@ _value:
             type: str
             sample: sha256WithRSAEncryption
         serial_number:
-            description: The certificate's serial number.
+            description:
+                - The certificate's serial number.
+                - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+                  such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
             returned: success
             type: int
             sample: 1234
@@ -291,6 +296,8 @@ _value:
             description:
                 - The certificate's authority cert serial number.
                 - Is V(none) if the C(AuthorityKeyIdentifier) extension is not present.
+                - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+                  such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
             returned: success
             type: int
             sample: 12345

@@ -190,7 +190,13 @@ options:
                The certificate serial number may be used in a KeyRevocationList.
                The serial number may be omitted for checks, but must be specified again for a new certificate.
                Note: The default value set by ssh-keygen is 0."
+            - This option accepts an B(integer). If you want to provide serial numbers as colon-separated hex strings,
+              such as C(11:22:33), you need to convert them to an integer with P(community.crypto.parse_serial#filter).
         type: int
+
+seealso:
+    - plugin: community.crypto.parse_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = '''

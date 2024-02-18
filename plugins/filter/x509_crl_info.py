@@ -35,6 +35,8 @@ extends_documentation_fragment:
     - community.crypto.name_encoding
 seealso:
     - module: community.crypto.x509_crl_info
+    - plugin: community.crypto.to_serial
+      plugin_type: filter
 '''
 
 EXAMPLES = '''
@@ -100,7 +102,10 @@ _value:
             elements: dict
             contains:
                 serial_number:
-                    description: Serial number of the certificate.
+                    description:
+                        - Serial number of the certificate.
+                        - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+                          such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
                     type: int
                     sample: 1234
                 revocation_date:
