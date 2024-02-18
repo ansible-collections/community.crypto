@@ -164,6 +164,21 @@ options:
         type: str
         default: sha256
 
+    serial_numbers:
+        description:
+            - This option determines which values will be accepted for O(revoked_certificates[].serial_number).
+            - If set to V(integer) (default), serial numbers are assumed to be integers, for example V(66223).
+              (This example value is equivalent to the hex octet string V(01:02:AF).)
+            - If set to V(hex-octets), serial numbers are assumed to be colon-separated hex octet strings,
+              for example V(01:02:AF).
+              (This example value is equivalent to the integer V(66223).)
+        type: str
+        choices:
+            - integer
+            - hex-octets
+        default: integer
+        version_added: 2.18.0
+
     revoked_certificates:
         description:
             - List of certificates to be revoked.
@@ -193,9 +208,13 @@ options:
                     - Mutually exclusive with O(revoked_certificates[].path) and
                       O(revoked_certificates[].content). One of these three options must
                       be specified.
-                    - This option accepts an B(integer). If you want to provide serial numbers as colon-separated hex strings,
-                      such as C(11:22:33), you need to convert them to an integer with P(community.crypto.parse_serial#filter).
-                type: int
+                    - This option accepts integers or hex octet strings, depending on the value
+                      of O(serial_numbers).
+                    - If O(serial_numbers=integer), integers such as V(66223) must be provided.
+                    - If O(serial_numbers=hex-octets), strings such as V(01:02:AF) must be provided.
+                    - You can use the filters P(community.crypto.parse_serial#filter) and
+                      P(community.crypto.to_serial#filter) to convert these two representations.
+                type: raw
             revocation_date:
                 description:
                     - The point in time the certificate was revoked.
@@ -431,7 +450,9 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.validation import check_type_int, check_type_str
 
+from ansible_collections.community.crypto.plugins.module_utils.serial import parse_serial
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
@@ -520,6 +541,7 @@ class CRL(OpenSSLObject):
         self.ignore_timestamps = module.params['ignore_timestamps']
         self.return_content = module.params['return_content']
         self.name_encoding = module.params['name_encoding']
+        self.serial_numbers_format = module.params['serial_numbers']
         self.crl_content = None
 
         self.privatekey_path = module.params['privatekey_path']
@@ -544,6 +566,8 @@ class CRL(OpenSSLObject):
         self.digest = select_message_digest(module.params['digest'])
         if self.digest is None:
             raise CRLError('The digest "{0}" is not supported'.format(module.params['digest']))
+
+        self.module = module
 
         self.revoked_certificates = []
         for i, rc in enumerate(module.params['revoked_certificates']):
@@ -576,7 +600,7 @@ class CRL(OpenSSLObject):
                         )
             else:
                 # Specify serial_number (and potentially issuer) directly
-                result['serial_number'] = rc['serial_number']
+                result['serial_number'] = self._parse_serial_number(rc['serial_number'], i)
             # All other options
             if rc['issuer']:
                 result['issuer'] = [cryptography_get_name(issuer, 'issuer') for issuer in rc['issuer']]
@@ -595,8 +619,6 @@ class CRL(OpenSSLObject):
                 )
                 result['invalidity_date_critical'] = rc['invalidity_date_critical']
             self.revoked_certificates.append(result)
-
-        self.module = module
 
         self.backup = module.params['backup']
         self.backup_file = None
@@ -630,6 +652,25 @@ class CRL(OpenSSLObject):
             data = None
 
         self.diff_after = self.diff_before = self._get_info(data)
+
+    def _parse_serial_number(self, value, index):
+        if self.serial_numbers_format == 'integer':
+            try:
+                return check_type_int(value)
+            except TypeError as exc:
+                self.module.fail_json(msg='Error while parsing revoked_certificates[{idx}].serial_number as an integer: {exc}'.format(
+                    idx=index + 1,
+                    exc=to_native(exc),
+                ))
+        if self.serial_numbers_format == 'hex-octets':
+            try:
+                return parse_serial(check_type_str(value))
+            except (TypeError, ValueError) as exc:
+                self.module.fail_json(msg='Error while parsing revoked_certificates[{idx}].serial_number as an colon-separated hex octet string: {exc}'.format(
+                    idx=index + 1,
+                    exc=to_native(exc),
+                ))
+        raise RuntimeError('Unexpected value %s of serial_numbers' % (self.serial_numbers_format, ))
 
     def _get_info(self, data):
         if data is None:
@@ -896,7 +937,7 @@ def main():
                 options=dict(
                     path=dict(type='path'),
                     content=dict(type='str'),
-                    serial_number=dict(type='int'),
+                    serial_number=dict(type='raw'),
                     revocation_date=dict(type='str', default='+0s'),
                     issuer=dict(type='list', elements='str'),
                     issuer_critical=dict(type='bool', default=False),
@@ -916,6 +957,7 @@ def main():
                 mutually_exclusive=[['path', 'content', 'serial_number']],
             ),
             name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
+            serial_numbers=dict(type='str', default='integer', choices=['integer', 'hex-octets']),
         ),
         required_if=[
             ('state', 'present', ['privatekey_path', 'privatekey_content'], True),
