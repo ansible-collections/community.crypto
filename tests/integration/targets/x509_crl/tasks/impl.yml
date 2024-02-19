@@ -119,7 +119,7 @@
     - cert-2.pem
   register: slurp
 
-- name: Create CRL 1 (idempotent with content, check mode)
+- name: Create CRL 1 (idempotent with content and octet string serial, check mode)
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl1.crl'
     privatekey_content: "{{ slurp.results[0].content | b64decode }}"
@@ -127,6 +127,7 @@
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
+    serial_numbers: hex-octets
     revoked_certificates:
       - content: "{{ slurp.results[1].content | b64decode }}"
         revocation_date: 20191013000000Z
@@ -135,12 +136,12 @@
         reason: key_compromise
         reason_critical: true
         invalidity_date: 20191012000000Z
-      - serial_number: 1234
+      - serial_number: 04:D2
         revocation_date: 20191001000000Z
   check_mode: true
   register: crl_1_idem_content_check
 
-- name: Create CRL 1 (idempotent with content)
+- name: Create CRL 1 (idempotent with content and octet string serial)
   x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl1.crl'
     privatekey_content: "{{ slurp.results[0].content | b64decode }}"
@@ -148,6 +149,7 @@
       CN: Ansible
     last_update: 20191013000000Z
     next_update: 20191113000000Z
+    serial_numbers: hex-octets
     revoked_certificates:
       - content: "{{ slurp.results[1].content | b64decode }}"
         revocation_date: 20191013000000Z
@@ -156,7 +158,7 @@
         reason: key_compromise
         reason_critical: true
         invalidity_date: 20191012000000Z
-      - serial_number: 1234
+      - serial_number: 04:D2
         revocation_date: 20191001000000Z
   register: crl_1_idem_content
 
@@ -220,7 +222,7 @@
         reason: key_compromise
         reason_critical: true
         invalidity_date: 20191012000000Z
-      - serial_number: 1234
+      - serial_number: "1234"
         revocation_date: 20191001000000Z
   check_mode: true
   register: crl_1_format_idem_check
@@ -242,7 +244,7 @@
         reason: key_compromise
         reason_critical: true
         invalidity_date: 20191012000000Z
-      - serial_number: 1234
+      - serial_number: "1234"
         revocation_date: 20191001000000Z
     return_content: true
   register: crl_1_format_idem
