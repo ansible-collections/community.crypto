@@ -557,11 +557,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoked_certificates/serial_number"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-serial-number"><strong>serial_number</strong></p>
-<a class="ansibleOptionLink" href="#parameter-revoked_certificates/serial_number" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<a class="ansibleOptionLink" href="#parameter-revoked_certificates/serial_number" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Serial number of the certificate.</p>
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-path"><span class="std std-ref"><span class="pre">revoked_certificates[].path</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-content"><span class="std std-ref"><span class="pre">revoked_certificates[].content</span></span></a></strong></code>. One of these three options must be specified.</p>
-<p>This option accepts an <strong>integer</strong>. If you want to provide serial numbers as colon-separated hex strings, such as <code class="docutils literal notranslate"><span class="pre">11:22:33</span></code>, you need to convert them to an integer with <a class="reference internal" href="parse_serial_filter.html#ansible-collections-community-crypto-parse-serial-filter"><span class="std std-ref">community.crypto.parse_serial</span></a>.</p>
+<p>This option accepts integers or hex octet strings, depending on the value of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-serial-numbers"><span class="std std-ref"><span class="pre">serial_numbers</span></span></a></strong></code>.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-serial-numbers"><span class="std std-ref"><span class="pre">serial_numbers=integer</span></span></a></code>, integers such as <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code> must be provided.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-serial-numbers"><span class="std std-ref"><span class="pre">serial_numbers=hex-octets</span></span></a></code>, strings such as <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code> must be provided.</p>
+<p>You can use the filters <a class="reference internal" href="parse_serial_filter.html#ansible-collections-community-crypto-parse-serial-filter"><span class="std std-ref">community.crypto.parse_serial</span></a> and <a class="reference internal" href="to_serial_filter.html#ansible-collections-community-crypto-to-serial-filter"><span class="std std-ref">community.crypto.to_serial</span></a> to convert these two representations.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -574,6 +577,21 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-serial_numbers"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-serial-numbers"><strong>serial_numbers</strong></p>
+<a class="ansibleOptionLink" href="#parameter-serial_numbers" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.18.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>This option determines which values will be accepted for <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-serial-number"><span class="std std-ref"><span class="pre">revoked_certificates[].serial_number</span></span></a></strong></code>.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">integer</span></code> (default), serial numbers are assumed to be integers, for example <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>. (This example value is equivalent to the hex octet string <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>.)</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">hex-octets</span></code>, serial numbers are assumed to be colon-separated hex octet strings, for example <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>. (This example value is equivalent to the integer <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>.)</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;integer&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;hex-octets&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-serole"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-serole"><strong>serole</strong></p>
 <a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -581,7 +599,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-setype"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-setype"><strong>setype</strong></p>
 <a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -589,7 +607,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-seuser"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-seuser"><strong>seuser</strong></p>
 <a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -598,7 +616,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -610,7 +628,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
 <a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
