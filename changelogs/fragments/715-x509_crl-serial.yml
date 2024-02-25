@@ -1,5 +1,0 @@
-minor_changes:
-  - "x509_crl - the new option ``serial_numbers`` allow to configure in which format serial numbers can be provided
-    to ``revoked_certificates[].serial_number``. The default is as integers (``serial_numbers=integer``) for backwards compatibility;
-    setting ``serial_numbers=hex-octets`` allows to specify colon-separated hex octet strings like ``00:11:22:FF``
-    (https://github.com/ansible-collections/community.crypto/issues/687, https://github.com/ansible-collections/community.crypto/pull/715)."
