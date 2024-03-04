@@ -29,4 +29,4 @@ jobs:
           rm -f tests/integration/targets/*/files/roots/*.pem
 
       - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@v2
+        uses: fsfe/reuse-action@v3
