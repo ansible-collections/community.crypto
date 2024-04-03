@@ -65,6 +65,17 @@ stages:
               test: 'devel/sanity/extra'
             - name: Units
               test: 'devel/units/1'
+  - stage: Ansible_2_17
+    displayName: Sanity & Units 2.17
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Sanity
+              test: '2.17/sanity/1'
+            - name: Units
+              test: '2.17/units/1'
   - stage: Ansible_2_16
     displayName: Sanity & Units 2.16
     dependsOn: []
@@ -111,6 +122,19 @@ stages:
               test: fedora39
             - name: Ubuntu 22.04
               test: ubuntu2204
+            - name: Alpine 3.19
+              test: alpine319
+          groups:
+            - 1
+            - 2
+  - stage: Docker_2_17
+    displayName: Docker 2.17
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.17/linux/{0}
+          targets:
             - name: Alpine 3.19
               test: alpine319
           groups:
@@ -210,10 +234,21 @@ stages:
               test: macos/14.3
             - name: RHEL 9.3
               test: rhel/9.3
-            - name: FreeBSD 13.3
-              test: freebsd/13.3
             - name: FreeBSD 14.0
               test: freebsd/14.0
+          groups:
+            - 1
+            - 2
+  - stage: Remote_2_17
+    displayName: Remote 2.17
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.17/{0}
+          targets:
+            - name: FreeBSD 13.3
+              test: freebsd/13.3
           groups:
             - 1
             - 2
@@ -293,6 +328,20 @@ stages:
           groups:
             - 1
             - 2
+  - stage: Generic_2_17
+    displayName: Generic 2.17
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.17/generic/{0}
+          targets:
+            - test: "3.7"
+            - test: "3.12"
+          groups:
+            - 1
+            - 2
   - stage: Generic_2_16
     displayName: Generic 2.16
     dependsOn: []
@@ -342,20 +391,24 @@ stages:
     condition: succeededOrFailed()
     dependsOn:
       - Ansible_devel
+      - Ansible_2_17
       - Ansible_2_16
       - Ansible_2_15
       - Ansible_2_14
       - Remote_devel_extra_vms
       - Remote_devel
+      - Remote_2_17
       - Remote_2_16
       - Remote_2_15
       - Remote_2_14
       - Docker_devel
+      - Docker_2_17
       - Docker_2_16
       - Docker_2_15
       - Docker_2_14
       - Docker_community_devel
       - Generic_devel
+      - Generic_2_17
       - Generic_2_16
       - Generic_2_15
       - Generic_2_14
