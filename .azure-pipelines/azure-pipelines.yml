@@ -98,17 +98,6 @@ stages:
               test: '2.15/sanity/1'
             - name: Units
               test: '2.15/units/1'
-  - stage: Ansible_2_14
-    displayName: Sanity & Units 2.14
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.14/sanity/1'
-            - name: Units
-              test: '2.14/units/1'
 ### Docker
   - stage: Docker_devel
     displayName: Docker devel
@@ -169,19 +158,6 @@ stages:
               test: fedora37
             - name: CentOS 7
               test: centos7
-          groups:
-            - 1
-            - 2
-  - stage: Docker_2_14
-    displayName: Docker 2.14
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.14/linux/{0}
-          targets:
-            - name: Ubuntu 20.04
-              test: ubuntu2004
           groups:
             - 1
             - 2
@@ -292,23 +268,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Remote_2_14
-    displayName: Remote 2.14
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.14/{0}
-          targets:
-            #- name: macOS 12.0
-            #  test: macos/12.0
-            - name: RHEL 9.0
-              test: rhel/9.0
-            #- name: FreeBSD 12.4
-            #  test: freebsd/12.4
-          groups:
-            - 1
-            - 2
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -371,19 +330,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Generic_2_14
-    displayName: Generic 2.14
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.14/generic/{0}
-          targets:
-            - test: 3.9
-          groups:
-            - 1
-            - 2
 
   ## Finally
 
@@ -394,23 +340,19 @@ stages:
       - Ansible_2_17
       - Ansible_2_16
       - Ansible_2_15
-      - Ansible_2_14
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_17
       - Remote_2_16
       - Remote_2_15
-      - Remote_2_14
       - Docker_devel
       - Docker_2_17
       - Docker_2_16
       - Docker_2_15
-      - Docker_2_14
       - Docker_community_devel
       - Generic_devel
       - Generic_2_17
       - Generic_2_16
       - Generic_2_15
-      - Generic_2_14
     jobs:
       - template: templates/coverage.yml
