@@ -298,31 +298,51 @@ class CryptographyBackend(CryptoBackend):
             },
         }
 
+    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+        '''
+        Return a list of requested identifiers (CN and SANs) for the CSR.
+        Each identifier is a pair (type, identifier), where type is either
+        'dns' or 'ip'.
+
+        The list is deduplicated, and if a CNAME is present, it will be returned
+        as the first element in the result.
+        '''
+        if csr_content is None:
+            csr_content = read_file(csr_filename)
+        else:
+            csr_content = to_bytes(csr_content)
+        csr = cryptography.x509.load_pem_x509_csr(csr_content, _cryptography_backend)
+
+        identifiers = set()
+        result = []
+
+        def add_identifier(identifier):
+            if identifier in identifiers:
+                return
+            identifiers.add(identifier)
+            result.append(identifier)
+
+        for sub in csr.subject:
+            if sub.oid == cryptography.x509.oid.NameOID.COMMON_NAME:
+                add_identifier(('dns', sub.value))
+        for extension in csr.extensions:
+            if extension.oid == cryptography.x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME:
+                for name in extension.value:
+                    if isinstance(name, cryptography.x509.DNSName):
+                        add_identifier(('dns', name.value))
+                    elif isinstance(name, cryptography.x509.IPAddress):
+                        add_identifier(('ip', name.value.compressed))
+                    else:
+                        raise BackendException('Found unsupported SAN identifier {0}'.format(name))
+        return result
+
     def get_csr_identifiers(self, csr_filename=None, csr_content=None):
         '''
         Return a set of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
         'dns' or 'ip'.
         '''
-        identifiers = set([])
-        if csr_content is None:
-            csr_content = read_file(csr_filename)
-        else:
-            csr_content = to_bytes(csr_content)
-        csr = cryptography.x509.load_pem_x509_csr(csr_content, _cryptography_backend)
-        for sub in csr.subject:
-            if sub.oid == cryptography.x509.oid.NameOID.COMMON_NAME:
-                identifiers.add(('dns', sub.value))
-        for extension in csr.extensions:
-            if extension.oid == cryptography.x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME:
-                for name in extension.value:
-                    if isinstance(name, cryptography.x509.DNSName):
-                        identifiers.add(('dns', name.value))
-                    elif isinstance(name, cryptography.x509.IPAddress):
-                        identifiers.add(('ip', name.value.compressed))
-                    else:
-                        raise BackendException('Found unsupported SAN identifier {0}'.format(name))
-        return identifiers
+        return set(self.get_ordered_csr_identifiers(csr_filename=csr_filename, csr_content=csr_content))
 
     def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
         '''

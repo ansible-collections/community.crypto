@@ -34,6 +34,23 @@ class CryptoBackend(object):
     def create_mac_key(self, alg, key):
         '''Create a MAC key.'''
 
+    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+        '''
+        Return a list of requested identifiers (CN and SANs) for the CSR.
+        Each identifier is a pair (type, identifier), where type is either
+        'dns' or 'ip'.
+
+        The list is deduplicated, and if a CNAME is present, it will be returned
+        as the first element in the result.
+        '''
+        self.module.deprecate(
+            "Every backend must override the get_ordered_csr_identifiers() method."
+            " The default implementation will be removed in 3.0.0 and this method will be marked as `abstractmethod` by then.",
+            version='3.0.0',
+            collection_name='community.crypto',
+        )
+        return sorted(self.get_csr_identifiers(csr_filename=csr_filename, csr_content=csr_content))
+
     @abc.abstractmethod
     def get_csr_identifiers(self, csr_filename=None, csr_content=None):
         '''
