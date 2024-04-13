@@ -225,11 +225,14 @@ class OpenSSLCLIBackend(CryptoBackend):
             # We do not want to error out on something IPAddress() cannot parse
             return ip
 
-    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
         '''
-        Return a set of requested identifiers (CN and SANs) for the CSR.
+        Return a list of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
         'dns' or 'ip'.
+
+        The list is deduplicated, and if a CNAME is present, it will be returned
+        as the first element in the result.
         '''
         filename = csr_filename
         data = None
@@ -241,24 +244,40 @@ class OpenSSLCLIBackend(CryptoBackend):
         dummy, out, dummy = self.module.run_command(
             openssl_csr_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
 
-        identifiers = set([])
+        identifiers = set()
+        result = []
+
+        def add_identifier(identifier):
+            if identifier in identifiers:
+                return
+            identifiers.add(identifier)
+            result.append(identifier)
+
         common_name = re.search(r"Subject:.* CN\s?=\s?([^\s,;/]+)", to_text(out, errors='surrogate_or_strict'))
         if common_name is not None:
-            identifiers.add(('dns', common_name.group(1)))
+            add_identifier(('dns', common_name.group(1)))
         subject_alt_names = re.search(
             r"X509v3 Subject Alternative Name: (?:critical)?\n +([^\n]+)\n",
             to_text(out, errors='surrogate_or_strict'), re.MULTILINE | re.DOTALL)
         if subject_alt_names is not None:
             for san in subject_alt_names.group(1).split(", "):
                 if san.lower().startswith("dns:"):
-                    identifiers.add(('dns', san[4:]))
+                    add_identifier(('dns', san[4:]))
                 elif san.lower().startswith("ip:"):
-                    identifiers.add(('ip', self._normalize_ip(san[3:])))
+                    add_identifier(('ip', self._normalize_ip(san[3:])))
                 elif san.lower().startswith("ip address:"):
-                    identifiers.add(('ip', self._normalize_ip(san[11:])))
+                    add_identifier(('ip', self._normalize_ip(san[11:])))
                 else:
                     raise BackendException('Found unsupported SAN identifier "{0}"'.format(san))
-        return identifiers
+        return result
+
+    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+        '''
+        Return a set of requested identifiers (CN and SANs) for the CSR.
+        Each identifier is a pair (type, identifier), where type is either
+        'dns' or 'ip'.
+        '''
+        return set(self.get_ordered_csr_identifiers(csr_filename=csr_filename, csr_content=csr_content))
 
     def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
         '''

@@ -661,7 +661,7 @@ class ACMECertificateClient(object):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
         # Extract list of identifiers from CSR
-        self.identifiers = self.client.backend.get_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
+        self.identifiers = self.client.backend.get_ordered_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
 
     def is_first_step(self):
         '''
