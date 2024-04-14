@@ -410,6 +410,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     get_relative_time_option,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
     select_backend,
 )
@@ -451,7 +455,7 @@ def main():
                 module.fail_json(
                     msg='The value for valid_at.{0} must be of type string (got {1})'.format(k, type(v))
                 )
-            valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k))
+            valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k), with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
     try:
         result = module_backend.get_info(der_support_enabled=module.params['content'] is None)

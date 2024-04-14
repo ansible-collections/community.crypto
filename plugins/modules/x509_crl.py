@@ -475,6 +475,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
     cryptography_get_name,
     cryptography_key_needs_digest_for_signing,
@@ -489,6 +490,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_decode_revoked_certificate,
     cryptography_dump_revoked,
     cryptography_get_signature_algorithm_oid_from_crl,
+    get_next_update,
+    get_last_update,
+    set_next_update,
+    set_last_update,
+    set_revocation_date,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
@@ -560,8 +566,8 @@ class CRL(OpenSSLObject):
         except (TypeError, ValueError) as exc:
             module.fail_json(msg=to_native(exc))
 
-        self.last_update = get_relative_time_option(module.params['last_update'], 'last_update')
-        self.next_update = get_relative_time_option(module.params['next_update'], 'next_update')
+        self.last_update = get_relative_time_option(module.params['last_update'], 'last_update', with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        self.next_update = get_relative_time_option(module.params['next_update'], 'next_update', with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
         self.digest = select_message_digest(module.params['digest'])
         if self.digest is None:
@@ -607,7 +613,8 @@ class CRL(OpenSSLObject):
                 result['issuer_critical'] = rc['issuer_critical']
             result['revocation_date'] = get_relative_time_option(
                 rc['revocation_date'],
-                path_prefix + 'revocation_date'
+                path_prefix + 'revocation_date',
+                with_timezone=CRYPTOGRAPHY_TIMEZONE,
             )
             if rc['reason']:
                 result['reason'] = REVOCATION_REASON_MAP[rc['reason']]
@@ -616,6 +623,7 @@ class CRL(OpenSSLObject):
                 result['invalidity_date'] = get_relative_time_option(
                     rc['invalidity_date'],
                     path_prefix + 'invalidity_date'
+                    # TODO with_timezone=CRYPTOGRAPHY_TIMEZONE,
                 )
                 result['invalidity_date_critical'] = rc['invalidity_date_critical']
             self.revoked_certificates.append(result)
@@ -731,9 +739,9 @@ class CRL(OpenSSLObject):
         if self.crl is None:
             return False
 
-        if self.last_update != self.crl.last_update and not self.ignore_timestamps:
+        if self.last_update != get_last_update(self.crl) and not self.ignore_timestamps:
             return False
-        if self.next_update != self.crl.next_update and not self.ignore_timestamps:
+        if self.next_update != get_next_update(self.crl) and not self.ignore_timestamps:
             return False
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.crl.signature_hash_algorithm is None or self.digest.name != self.crl.signature_hash_algorithm.name:
@@ -780,8 +788,8 @@ class CRL(OpenSSLObject):
         except ValueError as e:
             raise CRLError(e)
 
-        crl = crl.last_update(self.last_update)
-        crl = crl.next_update(self.next_update)
+        crl = set_last_update(crl, self.last_update)
+        crl = set_next_update(crl, self.next_update)
 
         if self.update and self.crl:
             new_entries = set([self._compress_entry(entry) for entry in self.revoked_certificates])
@@ -792,7 +800,7 @@ class CRL(OpenSSLObject):
         for entry in self.revoked_certificates:
             revoked_cert = RevokedCertificateBuilder()
             revoked_cert = revoked_cert.serial_number(entry['serial_number'])
-            revoked_cert = revoked_cert.revocation_date(entry['revocation_date'])
+            revoked_cert = set_revocation_date(revoked_cert, entry['revocation_date'])
             if entry['issuer'] is not None:
                 revoked_cert = revoked_cert.add_extension(
                     x509.CertificateIssuer(entry['issuer']),
@@ -876,8 +884,8 @@ class CRL(OpenSSLObject):
             for entry in self.revoked_certificates:
                 result['revoked_certificates'].append(cryptography_dump_revoked(entry, idn_rewrite=self.name_encoding))
         elif self.crl:
-            result['last_update'] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
-            result['next_update'] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
+            result['last_update'] = get_last_update(self.crl).strftime(TIMESTAMP_FORMAT)
+            result['next_update'] = get_next_update(self.crl).strftime(TIMESTAMP_FORMAT)
             result['digest'] = cryptography_oid_to_name(cryptography_get_signature_algorithm_oid_from_crl(self.crl))
             issuer = []
             for attribute in self.crl.issuer:

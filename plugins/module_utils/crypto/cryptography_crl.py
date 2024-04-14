@@ -19,6 +19,7 @@ from .basic import (
 )
 
 from .cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
 )
 
@@ -55,7 +56,7 @@ else:
 def cryptography_decode_revoked_certificate(cert):
     result = {
         'serial_number': cert.serial_number,
-        'revocation_date': cert.revocation_date,
+        'revocation_date': get_revocation_date(cert),
         'issuer': None,
         'issuer_critical': False,
         'reason': None,
@@ -112,3 +113,33 @@ def cryptography_get_signature_algorithm_oid_from_crl(crl):
             crl._x509_crl.sig_alg.algorithm
         )
         return x509.oid.ObjectIdentifier(dotted)
+
+
+def get_next_update(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.next_update_utc
+    return obj.next_update
+
+
+def get_last_update(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.last_update_utc
+    return obj.last_update
+
+
+def get_revocation_date(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.revocation_date_utc
+    return obj.revocation_date
+
+
+def set_next_update(builder, value):
+    return builder.next_update(value)
+
+
+def set_last_update(builder, value):
+    return builder.last_update(value)
+
+
+def set_revocation_date(builder, value):
+    return builder.revocation_date(value)

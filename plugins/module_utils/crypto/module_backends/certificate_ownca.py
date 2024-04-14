@@ -31,6 +31,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
     cryptography_verify_certificate_signature,
+    get_not_valid_after,
+    get_not_valid_before,
+    set_not_valid_after,
+    set_not_valid_before,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -120,8 +124,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         cert_builder = cert_builder.subject_name(self.csr.subject)
         cert_builder = cert_builder.issuer_name(self.ca_cert.subject)
         cert_builder = cert_builder.serial_number(self.serial_number)
-        cert_builder = cert_builder.not_valid_before(self.notBefore)
-        cert_builder = cert_builder.not_valid_after(self.notAfter)
+        cert_builder = set_not_valid_before(cert_builder, self.notBefore)
+        cert_builder = set_not_valid_after(cert_builder, self.notAfter)
         cert_builder = cert_builder.public_key(self.csr.public_key())
         has_ski = False
         for extension in self.csr.extensions:
@@ -220,8 +224,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             if self.cert is None:
                 self.cert = self.existing_certificate
             result.update({
-                'notBefore': self.cert.not_valid_before.strftime("%Y%m%d%H%M%SZ"),
-                'notAfter': self.cert.not_valid_after.strftime("%Y%m%d%H%M%SZ"),
+                'notBefore': get_not_valid_before(self.cert).strftime("%Y%m%d%H%M%SZ"),
+                'notAfter': get_not_valid_after(self.cert).strftime("%Y%m%d%H%M%SZ"),
                 'serial_number': cryptography_serial_number_of_cert(self.cert),
             })
 

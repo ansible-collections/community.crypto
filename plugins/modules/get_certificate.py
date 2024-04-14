@@ -209,7 +209,6 @@ EXAMPLES = '''
 
 import atexit
 import base64
-import datetime
 import traceback
 
 from os.path import isfile
@@ -221,9 +220,16 @@ from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_now_datetime,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_oid_to_name,
     cryptography_get_extensions_from_cert,
+    get_not_valid_after,
+    get_not_valid_before,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
@@ -392,7 +398,7 @@ def main():
         for attribute in x509.subject:
             result['subject'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
 
-        result['expired'] = x509.not_valid_after < datetime.datetime.utcnow()
+        result['expired'] = get_not_valid_after(x509) < get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
         result['extensions'] = []
         for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
@@ -410,8 +416,8 @@ def main():
         for attribute in x509.issuer:
             result['issuer'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
 
-        result['not_after'] = x509.not_valid_after.strftime('%Y%m%d%H%M%SZ')
-        result['not_before'] = x509.not_valid_before.strftime('%Y%m%d%H%M%SZ')
+        result['not_after'] = get_not_valid_after(x509).strftime('%Y%m%d%H%M%SZ')
+        result['not_before'] = get_not_valid_before(x509).strftime('%Y%m%d%H%M%SZ')
 
         result['serial_number'] = x509.serial_number
         result['signature_algorithm'] = cryptography_oid_to_name(x509.signature_algorithm_oid)

@@ -29,7 +29,9 @@ try:
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import padding
     import ipaddress
+    _HAS_CRYPTOGRAPHY = True
 except ImportError:
+    _HAS_CRYPTOGRAPHY = False
     # Error handled in the calling module.
     pass
 
@@ -104,6 +106,11 @@ from ._objects import (
 )
 
 from ._obj2txt import obj2txt
+
+
+CRYPTOGRAPHY_TIMEZONE = False
+if _HAS_CRYPTOGRAPHY:
+    CRYPTOGRAPHY_TIMEZONE = LooseVersion(cryptography.__version__) >= LooseVersion('42.0.0')
 
 
 DOTTED_OID = re.compile(r'^\d+(?:\.\d+)+$')
@@ -807,3 +814,23 @@ def cryptography_verify_certificate_signature(certificate, signer_public_key):
         certificate.signature_hash_algorithm,
         signer_public_key
     )
+
+
+def get_not_valid_after(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.not_valid_after_utc
+    return obj.not_valid_after
+
+
+def get_not_valid_before(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.not_valid_before_utc
+    return obj.not_valid_before
+
+
+def set_not_valid_after(builder, value):
+    return builder.not_valid_after(value)
+
+
+def set_not_valid_before(builder, value):
+    return builder.not_valid_before(value)

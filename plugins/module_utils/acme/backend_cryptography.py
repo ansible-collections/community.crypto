@@ -11,7 +11,6 @@ __metaclass__ = type
 
 import base64
 import binascii
-import datetime
 import os
 import traceback
 
@@ -42,11 +41,15 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_now_datetime,
+    ensure_utc_timezone,
     parse_name_field,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
+    get_not_valid_after,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
@@ -373,8 +376,10 @@ class CryptographyBackend(CryptoBackend):
             raise BackendException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
 
         if now is None:
-            now = datetime.datetime.now()
-        return (cert.not_valid_after - now).days
+            now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        elif CRYPTOGRAPHY_TIMEZONE:
+            now = ensure_utc_timezone(now)
+        return (get_not_valid_after(cert) - now).days
 
     def create_chain_matcher(self, criterium):
         '''

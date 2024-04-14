@@ -279,7 +279,19 @@ def parse_ordered_name_field(input_list, name_field_name):
     return result
 
 
-def convert_relative_to_datetime(relative_time_string):
+def get_now_datetime(with_timezone):
+    if with_timezone:
+        return datetime.datetime.now(tz=datetime.timezone.utc)
+    return datetime.datetime.utcnow()
+
+
+def ensure_utc_timezone(timestamp):
+    if timestamp.tzinfo is not None:
+        return timestamp
+    return timestamp.astimezone(datetime.timezone.utc)
+
+
+def convert_relative_to_datetime(relative_time_string, with_timezone=False):
     """Get a datetime.datetime or None from a string in the time format described in sshd_config(5)"""
 
     parsed_result = re.match(
@@ -304,13 +316,14 @@ def convert_relative_to_datetime(relative_time_string):
         offset += datetime.timedelta(
             seconds=int(parsed_result.group("seconds")))
 
+    now = get_now_datetime(with_timezone=with_timezone)
     if parsed_result.group("prefix") == "+":
-        return datetime.datetime.utcnow() + offset
+        return now + offset
     else:
-        return datetime.datetime.utcnow() - offset
+        return now - offset
 
 
-def get_relative_time_option(input_string, input_name, backend='cryptography'):
+def get_relative_time_option(input_string, input_name, backend='cryptography', with_timezone=False):
     """Return an absolute timespec if a relative timespec or an ASN1 formatted
        string is provided.
 
@@ -323,7 +336,7 @@ def get_relative_time_option(input_string, input_name, backend='cryptography'):
             input_string, input_name)
     # Relative time
     if result.startswith("+") or result.startswith("-"):
-        result_datetime = convert_relative_to_datetime(result)
+        result_datetime = convert_relative_to_datetime(result, with_timezone=with_timezone)
         if backend == 'pyopenssl':
             return result_datetime.strftime("%Y%m%d%H%M%SZ")
         elif backend == 'cryptography':
@@ -332,9 +345,13 @@ def get_relative_time_option(input_string, input_name, backend='cryptography'):
     if backend == 'cryptography':
         for date_fmt in ['%Y%m%d%H%M%SZ', '%Y%m%d%H%MZ', '%Y%m%d%H%M%S%z', '%Y%m%d%H%M%z']:
             try:
-                return datetime.datetime.strptime(result, date_fmt)
+                res = datetime.datetime.strptime(result, date_fmt)
             except ValueError:
                 pass
+            else:
+                if with_timezone:
+                    res = res.astimezone(datetime.timezone.utc)
+                return res
 
         raise OpenSSLObjectError(
             'The time spec "%s" for %s is invalid' %

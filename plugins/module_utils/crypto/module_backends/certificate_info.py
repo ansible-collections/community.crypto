@@ -12,7 +12,6 @@ __metaclass__ = type
 
 import abc
 import binascii
-import datetime
 import traceback
 
 from ansible.module_utils import six
@@ -24,13 +23,17 @@ from ansible_collections.community.crypto.plugins.module_utils.version import Lo
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
     get_fingerprint_of_bytes,
+    get_now_datetime,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
     cryptography_get_extensions_from_cert,
     cryptography_oid_to_name,
     cryptography_serial_number_of_cert,
+    get_not_valid_after,
+    get_not_valid_before,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
@@ -169,7 +172,7 @@ class CertificateInfoRetrieval(object):
         not_after = self.get_not_after()
         result['not_before'] = not_before.strftime(TIMESTAMP_FORMAT)
         result['not_after'] = not_after.strftime(TIMESTAMP_FORMAT)
-        result['expired'] = not_after < datetime.datetime.utcnow()
+        result['expired'] = not_after < get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
         result['public_key'] = to_native(self._get_public_key_pem())
 
@@ -322,10 +325,10 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             return None, False
 
     def get_not_before(self):
-        return self.cert.not_valid_before
+        return get_not_valid_before(self.cert)
 
     def get_not_after(self):
-        return self.cert.not_valid_after
+        return get_not_valid_after(self.cert)
 
     def _get_public_key_pem(self):
         return self.cert.public_key().public_bytes(
