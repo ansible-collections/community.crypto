@@ -54,6 +54,7 @@ If you use the Ansible package and do not update collections independently, use 
   - openssl_signature_info module
   - openssl_signature module
   - split_pem filter
+  - x509_certificate_convert module
   - x509_certificate_info module and filter
   - x509_certificate_pipe module
   - x509_certificate module
