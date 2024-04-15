@@ -147,7 +147,7 @@ class OpensshCertificateTimeParameters(object):
             elif dt == _FOREVER:
                 result = 'forever'
             else:
-                result = dt.isoformat() if date_format == 'human_readable' else dt.strftime("%Y%m%d%H%M%S")
+                result = dt.isoformat().replace('+00:00', '') if date_format == 'human_readable' else dt.strftime("%Y%m%d%H%M%S")
         elif date_format == 'timestamp':
             td = dt - _ALWAYS
             result = int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 10 ** 6)
