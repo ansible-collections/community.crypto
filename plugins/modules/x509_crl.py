@@ -485,6 +485,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
     REVOCATION_REASON_MAP,
     TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
@@ -622,8 +623,8 @@ class CRL(OpenSSLObject):
             if rc['invalidity_date']:
                 result['invalidity_date'] = get_relative_time_option(
                     rc['invalidity_date'],
-                    path_prefix + 'invalidity_date'
-                    # TODO with_timezone=CRYPTOGRAPHY_TIMEZONE,
+                    path_prefix + 'invalidity_date',
+                    with_timezone=CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
                 )
                 result['invalidity_date_critical'] = rc['invalidity_date_critical']
             self.revoked_certificates.append(result)
