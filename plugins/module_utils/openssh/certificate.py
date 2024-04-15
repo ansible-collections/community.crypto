@@ -22,7 +22,9 @@ __metaclass__ = type
 
 import abc
 import binascii
+import datetime as _datetime
 import os
+import sys
 from base64 import b64encode
 from datetime import datetime
 from hashlib import sha256
@@ -61,8 +63,17 @@ _ECDSA_CURVE_IDENTIFIERS_LOOKUP = {
     b'nistp521': 'ecdsa-nistp521',
 }
 
-_ALWAYS = datetime(1970, 1, 1)
-_FOREVER = datetime.max
+_USE_TIMEZONE = sys.version_info >= (3, 6)
+
+
+def _ensure_utc_timezone_if_use_timezone(value):
+    if not _USE_TIMEZONE or value.tzinfo is not None:
+        return value
+    return value.astimezone(_datetime.timezone.utc)
+
+
+_ALWAYS = _ensure_utc_timezone_if_use_timezone(datetime(1970, 1, 1))
+_FOREVER = datetime(9999, 12, 31, 23, 59, 59, 999999, _datetime.timezone.utc) if _USE_TIMEZONE else datetime.max
 
 _CRITICAL_OPTIONS = (
     'force-command',
@@ -167,7 +178,10 @@ class OpensshCertificateTimeParameters(object):
             result = _FOREVER
         else:
             try:
-                result = datetime.utcfromtimestamp(timestamp)
+                if _USE_TIMEZONE:
+                    result = datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
+                else:
+                    result = datetime.utcfromtimestamp(timestamp)
             except OverflowError as e:
                 raise ValueError
         return result
@@ -180,11 +194,11 @@ class OpensshCertificateTimeParameters(object):
         elif time_string == 'forever':
             result = _FOREVER
         elif is_relative_time_string(time_string):
-            result = convert_relative_to_datetime(time_string)
+            result = convert_relative_to_datetime(time_string, with_timezone=_USE_TIMEZONE)
         else:
             for time_format in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
                 try:
-                    result = datetime.strptime(time_string, time_format)
+                    result = _ensure_utc_timezone_if_use_timezone(datetime.strptime(time_string, time_format))
                 except ValueError:
                     pass
             if result is None:
