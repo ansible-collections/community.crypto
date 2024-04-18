@@ -165,6 +165,16 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     read_file,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_now_datetime,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
+    set_not_valid_after,
+    set_not_valid_before,
+)
+
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
@@ -244,8 +254,9 @@ def main():
         domain = to_text(challenge_data['resource'])
         identifier_type, identifier = to_text(challenge_data.get('resource_original', 'dns:' + challenge_data['resource'])).split(':', 1)
         subject = issuer = cryptography.x509.Name([])
-        not_valid_before = datetime.datetime.utcnow()
-        not_valid_after = datetime.datetime.utcnow() + datetime.timedelta(days=10)
+        now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        not_valid_before = now
+        not_valid_after = now + datetime.timedelta(days=10)
         if identifier_type == 'dns':
             san = cryptography.x509.DNSName(identifier)
         elif identifier_type == 'ip':
@@ -254,7 +265,7 @@ def main():
             raise ModuleFailException('Unsupported identifier type "{0}"'.format(identifier_type))
 
         # Generate regular self-signed certificate
-        regular_certificate = cryptography.x509.CertificateBuilder().subject_name(
+        cert_builder = cryptography.x509.CertificateBuilder().subject_name(
             subject
         ).issuer_name(
             issuer
@@ -262,14 +273,13 @@ def main():
             private_key.public_key()
         ).serial_number(
             cryptography.x509.random_serial_number()
-        ).not_valid_before(
-            not_valid_before
-        ).not_valid_after(
-            not_valid_after
         ).add_extension(
             cryptography.x509.SubjectAlternativeName([san]),
             critical=False,
-        ).sign(
+        )
+        cert_builder = set_not_valid_before(cert_builder, not_valid_before)
+        cert_builder = set_not_valid_after(cert_builder, not_valid_after)
+        regular_certificate = cert_builder.sign(
             private_key,
             cryptography.hazmat.primitives.hashes.SHA256(),
             _cryptography_backend
@@ -278,7 +288,7 @@ def main():
         # Process challenge
         if challenge == 'tls-alpn-01':
             value = base64.b64decode(challenge_data['resource_value'])
-            challenge_certificate = cryptography.x509.CertificateBuilder().subject_name(
+            cert_builder = cryptography.x509.CertificateBuilder().subject_name(
                 subject
             ).issuer_name(
                 issuer
@@ -286,10 +296,6 @@ def main():
                 private_key.public_key()
             ).serial_number(
                 cryptography.x509.random_serial_number()
-            ).not_valid_before(
-                not_valid_before
-            ).not_valid_after(
-                not_valid_after
             ).add_extension(
                 cryptography.x509.SubjectAlternativeName([san]),
                 critical=False,
@@ -299,7 +305,10 @@ def main():
                     encode_octet_string(value),
                 ),
                 critical=True,
-            ).sign(
+            )
+            cert_builder = set_not_valid_before(cert_builder, not_valid_before)
+            cert_builder = set_not_valid_after(cert_builder, not_valid_after)
+            challenge_certificate = cert_builder.sign(
                 private_key,
                 cryptography.hazmat.primitives.hashes.SHA256(),
                 _cryptography_backend

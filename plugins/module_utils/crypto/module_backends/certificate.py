@@ -32,6 +32,8 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_compare_public_keys,
+    get_not_valid_after,
+    get_not_valid_before,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
@@ -251,12 +253,12 @@ class CertificateBackend(object):
 
         # Check not before
         if not_before is not None and not self.ignore_timestamps:
-            if self.existing_certificate.not_valid_before != not_before:
+            if get_not_valid_before(self.existing_certificate) != not_before:
                 return True
 
         # Check not after
         if not_after is not None and not self.ignore_timestamps:
-            if self.existing_certificate.not_valid_after != not_after:
+            if get_not_valid_after(self.existing_certificate) != not_after:
                 return True
         return False
 

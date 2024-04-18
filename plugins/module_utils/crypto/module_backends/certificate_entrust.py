@@ -10,7 +10,6 @@ __metaclass__ = type
 
 
 import datetime
-import time
 import os
 
 from ansible.module_utils.common.text.converters import to_native, to_bytes
@@ -19,11 +18,14 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import EC
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
+    get_now_datetime,
     get_relative_time_option,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_serial_number_of_cert,
+    get_not_valid_after,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -99,7 +101,7 @@ class EntrustCertificateBackend(CertificateBackend):
         # Handle expiration (30 days if not specified)
         expiry = self.notAfter
         if not expiry:
-            gmt_now = datetime.datetime.fromtimestamp(time.mktime(time.gmtime()))
+            gmt_now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
             expiry = gmt_now + datetime.timedelta(days=365)
 
         expiry_iso3339 = expiry.strftime("%Y-%m-%dT%H:%M:%S.00Z")
@@ -154,7 +156,7 @@ class EntrustCertificateBackend(CertificateBackend):
             expiry = None
             if self.backend == 'cryptography':
                 serial_number = "{0:X}".format(cryptography_serial_number_of_cert(self.existing_certificate))
-                expiry = self.existing_certificate.not_valid_after
+                expiry = get_not_valid_after(self.existing_certificate)
 
             # get some information about the expiry of this certificate
             expiry_iso3339 = expiry.strftime("%Y-%m-%dT%H:%M:%S.00Z")

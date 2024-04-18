@@ -19,6 +19,7 @@ from .basic import (
 )
 
 from .cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
 )
 
@@ -26,6 +27,11 @@ from ._obj2txt import (
     obj2txt,
 )
 
+
+# TODO: once cryptography has a _utc variant of InvalidityDate.invalidity_date, set this
+#       to True and adjust get_invalidity_date() accordingly.
+#       (https://github.com/pyca/cryptography/issues/10818)
+CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = False
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
@@ -55,7 +61,7 @@ else:
 def cryptography_decode_revoked_certificate(cert):
     result = {
         'serial_number': cert.serial_number,
-        'revocation_date': cert.revocation_date,
+        'revocation_date': get_revocation_date(cert),
         'issuer': None,
         'issuer_critical': False,
         'reason': None,
@@ -77,7 +83,7 @@ def cryptography_decode_revoked_certificate(cert):
         pass
     try:
         ext = cert.extensions.get_extension_for_class(x509.InvalidityDate)
-        result['invalidity_date'] = ext.value.invalidity_date
+        result['invalidity_date'] = get_invalidity_date(ext.value)
         result['invalidity_date_critical'] = ext.critical
     except x509.ExtensionNotFound:
         pass
@@ -112,3 +118,38 @@ def cryptography_get_signature_algorithm_oid_from_crl(crl):
             crl._x509_crl.sig_alg.algorithm
         )
         return x509.oid.ObjectIdentifier(dotted)
+
+
+def get_next_update(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.next_update_utc
+    return obj.next_update
+
+
+def get_last_update(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.last_update_utc
+    return obj.last_update
+
+
+def get_revocation_date(obj):
+    if CRYPTOGRAPHY_TIMEZONE:
+        return obj.revocation_date_utc
+    return obj.revocation_date
+
+
+def get_invalidity_date(obj):
+    # TODO: special handling if CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE is True
+    return obj.invalidity_date
+
+
+def set_next_update(builder, value):
+    return builder.next_update(value)
+
+
+def set_last_update(builder, value):
+    return builder.last_update(value)
+
+
+def set_revocation_date(builder, value):
+    return builder.revocation_date(value)
