@@ -14,6 +14,7 @@ plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr_pipe.py validate-modules:invalid-documentation
 plugins/modules/openssl_privatekey_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_publickey_info.py validate-modules:invalid-documentation
+plugins/modules/x509_certificate_convert.py validate-modules:invalid-documentation
 plugins/modules/x509_certificate_info.py validate-modules:invalid-documentation
 plugins/modules/x509_crl.py validate-modules:invalid-documentation
 plugins/modules/x509_crl.py validate-modules:return-syntax-error

@@ -9,6 +9,7 @@ __metaclass__ = type
 
 
 PEM_START = '-----BEGIN '
+PEM_END_START = '-----END '
 PEM_END = '-----'
 PKCS8_PRIVATEKEY_NAMES = ('PRIVATE KEY', 'ENCRYPTED PRIVATE KEY')
 PKCS1_PRIVATEKEY_SUFFIX = ' PRIVATE KEY'
@@ -77,3 +78,31 @@ def extract_first_pem(text):
     if not all_pems:
         return None
     return all_pems[0]
+
+
+def _extract_type(line, start=PEM_START):
+    if not line.startswith(start):
+        return None
+    if not line.endswith(PEM_END):
+        return None
+    return line[len(start):-len(PEM_END)]
+
+
+def extract_pem(content, strict=False):
+    lines = content.splitlines()
+    if len(lines) < 3:
+        raise ValueError('PEM must have at least 3 lines, have only {count}'.format(count=len(lines)))
+    header_type = _extract_type(lines[0])
+    if header_type is None:
+        raise ValueError('First line is not of format {start}...{end}: {line!r}'.format(start=PEM_START, end=PEM_END, line=lines[0]))
+    footer_type = _extract_type(lines[-1], start=PEM_END_START)
+    if strict:
+        if header_type != footer_type:
+            raise ValueError('Header type ({header}) is different from footer type ({footer})'.format(header=header_type, footer=footer_type))
+        for idx, line in enumerate(lines[1:-2]):
+            if len(line) != 64:
+                raise ValueError('Line {idx} has length {len} instead of 64'.format(idx=idx, len=len(line)))
+        if not (0 < len(lines[-2]) <= 64):
+            raise ValueError('Last line has length {len}, should be in (0, 64]'.format(len=len(lines[-2])))
+    content = lines[1:-1]
+    return header_type, ''.join(content)
