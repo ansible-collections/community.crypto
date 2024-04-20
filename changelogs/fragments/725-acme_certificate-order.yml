@@ -1,7 +1,0 @@
-bugfixes:
-  - "acme_certificate - respect the order of the CNAME and SAN identifiers that are passed on when creating an ACME order
-     (https://github.com/ansible-collections/community.crypto/issues/723, https://github.com/ansible-collections/community.crypto/pull/725)."
-deprecated_features:
-  - "acme.backends module utils - from community.crypto on, all implementations of ``CryptoBackend`` must override ``get_ordered_csr_identifiers()``.
-     The current default implementation, which simply sorts the result of ``get_csr_identifiers()``, will then be removed
-     (https://github.com/ansible-collections/community.crypto/pull/725)."
