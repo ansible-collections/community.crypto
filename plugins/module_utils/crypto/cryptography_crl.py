@@ -8,7 +8,10 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion as _LooseVersion
+
 try:
+    import cryptography
     from cryptography import x509
 except ImportError:
     # Error handled in the calling module.
@@ -32,6 +35,8 @@ from ._obj2txt import (
 #       to True and adjust get_invalidity_date() accordingly.
 #       (https://github.com/pyca/cryptography/issues/10818)
 CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = False
+if HAS_CRYPTOGRAPHY:
+    CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = _LooseVersion(cryptography.__version__) >= _LooseVersion('43.0.0')
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
@@ -139,7 +144,8 @@ def get_revocation_date(obj):
 
 
 def get_invalidity_date(obj):
-    # TODO: special handling if CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE is True
+    if CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE:
+        return obj.invalidity_date_utc
     return obj.invalidity_date
 
 
