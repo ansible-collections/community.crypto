@@ -15,6 +15,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
     quick_is_not_prime,
     convert_int_to_bytes,
     convert_int_to_hex,
+    convert_bytes_to_int,
 )
 
 
@@ -98,5 +99,19 @@ def test_convert_int_to_bytes(no, count, result):
 ])
 def test_convert_int_to_hex(no, digits, result):
     value = convert_int_to_hex(no, digits=digits)
+    print(value)
+    assert value == result
+
+
+@pytest.mark.parametrize('data, result', [
+    (b'', 0),
+    (b'\x00', 0),
+    (b'\x00\x01', 1),
+    (b'\x01', 1),
+    (b'\xff', 255),
+    (b'\x01\x00', 256),
+])
+def test_convert_bytes_to_int(data, result):
+    value = convert_bytes_to_int(data)
     print(value)
     assert value == result
