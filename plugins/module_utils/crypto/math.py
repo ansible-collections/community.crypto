@@ -115,6 +115,8 @@ if sys.version_info[0] >= 3:
 else:
     # Python 2
     def _convert_int_to_bytes(count, n):
+        if n == 0 and count == 0:
+            return ''
         h = '%x' % n
         if len(h) > 2 * count:
             raise Exception('Number {1} needs more than {0} bytes!'.format(count, n))

@@ -1,2 +1,3 @@
 bugfixes:
   - "crypto.math module utils - fix ``quick_is_not_prime()`` for small primes < 200 (https://github.com/ansible-collections/community.crypto/pull/733)."
+  - "crypto.math module utils - fix return value of ``convert_int_to_bytes(0, 0)`` on Python 2 (https://github.com/ansible-collections/community.crypto/pull/733)."
