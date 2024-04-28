@@ -10,6 +10,7 @@ __metaclass__ = type
 
 
 import base64
+import datetime
 import re
 import textwrap
 import traceback
@@ -18,6 +19,8 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six.moves.urllib.parse import unquote
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import get_now_datetime
 
 
 def nopad_b64(data):
@@ -70,3 +73,22 @@ def process_links(info, callback):
         link = info['link']
         for url, relation in re.findall(r'<([^>]+)>;\s*rel="(\w+)"', link):
             callback(unquote(url), relation)
+
+
+def parse_retry_after(value, relative_with_timezone=True):
+    '''
+    Parse the value of a Retry-After header and return a timestamp.
+    '''
+    # First try a number of seconds
+    try:
+        delta = datetime.timedelta(seconds=int(value))
+        return get_now_datetime(relative_with_timezone) + delta
+    except ValueError:
+        pass
+
+    try:
+        return datetime.datetime.strptime(value, '%a, %d %b %Y %H:%M:%S GMT')
+    except ValueError:
+        pass
+
+    raise ValueError('Cannot parse Retry-After header value %s' % repr(value))
