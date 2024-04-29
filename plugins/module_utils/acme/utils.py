@@ -70,6 +70,8 @@ def pem_to_der(pem_filename=None, pem_content=None):
 def process_links(info, callback):
     '''
     Process link header, calls callback for every link header with the URL and relation as options.
+
+    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link
     '''
     if 'link' in info:
         link = info['link']
@@ -77,14 +79,18 @@ def process_links(info, callback):
             callback(unquote(url), relation)
 
 
-def parse_retry_after(value, relative_with_timezone=True):
+def parse_retry_after(value, relative_with_timezone=True, now=None):
     '''
     Parse the value of a Retry-After header and return a timestamp.
+
+    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
     '''
     # First try a number of seconds
     try:
         delta = datetime.timedelta(seconds=int(value))
-        return get_now_datetime(relative_with_timezone) + delta
+        if now is None:
+            now = get_now_datetime(relative_with_timezone)
+        return now + delta
     except ValueError:
         pass
 
