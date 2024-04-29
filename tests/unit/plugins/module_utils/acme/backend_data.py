@@ -11,6 +11,7 @@ import datetime
 import os
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
+    CertificateInformation,
     CryptoBackend,
 )
 
@@ -81,10 +82,28 @@ TEST_CSRS = [
 TEST_CERT = load_fixture("cert_1.pem")
 
 
+TEST_CERT_OPENSSL_OUTPUT = load_fixture("cert_1.txt")
+
+
 TEST_CERT_DAYS = [
     (datetime.datetime(2018, 11, 15, 1, 2, 3), 11),
     (datetime.datetime(2018, 11, 25, 15, 20, 0), 1),
     (datetime.datetime(2018, 11, 25, 15, 30, 0), 0),
+]
+
+
+TEST_CERT_INFO = [
+    (
+        TEST_CERT,
+        CertificateInformation(
+            not_valid_after=datetime.datetime(2018, 11, 26, 15, 28, 24),
+            not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
+            serial_number=1,
+            subject_key_identifier=b'\x98\xD2\xFD\x3C\xCC\xCD\x69\x45\xFB\xE2\x8C\x30\x2C\x54\x62\x18\x34\xB7\x07\x73',
+            authority_key_identifier=None,
+        ),
+        TEST_CERT_OPENSSL_OUTPUT,
+    ),
 ]
 
 
@@ -98,6 +117,9 @@ class FakeBackend(CryptoBackend):
     def create_mac_key(self, alg, key):
         raise BackendException('Not implemented in fake backend')
 
+    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+        raise BackendException('Not implemented in fake backend')
+
     def get_csr_identifiers(self, csr_filename=None, csr_content=None):
         raise BackendException('Not implemented in fake backend')
 
@@ -105,4 +127,7 @@ class FakeBackend(CryptoBackend):
         raise BackendException('Not implemented in fake backend')
 
     def create_chain_matcher(self, criterium):
+        raise BackendException('Not implemented in fake backend')
+
+    def get_cert_information(self, cert_filename=None, cert_content=None):
         raise BackendException('Not implemented in fake backend')

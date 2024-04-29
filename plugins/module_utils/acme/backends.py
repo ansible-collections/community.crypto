@@ -9,9 +9,26 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from collections import namedtuple
 import abc
 
 from ansible.module_utils import six
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    BackendException,
+)
+
+
+CertificateInformation = namedtuple(
+    'CertificateInformation',
+    (
+        'not_valid_after',
+        'not_valid_before',
+        'serial_number',
+        'subject_key_identifier',
+        'authority_key_identifier',
+    ),
+)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -74,3 +91,12 @@ class CryptoBackend(object):
         '''
         Given a Criterium object, creates a ChainMatcher object.
         '''
+
+    def get_cert_information(self, cert_filename=None, cert_content=None):
+        '''
+        Return some information on a X.509 certificate as a CertificateInformation object.
+        '''
+        # Not implementing this method in a backend is DEPRECATED and will be
+        # disallowed in community.crypto 3.0.0. This method will be marked as
+        # @abstractmethod by then.
+        raise BackendException('This backend does not support get_cert_information()')

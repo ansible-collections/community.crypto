@@ -18,6 +18,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
 from .backend_data import (
     TEST_KEYS,
     TEST_CSRS,
+    TEST_CERT,
+    TEST_CERT_OPENSSL_OUTPUT,
+    TEST_CERT_DAYS,
+    TEST_CERT_INFO,
 )
 
 
@@ -61,3 +65,29 @@ def test_normalize_ip(ip, result):
     module = MagicMock()
     backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
     assert backend._normalize_ip(ip) == result
+
+
+@pytest.mark.parametrize("now, expected_days", TEST_CERT_DAYS)
+def test_certdays_cryptography(now, expected_days, tmpdir):
+    fn = tmpdir / 'test-cert.pem'
+    fn.write(TEST_CERT)
+    module = MagicMock()
+    module.run_command = MagicMock(return_value=(0, TEST_CERT_OPENSSL_OUTPUT, 0))
+    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    days = backend.get_cert_days(cert_filename=str(fn), now=now)
+    assert days == expected_days
+    days = backend.get_cert_days(cert_content=TEST_CERT, now=now)
+    assert days == expected_days
+
+
+@pytest.mark.parametrize("cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO)
+def test_get_cert_information(cert_content, expected_cert_info, openssl_output, tmpdir):
+    fn = tmpdir / 'test-cert.pem'
+    fn.write(cert_content)
+    module = MagicMock()
+    module.run_command = MagicMock(return_value=(0, openssl_output, 0))
+    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    cert_info = backend.get_cert_information(cert_filename=str(fn))
+    assert cert_info == expected_cert_info
+    cert_info = backend.get_cert_information(cert_content=cert_content)
+    assert cert_info == expected_cert_info
