@@ -19,6 +19,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
 
 
 @pytest.mark.parametrize('f, e, m, result', [
+    (0, 0, 5, 1),
+    (0, 1, 5, 0),
+    (2, 1, 5, 2),
+    (2, 2, 5, 4),
+    (2, 3, 5, 3),
     (2, 10, 5, 4),
 ])
 def test_binary_exp_mod(f, e, m, result):
@@ -28,6 +33,14 @@ def test_binary_exp_mod(f, e, m, result):
 
 
 @pytest.mark.parametrize('a, b, result', [
+    (0, -123, -123),
+    (0, 123, 123),
+    (-123, 0, -123),
+    (123, 0, 123),
+    (-123, 1, 1),
+    (123, 1, 1),
+    (1, -123, -1),
+    (1, 123, 1),
     (1024, 10, 2),
 ])
 def test_simple_gcd(a, b, result):
