@@ -37,7 +37,8 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-  - community.crypto.acme
+  - community.crypto.acme.basic
+  - community.crypto.acme.account
   - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
 attributes:

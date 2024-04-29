@@ -168,9 +168,9 @@ class ACMEClient(object):
         self.backend = backend
         self.version = module.params['acme_version']
         # account_key path and content are mutually exclusive
-        self.account_key_file = module.params['account_key_src']
-        self.account_key_content = module.params['account_key_content']
-        self.account_key_passphrase = module.params['account_key_passphrase']
+        self.account_key_file = module.params.get('account_key_src')
+        self.account_key_content = module.params.get('account_key_content')
+        self.account_key_passphrase = module.params.get('account_key_passphrase')
 
         # Grab account URI from module parameters.
         # Make sure empty string is treated as None.
@@ -384,21 +384,25 @@ class ACMEClient(object):
         return result, info
 
 
-def get_default_argspec():
+def get_default_argspec(with_account=True):
     '''
     Provides default argument spec for the options documented in the acme doc fragment.
     '''
-    return dict(
-        account_key_src=dict(type='path', aliases=['account_key']),
-        account_key_content=dict(type='str', no_log=True),
-        account_key_passphrase=dict(type='str', no_log=True),
-        account_uri=dict(type='str'),
+    argspec = dict(
         acme_directory=dict(type='str', required=True),
         acme_version=dict(type='int', required=True, choices=[1, 2]),
         validate_certs=dict(type='bool', default=True),
         select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'openssl', 'cryptography']),
         request_timeout=dict(type='int', default=10),
     )
+    if with_account:
+        argspec.update(dict(
+            account_key_src=dict(type='path', aliases=['account_key']),
+            account_key_content=dict(type='str', no_log=True),
+            account_key_passphrase=dict(type='str', no_log=True),
+            account_uri=dict(type='str'),
+        ))
+    return argspec
 
 
 def create_backend(module, needs_acme_v2):
