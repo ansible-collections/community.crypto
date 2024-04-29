@@ -53,9 +53,18 @@ def quick_is_not_prime(n):
     that we couldn't detect quickly whether it is not prime.
     '''
     if n <= 2:
-        return True
+        return n < 2
     # The constant in the next line is the product of all primes < 200
-    if simple_gcd(n, 7799922041683461553249199106329813876687996789903550945093032474868511536164700810) > 1:
+    prime_product = 7799922041683461553249199106329813876687996789903550945093032474868511536164700810
+    gcd = simple_gcd(n, prime_product)
+    if gcd > 1:
+        if n < 200 and gcd == n:
+            # Explicitly check for all primes < 200
+            return n not in (
+                2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83,
+                89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179,
+                181, 191, 193, 197, 199,
+            )
         return True
     # TODO: maybe do some iterations of Miller-Rabin to increase confidence
     # (https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test)
