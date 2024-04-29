@@ -20,6 +20,8 @@ from ansible.module_utils.six.moves.urllib.parse import unquote
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_int_to_bytes
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import get_now_datetime
 
 
@@ -92,3 +94,23 @@ def parse_retry_after(value, relative_with_timezone=True):
         pass
 
     raise ValueError('Cannot parse Retry-After header value %s' % repr(value))
+
+
+def compute_cert_id(backend, cert_info=None, cert_filename=None, cert_content=None):
+    # Obtain certificate info if not provided
+    if cert_info is None:
+        cert_info = backend.get_cert_information(cert_filename=cert_filename, cert_content=cert_content)
+
+    # Convert Authority Key Identifier to string
+    if cert_info.authority_key_identifier is None:
+        raise ModuleFailException('Module has no Authority Key Identifier extension')
+    aki = to_native(base64.urlsafe_b64encode(cert_info.authority_key_identifier)).replace('=', '')
+
+    # Convert serial number to string
+    serial_bytes = convert_int_to_bytes(cert_info.serial_number)
+    if ord(serial_bytes[:1]) >= 128:
+        serial_bytes = b'\x00' + serial_bytes
+    serial = to_native(base64.urlsafe_b64encode(serial_bytes)).replace('=', '')
+
+    # Compose cert ID
+    return '{aki}.{serial}'.format(aki=aki, serial=serial)
