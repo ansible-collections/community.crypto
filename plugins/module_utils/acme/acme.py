@@ -42,7 +42,9 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    compute_cert_id,
     nopad_b64,
+    parse_retry_after,
 )
 
 try:
@@ -152,6 +154,9 @@ class ACMEDirectory(object):
                 raise ACMEProtocolException(
                     self.module, msg='Was not able to obtain nonce, giving up after 5 retries', info=info, response=response)
             retry_count += 1
+
+    def has_renewal_info_endpoint(self):
+        return 'renewalInfo' in self.directory
 
 
 class ACMEClient(object):
@@ -382,6 +387,32 @@ class ACMEClient(object):
             raise ACMEProtocolException(
                 self.module, msg=error_msg, info=info, content=content, content_json=result if parsed_json_result else None)
         return result, info
+
+    def get_renewal_info(
+        self,
+        cert_filename=None,
+        cert_content=None,
+        include_retry_after=False,
+        retry_after_relative_with_timezone=True,
+    ):
+        if not self.directory.has_renewal_info_endpoint():
+            raise ModuleFailException('The ACME endpoint does not support ACME Renewal Information retrieval')
+
+        cert_id = compute_cert_id(self.backend, cert_filename=cert_filename, cert_content=cert_content)
+        url = '{base}{cert_id}'.format(base=self.directory.directory['renewalInfo'], cert_id=cert_id)
+
+        data, info = self.get_request(url, parse_json_result=True, fail_on_error=True, get_only=True)
+
+        # Include Retry-After header if asked for
+        if include_retry_after and 'retry-after' in info:
+            try:
+                data['retryAfter'] = parse_retry_after(
+                    info['retry-after'],
+                    relative_with_timezone=retry_after_relative_with_timezone,
+                )
+            except ValueError:
+                pass
+        return data
 
 
 def get_default_argspec(with_account=True):
