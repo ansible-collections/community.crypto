@@ -103,11 +103,12 @@ options:
             - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
             - If O(state) is V(absent), this parameter is ignored. 
         type: str
-    fingerprint:
+    fingerprints:
         description:
-            - Specifies an existing key to delete.
-            - If O(state) is V(present), this parameter will be ignored.
-        type: str
+            - Specifies keys to match against.
+            - Provided fingerprints will take priority over user-id "V(name) (V(comment)) <V(email)>".
+            - If O(state) is V(absent), keys with the provided fingerprints will be deleted if found 
+        type: list[str]
     keyserver:
         description:
             - Specifies keyserver to upload key to.
@@ -123,10 +124,6 @@ options:
             - Allows for the return of fingerprint(s) for newly created or deleted keys(s)
         type: bool
         default: False
-notes:
-    - 
-      Set the O(force) option to V(true) if you want to regenerate the keypair.
-    - In the case a custom O(mode), O(group), O(owner), or other file attribute is provided it will be applied to both key files.
 '''
 
 EXAMPLES = '''
@@ -164,8 +161,8 @@ EXAMPLES = '''
 
 - name: Generate a GPG keypair and return fingerprint of new key
   community.crypto.gpg_keypair:
-    return_fingerprint: true
-  register: gpg_fingerprint
+    return_fingerprints: true
+  register: gpg_keys
 
 - name: Delete GPG keypair(s) matching a specified user-id:
   community.crypto.gpg_keypair:
@@ -177,7 +174,8 @@ EXAMPLES = '''
 - name: Delete GPG keypair(s) matching a specified fingerprint:
   community.crypto.gpg_keypair:
     state: abscent
-    fingerprint: ABC123...
+    fingerprints:
+      - ABC123...
 
 '''
 
@@ -188,8 +186,8 @@ size:
     type: int
     sample: 4096
 fingerprints:
-    description: Fingerprint(s) of new created or deleted key(s)
-    return: changed and `return_fingerprint`==True
+    description: Fingerprint(s) of newly created or deleted key(s)
+    return: changed and `return_fingerprints`==True
     type: list[str]
     sample: [ ABC123... ]
 '''
@@ -252,16 +250,12 @@ def validate_params(params: Dict[str, Union[str, int]]) -> None:
                 raise GPGError, f'Invalid algorithm for {key}_type parameter.'
             if not params[f'{key}_usage']: params[f'{key}_usage'] = ['encrypt']
             elif params[f'{key}_usage'] != ['encrypt']:
-                raise GPGError, f'Invalid {key}_usage for {params[f"{key}_type"]} {key}.'
+                raise GPGError, f'Invalid {key}_iusage for {params[f"{key}_type"]} {key}.'
             if not params[f'{key}_length']: params[f'{key}_length'] = 3072
             elif not 1024 <= params[f'{key}_length'] < 4096:
                 params[f'{key}_length'] = min(max(params[f'{key}_length'], 1024), 4096)
 
-def delete_keypair(
-    gpg_runner: PluginGPGRunner,
-    params: Dict[str, Union[str, int, bool, List[str]]],
-    check_mode: bool = False
-) -> Dict[str, Union[str, int]]:
+def list_matching_keys(name, comment, email, fingerprint):
     user_id = ""
     if params['name']:
         user_id += f'{params["name"]} '
@@ -270,23 +264,44 @@ def delete_keypair(
     if params['email']:
         user_id += f'<{params["email"]}>'
     if user_id:
-        user_id = user_id.strip()
-        user_id = f'"{user_id}"'
+        user_id = f'"{user_id.strip()}"'
 
-    _, stdout, _ = gpg_runner.run_command(['gpg', '--batch', '--list-secret-keys', f'{params["fingerprint"] if params["fingerprint"] else user_id}'])
-    lines = stdout.split('\n')
-    matching_keys = [line.strip() for line in lines if line.strip().isalnum()]
-    if not matching_keys:
-        raise GPGError, 'No matching keys'
-    gpg_runner.run_command([f'{"dry-run" if check_mode else ""}', '--batch', '--yes', '--delete-secret-and-public-key', *matching_keys], check_rc=True)
-    return dict(changed=True, fingerprints=matching_keys)
+    if user_id or fingerprints:
+        _, stdout, _ = gpg_runner.run_command(['gpg', '--batch', '--list-secret-keys', f'{*fingerprints if fingerprints else user_id}'])
+        lines = stdout.split('\n')
+        matching_keys = [line.strip() for line in lines if line.strip().isalnum()]
+        return matching_keys
+    return []
+
+def delete_keypair(
+    gpg_runner: PluginGPGRunner,
+    matching_keys: List[str],
+    check_mode: bool = False
+) -> Dict[str, Union[str, int]]:
+    if matching_keys:
+        gpg_runner.run_command([
+            f'{"dry-run" if check_mode else ""}',
+            '--batch',
+            '--yes',
+            '--delete-secret-and-public-key',
+            *matching_key
+        ], check_rc=True)
+        if params['return_fingerprints']:
+            return dict(changed=True, fingerprints=matching_keys)
+        return dict(changed=True, fingerprints=[])
+    return dict(changed=False, fingerprints=[])
 
 def generate_keypair(
     gpg_runner: PluginGPGRunner,
     params: Dict[str, Union[str, int, bool, List[str]]],
+    matching_keys,
     check_mode: bool = False
 ) -> Dict[str, Union[bool, str]]:
-    # https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
+    if matching_keys:
+        if params['return_fingerprints']:
+            return dict(changed=False, fingerprints=matching_keys)
+        return dict(change=False, fingerprints=[])
+
     parameters = f"""<<EOF
         Key-Type: {params['key_type']}
         Key-Length: {params['key_type']}
@@ -308,9 +323,15 @@ def generate_keypair(
         EOF
         """
 
-    _, stdout, _ = gpg_runner.run_command(
-        ['--batch', '--log-file', '/dev/stdout', '--gen-key', f'{parameters}'])
-    
+    _, stdout, _ = gpg_runner.run_command([
+        f'{"dry-run" if check_mode else ""}',
+        '--batch',
+        '--log-file',
+        '/dev/stdout',
+        '--gen-key',
+        f'{parameters}'
+    ])
+
     if params['return_fingerprints']:
         fingerprints = []
         fingerprint = re.search(r"([a-zA-Z0-9]*)\.rev", stdout)
@@ -322,7 +343,14 @@ def generate_keypair(
 def run_module(params: Dict[str, Union[str, int, bool, List[str]]], check_mode: bool = False):
     validate_params(params)
     gpg_runner = PluginGPGRunner()
-    result = generate_keypair(gpg_runner, params, check_mode) if params['state'] == 'present' else delete_keypair(gpg_runner, params, check_mode)
+    matching_keys = list_matching_keys(
+        params["name"],
+        params["comment"],
+        params["email"],
+        params["fingerprints"]
+    )
+    result = generate_keypair(gpg_runner, params, matching_keys, check_mode) if params['state'] == 'present' else delete_keypair(gpg_runner, matching_keys, check_mode)
+    return result
 
 def main():
     key_types = ['RSA', 'DSA', 'ECDH', 'ECDSA', 'EDDSA', 'ELG']
@@ -342,7 +370,7 @@ def main():
             comment=dict(type='str', default=None),
             email=dict(type='str', default=None),
             passphrase=dict(type='str', default=None),
-            fingerprint=dict(type='str', default=None, no_log=True),
+            fingerprints=dict(type='str', default=None, no_log=True),
             keyserver=dict(type='str', default=None)
             transient_key=dict(type='bool', default=False),
             return_fingerprints=dict(type='bool', default=False)
