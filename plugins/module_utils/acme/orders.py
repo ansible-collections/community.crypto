@@ -32,6 +32,7 @@ class Order(object):
         self.identifiers = []
         for identifier in data['identifiers']:
             self.identifiers.append((identifier['type'], identifier['value']))
+        self.replaces_cert_id = data.get('replaces')
         self.finalize_uri = data.get('finalize')
         self.certificate_uri = data.get('certificate')
         self.authorization_uris = data['authorizations']
@@ -44,6 +45,7 @@ class Order(object):
 
         self.status = None
         self.identifiers = []
+        self.replaces_cert_id = None
         self.finalize_uri = None
         self.certificate_uri = None
         self.authorization_uris = []
@@ -62,7 +64,7 @@ class Order(object):
         return result
 
     @classmethod
-    def create(cls, client, identifiers):
+    def create(cls, client, identifiers, replaces_cert_id=None):
         '''
         Start a new certificate order (ACME v2 protocol).
         https://tools.ietf.org/html/rfc8555#section-7.4
@@ -76,6 +78,8 @@ class Order(object):
         new_order = {
             "identifiers": acme_identifiers
         }
+        if replaces_cert_id is not None:
+            new_order["replaces"] = replaces_cert_id
         result, info = client.send_signed_request(
             client.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
         return cls.from_json(client, result, info['location'])
