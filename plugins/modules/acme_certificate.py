@@ -297,9 +297,13 @@ options:
     description:
       - Determines whether to request renewal of an existing certificate according to
         L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
-      - This is only used if the certificate specified in O(dest) or O(fullchain_dest) already exists.
+      - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
       - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
       - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
+      - Generally you should use V(when_ari_supported) if you know that the ACME service supports a compatible
+        draft (or final version, once it is out) of the ARI extension. V(always) should never be necessary.
+        If you are not sure, or if you receive strange errors on invalid C(replaces) values in order objects,
+        use V(never), which also happens to be the default.
     type: str
     choices:
       - never
