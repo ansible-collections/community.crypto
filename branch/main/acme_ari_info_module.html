@@ -5,7 +5,7 @@
 <meta content="2.10.0" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol &mdash; Community.Crypto Collection  documentation</title>
+  <title>community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate &mdash; Community.Crypto Collection  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5707b69d" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
@@ -24,8 +24,8 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as tls-alpn-01" href="acme_challenge_cert_helper_module.html" />
-    <link rel="prev" title="community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol" href="acme_certificate_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+    <link rel="next" title="community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol" href="acme_certificate_module.html" />
+    <link rel="prev" title="community.crypto.acme_account_info module – Retrieves information on ACME accounts" href="acme_account_info_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
 
 
 
@@ -85,22 +85,23 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acme_ari_info_module.html">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#attributes">Attributes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
@@ -161,10 +162,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</li>
+      <li class="breadcrumb-item active">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/acme_certificate_revoke.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/acme_ari_info.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -174,8 +175,8 @@
   
            <div itemprop="articleBody">
              
-  <span class="target" id="ansible-collections-community-crypto-acme-certificate-revoke-module"></span><section id="community-crypto-acme-certificate-revoke-module-revoke-certificates-with-the-acme-protocol">
-<h1>community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol<a class="headerlink" href="#community-crypto-acme-certificate-revoke-module-revoke-certificates-with-the-acme-protocol" title="Link to this heading"></a></h1>
+  <span class="target" id="ansible-collections-community-crypto-acme-ari-info-module"></span><section id="community-crypto-acme-ari-info-module-retrieves-acme-renewal-information-ari-for-a-certificate">
+<h1>community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate<a class="headerlink" href="#community-crypto-acme-ari-info-module-retrieves-acme-renewal-information-ari-for-a-certificate" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.20.0).</p>
@@ -183,9 +184,10 @@
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
 You need further requirements to be able to use this module,
-see <a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
-<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.acme_certificate_revoke</span></code>.</p>
+see <a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.acme_ari_info</span></code>.</p>
 </div>
+<p class="ansible-version-added">New in community.crypto 2.20.0</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -195,16 +197,18 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <li><p><a class="reference internal" href="#notes" id="id5">Notes</a></p></li>
 <li><p><a class="reference internal" href="#see-also" id="id6">See Also</a></p></li>
 <li><p><a class="reference internal" href="#examples" id="id7">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id8">Return Values</a></p></li>
 </ul>
 </nav>
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Allows to revoke certificates issued by a CA supporting the <a class="reference external" href="https://tools.ietf.org/html/rfc8555">ACME protocol</a>, such as <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a>.</p></li>
+<li><p>Allows to retrieve renewal information on a certificate obtained with the <a class="reference external" href="https://tools.ietf.org/html/rfc8555">ACME protocol</a>.</p></li>
+<li><p>This module only works with the ACME v2 protocol, and requires the ACME server to support the ARI extension (<a class="reference external" href="https://datatracker.ietf.org/doc/draft-ietf-acme-ari/">https://datatracker.ietf.org/doc/draft-ietf-acme-ari/</a>). This module implements version 3 of the ARI draft.</p></li>
 </ul>
 </section>
 <section id="requirements">
-<span id="ansible-collections-community-crypto-acme-certificate-revoke-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<span id="ansible-collections-community-crypto-acme-ari-info-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
 <li><p>either openssl or <a class="reference external" href="https://cryptography.io/">cryptography</a> &gt;= 1.5</p></li>
@@ -221,45 +225,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-account_key_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><strong>account_key_content</strong></p>
-<a class="ansibleOptionLink" href="#parameter-account_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Content of the ACME account RSA or Elliptic Curve key.</p>
-<p>Note that exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><span class="std std-ref"><span class="pre">private_key_src</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><span class="std std-ref"><span class="pre">private_key_content</span></span></a></strong></code> must be specified.</p>
-<p><em>Warning</em>: the content will be written into a temporary file, which will be deleted by Ansible when the module completes. Since this is an important private key — it can be used to change the account key, or to revoke your certificates without knowing their private keys —, this might not be acceptable.</p>
-<p>In case <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> is used, the content is not written into a temporary file. It can still happen that it is written to disk by Ansible in the process of moving the module with its argument to the node where it is executed.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-account_key_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-passphrase"><strong>account_key_passphrase</strong></p>
-<a class="ansibleOptionLink" href="#parameter-account_key_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-<p><em class="ansible-option-versionadded">added in community.crypto 1.6.0</em></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Phassphrase to use to decode the account key.</p>
-<p><strong>Note:</strong> this is not supported by the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> backend, only by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-account_key_src"></div>
-<div class="ansibleOptionAnchor" id="parameter-account_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key"></span><strong>account_key_src</strong></p>
-<a class="ansibleOptionLink" href="#parameter-account_key_src" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: account_key</span></p>
-<p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Path to a file containing the ACME account RSA or Elliptic Curve key.</p>
-<p>RSA keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">rsa</span> <span class="pre">...</span></code>. Elliptic curve keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">ecparam</span> <span class="pre">-genkey</span> <span class="pre">...</span></code>. Any other tool creating private keys in PEM format can be used as well.</p>
-<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>.</p>
-<p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code> is not used.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-account_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-uri"><strong>account_uri</strong></p>
-<a class="ansibleOptionLink" href="#parameter-account_uri" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>If specified, assumes that the account URI is as given. If the account key does not match this account, or an account with this URI does not exist, the module fails.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-acme_directory"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-acme-directory"><strong>acme_directory</strong></p>
+<div class="ansibleOptionAnchor" id="parameter-acme_directory"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-acme-directory"><strong>acme_directory</strong></p>
 <a class="ansibleOptionLink" href="#parameter-acme_directory" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The ACME directory to use. This is the entry point URL to access the ACME CA server API.</p>
@@ -273,7 +239,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-acme_version"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-acme-version"><strong>acme_version</strong></p>
+<div class="ansibleOptionAnchor" id="parameter-acme_version"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-acme-version"><strong>acme_version</strong></p>
 <a class="ansibleOptionLink" href="#parameter-acme_version" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The ACME version of the endpoint.</p>
@@ -287,41 +253,23 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-certificate"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-certificate"><strong>certificate</strong></p>
-<a class="ansibleOptionLink" href="#parameter-certificate" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span> / <span class="ansible-option-required">required</span></p>
+<div class="ansibleOptionAnchor" id="parameter-certificate_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-content"><strong>certificate_content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-certificate_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Path to the certificate to revoke.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-private_key_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><strong>private_key_content</strong></p>
-<a class="ansibleOptionLink" href="#parameter-private_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Content of the certificate’s private key.</p>
-<p>Note that exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><span class="std std-ref"><span class="pre">private_key_src</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><span class="std std-ref"><span class="pre">private_key_content</span></span></a></strong></code> must be specified.</p>
-<p><em>Warning</em>: the content will be written into a temporary file, which will be deleted by Ansible when the module completes. Since this is an important private key — it can be used to change the account key, or to revoke your certificates without knowing their private keys —, this might not be acceptable.</p>
-<p>In case <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> is used, the content is not written into a temporary file. It can still happen that it is written to disk by Ansible in the process of moving the module with its argument to the node where it is executed.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-private_key_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-passphrase"><strong>private_key_passphrase</strong></p>
-<a class="ansibleOptionLink" href="#parameter-private_key_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-<p><em class="ansible-option-versionadded">added in community.crypto 1.6.0</em></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Phassphrase to use to decode the certificate’s private key.</p>
-<p><strong>Note:</strong> this is not supported by the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> backend, only by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
+<td><div class="ansible-option-cell"><p>The content of the X.509 certificate to request information for.</p>
+<p>Exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-path"><span class="std std-ref"><span class="pre">certificate_path</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-content"><span class="std std-ref"><span class="pre">certificate_content</span></span></a></strong></code> must be provided.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-private_key_src"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><strong>private_key_src</strong></p>
-<a class="ansibleOptionLink" href="#parameter-private_key_src" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+<div class="ansibleOptionAnchor" id="parameter-certificate_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-path"><strong>certificate_path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-certificate_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Path to the certificate’s private key.</p>
-<p>Note that exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><span class="std std-ref"><span class="pre">private_key_src</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><span class="std std-ref"><span class="pre">private_key_content</span></span></a></strong></code> must be specified.</p>
+<td><div class="ansible-option-cell"><p>A path to the X.509 certificate to request information for.</p>
+<p>Exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-path"><span class="std std-ref"><span class="pre">certificate_path</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-parameter-certificate-content"><span class="std std-ref"><span class="pre">certificate_content</span></span></a></strong></code> must be provided.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-request-timeout"><strong>request_timeout</strong></p>
+<div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-request-timeout"><strong>request_timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
 </div></td>
@@ -331,15 +279,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-revoke_reason"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-revoke-reason"><strong>revoke_reason</strong></p>
-<a class="ansibleOptionLink" href="#parameter-revoke_reason" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>One of the revocation reasonCodes defined in <a class="reference external" href="https://tools.ietf.org/html/rfc5280#section-5.3.1">Section 5.3.1 of RFC5280</a>.</p>
-<p>Possible values are <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code> (unspecified), <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code> (keyCompromise), <code class="ansible-value docutils literal notranslate"><span class="pre">2</span></code> (cACompromise), <code class="ansible-value docutils literal notranslate"><span class="pre">3</span></code> (affiliationChanged), <code class="ansible-value docutils literal notranslate"><span class="pre">4</span></code> (superseded), <code class="ansible-value docutils literal notranslate"><span class="pre">5</span></code> (cessationOfOperation), <code class="ansible-value docutils literal notranslate"><span class="pre">6</span></code> (certificateHold), <code class="ansible-value docutils literal notranslate"><span class="pre">8</span></code> (removeFromCRL), <code class="ansible-value docutils literal notranslate"><span class="pre">9</span></code> (privilegeWithdrawn), <code class="ansible-value docutils literal notranslate"><span class="pre">10</span></code> (aACompromise).</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
+<div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
@@ -354,8 +294,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-validate-certs"><strong>validate_certs</strong></p>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether calls to the ACME directory will validate TLS certificates.</p>
@@ -381,25 +321,19 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="attribute-action_group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-attribute-action-group"><strong>action_group</strong></p>
-<a class="ansibleOptionLink" href="#attribute-action_group" title="Permalink to this attribute"></a></div></td>
-<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-property">Action groups:</strong> <strong class="ansible-attribute-support-full">community.crypto.acme</strong>, <strong class="ansible-attribute-support-full">acme</strong></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Use <code class="docutils literal notranslate"><span class="pre">group/acme</span></code> or <code class="docutils literal notranslate"><span class="pre">group/community.crypto.acme</span></code> in <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code> to set defaults for this module.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="attribute-check_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-attribute-check-mode"><strong>check_mode</strong></p>
+<div class="ansibleOptionAnchor" id="attribute-check_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-attribute-check-mode"><strong>check_mode</strong></p>
 <a class="ansibleOptionLink" href="#attribute-check_mode" title="Permalink to this attribute"></a></div></td>
-<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
+<p>This action does not modify state.</p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Can run in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code> and return changed status prediction without modifying target.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="attribute-diff_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-attribute-diff-mode"><strong>diff_mode</strong></p>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-diff_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-attribute-diff-mode"><strong>diff_mode</strong></p>
 <a class="ansibleOptionLink" href="#attribute-diff_mode" title="Permalink to this attribute"></a></div></td>
-<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong>      <span class="ansible-attribute-support-na">N/A</span></p>
+<p>This action does not modify state.</p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
 </div></td>
@@ -412,11 +346,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><span class="std std-ref"><span class="pre">private_key_src</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><span class="std std-ref"><span class="pre">private_key_content</span></span></a></strong></code> must be specified.</p></li>
-<li><p>Trying to revoke an already revoked certificate should result in an unchanged status, even if the revocation reason was different than the one specified here. Also, depending on the server, it can happen that some other error is returned if the certificate has already been revoked.</p></li>
 <li><p>Although the defaults are chosen so that the module can be used with the <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a> CA, the module can in principle be used with any CA providing an ACME endpoint, such as <a class="reference external" href="https://www.buypass.com/ssl/products/acme">Buypass Go SSL</a>.</p></li>
 <li><p>So far, the ACME modules have only been tested by the developers against Let’s Encrypt (staging and production), Buypass (staging and production), ZeroSSL (production), and <a class="reference external" href="https://github.com/letsencrypt/Pebble">Pebble testing server</a>. We have got community feedback that they also work with Sectigo ACME Service for InCommon. If you experience problems with another ACME server, please <a class="reference external" href="https://github.com/ansible-collections/community.crypto/issues/new/choose">create an issue</a> to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.</p></li>
-<li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower and less secure, as private key contents always have to be stored on disk (see <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>).</p></li>
+<li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-ari-info-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower.</p></li>
 </ul>
 </div>
 </section>
@@ -425,28 +357,93 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference external" href="https://letsencrypt.org/docs/">The Let’s Encrypt documentation</a></dt><dd><p>Documentation for the Let’s Encrypt Certification Authority. Provides useful information for example on rate limits.</p>
+<dt><a class="reference internal" href="acme_certificate_module.html#ansible-collections-community-crypto-acme-certificate-module"><span class="std std-ref">community.crypto.acme_certificate</span></a></dt><dd><p>Allows to obtain a certificate using the ACME protocol</p>
 </dd>
-<dt><a class="reference external" href="https://tools.ietf.org/html/rfc8555">Automatic Certificate Management Environment (ACME)</a></dt><dd><p>The specification of the ACME protocol (RFC 8555).</p>
-</dd>
-<dt><a class="reference internal" href="acme_inspect_module.html#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a></dt><dd><p>Allows to debug problems.</p>
+<dt><a class="reference internal" href="acme_certificate_revoke_module.html#ansible-collections-community-crypto-acme-certificate-revoke-module"><span class="std std-ref">community.crypto.acme_certificate_revoke</span></a></dt><dd><p>Allows to revoke a certificate using the ACME protocol</p>
 </dd>
 </dl>
 </div>
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Revoke certificate with account key</span>
-<span class="w">  </span><span class="nt">community.crypto.acme_certificate_revoke</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">certificate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retrieve renewal information for a certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_ari_info</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cert_data</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Revoke certificate with certificate&#39;s private key</span>
-<span class="w">  </span><span class="nt">community.crypto.acme_certificate_revoke</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">private_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.key</span>
-<span class="w">    </span><span class="nt">certificate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Show the certificate renewal information</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cert_data.renewal_info</span>
 </pre></div>
 </div>
+</section>
+<section id="return-values">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
+<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info"><strong>renewal_info</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The ARI renewal info object (<a class="reference external" href="https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.2">https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.2</a>).</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info/explanationURL"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info-explanationurl"><strong>explanationURL</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info/explanationURL" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>A URL pointing to a page which may explain why the suggested renewal window is what it is.</p>
+<p>For example, it may be a page explaining the CA’s dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Should be shown to the user.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> depends on the ACME server</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;https://example.com/docs/ari&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info/retryAfter"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info-retryafter"><strong>retryAfter</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info/retryAfter" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>A timestamp before the next retry to ask for this information should not be made.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> depends on the ACME server</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;2024-04-29T01:17:10.236921+00:00&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info/suggestedWindow"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info-suggestedwindow"><strong>suggestedWindow</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info/suggestedWindow" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Describes the window during which the certificate should be renewed.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info/suggestedWindow/end"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info-suggestedwindow-end"><strong>end</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info/suggestedWindow/end" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The end of the window during which the certificate should be renewed.</p>
+<p>The format is specified in <a class="reference external" href="https://www.rfc-editor.org/info/rfc3339">RFC 3339</a>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;2021-01-03T00:00:00Z&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-renewal_info/suggestedWindow/start"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-ari-info-module-return-renewal-info-suggestedwindow-start"><strong>start</strong></p>
+<a class="ansibleOptionLink" href="#return-renewal_info/suggestedWindow/start" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The start of the window during which the certificate should be renewed.</p>
+<p>The format is specified in <a class="reference external" href="https://www.rfc-editor.org/info/rfc3339">RFC 3339</a>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;2021-01-03T00:00:00Z&quot;</span></code></p>
+</div></td>
+</tr>
+</tbody>
+</table>
 <section id="authors">
 <h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
 <ul class="simple">
@@ -472,8 +469,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
           
 
 <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="acme_certificate_module.html" class="btn btn-neutral float-left" title="community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="acme_challenge_cert_helper_module.html" class="btn btn-neutral float-right" title="community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as tls-alpn-01" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="acme_account_info_module.html" class="btn btn-neutral float-left" title="community.crypto.acme_account_info module – Retrieves information on ACME accounts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acme_certificate_module.html" class="btn btn-neutral float-right" title="community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
