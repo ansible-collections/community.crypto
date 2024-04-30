@@ -293,6 +293,20 @@ options:
           - "The identifier must be of the form
              V(C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10)."
         type: str
+  include_renewal_cert_id:
+    description:
+      - Determines whether to request renewal of an existing certificate according to
+        L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
+      - This is only used if the certificate specified in O(dest) or O(fullchain_dest) already exists.
+      - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
+      - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
+    type: str
+    choices:
+      - never
+      - when_ari_supported
+      - always
+    default: never
+    version_added: 2.20.0
 '''
 
 EXAMPLES = r'''
@@ -586,6 +600,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.orders impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    compute_cert_id,
     pem_to_der,
 )
 
@@ -622,6 +637,7 @@ class ACMECertificateClient(object):
         self.order_uri = self.data.get('order_uri') if self.data else None
         self.all_chains = None
         self.select_chain_matcher = []
+        self.include_renewal_cert_id = module.params['include_renewal_cert_id']
 
         if self.module.params['select_chain']:
             for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
@@ -679,6 +695,15 @@ class ACMECertificateClient(object):
             # stored in self.order_uri by the constructor).
             return self.order_uri is None
 
+    def _get_cert_info_or_none(self):
+        if self.module.params.get('dest'):
+            filename = self.module.params['dest']
+        else:
+            filename = self.module.params['fullchain_dest']
+        if not os.path.exist(filename):
+            return None
+        return self.backend.get_cert_information(cert_filename=filename)
+
     def start_challenges(self):
         '''
         Create new authorizations for all identifiers of the CSR,
@@ -693,7 +718,15 @@ class ACMECertificateClient(object):
                 authz = Authorization.create(self.client, identifier_type, identifier)
                 self.authorizations[authz.combined_identifier] = authz
         else:
-            self.order = Order.create(self.client, self.identifiers)
+            replaces_cert_id = None
+            if (
+                self.include_renewal_cert_id == 'always' or
+                (self.include_renewal_cert_id == 'when_ari_supported' and self.client.directory.has_renewal_info_endpoint())
+            ):
+                cert_info = self._get_cert_info_or_none()
+                if cert_info is not None:
+                    replaces_cert_id = compute_cert_id(self.backend, cert_info=cert_info)
+            self.order = Order.create(self.client, self.identifiers, replaces_cert_id)
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)
             self.authorizations.update(self.order.authorizations)
@@ -879,6 +912,7 @@ def main():
             subject_key_identifier=dict(type='str'),
             authority_key_identifier=dict(type='str'),
         )),
+        include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
