@@ -8,6 +8,7 @@ requires_ansible: '>=2.9.10'
 action_groups:
   acme:
     - acme_inspect
+    - acme_certificate_deactivate_authz
     - acme_certificate_revoke
     - acme_certificate
     - acme_account
