@@ -304,6 +304,12 @@ options:
         draft (or final version, once it is out) of the ARI extension. V(always) should never be necessary.
         If you are not sure, or if you receive strange errors on invalid C(replaces) values in order objects,
         use V(never), which also happens to be the default.
+      - ACME servers might refuse to create new orders with C(replaces) for certificates that already have an
+        existing order. This can happen if this module is used to create an order, and then the playbook/role
+        fails in case the challenges cannot be set up. If the playbook/role does not record the order data to
+        continue with the existing order, but tries to create a new one on the next run, creating the new order
+        might fail. For this reason, this option should only be set to a value different from V(never) if the
+        role/playbook using it keeps track of order data accross restarts.
     type: str
     choices:
       - never
