@@ -1,0 +1,2 @@
+bugfixes:
+  - "ecs_certificate - fixed ``csr`` option to be empty and allow renewal of a specific certificate according to the Renewal Information specification (https://github.com/ansible-collections/community.crypto/pull/740)."
