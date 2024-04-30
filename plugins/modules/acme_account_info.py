@@ -25,7 +25,8 @@ notes:
   - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
      did not change."
 extends_documentation_fragment:
-  - community.crypto.acme
+  - community.crypto.acme.basic
+  - community.crypto.acme.account
   - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
   - community.crypto.attributes.info_module

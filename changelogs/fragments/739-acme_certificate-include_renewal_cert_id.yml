@@ -1,0 +1,2 @@
+minor_changes:
+  - "acme_certificate - add ``include_renewal_cert_id`` option to allow requesting renewal of a specific certificate according to the current ACME Renewal Information specification draft (https://github.com/ansible-collections/community.crypto/pull/739)."

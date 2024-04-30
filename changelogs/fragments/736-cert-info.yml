@@ -1,0 +1,2 @@
+deprecated_features:
+  - "acme.backends module utils - the ``get_cert_information()`` method for a ACME crypto backend must be implemented from community.crypto 3.0.0 on (https://github.com/ansible-collections/community.crypto/pull/736)."
