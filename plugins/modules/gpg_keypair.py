@@ -66,7 +66,8 @@ options:
             - V(cert) is given to all primary keys regardess, however can be used to only give V(vert) usage to a key.
             - If not usage is specified, the valid usages for the given key type with be assigned.
             - If O(state) is V(absent), this parameter is ignored. 
-        type: list[str]
+        type: list
+        elements: str
         choices: ['encrypt', 'sign', 'auth', 'cert']
     subkey_type:
         description:
