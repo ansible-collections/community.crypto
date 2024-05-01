@@ -90,6 +90,9 @@ def main():
         ),
         supports_check_mode=True,
     )
+    if module.params['acme_version'] == 1:
+        module.fail_json('The module does not support acme_version=1')
+
     backend = create_backend(module, False)
 
     try:
