@@ -111,7 +111,7 @@ options:
         description:
             - Specifies keys to match against.
             - Provided fingerprints will take priority over user-id "V(name) (V(comment)) <V(email)>".
-            - If O(state) is V(absent), keys with the provided fingerprints will be deleted if found 
+            - If O(state) is V(absent), keys with the provided fingerprints will be deleted if found.
         type: list[str]
     keyserver:
         description:
