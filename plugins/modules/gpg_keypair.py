@@ -327,7 +327,7 @@ def generate_keypair(
         EOF
         """
 
-    _, stdout, _ = gpg_runner.run_command([
+    dummy, stdout, dummy2 = gpg_runner.run_command([
         f'{"dry-run" if check_mode else ""}',
         '--batch',
         '--log-file',
