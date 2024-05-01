@@ -1,0 +1,30 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the github_issue module.
+#
+# Copyright (c) 2024, Austin Lucas Lake <53884490+austinlucaslake@users.noreply.github.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create GPG key
+  github_gpg_key:
+    name: {{ name }}
+    comment: {{ comment }}
+    email: {{ email }}
+  register: created_gpg_key
+
+- name: Delete GPG key 
+  github_gpg_key:
+    state: absent
+    name: {{ name }}
+    comment: {{ comment }}
+    email: {{ email }}
+  register: deleted_gpg_key
+
+- assert:
+    that:
+      - created_gpg_key.changed
+      - delete_gpg_key.changed
