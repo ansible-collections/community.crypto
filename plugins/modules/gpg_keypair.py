@@ -288,7 +288,7 @@ def delete_keypair(
             '--batch',
             '--yes',
             '--delete-secret-and-public-key',
-            *matching_key
+            *matching_keys
         ], check_rc=True)
         if params['return_fingerprints']:
             return dict(changed=True, fingerprints=matching_keys)
