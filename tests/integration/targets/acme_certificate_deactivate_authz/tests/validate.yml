@@ -1,0 +1,17 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Checks
+  assert:
+    that:
+      - order_1.output_json.status == 'pending'
+      - deactivate_1 is changed
+      - order_2.output_json.status == 'pending'
+      - deactivate_2 is changed
+      - order_3.output_json.status == 'deactivated'
+      - deactivate_3 is not changed
+      - order_4.output_json.status == 'deactivated'
+      - deactivate_4 is not changed
+      - order_5.output_json.status == 'deactivated'
