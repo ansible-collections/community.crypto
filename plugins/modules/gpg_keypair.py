@@ -191,7 +191,7 @@ size:
     sample: 4096
 fingerprints:
     description: Fingerprint(s) of newly created or deleted key(s)
-    return: changed and `return_fingerprints`==True
+    return: changed and O(return_fingerprints=true)
     type: list[str]
     sample: [ ABC123... ]
 '''
