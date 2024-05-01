@@ -283,13 +283,21 @@ class Authorization(object):
             return self.status == 'valid'
         return self.wait_for_validation(client, challenge_type)
 
+    def can_deactivate(self):
+        '''
+        Deactivates this authorization.
+        https://community.letsencrypt.org/t/authorization-deactivation/19860/2
+        https://tools.ietf.org/html/rfc8555#section-7.5.2
+        '''
+        return self.status in ('valid', 'pending')
+
     def deactivate(self, client):
         '''
         Deactivates this authorization.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        if self.status != 'valid':
+        if not self.can_deactivate():
             return
         authz_deactivate = {
             'status': 'deactivated'

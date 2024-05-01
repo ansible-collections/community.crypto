@@ -77,6 +77,8 @@ seealso:
     description: Allows to create, modify or delete an ACME account.
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
+  - module: community.crypto.acme_certificate_deactivate_authz
+    description: Allows to deactivate (invalidate) ACME v2 orders.
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.account
@@ -309,7 +311,9 @@ options:
         fails in case the challenges cannot be set up. If the playbook/role does not record the order data to
         continue with the existing order, but tries to create a new one on the next run, creating the new order
         might fail. For this reason, this option should only be set to a value different from V(never) if the
-        role/playbook using it keeps track of order data accross restarts.
+        role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate
+        orders whose processing is aborted. Orders can be deactivated with the
+        M(community.crypto.acme_certificate_deactivate_authz) module.
     type: str
     choices:
       - never
