@@ -24,7 +24,7 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol" href="acme_certificate_revoke_module.html" />
+    <link rel="next" title="community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order" href="acme_certificate_deactivate_authz_module.html" />
     <link rel="prev" title="community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate" href="acme_ari_info_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
 
 
@@ -101,6 +101,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_deactivate_authz_module.html">community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
@@ -426,7 +427,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> never sends the certificate ID of the certificate to renew. <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code> will always send it.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">when_ari_supported</span></code> only sends the certificate ID if the ARI endpoint is found in the ACME directory.</p>
 <p>Generally you should use <code class="ansible-value docutils literal notranslate"><span class="pre">when_ari_supported</span></code> if you know that the ACME service supports a compatible draft (or final version, once it is out) of the ARI extension. <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code> should never be necessary. If you are not sure, or if you receive strange errors on invalid <code class="docutils literal notranslate"><span class="pre">replaces</span></code> values in order objects, use <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code>, which also happens to be the default.</p>
-<p>ACME servers might refuse to create new orders with <code class="docutils literal notranslate"><span class="pre">replaces</span></code> for certificates that already have an existing order. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. For this reason, this option should only be set to a value different from <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> if the role/playbook using it keeps track of order data accross restarts.</p>
+<p>ACME servers might refuse to create new orders with <code class="docutils literal notranslate"><span class="pre">replaces</span></code> for certificates that already have an existing order. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. For this reason, this option should only be set to a value different from <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> if the role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;never&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -677,6 +678,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <dt><a class="reference internal" href="acme_account_module.html#ansible-collections-community-crypto-acme-account-module"><span class="std std-ref">community.crypto.acme_account</span></a></dt><dd><p>Allows to create, modify or delete an ACME account.</p>
 </dd>
 <dt><a class="reference internal" href="acme_inspect_module.html#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a></dt><dd><p>Allows to debug problems.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a></dt><dd><p>Allows to deactivate (invalidate) ACME v2 orders.</p>
 </dd>
 </dl>
 </div>
@@ -994,7 +997,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 
 <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="acme_ari_info_module.html" class="btn btn-neutral float-left" title="community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="acme_certificate_revoke_module.html" class="btn btn-neutral float-right" title="community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="acme_certificate_deactivate_authz_module.html" class="btn btn-neutral float-right" title="community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
