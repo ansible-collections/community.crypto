@@ -13,6 +13,7 @@ DOCUMENTATION = '''
 module: gpg_keypair
 author: "Austin Lucas Lake (@austinlucaslake)"
 short_description: Generate or delete GPG private and public keys
+version_added: 2.20.0
 description:
     - "This module allows one to generate or delete OpenSSH private and public keys using GnuPG (gpg)."
 requirements:
