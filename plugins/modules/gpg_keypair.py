@@ -353,7 +353,10 @@ def run_module(params: Dict[str, Union[str, int, bool, List[str]]], check_mode: 
         params["email"],
         params["fingerprints"]
     )
-    result = generate_keypair(gpg_runner, params, matching_keys, check_mode) if params['state'] == 'present' else delete_keypair(gpg_runner, matching_keys, check_mode)
+    if params['state'] = present:
+        result = generate_keypair(gpg_runner, params, matching_keys, check_mode)
+    else:
+        result = delete_keypair(gpg_runner, matching_keys, check_mode)
     return result
 
 def main():
