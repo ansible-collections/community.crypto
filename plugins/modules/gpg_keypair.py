@@ -232,7 +232,7 @@ def validate_params(params):
         validate_key(subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], ('subkey #{}').format(index+1))
 
 
-def list_matching_keys(name, comment, email, fingerprint):
+def list_matching_keys(name, comment, email, fingerprints):
     user_id = ''
     if params['name']:
         user_id += '{} '.format(params["name"])
