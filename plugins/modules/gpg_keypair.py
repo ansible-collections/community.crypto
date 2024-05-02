@@ -204,7 +204,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError
 from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import GPGError
 
-def validate_params(params: Dict[str, Union[str, int]]) -> None:
+def validate_params(params):
 
     if params['override'] and params['present'] and not (params['fingerprint'] or params['name'] or params['comment'] or params['email']):
             raise GPGError, 'To override existing keys, please provide any combination of the `fingerprint`, `name`, `comment`, and `email` parameters.'
@@ -276,11 +276,7 @@ def list_matching_keys(name, comment, email, fingerprint):
         return matching_keys
     return []
 
-def delete_keypair(
-    gpg_runner: PluginGPGRunner,
-    matching_keys: List[str],
-    check_mode: bool = False
-) -> Dict[str, Union[str, int]]:
+def delete_keypair(gpg_runner, matching_keys, check_mode):
     if matching_keys:
         gpg_runner.run_command([
             f'{"dry-run" if check_mode else ""}',
@@ -294,12 +290,7 @@ def delete_keypair(
         return dict(changed=True, fingerprints=[])
     return dict(changed=False, fingerprints=[])
 
-def generate_keypair(
-    gpg_runner: PluginGPGRunner,
-    params: Dict[str, Union[str, int, bool, List[str]]],
-    matching_keys,
-    check_mode: bool = False
-) -> Dict[str, Union[bool, str]]:
+def generate_keypair(gpg_runner, params, matching_keys, check_mode):
     if matching_keys:
         if params['return_fingerprints']:
             return dict(changed=False, fingerprints=matching_keys)
@@ -343,7 +334,7 @@ def generate_keypair(
         return dict(changed=True, fingerprints=fingerprints)
     return dict(changed=True, fingerprints=[])
 
-def run_module(params: Dict[str, Union[str, int, bool, List[str]]], check_mode: bool = False):
+def run_module(params, check_mode = False):
     validate_params(params)
     gpg_runner = PluginGPGRunner()
     matching_keys = list_matching_keys(
