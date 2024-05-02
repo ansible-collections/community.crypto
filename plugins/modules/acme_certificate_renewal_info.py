@@ -200,13 +200,13 @@ def main():
             window_end = backend.parse_acme_timestamp(renewal_info['suggestedWindow']['end'])
             msg_append = ''
             if 'explanationURL' in renewal_info:
-                msg_append = 'Information on renewal interval: {0}'.format(renewal_info['explanationURL'])
+                msg_append = '. Information on renewal interval: {0}'.format(renewal_info['explanationURL'])
             renewal_ari = True
             if now > window_end:
                 module.exit_json(
                     changed=False,
                     should_renew=True,
-                    msg='The suggested renewal interval provided by ARI is in the past',
+                    msg='The suggested renewal interval provided by ARI is in the past{0}'.format(msg_append),
                     supports_ari=True,
                 )
             if module.params['ari_algorithm'] == 'start':
@@ -214,7 +214,7 @@ def main():
                     module.exit_json(
                         changed=False,
                         should_renew=True,
-                        msg='The suggested renewal interval provided by ARI has begun',
+                        msg='The suggested renewal interval provided by ARI has begun{0}'.format(msg_append),
                         supports_ari=True,
                     )
             else:
@@ -223,7 +223,7 @@ def main():
                     module.exit_json(
                         changed=False,
                         should_renew=True,
-                        msg='The picked random renewal time {0} in sugested renewal internal provided by ARI is in the past'.format(random_time),
+                        msg='The picked random renewal time {0} in sugested renewal internal provided by ARI is in the past{1}'.format(random_time, msg_append),
                         supports_ari=True,
                     )
 
