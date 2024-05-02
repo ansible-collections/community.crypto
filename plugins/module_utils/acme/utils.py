@@ -22,7 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_int_to_bytes
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import get_now_datetime
+from ansible_collections.community.crypto.plugins.module_utils.time import get_now_datetime
 
 
 def nopad_b64(data):

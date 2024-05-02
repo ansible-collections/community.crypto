@@ -41,12 +41,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
     convert_int_to_hex,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    get_now_datetime,
-    ensure_utc_timezone,
-    parse_name_field,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
@@ -57,6 +51,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     extract_first_pem,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    ensure_utc_timezone,
+    get_now_datetime,
+    parse_name_field,
 )
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
