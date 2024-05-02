@@ -36,10 +36,9 @@ options:
         choices: [ present, absent ]
     key_type:
         description:
-            - "Specifies the type of key to create. By default this is V(EDDSSA) which must be used with Curve25519.
+            - "Specifies the type of key to create.
               Supported key types are V(RSA), V(DSA), V(ECDSA), V(EDDSA), and V(ECDH)."
         type: str
-        default: EDDSA
         choices: ['RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH']        
     key_length:
         description:
@@ -367,7 +366,7 @@ def main():
     module = AnsibleModule(
         argument_spec=
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            key_type=dict(type='str', default='EDDSA', choices=key_types[:-1]),
+            key_type=dict(type='str', choices=key_types[:-1]),
             key_curve=dict(type='str', choices=key_curves),
             key_usage=dict(type='str', choices=key_usages),
             subkey_type=dict(type='str', choices=key_types),
