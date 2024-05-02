@@ -66,6 +66,14 @@ options:
         this check causes RV(should_renew=true) if the certificate is valid for less than 9 days.
       - Must be a value between 0 and 1.
     type: float
+  now:
+    description:
+      - Use this timestamp instead of the current timestamp to determine whether a certificate should be renewed.
+      - Time can be specified either as relative time or as absolute timestamp.
+      - Time will always be interpreted as UTC.
+      - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
+        + C([w | d | h | m | s]) (for example V(+32w1d2h)).
+    type: str
 seealso:
   - module: community.crypto.acme_certificate
     description: Allows to obtain a certificate using the ACME protocol
@@ -136,6 +144,7 @@ def main():
         ari_algorithm=dict(type='str', choices=['standard', 'start'], default='standard'),
         remaining_days=dict(type='int'),
         remaining_percentage=dict(type='float'),
+        now=dict(type='str'),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -167,7 +176,12 @@ def main():
             cert_filename=module.params['certificate_path'],
             cert_content=module.params['certificate_content'],
         )
-        now = backend.get_now()
+
+        if module.params['now']:
+            now = backend.parse_module_parameter(module.params['now'], 'now')
+        else:
+            now = backend.get_now()
+
         no_renewal_msg = 'The certificate is still valid and no condition was reached'
         renewal_ari = False
 

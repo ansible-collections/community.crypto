@@ -38,6 +38,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.io import re
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     convert_int_to_bytes,
     convert_int_to_hex,
@@ -64,6 +68,7 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
     from_epoch_seconds,
     get_epoch_seconds,
     get_now_datetime,
+    get_relative_time_option,
     UTC,
 )
 
@@ -186,6 +191,12 @@ class CryptographyBackend(CryptoBackend):
 
     def parse_acme_timestamp(self, timestamp_str):
         return _parse_acme_timestamp(timestamp_str, with_timezone=CRYPTOGRAPHY_TIMEZONE)
+
+    def parse_module_parameter(self, value, name):
+        try:
+            return get_relative_time_option(value, name, backend='cryptography', with_timezone=False)
+        except OpenSSLObjectError as exc:
+            raise BackendException(to_native(exc))
 
     def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
         start = get_epoch_seconds(timestamp_start)

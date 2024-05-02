@@ -15,9 +15,14 @@ import datetime
 import re
 
 from ansible.module_utils import six
+from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.time import (
@@ -25,6 +30,7 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
     from_epoch_seconds,
     get_epoch_seconds,
     get_now_datetime,
+    get_relative_time_option,
     remove_timezone,
 )
 
@@ -88,6 +94,12 @@ class CryptoBackend(object):
     def parse_acme_timestamp(self, timestamp_str):
         # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
         return _parse_acme_timestamp(timestamp_str, with_timezone=False)
+
+    def parse_module_parameter(self, value, name):
+        try:
+            return get_relative_time_option(value, name, backend='cryptography', with_timezone=True)
+        except OpenSSLObjectError as exc:
+            raise BackendException(to_native(exc))
 
     def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
         start = get_epoch_seconds(timestamp_start)
