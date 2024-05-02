@@ -12,6 +12,7 @@ __metaclass__ = type
 from collections import namedtuple
 import abc
 import datetime
+import re
 
 from ansible.module_utils import six
 
@@ -40,8 +41,31 @@ CertificateInformation = namedtuple(
 )
 
 
-def _parse_acme_timestamp(timestamp_str, with_timezone):
+_FRACTIONAL_MATCHER = re.compile(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(|\.\d+)(Z|[+-]\d{2}:?\d{2}.*)$')
+
+
+def _reduce_fractional_digits(timestamp_str):
+    """
+    Given a RFC 3339 timestamp that includes too many digits for the fractional seconds part, reduces these to at most 6.
+    """
     # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
+    m = _FRACTIONAL_MATCHER.match(timestamp_str)
+    if not m:
+        raise BackendException('Cannot parse ISO 8601 timestamp {0!r}'.format(timestamp_str))
+    timestamp, fractional, timezone = m.groups()
+    if len(fractional) > 7:
+        # Python does not support anything smaller than microseconds
+        # (Golang supports nanoseconds, Boulder often emits more fractional digits, which Python chokes on)
+        fractional = fractional[:7]
+    return '%s%s%s' % (timestamp, fractional, timezone)
+
+
+def _parse_acme_timestamp(timestamp_str, with_timezone):
+    """
+    Parses a RFC 3339 timestamp.
+    """
+    # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
+    timestamp_str = _reduce_fractional_digits(timestamp_str)
     for format in ('%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%dT%H:%M:%S.%f%z'):
         # Note that %z won't work with Python 2... https://stackoverflow.com/a/27829491
         try:

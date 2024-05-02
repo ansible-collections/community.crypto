@@ -117,6 +117,10 @@ TEST_PARSE_ACME_TIMESTAMP = [
         '2024-01-01T00:11:22.123Z',
         dict(year=2024, month=1, day=1, hour=0, minute=11, second=22, microsecond=123000),
     ),
+    (
+        '2024-04-17T06:54:13.333333334Z',
+        dict(year=2024, month=4, day=17, hour=6, minute=54, second=13, microsecond=333333),
+    ),
 ]
 
 if sys.version_info >= (3, 5):
