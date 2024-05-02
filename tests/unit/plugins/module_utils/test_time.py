@@ -198,7 +198,6 @@ TEST_GET_RELATIVE_TIME_OPTION = [
 ]
 
 
-
 if sys.version_info >= (3, 5):
     ONE_HOUR_PLUS = datetime.timezone(datetime.timedelta(hours=1))
 
@@ -322,4 +321,3 @@ def test_convert_relative_to_datetime(relative_time_string, with_timezone, now, 
 def test_get_relative_time_option(input_string, input_name, backend, with_timezone, now, expected):
     output = get_relative_time_option(input_string, input_name, backend=backend, with_timezone=with_timezone, now=now)
     assert expected == output
-

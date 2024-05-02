@@ -22,6 +22,8 @@ from .backend_data import (
     TEST_CERT_OPENSSL_OUTPUT,
     TEST_CERT_DAYS,
     TEST_CERT_INFO,
+    TEST_PARSE_ACME_TIMESTAMP,
+    TEST_INTERPOLATE_TIMESTAMP,
 )
 
 
@@ -91,3 +93,30 @@ def test_get_cert_information(cert_content, expected_cert_info, openssl_output, 
     assert cert_info == expected_cert_info
     cert_info = backend.get_cert_information(cert_content=cert_content)
     assert cert_info == expected_cert_info
+
+
+def test_now():
+    module = MagicMock()
+    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    now = backend.get_now()
+    assert now.tzinfo is None
+
+
+@pytest.mark.parametrize("input, expected", TEST_PARSE_ACME_TIMESTAMP)
+def test_parse_acme_timestamp(input, expected):
+    module = MagicMock()
+    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    ts_expected = backend.get_utc_datetime(**expected)
+    timestamp = backend.parse_acme_timestamp(input)
+    assert ts_expected == timestamp
+
+
+@pytest.mark.parametrize("start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP)
+def test_interpolate_timestamp(start, end, percentage, expected):
+    module = MagicMock()
+    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    ts_start = backend.get_utc_datetime(**start)
+    ts_end = backend.get_utc_datetime(**end)
+    ts_expected = backend.get_utc_datetime(**expected)
+    timestamp = backend.interpolate_timestamp(ts_start, ts_end, percentage)
+    assert ts_expected == timestamp

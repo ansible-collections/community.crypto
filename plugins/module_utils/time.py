@@ -8,15 +8,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-import abc
 import datetime
-import errno
-import hashlib
-import os
 import re
+import sys
 
-from ansible.module_utils import six
-from ansible.module_utils.common.text.converters import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -56,6 +52,9 @@ def get_now_datetime(with_timezone):
 def ensure_utc_timezone(timestamp):
     if timestamp.tzinfo is UTC:
         return timestamp
+    if timestamp.tzinfo is None:
+        # We assume that naive datetime objects use timezone UTC!
+        return timestamp.replace(tzinfo=UTC)
     return timestamp.astimezone(UTC)
 
 
@@ -72,11 +71,19 @@ def add_or_remove_timezone(timestamp, with_timezone):
     return ensure_utc_timezone(timestamp) if with_timezone else remove_timezone(timestamp)
 
 
-def get_epoch_seconds(timestamp):
-    try:
+if sys.version_info < (3, 3):
+    def get_epoch_seconds(timestamp):
+        epoch = datetime.datetime(1970, 1, 1, tzinfo=UTC if timestamp.tzinfo is not None else None)
+        delta = timestamp - epoch
+        try:
+            return delta.total_seconds()
+        except AttributeError:
+            # Python 2.6 and earlier: total_seconds() does not yet exist, so we use the formula from
+            # https://docs.python.org/2/library/datetime.html#datetime.timedelta.total_seconds
+            return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+else:
+    def get_epoch_seconds(timestamp):
         return timestamp.timestamp()
-    except AttributeError:
-        return (ensure_utc_timezone(timestamp) - datetime(1970, 1, 1, tzinfo=UTC)).total_seconds()
 
 
 def from_epoch_seconds(timestamp, with_timezone):

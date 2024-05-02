@@ -9,6 +9,7 @@ __metaclass__ = type
 import base64
 import datetime
 import os
+import sys
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
@@ -103,6 +104,52 @@ TEST_CERT_INFO = [
             authority_key_identifier=None,
         ),
         TEST_CERT_OPENSSL_OUTPUT,
+    ),
+]
+
+
+TEST_PARSE_ACME_TIMESTAMP = [
+    (
+        '2024-01-01T00:11:22Z',
+        dict(year=2024, month=1, day=1, hour=0, minute=11, second=22),
+    ),
+    (
+        '2024-01-01T00:11:22.123Z',
+        dict(year=2024, month=1, day=1, hour=0, minute=11, second=22, microsecond=123000),
+    ),
+]
+
+if sys.version_info >= (3, 5):
+    TEST_PARSE_ACME_TIMESTAMP.extend([
+        (
+            '2024-01-01T00:11:22+0100',
+            dict(year=2023, month=12, day=31, hour=23, minute=11, second=22),
+        ),
+        (
+            '2024-01-01T00:11:22.123+0100',
+            dict(year=2023, month=12, day=31, hour=23, minute=11, second=22, microsecond=123000),
+        ),
+    ])
+
+
+TEST_INTERPOLATE_TIMESTAMP = [
+    (
+        dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
+        dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+        0.0,
+        dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
+    ),
+    (
+        dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
+        dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+        0.5,
+        dict(year=2024, month=1, day=1, hour=0, minute=30, second=0),
+    ),
+    (
+        dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
+        dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+        1.0,
+        dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
     ),
 ]
 

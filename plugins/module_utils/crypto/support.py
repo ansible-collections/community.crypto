@@ -20,12 +20,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     identify_pem_format,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.time import (
+from ansible_collections.community.crypto.plugins.module_utils.time import (  # noqa: F401, pylint: disable=unused-import
     # These imports are for backwards compatibility
-    get_now_datetime,  # noqa: F401, pylint: disable=unused-import
-    ensure_utc_timezone,  # noqa: F401, pylint: disable=unused-import
-    convert_relative_to_datetime,  # noqa: F401, pylint: disable=unused-import
-    get_relative_time_option,  # noqa: F401, pylint: disable=unused-import
+    get_now_datetime,
+    ensure_utc_timezone,
+    convert_relative_to_datetime,
+    get_relative_time_option,
 )
 
 try:
