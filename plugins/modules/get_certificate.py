@@ -220,16 +220,16 @@ from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    get_now_datetime,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_oid_to_name,
     cryptography_get_extensions_from_cert,
     get_not_valid_after,
     get_not_valid_before,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    get_now_datetime,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
