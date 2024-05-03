@@ -470,7 +470,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_certificate,
     parse_name_field,
     parse_ordered_name_field,
-    get_relative_time_option,
     select_message_digest,
 )
 
@@ -504,6 +503,10 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
     get_crl_info,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    get_relative_time_option,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'

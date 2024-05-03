@@ -11,6 +11,7 @@ __metaclass__ = type
 
 import base64
 import binascii
+import datetime
 import os
 import traceback
 
@@ -21,6 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import Lo
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
     CryptoBackend,
+    _parse_acme_timestamp,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
@@ -41,12 +43,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
     convert_int_to_hex,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    get_now_datetime,
-    ensure_utc_timezone,
-    parse_name_field,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
@@ -57,6 +53,18 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     extract_first_pem,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    parse_name_field,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    ensure_utc_timezone,
+    from_epoch_seconds,
+    get_epoch_seconds,
+    get_now_datetime,
+    UTC,
 )
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
@@ -172,6 +180,26 @@ class CryptographyChainMatcher(ChainMatcher):
 class CryptographyBackend(CryptoBackend):
     def __init__(self, module):
         super(CryptographyBackend, self).__init__(module)
+
+    def get_now(self):
+        return get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
+
+    def parse_acme_timestamp(self, timestamp_str):
+        return _parse_acme_timestamp(timestamp_str, with_timezone=CRYPTOGRAPHY_TIMEZONE)
+
+    def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
+        start = get_epoch_seconds(timestamp_start)
+        end = get_epoch_seconds(timestamp_end)
+        return from_epoch_seconds(start + percentage * (end - start), with_timezone=CRYPTOGRAPHY_TIMEZONE)
+
+    def get_utc_datetime(self, *args, **kwargs):
+        kwargs_ext = dict(kwargs)
+        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' not in kwargs_ext and len(args) < 8):
+            kwargs_ext['tzinfo'] = UTC
+        result = datetime.datetime(*args, **kwargs_ext)
+        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' in kwargs or len(args) >= 8):
+            result = ensure_utc_timezone(result)
+        return result
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
@@ -379,7 +407,7 @@ class CryptographyBackend(CryptoBackend):
             raise BackendException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
 
         if now is None:
-            now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
+            now = self.get_now()
         elif CRYPTOGRAPHY_TIMEZONE:
             now = ensure_utc_timezone(now)
         return (get_not_valid_after(cert) - now).days

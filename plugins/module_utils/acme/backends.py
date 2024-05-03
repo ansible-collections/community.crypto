@@ -11,11 +11,21 @@ __metaclass__ = type
 
 from collections import namedtuple
 import abc
+import datetime
+import re
 
 from ansible.module_utils import six
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    ensure_utc_timezone,
+    from_epoch_seconds,
+    get_epoch_seconds,
+    get_now_datetime,
+    remove_timezone,
 )
 
 
@@ -31,10 +41,64 @@ CertificateInformation = namedtuple(
 )
 
 
+_FRACTIONAL_MATCHER = re.compile(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(|\.\d+)(Z|[+-]\d{2}:?\d{2}.*)$')
+
+
+def _reduce_fractional_digits(timestamp_str):
+    """
+    Given a RFC 3339 timestamp that includes too many digits for the fractional seconds part, reduces these to at most 6.
+    """
+    # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
+    m = _FRACTIONAL_MATCHER.match(timestamp_str)
+    if not m:
+        raise BackendException('Cannot parse ISO 8601 timestamp {0!r}'.format(timestamp_str))
+    timestamp, fractional, timezone = m.groups()
+    if len(fractional) > 7:
+        # Python does not support anything smaller than microseconds
+        # (Golang supports nanoseconds, Boulder often emits more fractional digits, which Python chokes on)
+        fractional = fractional[:7]
+    return '%s%s%s' % (timestamp, fractional, timezone)
+
+
+def _parse_acme_timestamp(timestamp_str, with_timezone):
+    """
+    Parses a RFC 3339 timestamp.
+    """
+    # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
+    timestamp_str = _reduce_fractional_digits(timestamp_str)
+    for format in ('%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%dT%H:%M:%S.%f%z'):
+        # Note that %z won't work with Python 2... https://stackoverflow.com/a/27829491
+        try:
+            result = datetime.datetime.strptime(timestamp_str, format)
+        except ValueError:
+            pass
+        else:
+            return ensure_utc_timezone(result) if with_timezone else remove_timezone(result)
+    raise BackendException('Cannot parse ISO 8601 timestamp {0!r}'.format(timestamp_str))
+
+
 @six.add_metaclass(abc.ABCMeta)
 class CryptoBackend(object):
     def __init__(self, module):
         self.module = module
+
+    def get_now(self):
+        return get_now_datetime(with_timezone=False)
+
+    def parse_acme_timestamp(self, timestamp_str):
+        # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
+        return _parse_acme_timestamp(timestamp_str, with_timezone=False)
+
+    def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
+        start = get_epoch_seconds(timestamp_start)
+        end = get_epoch_seconds(timestamp_end)
+        return from_epoch_seconds(start + percentage * (end - start), with_timezone=False)
+
+    def get_utc_datetime(self, *args, **kwargs):
+        result = datetime.datetime(*args, **kwargs)
+        if 'tzinfo' in kwargs or len(args) >= 8:
+            result = remove_timezone(result)
+        return result
 
     @abc.abstractmethod
     def parse_key(self, key_file=None, key_content=None, passphrase=None):

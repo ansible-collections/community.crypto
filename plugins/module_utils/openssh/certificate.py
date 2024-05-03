@@ -31,10 +31,14 @@ from hashlib import sha256
 
 from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_text
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import convert_relative_to_datetime
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     OpensshParser,
     _OpensshWriter,
+)
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    add_or_remove_timezone as _add_or_remove_timezone,
+    convert_relative_to_datetime,
+    UTC as _UTC,
 )
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
@@ -66,14 +70,8 @@ _ECDSA_CURVE_IDENTIFIERS_LOOKUP = {
 _USE_TIMEZONE = sys.version_info >= (3, 6)
 
 
-def _ensure_utc_timezone_if_use_timezone(value):
-    if not _USE_TIMEZONE or value.tzinfo is not None:
-        return value
-    return value.astimezone(_datetime.timezone.utc)
-
-
-_ALWAYS = _ensure_utc_timezone_if_use_timezone(datetime(1970, 1, 1))
-_FOREVER = datetime(9999, 12, 31, 23, 59, 59, 999999, _datetime.timezone.utc) if _USE_TIMEZONE else datetime.max
+_ALWAYS = _add_or_remove_timezone(datetime(1970, 1, 1), with_timezone=_USE_TIMEZONE)
+_FOREVER = datetime(9999, 12, 31, 23, 59, 59, 999999, _UTC) if _USE_TIMEZONE else datetime.max
 
 _CRITICAL_OPTIONS = (
     'force-command',
@@ -198,7 +196,7 @@ class OpensshCertificateTimeParameters(object):
         else:
             for time_format in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
                 try:
-                    result = _ensure_utc_timezone_if_use_timezone(datetime.strptime(time_string, time_format))
+                    result = _add_or_remove_timezone(datetime.strptime(time_string, time_format), with_timezone=_USE_TIMEZONE)
                 except ValueError:
                     pass
             if result is None:
