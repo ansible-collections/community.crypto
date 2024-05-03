@@ -194,7 +194,7 @@ class CryptographyBackend(CryptoBackend):
 
     def parse_module_parameter(self, value, name):
         try:
-            return get_relative_time_option(value, name, backend='cryptography', with_timezone=False)
+            return get_relative_time_option(value, name, backend='cryptography', with_timezone=CRYPTOGRAPHY_TIMEZONE)
         except OpenSSLObjectError as exc:
             raise BackendException(to_native(exc))
 
