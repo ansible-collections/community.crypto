@@ -56,12 +56,12 @@ def _decode_octets(octets_text):
     return binascii.unhexlify(re.sub(r"(\s|:)", "", octets_text).encode("utf-8"))
 
 
-def _extract_octets(out_text, name, required=True):
-    match = re.search(
-        r"\s+%s:\s*\n\s+([A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2})*)\s*\n" % name,
-        out_text,
-        re.MULTILINE | re.DOTALL,
+def _extract_octets(out_text, name, required=True, potential_prefixes=None):
+    regexp = r"\s+%s:\s*\n\s+%s([A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2})*)\s*\n" % (
+        name,
+        ('(?:%s)' % '|'.join(re.escape(pp) for pp in potential_prefixes)) if potential_prefixes else '',
     )
+    match = re.search(regexp, out_text, re.MULTILINE | re.DOTALL)
     if match is not None:
         return _decode_octets(match.group(1))
     if not required:
@@ -379,7 +379,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             serial = convert_bytes_to_int(_extract_octets(out_text, 'Serial Number', required=True))
 
         ski = _extract_octets(out_text, 'X509v3 Subject Key Identifier', required=False)
-        aki = _extract_octets(out_text, 'X509v3 Authority Key Identifier', required=False)
+        aki = _extract_octets(out_text, 'X509v3 Authority Key Identifier', required=False, potential_prefixes=['keyid:', ''])
 
         return CertificateInformation(
             not_valid_after=not_after,
