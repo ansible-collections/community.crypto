@@ -109,7 +109,7 @@ def compute_cert_id(backend, cert_info=None, cert_filename=None, cert_content=No
 
     # Convert Authority Key Identifier to string
     if cert_info.authority_key_identifier is None:
-        raise ModuleFailException('Module has no Authority Key Identifier extension')
+        raise ModuleFailException('Certificate has no Authority Key Identifier extension')
     aki = to_native(base64.urlsafe_b64encode(cert_info.authority_key_identifier)).replace('=', '')
 
     # Convert serial number to string

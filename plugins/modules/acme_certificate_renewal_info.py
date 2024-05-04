@@ -119,6 +119,13 @@ supports_ari:
   returned: success
   type: bool
   sample: true
+
+cert_id:
+  description:
+    - The certificate ID according to the L(ARI specification, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1).
+  returned: success, the certificate exists, and has an Authority Key Identifier X.509 extension
+  type: str
+  sample: aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
 '''
 
 import os
@@ -133,6 +140,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import compute_cert_id
 
 
 def main():
@@ -155,109 +164,86 @@ def main():
     )
     backend = create_backend(module, True)
 
+    result = dict(
+        changed=False,
+        msg='The certificate is still valid and no condition was reached',
+        supports_ari=False,
+    )
+
+    def complete(should_renew, **kwargs):
+        result['should_renew'] = should_renew
+        result.update(kwargs)
+        module.exit_json(**result)
+
     if not module.params['certificate_path'] and not module.params['certificate_content']:
-        module.exit_json(
-            changed=False,
-            should_renew=True,
-            msg='No certificate was specified',
-            supports_ari=False,
-        )
+        complete(True, msg='No certificate was specified')
 
     if module.params['certificate_path'] is not None and not os.path.exists(module.params['certificate_path']):
-        module.exit_json(
-            changed=False,
-            should_renew=True,
-            msg='The certificate file does not exist',
-            supports_ari=False,
-        )
+        complete(True, msg='The certificate file does not exist')
 
     try:
         cert_info = backend.get_cert_information(
             cert_filename=module.params['certificate_path'],
             cert_content=module.params['certificate_content'],
         )
+        cert_id = None
+        if cert_info.authority_key_identifier is not None:
+            cert_id = compute_cert_id(backend, cert_info=cert_info)
+        if cert_id is not None:
+            result['cert_id'] = cert_id
 
         if module.params['now']:
             now = backend.parse_module_parameter(module.params['now'], 'now')
         else:
             now = backend.get_now()
 
-        no_renewal_msg = 'The certificate is still valid and no condition was reached'
-        renewal_ari = False
-
         if now >= cert_info.not_valid_after:
-            module.exit_json(
-                changed=False,
-                should_renew=True,
-                msg='The certificate already expired',
-                supports_ari=False,
-            )
+            complete(True, msg='The certificate has already expired')
 
         client = ACMEClient(module, backend)
-        if client.directory.has_renewal_info_endpoint():
-            renewal_info = client.get_renewal_info(cert_info=cert_info)
+        if cert_id is not None and module.params['use_ari'] and client.directory.has_renewal_info_endpoint():
+            renewal_info = client.get_renewal_info(cert_id=cert_id)
             window_start = backend.parse_acme_timestamp(renewal_info['suggestedWindow']['start'])
             window_end = backend.parse_acme_timestamp(renewal_info['suggestedWindow']['end'])
             msg_append = ''
             if 'explanationURL' in renewal_info:
                 msg_append = '. Information on renewal interval: {0}'.format(renewal_info['explanationURL'])
-            renewal_ari = True
+            result['supports_ari'] = True
             if now > window_end:
-                module.exit_json(
-                    changed=False,
-                    should_renew=True,
-                    msg='The suggested renewal interval provided by ARI is in the past{0}'.format(msg_append),
-                    supports_ari=True,
-                )
+                complete(True, msg='The suggested renewal interval provided by ARI is in the past{0}'.format(msg_append))
             if module.params['ari_algorithm'] == 'start':
                 if now > window_start:
-                    module.exit_json(
-                        changed=False,
-                        should_renew=True,
-                        msg='The suggested renewal interval provided by ARI has begun{0}'.format(msg_append),
-                        supports_ari=True,
-                    )
+                    complete(True, msg='The suggested renewal interval provided by ARI has begun{0}'.format(msg_append))
             else:
                 random_time = backend.interpolate_timestamp(window_start, window_end, random.random())
                 if now > random_time:
-                    module.exit_json(
-                        changed=False,
-                        should_renew=True,
-                        msg='The picked random renewal time {0} in sugested renewal internal provided by ARI is in the past{1}'.format(random_time, msg_append),
-                        supports_ari=True,
+                    complete(
+                        True,
+                        msg='The picked random renewal time {0} in sugested renewal internal provided by ARI is in the past{1}'.format(
+                            random_time,
+                            msg_append,
+                        ),
                     )
 
         # TODO check remaining_days
         if module.params['remaining_days'] is not None:
             remaining_days = (cert_info.not_valid_after - now).days
             if remaining_days < module.params['remaining_days']:
-                module.exit_json(
-                    changed=False,
-                    should_renew=True,
-                    msg='The certificate expires in {0} days'.format(remaining_days),
-                    supports_ari=False,
-                )
+                complete(True, msg='The certificate expires in {0} days'.format(remaining_days))
 
         # TODO check remaining_percentage
         if module.params['remaining_percentage'] is not None:
             timestamp = backend.interpolate_timestamp(cert_info.not_valid_before, cert_info.not_valid_after, 1 - module.params['remaining_percentage'])
             if timestamp < now:
-                module.exit_json(
-                    changed=False,
-                    should_renew=True,
+                complete(
+                    True,
                     msg="The remaining percentage {0}% of the certificate's lifespan was reached on {1}".format(
                         module.params['remaining_percentage'] * 100,
                         timestamp,
                     ),
-                    supports_ari=False,
                 )
 
-        module.exit_json(
-            changed=False,
-            should_renew=False,
-            msg=no_renewal_msg,
-            supports_ari=renewal_ari,
-        )
+        complete(False)
     except ModuleFailException as e:
         e.do_fail(module)
 
