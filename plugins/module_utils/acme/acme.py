@@ -390,6 +390,7 @@ class ACMEClient(object):
 
     def get_renewal_info(
         self,
+        cert_info=None,
         cert_filename=None,
         cert_content=None,
         include_retry_after=False,
@@ -398,7 +399,7 @@ class ACMEClient(object):
         if not self.directory.has_renewal_info_endpoint():
             raise ModuleFailException('The ACME endpoint does not support ACME Renewal Information retrieval')
 
-        cert_id = compute_cert_id(self.backend, cert_filename=cert_filename, cert_content=cert_content)
+        cert_id = compute_cert_id(self.backend, cert_info=cert_info, cert_filename=cert_filename, cert_content=cert_content)
         url = '{base}{cert_id}'.format(base=self.directory.directory['renewalInfo'], cert_id=cert_id)
 
         data, info = self.get_request(url, parse_json_result=True, fail_on_error=True, get_only=True)
