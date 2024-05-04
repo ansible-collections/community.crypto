@@ -404,7 +404,7 @@ EXAMPLES = r'''
 #     state: present
 #     wait: true
 #     # Note: route53 requires TXT entries to be enclosed in quotes
-#     value: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].resource_value | regex_replace('^(.*)$', '\"\\1\"') }}"
+#     value: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].resource_value | community.dns.quote_txt(always_quote=true) }}"
 #   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge.challenge_data
 #
 # Alternative way:
@@ -419,7 +419,7 @@ EXAMPLES = r'''
 #     wait: true
 #     # Note: item.value is a list of TXT entries, and route53
 #     # requires every entry to be enclosed in quotes
-#     value: "{{ item.value | map('regex_replace', '^(.*)$', '\"\\1\"' ) | list }}"
+#     value: "{{ item.value | map('community.dns.quote_txt', always_quote=true) | list }}"
 #   loop: "{{ sample_com_challenge.challenge_data_dns | dict2items }}"
 #   when: sample_com_challenge is changed
 
