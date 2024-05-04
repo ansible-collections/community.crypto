@@ -475,39 +475,55 @@ challenge_data:
     - Per identifier / challenge type challenge data.
     - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
   returned: changed
-  type: list
-  elements: dict
+  type: dict
   contains:
-    resource:
-      description: The challenge resource that must be created for validation.
-      returned: changed
-      type: str
-      sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
-    resource_original:
+    identifier:
       description:
-        - The original challenge resource including type identifier for V(tls-alpn-01)
-          challenges.
-      returned: changed and O(challenge) is V(tls-alpn-01)
-      type: str
-      sample: DNS:example.com
-    resource_value:
-      description:
-        - The value the resource has to produce for the validation.
-        - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
-        - "For V(tls-alpn-01) challenges, note that this return value contains a
-           Base64 encoded version of the correct binary blob which has to be put
-           into the acmeValidation x509 extension; see
-           U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
-           for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter
-           to extract the binary blob from this return value."
+        - For every identifier, provides a dictionary of challenge types mapping to challenge data.
+        - The keys in this dictionary the identifiers. C(identifier) is a placeholder used in the documentation.
+        - Note that the keys are not valid Jinja2 identifiers.
       returned: changed
-      type: str
-      sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
-    record:
-      description: The full DNS record's name for the challenge.
-      returned: changed and challenge is V(dns-01)
-      type: str
-      sample: _acme-challenge.example.com
+      type: dict
+      contains:
+        challenge-type:
+          description:
+            - Data for every challenge type.
+            - The keys in this dictionary the challenge types. C(challenge-type) is a placeholder used in the documentation.
+              Possible keys are V(http-01), V(dns-01), and V(tls-alpn-01).
+            - Note that the keys are not valid Jinja2 identifiers.
+          returned: changed
+          type: dict
+          contains:
+            resource:
+              description: The challenge resource that must be created for validation.
+              returned: changed
+              type: str
+              sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
+            resource_original:
+              description:
+                - The original challenge resource including type identifier for V(tls-alpn-01)
+                  challenges.
+              returned: changed and O(challenge) is V(tls-alpn-01)
+              type: str
+              sample: DNS:example.com
+            resource_value:
+              description:
+                - The value the resource has to produce for the validation.
+                - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
+                - "For V(tls-alpn-01) challenges, note that this return value contains a
+                   Base64 encoded version of the correct binary blob which has to be put
+                   into the acmeValidation x509 extension; see
+                   U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
+                   for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter
+                   to extract the binary blob from this return value."
+              returned: changed
+              type: str
+              sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
+            record:
+              description: The full DNS record's name for the challenge.
+              returned: changed and challenge is V(dns-01)
+              type: str
+              sample: _acme-challenge.example.com
 challenge_data_dns:
   description:
     - List of TXT values per DNS record, in case challenge is V(dns-01).
