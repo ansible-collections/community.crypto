@@ -81,9 +81,12 @@ TEST_CSRS = [
 
 
 TEST_CERT = load_fixture("cert_1.pem")
+TEST_CERT_2 = load_fixture("cert_2.pem")
 
 
-TEST_CERT_OPENSSL_OUTPUT = load_fixture("cert_1.txt")
+TEST_CERT_OPENSSL_OUTPUT = load_fixture("cert_1.txt")  # OpenSSL 3.3.0 output
+TEST_CERT_OPENSSL_OUTPUT_2 = load_fixture("cert_2.txt")  # OpenSSL 3.3.0 output
+TEST_CERT_OPENSSL_OUTPUT_2B = load_fixture("cert_2-b.txt")  # OpenSSL 1.1.1f output
 
 
 TEST_CERT_DAYS = [
@@ -93,18 +96,28 @@ TEST_CERT_DAYS = [
 ]
 
 
+TEST_CERT_INFO = CertificateInformation(
+    not_valid_after=datetime.datetime(2018, 11, 26, 15, 28, 24),
+    not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
+    serial_number=1,
+    subject_key_identifier=b'\x98\xD2\xFD\x3C\xCC\xCD\x69\x45\xFB\xE2\x8C\x30\x2C\x54\x62\x18\x34\xB7\x07\x73',
+    authority_key_identifier=None,
+)
+
+
+TEST_CERT_INFO_2 = CertificateInformation(
+    not_valid_before=datetime.datetime(2024, 5, 4, 20, 42, 21),
+    not_valid_after=datetime.datetime(2029, 5, 4, 20, 42, 20),
+    serial_number=4218235397573492796,
+    subject_key_identifier=b'\x17\xE5\x83\x22\x14\xEF\x74\xD3\xBE\x7E\x30\x76\x56\x1F\x51\x74\x65\x1F\xE9\xF0',
+    authority_key_identifier=b'\x13\xC3\x4C\x3E\x59\x45\xDD\xE3\x63\x51\xA3\x46\x80\xC4\x08\xC7\x14\xC0\x64\x4E',
+)
+
+
 TEST_CERT_INFO = [
-    (
-        TEST_CERT,
-        CertificateInformation(
-            not_valid_after=datetime.datetime(2018, 11, 26, 15, 28, 24),
-            not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
-            serial_number=1,
-            subject_key_identifier=b'\x98\xD2\xFD\x3C\xCC\xCD\x69\x45\xFB\xE2\x8C\x30\x2C\x54\x62\x18\x34\xB7\x07\x73',
-            authority_key_identifier=None,
-        ),
-        TEST_CERT_OPENSSL_OUTPUT,
-    ),
+    (TEST_CERT, TEST_CERT_INFO, TEST_CERT_OPENSSL_OUTPUT),
+    (TEST_CERT_2, TEST_CERT_INFO_2, TEST_CERT_OPENSSL_OUTPUT_2),
+    (TEST_CERT_2, TEST_CERT_INFO_2, TEST_CERT_OPENSSL_OUTPUT_2B),
 ]
 
 

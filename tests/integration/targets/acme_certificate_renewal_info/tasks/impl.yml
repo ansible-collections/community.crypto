@@ -38,6 +38,9 @@
     terms_agreed: true
     account_email: "example@example.org"
 ## OBTAIN CERTIFICATE INFOS ###################################################################
+- name: Dump OpenSSL x509 info
+  command:
+    cmd: openssl x509 -in {{ remote_tmp_dir }}/cert-1.pem -noout -text
 - name: Obtain certificate information
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-1.pem"

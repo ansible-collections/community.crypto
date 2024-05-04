@@ -1,0 +1,56 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 4218235397573492796 (0x3a8a2ebeb358c03c)
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=Pebble Intermediate CA 734609
+        Validity
+            Not Before: May  4 20:42:21 2024 GMT
+            Not After : May  4 20:42:20 2029 GMT
+        Subject: CN=example.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:c1:43:a5:f9:ad:00:b7:bb:1b:73:27:00:b3:a2:
+                    4e:27:0d:ff:ae:64:3e:a0:7e:f9:28:56:48:47:21:
+                    9e:0f:d8:fb:69:b5:21:e8:98:84:60:6c:aa:73:b9:
+                    6e:d9:f6:19:ad:85:e0:c2:f6:80:d3:22:b8:5a:d6:
+                    3a:89:3e:2a:7a:fc:1d:bf:fc:69:20:e5:91:b8:34:
+                    52:26:c8:15:74:e1:36:0c:cd:ab:01:4a:ad:83:f5:
+                    0b:77:96:31:cf:1c:ea:6f:88:75:23:ac:51:a6:d8:
+                    77:43:1b:b3:44:93:2c:8d:05:25:fb:77:41:36:94:
+                    81:d5:ca:56:ff:b5:23:b2:a5
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication, TLS Web Client Authentication
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                17:E5:83:22:14:EF:74:D3:BE:7E:30:76:56:1F:51:74:65:1F:E9:F0
+            X509v3 Authority Key Identifier: 
+                13:C3:4C:3E:59:45:DD:E3:63:51:A3:46:80:C4:08:C7:14:C0:64:4E
+            Authority Information Access: 
+                OCSP - URI:http://10.88.0.74:5000/ocsp
+            X509v3 Subject Alternative Name: 
+                DNS:example.com
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        31:43:de:b6:48:f4:b8:30:46:25:65:e6:91:22:33:1b:d1:ba:
+        3f:60:f8:c3:18:32:72:e9:f8:d1:88:11:5a:0a:86:dc:1d:6d:
+        a5:ea:58:cd:05:ea:cd:5e:40:86:c1:ae:d5:cd:2e:8a:ca:50:
+        ee:df:bd:cf:6c:d9:20:3b:4b:49:f8:d5:8a:e3:be:f3:dd:24:
+        b2:7f:3f:3b:bf:e6:8d:7a:f8:8f:4b:6e:25:60:80:33:6f:0f:
+        53:b7:7d:94:2a:d2:4a:db:3a:2f:70:79:d7:bf:05:ed:df:10:
+        61:e7:24:ac:b2:fc:03:bd:ad:8c:e1:f3:1d:cc:78:99:e3:22:
+        59:bf:c5:92:57:95:92:56:35:fc:05:8b:26:10:c5:1b:87:17:
+        64:0b:bd:33:a9:54:d5:c0:2b:43:56:1b:52:d3:4f:8b:6f:25:
+        06:58:7f:6f:aa:27:35:05:d5:57:6d:83:a0:73:de:40:3f:67:
+        1c:5a:92:c6:37:e6:8f:c7:b8:91:d7:50:b9:4d:d4:f2:92:1f:
+        8b:93:0c:e2:b4:b8:d7:1d:8e:ce:6d:19:dc:8f:12:8e:c0:f2:
+        92:3b:95:5a:8c:c8:69:0e:0b:f7:fa:1f:55:62:80:7c:e2:f6:
+        41:3f:7d:69:36:9e:7c:90:7e:d7:3b:e6:a3:15:de:a4:7d:95:
+        13:46:c6:1a
