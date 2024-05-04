@@ -123,7 +123,7 @@ supports_ari:
 cert_id:
   description:
     - The certificate ID according to the L(ARI specification, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1).
-  returned: success and the certificate exists
+  returned: success, the certificate exists, and has an Authority Key Identifier X.509 extension
   type: str
   sample: aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
 '''
@@ -186,8 +186,11 @@ def main():
             cert_filename=module.params['certificate_path'],
             cert_content=module.params['certificate_content'],
         )
-        cert_id = compute_cert_id(backend, cert_info=cert_info)
-        result['cert_id'] = cert_id
+        cert_id = None
+        if cert_info.authority_key_identifier is not None:
+            cert_id = compute_cert_id(backend, cert_info=cert_info)
+        if cert_id is not None:
+            result['cert_id'] = cert_id
 
         if module.params['now']:
             now = backend.parse_module_parameter(module.params['now'], 'now')
@@ -198,7 +201,7 @@ def main():
             complete(True, msg='The certificate has already expired')
 
         client = ACMEClient(module, backend)
-        if module.params['use_ari'] and client.directory.has_renewal_info_endpoint():
+        if cert_id is not None and module.params['use_ari'] and client.directory.has_renewal_info_endpoint():
             renewal_info = client.get_renewal_info(cert_id=cert_id)
             window_start = backend.parse_acme_timestamp(renewal_info['suggestedWindow']['start'])
             window_end = backend.parse_acme_timestamp(renewal_info['suggestedWindow']['end'])
