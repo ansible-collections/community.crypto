@@ -58,7 +58,7 @@ seealso:
     link: https://tools.ietf.org/html/rfc8555
   - name: ACME TLS ALPN Challenge Extension
     description: The specification of the V(tls-alpn-01) challenge (RFC 8737).
-    link: https://www.rfc-editor.org/rfc/rfc8737.html-05
+    link: https://www.rfc-editor.org/rfc/rfc8737.html
   - module: community.crypto.acme_challenge_cert_helper
     description: Helps preparing V(tls-alpn-01) challenges.
   - module: community.crypto.openssl_privatekey
@@ -457,7 +457,7 @@ challenge_data:
     identifier:
       description:
         - For every identifier, provides a dictionary of challenge types mapping to challenge data.
-        - The keys in this dictionary the identifiers. C(identifier) is a placeholder used in the documentation.
+        - The keys in this dictionary are the identifiers. C(identifier) is a placeholder used in the documentation.
         - Note that the keys are not valid Jinja2 identifiers.
       returned: changed
       type: dict
@@ -465,7 +465,7 @@ challenge_data:
         challenge-type:
           description:
             - Data for every challenge type.
-            - The keys in this dictionary the challenge types. C(challenge-type) is a placeholder used in the documentation.
+            - The keys in this dictionary are the challenge types. C(challenge-type) is a placeholder used in the documentation.
               Possible keys are V(http-01), V(dns-01), and V(tls-alpn-01).
             - Note that the keys are not valid Jinja2 identifiers.
           returned: changed
