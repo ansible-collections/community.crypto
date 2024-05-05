@@ -172,32 +172,32 @@ fingerprints:
     sample: [ ABC123... ]
 '''
 
-from typing import Dict, Union
-
 import itertools
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.crypto.plugins.plugin_utils.gnupg.py import PluginGPGRunner
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError
-from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import GPGError
 
 
 def validate_key(key_type, key_length, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
             raise GPGError('Invalid curve for {} {}.'.format(key_type, key_name))
-        elif:
+        elif not key_curve:
             raise GPGError('No curve provided for {} {}.'.format(key_type, key_name))
         elif key_usage and key_usage not in list(itertools.combinations(['sign', 'auth'])):
             raise GPGError('Invalid usage for {} {}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
-        if key_name = 'primary key':
+        if key_name == 'primary key':
             raise GPGError('Invalid type for {}.'.format(key_name))
-        elif key_usage and key_usage != ['encrypt']:
-            raise GPGError('Invalid usage for {} {}.'.format(key_type, key_name))
+        elif key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
+            raise GPGError('Invalid curve for {} {}.'.format(key_type, key_name))
         elif not key_curve:
             raise GPGError('No curve provided for {} {}.'.format(key_type, key_name))
+        elif key_usage and key_usage != ['encrypt']:
+            raise GPGError('Invalid usage for {} {}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDSA':
         if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
@@ -208,7 +208,7 @@ def validate_key(key_type, key_length, key_curve, key_usage, key_name='primary k
             raise GPGError('Invalid usage for {} {}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
-        if key_usage and key_usage not in list(itertools.combinatios(['ecrypt', 'sign', 'auth'])):
+        if key_usage and key_usage not in list(itertools.combinatios(['ecrypt', 'sign', 'auth', 'cert'])):
             raise GPGError('Invalid usage for {} {}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
@@ -258,7 +258,7 @@ def expand_usages(usages):
     return usages
 
 
-def list_matching_keys(params):
+def list_matching_keys(gpg_runner, params):
     user_id = ''
     if params['name']:
         user_id += '{} '.format(params["name"])
@@ -270,12 +270,11 @@ def list_matching_keys(params):
         user_id = '"{}"'.format(user_id.strip())
 
     search_criteria = ' '.join(params['fingerprints']) + user_id
-    params[]
     if params['fingerprints']:
         search_criteria = ' '.join(params[''])
-    _, stdout, _ = gpg_runner.run_command(['gpg', '--list-secret-keys', '{}'.format(*params['fingerprints'])])
+    _, stdout, _ = gpg_runner.run_command(['gpg', '--list-secret-keys', '{}'.format(search_criteria)])
     lines = stdout.split('\n')
-    fingerprints = list(set([line.strip() for line in lines in line.strip().isalnum()]))
+    fingerprints = list(set([line.strip() for line in lines if line.strip().isalnum()]))
     matching_keys = []
     for fingerprint in fingerprints:
         _, stdout, _ = gpg_runner.run_command(['gpg', '--list-secret-keys', '{}'.format(fingerprint)])
@@ -334,7 +333,7 @@ def list_matching_keys(params):
                 if params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] in itertools.permutations(subkey_usage):
                     is_match = False
                     break
-        if good_match and uid_present:
+        if is_match and uid_present:
             matching_keys.append(fingerprint)
     return matching_keys
 
@@ -352,8 +351,8 @@ def delete_keypair(gpg_runner, matching_keys, check_mode):
     return dict(changed=False, fingerprints=[])
 
 
-def add_subkey(gpg_runner, fingerprint, subkey_index, subkey_type, subkey_length, subkey_curve, subkey_usage, subkey_index):
-    if subkey_type in ['RSA', 'DSA'. 'ELG']:
+def add_subkey(gpg_runner, fingerprint, subkey_index, subkey_type, subkey_length, subkey_curve, subkey_usage, expire_date):
+    if subkey_type in ['RSA', 'DSA', 'ELG']:
         algo = '{}'.format(subkey_type.lower())
         if subkey_length:
             algo += str(subkey_length)
@@ -366,7 +365,7 @@ def add_subkey(gpg_runner, fingerprint, subkey_index, subkey_type, subkey_length
             '--quick-add-key',
             fingerprint,
             algo if algo else 'default',
-            *usage,
+            *subkey_usage,
             expire_date if expire_date else 0
         ])
     else:
@@ -415,7 +414,7 @@ def generate_keypair(gpg_runner, params, matching_keys, check_mode):
     fingerprint = re.search(r'([a-zA-Z0-9]*)\.rev', stdout)
 
     for index, subkey in enumerate(params['subkeys']):
-        add_subkey(gpg_runner, fingerprint, index, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'])
+        add_subkey(gpg_runner, fingerprint, index, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], params['expire_date'])
 
     return dict(changed=True, fingerprints=[fingerprint])
 
@@ -423,13 +422,8 @@ def generate_keypair(gpg_runner, params, matching_keys, check_mode):
 def run_module(params, check_mode=False):
     validate_params(params)
     gpg_runner = PluginGPGRunner()
-    matching_keys = list_matching_keys(
-        params['name'],
-        params['comment'],
-        params['email'],
-        params['fingerprints']
-    )
-    if params['state'] = present:
+    matching_keys = list_matching_keys(gpg_runner, params)
+    if params['state'] == 'present':
         result = generate_keypair(gpg_runner, params, matching_keys, check_mode)
     else:
         result = delete_keypair(gpg_runner, matching_keys, check_mode)
@@ -454,13 +448,13 @@ def main():
                 subkey_curve=dict(type='str', choices=key_curves),
                 subkey_usage=dict(type='list', elements='str', choices=key_usages[:-1])
             )),
-            expire_date=dict(type='str')
+            expire_date=dict(type='str'),
             name=dict(type='str'),
             comment=dict(type='str'),
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
             keyserver=dict(type='str'),
-            transient_key=dict(type='bool')
+            transient_key=dict(type='bool'),
             fingerprints=dict(type='list', elements='str', no_log=True),
         ),
         supports_check_mode=True,
@@ -471,7 +465,7 @@ def main():
     )
 
     try:
-        result = run_module(module.params, check_mode)
+        results = run_module(module.params, module.check_mode)
         module.exit_json(**results)
     except GPGError as e:
         module.fail_json(e)
