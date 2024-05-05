@@ -420,45 +420,60 @@ class ACMEClient(object):
         return data
 
 
-def get_default_argspec(with_account=True):
+def get_default_argspec():
     '''
     Provides default argument spec for the options documented in the acme doc fragment.
+
+    DEPRECATED: will be removed in community.crypto 3.0.0
     '''
-    argspec = dict(
+    return dict(
         acme_directory=dict(type='str', required=True),
         acme_version=dict(type='int', required=True, choices=[1, 2]),
         validate_certs=dict(type='bool', default=True),
         select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'openssl', 'cryptography']),
         request_timeout=dict(type='int', default=10),
+        account_key_src=dict(type='path', aliases=['account_key']),
+        account_key_content=dict(type='str', no_log=True),
+        account_key_passphrase=dict(type='str', no_log=True),
+        account_uri=dict(type='str'),
     )
-    if with_account:
-        argspec.update(dict(
-            account_key_src=dict(type='path', aliases=['account_key']),
-            account_key_content=dict(type='str', no_log=True),
-            account_key_passphrase=dict(type='str', no_log=True),
-            account_uri=dict(type='str'),
-        ))
-    return argspec
 
 
-def create_default_argspec(with_account=True, require_account_key=True):
+def create_default_argspec(
+    with_account=True,
+    require_account_key=True,
+    with_certificate=False,
+):
     '''
     Provides default argument spec for the options documented in the acme doc fragment.
     '''
     result = ArgumentSpec(
-        get_default_argspec(with_account=with_account),
+        argument_spec=dict(
+            acme_directory=dict(type='str', required=True),
+            acme_version=dict(type='int', required=True, choices=[1, 2]),
+            validate_certs=dict(type='bool', default=True),
+            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'openssl', 'cryptography']),
+            request_timeout=dict(type='int', default=10),
+        ),
     )
     if with_account:
+        result.update_argspec(
+            account_key_src=dict(type='path', aliases=['account_key']),
+            account_key_content=dict(type='str', no_log=True),
+            account_key_passphrase=dict(type='str', no_log=True),
+            account_uri=dict(type='str'),
+        )
         if require_account_key:
-            result.update(
-                required_one_of=[
-                    ['account_key_src', 'account_key_content'],
-                ],
-            )
+            result.update(required_one_of=[['account_key_src', 'account_key_content']])
+        result.update(mutually_exclusive=[['account_key_src', 'account_key_content']])
+    if with_certificate:
+        result.update_argspec(
+            csr=dict(type='path'),
+            csr_content=dict(type='str'),
+        )
         result.update(
-            mutually_exclusive=[
-                ['account_key_src', 'account_key_content'],
-            ],
+            required_one_of=[['csr', 'csr_content']],
+            mutually_exclusive=[['csr', 'csr_content']],
         )
     return result
 

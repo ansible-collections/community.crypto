@@ -285,3 +285,33 @@ notes:
      the C(openssl) binary will be slower."
 options: {}
 '''
+
+    CERTIFICATE = r'''
+options:
+  csr:
+    description:
+      - "File containing the CSR for the new certificate."
+      - "Can be created with M(community.crypto.openssl_csr)."
+      - "The CSR may contain multiple Subject Alternate Names, but each one
+         will lead to an individual challenge that must be fulfilled for the
+         CSR to be signed."
+      - "B(Note): the private key used to create the CSR B(must not) be the
+         account key. This is a bad idea from a security point of view, and
+         the CA should not accept the CSR. The ACME server should return an
+         error in this case."
+      - Precisely one of O(csr) or O(csr_content) must be specified.
+    type: path
+  csr_content:
+    description:
+      - "Content of the CSR for the new certificate."
+      - "Can be created with M(community.crypto.openssl_csr_pipe)."
+      - "The CSR may contain multiple Subject Alternate Names, but each one
+         will lead to an individual challenge that must be fulfilled for the
+         CSR to be signed."
+      - "B(Note): the private key used to create the CSR B(must not) be the
+         account key. This is a bad idea from a security point of view, and
+         the CA should not accept the CSR. The ACME server should return an
+         error in this case."
+      - Precisely one of O(csr) or O(csr_content) must be specified.
+    type: str
+'''
