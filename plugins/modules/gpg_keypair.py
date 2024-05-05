@@ -147,7 +147,7 @@ EXAMPLES = '''
     subkeys:
         - { subkey_type: ECDH, subkey_curve: cv25519 }
 
-- name: Generate a GPG keypair with custom user-id:
+- name: Generate a GPG keypair with custom user-id
   community.crypto.gpg_keypair:
     name: name
     comment: comment
