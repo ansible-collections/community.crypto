@@ -74,7 +74,7 @@ options:
             - For ELG keys, the minimum length is V(1024) bits, the maximum length is V(4096) bits, and the default length is V(3072) bits.
         type: list
         elements: dict
-        options:
+        suboptions:
             subkey_type:
                 type: str
                 choices: ['RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH', 'ELG']
