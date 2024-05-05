@@ -82,6 +82,7 @@ seealso:
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.account
+  - community.crypto.acme.certificate
   - community.crypto.attributes
   - community.crypto.attributes.files
   - community.crypto.attributes.actiongroup_acme
@@ -141,32 +142,8 @@ options:
       - 'tls-alpn-01'
       - 'no challenge'
   csr:
-    description:
-      - "File containing the CSR for the new certificate."
-      - "Can be created with M(community.crypto.openssl_csr) or C(openssl req ...)."
-      - "The CSR may contain multiple Subject Alternate Names, but each one
-         will lead to an individual challenge that must be fulfilled for the
-         CSR to be signed."
-      - "I(Note): the private key used to create the CSR I(must not) be the
-         account key. This is a bad idea from a security point of view, and
-         the CA should not accept the CSR. The ACME server should return an
-         error in this case."
-      - Precisely one of O(csr) or O(csr_content) must be specified.
-    type: path
     aliases: ['src']
   csr_content:
-    description:
-      - "Content of the CSR for the new certificate."
-      - "Can be created with M(community.crypto.openssl_csr_pipe) or C(openssl req ...)."
-      - "The CSR may contain multiple Subject Alternate Names, but each one
-         will lead to an individual challenge that must be fulfilled for the
-         CSR to be signed."
-      - "I(Note): the private key used to create the CSR I(must not) be the
-         account key. This is a bad idea from a security point of view, and
-         the CA should not accept the CSR. The ACME server should return an
-         error in this case."
-      - Precisely one of O(csr) or O(csr_content) must be specified.
-    type: str
     version_added: 1.2.0
   data:
     description:
@@ -920,15 +897,14 @@ class ACMECertificateClient(object):
 
 
 def main():
-    argument_spec = create_default_argspec()
+    argument_spec = create_default_argspec(with_certificate=True)
+    argument_spec.argument_spec['csr']['aliases'] = ['src']
     argument_spec.update_argspec(
         modify_account=dict(type='bool', default=True),
         account_email=dict(type='str'),
         agreement=dict(type='str'),
         terms_agreed=dict(type='bool', default=False),
         challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01', NO_CHALLENGE]),
-        csr=dict(type='path', aliases=['src']),
-        csr_content=dict(type='str'),
         data=dict(type='dict'),
         dest=dict(type='path', aliases=['cert']),
         fullchain_dest=dict(type='path', aliases=['fullchain']),
@@ -947,13 +923,9 @@ def main():
         include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
     )
     argument_spec.update(
-        required_one_of=(
+        required_one_of=[
             ['dest', 'fullchain_dest'],
-            ['csr', 'csr_content'],
-        ),
-        mutually_exclusive=(
-            ['csr', 'csr_content'],
-        ),
+        ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, False)

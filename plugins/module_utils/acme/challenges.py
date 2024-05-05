@@ -103,7 +103,7 @@ class Challenge(object):
             # https://tools.ietf.org/html/rfc8555#section-8.4
             resource = '_acme-challenge'
             value = nopad_b64(hashlib.sha256(to_bytes(key_authorization)).digest())
-            record = (resource + identifier[1:]) if identifier.startswith('*.') else '{0}.{1}'.format(resource, identifier)
+            record = '{0}.{1}'.format(resource, identifier[2:] if identifier.startswith('*.') else identifier)
             return {
                 'resource': resource,
                 'resource_value': value,

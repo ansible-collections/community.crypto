@@ -47,7 +47,7 @@ class ArgumentSpec:
         return self
 
     def merge(self, other):
-        self.update_argspec(other.argument_spec)
+        self.update_argspec(**other.argument_spec)
         self.update(
             mutually_exclusive=other.mutually_exclusive,
             required_together=other.required_together,
