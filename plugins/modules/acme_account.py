@@ -170,11 +170,9 @@ account_uri:
 
 import base64
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -189,8 +187,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 
 def main():
-    argument_spec = get_default_argspec()
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec()
+    argument_spec.update_argspec(
         terms_agreed=dict(type='bool', default=False),
         state=dict(type='str', required=True, choices=['absent', 'present', 'changed_key']),
         allow_creation=dict(type='bool', default=True),
@@ -203,14 +201,9 @@ def main():
             alg=dict(type='str', required=True, choices=['HS256', 'HS384', 'HS512']),
             key=dict(type='str', required=True, no_log=True),
         ))
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        required_one_of=(
-            ['account_key_src', 'account_key_content'],
-        ),
+    )
+    argument_spec.update(
         mutually_exclusive=(
-            ['account_key_src', 'account_key_content'],
             ['new_account_key_src', 'new_account_key_content'],
         ),
         required_if=(
@@ -218,8 +211,8 @@ def main():
             # new_account_key_src and new_account_key_content are specified
             ['state', 'changed_key', ['new_account_key_src', 'new_account_key_content'], True],
         ),
-        supports_check_mode=True,
     )
+    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
 
     if module.params['external_account_binding']:

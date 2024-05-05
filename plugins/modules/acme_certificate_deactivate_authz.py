@@ -54,11 +54,9 @@ EXAMPLES = r'''
 
 RETURN = '''#'''
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -76,20 +74,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.orders impor
 
 
 def main():
-    argument_spec = get_default_argspec()
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec()
+    argument_spec.update_argspec(
         order_uri=dict(type='str', required=True),
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        required_one_of=(
-            ['account_key_src', 'account_key_content'],
-        ),
-        mutually_exclusive=(
-            ['account_key_src', 'account_key_content'],
-        ),
-        supports_check_mode=True,
     )
+    module = argument_spec.create_ansible_module(supports_check_mode=True)
     if module.params['acme_version'] == 1:
         module.fail_json('The module does not support acme_version=1')
 
