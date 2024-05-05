@@ -21,6 +21,8 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six import PY3
 
+from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
     OpenSSLCLIBackend,
 )
@@ -437,6 +439,28 @@ def get_default_argspec(with_account=True):
             account_uri=dict(type='str'),
         ))
     return argspec
+
+
+def create_default_argspec(with_account=True, require_account_key=True):
+    '''
+    Provides default argument spec for the options documented in the acme doc fragment.
+    '''
+    result = ArgumentSpec(
+        get_default_argspec(with_account=with_account),
+    )
+    if with_account:
+        if require_account_key:
+            result.update(
+                required_one_of=[
+                    ['account_key_src', 'account_key_content'],
+                ],
+            )
+        result.update(
+            mutually_exclusive=[
+                ['account_key_src', 'account_key_content'],
+            ],
+        )
+    return result
 
 
 def create_backend(module, needs_acme_v2):

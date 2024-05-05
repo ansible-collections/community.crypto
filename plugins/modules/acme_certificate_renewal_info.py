@@ -131,11 +131,9 @@ cert_id:
 import os
 import random
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -145,8 +143,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 
 
 def main():
-    argument_spec = get_default_argspec(with_account=False)
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec(with_account=False)
+    argument_spec.update_argspec(
         certificate_path=dict(type='path'),
         certificate_content=dict(type='str'),
         use_ari=dict(type='bool', default=True),
@@ -154,14 +152,13 @@ def main():
         remaining_days=dict(type='int'),
         remaining_percentage=dict(type='float'),
         now=dict(type='str'),
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
+    )
+    argument_spec.update(
         mutually_exclusive=(
             ['certificate_path', 'certificate_content'],
         ),
-        supports_check_mode=True,
     )
+    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
 
     result = dict(
@@ -223,13 +220,11 @@ def main():
                         ),
                     )
 
-        # TODO check remaining_days
         if module.params['remaining_days'] is not None:
             remaining_days = (cert_info.not_valid_after - now).days
             if remaining_days < module.params['remaining_days']:
                 complete(True, msg='The certificate expires in {0} days'.format(remaining_days))
 
-        # TODO check remaining_percentage
         if module.params['remaining_percentage'] is not None:
             timestamp = backend.interpolate_timestamp(cert_info.not_valid_before, cert_info.not_valid_after, 1 - module.params['remaining_percentage'])
             if timestamp < now:

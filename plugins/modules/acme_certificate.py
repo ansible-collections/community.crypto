@@ -592,11 +592,9 @@ all_chains:
 
 import os
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -922,8 +920,8 @@ class ACMECertificateClient(object):
 
 
 def main():
-    argument_spec = get_default_argspec()
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec()
+    argument_spec.update_argspec(
         modify_account=dict(type='bool', default=True),
         account_email=dict(type='str'),
         agreement=dict(type='str'),
@@ -947,20 +945,17 @@ def main():
             authority_key_identifier=dict(type='str'),
         )),
         include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
+    )
+    argument_spec.update(
         required_one_of=(
-            ['account_key_src', 'account_key_content'],
             ['dest', 'fullchain_dest'],
             ['csr', 'csr_content'],
         ),
         mutually_exclusive=(
-            ['account_key_src', 'account_key_content'],
             ['csr', 'csr_content'],
         ),
-        supports_check_mode=True,
     )
+    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, False)
 
     try:

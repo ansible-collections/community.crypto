@@ -248,12 +248,11 @@ output_json:
       - ...
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -264,18 +263,14 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 
 def main():
-    argument_spec = get_default_argspec()
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec(require_account_key=False)
+    argument_spec.update_argspec(
         url=dict(type='str'),
         method=dict(type='str', choices=['get', 'post', 'directory-only'], default='get'),
         content=dict(type='str'),
         fail_on_acme_error=dict(type='bool', default=True),
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        mutually_exclusive=(
-            ['account_key_src', 'account_key_content'],
-        ),
+    )
+    argument_spec.update(
         required_if=(
             ['method', 'get', ['url']],
             ['method', 'post', ['url', 'content']],
@@ -283,6 +278,7 @@ def main():
             ['method', 'post', ['account_key_src', 'account_key_content'], True],
         ),
     )
+    module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)
 
     result = dict()

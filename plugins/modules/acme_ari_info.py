@@ -98,11 +98,9 @@ renewal_info:
       sample: '2024-04-29T01:17:10.236921+00:00'
 '''
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    get_default_argspec,
+    create_default_argspec,
     ACMEClient,
 )
 
@@ -110,21 +108,20 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 
 def main():
-    argument_spec = get_default_argspec(with_account=False)
-    argument_spec.update(dict(
+    argument_spec = create_default_argspec(with_account=False)
+    argument_spec.update_argspec(
         certificate_path=dict(type='path'),
         certificate_content=dict(type='str'),
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
+    )
+    argument_spec.update(
         required_one_of=(
             ['certificate_path', 'certificate_content'],
         ),
         mutually_exclusive=(
             ['certificate_path', 'certificate_content'],
         ),
-        supports_check_mode=True,
     )
+    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
 
     try:
