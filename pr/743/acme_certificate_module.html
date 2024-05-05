@@ -661,7 +661,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </dd>
 <dt><a class="reference external" href="https://tools.ietf.org/html/rfc8555">Automatic Certificate Management Environment (ACME)</a></dt><dd><p>The specification of the ACME protocol (RFC 8555).</p>
 </dd>
-<dt><a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html-05">ACME TLS ALPN Challenge Extension</a></dt><dd><p>The specification of the <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenge (RFC 8737).</p>
+<dt><a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html">ACME TLS ALPN Challenge Extension</a></dt><dd><p>The specification of the <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenge (RFC 8737).</p>
 </dd>
 <dt><a class="reference internal" href="acme_challenge_cert_helper_module.html#ansible-collections-community-crypto-acme-challenge-cert-helper-module"><span class="std std-ref">community.crypto.acme_challenge_cert_helper</span></a></dt><dd><p>Helps preparing <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges.</p>
 </dd>
@@ -913,7 +913,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#return-challenge_data/identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For every identifier, provides a dictionary of challenge types mapping to challenge data.</p>
-<p>The keys in this dictionary the identifiers. <code class="docutils literal notranslate"><span class="pre">identifier</span></code> is a placeholder used in the documentation.</p>
+<p>The keys in this dictionary are the identifiers. <code class="docutils literal notranslate"><span class="pre">identifier</span></code> is a placeholder used in the documentation.</p>
 <p>Note that the keys are not valid Jinja2 identifiers.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
 </div></td>
@@ -923,7 +923,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Data for every challenge type.</p>
-<p>The keys in this dictionary the challenge types. <code class="docutils literal notranslate"><span class="pre">challenge-type</span></code> is a placeholder used in the documentation. Possible keys are <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code>.</p>
+<p>The keys in this dictionary are the challenge types. <code class="docutils literal notranslate"><span class="pre">challenge-type</span></code> is a placeholder used in the documentation. Possible keys are <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code>.</p>
 <p>Note that the keys are not valid Jinja2 identifiers.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
 </div></td>
