@@ -176,10 +176,9 @@ import itertools
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError
 
 
-def validate_key(key_type, key_length, key_curve, key_usage, key_name='primary key'):
+def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
             module.fail_json('Invalid curve for {} {}.'.format(key_type, key_name))
@@ -225,7 +224,6 @@ def validate_key(key_type, key_length, key_curve, key_usage, key_name='primary k
 def validate_params(module, params):
     if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
         module.fail_json('Invalid format for expire date') 
-        expire-date[-1] not in ['y'] 
     validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
     for index, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{}'.format(index + 1))
@@ -426,9 +424,8 @@ def generate_keypair(module, params, matching_keys, check_mode):
     return dict(changed=True, fingerprints=[fingerprint])
 
 
-def run_module(params, check_mode=False):
+def run_module(module, params, check_mode=False):
     validate_params(params)
-    module = PluginGPGRunner()
     matching_keys = list_matching_keys(module, params)
     if params['state'] == 'present':
         result = generate_keypair(module, params, matching_keys, check_mode)
