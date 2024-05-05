@@ -82,6 +82,7 @@ seealso:
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.account
+  - community.crypto.acme.certificate
   - community.crypto.attributes
   - community.crypto.attributes.files
   - community.crypto.attributes.actiongroup_acme
@@ -141,32 +142,8 @@ options:
       - 'tls-alpn-01'
       - 'no challenge'
   csr:
-    description:
-      - "File containing the CSR for the new certificate."
-      - "Can be created with M(community.crypto.openssl_csr) or C(openssl req ...)."
-      - "The CSR may contain multiple Subject Alternate Names, but each one
-         will lead to an individual challenge that must be fulfilled for the
-         CSR to be signed."
-      - "I(Note): the private key used to create the CSR I(must not) be the
-         account key. This is a bad idea from a security point of view, and
-         the CA should not accept the CSR. The ACME server should return an
-         error in this case."
-      - Precisely one of O(csr) or O(csr_content) must be specified.
-    type: path
     aliases: ['src']
   csr_content:
-    description:
-      - "Content of the CSR for the new certificate."
-      - "Can be created with M(community.crypto.openssl_csr_pipe) or C(openssl req ...)."
-      - "The CSR may contain multiple Subject Alternate Names, but each one
-         will lead to an individual challenge that must be fulfilled for the
-         CSR to be signed."
-      - "I(Note): the private key used to create the CSR I(must not) be the
-         account key. This is a bad idea from a security point of view, and
-         the CA should not accept the CSR. The ACME server should return an
-         error in this case."
-      - Precisely one of O(csr) or O(csr_content) must be specified.
-    type: str
     version_added: 1.2.0
   data:
     description:
