@@ -445,6 +445,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-cert_id"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-cert-id"><strong>cert_id</strong></p>
+<a class="ansibleOptionLink" href="#return-cert_id" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The certificate ID according to the <a class="reference external" href="https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1">ARI specification</a>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success, the certificate exists, and has an Authority Key Identifier X.509 extension</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-msg"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-msg"><strong>msg</strong></p>
 <a class="ansibleOptionLink" href="#return-msg" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -454,7 +463,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;The</span> <span class="pre">certificate</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist.&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-should_renew"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-should-renew"><strong>should_renew</strong></p>
 <a class="ansibleOptionLink" href="#return-should_renew" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -464,7 +473,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-supports_ari"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-supports-ari"><strong>supports_ari</strong></p>
 <a class="ansibleOptionLink" href="#return-supports_ari" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>

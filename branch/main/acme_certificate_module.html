@@ -767,7 +767,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1">#     state: present</span>
 <span class="c1">#     wait: true</span>
 <span class="c1">#     # Note: route53 requires TXT entries to be enclosed in quotes</span>
-<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;dns-01&#39;</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="o">|</span> <span class="nf">regex_replace</span><span class="o">(</span><span class="s1">&#39;^(.*)$&#39;</span><span class="o">,</span> <span class="s1">&#39;\&quot;\\1\&quot;&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;dns-01&#39;</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.dns.quote_txt</span><span class="o">(</span><span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#   when: sample_com_challenge is changed and &#39;sample.com&#39; in sample_com_challenge.challenge_data</span>
 <span class="c1">#</span>
 <span class="c1"># Alternative way:</span>
@@ -782,7 +782,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1">#     wait: true</span>
 <span class="c1">#     # Note: item.value is a list of TXT entries, and route53</span>
 <span class="c1">#     # requires every entry to be enclosed in quotes</span>
-<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;regex_replace&#39;</span><span class="o">,</span> <span class="s1">&#39;^(.*)$&#39;</span><span class="o">,</span> <span class="s1">&#39;\&quot;\\1\&quot;&#39;</span> <span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;community.dns.quote_txt&#39;</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
 <span class="c1">#   when: sample_com_challenge is changed</span>
 
@@ -900,7 +900,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-challenge_data"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data"><strong>challenge_data</strong></p>
-<a class="ansibleOptionLink" href="#return-challenge_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
+<a class="ansibleOptionLink" href="#return-challenge_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Per identifier / challenge type challenge data.</p>
 <p>Since Ansible 2.8.5, only challenges which are not yet valid are returned.</p>
@@ -908,37 +908,57 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="return-challenge_data/record"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-record"><strong>record</strong></p>
-<a class="ansibleOptionLink" href="#return-challenge_data/record" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier"><strong>identifier</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The full DNS record’s name for the challenge.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>For every identifier, provides a dictionary of challenge types mapping to challenge data.</p>
+<p>The keys in this dictionary the identifiers. <code class="docutils literal notranslate"><span class="pre">identifier</span></code> is a placeholder used in the documentation.</p>
+<p>Note that the keys are not valid Jinja2 identifiers.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier/challenge-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier-challenge-type"><strong>challenge-type</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Data for every challenge type.</p>
+<p>The keys in this dictionary the challenge types. <code class="docutils literal notranslate"><span class="pre">challenge-type</span></code> is a placeholder used in the documentation. Possible keys are <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code>.</p>
+<p>Note that the keys are not valid Jinja2 identifiers.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier/challenge-type/record"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier-challenge-type-record"><strong>record</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type/record" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The full DNS record’s name for the challenge.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed and challenge is <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code></p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;_acme-challenge.example.com&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="return-challenge_data/resource"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-resource"><strong>resource</strong></p>
-<a class="ansibleOptionLink" href="#return-challenge_data/resource" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier/challenge-type/resource"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier-challenge-type-resource"><strong>resource</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type/resource" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The challenge resource that must be created for validation.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The challenge resource that must be created for validation.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;.well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="return-challenge_data/resource_original"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-resource-original"><strong>resource_original</strong></p>
-<a class="ansibleOptionLink" href="#return-challenge_data/resource_original" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier/challenge-type/resource_original"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier-challenge-type-resource-original"><strong>resource_original</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type/resource_original" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The original challenge resource including type identifier for <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The original challenge resource including type identifier for <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-challenge"><span class="std std-ref"><span class="pre">challenge</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;DNS:example.com&quot;</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="return-challenge_data/resource_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-resource-value"><strong>resource_value</strong></p>
-<a class="ansibleOptionLink" href="#return-challenge_data/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier/challenge-type/resource_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-return-challenge-data-identifier-challenge-type-resource-value"><strong>resource_value</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier/challenge-type/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
 <p>For <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> challenges, the value can be used as-is.</p>
 <p>For <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges, note that this return value contains a Base64 encoded version of the correct binary blob which has to be put into the acmeValidation x509 extension; see <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">https://www.rfc-editor.org/rfc/rfc8737.html#section-3</a> for details. To do this, you might need the <a class="reference external" href="https://docs.ansible.com/ansible/devel/collections/ansible/builtin/b64decode_filter.html#ansible-collections-ansible-builtin-b64decode-filter" title="(in Ansible vdevel)"><span class="xref std std-ref">ansible.builtin.b64decode</span></a> Jinja filter to extract the binary blob from this return value.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
