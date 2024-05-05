@@ -186,9 +186,7 @@ def main():
             cert_filename=module.params['certificate_path'],
             cert_content=module.params['certificate_content'],
         )
-        cert_id = None
-        if cert_info.authority_key_identifier is not None:
-            cert_id = compute_cert_id(backend, cert_info=cert_info)
+        cert_id = compute_cert_id(backend, cert_info=cert_info, none_if_required_information_is_missing=True)
         if cert_id is not None:
             result['cert_id'] = cert_id
 

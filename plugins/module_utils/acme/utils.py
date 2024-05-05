@@ -102,13 +102,21 @@ def parse_retry_after(value, relative_with_timezone=True, now=None):
     raise ValueError('Cannot parse Retry-After header value %s' % repr(value))
 
 
-def compute_cert_id(backend, cert_info=None, cert_filename=None, cert_content=None):
+def compute_cert_id(
+    backend,
+    cert_info=None,
+    cert_filename=None,
+    cert_content=None,
+    none_if_required_information_is_missing=False,
+):
     # Obtain certificate info if not provided
     if cert_info is None:
         cert_info = backend.get_cert_information(cert_filename=cert_filename, cert_content=cert_content)
 
     # Convert Authority Key Identifier to string
     if cert_info.authority_key_identifier is None:
+        if none_if_required_information_is_missing:
+            return None
         raise ModuleFailException('Certificate has no Authority Key Identifier extension')
     aki = to_native(base64.urlsafe_b64encode(cert_info.authority_key_identifier)).replace('=', '')
 

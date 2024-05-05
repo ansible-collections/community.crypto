@@ -755,7 +755,11 @@ class ACMECertificateClient(object):
             ):
                 cert_info = self._get_cert_info_or_none()
                 if cert_info is not None:
-                    replaces_cert_id = compute_cert_id(self.client.backend, cert_info=cert_info)
+                    replaces_cert_id = compute_cert_id(
+                        self.client.backend,
+                        cert_info=cert_info,
+                        none_if_required_information_is_missing=True,
+                    )
             self.order = Order.create(self.client, self.identifiers, replaces_cert_id)
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)
