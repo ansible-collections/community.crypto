@@ -10,26 +10,19 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec as _ArgumentSpec
 
-class ArgumentSpec:
-    def __init__(self, argument_spec, mutually_exclusive=None, required_together=None, required_one_of=None, required_if=None, required_by=None):
-        self.argument_spec = argument_spec
-        self.mutually_exclusive = mutually_exclusive or []
-        self.required_together = required_together or []
-        self.required_one_of = required_one_of or []
-        self.required_if = required_if or []
-        self.required_by = required_by or {}
 
+class ArgumentSpec(_ArgumentSpec):
     def create_ansible_module_helper(self, clazz, args, **kwargs):
-        return clazz(
-            *args,
-            argument_spec=self.argument_spec,
-            mutually_exclusive=self.mutually_exclusive,
-            required_together=self.required_together,
-            required_one_of=self.required_one_of,
-            required_if=self.required_if,
-            required_by=self.required_by,
-            **kwargs)
+        result = super(ArgumentSpec, self).create_ansible_module_helper(clazz, args, **kwargs)
+        result.deprecate(
+            "The crypto.module_backends.common module utils is deprecated and will be removed from community.crypto 3.0.0."
+            " Use the argspec module utils from community.crypto instead.",
+            version='3.0.0',
+            collection_name='community.crypto',
+        )
+        return result
 
-    def create_ansible_module(self, **kwargs):
-        return self.create_ansible_module_helper(AnsibleModule, (), **kwargs)
+
+__all__ = ('AnsibleModule', 'ArgumentSpec')
