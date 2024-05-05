@@ -344,9 +344,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>File containing the CSR for the new certificate.</p>
-<p>Can be created with <a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a> or <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">req</span> <span class="pre">...</span></code>.</p>
+<p>Can be created with <a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a>.</p>
 <p>The CSR may contain multiple Subject Alternate Names, but each one will lead to an individual challenge that must be fulfilled for the CSR to be signed.</p>
-<p><em>Note</em>: the private key used to create the CSR <em>must not</em> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
+<p><strong>Note</strong>: the private key used to create the CSR <strong>must not</strong> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
 <p>Precisely one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-csr-content"><span class="std std-ref"><span class="pre">csr_content</span></span></a></strong></code> must be specified.</p>
 </div></td>
 </tr>
@@ -356,9 +356,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p><em class="ansible-option-versionadded">added in community.crypto 1.2.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Content of the CSR for the new certificate.</p>
-<p>Can be created with <a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a> or <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">req</span> <span class="pre">...</span></code>.</p>
+<p>Can be created with <a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a>.</p>
 <p>The CSR may contain multiple Subject Alternate Names, but each one will lead to an individual challenge that must be fulfilled for the CSR to be signed.</p>
-<p><em>Note</em>: the private key used to create the CSR <em>must not</em> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
+<p><strong>Note</strong>: the private key used to create the CSR <strong>must not</strong> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
 <p>Precisely one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-csr-content"><span class="std std-ref"><span class="pre">csr_content</span></span></a></strong></code> must be specified.</p>
 </div></td>
 </tr>
