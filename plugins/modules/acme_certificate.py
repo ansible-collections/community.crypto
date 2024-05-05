@@ -897,15 +897,14 @@ class ACMECertificateClient(object):
 
 
 def main():
-    argument_spec = create_default_argspec()
+    argument_spec = create_default_argspec(with_certificate=True)
+    argument_spec.argument_spec['csr']['aliases'] = ['src']
     argument_spec.update_argspec(
         modify_account=dict(type='bool', default=True),
         account_email=dict(type='str'),
         agreement=dict(type='str'),
         terms_agreed=dict(type='bool', default=False),
         challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01', NO_CHALLENGE]),
-        csr=dict(type='path', aliases=['src']),
-        csr_content=dict(type='str'),
         data=dict(type='dict'),
         dest=dict(type='path', aliases=['cert']),
         fullchain_dest=dict(type='path', aliases=['fullchain']),
@@ -924,13 +923,9 @@ def main():
         include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
     )
     argument_spec.update(
-        required_one_of=(
+        required_one_of=[
             ['dest', 'fullchain_dest'],
-            ['csr', 'csr_content'],
-        ),
-        mutually_exclusive=(
-            ['csr', 'csr_content'],
-        ),
+        ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, False)
