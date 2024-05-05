@@ -11,17 +11,17 @@
 
 - name: Create GPG key
   github_gpg_key:
-    name: {{ name }}
-    comment: {{ comment }}
-    email: {{ email }}
+    name: "{{ name }}"
+    comment: "{{ comment }}"
+    email: "{{ email }}"
   register: created_gpg_key
 
 - name: Delete GPG key 
   github_gpg_key:
     state: absent
-    name: {{ name }}
-    comment: {{ comment }}
-    email: {{ email }}
+    name: "{{ name }}"
+    comment: "{{ comment }}"
+    email: "{{ email }}"
   register: deleted_gpg_key
 
 - assert:
