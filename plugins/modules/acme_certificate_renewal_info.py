@@ -220,13 +220,11 @@ def main():
                         ),
                     )
 
-        # TODO check remaining_days
         if module.params['remaining_days'] is not None:
             remaining_days = (cert_info.not_valid_after - now).days
             if remaining_days < module.params['remaining_days']:
                 complete(True, msg='The certificate expires in {0} days'.format(remaining_days))
 
-        # TODO check remaining_percentage
         if module.params['remaining_percentage'] is not None:
             timestamp = backend.interpolate_timestamp(cert_info.not_valid_before, cert_info.not_valid_after, 1 - module.params['remaining_percentage'])
             if timestamp < now:
