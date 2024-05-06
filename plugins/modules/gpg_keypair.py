@@ -328,7 +328,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
         executable=get_bin_path('gpg')
     )
 
-    fingerprint = re.search(r'([0-9a-zA-Z]+)\.rev', stderr)
+    fingerprint = re.search(r'([0-9a-zA-Z]+)\.rev', stderr).group(1)
 
     for subkey in params['subkeys']:
         if subkey['subkey_type'] in ['RSA', 'DSA', 'ELG']:
