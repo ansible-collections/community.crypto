@@ -45,15 +45,13 @@ options:
             - For RSA keys, the minimum is V(1024), the maximum is V(4096), and the default is V(3072).
             - For DSA keys, the minimum is V(768), the maximum is V(3072), and the default is V(2048).
             - As per gpg's behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.
-            - For ECC keys, this parameter will be ignored.
         type: int
     key_curve:
         description:
             - For ECC keys, this specifies the curve used to generate the keys.
-            - EDDSA keys only support the V(ed25519) curve and they can only be generated using said curve.
-            - For ECDSA keys, the default is V(brainpoolP512r1).
-            - For non-ECC keys, this parameter with be ignored.
-            - Required if O(key_type=ECDSA) or O(key_type=EDDSA).
+            - If O(key_type=EDDSA), O(key_curve=ed25519) is required.
+            - If O(key_curve=ed25519) is only supported if O(key_type=EDDSA).
+            - This is required if O(key_type=ECDSA) or O(key_type=EDDSA) and it is ignored if O(key_type=RSA) or O(key_type=DSA).
         type: str
         choices: ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519']
     key_usage:
@@ -61,7 +59,7 @@ options:
             - Specifies usage(s) for key.
             - V(cert) is given to all primary keys regardess, however can be used to only give V(vert) usage to a key.
             - If not usage is specified, all of valid usages for the given key type are assigned.
-            - Only RSA keys support V(encrypt) usage.
+            - O(key_usage=encrypt) is only supported is O(key_type=RSA).
         type: list
         elements: str
         choices: ['encrypt', 'sign', 'auth', 'cert']
@@ -81,20 +79,19 @@ options:
                 description:
                     - Similar to O(key_length).
                     - For ELG subkeys, the minimum length is V(1024) bits, the maximum length is V(4096) bits, and the default length is V(3072) bits.
-                    - For ECC subkeys, this parameter will be ignored.
                 type: int
             subkey_curve:
                 description:
-                    - Similar to O(key_curve)
-                    - O(subkey_curve=cv25519) is supported if O(subkey_type=ECDH).
-                    - Required if O(subkey_type=ECDSA), O(subkey_type=EDDSA), or O(subkey_type=ECDH).
+                    - Similar to O(key_curve).
+                    - V(cv25519) is supported if subkey_type is V(ECDH).
+                    - This is required if subkey_type is V(ECDSA), V(EDDSA), or V(ECDH) and it is ignored if subkey_type is V(RSA), V(DSA), or V(ELG).
                 type: str
                 choices: ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519', 'cv25519']
             subkey_usage:
                 description:
                     - Similar to O(key_usage).
-                    - In addition to when O(subkey_type=RSA), V(subkey_usage=ecrypt) is supported if O(subkey_type=ECDH) or O(subkey_type=ELG).
-                    - If O(subkey_type=ECDH) or O(subkey_type=ELG), only O(subkey_curve=encrypt) is supported.
+                    - V(encrypt) is supported if subkey_type is V(RSA), V(ECDH), or V(ELG).
+                    - If subkey_type is V(ECDH) or V(ELG), only V(encrypt) is supported.
                 type: list
                 elements: str
                 choices: ['encrypt', 'sign', 'auth']
@@ -176,7 +173,7 @@ EXAMPLES = '''
 RETURN = '''
 changed:
     description: Indicates if changes were made to GPG keyring.
-    return: success
+    returned: success
     type: bool
     sample: True
 fingerprints:
@@ -234,8 +231,9 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
 
 
 def validate_params(module, params):
-    if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
-        module.fail_json('Invalid format for expire date')
+    if params['expire_date']:
+        if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
+            module.fail_json('Invalid format for expire date')
     validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
     for index, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(index + 1))
@@ -281,15 +279,12 @@ def list_matching_keys(module, params):
     if user_id:
         user_id = '"{0}"'.format(user_id.strip())
 
-    search_criteria = ' '.join(params['fingerprints']) + user_id
-    if params['fingerprints']:
-        search_criteria = ' '.join(params[''])
-    dummy, stdout, dummy2 = module.run_command(['gpg', '--list-secret-keys', '{0}'.format(search_criteria)])
+    dummy, stdout, dummy2 = module.run_command(['--list-secret-keys', user_id] + params['fingerprints'], executable='gpg')
     lines = stdout.split('\n')
     fingerprints = list(set([line.strip() for line in lines if line.strip().isalnum()]))
     matching_keys = []
     for fingerprint in fingerprints:
-        dummy, stdout, dummy2 = module.run_command(['gpg', '--list-secret-keys', '{0}'.format(fingerprint)])
+        dummy, stdout, dummy2 = module.run_command(['--list-secret-keys', '--with-colons', fingerprint], executable='gpg')
         lines = stdout.split('\n')
         primary_key = lines[0]
         subkey_count = 0
@@ -358,8 +353,7 @@ def delete_keypair(module, matching_keys, check_mode):
                 '--batch',
                 '--yes',
                 '--delete-secret-and-public-key',
-                *matching_keys
-            ],
+            ] + matching_keys,
             executable='gpg'
         )
         return dict(changed=True, fingerprints=matching_keys)
@@ -368,7 +362,7 @@ def delete_keypair(module, matching_keys, check_mode):
 
 def add_subkey(module, fingerprint, subkey_index, subkey_type, subkey_length, subkey_curve, subkey_usage, expire_date):
     if subkey_type in ['RSA', 'DSA', 'ELG']:
-        algo = '{}'.format(subkey_type.lower())
+        algo = '{0}'.format(subkey_type.lower())
         if subkey_length:
             algo += str(subkey_length)
     elif subkey_curve:
@@ -381,8 +375,8 @@ def add_subkey(module, fingerprint, subkey_index, subkey_type, subkey_length, su
                 '--quick-add-key',
                 fingerprint,
                 algo if algo else 'default',
-                *subkey_usage,
-                expire_date if expire_date else 0
+                ' '.join(subkey_usage),
+                expire_date if expire_date else '0'
             ],
             executable='gpg'
         )
@@ -464,15 +458,25 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent']),
             key_type=dict(type='str', choices=key_types[:-2]),
-            key_length=dict(type='int'),
+            key_length=dict(type='int', no_log=False),
             key_curve=dict(type='str', choices=key_curves[:-1]),
             key_usage=dict(type='list', elements='str', choices=key_usages),
-            subkeys=dict(type='list', elements='dict', options=dict(
-                subkey_type=dict(type='str', choices=key_types),
-                subkey_length=dict(type='int'),
-                subkey_curve=dict(type='str', choices=key_curves),
-                subkey_usage=dict(type='list', elements='str', choices=key_usages[:-1])
-            )),
+            subkeys=dict(
+                type='list',
+                elements='dict',
+                no_log=False,
+                options=dict(
+                    subkey_type=dict(type='str', choices=key_types),
+                    subkey_length=dict(type='int',no_log=False),
+                    subkey_curve=dict(type='str', choices=key_curves),
+                    subkey_usage=dict(type='list', elements='str', choices=key_usages[:-1])
+                ),
+                required_if=[
+                    ['subkey_type', 'ECDSA', ['subkey_curve']],
+                    ['subkey_type', 'EDDSA', ['subkey_curve']],
+                    ['subkey_type', 'ECDH', ['subkey_curve']]
+                ]
+            ),
             expire_date=dict(type='str'),
             name=dict(type='str'),
             comment=dict(type='str'),
@@ -485,10 +489,7 @@ def main():
             ['state', 'present', ['name', 'comment', 'email'], True],
             ['state', 'absent', ['name', 'comment', 'email', 'fingerprints'], True],
             ['key_type', 'ECDSA', ['key_curve']],
-            ['key_type', 'EDDSA', ['key_curve']],
-            ['subkey_type', 'ECDSA', ['subkey_curve']],
-            ['subkey_type', 'EDDSA', ['subkey_curve']],
-            ['subkey_type', 'ECDH', ['subkey_curve']]
+            ['key_type', 'EDDSA', ['key_curve']]
         ]
     )
 
