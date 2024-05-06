@@ -102,6 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -195,8 +196,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id3">Parameters</a></p></li>
 <li><p><a class="reference internal" href="#attributes" id="id4">Attributes</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id5">Examples</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id5">Notes</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id6">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id7">Return Values</a></p></li>
 </ul>
 </nav>
 <section id="synopsis">
@@ -257,6 +259,20 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-force"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-force"><strong>force</strong></p>
+<a class="ansibleOptionLink" href="#parameter-force" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-force"><span class="std std-ref"><span class="pre">force=True</span></span></a></code>, key generation is executed using the module’s options, even a matching key is found.</p>
+<p>This parameter does not override <code class="ansible-value docutils literal notranslate"><span class="pre">check_mode</span></code>.</p>
+<p>This parameter is ignored if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><span class="std std-ref"><span class="pre">state=absent</span></span></a></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><strong>key_curve</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -277,7 +293,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_length"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-length"><strong>key_length</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_length" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -287,7 +303,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>As per gpg’s behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><strong>key_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -301,7 +317,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><strong>key_usage</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
@@ -319,21 +335,21 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies a name for the key’s user id.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-passphrase"><strong>passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encrypt a newly generated private key.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -345,7 +361,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys"><strong>subkeys</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 </div></td>
@@ -353,7 +369,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-curve"><strong>subkey_curve</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -374,7 +390,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_length"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-length"><strong>subkey_length</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_length" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -382,7 +398,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>For ELG subkeys, the minimum length is <code class="ansible-value docutils literal notranslate"><span class="pre">1024</span></code> bits, the maximum length is <code class="ansible-value docutils literal notranslate"><span class="pre">4096</span></code> bits, and the default length is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code> bits.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-type"><strong>subkey_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -399,7 +415,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-usage"><strong>subkey_usage</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
@@ -447,8 +463,19 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </tbody>
 </table>
 </section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>If a user-id is provided, the module’s options are matched against all keys with said user-id.</p></li>
+<li><p>If a fingerprint is provided but no user-id is provided, the module’s options are matched against the fingerprint(s).</p></li>
+<li><p>If neither a fingerprint or user-id is provided, the module’s options are matched against all keys.</p></li>
+</ul>
+</div>
+</section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate the default GPG keypair</span>
 <span class="w">  </span><span class="nt">community.crypto.gpg_keypair</span><span class="p">:</span>
 
@@ -490,7 +517,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </div>
 </section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
 <p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
 <table class="longtable ansible-option-table docutils align-default" style="width: 100%">
 <thead>
