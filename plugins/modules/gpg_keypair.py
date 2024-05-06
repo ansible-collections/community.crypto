@@ -219,7 +219,7 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
     elif key_type == 'RSA':
         if key_usage:
             if key_usage not in list(itertools.combinations(['ecrypt', 'sign', 'auth', 'cert'])):
-                module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))`
+                module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
         if key_usage and key_usage not in list(itertools.combinations(['sign', 'auth'])):
@@ -431,7 +431,16 @@ def generate_keypair(module, params, matching_keys, check_mode):
     fingerprint = re.search(r'([a-zA-Z0-9]*)\.rev', stdout)
 
     for index, subkey in enumerate(params['subkeys']):
-        add_subkey(module, fingerprint, index, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], params['expire_date'])
+        add_subkey(
+            module,
+            fingerprint,
+            index,
+            subkey['subkey_type'],
+            subkey['subkey_length'],
+            subkey['subkey_curve'],
+            subkey['subkey_usage'],
+            params['expire_date']
+        )
 
     return dict(changed=True, fingerprints=[fingerprint])
 
@@ -469,7 +478,7 @@ def main():
             comment=dict(type='str'),
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
-            fingerprints=dict(type='list', elements='str', no_log=True),
+            fingerprints=dict(type='list', elements='str', no_log=True)
         ),
         supports_check_mode=True,
         required_if=[
