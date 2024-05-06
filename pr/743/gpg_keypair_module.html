@@ -222,57 +222,37 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-attributes"></div>
-<div class="ansibleOptionAnchor" id="parameter-attr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-attributes"><span id="ansible-collections-community-crypto-gpg-keypair-module-parameter-attr"></span><strong>attributes</strong></p>
-<a class="ansibleOptionLink" href="#parameter-attributes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: attr</span></p>
-<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
-<p>To get supported flags look at the man page for <em>chattr</em> on the target system.</p>
-<p>This string should contain the attributes in the same order as the one displayed by <em>lsattr</em>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">=</span></code> operator is assumed as default, otherwise <code class="docutils literal notranslate"><span class="pre">+</span></code> or <code class="docutils literal notranslate"><span class="pre">-</span></code> operators need to be included in the string.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-comment"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-comment"><strong>comment</strong></p>
 <a class="ansibleOptionLink" href="#parameter-comment" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies a comment for the key’s user id.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-email"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-email"><strong>email</strong></p>
 <a class="ansibleOptionLink" href="#parameter-email" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies an email for the key’s user id.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-expire_date"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><strong>expire_date</strong></p>
 <a class="ansibleOptionLink" href="#parameter-expire_date" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Sets the expire date for the key.</p>
-<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=0</span></span></a></code>, the key will never expire</p>
-<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;</span></span></a></code>, the key will expire in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> days.</p>
-<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;w</span></span></a></code>, the key will expire in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> weeks.</p>
-<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;m</span></span></a></code>, the key will expire in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> months.</p>
-<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;y</span></span></a></code>, the key will expire in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> years.</p>
-<p>If left unspecified, any created GPG keys will never expire.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=0</span></span></a></code>, the key never expires.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> days.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;w</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> weeks.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;m</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> months.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;y</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> years.</p>
+<p>If left unspecified, any created GPG keys never expire.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-fingerprints"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-fingerprints"><strong>fingerprints</strong></p>
 <a class="ansibleOptionLink" href="#parameter-fingerprints" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies keys to match against.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-group"><strong>group</strong></p>
-<a class="ansibleOptionLink" href="#parameter-group" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <em>chown</em>.</p>
-<p>When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -280,9 +260,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#parameter-key_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>For ECC keys, this specifies the curve used to generate the keys.</p>
-<p>EDDSA keys only support the <code class="ansible-value docutils literal notranslate"><span class="pre">ed25519</span></code> curve and they can only be generate using said curve.</p>
-<p>For ECDSA keys, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">brainpoolP512r1</span></code>.</p>
-<p>For non-ECC keys, this parameter with be ignored.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=EDDSA</span></span></a></code>, <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve=ed25519</span></span></a></code> is required.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve=ed25519</span></span></a></code> is only supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=EDDSA</span></span></a></code>.</p>
+<p>This is required if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=ECDSA</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=EDDSA</span></span></a></code> and it is ignored if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=DSA</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;nistp256&quot;</span></code></p></li>
@@ -304,7 +284,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>For RSA keys, the minimum is <code class="ansible-value docutils literal notranslate"><span class="pre">1024</span></code>, the maximum is <code class="ansible-value docutils literal notranslate"><span class="pre">4096</span></code>, and the default is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code>.</p>
 <p>For DSA keys, the minimum is <code class="ansible-value docutils literal notranslate"><span class="pre">768</span></code>, the maximum is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code>, and the default is <code class="ansible-value docutils literal notranslate"><span class="pre">2048</span></code>.</p>
 <p>As per gpg’s behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.</p>
-<p>For ECC keys, this parameter will be ignored.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -327,7 +306,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies usage(s) for key.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">cert</span></code> is given to all primary keys regardess, however can be used to only give <code class="ansible-value docutils literal notranslate"><span class="pre">vert</span></code> usage to a key.</p>
-<p>If not usage is specified, the valid usages for the given key type with be assigned.</p>
+<p>If not usage is specified, all of valid usages for the given key type are assigned.</p>
+<p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage=encrypt</span></span></a></code> is only supported is <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encrypt&quot;</span></code></p></li>
@@ -338,32 +318,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-mode"><strong>mode</strong></p>
-<a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The permissions the resulting filesystem object should have.</p>
-<p>For those used to <em>/usr/bin/chmod</em> remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, <code class="docutils literal notranslate"><span class="pre">'644'</span></code> or <code class="docutils literal notranslate"><span class="pre">'1777'</span></code>) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, <code class="docutils literal notranslate"><span class="pre">0755</span></code>) works sometimes, but can fail in loops and some other circumstances.</p>
-<p>Giving Ansible a number without following either of these rules will end up with a decimal number which will have unexpected results.</p>
-<p>As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, <code class="docutils literal notranslate"><span class="pre">u+rwx</span></code> or <code class="docutils literal notranslate"><span class="pre">u=rw,g=r,o=r</span></code>).</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">mode</span></code> is not specified and the destination filesystem object <strong>does not</strong> exist, the default <code class="docutils literal notranslate"><span class="pre">umask</span></code> on the system will be used when setting the mode for the newly created filesystem object.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">mode</span></code> is not specified and the destination filesystem object <strong>does</strong> exist, the mode of the existing filesystem object will be used.</p>
-<p>Specifying <code class="docutils literal notranslate"><span class="pre">mode</span></code> is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies a name for the key’s user id.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-owner"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-owner"><strong>owner</strong></p>
-<a class="ansibleOptionLink" href="#parameter-owner" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <em>chown</em>.</p>
-<p>When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.</p>
-<p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -371,40 +329,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encrypt a newly generated private key.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-selevel"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-selevel"><strong>selevel</strong></p>
-<a class="ansibleOptionLink" href="#parameter-selevel" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The level part of the SELinux filesystem object context.</p>
-<p>This is the MLS/MCS attribute, sometimes known as the <code class="docutils literal notranslate"><span class="pre">range</span></code>.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-serole"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-serole"><strong>serole</strong></p>
-<a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The role part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-setype"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-setype"><strong>setype</strong></p>
-<a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The type part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-seuser"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-seuser"><strong>seuser</strong></p>
-<a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The user part of the SELinux filesystem object context.</p>
-<p>By default it uses the <code class="docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -424,19 +348,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#parameter-subkeys" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>List of subkeys with their own respective key types, lengths, curves, and usages.</p>
-<p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-length"><span class="std std-ref"><span class="pre">key_length</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve</span></span></a></strong></code>, and (key_usage).</p>
-<p>Supports ECDH and ELG keys.</p>
-<p>For both ECDH and ELG keys, the only supported usage is <code class="ansible-value docutils literal notranslate"><span class="pre">encrypt</span></code>.</p>
-<p>For ECDH keys, the default curve is <code class="ansible-value docutils literal notranslate"><span class="pre">brainpoolP512r1</span></code>.</p>
-<p>ECDH keys also support the <code class="ansible-value docutils literal notranslate"><span class="pre">cv25519</span></code> curve.</p>
-<p>For ELG keys, the minimum length is <code class="ansible-value docutils literal notranslate"><span class="pre">1024</span></code> bits, the maximum length is <code class="ansible-value docutils literal notranslate"><span class="pre">4096</span></code> bits, and the default length is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code> bits.</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-curve"><strong>subkey_curve</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve</span></span></a></strong></code>.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">cv25519</span></code> is supported if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>.</p>
+<p>This is required if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EDDSA</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code> and it is ignored if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DSA</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;nistp256&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;nistp384&quot;</span></code></p></li>
@@ -445,6 +367,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;brainpoolP384r1&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;brainpoolP512r1&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp256k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ed25519&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cv25519&quot;</span></code></p></li>
 </ul>
 </div></td>
@@ -453,13 +376,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_length"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-length"><strong>subkey_length</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_length" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"></div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-length"><span class="std std-ref"><span class="pre">key_length</span></span></a></strong></code>.</p>
+<p>For ELG subkeys, the minimum length is <code class="ansible-value docutils literal notranslate"><span class="pre">1024</span></code> bits, the maximum length is <code class="ansible-value docutils literal notranslate"><span class="pre">4096</span></code> bits, and the default length is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code> bits.</p>
+</div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-type"><strong>subkey_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type</span></span></a></strong></code>.</p>
+<p>Also supports ECDH and ELG keys.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;RSA&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;DSA&quot;</span></code></p></li>
@@ -474,26 +401,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <div class="ansibleOptionAnchor" id="parameter-subkeys/subkey_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-subkey-usage"><strong>subkey_usage</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage</span></span></a></strong></code>.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">encrypt</span></code> is supported if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
+<p>If subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>, only <code class="ansible-value docutils literal notranslate"><span class="pre">encrypt</span></code> is supported.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encrypt&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sign&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;auth&quot;</span></code></p></li>
-</ul>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
-<a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.</p>
-<p>By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.</p>
-<p>This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).</p>
-<p>IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.</p>
-<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
-<ul class="simple">
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
 </ul>
 </div></td>
 </tr>
@@ -515,7 +430,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#attribute-check_mode" title="Permalink to this attribute"></a></div></td>
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Can run in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code> and return changed status prediction without modifying target.</p>
+<td><div class="ansible-option-cell"><p>Can run in check_mode and return changed status prediction without modifying target.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -523,15 +438,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#attribute-diff_mode" title="Permalink to this attribute"></a></div></td>
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="attribute-safe_file_operations"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-attribute-safe-file-operations"><strong>safe_file_operations</strong></p>
-<a class="ansibleOptionLink" href="#attribute-safe_file_operations" title="Permalink to this attribute"></a></div></td>
-<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong>      <span class="ansible-attribute-support-na">str</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Uses Ansible’s strict file operation functions to ensure proper permissions and avoid data corruption.</p>
+<td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode.</p>
 </div></td>
 </tr>
 </tbody>
@@ -544,7 +451,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate the default GPG keypair with a passphrase</span>
 <span class="w">  </span><span class="nt">community.crypto.gpg_keypair</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">passphrase</span> <span class="cp">}}</span><span class="s">&#39;</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate a RSA GPG keypair with the default RSA size (2048 bits)</span>
 <span class="w">  </span><span class="nt">community.crypto.gpg_keypair</span><span class="p">:</span>
