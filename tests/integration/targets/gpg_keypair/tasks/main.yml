@@ -19,9 +19,7 @@
 - name: Delete GPG key 
   gpg_keypair:
     state: absent
-    name: "{{ name }}"
-    comment: "{{ comment }}"
-    email: "{{ email }}"
+    fingerprints: {{ created_gpg_key.fingerprints }}
   register: deleted_gpg_key
 
 - assert:
