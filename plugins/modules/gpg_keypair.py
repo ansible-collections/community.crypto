@@ -487,7 +487,7 @@ def main():
             comment=dict(type='str'),
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
-            fingerprints=dict(type='list', elements='str', default=[], no_log=True),
+            fingerprints=dict(type='list', elements='str', default=[]),
             force=dict(type='bool', default=False)
         ),
         supports_check_mode=True,
