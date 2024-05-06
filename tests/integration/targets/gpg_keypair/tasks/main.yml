@@ -26,4 +26,4 @@
 - assert:
     that:
       - created_gpg_key.changed
-      - delete_gpg_key.changed
+      - deleted_gpg_key.changed
