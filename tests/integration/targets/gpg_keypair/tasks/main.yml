@@ -19,7 +19,7 @@
 - name: Delete GPG key 
   gpg_keypair:
     state: absent
-    fingerprints: {{ created_gpg_key.fingerprints }}
+    fingerprints: "{{ created_gpg_key.fingerprints }}"
   register: deleted_gpg_key
 
 - assert:
