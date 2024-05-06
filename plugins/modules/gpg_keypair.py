@@ -280,7 +280,12 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
 def delete_keypair(module, matching_keys, check_mode):
     if matching_keys:
         module.run_command(
-            ['--dry-run' if check_mode else '', '--batch', '--yes', '--delete-secret-and-public-key'] + matching_keys,
+            [
+                '--dry-run' if check_mode else '',
+                '--batch',
+                '--yes',
+                '--delete-secret-and-public-key'
+            ] + matching_keys,
             executable=get_bin_path('gpg')
         )
         return dict(changed=True, fingerprints=matching_keys)
@@ -313,19 +318,17 @@ def generate_keypair(module, params, matching_keys, check_mode):
         'Passphrase: {0}'.format(params['passphrase']) if params['passphrase'] else '%no-protection',
     )
 
-    dummy, stdout, dummy2 = module.run_command(
+    rc, stdout, stderr = module.run_command(
         [
             '--dry-run' if check_mode else '',
             '--batch',
-            '--log-file',
-            '/dev/stdout',
             '--gen-key',
             parameters
         ],
         executable=get_bin_path('gpg')
     )
 
-    fingerprint = re.search(r'.*([a-zA-Z0-9]*)\.rev', stdout)
+    fingerprint = re.search(r'([0-9a-zA-Z]+)\.rev', stderr)
 
     for subkey in params['subkeys']:
         if subkey['subkey_type'] in ['RSA', 'DSA', 'ELG']:
@@ -372,24 +375,26 @@ def run_module(module, params, check_mode=False):
     if user_id:
         user_id = '"{0}"'.format(user_id.strip())
 
-    dummy, stdout, dummy2 = module.run_command(
+    rc, stdout, stderr = module.run_command(
         ['--list-secret-keys', user_id] + params['fingerprints'],
         executable=get_bin_path('gpg')
     )
-    lines = stdout.split('\n')
-    fingerprints = list(set([line.strip() for line in lines if line.strip().isalnum()]))
+
+    fingerprints = list(set([line.strip() for line in stderr.split('\n') if line.strip().isalnum()]))
     matching_keys = []
     for fingerprint in fingerprints:
-        dummy, stdout, dummy2 = module.run_command(
-            ['--list-secret-keys', '--with-colons', fingerprint],
+        rc, stdout, stderr = module.run_command(
+            [
+                '--list-secret-keys',
+                '--with-colons',
+                fingerprint
+            ],
             executable=get_bin_path('gpg')
         )
-        lines = stdout.split('\n')
-        primary_key = lines[0]
         subkey_count = 0
         is_match = True
         uid_present = not bool(user_id)
-        for line in lines:
+        for line in stderr.split('\n'):
             if line[:3] == 'sec':
                 primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+::([0-9a-zA-Z]+):+0:', line)
                 key_type = key_type_from_algo(int(primary_key.group(2)))
