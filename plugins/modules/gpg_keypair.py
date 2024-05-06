@@ -130,6 +130,17 @@ options:
         type: list
         elements: str
         default: []
+    force:
+        description:
+            - If O(force=True), key generation is executed using the module's options, even a matching key is found.
+            - This parameter does not override V(check_mode).
+            - This parameter is ignored if O(state=absent).
+        type: bool
+        default: False
+notes:
+    - If a user-id is provided, the module's options are matched against all keys with said user-id.
+    - If a fingerprint is provided but no user-id is provided, the module's options are matched against the fingerprint(s).
+    - If neither a fingerprint or user-id is provided, the module's options are matched against all keys.
 '''
 
 EXAMPLES = '''
@@ -199,6 +210,35 @@ def all_permutations(arr):
         for i in range(len(arr))))
 
 
+def key_type_from_algo(algo):
+    if algo == 1:
+        return 'RSA'
+    elif algo == 16:
+        return 'ELG'
+    elif algo == 17:
+        return 'DSA'
+    elif algo == 18:
+        return 'ECDH'
+    elif algo == 19:
+        return 'ECDSA'
+    elif algo == 22:
+        return 'EDDSA'
+
+
+def expand_usages(usages):
+    usages = list(usages)
+    for i in range(len(usages)):
+        if usages[i] == 'c':
+            usages[i] = 'cert'
+        elif usages[i] == 's':
+            usages[i] = 'sign'
+        elif usages[i] == 'a':
+            usages[i] = 'auth'
+        elif usages[i] == 'e':
+            usages[i] = 'encrypt'
+    return usages
+
+
 def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
@@ -237,7 +277,83 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
         pass
 
 
-def validate_params(module, params):
+def delete_keypair(module, matching_keys, check_mode):
+    if matching_keys:
+        module.run_command(
+            ['--dry-run' if check_mode else '', '--batch', '--yes', '--delete-secret-and-public-key'] + matching_keys,
+            executable=get_bin_path('gpg')
+        )
+        return dict(changed=True, fingerprints=matching_keys)
+    return dict(changed=False, fingerprints=[])
+
+
+def generate_keypair(module, params, matching_keys, check_mode):
+    if matching_keys and not params['force']:
+        return dict(changed=False, fingerprints=matching_keys)
+
+    parameters = '''<<EOF
+        {0}
+        {1}
+        {2}
+        {3}
+        {4}
+        {5}
+        {6}
+        {7}
+        %commit
+        EOF
+        '''.format(
+        'Key-Type: {0}'.format(params['key_type'] if params['key_type'] else 'default'),
+        'Key-Length: {0}'.format(params['key_length']) if params['key_length'] else '',
+        'Key-Curve: {0}'.format(params['key_curve']) if params['key_curve'] else '',
+        'Expire-Date: {0}'.format(params['expire_date']) if params['expire_date'] else '',
+        'Name-Real: {0}'.format(params['name']) if params['name'] else '',
+        'Name-Comment: {0}'.format(params['comment']) if params['comment'] else '',
+        'Name-Email: {0}'.format(params['email']) if params['email'] else '',
+        'Passphrase: {0}'.format(params['passphrase']) if params['passphrase'] else '%no-protection',
+    )
+
+    dummy, stdout, dummy2 = module.run_command(
+        [
+            '--dry-run' if check_mode else '',
+            '--batch',
+            '--log-file',
+            '/dev/stdout',
+            '--gen-key',
+            parameters
+        ],
+        executable=get_bin_path('gpg')
+    )
+
+    fingerprint = re.search(r'.*([a-zA-Z0-9]*)\.rev', stdout)
+
+    for subkey in params['subkeys']:
+        if subkey['subkey_type'] in ['RSA', 'DSA', 'ELG']:
+            algo = '{0}'.format(subkey['subkey_type'].lower())
+            if subkey['subkey_length']:
+                algo += str(subkey['subkey_length'])
+        elif subkey['subkey_curve']:
+            algo = subkey['subkey_curve']
+        else:
+            algo = 'default'
+
+        module.run_command(
+            [
+                '--dry-run' if check_mode else '',
+                '--batch',
+                '--quick-add-key',
+                fingerprint,
+                algo,
+                ' '.join(subkey_usage),
+                params['expire_date'] if params['expire_date'] else ''
+            ],
+            executable=get_bin_path('gpg')
+        )
+
+    return dict(changed=True, fingerprints=[fingerprint])
+
+
+def run_module(module, params, check_mode=False):
     if params['expire_date']:
         if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
             module.fail_json('Invalid format for expire date')
@@ -246,37 +362,6 @@ def validate_params(module, params):
     for i, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
 
-
-def key_type_from_algo(algo):
-    if algo == 1:
-        return 'RSA'
-    elif algo == 16:
-        return 'ELG'
-    elif algo == 17:
-        return 'DSA'
-    elif algo == 18:
-        return 'ECDH'
-    elif algo == 19:
-        return 'ECDSA'
-    elif algo == 22:
-        return 'EDDSA'
-
-
-def expand_usages(usages):
-    usages = list(usages)
-    for i in range(len(usages)):
-        if usages[i] == 'c':
-            usages[i] = 'cert'
-        elif usages[i] == 's':
-            usages[i] = 'sign'
-        elif usages[i] == 'a':
-            usages[i] = 'auth'
-        elif usages[i] == 'e':
-            usages[i] = 'encrypt'
-    return usages
-
-
-def list_matching_keys(module, params):
     user_id = ''
     if params['name']:
         user_id += '{0} '.format(params['name'])
@@ -356,99 +441,7 @@ def list_matching_keys(module, params):
                     break
         if is_match and uid_present:
             matching_keys.append(fingerprint)
-    return matching_keys
-
-
-def delete_keypair(module, matching_keys, check_mode):
-    if matching_keys:
-        module.run_command(
-            ['--dry-run' if check_mode else '', '--batch', '--yes', '--delete-secret-and-public-key'] + matching_keys,
-            executable=get_bin_path('gpg')
-        )
-        return dict(changed=True, fingerprints=matching_keys)
-    return dict(changed=False, fingerprints=[])
-
-
-def add_subkey(module, fingerprint, subkey_type, subkey_length, subkey_curve, subkey_usage, expire_date):
-    if subkey_type in ['RSA', 'DSA', 'ELG']:
-        algo = '{0}'.format(subkey_type.lower())
-        if subkey_length:
-            algo += str(subkey_length)
-    elif subkey_curve:
-        algo = subkey_curve
-    else:
-        algo = 'default'
-
-    module.run_command(
-        [
-            '--batch',
-            '--quick-add-key',
-            fingerprint,
-            algo,
-            ' '.join(subkey_usage),
-            expire_date if expire_date else ''
-        ],
-        executable=get_bin_path('gpg')
-    )
-
-
-def generate_keypair(module, params, matching_keys, check_mode):
-    if matching_keys:
-        return dict(changed=False, fingerprints=matching_keys)
-
-    parameters = '''<<EOF
-        {0}
-        {1}
-        {2}
-        {3}
-        {4}
-        {5}
-        {6}
-        {7}
-        %commit
-        EOF
-        '''.format(
-        'Key-Type: {0}'.format(params['key_type'] if params['key_type'] else 'default'),
-        'Key-Length: {0}'.format(params['key_length']) if params['key_length'] else '',
-        'Key-Curve: {0}'.format(params['key_curve']) if params['key_curve'] else '',
-        'Expire-Date: {0}'.format(params['expire_date']) if params['expire_date'] else '',
-        'Name-Real: {0}'.format(params['name']) if params['name'] else '',
-        'Name-Comment: {0}'.format(params['comment']) if params['comment'] else '',
-        'Name-Email: {0}'.format(params['email']) if params['email'] else '',
-        'Passphrase: {0}'.format(params['passphrase']) if params['passphrase'] else '%no-protection',
-    )
-
-    dummy, stdout, dummy2 = module.run_command(
-        [
-            '--dry-run' if check_mode else '',
-            '--batch',
-            '--log-file',
-            '/dev/stdout',
-            '--gen-key',
-            parameters
-        ],
-        executable=get_bin_path('gpg')
-    )
-
-    fingerprint = re.search(r'.*([a-zA-Z0-9]*)\.rev', stdout)
-
-    for subkey in params['subkeys']:
-        add_subkey(
-            module,
-            fingerprint,
-            subkey['subkey_type'],
-            subkey['subkey_length'],
-            subkey['subkey_curve'],
-            subkey['subkey_usage'],
-            params['expire_date']
-        )
-
-    return dict(changed=True, fingerprints=[fingerprint])
-
-
-def run_module(module, params, check_mode=False):
-    validate_params(module, params)
-    matching_keys = list_matching_keys(module, params)
+ 
     if params['state'] == 'present':
         result = generate_keypair(module, params, matching_keys, check_mode)
     else:
@@ -491,6 +484,7 @@ def main():
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
             fingerprints=dict(type='list', elements='str', default=[], no_log=True)
+            force=dict(type='bool', default=True)
         ),
         supports_check_mode=True,
         required_if=[
