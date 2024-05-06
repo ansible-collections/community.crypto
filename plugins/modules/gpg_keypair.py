@@ -62,6 +62,7 @@ options:
             - O(key_usage=encrypt) is only supported is O(key_type=RSA).
         type: list
         elements: str
+        default: []
         choices: [ 'encrypt', 'sign', 'auth', 'cert' ]
     subkeys:
         description:
@@ -95,6 +96,7 @@ options:
                     - If subkey_type is V(ECDH) or V(ELG), only V(encrypt) is supported.
                 type: list
                 elements: str
+                default: []
                 choices: [ 'encrypt', 'sign', 'auth' ]
     expire_date:
         description:
@@ -127,6 +129,7 @@ options:
             - Specifies keys to match against.
         type: list
         elements: str
+        default: []
 '''
 
 EXAMPLES = '''
@@ -293,10 +296,10 @@ def list_matching_keys(module, params):
         primary_key = lines[0]
         subkey_count = 0
         is_match = True
-        uid_present = False
+        uid_present = not bool(user_id)
         for line in lines:
             if line[:3] == 'sec':
-                primary_key = re.search(r'sec:u:([0-9]*):([0-9]*):[0-9A-Z]*:*([a-z])*:*+:*([0-9a-zA-Z])', line)
+                primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+::([0-9a-zA-Z]+):+0:', line)
                 key_type = key_type_from_algo(int(primary_key.group(2)))
                 if params['key_type'] and params['key_type'] != key_type:
                     is_match = False
@@ -316,7 +319,7 @@ def list_matching_keys(module, params):
                     is_match = False
                     break
             elif line[:3] == 'uid':
-                uid = re.search(r'uid:u:*[0-9]*::[0-9a-zA-Z]*::(.*):*0:').group(1)
+                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(uid)-75), line).group(1)
                 if user_id == uid:
                     uid_present = True
             elif line[:3] == 'ssb':
@@ -324,7 +327,7 @@ def list_matching_keys(module, params):
                 if subkey_count > len(params['subkeys']):
                     is_match = False
                     break
-                subkey = re.search(r'ssb:u:([0-9]*):([0-9]*):[0-9A-Z]*:*([a-z])*:*+:*([0-9a-zA-Z])', line)
+                subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+):', line)
                 subkey_type = key_type_from_algo(int(subkey.group(2)))
                 if params['subkeys'][subkey_count]['type'] and params['subkeys'][subkey_count]['type'] != subkey_type:
 
@@ -426,7 +429,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
         executable='gpg'
     )
 
-    fingerprint = re.search(r'([a-zA-Z0-9]*)\.rev', stdout)
+    fingerprint = re.search(r'.*([a-zA-Z0-9]*)\.rev', stdout)
 
     for index, subkey in enumerate(params['subkeys']):
         add_subkey(
@@ -464,7 +467,7 @@ def main():
             key_type=dict(type='str', choices=key_types[:-2]),
             key_length=dict(type='int', no_log=False),
             key_curve=dict(type='str', choices=key_curves[:-1]),
-            key_usage=dict(type='list', elements='str', choices=key_usages),
+            key_usage=dict(type='list', elements='str', default=[], choices=key_usages),
             subkeys=dict(
                 type='list',
                 elements='dict',
@@ -474,7 +477,7 @@ def main():
                     subkey_type=dict(type='str', choices=key_types),
                     subkey_length=dict(type='int', no_log=False),
                     subkey_curve=dict(type='str', choices=key_curves),
-                    subkey_usage=dict(type='list', elements='str', choices=key_usages[:-1])
+                    subkey_usage=dict(type='list', elements='str', default=[], choices=key_usages[:-1])
                 ),
                 required_if=[
                     ['subkey_type', 'ECDSA', ['subkey_curve']],
@@ -487,7 +490,7 @@ def main():
             comment=dict(type='str'),
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
-            fingerprints=dict(type='list', elements='str', no_log=True)
+            fingerprints=dict(type='list', elements='str', default=[], no_log=True)
         ),
         supports_check_mode=True,
         required_if=[
