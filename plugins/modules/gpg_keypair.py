@@ -18,10 +18,6 @@ description:
     - "This module allows one to generate or delete GPG private and public keys using GnuPG (gpg)."
 requirements:
     - gpg >= 2.1
-extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.attributes
-    - community.crypto.attributes.files
 attributes:
     check_mode:
         support: full
@@ -38,7 +34,7 @@ options:
         description:
             - Specifies the type of key to create.
         type: str
-        choices: ['RSA', 'DSA', 'ECDSA', 'EDDSA']
+        choices: [ 'RSA', 'DSA', 'ECDSA', 'EDDSA' ]
     key_length:
         description:
             - For non-ECC keys, this specifies the number of bits in the key to create.
@@ -53,7 +49,7 @@ options:
             - If O(key_curve=ed25519) is only supported if O(key_type=EDDSA).
             - This is required if O(key_type=ECDSA) or O(key_type=EDDSA) and it is ignored if O(key_type=RSA) or O(key_type=DSA).
         type: str
-        choices: ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519']
+        choices: [ 'nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519' ]
     key_usage:
         description:
             - Specifies usage(s) for key.
@@ -62,19 +58,20 @@ options:
             - O(key_usage=encrypt) is only supported is O(key_type=RSA).
         type: list
         elements: str
-        choices: ['encrypt', 'sign', 'auth', 'cert']
+        choices: [ 'encrypt', 'sign', 'auth', 'cert' ]
     subkeys:
         description:
             - List of subkeys with their own respective key types, lengths, curves, and usages.
         type: list
         elements: dict
+        default: []
         suboptions:
             subkey_type:
                 description:
                  - Similar to O(key_type).
                  - Also supports ECDH and ELG keys.
                 type: str
-                choices: ['RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH', 'ELG']
+                choices: [ 'RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH', 'ELG' ]
             subkey_length:
                 description:
                     - Similar to O(key_length).
@@ -94,7 +91,7 @@ options:
                     - If subkey_type is V(ECDH) or V(ELG), only V(encrypt) is supported.
                 type: list
                 elements: str
-                choices: ['encrypt', 'sign', 'auth']
+                choices: [ 'encrypt', 'sign', 'auth' ]
     expire_date:
         description:
             - Sets the expire date for the key.
@@ -121,13 +118,11 @@ options:
         description:
             - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
         type: str
-        no_log: True
     fingerprints:
         description:
             - Specifies keys to match against.
         type: list
         elements: str
-        no_log: True
 '''
 
 EXAMPLES = '''
@@ -136,7 +131,7 @@ EXAMPLES = '''
 
 - name: Generate the default GPG keypair with a passphrase
   community.crypto.gpg_keypair:
-    passphrase: "{{ passphrase }}"
+    passphrase: '{{ passphrase }}'
 
 - name: Generate a RSA GPG keypair with the default RSA size (2048 bits)
   community.crypto.gpg_keypair:
@@ -190,53 +185,56 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
+def all_permutations(arr):
+    return list(itertools.chain.from_iterable(
+        itertools.permutations(arr, i + 1)
+        for i in range(len(arr))))
+
+
 def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
-            module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in list(itertools.combinations(['sign', 'auth'])):
+                module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
+        elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
         if key_name == 'primary key':
             module.fail_json('Invalid type for {0}.'.format(key_name))
-        elif key_curve:
-            if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
+        elif key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage != ['encrypt']:
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDSA':
-        if key_curve:
-            if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
+        if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in list(itertools.combinations(['sign', 'auth'])):
+        elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
-        if key_usage:
-            if key_usage not in list(itertools.combinations(['ecrypt', 'sign', 'auth', 'cert'])):
+        if key_usage and key_usage not in all_permutations(['ecrypt', 'sign', 'auth', 'cert']):
                 module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
-        if key_usage and key_usage not in list(itertools.combinations(['sign', 'auth'])):
+        if key_usage and key_usage not in all_permutations(['sign', 'auth']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ELG':
         if key_name == 'primary key':
             module.fail_json('Invalid type for {0}.'.format(key_name))
-        elif key_usage != ['encrypt']:
+        elif key_usage and key_usage != ['encrypt']:
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
 
 
 def validate_params(module, params):
-    if params['expire_date']:
-        if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
-            module.fail_json('Invalid format for expire date')
+    if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
+        module.fail_json('Invalid format for expire date')
     validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
-    for index, subkey in enumerate(params['subkeys']):
-        validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(index + 1))
+   
+    for i, subkey in enumerate(params['subkeys']):
+        validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
 
 
 def key_type_from_algo(algo):
@@ -337,7 +335,7 @@ def list_matching_keys(module, params):
                         is_match = False
                         break
                 subkey_usage = expand_usages(subkey.group(3))
-                if params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] in itertools.permutations(subkey_usage):
+                if params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] in all_permutations(subkey_usage):
                     is_match = False
                     break
         if is_match and uid_present:
@@ -465,6 +463,7 @@ def main():
                 type='list',
                 elements='dict',
                 no_log=False,
+                default=[],
                 options=dict(
                     subkey_type=dict(type='str', choices=key_types),
                     subkey_length=dict(type='int',no_log=False),
