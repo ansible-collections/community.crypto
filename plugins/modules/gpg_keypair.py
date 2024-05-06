@@ -326,7 +326,7 @@ def list_matching_keys(module, params):
                     is_match = False
                     break
             elif line[:3] == 'uid':
-                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(uid) - 75), line).group(1)
+                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1)
                 if user_id == '"{0}"'.format(uid):
                     uid_present = True
             elif line[:3] == 'ssb':
