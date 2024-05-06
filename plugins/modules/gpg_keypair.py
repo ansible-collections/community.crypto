@@ -198,27 +198,28 @@ def all_permutations(arr):
 def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
-                module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
         if key_name == 'primary key':
             module.fail_json('Invalid type for {0}.'.format(key_name))
-        elif key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
+        elif key_curve:
+            if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage != ['encrypt']:
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDSA':
         if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
-                module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
         if key_usage and key_usage not in all_permutations(['ecrypt', 'sign', 'auth', 'cert']):
-                module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
         if key_usage and key_usage not in all_permutations(['sign', 'auth']):
@@ -233,10 +234,11 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
 
 
 def validate_params(module, params):
-    if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
-        module.fail_json('Invalid format for expire date')
+    if params['expire_date']:
+        if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
+            module.fail_json('Invalid format for expire date')
     validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
-   
+
     for i, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
 
@@ -378,7 +380,7 @@ def add_subkey(module, fingerprint, subkey_index, subkey_type, subkey_length, su
                 fingerprint,
                 algo if algo else 'default',
                 ' '.join(subkey_usage),
-                expire_date if expire_date else '0'
+                expire_date if expire_date else ''
             ],
             executable='gpg'
         )
@@ -470,7 +472,7 @@ def main():
                 default=[],
                 options=dict(
                     subkey_type=dict(type='str', choices=key_types),
-                    subkey_length=dict(type='int',no_log=False),
+                    subkey_length=dict(type='int', no_log=False),
                     subkey_curve=dict(type='str', choices=key_curves),
                     subkey_usage=dict(type='list', elements='str', choices=key_usages[:-1])
                 ),
