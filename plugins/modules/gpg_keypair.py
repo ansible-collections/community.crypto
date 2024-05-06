@@ -344,7 +344,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
                 '--quick-add-key',
                 fingerprint,
                 algo,
-                ' '.join(subkey_usage),
+                ' '.join(subkey['subkey_usage']),
                 params['expire_date'] if params['expire_date'] else ''
             ],
             executable=get_bin_path('gpg')
@@ -422,7 +422,6 @@ def run_module(module, params, check_mode=False):
                 subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+):', line)
                 subkey_type = key_type_from_algo(int(subkey.group(2)))
                 if params['subkeys'][subkey_count]['type'] and params['subkeys'][subkey_count]['type'] != subkey_type:
-
                     is_match = False
                     break
                 if subkey_type in ['RSA', 'DSA', 'ELG']:
@@ -441,7 +440,7 @@ def run_module(module, params, check_mode=False):
                     break
         if is_match and uid_present:
             matching_keys.append(fingerprint)
- 
+
     if params['state'] == 'present':
         result = generate_keypair(module, params, matching_keys, check_mode)
     else:
@@ -483,8 +482,8 @@ def main():
             comment=dict(type='str'),
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
-            fingerprints=dict(type='list', elements='str', default=[], no_log=True)
-            force=dict(type='bool', default=True)
+            fingerprints=dict(type='list', elements='str', default=[], no_log=True),
+            force=dict(type='bool', default=False)
         ),
         supports_check_mode=True,
         required_if=[
