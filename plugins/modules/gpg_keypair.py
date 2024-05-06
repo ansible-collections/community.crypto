@@ -189,6 +189,7 @@ fingerprints:
 import itertools
 import re
 
+from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -286,12 +287,18 @@ def list_matching_keys(module, params):
     if user_id:
         user_id = '"{0}"'.format(user_id.strip())
 
-    dummy, stdout, dummy2 = module.run_command(['--list-secret-keys', user_id] + params['fingerprints'], executable='gpg')
+    dummy, stdout, dummy2 = module.run_command(
+        ['--list-secret-keys', user_id] + params['fingerprints'],
+        executable=get_bin_path('gpg')
+    )
     lines = stdout.split('\n')
     fingerprints = list(set([line.strip() for line in lines if line.strip().isalnum()]))
     matching_keys = []
     for fingerprint in fingerprints:
-        dummy, stdout, dummy2 = module.run_command(['--list-secret-keys', '--with-colons', fingerprint], executable='gpg')
+        dummy, stdout, dummy2 = module.run_command(
+            ['--list-secret-keys', '--with-colons', fingerprint],
+            executable=get_bin_path('gpg')
+        )
         lines = stdout.split('\n')
         primary_key = lines[0]
         subkey_count = 0
@@ -319,8 +326,8 @@ def list_matching_keys(module, params):
                     is_match = False
                     break
             elif line[:3] == 'uid':
-                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(uid)-75), line).group(1)
-                if user_id == uid:
+                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(uid) - 75), line).group(1)
+                if user_id == '"{0}"'.format(uid):
                     uid_present = True
             elif line[:3] == 'ssb':
                 subkey_count += 1
@@ -355,40 +362,34 @@ def list_matching_keys(module, params):
 def delete_keypair(module, matching_keys, check_mode):
     if matching_keys:
         module.run_command(
-            [
-                '--dry-run' if check_mode else '',
-                '--batch',
-                '--yes',
-                '--delete-secret-and-public-key',
-            ] + matching_keys,
-            executable='gpg'
+            ['--dry-run' if check_mode else '', '--batch', '--yes', '--delete-secret-and-public-key'] + matching_keys,
+            executable=get_bin_path('gpg')
         )
         return dict(changed=True, fingerprints=matching_keys)
     return dict(changed=False, fingerprints=[])
 
 
-def add_subkey(module, fingerprint, subkey_index, subkey_type, subkey_length, subkey_curve, subkey_usage, expire_date):
+def add_subkey(module, fingerprint, subkey_type, subkey_length, subkey_curve, subkey_usage, expire_date):
     if subkey_type in ['RSA', 'DSA', 'ELG']:
         algo = '{0}'.format(subkey_type.lower())
         if subkey_length:
             algo += str(subkey_length)
     elif subkey_curve:
         algo = subkey_curve
-
-    if algo:
-        module.run_command(
-            [
-                '--batch',
-                '--quick-add-key',
-                fingerprint,
-                algo if algo else 'default',
-                ' '.join(subkey_usage),
-                expire_date if expire_date else ''
-            ],
-            executable='gpg'
-        )
     else:
-        module.fail_json('No algorithm applied for subkey #{}'.format(subkey_index + 1))
+        algo = 'default'
+
+    module.run_command(
+        [
+            '--batch',
+            '--quick-add-key',
+            fingerprint,
+            algo,
+            ' '.join(subkey_usage),
+            expire_date if expire_date else ''
+        ],
+        executable=get_bin_path('gpg')
+    )
 
 
 def generate_keypair(module, params, matching_keys, check_mode):
@@ -426,16 +427,15 @@ def generate_keypair(module, params, matching_keys, check_mode):
             '--gen-key',
             parameters
         ],
-        executable='gpg'
+        executable=get_bin_path('gpg')
     )
 
     fingerprint = re.search(r'.*([a-zA-Z0-9]*)\.rev', stdout)
 
-    for index, subkey in enumerate(params['subkeys']):
+    for subkey in params['subkeys']:
         add_subkey(
             module,
             fingerprint,
-            index,
             subkey['subkey_type'],
             subkey['subkey_length'],
             subkey['subkey_curve'],
