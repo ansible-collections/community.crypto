@@ -938,8 +938,8 @@ def main():
             module.fail_json(msg='The cert_expiry field is invalid when request_type="reissue".')
         elif module.params['cert_lifetime']:
             module.fail_json(msg='The cert_lifetime field is invalid when request_type="reissue".')
-    # Only a reissued request can omit the CSR
-    else:
+    # Reissued or renew request can omit the CSR
+    elif module.params['request_type'] != 'renew':
         module_params_csr = module.params['csr']
         if module_params_csr is None:
             module.fail_json(msg='The csr field is required when request_type={0}'.format(module.params['request_type']))
