@@ -139,6 +139,7 @@ options:
         default: False
 notes:
     - If a user-id is provided, the module's options are matched against all keys with said user-id.
+    - Matched parameters only include those in which an user has specified.
     - If a fingerprint is provided but no user-id is provided, the module's options are matched against the fingerprint(s).
     - If neither a fingerprint or user-id is provided, the module's options are matched against all keys.
 '''
@@ -243,7 +244,7 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
             module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
+        elif key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
@@ -258,15 +259,15 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
     elif key_type == 'ECDSA':
         if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
             module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
+        elif key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
-        if key_usage and key_usage not in all_permutations(['encr', 'sign', 'auth', 'cert']):
+        if key_usage and tuple(key_usage) not in all_permutations(['encr', 'sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
-        if key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
+        if key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ELG':
@@ -367,18 +368,18 @@ def run_module(module, params, check_mode=False):
     for i, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
 
-    user_id = ''
+    uid = ''
     if params['name']:
-        user_id += '{0} '.format(params['name'])
+        uid += '{0} '.format(params['name'])
     if params['comment']:
-        user_id += '({0}) '.format(params['comment'])
+        uid += '({0}) '.format(params['comment'])
     if params['email']:
-        user_id += '<{0}>'.format(params['email'])
-    if user_id:
-        user_id = '"{0}"'.format(user_id.strip())
+        uid += '<{0}>'.format(params['email'])
+    if uid:
+        uid = '"{0}"'.format(uid.strip())
 
     rc, stdout, stderr = module.run_command(
-        ['--list-secret-keys', user_id] + params['fingerprints'],
+        ['--list-secret-keys', uid] + params['fingerprints'],
         executable=get_bin_path('gpg')
     )
 
@@ -387,43 +388,39 @@ def run_module(module, params, check_mode=False):
     for fingerprint in fingerprints:
         rc, stdout, stderr = module.run_command(
             ['--list-secret-keys', '--with-colons', fingerprint],
-            executable=get_bin_path('gpg')
+            executable=get_bin_path('gpg'),
+            check_rc=True
         )
 
         subkey_count = 0
-        is_match = True
-        uid_present = not bool(user_id)
+        uid_present = not bool(uid)
         for line in stdout.splitlines():
             if line[:3] == 'sec':
-                primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+::([0-9a-zA-Z]+):+0:', line)
+                primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+:+([0-9a-zA-Z]+)::0:', line)
                 key_type = key_type_from_algo(int(primary_key.group(2)))
                 key_length = int(primary_key.group(1))
                 key_curve = primary_key.group(4)
                 key_usage = expand_usages(primary_key.group(3))
 
                 if params['key_type'] and params['key_type'] != key_type:
-                    is_match = False
                     break
-                elif params['key_usage'] and params['key_usage'] not in itertools.permutations(key_usage):
-                    is_match = False
+                elif params['key_usage'] and tuple(params['key_usage']) not in itertools.permutations(key_usage):
                     break
                 elif key_type in ['RSA', 'DSA', 'ELG']:
                     if params['key_length'] and params['key_length'] != key_length:
-                        is_match = False
                         break
                 else:
                     if params['key_curve'] and params['key_curve'] != key_curve:
-                        is_match = False
                         break
 
             elif line[:3] == 'uid':
-                uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1)
-                if user_id == '"{0}"'.format(uid):
+                parsed_uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1)
+                if uid == '"{0}"'.format(parsed_uid):
                     uid_present = True
+
             elif line[:3] == 'ssb':
                 subkey_count += 1
                 if subkey_count > len(params['subkeys']):
-                    is_match = False
                     break
 
                 subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+):', line)
@@ -433,22 +430,18 @@ def run_module(module, params, check_mode=False):
                 subkey_usage = expand_usages(subkey.group(3))
 
                 if params['subkeys'][subkey_count]['type'] and params['subkeys'][subkey_count]['type'] != subkey_type:
-                    is_match = False
                     break
-                elif params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] not in all_permutations(subkey_usage):
-                    is_match = False
+                elif params['subkeys'][subkey_count]['usage'] and tuple(params['subkeys'][subkey_count]['usage']) not in itertools.permutations(subkey_usage):
                     break
                 elif subkey_type in ['RSA', 'DSA', 'ELG']:
                     if params['subkeys'][subkey_count]['length'] and params['subkeys'][subkey_count]['length'] != subkey_length:
-                        is_match = False
                         break
                 else:
                     if params['subkeys'][subkey_count]['curve'] and params['subkeys'][subkey_count]['curve'] != subkey_curve:
-                        is_match = False
                         break
-
-        if is_match and uid_present:
-            matching_keys.append(fingerprint)
+        else:
+            if uid_present:
+                matching_keys.append(fingerprint)
 
     if params['state'] == 'present':
         result = generate_keypair(module, params, matching_keys, check_mode)
