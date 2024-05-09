@@ -290,8 +290,7 @@ def delete_keypair(module, matching_keys, check_mode):
             executable=get_bin_path('gpg'),
             check_rc=True
         )
-        return dict(changed=True, fingerprints=matching_keys)
-    return dict(changed=False, fingerprints=[])
+    return dict(changed=bool(matching_keys), fingerprints=matching_keys)
 
 
 def generate_keypair(module, params, matching_keys, check_mode):
@@ -356,7 +355,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
             executable=get_bin_path('gpg')
         )
 
-    return dict(changed=True, fingerprints=[fingerprint])
+    return dict(changed=True, fingerprint=[fingerprint])
 
 
 def run_module(module, params, check_mode=False):
@@ -375,8 +374,7 @@ def run_module(module, params, check_mode=False):
         uid += '({0}) '.format(params['comment'])
     if params['email']:
         uid += '<{0}>'.format(params['email'])
-    if uid:
-        uid = '"{0}"'.format(uid.strip())
+    uid = uid.strip()
 
     rc, stdout, stderr = module.run_command(
         ['--list-secret-keys', uid] + params['fingerprints'],
@@ -392,7 +390,7 @@ def run_module(module, params, check_mode=False):
             check_rc=True
         )
 
-        subkey_count = 0
+        subkey_index = 0
         uid_present = not bool(uid)
         for line in stdout.splitlines():
             if line[:3] == 'sec':
@@ -419,25 +417,25 @@ def run_module(module, params, check_mode=False):
                     uid_present = True
 
             elif line[:3] == 'ssb':
-                subkey_count += 1
-                if subkey_count > len(params['subkeys']):
+                subkey_index += 1
+                if subkey_index >= len(params['subkeys']):
                     break
 
-                subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+):', line)
+                subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+)::', line)
                 subkey_type = key_type_from_algo(int(subkey.group(2)))
                 subkey_length = int(subkey.group(1))
                 subkey_curve = subkey.group(4)
                 subkey_usage = expand_usages(subkey.group(3))
 
-                if params['subkeys'][subkey_count]['type'] and params['subkeys'][subkey_count]['type'] != subkey_type:
+                if params['subkeys'][subkey_index]['type'] and params['subkeys'][subkey_index]['type'] != subkey_type:
                     break
-                elif params['subkeys'][subkey_count]['usage'] and tuple(params['subkeys'][subkey_count]['usage']) not in itertools.permutations(subkey_usage):
+                elif params['subkeys'][subkey_index]['usage'] and tuple(params['subkeys'][subkey_index]['usage']) not in itertools.permutations(subkey_usage):
                     break
                 elif subkey_type in ['RSA', 'DSA', 'ELG']:
-                    if params['subkeys'][subkey_count]['length'] and params['subkeys'][subkey_count]['length'] != subkey_length:
+                    if params['subkeys'][subkey_index]['length'] and params['subkeys'][subkey_index]['length'] != subkey_length:
                         break
                 else:
-                    if params['subkeys'][subkey_count]['curve'] and params['subkeys'][subkey_count]['curve'] != subkey_curve:
+                    if params['subkeys'][subkey_index]['curve'] and params['subkeys'][subkey_index]['curve'] != subkey_curve:
                         break
         else:
             if uid_present:
