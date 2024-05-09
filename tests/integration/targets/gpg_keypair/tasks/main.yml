@@ -78,7 +78,7 @@
 - name: Create 2048-bit RSA key
   community.crypto.gpg_keypair:
     key_type: RSA
-    key_length: 2048
+    key_size: 2048
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -86,7 +86,7 @@
 - name: Delete default RSA key
   community.crypto.gpg_keypair:
     state: absent
-    key_length: 2048
+    key_size: 2048
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -132,7 +132,7 @@
   community.crypto.gpg_keypair:
     state: absent
     key_type: ECDSA
-    key_length: brainpoolP512r1
+    key_curve: brainpoolP512r1
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -197,7 +197,7 @@
 - name: Create default key with default RSA subkey 
   community.crypto.gpg_keypair:
     subkeys:
-      - { subkey_type: RSA }
+      - { key_type: RSA }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -206,7 +206,7 @@
   community.crypto.gpg_keypair:
     state: absent
     subkeys:
-      - { subkey_type: RSA }
+      - { key_type: RSA }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -221,7 +221,7 @@
 - name: Create default key with default DSA subkey 
   community.crypto.gpg_keypair:
     subkeys:
-      - { subkey_type: DSA }
+      - { key_type: DSA }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -230,7 +230,7 @@
   community.crypto.gpg_keypair:
     state: absent
     subkeys:
-      - { subkey_type: DSA }
+      - { key_type: DSA }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -245,7 +245,7 @@
 - name: Create default key with default ELG subkey 
   community.crypto.gpg_keypair:
     subkeys:
-      - { subkey_type: ELG }
+      - { key_type: ELG }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -255,7 +255,7 @@
   community.crypto.gpg_keypair:
     state: absent
     subkeys:
-      - { subkey_type: ELG }
+      - { key_type: ELG }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -270,7 +270,7 @@
 - name: Create default key with Ed25519 subkey 
   community.crypto.gpg_keypair:
     subkeys:
-      - { subkey_type: EDDSA, subkey_curve: ed25519 }
+      - { key_type: EDDSA, key_curve: ed25519 }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -279,7 +279,7 @@
   community.crypto.gpg_keypair:
     state: absent
     subkeys:
-      - { subkey_type: EDDSA, subkey_curve: ed25519 }
+      - { key_type: EDDSA, key_curve: ed25519 }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -294,7 +294,7 @@
 - name: Create default key with Cv25519 ECDH subkey 
   community.crypto.gpg_keypair:
     subkeys:
-      - { subkey_type: ECDH, subkey_curve: cv25519 }
+      - { key_type: ECDH, key_curve: cv25519 }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -303,7 +303,7 @@
   community.crypto.gpg_keypair:
     state: absent
     subkeys:
-      - { subkey_type: ECDH, subkey_curve: cv25519 }
+      - { key_type: ECDH, key_curve: cv25519 }
     name: '{{ name }}'
     comment: '{{ comment }}'
     email: '{{ email }}'
@@ -319,8 +319,8 @@
   community.crypto.gpg_keypair:
     subkeys:
       - {
-          subkey_type: RSA,
-          subkey_usage: 
+          key_type: RSA,
+          key_usage: 
             - auth
             - encr
         }
@@ -333,8 +333,8 @@
     state: absent
     subkeys:
       - {
-          subkey_type: RSA,
-          subkey_usage: 
+          key_type: RSA,
+          key_usage: 
             - auth
             - encr
         }
