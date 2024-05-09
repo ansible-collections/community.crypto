@@ -44,7 +44,7 @@ options:
             - For non-ECC keys, this specifies the number of bits in the key to create.
             - For RSA keys, the minimum is V(1024), the maximum is V(4096), and the default is V(3072).
             - For DSA keys, the minimum is V(768), the maximum is V(3072), and the default is V(2048).
-            - As per gpg's behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.
+            - As per GPG's behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.
         type: int
     key_curve:
         description:
