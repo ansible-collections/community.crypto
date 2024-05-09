@@ -18,6 +18,8 @@ description:
     - "This module allows one to generate or delete GPG private and public keys using GnuPG (gpg)."
 requirements:
     - gpg >= 2.1
+extends_documentation_fragment:
+  - community.crypto.attributes
 attributes:
     check_mode:
         description:
