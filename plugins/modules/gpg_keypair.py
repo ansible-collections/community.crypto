@@ -59,11 +59,11 @@ options:
             - Specifies usage(s) for key.
             - V(cert) is given to all primary keys regardess, however can be used to only give V(vert) usage to a key.
             - If not usage is specified, all of valid usages for the given key type are assigned.
-            - O(key_usage=encrypt) is only supported is O(key_type=RSA).
+            - O(key_usage=encr) is only supported is O(key_type=RSA).
         type: list
         elements: str
         default: []
-        choices: [ 'encrypt', 'sign', 'auth', 'cert' ]
+        choices: [ 'encr', 'sign', 'auth', 'cert' ]
     subkeys:
         description:
             - List of subkeys with their own respective key types, lengths, curves, and usages.
@@ -92,12 +92,12 @@ options:
             subkey_usage:
                 description:
                     - Similar to O(key_usage).
-                    - V(encrypt) is supported if subkey_type is V(RSA), V(ECDH), or V(ELG).
-                    - If subkey_type is V(ECDH) or V(ELG), only V(encrypt) is supported.
+                    - V(encr) is supported if subkey_type is V(RSA), V(ECDH), or V(ELG).
+                    - If subkey_type is V(ECDH) or V(ELG), only V(encr) is supported.
                 type: list
                 elements: str
                 default: []
-                choices: [ 'encrypt', 'sign', 'auth' ]
+                choices: [ 'encr', 'sign', 'auth' ]
     expire_date:
         description:
             - Sets the expire date for the key.
@@ -122,7 +122,7 @@ options:
         type: str
     passphrase:
         description:
-            - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
+            - Passphrase used to decrypt an existing private key or encr a newly generated private key.
         type: str
     fingerprints:
         description:
@@ -235,7 +235,7 @@ def expand_usages(usages):
         elif usages[i] == 'a':
             usages[i] = 'auth'
         elif usages[i] == 'e':
-            usages[i] = 'encrypt'
+            usages[i] = 'encr'
     return usages
 
 
@@ -243,7 +243,7 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
             module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
+        elif key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
@@ -252,27 +252,27 @@ def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='p
         elif key_curve:
             if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage != ['encrypt']:
+        elif key_usage and key_usage != ['encr']:
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDSA':
         if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
             module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
-        elif key_usage and key_usage not in all_permutations(['sign', 'auth']):
+        elif key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
-        if key_usage and key_usage not in all_permutations(['ecrypt', 'sign', 'auth', 'cert']):
+        if key_usage and key_usage not in all_permutations(['encr', 'sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
-        if key_usage and key_usage not in all_permutations(['sign', 'auth']):
+        if key_usage and key_usage not in all_permutations(['sign', 'auth', 'cert']):
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ELG':
         if key_name == 'primary key':
             module.fail_json('Invalid type for {0}.'.format(key_name))
-        elif key_usage and key_usage != ['encrypt']:
+        elif key_usage and key_usage != ['encr']:
             module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
         pass
 
@@ -286,7 +286,8 @@ def delete_keypair(module, matching_keys, check_mode):
                 '--yes',
                 '--delete-secret-and-public-key'
             ] + matching_keys,
-            executable=get_bin_path('gpg')
+            executable=get_bin_path('gpg'),
+            check_rc=True
         )
         return dict(changed=True, fingerprints=matching_keys)
     return dict(changed=False, fingerprints=[])
@@ -296,7 +297,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
     if matching_keys and not params['force']:
         return dict(changed=False, fingerprints=matching_keys)
 
-    parameters = '''<<EOF
+    parameters = '''
         {0}
         {1}
         {2}
@@ -306,7 +307,6 @@ def generate_keypair(module, params, matching_keys, check_mode):
         {6}
         {7}
         %commit
-        EOF
         '''.format(
         'Key-Type: {0}'.format(params['key_type'] if params['key_type'] else 'default'),
         'Key-Length: {0}'.format(params['key_length']) if params['key_length'] else '',
@@ -323,12 +323,13 @@ def generate_keypair(module, params, matching_keys, check_mode):
             '--dry-run' if check_mode else '',
             '--batch',
             '--gen-key',
-            parameters
         ],
-        executable=get_bin_path('gpg')
+        data=parameters,
+        executable=get_bin_path('gpg'),
+        check_rc=True
     )
 
-    fingerprint = re.search(r'([0-9a-zA-Z]+)\.rev', stderr).group(1)
+    fingerprint = re.search(r'([0-9A-Z]+)\.rev', stderr).group(1)
 
     for subkey in params['subkeys']:
         if subkey['subkey_type'] in ['RSA', 'DSA', 'ELG']:
@@ -344,6 +345,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
             [
                 '--dry-run' if check_mode else '',
                 '--batch',
+                '--passphrase {0}'.format(params['passphrase']) if params['passphrase'] else ''
                 '--quick-add-key',
                 fingerprint,
                 algo,
@@ -360,8 +362,8 @@ def run_module(module, params, check_mode=False):
     if params['expire_date']:
         if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
             module.fail_json('Invalid format for expire date')
-    validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
 
+    validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
     for i, subkey in enumerate(params['subkeys']):
         validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
 
@@ -380,41 +382,40 @@ def run_module(module, params, check_mode=False):
         executable=get_bin_path('gpg')
     )
 
-    fingerprints = list(set([line.strip() for line in stderr.split('\n') if line.strip().isalnum()]))
+    fingerprints = list(set([line.strip() for line in stdout.splitlines() if line.strip().isalnum()]))
     matching_keys = []
     for fingerprint in fingerprints:
         rc, stdout, stderr = module.run_command(
-            [
-                '--list-secret-keys',
-                '--with-colons',
-                fingerprint
-            ],
+            ['--list-secret-keys', '--with-colons', fingerprint],
             executable=get_bin_path('gpg')
         )
+
         subkey_count = 0
         is_match = True
         uid_present = not bool(user_id)
-        for line in stderr.split('\n'):
+        for line in stdout.splitlines():
             if line[:3] == 'sec':
                 primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+::([0-9a-zA-Z]+):+0:', line)
                 key_type = key_type_from_algo(int(primary_key.group(2)))
+                key_length = int(primary_key.group(1))
+                key_curve = primary_key.group(4)
+                key_usage = expand_usages(primary_key.group(3))
+
                 if params['key_type'] and params['key_type'] != key_type:
                     is_match = False
                     break
-                if key_type in ['RSA', 'DSA', 'ELG']:
-                    key_length = int(primary_key.group(1))
+                elif params['key_usage'] and params['key_usage'] not in itertools.permutations(key_usage):
+                    is_match = False
+                    break
+                elif key_type in ['RSA', 'DSA', 'ELG']:
                     if params['key_length'] and params['key_length'] != key_length:
                         is_match = False
                         break
                 else:
-                    key_curve = primary_key.group(4)
                     if params['key_curve'] and params['key_curve'] != key_curve:
                         is_match = False
                         break
-                key_usage = expand_usages(primary_key.group(3))
-                if params['key_usage'] and params['key_usage'] in itertools.permutations(key_usage):
-                    is_match = False
-                    break
+
             elif line[:3] == 'uid':
                 uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1)
                 if user_id == '"{0}"'.format(uid):
@@ -424,25 +425,28 @@ def run_module(module, params, check_mode=False):
                 if subkey_count > len(params['subkeys']):
                     is_match = False
                     break
+
                 subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+):', line)
                 subkey_type = key_type_from_algo(int(subkey.group(2)))
+                subkey_length = int(subkey.group(1))
+                subkey_curve = subkey.group(4)
+                subkey_usage = expand_usages(subkey.group(3))
+
                 if params['subkeys'][subkey_count]['type'] and params['subkeys'][subkey_count]['type'] != subkey_type:
                     is_match = False
                     break
-                if subkey_type in ['RSA', 'DSA', 'ELG']:
-                    subkey_length = int(subkey.group(1))
+                elif params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] not in all_permutations(subkey_usage):
+                    is_match = False
+                    break
+                elif subkey_type in ['RSA', 'DSA', 'ELG']:
                     if params['subkeys'][subkey_count]['length'] and params['subkeys'][subkey_count]['length'] != subkey_length:
                         is_match = False
                         break
                 else:
-                    subkey_curve = subkey.group(4)
                     if params['subkeys'][subkey_count]['curve'] and params['subkeys'][subkey_count]['curve'] != subkey_curve:
                         is_match = False
                         break
-                subkey_usage = expand_usages(subkey.group(3))
-                if params['subkeys'][subkey_count]['usage'] and params['subkeys'][subkey_count]['usage'] in all_permutations(subkey_usage):
-                    is_match = False
-                    break
+
         if is_match and uid_present:
             matching_keys.append(fingerprint)
 
@@ -456,7 +460,7 @@ def run_module(module, params, check_mode=False):
 def main():
     key_types = ['RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH', 'ELG']
     key_curves = ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519', 'cv25519']
-    key_usages = ['encrypt', 'sign', 'auth', 'cert']
+    key_usages = ['encr', 'sign', 'auth', 'cert']
 
     module = AnsibleModule(
         argument_spec=dict(
