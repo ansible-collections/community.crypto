@@ -324,10 +324,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <td><div class="ansible-option-cell"><p>Specifies usage(s) for key.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">cert</span></code> is given to all primary keys regardess, however can be used to only give <code class="ansible-value docutils literal notranslate"><span class="pre">vert</span></code> usage to a key.</p>
 <p>If not usage is specified, all of valid usages for the given key type are assigned.</p>
-<p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage=encrypt</span></span></a></code> is only supported is <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code>.</p>
+<p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage=encr</span></span></a></code> is only supported is <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encrypt&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encr&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sign&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;auth&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cert&quot;</span></code></p></li>
@@ -346,7 +346,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <div class="ansibleOptionAnchor" id="parameter-passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-passphrase"><strong>passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encrypt a newly generated private key.</p>
+<td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encr a newly generated private key.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -420,11 +420,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <a class="ansibleOptionLink" href="#parameter-subkeys/subkey_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage</span></span></a></strong></code>.</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">encrypt</span></code> is supported if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
-<p>If subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>, only <code class="ansible-value docutils literal notranslate"><span class="pre">encrypt</span></code> is supported.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">encr</span></code> is supported if subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
+<p>If subkey_type is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>, only <code class="ansible-value docutils literal notranslate"><span class="pre">encr</span></code> is supported.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encrypt&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encr&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sign&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;auth&quot;</span></code></p></li>
 </ul>
