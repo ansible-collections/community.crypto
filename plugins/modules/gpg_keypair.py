@@ -22,12 +22,8 @@ extends_documentation_fragment:
   - community.crypto.attributes
 attributes:
     check_mode:
-        description:
-            - Can run in check_mode and return changed status prediction without modifying target.
         support: full
     diff_mode:
-        description:
-            - Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode.
         support: none
 options:
     state:
@@ -41,27 +37,30 @@ options:
             - Specifies the type of key to create.
         type: str
         choices: [ 'RSA', 'DSA', 'ECDSA', 'EDDSA' ]
-    key_length:
+    key_size:
         description:
             - For non-ECC keys, this specifies the number of bits in the key to create.
-            - For RSA keys, the minimum is V(1024), the maximum is V(4096), and the default is V(3072).
-            - For DSA keys, the minimum is V(768), the maximum is V(3072), and the default is V(2048).
+            - If O(key_type=RSA), the minimum is V(1024), the maximum is V(4096), and the default is V(3072).
+            - IF O(key_type=DSA), the minimum is V(768), the maximum is V(3072), and the default is V(2048).
             - As per GPG's behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.
         type: int
+        aliases:
+            - key_length
     key_curve:
         description:
             - For ECC keys, this specifies the curve used to generate the keys.
             - If O(key_type=EDDSA), O(key_curve=ed25519) is required.
             - If O(key_curve=ed25519) is only supported if O(key_type=EDDSA).
-            - This is required if O(key_type=ECDSA) or O(key_type=EDDSA) and it is ignored if O(key_type=RSA) or O(key_type=DSA).
+            - This parameter is required if O(key_type=ECDSA) or O(key_type=EDDSA).
+            - This parameter is ignored if O(key_type=RSA) or O(key_type=DSA).
         type: str
         choices: [ 'nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519' ]
     key_usage:
         description:
             - Specifies usage(s) for key.
             - V(cert) is given to all primary keys regardess, however can be used to only give V(vert) usage to a key.
-            - If not usage is specified, all of valid usages for the given key type are assigned.
-            - O(key_usage=encr) is only supported is O(key_type=RSA).
+            - If O(key_usage) is not specified, all of valid usages for the given O(key_type) are assigned.
+            - O(key_usage=encr) is only supported if O(key_type=RSA).
         type: list
         elements: str
         default: []
@@ -73,29 +72,32 @@ options:
         elements: dict
         default: []
         suboptions:
-            subkey_type:
+            key_type:
                 description:
                  - Similar to O(key_type).
                  - Also supports ECDH and ELG keys.
                 type: str
                 choices: [ 'RSA', 'DSA', 'ECDSA', 'EDDSA', 'ECDH', 'ELG' ]
-            subkey_length:
+            key_size:
                 description:
-                    - Similar to O(key_length).
-                    - For ELG subkeys, the minimum length is V(1024) bits, the maximum length is V(4096) bits, and the default length is V(3072) bits.
+                    - Similar to O(key_size).
+                    - If O(subkeys[].key_type=ELG), the minimum is V(1024) bits, the maximum is V(4096) bits, and the default is V(3072) bits.
                 type: int
-            subkey_curve:
+                aliases:
+                    - key_length
+            key_curve:
                 description:
                     - Similar to O(key_curve).
-                    - V(cv25519) is supported if subkey_type is V(ECDH).
-                    - This is required if subkey_type is V(ECDSA), V(EDDSA), or V(ECDH) and it is ignored if subkey_type is V(RSA), V(DSA), or V(ELG).
+                    - O(subkeys[].key_curve=cv25519) is supported if O(subkeys[].key_type=ECDH).
+                    - This parameter is required if O(subkeys[].key_type) is V(ECDSA), V(EDDSA), or V(ECDH).
+                    - This parameter is ignored if O(subkeys[].key_type) is V(RSA), V(DSA), or V(ELG).
                 type: str
                 choices: ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519', 'cv25519']
-            subkey_usage:
+            key_usage:
                 description:
                     - Similar to O(key_usage).
-                    - V(encr) is supported if subkey_type is V(RSA), V(ECDH), or V(ELG).
-                    - If subkey_type is V(ECDH) or V(ELG), only V(encr) is supported.
+                    - V(encr) is supported if O(subkeys[].key_type) is V(RSA), V(ECDH), or V(ELG).
+                    - If O(subkeys[].key_type) is V(ECDH) or V(ELG), only V(encr) is supported.
                 type: list
                 elements: str
                 default: []
@@ -108,23 +110,24 @@ options:
             - If O(expire_date=<n>w), the key expires in V(n) weeks.
             - If O(expire_date=<n>m), the key expires in V(n) months.
             - If O(expire_date=<n>y), the key expires in V(n) years.
+            - Also excepts dates in ISO formats.
             - If left unspecified, any created GPG keys never expire.
         type: str
     name:
         description:
-            - Specifies a name for the key's user id.
+            - Specifies a name for the key's user ID.
         type: str
     comment:
         description:
-            - Specifies a comment for the key's user id.
+            - Specifies a comment for the key's user ID.
         type: str
     email:
         description:
-            - Specifies an email for the key's user id.
+            - Specifies an email for the key's user ID.
         type: str
     passphrase:
         description:
-            - Passphrase used to decrypt an existing private key or encr a newly generated private key.
+            - Passphrase used to decrypt an existing private key or encrypt a newly generated private key.
         type: str
     fingerprints:
         description:
@@ -134,16 +137,16 @@ options:
         default: []
     force:
         description:
-            - If O(force=True), key generation is executed using the module's options, even a matching key is found.
+            - If O(force=true), key generation is executed using the module's options, even a matching key is found.
             - This parameter does not override V(check_mode).
             - This parameter is ignored if O(state=absent).
         type: bool
         default: False
 notes:
-    - If a user-id is provided, the module's options are matched against all keys with said user-id.
+    - If a user ID is provided, the module's options are matched against all keys with said user ID.
     - Matched parameters only include those in which an user has specified.
-    - If a fingerprint is provided but no user-id is provided, the module's options are matched against the fingerprint(s).
-    - If neither a fingerprint or user-id is provided, the module's options are matched against all keys.
+    - If a fingerprint is provided but no user ID is provided, the module's options are matched against the fingerprint(s).
+    - If neither a fingerprint or user ID is provided, the module's options are matched against all keys.
 '''
 
 EXAMPLES = '''
@@ -161,9 +164,9 @@ EXAMPLES = '''
 - name: Generate a RSA GPG keypair with custom size (4096 bits)
   community.crypto.gpg_keypair:
     key_type: RSA
-    key_length: 4096
+    key_size: 4096
 
-- name: Generate an ECC GPG keypair
+-~/.local/share/nvim/swap/ name: Generate an ECC GPG keypair
   community.crypto.gpg_keypair:
     key_type: EDDSA
     key_curve: ed25519
@@ -171,7 +174,7 @@ EXAMPLES = '''
 - name: Generate a GPG keypair and with a subkey
   community.crypto.gpg_keypair:
     subkeys:
-        - { subkey_type: ECDH, subkey_curve: cv25519 }
+        - { key_type: ECDH, key_curve: cv25519 }
 
 - name: Generate a GPG keypair with custom user-id
   community.crypto.gpg_keypair:
@@ -200,16 +203,17 @@ fingerprints:
     sample: [ ABC123... ]
 '''
 
-import itertools
+from itertools import chain, permutations
 import re
+import dateutil.parser as dp
 
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.basic import AnsibleModule
 
 
 def all_permutations(arr):
-    return list(itertools.chain.from_iterable(
-        itertools.permutations(arr, i + 1)
+    return list(chain.from_iterable(
+        permutations(arr, i + 1)
         for i in range(len(arr))))
 
 
@@ -242,41 +246,41 @@ def expand_usages(usages):
     return usages
 
 
-def validate_key(module, key_type, key_length, key_curve, key_usage, key_name='primary key'):
+def validate_key(module, key_type, key_curve, key_usage, key_name='primary key'):
     if key_type == 'EDDSA':
         if key_curve and key_curve != 'ed25519':
-            module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
         if key_name == 'primary key':
-            module.fail_json('Invalid type for {0}.'.format(key_name))
+            module.fail_json('Invalid key_type for {0}.'.format(key_name))
         elif key_curve:
             if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage != ['encr']:
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDSA':
         if key_curve and key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1']:
-            module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'RSA':
         if key_usage and tuple(key_usage) not in all_permutations(['encr', 'sign', 'auth', 'cert']):
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'DSA':
         if key_usage and tuple(key_usage) not in all_permutations(['sign', 'auth', 'cert']):
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ELG':
         if key_name == 'primary key':
-            module.fail_json('Invalid type for {0}.'.format(key_name))
+            module.fail_json('Invalid key_type for {0}.'.format(key_name))
         elif key_usage and key_usage != ['encr']:
-            module.fail_json('Invalid usage for {0} {1}.'.format(key_type, key_name))
+            module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
 
 
@@ -284,7 +288,7 @@ def delete_keypair(module, matching_keys, check_mode):
     if matching_keys:
         module.run_command(
             [
-                '--dry-run' if check_mode else '',
+                '--dry-run' if check_mode else None,
                 '--batch',
                 '--yes',
                 '--delete-secret-and-public-key'
@@ -311,7 +315,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
         %commit
         '''.format(
         'Key-Type: {0}'.format(params['key_type'] if params['key_type'] else 'default'),
-        'Key-Length: {0}'.format(params['key_length']) if params['key_length'] else '',
+        'Key-Length: {0}'.format(params['key_size']) if params['key_size'] else '',
         'Key-Curve: {0}'.format(params['key_curve']) if params['key_curve'] else '',
         'Expire-Date: {0}'.format(params['expire_date']) if params['expire_date'] else '',
         'Name-Real: {0}'.format(params['name']) if params['name'] else '',
@@ -322,7 +326,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
 
     rc, stdout, stderr = module.run_command(
         [
-            '--dry-run' if check_mode else '',
+            '--dry-run' if check_mode else None,
             '--batch',
             '--gen-key',
         ],
@@ -334,25 +338,25 @@ def generate_keypair(module, params, matching_keys, check_mode):
     fingerprint = re.search(r'([0-9A-Z]+)\.rev', stderr).group(1)
 
     for subkey in params['subkeys']:
-        if subkey['subkey_type'] in ['RSA', 'DSA', 'ELG']:
-            algo = '{0}'.format(subkey['subkey_type'].lower())
-            if subkey['subkey_length']:
-                algo += str(subkey['subkey_length'])
-        elif subkey['subkey_curve']:
-            algo = subkey['subkey_curve']
+        if subkey['key_type'] in ['RSA', 'DSA', 'ELG']:
+            algo = subkey['key_type'].lower()
+            if subkey['key_size']:
+                algo += str(subkey['key_size'])
+        elif subkey['key_curve']:
+            algo = subkey['key_curve']
         else:
             algo = 'default'
 
         module.run_command(
             [
-                '--dry-run' if check_mode else '',
+                '--dry-run' if check_mode else None,
                 '--batch',
-                '--passphrase {0}'.format(params['passphrase']) if params['passphrase'] else ''
+                '--passphrase {0}'.format(params['passphrase'] if params['passphrase'] else ''),
                 '--quick-add-key',
                 fingerprint,
                 algo,
-                ' '.join(subkey['subkey_usage']),
-                params['expire_date'] if params['expire_date'] else ''
+                ' '.join(subkey['key_usage']),
+                params['expire_date'] if params['expire_date'] else None
             ],
             executable=get_bin_path('gpg')
         )
@@ -362,12 +366,15 @@ def generate_keypair(module, params, matching_keys, check_mode):
 
 def run_module(module, params, check_mode=False):
     if params['expire_date']:
-        if not (params['expire_date'].isnumeric() or params['expire_date'][:-1].isnumeric()):
-            module.fail_json('Invalid format for expire date')
+        try:
+            dp.parse(params['expire_date'])
+        except ValueError:
+            if not (params['expire_date'].isnumeric() or (params['expire_date'][:-1].isnumeric() and params['expire_date'][-1] in ['w', 'm', 'y'])):
+                module.fail_json('Invalid format for expire date')
 
-    validate_key(module, params['key_type'], params['key_length'], params['key_curve'], params['key_usage'])
+    validate_key(module, params['key_type'], params['key_curve'], params['key_usage'])
     for i, subkey in enumerate(params['subkeys']):
-        validate_key(module, subkey['subkey_type'], subkey['subkey_length'], subkey['subkey_curve'], subkey['subkey_usage'], 'subkey #{0}'.format(i + 1))
+        validate_key(module, subkey['key_type'], subkey['key_curve'], subkey['key_usage'], 'subkey #{0}'.format(i + 1))
 
     uid = ''
     if params['name']:
@@ -396,26 +403,25 @@ def run_module(module, params, check_mode=False):
         uid_present = not bool(uid)
         for line in stdout.splitlines():
             if line[:3] == 'sec':
-                primary_key = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:[0-9]+::u:+([a-z]+)[A-Z]+:+\+:+([0-9a-zA-Z]+)::0:', line)
+                primary_key = re.search(r'.+u:([0-9]+):([0-9]+):.+:([a-z]+)[A-Z]+.+\+:+([0-9a-zA-Z]+).+', line)
                 key_type = key_type_from_algo(int(primary_key.group(2)))
-                key_length = int(primary_key.group(1))
+                key_size = int(primary_key.group(1))
                 key_curve = primary_key.group(4)
                 key_usage = expand_usages(primary_key.group(3))
 
                 if params['key_type'] and params['key_type'] != key_type:
                     break
-                elif params['key_usage'] and tuple(params['key_usage']) not in itertools.permutations(key_usage):
+                elif params['key_usage'] and tuple(params['key_usage']) not in permutations(key_usage):
                     break
                 elif key_type in ['RSA', 'DSA', 'ELG']:
-                    if params['key_length'] and params['key_length'] != key_length:
+                    if params['key_size'] and params['key_size'] != key_size:
                         break
                 else:
                     if params['key_curve'] and params['key_curve'] != key_curve:
                         break
 
             elif line[:3] == 'uid':
-                parsed_uid = re.search(r'.+:+[0-9]+::[0-9A-Z]+::(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1)
-                if uid == '"{0}"'.format(parsed_uid):
+                if uid == re.search(r'.+:(.{{{0}}}):+0:'.format(len(line) - 75), line).group(1):
                     uid_present = True
 
             elif line[:3] == 'ssb':
@@ -423,21 +429,21 @@ def run_module(module, params, check_mode=False):
                 if subkey_index >= len(params['subkeys']):
                     break
 
-                subkey = re.search(r'.+:([0-9]+):([0-9]+):[0-9A-Z]+:[0-9]+:+([a-z]+):+\+:+([0-9a-zA-Z]+)::', line)
-                subkey_type = key_type_from_algo(int(subkey.group(2)))
-                subkey_length = int(subkey.group(1))
-                subkey_curve = subkey.group(4)
-                subkey_usage = expand_usages(subkey.group(3))
+                subkey = re.search(r'.+:([0-9]+):([0-9]+):.+([a-z]+):.+([0-9a-zA-Z]+)::', line)
+                key_type = key_type_from_algo(int(subkey.group(2)))
+                key_size = int(subkey.group(1))
+                key_curve = subkey.group(4)
+                key_usage = expand_usages(subkey.group(3))
 
-                if params['subkeys'][subkey_index]['type'] and params['subkeys'][subkey_index]['type'] != subkey_type:
+                if params['subkeys'][subkey_index]['key_type'] and params['subkeys'][subkey_index]['sub_type'] != key_type:
                     break
-                elif params['subkeys'][subkey_index]['usage'] and tuple(params['subkeys'][subkey_index]['usage']) not in itertools.permutations(subkey_usage):
+                elif params['subkeys'][subkey_index]['key_usage'] and tuple(params['subkeys'][subkey_index]['key_usage']) not in permutations(key_usage):
                     break
-                elif subkey_type in ['RSA', 'DSA', 'ELG']:
-                    if params['subkeys'][subkey_index]['length'] and params['subkeys'][subkey_index]['length'] != subkey_length:
+                elif key_type in ['RSA', 'DSA', 'ELG']:
+                    if params['subkeys'][subkey_index]['key_size'] and params['subkeys'][subkey_index]['key_size'] != key_size:
                         break
                 else:
-                    if params['subkeys'][subkey_index]['curve'] and params['subkeys'][subkey_index]['curve'] != subkey_curve:
+                    if params['subkeys'][subkey_index]['key_curve'] and params['subkeys'][subkey_index]['key_curve'] != key_curve:
                         break
         else:
             if uid_present:
@@ -459,7 +465,7 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent']),
             key_type=dict(type='str', choices=key_types[:-2]),
-            key_length=dict(type='int', no_log=False),
+            key_size=dict(type='int', aliases=['key_length'], no_log=False),
             key_curve=dict(type='str', choices=key_curves[:-1]),
             key_usage=dict(type='list', elements='str', default=[], choices=key_usages),
             subkeys=dict(
@@ -468,15 +474,15 @@ def main():
                 no_log=False,
                 default=[],
                 options=dict(
-                    subkey_type=dict(type='str', choices=key_types),
-                    subkey_length=dict(type='int', no_log=False),
-                    subkey_curve=dict(type='str', choices=key_curves),
-                    subkey_usage=dict(type='list', elements='str', default=[], choices=key_usages[:-1])
+                    key_type=dict(type='str', choices=key_types),
+                    key_size=dict(type='int', aliases=['key_length'], no_log=False),
+                    key_curve=dict(type='str', choices=key_curves),
+                    key_usage=dict(type='list', elements='str', default=[], choices=key_usages[:-1])
                 ),
                 required_if=[
-                    ['subkey_type', 'ECDSA', ['subkey_curve']],
-                    ['subkey_type', 'EDDSA', ['subkey_curve']],
-                    ['subkey_type', 'ECDH', ['subkey_curve']]
+                    ['key_type', 'ECDSA', ['key_curve']],
+                    ['key_type', 'EDDSA', ['key_curve']],
+                    ['key_type', 'ECDH', ['key_curve']],
                 ]
             ),
             expire_date=dict(type='str'),
@@ -492,7 +498,7 @@ def main():
             ['state', 'present', ['name', 'comment', 'email'], True],
             ['state', 'absent', ['name', 'comment', 'email', 'fingerprints'], True],
             ['key_type', 'ECDSA', ['key_curve']],
-            ['key_type', 'EDDSA', ['key_curve']]
+            ['key_type', 'EDDSA', ['key_curve']],
         ]
     )
 
