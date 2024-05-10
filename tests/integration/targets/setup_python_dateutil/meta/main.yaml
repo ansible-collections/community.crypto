@@ -4,5 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependencies:
-  - setup_gnupg
-  - setup_python_dateutil
+  - setup_python_info
+  - setup_remote_constraints
+  - setup_pkg_mgr

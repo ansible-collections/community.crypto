@@ -18,6 +18,7 @@ description:
     - "This module allows one to generate or delete GPG private and public keys using GnuPG (gpg)."
 requirements:
     - gpg >= 2.1
+    - python-dateutil
 extends_documentation_fragment:
   - community.crypto.attributes
 attributes:
@@ -367,7 +368,7 @@ def generate_keypair(module, params, matching_keys, check_mode):
 def run_module(module, params, check_mode=False):
     if params['expire_date']:
         try:
-            dp.parse(params['expire_date'])
+            dp.isoparse(params['expire_date'])
         except ValueError:
             if not (params['expire_date'].isnumeric() or (params['expire_date'][:-1].isnumeric() and params['expire_date'][-1] in ['w', 'm', 'y'])):
                 module.fail_json('Invalid format for expire date')
