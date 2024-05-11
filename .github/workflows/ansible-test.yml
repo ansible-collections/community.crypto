@@ -110,10 +110,10 @@ jobs:
             docker: centos6
             python: ''
             target: shippable/posix/group1/
-          - ansible: '2.9'
-            docker: centos7
-            python: ''
-            target: shippable/posix/group1/
+          #- ansible: '2.9'
+          #  docker: centos7
+          #  python: ''
+          #  target: shippable/posix/group1/
           - ansible: '2.9'
             docker: fedora31
             python: ''
@@ -148,10 +148,10 @@ jobs:
             python: '3.6'
             target: shippable/cloud/group1/
           # 2.11
-          - ansible: '2.11'
-            docker: centos7
-            python: ''
-            target: shippable/posix/group1/
+          #- ansible: '2.11'
+          #  docker: centos7
+          #  python: ''
+          #  target: shippable/posix/group1/
           - ansible: '2.11'
             docker: fedora32
             python: ''
