@@ -98,6 +98,11 @@
     that:
       - ownca_cert3_notAfter.stdout == 'Oct 23 13:37:42 2019'
 
+- name: (OwnCA validation, {{select_crypto_backend}}) Validate idempotency
+  assert:
+    that:
+      - ownca_cert3_selfsigned_idem is not changed
+
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca certificate pubkey)
   shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem'
   register: ownca_cert_ecc_pubkey
