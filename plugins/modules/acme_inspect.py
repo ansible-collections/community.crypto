@@ -42,8 +42,7 @@ seealso:
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
+  - community.crypto.acme
   - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
 attributes:
@@ -248,11 +247,12 @@ output_json:
       - ...
 '''
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    create_default_argspec,
+    get_default_argspec,
     ACMEClient,
 )
 
@@ -263,14 +263,18 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 
 def main():
-    argument_spec = create_default_argspec(require_account_key=False)
-    argument_spec.update_argspec(
+    argument_spec = get_default_argspec()
+    argument_spec.update(dict(
         url=dict(type='str'),
         method=dict(type='str', choices=['get', 'post', 'directory-only'], default='get'),
         content=dict(type='str'),
         fail_on_acme_error=dict(type='bool', default=True),
-    )
-    argument_spec.update(
+    ))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        mutually_exclusive=(
+            ['account_key_src', 'account_key_content'],
+        ),
         required_if=(
             ['method', 'get', ['url']],
             ['method', 'post', ['url', 'content']],
@@ -278,7 +282,6 @@ def main():
             ['method', 'post', ['account_key_src', 'account_key_content'], True],
         ),
     )
-    module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)
 
     result = dict()

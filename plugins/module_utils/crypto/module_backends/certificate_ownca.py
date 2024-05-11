@@ -22,6 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_privatekey,
     load_certificate,
+    get_relative_time_option,
     select_message_digest,
 )
 
@@ -42,10 +43,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     CertificateError,
     CertificateBackend,
     CertificateProvider,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.time import (
-    get_relative_time_option,
 )
 
 try:

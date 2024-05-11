@@ -15,9 +15,9 @@ import traceback
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.common import ArgumentSpec
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,

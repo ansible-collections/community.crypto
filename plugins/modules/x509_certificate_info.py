@@ -406,16 +406,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     OpenSSLObjectError,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_relative_time_option,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
     select_backend,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.time import (
-    get_relative_time_option,
 )
 
 

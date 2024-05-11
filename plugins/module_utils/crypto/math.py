@@ -110,9 +110,6 @@ if sys.version_info[0] >= 3:
     def _convert_int_to_bytes(count, no):
         return no.to_bytes(count, byteorder='big')
 
-    def _convert_bytes_to_int(data):
-        return int.from_bytes(data, byteorder='big', signed=False)
-
     def _to_hex(no):
         return hex(no)[2:]
 else:
@@ -124,12 +121,6 @@ else:
         if len(h) > 2 * count:
             raise Exception('Number {1} needs more than {0} bytes!'.format(count, n))
         return ('0' * (2 * count - len(h)) + h).decode('hex')
-
-    def _convert_bytes_to_int(data):
-        v = 0
-        for x in data:
-            v = (v << 8) | ord(x)
-        return v
 
     def _to_hex(no):
         return '%x' % no
@@ -164,10 +155,3 @@ def convert_int_to_hex(no, digits=None):
     if digits is not None and len(value) < digits:
         value = '0' * (digits - len(value)) + value
     return value
-
-
-def convert_bytes_to_int(data):
-    """
-    Convert a byte string to an unsigned integer in network byte order.
-    """
-    return _convert_bytes_to_int(data)
