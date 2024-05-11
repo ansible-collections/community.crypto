@@ -18,7 +18,7 @@ description:
     - "This module allows one to generate or delete GPG private and public keys using GnuPG (gpg)."
 requirements:
     - gpg >= 2.1
-    - python-dateutil
+    - python-dateutil >= 2.7.0
 extends_documentation_fragment:
   - community.crypto.attributes
 attributes:
@@ -120,8 +120,8 @@ options:
             - Also excepts dates in ISO formats.
             - If left unspecified, any created GPG keys never expire.
             - This module will fail if an unsupported format for O(expire_date) is provided.
-            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, and O(install_python_dateutil=false).
-            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, O(install_python_dateutil=true), and check_mode is enabled.
+            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, and O(install_dateutil=false).
+            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, O(install_dateutil=true), and check_mode is true.
         type: str
     name:
         description:
@@ -152,7 +152,7 @@ options:
             - This parameter is ignored if O(state=absent).
         type: bool
         default: true
-    install_python_dateutil:
+    install_dateutil:
         description:
             - Specifies whether or not to try to install python-dateutil package if not found.
         type: str
@@ -224,6 +224,7 @@ import sys
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.respawn import has_respawned, respawn_module
+
 
 def all_permutations(arr):
     return list(chain.from_iterable(
@@ -380,22 +381,22 @@ def run_module(module, params, check_mode=False):
             import dateutil.parser as dp
             dp.isoparse(params['expire_date'])
         except ImportError:
-            if params['install_python_dateutil']:
-                apt_pkg_name = 'python-dateutil'
+            if params['install_dateutil']:
+                pip_package = 'python-dateutil>=2.7.0'
                 if has_respawned():
-                    module.fail_json(msg="{0} must be installed and visible from {1}.".format(apt_pkg_name, sys.executable))
+                    module.fail_json(msg="{0} must be installed and visible from {1}.".format(pip_package, sys.executable))
                 elif module.check_mode:
-                    module.fail_json("{} must be installed to use check mode. If run normally this module can auto-install it.".format(apt_pkg_name))
+                    module.fail_json("{} must be installed to use check mode. If run normally this module can auto-install it.".format(pip_package))
 
                 else:
                     module.run_command(
-                        ['-m', 'pip', 'install', apt_pkg_name],
-                        executable=sys.executable
+                        ['-m', 'pip', 'install', pip_package],
+                        executable=sys.executable,
                         check_rc=True
                     )
-                    respawn_module(sys.executable) # process will exit here once respawned module has completed
+                    respawn_module(sys.executable)  # process will exit here once respawned module has completed
             else:
-                module.fail_json('An expire date was specified, but the python-dateutil package was not found and install_python_dateutil=false.')
+                module.fail_json('An expire date was specified, but the python-dateutil package was not found and install_dateutil=false.')
         except ValueError:
             if not (params['expire_date'].isnumeric() or (params['expire_date'][:-1].isnumeric() and params['expire_date'][-1] in ['w', 'm', 'y'])):
                 module.fail_json('Invalid format for expire date.')
@@ -520,7 +521,7 @@ def main():
             passphrase=dict(type='str', no_log=True),
             fingerprints=dict(type='list', elements='str', default=[]),
             force=dict(type='bool', default=False),
-            install_python_dateutil=dict(type='bool', default=True)
+            install_dateutil=dict(type='bool', default=True)
         ),
         supports_check_mode=True,
         required_if=[
