@@ -249,7 +249,7 @@
     ownca_not_after: 20191023133742Z
     path: "{{ remote_tmp_dir }}/ownca_cert3.pem"
     csr_path: "{{ remote_tmp_dir }}/csr.csr"
-    privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
+    privatekey_path: "{{ remote_tmp_dir }}/privatekey.pem"
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -259,13 +259,14 @@
     provider: ownca
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
+    ignore_timestamps: false
     path: "{{ remote_tmp_dir }}/ownca_cert3.pem"
     csr_path: "{{ remote_tmp_dir }}/csr.csr"
-    privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
+    privatekey_path: "{{ remote_tmp_dir }}/privatekey.pem"
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
     ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
-  register: ownca_cert3_selfsigned_idem
+  register: ownca_cert3_idem
 
 - name: (OwnCA, {{select_crypto_backend}}) Create ownca certificate with relative notBefore and notAfter
   x509_certificate:
