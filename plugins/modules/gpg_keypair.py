@@ -113,6 +113,7 @@ options:
             - If O(expire_date=<n>y), the key expires in V(n) years.
             - Also excepts dates in ISO formats.
             - If left unspecified, any created GPG keys never expire.
+            - The module will fail if O(expire_date) is specified, but the python-dateutil package is not found.
         type: str
     name:
         description:
@@ -206,7 +207,6 @@ fingerprints:
 
 from itertools import chain, permutations
 import re
-import dateutil.parser as dp
 
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.basic import AnsibleModule
@@ -368,10 +368,13 @@ def generate_keypair(module, params, matching_keys, check_mode):
 def run_module(module, params, check_mode=False):
     if params['expire_date']:
         try:
+            import dateutil.parser as dp
             dp.isoparse(params['expire_date'])
+        except ImportError:
+            module.fail_json('The python-dateutil package was not found. Install it from PyPI to so that this module can validate the expire_date parameter.')
         except ValueError:
             if not (params['expire_date'].isnumeric() or (params['expire_date'][:-1].isnumeric() and params['expire_date'][-1] in ['w', 'm', 'y'])):
-                module.fail_json('Invalid format for expire date')
+                module.fail_json('Invalid format for expire date.')
 
     validate_key(module, params['key_type'], params['key_curve'], params['key_usage'])
     for i, subkey in enumerate(params['subkeys']):
