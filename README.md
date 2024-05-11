@@ -66,7 +66,9 @@ If you use the Ansible package and do not update collections independently, use 
 - ACME modules and plugins:
   - acme_account_info module
   - acme_account module
+  - acme_ari_info module
   - acme_certificate module
+  - acme_certificate_deactivate_authz module
   - acme_certificate_revoke module
   - acme_challenge_cert_helper module
   - acme_inspect module

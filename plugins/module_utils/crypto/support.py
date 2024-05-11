@@ -9,17 +9,23 @@ __metaclass__ = type
 
 
 import abc
-import datetime
 import errno
 import hashlib
 import os
-import re
 
 from ansible.module_utils import six
-from ansible.module_utils.common.text.converters import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_pem_format,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (  # noqa: F401, pylint: disable=unused-import
+    # These imports are for backwards compatibility
+    get_now_datetime,
+    ensure_utc_timezone,
+    convert_relative_to_datetime,
+    get_relative_time_option,
 )
 
 try:
@@ -277,86 +283,6 @@ def parse_ordered_name_field(input_list, name_field_name):
                 'Error while processing entry #{index} in {name}: {error}'.format(
                     name=name_field_name, index=index + 1, error=exc))
     return result
-
-
-def get_now_datetime(with_timezone):
-    if with_timezone:
-        return datetime.datetime.now(tz=datetime.timezone.utc)
-    return datetime.datetime.utcnow()
-
-
-def ensure_utc_timezone(timestamp):
-    if timestamp.tzinfo is not None:
-        return timestamp
-    return timestamp.astimezone(datetime.timezone.utc)
-
-
-def convert_relative_to_datetime(relative_time_string, with_timezone=False):
-    """Get a datetime.datetime or None from a string in the time format described in sshd_config(5)"""
-
-    parsed_result = re.match(
-        r"^(?P<prefix>[+-])((?P<weeks>\d+)[wW])?((?P<days>\d+)[dD])?((?P<hours>\d+)[hH])?((?P<minutes>\d+)[mM])?((?P<seconds>\d+)[sS]?)?$",
-        relative_time_string)
-
-    if parsed_result is None or len(relative_time_string) == 1:
-        # not matched or only a single "+" or "-"
-        return None
-
-    offset = datetime.timedelta(0)
-    if parsed_result.group("weeks") is not None:
-        offset += datetime.timedelta(weeks=int(parsed_result.group("weeks")))
-    if parsed_result.group("days") is not None:
-        offset += datetime.timedelta(days=int(parsed_result.group("days")))
-    if parsed_result.group("hours") is not None:
-        offset += datetime.timedelta(hours=int(parsed_result.group("hours")))
-    if parsed_result.group("minutes") is not None:
-        offset += datetime.timedelta(
-            minutes=int(parsed_result.group("minutes")))
-    if parsed_result.group("seconds") is not None:
-        offset += datetime.timedelta(
-            seconds=int(parsed_result.group("seconds")))
-
-    now = get_now_datetime(with_timezone=with_timezone)
-    if parsed_result.group("prefix") == "+":
-        return now + offset
-    else:
-        return now - offset
-
-
-def get_relative_time_option(input_string, input_name, backend='cryptography', with_timezone=False):
-    """Return an absolute timespec if a relative timespec or an ASN1 formatted
-       string is provided.
-
-       The return value will be a datetime object for the cryptography backend,
-       and a ASN1 formatted string for the pyopenssl backend."""
-    result = to_native(input_string)
-    if result is None:
-        raise OpenSSLObjectError(
-            'The timespec "%s" for %s is not valid' %
-            input_string, input_name)
-    # Relative time
-    if result.startswith("+") or result.startswith("-"):
-        result_datetime = convert_relative_to_datetime(result, with_timezone=with_timezone)
-        if backend == 'pyopenssl':
-            return result_datetime.strftime("%Y%m%d%H%M%SZ")
-        elif backend == 'cryptography':
-            return result_datetime
-    # Absolute time
-    if backend == 'cryptography':
-        for date_fmt in ['%Y%m%d%H%M%SZ', '%Y%m%d%H%MZ', '%Y%m%d%H%M%S%z', '%Y%m%d%H%M%z']:
-            try:
-                res = datetime.datetime.strptime(result, date_fmt)
-            except ValueError:
-                pass
-            else:
-                if with_timezone:
-                    res = res.astimezone(datetime.timezone.utc)
-                return res
-
-        raise OpenSSLObjectError(
-            'The time spec "%s" for %s is invalid' %
-            (input_string, input_name)
-        )
 
 
 def select_message_digest(digest_string):

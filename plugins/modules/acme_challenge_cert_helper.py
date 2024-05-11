@@ -165,14 +165,14 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     read_file,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    get_now_datetime,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     set_not_valid_after,
     set_not_valid_before,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    get_now_datetime,
 )
 
 CRYPTOGRAPHY_IMP_ERR = None

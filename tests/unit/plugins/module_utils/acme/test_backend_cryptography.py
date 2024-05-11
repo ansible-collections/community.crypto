@@ -16,11 +16,22 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryp
     CryptographyBackend,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    ensure_utc_timezone,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
+)
+
 from .backend_data import (
     TEST_KEYS,
     TEST_CSRS,
     TEST_CERT,
     TEST_CERT_DAYS,
+    TEST_CERT_INFO,
+    TEST_PARSE_ACME_TIMESTAMP,
+    TEST_INTERPOLATE_TIMESTAMP,
 )
 
 
@@ -64,3 +75,49 @@ def test_certdays_cryptography(now, expected_days, tmpdir):
     assert days == expected_days
     days = backend.get_cert_days(cert_content=TEST_CERT, now=now)
     assert days == expected_days
+
+
+@pytest.mark.parametrize("cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO)
+def test_get_cert_information(cert_content, expected_cert_info, openssl_output, tmpdir):
+    fn = tmpdir / 'test-cert.pem'
+    fn.write(cert_content)
+    module = MagicMock()
+    backend = CryptographyBackend(module)
+
+    if CRYPTOGRAPHY_TIMEZONE:
+        expected_cert_info = expected_cert_info._replace(
+            not_valid_after=ensure_utc_timezone(expected_cert_info.not_valid_after),
+            not_valid_before=ensure_utc_timezone(expected_cert_info.not_valid_before),
+        )
+
+    cert_info = backend.get_cert_information(cert_filename=str(fn))
+    assert cert_info == expected_cert_info
+    cert_info = backend.get_cert_information(cert_content=cert_content)
+    assert cert_info == expected_cert_info
+
+
+def test_now():
+    module = MagicMock()
+    backend = CryptographyBackend(module)
+    now = backend.get_now()
+    assert CRYPTOGRAPHY_TIMEZONE == (now.tzinfo is not None)
+
+
+@pytest.mark.parametrize("input, expected", TEST_PARSE_ACME_TIMESTAMP)
+def test_parse_acme_timestamp(input, expected):
+    module = MagicMock()
+    backend = CryptographyBackend(module)
+    ts_expected = backend.get_utc_datetime(**expected)
+    timestamp = backend.parse_acme_timestamp(input)
+    assert ts_expected == timestamp
+
+
+@pytest.mark.parametrize("start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP)
+def test_interpolate_timestamp(start, end, percentage, expected):
+    module = MagicMock()
+    backend = CryptographyBackend(module)
+    ts_start = backend.get_utc_datetime(**start)
+    ts_end = backend.get_utc_datetime(**end)
+    ts_expected = backend.get_utc_datetime(**expected)
+    timestamp = backend.interpolate_timestamp(ts_start, ts_end, percentage)
+    assert ts_expected == timestamp

@@ -1,0 +1,38 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: ecdsa-with-SHA256
+        Issuer: CN=ansible.com
+        Validity
+            Not Before: Nov 25 15:28:23 2018 GMT
+            Not After : Nov 26 15:28:24 2018 GMT
+        Subject: CN=ansible.com
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (256 bit)
+                pub:
+                    04:00:9c:f4:c8:00:17:03:01:26:3a:14:d1:92:35:
+                    f1:c2:07:9d:6d:63:ba:82:86:d8:33:79:56:b3:3a:
+                    d2:eb:c1:bc:41:2c:e1:5d:1e:80:99:0d:c8:cd:90:
+                    e2:9a:74:d3:5c:ee:d7:85:5c:a5:0d:3f:12:2f:31:
+                    38:e3:f1:29:9b
+                ASN1 OID: prime256v1
+                NIST CURVE: P-256
+        X509v3 extensions:
+            X509v3 Subject Alternative Name: 
+                DNS:example.com, DNS:example.org
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Key Usage: critical
+                Digital Signature
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Subject Key Identifier: 
+                98:D2:FD:3C:CC:CD:69:45:FB:E2:8C:30:2C:54:62:18:34:B7:07:73
+    Signature Algorithm: ecdsa-with-SHA256
+    Signature Value:
+        30:46:02:21:00:bc:fb:52:bf:7a:93:2d:0e:7c:ce:43:f4:cc:
+        05:98:28:36:8d:c7:2a:9b:f5:20:94:62:3d:fb:82:9e:38:42:
+        32:02:21:00:c0:55:f8:b5:d9:65:41:2a:dd:d4:76:3f:8c:cb:
+        07:c1:d2:b9:c0:7d:c9:90:af:fd:f9:f1:b0:c9:13:f5:d5:52

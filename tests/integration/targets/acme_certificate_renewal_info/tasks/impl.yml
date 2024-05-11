@@ -1,0 +1,145 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## SET UP ACCOUNT KEYS ########################################################################
+- block:
+  - name: Generate account keys
+    openssl_privatekey:
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+      type: "{{ item.type }}"
+      size: "{{ item.size | default(omit) }}"
+      curve: "{{ item.curve | default(omit) }}"
+      force: true
+    loop: "{{ account_keys }}"
+
+  vars:
+    account_keys:
+      - name: account-ec256
+        type: ECC
+        curve: secp256r1
+## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
+- name: Obtain cert 1
+  include_tasks: obtain-cert.yml
+  vars:
+    certgen_title: Certificate 1 for renewal check
+    certificate_name: cert-1
+    key_type: rsa
+    rsa_bits: "{{ default_rsa_key_size }}"
+    subject_alt_name: "DNS:example.com"
+    subject_alt_name_critical: false
+    account_key: account-ec256
+    challenge: http-01
+    modify_account: true
+    deactivate_authzs: false
+    force: true
+    remaining_days: "{{ omit }}"
+    terms_agreed: true
+    account_email: "example@example.org"
+## OBTAIN CERTIFICATE INFOS ###################################################################
+- name: Dump OpenSSL x509 info
+  command:
+    cmd: openssl x509 -in {{ remote_tmp_dir }}/cert-1.pem -noout -text
+- name: Obtain certificate information
+  x509_certificate_info:
+    path: "{{ remote_tmp_dir }}/cert-1.pem"
+  register: cert_1_info
+- name: Read certificate
+  slurp:
+    src: '{{ remote_tmp_dir }}/cert-1.pem'
+  register: slurp_cert_1
+- name: Obtain certificate information (1/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    # Certificate is valid for ~1826 days
+  register: cert_1_renewal_1
+- name: Obtain certificate information (2/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    # Certificate is valid for ~1826 days
+    remaining_days: 1000
+    remaining_percentage: 0.5
+  register: cert_1_renewal_2
+- name: Obtain certificate information (3/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_content: "{{ slurp_cert_1.content | b64decode }}"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1800d
+    # Certificate is valid for ~26 days
+  register: cert_1_renewal_3
+- name: Obtain certificate information (4/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1800d
+    # Certificate is valid for ~26 days
+    remaining_days: 30
+    remaining_percentage: 0.1
+  register: cert_1_renewal_4
+- name: Obtain certificate information (5/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1800d
+    # Certificate is valid for ~26 days
+    remaining_days: 30
+    remaining_percentage: 0.01
+  register: cert_1_renewal_5
+- name: Obtain certificate information (6/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1800d
+    # Certificate is valid for ~26 days
+    remaining_days: 10
+    remaining_percentage: 0.03
+  register: cert_1_renewal_6
+- name: Obtain certificate information (7/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1830d
+    # Certificate is no longer valid
+  register: cert_1_renewal_7
+- name: Obtain certificate information (8/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    now: +1830d
+    # Certificate is no longer valid
+  register: cert_1_renewal_8
+- name: Obtain certificate information (9/9)
+  acme_certificate_renewal_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-does-not-exist.pem"
+    acme_version: 2
+    acme_directory: https://{{ acme_host }}:14000/dir
+    validate_certs: false
+    # Certificate is no longer valid
+  register: cert_1_renewal_9
