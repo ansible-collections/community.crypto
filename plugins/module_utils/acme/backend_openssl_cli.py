@@ -20,7 +20,6 @@ import traceback
 from ansible.module_utils.common.text.converters import to_native, to_text, to_bytes
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
-    CertificateInformation,
     CryptoBackend,
 )
 
@@ -31,8 +30,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_bytes_to_int
-
 try:
     import ipaddress
 except ImportError:
@@ -40,33 +37,6 @@ except ImportError:
 
 
 _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
-
-
-def _extract_date(out_text, name, cert_filename_suffix=""):
-    try:
-        date_str = re.search(r"\s+%s\s*:\s+(.*)" % name, out_text).group(1)
-        return datetime.datetime.strptime(date_str, '%b %d %H:%M:%S %Y %Z')
-    except AttributeError:
-        raise BackendException("No '{0}' date found{1}".format(name, cert_filename_suffix))
-    except ValueError as exc:
-        raise BackendException("Failed to parse '{0}' date{1}: {2}".format(name, cert_filename_suffix, exc))
-
-
-def _decode_octets(octets_text):
-    return binascii.unhexlify(re.sub(r"(\s|:)", "", octets_text).encode("utf-8"))
-
-
-def _extract_octets(out_text, name, required=True, potential_prefixes=None):
-    regexp = r"\s+%s:\s*\n\s+%s([A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2})*)\s*\n" % (
-        name,
-        ('(?:%s)' % '|'.join(re.escape(pp) for pp in potential_prefixes)) if potential_prefixes else '',
-    )
-    match = re.search(regexp, out_text, re.MULTILINE | re.DOTALL)
-    if match is not None:
-        return _decode_octets(match.group(1))
-    if not required:
-        return None
-    raise BackendException("No '{0}' octet string found".format(name))
 
 
 class OpenSSLCLIBackend(CryptoBackend):
@@ -119,12 +89,10 @@ class OpenSSLCLIBackend(CryptoBackend):
         dummy, out, dummy = self.module.run_command(
             openssl_keydump_cmd, check_rc=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
 
-        out_text = to_text(out, errors='surrogate_or_strict')
-
         if account_key_type == 'rsa':
-            pub_hex = re.search(r"modulus:\n\s+00:([a-f0-9\:\s]+?)\npublicExponent", out_text, re.MULTILINE | re.DOTALL).group(1)
-
-            pub_exp = re.search(r"\npublicExponent: ([0-9]+)", out_text, re.MULTILINE | re.DOTALL).group(1)
+            pub_hex, pub_exp = re.search(
+                r"modulus:\n\s+00:([a-f0-9\:\s]+?)\npublicExponent: ([0-9]+)",
+                to_text(out, errors='surrogate_or_strict'), re.MULTILINE | re.DOTALL).groups()
             pub_exp = "{0:x}".format(int(pub_exp))
             if len(pub_exp) % 2:
                 pub_exp = "0{0}".format(pub_exp)
@@ -136,19 +104,17 @@ class OpenSSLCLIBackend(CryptoBackend):
                 'jwk': {
                     "kty": "RSA",
                     "e": nopad_b64(binascii.unhexlify(pub_exp.encode("utf-8"))),
-                    "n": nopad_b64(_decode_octets(pub_hex)),
+                    "n": nopad_b64(binascii.unhexlify(re.sub(r"(\s|:)", "", pub_hex).encode("utf-8"))),
                 },
                 'hash': 'sha256',
             }
         elif account_key_type == 'ec':
             pub_data = re.search(
                 r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
-                out_text,
-                re.MULTILINE | re.DOTALL,
-            )
+                to_text(out, errors='surrogate_or_strict'), re.MULTILINE | re.DOTALL)
             if pub_data is None:
                 raise KeyParsingError('cannot parse elliptic curve key')
-            pub_hex = _decode_octets(pub_data.group(1))
+            pub_hex = binascii.unhexlify(re.sub(r"(\s|:)", "", pub_data.group(1)).encode("utf-8"))
             asn1_oid_curve = pub_data.group(2).lower()
             nist_curve = pub_data.group(3).lower() if pub_data.group(3) else None
             if asn1_oid_curve == 'prime256v1' or nist_curve == 'p-256':
@@ -337,8 +303,13 @@ class OpenSSLCLIBackend(CryptoBackend):
         openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
         dummy, out, dummy = self.module.run_command(
             openssl_cert_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
-        out_text = to_text(out, errors='surrogate_or_strict')
-        not_after = _extract_date(out_text, 'Not After', cert_filename_suffix=cert_filename_suffix)
+        try:
+            not_after_str = re.search(r"\s+Not After\s*:\s+(.*)", to_text(out, errors='surrogate_or_strict')).group(1)
+            not_after = datetime.datetime.strptime(not_after_str, '%b %d %H:%M:%S %Y %Z')
+        except AttributeError:
+            raise BackendException("No 'Not after' date found{0}".format(cert_filename_suffix))
+        except ValueError:
+            raise BackendException("Failed to parse 'Not after' date{0}".format(cert_filename_suffix))
         if now is None:
             now = datetime.datetime.now()
         return (not_after - now).days
@@ -348,43 +319,3 @@ class OpenSSLCLIBackend(CryptoBackend):
         Given a Criterium object, creates a ChainMatcher object.
         '''
         raise BackendException('Alternate chain matching can only be used with the "cryptography" backend.')
-
-    def get_cert_information(self, cert_filename=None, cert_content=None):
-        '''
-        Return some information on a X.509 certificate as a CertificateInformation object.
-        '''
-        filename = cert_filename
-        data = None
-        if cert_filename is not None:
-            cert_filename_suffix = ' in {0}'.format(cert_filename)
-        else:
-            filename = '/dev/stdin'
-            data = to_bytes(cert_content)
-            cert_filename_suffix = ''
-
-        openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(
-            openssl_cert_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
-        out_text = to_text(out, errors='surrogate_or_strict')
-
-        not_after = _extract_date(out_text, 'Not After', cert_filename_suffix=cert_filename_suffix)
-        not_before = _extract_date(out_text, 'Not Before', cert_filename_suffix=cert_filename_suffix)
-
-        sn = re.search(
-            r" Serial Number: ([0-9]+)",
-            to_text(out, errors='surrogate_or_strict'), re.MULTILINE | re.DOTALL)
-        if sn:
-            serial = int(sn.group(1))
-        else:
-            serial = convert_bytes_to_int(_extract_octets(out_text, 'Serial Number', required=True))
-
-        ski = _extract_octets(out_text, 'X509v3 Subject Key Identifier', required=False)
-        aki = _extract_octets(out_text, 'X509v3 Authority Key Identifier', required=False, potential_prefixes=['keyid:', ''])
-
-        return CertificateInformation(
-            not_valid_after=not_after,
-            not_valid_before=not_before,
-            serial_number=serial,
-            subject_key_identifier=ski,
-            authority_key_identifier=aki,
-        )

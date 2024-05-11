@@ -11,7 +11,6 @@ __metaclass__ = type
 
 import base64
 import binascii
-import datetime
 import os
 import traceback
 
@@ -20,9 +19,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native, to_
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
-    CertificateInformation,
     CryptoBackend,
-    _parse_acme_timestamp,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
@@ -38,38 +35,25 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.io import re
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     convert_int_to_bytes,
     convert_int_to_hex,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_now_datetime,
+    ensure_utc_timezone,
+    parse_name_field,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
-    cryptography_serial_number_of_cert,
     get_not_valid_after,
-    get_not_valid_before,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     extract_first_pem,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    parse_name_field,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.time import (
-    ensure_utc_timezone,
-    from_epoch_seconds,
-    get_epoch_seconds,
-    get_now_datetime,
-    get_relative_time_option,
-    UTC,
 )
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
@@ -185,32 +169,6 @@ class CryptographyChainMatcher(ChainMatcher):
 class CryptographyBackend(CryptoBackend):
     def __init__(self, module):
         super(CryptographyBackend, self).__init__(module)
-
-    def get_now(self):
-        return get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def parse_acme_timestamp(self, timestamp_str):
-        return _parse_acme_timestamp(timestamp_str, with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def parse_module_parameter(self, value, name):
-        try:
-            return get_relative_time_option(value, name, backend='cryptography', with_timezone=CRYPTOGRAPHY_TIMEZONE)
-        except OpenSSLObjectError as exc:
-            raise BackendException(to_native(exc))
-
-    def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
-        start = get_epoch_seconds(timestamp_start)
-        end = get_epoch_seconds(timestamp_end)
-        return from_epoch_seconds(start + percentage * (end - start), with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def get_utc_datetime(self, *args, **kwargs):
-        kwargs_ext = dict(kwargs)
-        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' not in kwargs_ext and len(args) < 8):
-            kwargs_ext['tzinfo'] = UTC
-        result = datetime.datetime(*args, **kwargs_ext)
-        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' in kwargs or len(args) >= 8):
-            result = ensure_utc_timezone(result)
-        return result
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
@@ -418,7 +376,7 @@ class CryptographyBackend(CryptoBackend):
             raise BackendException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
 
         if now is None:
-            now = self.get_now()
+            now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
         elif CRYPTOGRAPHY_TIMEZONE:
             now = ensure_utc_timezone(now)
         return (get_not_valid_after(cert) - now).days
@@ -428,44 +386,3 @@ class CryptographyBackend(CryptoBackend):
         Given a Criterium object, creates a ChainMatcher object.
         '''
         return CryptographyChainMatcher(criterium, self.module)
-
-    def get_cert_information(self, cert_filename=None, cert_content=None):
-        '''
-        Return some information on a X.509 certificate as a CertificateInformation object.
-        '''
-        if cert_filename is not None:
-            cert_content = read_file(cert_filename)
-        else:
-            cert_content = to_bytes(cert_content)
-
-        # Make sure we have at most one PEM. Otherwise cryptography 36.0.0 will barf.
-        cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or '')
-
-        try:
-            cert = cryptography.x509.load_pem_x509_certificate(cert_content, _cryptography_backend)
-        except Exception as e:
-            if cert_filename is None:
-                raise BackendException('Cannot parse certificate: {0}'.format(e))
-            raise BackendException('Cannot parse certificate {0}: {1}'.format(cert_filename, e))
-
-        ski = None
-        try:
-            ext = cert.extensions.get_extension_for_class(cryptography.x509.SubjectKeyIdentifier)
-            ski = ext.value.digest
-        except cryptography.x509.ExtensionNotFound:
-            pass
-
-        aki = None
-        try:
-            ext = cert.extensions.get_extension_for_class(cryptography.x509.AuthorityKeyIdentifier)
-            aki = ext.value.key_identifier
-        except cryptography.x509.ExtensionNotFound:
-            pass
-
-        return CertificateInformation(
-            not_valid_after=get_not_valid_after(cert),
-            not_valid_before=get_not_valid_before(cert),
-            serial_number=cryptography_serial_number_of_cert(cert),
-            subject_key_identifier=ski,
-            authority_key_identifier=aki,
-        )

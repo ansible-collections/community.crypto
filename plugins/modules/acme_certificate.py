@@ -58,7 +58,7 @@ seealso:
     link: https://tools.ietf.org/html/rfc8555
   - name: ACME TLS ALPN Challenge Extension
     description: The specification of the V(tls-alpn-01) challenge (RFC 8737).
-    link: https://www.rfc-editor.org/rfc/rfc8737.html
+    link: https://www.rfc-editor.org/rfc/rfc8737.html-05
   - module: community.crypto.acme_challenge_cert_helper
     description: Helps preparing V(tls-alpn-01) challenges.
   - module: community.crypto.openssl_privatekey
@@ -77,12 +77,8 @@ seealso:
     description: Allows to create, modify or delete an ACME account.
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
-  - module: community.crypto.acme_certificate_deactivate_authz
-    description: Allows to deactivate (invalidate) ACME v2 orders.
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
-  - community.crypto.acme.certificate
+  - community.crypto.acme
   - community.crypto.attributes
   - community.crypto.attributes.files
   - community.crypto.attributes.actiongroup_acme
@@ -142,8 +138,32 @@ options:
       - 'tls-alpn-01'
       - 'no challenge'
   csr:
+    description:
+      - "File containing the CSR for the new certificate."
+      - "Can be created with M(community.crypto.openssl_csr) or C(openssl req ...)."
+      - "The CSR may contain multiple Subject Alternate Names, but each one
+         will lead to an individual challenge that must be fulfilled for the
+         CSR to be signed."
+      - "I(Note): the private key used to create the CSR I(must not) be the
+         account key. This is a bad idea from a security point of view, and
+         the CA should not accept the CSR. The ACME server should return an
+         error in this case."
+      - Precisely one of O(csr) or O(csr_content) must be specified.
+    type: path
     aliases: ['src']
   csr_content:
+    description:
+      - "Content of the CSR for the new certificate."
+      - "Can be created with M(community.crypto.openssl_csr_pipe) or C(openssl req ...)."
+      - "The CSR may contain multiple Subject Alternate Names, but each one
+         will lead to an individual challenge that must be fulfilled for the
+         CSR to be signed."
+      - "I(Note): the private key used to create the CSR I(must not) be the
+         account key. This is a bad idea from a security point of view, and
+         the CA should not accept the CSR. The ACME server should return an
+         error in this case."
+      - Precisely one of O(csr) or O(csr_content) must be specified.
+    type: str
     version_added: 1.2.0
   data:
     description:
@@ -272,32 +292,6 @@ options:
           - "The identifier must be of the form
              V(C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10)."
         type: str
-  include_renewal_cert_id:
-    description:
-      - Determines whether to request renewal of an existing certificate according to
-        L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
-      - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
-      - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
-      - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
-      - Generally you should use V(when_ari_supported) if you know that the ACME service supports a compatible
-        draft (or final version, once it is out) of the ARI extension. V(always) should never be necessary.
-        If you are not sure, or if you receive strange errors on invalid C(replaces) values in order objects,
-        use V(never), which also happens to be the default.
-      - ACME servers might refuse to create new orders with C(replaces) for certificates that already have an
-        existing order. This can happen if this module is used to create an order, and then the playbook/role
-        fails in case the challenges cannot be set up. If the playbook/role does not record the order data to
-        continue with the existing order, but tries to create a new one on the next run, creating the new order
-        might fail. For this reason, this option should only be set to a value different from V(never) if the
-        role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate
-        orders whose processing is aborted. Orders can be deactivated with the
-        M(community.crypto.acme_certificate_deactivate_authz) module.
-    type: str
-    choices:
-      - never
-      - when_ari_supported
-      - always
-    default: never
-    version_added: 2.20.0
 '''
 
 EXAMPLES = r'''
@@ -381,7 +375,7 @@ EXAMPLES = r'''
 #     state: present
 #     wait: true
 #     # Note: route53 requires TXT entries to be enclosed in quotes
-#     value: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].resource_value | community.dns.quote_txt(always_quote=true) }}"
+#     value: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].resource_value | regex_replace('^(.*)$', '\"\\1\"') }}"
 #   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge.challenge_data
 #
 # Alternative way:
@@ -396,7 +390,7 @@ EXAMPLES = r'''
 #     wait: true
 #     # Note: item.value is a list of TXT entries, and route53
 #     # requires every entry to be enclosed in quotes
-#     value: "{{ item.value | map('community.dns.quote_txt', always_quote=true) | list }}"
+#     value: "{{ item.value | map('regex_replace', '^(.*)$', '\"\\1\"' ) | list }}"
 #   loop: "{{ sample_com_challenge.challenge_data_dns | dict2items }}"
 #   when: sample_com_challenge is changed
 
@@ -452,55 +446,39 @@ challenge_data:
     - Per identifier / challenge type challenge data.
     - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
   returned: changed
-  type: dict
+  type: list
+  elements: dict
   contains:
-    identifier:
-      description:
-        - For every identifier, provides a dictionary of challenge types mapping to challenge data.
-        - The keys in this dictionary are the identifiers. C(identifier) is a placeholder used in the documentation.
-        - Note that the keys are not valid Jinja2 identifiers.
+    resource:
+      description: The challenge resource that must be created for validation.
       returned: changed
-      type: dict
-      contains:
-        challenge-type:
-          description:
-            - Data for every challenge type.
-            - The keys in this dictionary are the challenge types. C(challenge-type) is a placeholder used in the documentation.
-              Possible keys are V(http-01), V(dns-01), and V(tls-alpn-01).
-            - Note that the keys are not valid Jinja2 identifiers.
-          returned: changed
-          type: dict
-          contains:
-            resource:
-              description: The challenge resource that must be created for validation.
-              returned: changed
-              type: str
-              sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
-            resource_original:
-              description:
-                - The original challenge resource including type identifier for V(tls-alpn-01)
-                  challenges.
-              returned: changed and O(challenge) is V(tls-alpn-01)
-              type: str
-              sample: DNS:example.com
-            resource_value:
-              description:
-                - The value the resource has to produce for the validation.
-                - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
-                - "For V(tls-alpn-01) challenges, note that this return value contains a
-                   Base64 encoded version of the correct binary blob which has to be put
-                   into the acmeValidation x509 extension; see
-                   U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
-                   for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter
-                   to extract the binary blob from this return value."
-              returned: changed
-              type: str
-              sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
-            record:
-              description: The full DNS record's name for the challenge.
-              returned: changed and challenge is V(dns-01)
-              type: str
-              sample: _acme-challenge.example.com
+      type: str
+      sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
+    resource_original:
+      description:
+        - The original challenge resource including type identifier for V(tls-alpn-01)
+          challenges.
+      returned: changed and O(challenge) is V(tls-alpn-01)
+      type: str
+      sample: DNS:example.com
+    resource_value:
+      description:
+        - The value the resource has to produce for the validation.
+        - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
+        - "For V(tls-alpn-01) challenges, note that this return value contains a
+           Base64 encoded version of the correct binary blob which has to be put
+           into the acmeValidation x509 extension; see
+           U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
+           for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter
+           to extract the binary blob from this return value."
+      returned: changed
+      type: str
+      sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
+    record:
+      description: The full DNS record's name for the challenge.
+      returned: changed and challenge is V(dns-01)
+      type: str
+      sample: _acme-challenge.example.com
 challenge_data_dns:
   description:
     - List of TXT values per DNS record, in case challenge is V(dns-01).
@@ -569,9 +547,11 @@ all_chains:
 
 import os
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    create_default_argspec,
+    get_default_argspec,
     ACMEClient,
 )
 
@@ -605,7 +585,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.orders impor
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
-    compute_cert_id,
     pem_to_der,
 )
 
@@ -642,7 +621,6 @@ class ACMECertificateClient(object):
         self.order_uri = self.data.get('order_uri') if self.data else None
         self.all_chains = None
         self.select_chain_matcher = []
-        self.include_renewal_cert_id = module.params['include_renewal_cert_id']
 
         if self.module.params['select_chain']:
             for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
@@ -700,15 +678,6 @@ class ACMECertificateClient(object):
             # stored in self.order_uri by the constructor).
             return self.order_uri is None
 
-    def _get_cert_info_or_none(self):
-        if self.module.params.get('dest'):
-            filename = self.module.params['dest']
-        else:
-            filename = self.module.params['fullchain_dest']
-        if not os.path.exists(filename):
-            return None
-        return self.client.backend.get_cert_information(cert_filename=filename)
-
     def start_challenges(self):
         '''
         Create new authorizations for all identifiers of the CSR,
@@ -723,19 +692,7 @@ class ACMECertificateClient(object):
                 authz = Authorization.create(self.client, identifier_type, identifier)
                 self.authorizations[authz.combined_identifier] = authz
         else:
-            replaces_cert_id = None
-            if (
-                self.include_renewal_cert_id == 'always' or
-                (self.include_renewal_cert_id == 'when_ari_supported' and self.client.directory.has_renewal_info_endpoint())
-            ):
-                cert_info = self._get_cert_info_or_none()
-                if cert_info is not None:
-                    replaces_cert_id = compute_cert_id(
-                        self.client.backend,
-                        cert_info=cert_info,
-                        none_if_required_information_is_missing=True,
-                    )
-            self.order = Order.create(self.client, self.identifiers, replaces_cert_id)
+            self.order = Order.create(self.client, self.identifiers)
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)
             self.authorizations.update(self.order.authorizations)
@@ -897,14 +854,15 @@ class ACMECertificateClient(object):
 
 
 def main():
-    argument_spec = create_default_argspec(with_certificate=True)
-    argument_spec.argument_spec['csr']['aliases'] = ['src']
-    argument_spec.update_argspec(
+    argument_spec = get_default_argspec()
+    argument_spec.update(dict(
         modify_account=dict(type='bool', default=True),
         account_email=dict(type='str'),
         agreement=dict(type='str'),
         terms_agreed=dict(type='bool', default=False),
         challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01', NO_CHALLENGE]),
+        csr=dict(type='path', aliases=['src']),
+        csr_content=dict(type='str'),
         data=dict(type='dict'),
         dest=dict(type='path', aliases=['cert']),
         fullchain_dest=dict(type='path', aliases=['fullchain']),
@@ -920,14 +878,20 @@ def main():
             subject_key_identifier=dict(type='str'),
             authority_key_identifier=dict(type='str'),
         )),
-        include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
-    )
-    argument_spec.update(
-        required_one_of=[
+    ))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_one_of=(
+            ['account_key_src', 'account_key_content'],
             ['dest', 'fullchain_dest'],
-        ],
+            ['csr', 'csr_content'],
+        ),
+        mutually_exclusive=(
+            ['account_key_src', 'account_key_content'],
+            ['csr', 'csr_content'],
+        ),
+        supports_check_mode=True,
     )
-    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, False)
 
     try:

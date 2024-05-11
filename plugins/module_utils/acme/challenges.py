@@ -103,7 +103,7 @@ class Challenge(object):
             # https://tools.ietf.org/html/rfc8555#section-8.4
             resource = '_acme-challenge'
             value = nopad_b64(hashlib.sha256(to_bytes(key_authorization)).digest())
-            record = '{0}.{1}'.format(resource, identifier[2:] if identifier.startswith('*.') else identifier)
+            record = (resource + identifier[1:]) if identifier.startswith('*.') else '{0}.{1}'.format(resource, identifier)
             return {
                 'resource': resource,
                 'resource_value': value,
@@ -283,21 +283,13 @@ class Authorization(object):
             return self.status == 'valid'
         return self.wait_for_validation(client, challenge_type)
 
-    def can_deactivate(self):
-        '''
-        Deactivates this authorization.
-        https://community.letsencrypt.org/t/authorization-deactivation/19860/2
-        https://tools.ietf.org/html/rfc8555#section-7.5.2
-        '''
-        return self.status in ('valid', 'pending')
-
     def deactivate(self, client):
         '''
         Deactivates this authorization.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        if not self.can_deactivate():
+        if self.status != 'valid':
             return
         authz_deactivate = {
             'status': 'deactivated'

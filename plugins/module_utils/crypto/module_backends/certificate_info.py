@@ -23,6 +23,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import Lo
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
     get_fingerprint_of_bytes,
+    get_now_datetime,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -37,10 +38,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     get_publickey_info,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.time import (
-    get_now_datetime,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'

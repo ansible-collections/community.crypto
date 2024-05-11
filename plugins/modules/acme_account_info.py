@@ -25,8 +25,7 @@ notes:
   - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
      did not change."
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
+  - community.crypto.acme
   - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
   - community.crypto.attributes.info_module
@@ -214,9 +213,11 @@ order_uris:
   version_added: 1.5.0
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    create_default_argspec,
+    get_default_argspec,
     ACMEClient,
 )
 
@@ -269,11 +270,20 @@ def get_order(client, order_url):
 
 
 def main():
-    argument_spec = create_default_argspec()
-    argument_spec.update_argspec(
+    argument_spec = get_default_argspec()
+    argument_spec.update(dict(
         retrieve_orders=dict(type='str', default='ignore', choices=['ignore', 'url_list', 'object_list']),
+    ))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_one_of=(
+            ['account_key_src', 'account_key_content'],
+        ),
+        mutually_exclusive=(
+            ['account_key_src', 'account_key_content'],
+        ),
+        supports_check_mode=True,
     )
-    module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
 
     try:

@@ -37,8 +37,7 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
+  - community.crypto.acme
   - community.crypto.attributes
   - community.crypto.attributes.actiongroup_acme
 attributes:
@@ -128,9 +127,11 @@ EXAMPLES = '''
 
 RETURN = '''#'''
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
-    create_default_argspec,
+    get_default_argspec,
     ACMEClient,
 )
 
@@ -151,23 +152,24 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 
 
 def main():
-    argument_spec = create_default_argspec(require_account_key=False)
-    argument_spec.update_argspec(
+    argument_spec = get_default_argspec()
+    argument_spec.update(dict(
         private_key_src=dict(type='path'),
         private_key_content=dict(type='str', no_log=True),
         private_key_passphrase=dict(type='str', no_log=True),
         certificate=dict(type='path', required=True),
         revoke_reason=dict(type='int'),
-    )
-    argument_spec.update(
+    ))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         required_one_of=(
             ['account_key_src', 'account_key_content', 'private_key_src', 'private_key_content'],
         ),
         mutually_exclusive=(
             ['account_key_src', 'account_key_content', 'private_key_src', 'private_key_content'],
         ),
+        supports_check_mode=False,
     )
-    module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)
 
     try:
