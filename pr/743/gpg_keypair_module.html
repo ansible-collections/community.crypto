@@ -212,7 +212,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
 <li><p>gpg &gt;= 2.1</p></li>
-<li><p>python-dateutil</p></li>
+<li><p>python-dateutil &gt;= 2.7.0</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -250,7 +250,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;y</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> years.</p>
 <p>Also excepts dates in ISO formats.</p>
 <p>If left unspecified, any created GPG keys never expire.</p>
-<p>The module will fail if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date</span></span></a></strong></code> is specified, but the python-dateutil package is not found.</p>
+<p>This module will fail if an unsupported format for <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date</span></span></a></strong></code> is provided.</p>
+<p>This module will fail if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date</span></span></a></strong></code> is provided, the python-dateutil package is not found, and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-install-dateutil"><span class="std std-ref"><span class="pre">install_dateutil=false</span></span></a></code>.</p>
+<p>This module will fail if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date</span></span></a></strong></code> is provided, the python-dateutil package is not found, <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-install-dateutil"><span class="std std-ref"><span class="pre">install_dateutil=true</span></span></a></code>, and check_mode is true.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -270,12 +272,19 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>This parameter is ignored if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><span class="std std-ref"><span class="pre">state=absent</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 </ul>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-install_dateutil"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-install-dateutil"><strong>install_dateutil</strong></p>
+<a class="ansibleOptionLink" href="#parameter-install_dateutil" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Specifies whether or not to try to install python-dateutil package if not found.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><strong>key_curve</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -284,6 +293,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve=ed25519</span></span></a></code> is only supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=EDDSA</span></span></a></code>.</p>
 <p>This parameter is required if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=ECDSA</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=EDDSA</span></span></a></code>.</p>
 <p>This parameter is ignored if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=DSA</span></span></a></code>.</p>
+<p>This module will fail if an unsupported <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-curve"><span class="std std-ref"><span class="pre">key_curve</span></span></a></strong></code> is provided for the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;nistp256&quot;</span></code></p></li>
@@ -297,7 +307,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_size"></div>
 <div class="ansibleOptionAnchor" id="parameter-key_length"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-size"><span id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-length"></span><strong>key_size</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: key_length</span></p>
@@ -309,7 +319,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>As per GPG’s behavior, values below the allowed ranges will be set to the respective defaults, and values above will saturate at the maximum.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><strong>key_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -323,7 +333,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-key_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><strong>key_usage</strong></p>
 <a class="ansibleOptionLink" href="#parameter-key_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
@@ -331,6 +341,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">cert</span></code> is given to all primary keys regardess, however can be used to only give <code class="ansible-value docutils literal notranslate"><span class="pre">vert</span></code> usage to a key.</p>
 <p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage</span></span></a></strong></code> is not specified, all of valid usages for the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type</span></span></a></strong></code> are assigned.</p>
 <p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage=encr</span></span></a></code> is only supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type=RSA</span></span></a></code>.</p>
+<p>This module will fail if an unsupported <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage</span></span></a></strong></code> is provided for the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-type"><span class="std std-ref"><span class="pre">key_type</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encr&quot;</span></code></p></li>
@@ -341,25 +352,27 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specifies a name for the key’s user ID.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-passphrase"><strong>passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Passphrase used to decrypt an existing private key or encrypt a newly generated private key.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether the private and public keys should exist or not, taking action if the state is different from what is stated.</p>
+<p>This module will fail if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><span class="std std-ref"><span class="pre">state=present</span></span></a></code>, and neither <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-comment"><span class="std std-ref"><span class="pre">comment</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-email"><span class="std std-ref"><span class="pre">email</span></span></a></strong></code> are provided.</p>
+<p>This module will fail if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-state"><span class="std std-ref"><span class="pre">state=present</span></span></a></code>, and neither <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-comment"><span class="std std-ref"><span class="pre">comment</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-email"><span class="std std-ref"><span class="pre">email</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-fingerprints"><span class="std std-ref"><span class="pre">fingerprints</span></span></a></strong></code> are provided.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;present&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -367,7 +380,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys"><strong>subkeys</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 </div></td>
@@ -375,7 +388,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/key_curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-curve"><strong>key_curve</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/key_curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -383,6 +396,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-curve"><span class="std std-ref"><span class="pre">subkeys[].key_curve=cv25519</span></span></a></code> is supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type=ECDH</span></span></a></code>.</p>
 <p>This parameter is required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EDDSA</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>.</p>
 <p>This parameter is ignored if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DSA</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
+<p>This module will fail if an unsupported <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-curve"><span class="std std-ref"><span class="pre">subkeys[].key_curve</span></span></a></strong></code> is provided for the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;nistp256&quot;</span></code></p></li>
@@ -397,7 +411,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/key_size"></div>
 <div class="ansibleOptionAnchor" id="parameter-subkeys/key_length"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-size"><span id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-length"></span><strong>key_size</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/key_size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: key_length</span></p>
@@ -407,7 +421,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type=ELG</span></span></a></code>, the minimum is <code class="ansible-value docutils literal notranslate"><span class="pre">1024</span></code> bits, the maximum is <code class="ansible-value docutils literal notranslate"><span class="pre">4096</span></code> bits, and the default is <code class="ansible-value docutils literal notranslate"><span class="pre">3072</span></code> bits.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/key_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><strong>key_type</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/key_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -424,13 +438,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-subkeys/key_usage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-usage"><strong>key_usage</strong></p>
 <a class="ansibleOptionLink" href="#parameter-subkeys/key_usage" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Similar to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-key-usage"><span class="std std-ref"><span class="pre">key_usage</span></span></a></strong></code>.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">encr</span></code> is supported if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">RSA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>.</p>
 <p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">ECDH</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ELG</span></code>, only <code class="ansible-value docutils literal notranslate"><span class="pre">encr</span></code> is supported.</p>
+<p>This module will fail if an unsupported <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-usage"><span class="std std-ref"><span class="pre">subkeys[].key_usage</span></span></a></strong></code> is provided for the given <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-subkeys-key-type"><span class="std std-ref"><span class="pre">subkeys[].key_type</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;encr&quot;</span></code></p></li>
