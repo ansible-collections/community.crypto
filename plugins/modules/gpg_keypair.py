@@ -30,6 +30,8 @@ options:
     state:
         description:
             - Whether the private and public keys should exist or not, taking action if the state is different from what is stated.
+            - This module will fail if O(state=present), and neither O(name), O(comment), or O(email) are provided.
+            - This module will fail if O(state=present), and neither O(name), O(comment), O(email), O(fingerprints) are provided.
         type: str
         default: present
         choices: [ present, absent ]
@@ -54,6 +56,7 @@ options:
             - If O(key_curve=ed25519) is only supported if O(key_type=EDDSA).
             - This parameter is required if O(key_type=ECDSA) or O(key_type=EDDSA).
             - This parameter is ignored if O(key_type=RSA) or O(key_type=DSA).
+            - This module will fail if an unsupported O(key_curve) is provided for the given O(key_type).
         type: str
         choices: [ 'nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519' ]
     key_usage:
@@ -62,6 +65,7 @@ options:
             - V(cert) is given to all primary keys regardess, however can be used to only give V(vert) usage to a key.
             - If O(key_usage) is not specified, all of valid usages for the given O(key_type) are assigned.
             - O(key_usage=encr) is only supported if O(key_type=RSA).
+            - This module will fail if an unsupported O(key_usage) is provided for the given O(key_type).
         type: list
         elements: str
         default: []
@@ -92,6 +96,7 @@ options:
                     - O(subkeys[].key_curve=cv25519) is supported if O(subkeys[].key_type=ECDH).
                     - This parameter is required if O(subkeys[].key_type) is V(ECDSA), V(EDDSA), or V(ECDH).
                     - This parameter is ignored if O(subkeys[].key_type) is V(RSA), V(DSA), or V(ELG).
+                    - This module will fail if an unsupported O(subkeys[].key_curve) is provided for the given O(subkeys[].key_type).
                 type: str
                 choices: ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'ed25519', 'cv25519']
             key_usage:
@@ -99,6 +104,7 @@ options:
                     - Similar to O(key_usage).
                     - V(encr) is supported if O(subkeys[].key_type) is V(RSA), V(ECDH), or V(ELG).
                     - If O(subkeys[].key_type) is V(ECDH) or V(ELG), only V(encr) is supported.
+                    - This module will fail if an unsupported O(subkeys[].key_usage) is provided for the given O(subkeys[].key_type).
                 type: list
                 elements: str
                 default: []
@@ -113,7 +119,9 @@ options:
             - If O(expire_date=<n>y), the key expires in V(n) years.
             - Also excepts dates in ISO formats.
             - If left unspecified, any created GPG keys never expire.
-            - The module will fail if O(expire_date) is specified, but the python-dateutil package is not found.
+            - This module will fail if an unsupported format for O(expire_date) is provided.
+            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, and O(install_python_dateutil=false).
+            - This module will fail if O(expire_date) is provided, the python-dateutil package is not found, O(install_python_dateutil=true), and check_mode is enabled.
         type: str
     name:
         description:
@@ -143,7 +151,11 @@ options:
             - This parameter does not override V(check_mode).
             - This parameter is ignored if O(state=absent).
         type: bool
-        default: False
+        default: true
+    install_python_dateutil:
+        description:
+            - Specifies whether or not to try to install python-dateutil package if not found.
+        type: str
 notes:
     - If a user ID is provided, the module's options are matched against all keys with said user ID.
     - Matched parameters only include those in which an user has specified.
@@ -207,10 +219,11 @@ fingerprints:
 
 from itertools import chain, permutations
 import re
+import sys
 
-from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.basic import AnsibleModule
-
+from ansible.module_utils.common.process import get_bin_path
+from ansible.module_utils.common.respawn import has_respawned, respawn_module
 
 def all_permutations(arr):
     return list(chain.from_iterable(
@@ -255,9 +268,7 @@ def validate_key(module, key_type, key_curve, key_usage, key_name='primary key')
             module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ECDH':
-        if key_name == 'primary key':
-            module.fail_json('Invalid key_type for {0}.'.format(key_name))
-        elif key_curve:
+        if key_curve:
             if key_curve not in ['nistp256', 'nistp384', 'nistp521', 'brainpoolP256r1', 'brainpoolP384r1', 'brainpoolP512r1', 'secp256k1', 'cv25519']:
                 module.fail_json('Invalid curve for {0} {1}.'.format(key_type, key_name))
         elif key_usage and key_usage != ['encr']:
@@ -278,9 +289,7 @@ def validate_key(module, key_type, key_curve, key_usage, key_name='primary key')
             module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
     elif key_type == 'ELG':
-        if key_name == 'primary key':
-            module.fail_json('Invalid key_type for {0}.'.format(key_name))
-        elif key_usage and key_usage != ['encr']:
+        if key_usage and key_usage != ['encr']:
             module.fail_json('Invalid key_usage for {0} {1}.'.format(key_type, key_name))
         pass
 
@@ -371,7 +380,22 @@ def run_module(module, params, check_mode=False):
             import dateutil.parser as dp
             dp.isoparse(params['expire_date'])
         except ImportError:
-            module.fail_json('The python-dateutil package was not found. Install it from PyPI to so that this module can validate the expire_date parameter.')
+            if params['install_python_dateutil']:
+                apt_pkg_name = 'python-dateutil'
+                if has_respawned():
+                    module.fail_json(msg="{0} must be installed and visible from {1}.".format(apt_pkg_name, sys.executable))
+                elif module.check_mode:
+                    module.fail_json("{} must be installed to use check mode. If run normally this module can auto-install it.".format(apt_pkg_name))
+
+                else:
+                    module.run_command(
+                        ['-m', 'pip', 'install', apt_pkg_name],
+                        executable=sys.executable
+                        check_rc=True
+                    )
+                    respawn_module(sys.executable) # process will exit here once respawned module has completed
+            else:
+                module.fail_json('An expire date was specified, but the python-dateutil package was not found and install_python_dateutil=false.')
         except ValueError:
             if not (params['expire_date'].isnumeric() or (params['expire_date'][:-1].isnumeric() and params['expire_date'][-1] in ['w', 'm', 'y'])):
                 module.fail_json('Invalid format for expire date.')
@@ -495,7 +519,8 @@ def main():
             email=dict(type='str'),
             passphrase=dict(type='str', no_log=True),
             fingerprints=dict(type='list', elements='str', default=[]),
-            force=dict(type='bool', default=False)
+            force=dict(type='bool', default=False),
+            install_python_dateutil=dict(type='bool', default=True)
         ),
         supports_check_mode=True,
         required_if=[
