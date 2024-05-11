@@ -10,6 +10,7 @@ __metaclass__ = type
 
 
 import base64
+import datetime
 import re
 import textwrap
 import traceback
@@ -18,6 +19,10 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six.moves.urllib.parse import unquote
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_int_to_bytes
+
+from ansible_collections.community.crypto.plugins.module_utils.time import get_now_datetime
 
 
 def nopad_b64(data):
@@ -65,8 +70,61 @@ def pem_to_der(pem_filename=None, pem_content=None):
 def process_links(info, callback):
     '''
     Process link header, calls callback for every link header with the URL and relation as options.
+
+    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link
     '''
     if 'link' in info:
         link = info['link']
         for url, relation in re.findall(r'<([^>]+)>;\s*rel="(\w+)"', link):
             callback(unquote(url), relation)
+
+
+def parse_retry_after(value, relative_with_timezone=True, now=None):
+    '''
+    Parse the value of a Retry-After header and return a timestamp.
+
+    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
+    '''
+    # First try a number of seconds
+    try:
+        delta = datetime.timedelta(seconds=int(value))
+        if now is None:
+            now = get_now_datetime(relative_with_timezone)
+        return now + delta
+    except ValueError:
+        pass
+
+    try:
+        return datetime.datetime.strptime(value, '%a, %d %b %Y %H:%M:%S GMT')
+    except ValueError:
+        pass
+
+    raise ValueError('Cannot parse Retry-After header value %s' % repr(value))
+
+
+def compute_cert_id(
+    backend,
+    cert_info=None,
+    cert_filename=None,
+    cert_content=None,
+    none_if_required_information_is_missing=False,
+):
+    # Obtain certificate info if not provided
+    if cert_info is None:
+        cert_info = backend.get_cert_information(cert_filename=cert_filename, cert_content=cert_content)
+
+    # Convert Authority Key Identifier to string
+    if cert_info.authority_key_identifier is None:
+        if none_if_required_information_is_missing:
+            return None
+        raise ModuleFailException('Certificate has no Authority Key Identifier extension')
+    aki = to_native(base64.urlsafe_b64encode(cert_info.authority_key_identifier)).replace('=', '')
+
+    # Convert serial number to string
+    serial_bytes = convert_int_to_bytes(cert_info.serial_number)
+    if ord(serial_bytes[:1]) >= 128:
+        serial_bytes = b'\x00' + serial_bytes
+    serial = to_native(base64.urlsafe_b64encode(serial_bytes)).replace('=', '')
+
+    # Compose cert ID
+    return '{aki}.{serial}'.format(aki=aki, serial=serial)

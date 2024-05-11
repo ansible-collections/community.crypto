@@ -18,8 +18,6 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import EC
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
-    get_now_datetime,
-    get_relative_time_option,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -32,6 +30,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
     CertificateError,
     CertificateBackend,
     CertificateProvider,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    get_now_datetime,
+    get_relative_time_option,
 )
 
 try:

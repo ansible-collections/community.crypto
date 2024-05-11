@@ -1,0 +1,154 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- vars:
+    certificate_name: cert-1
+    subject_alt_name: DNS:example.com
+    account_email: example@example.org
+  block:
+    - name: Generate account key
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/account-ec256.pem"
+        type: ECC
+        curve: secp256r1
+        force: true
+    - name: Create cert private key
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
+        type: ECC
+        curve: secp256r1
+        force: true
+    - name: Create cert CSR
+      openssl_csr:
+        path: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
+        privatekey_path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
+        subject_alt_name: "{{ subject_alt_name }}"
+    - name: Start process of obtaining certificate
+      acme_certificate:
+        select_crypto_backend: "{{ select_crypto_backend }}"
+        acme_version: 2
+        acme_directory: https://{{ acme_host }}:14000/dir
+        validate_certs: false
+        account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+        modify_account: true
+        csr: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
+        dest: "{{ remote_tmp_dir }}/{{ certificate_name }}.pem"
+        challenge: http-01
+        force: true
+        terms_agreed: true
+        account_email: "{{ account_email }}"
+      register: certificate_data
+
+- name: Inspect order
+  acme_inspect:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    url: "{{ certificate_data.order_uri }}"
+    method: get
+  register: order_1
+- name: Show order
+  debug:
+    var: order_1.output_json
+
+- name: Deactivate order (check mode)
+  acme_certificate_deactivate_authz:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    order_uri: "{{ certificate_data.order_uri }}"
+  check_mode: true
+  register: deactivate_1
+
+- name: Inspect order again
+  acme_inspect:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    url: "{{ certificate_data.order_uri }}"
+    method: get
+  register: order_2
+- name: Show order
+  debug:
+    var: order_2.output_json
+
+- name: Deactivate order
+  acme_certificate_deactivate_authz:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    order_uri: "{{ certificate_data.order_uri }}"
+  register: deactivate_2
+
+- name: Inspect order again
+  acme_inspect:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    url: "{{ certificate_data.order_uri }}"
+    method: get
+  register: order_3
+- name: Show order
+  debug:
+    var: order_3.output_json
+
+- name: Deactivate order (check mode, idempotent)
+  acme_certificate_deactivate_authz:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    order_uri: "{{ certificate_data.order_uri }}"
+  check_mode: true
+  register: deactivate_3
+
+- name: Inspect order again
+  acme_inspect:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    url: "{{ certificate_data.order_uri }}"
+    method: get
+  register: order_4
+- name: Show order
+  debug:
+    var: order_4.output_json
+
+- name: Deactivate order (idempotent)
+  acme_certificate_deactivate_authz:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    order_uri: "{{ certificate_data.order_uri }}"
+  register: deactivate_4
+
+- name: Inspect order again
+  acme_inspect:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+    account_uri: "{{ certificate_data.account_uri }}"
+    url: "{{ certificate_data.order_uri }}"
+    method: get
+  register: order_5
+- name: Show order
+  debug:
+    var: order_5.output_json
