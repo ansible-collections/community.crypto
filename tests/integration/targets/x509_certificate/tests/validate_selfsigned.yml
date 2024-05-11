@@ -139,6 +139,11 @@
     that:
       - cert3_notAfter.stdout == 'Oct 23 13:37:42 2019'
 
+- name: (Selfsigned validation, {{select_crypto_backend}}) Validate idempotency
+  assert:
+    that:
+      - cert3_selfsigned_idem is not changed
+
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (test - privatekey's pubkey)
   shell: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey_ecc.pem'
   register: privatekey_ecc_pubkey

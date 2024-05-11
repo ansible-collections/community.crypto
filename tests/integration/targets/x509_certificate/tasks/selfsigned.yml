@@ -220,6 +220,18 @@
     privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
     select_crypto_backend: '{{ select_crypto_backend }}'
 
+- name: (Selfsigned, {{select_crypto_backend}}) Create certificate3 with notBefore and notAfter (idempotent)
+  x509_certificate:
+    provider: selfsigned
+    selfsigned_not_before: 20181023133742Z
+    selfsigned_not_after: 20191023133742Z
+    ignore_timestamps: false
+    path: "{{ remote_tmp_dir }}/cert3.pem"
+    csr_path: "{{ remote_tmp_dir }}/csr3.pem"
+    privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: cert3_selfsigned_idem
+
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'

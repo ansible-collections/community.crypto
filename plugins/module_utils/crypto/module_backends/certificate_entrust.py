@@ -47,7 +47,12 @@ class EntrustCertificateBackend(CertificateBackend):
     def __init__(self, module, backend):
         super(EntrustCertificateBackend, self).__init__(module, backend)
         self.trackingId = None
-        self.notAfter = get_relative_time_option(module.params['entrust_not_after'], 'entrust_not_after', backend=self.backend)
+        self.notAfter = get_relative_time_option(
+            module.params['entrust_not_after'],
+            'entrust_not_after',
+            backend=self.backend,
+            with_timezone=CRYPTOGRAPHY_TIMEZONE,
+        )
 
         if self.csr_content is None and self.csr_path is None:
             raise CertificateError(
