@@ -212,6 +212,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
 <li><p>gpg &gt;= 2.1</p></li>
+<li><p>python-dateutil</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -249,6 +250,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-gp
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date=&lt;n&gt;y</span></span></a></code>, the key expires in <code class="ansible-value docutils literal notranslate"><span class="pre">n</span></code> years.</p>
 <p>Also excepts dates in ISO formats.</p>
 <p>If left unspecified, any created GPG keys never expire.</p>
+<p>The module will fail if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-gpg-keypair-module-parameter-expire-date"><span class="std std-ref"><span class="pre">expire_date</span></span></a></strong></code> is specified, but the python-dateutil package is not found.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
