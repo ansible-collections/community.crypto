@@ -18,6 +18,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
     cryptography_verify_certificate_signature,
@@ -51,8 +52,18 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         super(SelfSignedCertificateBackendCryptography, self).__init__(module, 'cryptography')
 
         self.create_subject_key_identifier = module.params['selfsigned_create_subject_key_identifier']
-        self.notBefore = get_relative_time_option(module.params['selfsigned_not_before'], 'selfsigned_not_before', backend=self.backend)
-        self.notAfter = get_relative_time_option(module.params['selfsigned_not_after'], 'selfsigned_not_after', backend=self.backend)
+        self.notBefore = get_relative_time_option(
+            module.params['selfsigned_not_before'],
+            'selfsigned_not_before',
+            backend=self.backend,
+            with_timezone=CRYPTOGRAPHY_TIMEZONE,
+        )
+        self.notAfter = get_relative_time_option(
+            module.params['selfsigned_not_after'],
+            'selfsigned_not_after',
+            backend=self.backend,
+            with_timezone=CRYPTOGRAPHY_TIMEZONE,
+        )
         self.digest = select_message_digest(module.params['selfsigned_digest'])
         self.version = module.params['selfsigned_version']
         self.serial_number = x509.random_serial_number()
