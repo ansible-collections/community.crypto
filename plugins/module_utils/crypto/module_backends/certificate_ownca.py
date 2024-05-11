@@ -26,6 +26,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
     cryptography_compare_public_keys,
     cryptography_key_needs_digest_for_signing,
     cryptography_serial_number_of_cert,
@@ -62,8 +63,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         self.create_subject_key_identifier = module.params['ownca_create_subject_key_identifier']
         self.create_authority_key_identifier = module.params['ownca_create_authority_key_identifier']
-        self.notBefore = get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend)
-        self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend)
+        self.notBefore = get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend, with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend, with_timezone=CRYPTOGRAPHY_TIMEZONE)
         self.digest = select_message_digest(module.params['ownca_digest'])
         self.version = module.params['ownca_version']
         self.serial_number = x509.random_serial_number()
