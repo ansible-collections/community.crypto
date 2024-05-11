@@ -63,8 +63,18 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         self.create_subject_key_identifier = module.params['ownca_create_subject_key_identifier']
         self.create_authority_key_identifier = module.params['ownca_create_authority_key_identifier']
-        self.notBefore = get_relative_time_option(module.params['ownca_not_before'], 'ownca_not_before', backend=self.backend, with_timezone=CRYPTOGRAPHY_TIMEZONE)
-        self.notAfter = get_relative_time_option(module.params['ownca_not_after'], 'ownca_not_after', backend=self.backend, with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        self.notBefore = get_relative_time_option(
+            module.params['ownca_not_before'],
+            'ownca_not_before',
+            backend=self.backend,
+            with_timezone=CRYPTOGRAPHY_TIMEZONE,
+        )
+        self.notAfter = get_relative_time_option(
+            module.params['ownca_not_after'],
+            'ownca_not_after',
+            backend=self.backend,
+            with_timezone=CRYPTOGRAPHY_TIMEZONE,
+        )
         self.digest = select_message_digest(module.params['ownca_digest'])
         self.version = module.params['ownca_version']
         self.serial_number = x509.random_serial_number()
