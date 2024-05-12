@@ -89,6 +89,10 @@ If you use the Ansible package and do not update collections independently, use 
   - acme_ari_info module
   - acme_certificate module
   - acme_certificate_deactivate_authz module
+  - acme_certificate_order_create module
+  - acme_certificate_order_finalize module
+  - acme_certificate_order_info module
+  - acme_certificate_order_validate module
   - acme_certificate_revoke module
   - acme_challenge_cert_helper module
   - acme_inspect module
