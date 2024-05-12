@@ -28,6 +28,7 @@
     acme_version: 2
     validate_certs: false
     method: directory-only
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: directory
 - debug: var=directory
 
@@ -40,6 +41,7 @@
     url: "{{ directory.directory.newAccount}}"
     method: post
     content: '{"termsOfServiceAgreed":true}'
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: account_creation
   # account_creation.headers.location contains the account URI
   # if creation was successful
@@ -54,6 +56,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
     method: get
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: account_get
 - debug: var=account_get
 
@@ -67,6 +70,7 @@
     url: "{{ account_creation.headers.location }}"
     method: post
     content: '{{ account_info | to_json }}'
+    select_crypto_backend: "{{ select_crypto_backend }}"
   vars:
     account_info:
       # For valid values, see
@@ -86,6 +90,7 @@
     url: "{{ directory.directory.newOrder }}"
     method: post
     content: '{{ create_order | to_json }}'
+    select_crypto_backend: "{{ select_crypto_backend }}"
   vars:
     create_order:
       # For valid values, see
@@ -108,6 +113,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ new_order.headers.location }}"
     method: get
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: order
 - debug: var=order
 
@@ -120,6 +126,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item }}"
     method: get
+    select_crypto_backend: "{{ select_crypto_backend }}"
   loop: "{{ order.output_json.authorizations }}"
   register: authz
 - debug: var=authz
@@ -133,6 +140,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ (item.challenges | selectattr('type', 'equalto', 'http-01') | list)[0].url }}"
     method: get
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: http01challenge
   loop: "{{ authz.results | map(attribute='output_json') | list }}"
 - debug: var=http01challenge
@@ -147,6 +155,7 @@
     url: "{{ item.url }}"
     method: post
     content: '{}'
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: activation
   loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
 - debug: var=activation
@@ -160,6 +169,7 @@
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ item.url }}"
     method: get
+    select_crypto_backend: "{{ select_crypto_backend }}"
   register: validation_result
   loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
   until: "validation_result.output_json.status not in ['pending', 'processing']"
