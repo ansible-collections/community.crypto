@@ -5,7 +5,7 @@
 
 # Test code for the community.crypto.gpg_keypair module.
 #
-# Copyright (c) 2024, Austin Lucas Lake <53884490+austinlucaslake@users.noreply.github.com>
+# Copyright (c) 2024 Austin Lucas Lake <git@austinlucaslake.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
