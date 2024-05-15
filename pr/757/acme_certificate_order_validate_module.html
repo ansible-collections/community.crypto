@@ -570,6 +570,65 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 </div></td>
 </tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges"><strong>validating_challenges</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>List of challenges whose validation was triggered.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges/authz_url"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges-authz-url"><strong>authz_url</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges/authz_url" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The URL of the authorization object for this challenge.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges/challenge_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges-challenge-type"><strong>challenge_type</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges/challenge_type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The challenge’s type.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Can only return:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;http-01&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-01&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;tls-alpn-01&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges/challenge_url"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges-challenge-url"><strong>challenge_url</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges/challenge_url" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The URL of the challenge object.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges/identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges-identifier"><strong>identifier</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges/identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The identifier the challenge is for.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-validating_challenges/identifier_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-validate-module-return-validating-challenges-identifier-type"><strong>identifier_type</strong></p>
+<a class="ansibleOptionLink" href="#return-validating_challenges/identifier_type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The identifier’s type for the challenge.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Can only return:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ip&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
 </tbody>
 </table>
 <section id="authors">
