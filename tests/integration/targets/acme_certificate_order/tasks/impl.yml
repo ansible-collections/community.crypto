@@ -146,6 +146,11 @@
       - validate_1 is changed
       - validate_1.account_uri == account.account_uri
 
+- name: Wait until we know that the challenges have been validated for ansible-core <= 2.11
+  pause:
+    seconds: 5
+  when: ansible_version.full is version('2.12', '<')
+
 - name: Get order information
   acme_certificate_order_info:
     acme_directory: https://{{ acme_host }}:14000/dir
