@@ -741,6 +741,19 @@ releases:
     - 701-private_key_info-consistency.yml
     - 704-x509_certificate-assertonly-privatekey.yml
     release_date: '2024-01-27'
+  1.9.25:
+    changes:
+      bugfixes:
+      - crypto.math module utils - change return values for ``quick_is_not_prime()``
+        for special cases that do not appear when using the collection (https://github.com/ansible-collections/community.crypto/pull/733).
+      - ecs_certificate - fixed ``csr`` option to be empty and allow renewal of a
+        specific certificate according to the Renewal Information specification (https://github.com/ansible-collections/community.crypto/pull/740).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.9.25.yml
+    - 733-math-prime.yml
+    - 740-ecs_certificate-renewal-without-csr.yml
+    release_date: '2024-05-20'
   1.9.3:
     changes:
       bugfixes:

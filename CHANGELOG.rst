@@ -4,6 +4,20 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v1.9.25
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- crypto.math module utils - change return values for ``quick_is_not_prime()`` for special cases that do not appear when using the collection (https://github.com/ansible-collections/community.crypto/pull/733).
+- ecs_certificate - fixed ``csr`` option to be empty and allow renewal of a specific certificate according to the Renewal Information specification (https://github.com/ansible-collections/community.crypto/pull/740).
+
 v1.9.24
 =======
 
