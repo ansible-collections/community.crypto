@@ -4,6 +4,41 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.20.0
+=======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+The deprecations in this release are only relevant for collections that use shared
+code or docs fragments from this collection.
+
+Minor Changes
+-------------
+
+- acme_certificate - add ``include_renewal_cert_id`` option to allow requesting renewal of a specific certificate according to the current ACME Renewal Information specification draft (https://github.com/ansible-collections/community.crypto/pull/739).
+
+Deprecated Features
+-------------------
+
+- acme documentation fragment - the default ``community.crypto.acme[.documentation]`` docs fragment is deprecated and will be removed from community.crypto 3.0.0. Replace it with both the new ``community.crypto.acme.basic`` and ``community.crypto.acme.account`` fragments (https://github.com/ansible-collections/community.crypto/pull/735).
+- acme.backends module utils - the ``get_cert_information()`` method for a ACME crypto backend must be implemented from community.crypto 3.0.0 on (https://github.com/ansible-collections/community.crypto/pull/736).
+- crypto.module_backends.common module utils - the ``crypto.module_backends.common`` module utils is deprecated and will be removed from community.crypto 3.0.0. Use the improved ``argspec`` module util instead (https://github.com/ansible-collections/community.crypto/pull/749).
+
+Bugfixes
+--------
+
+- x509_crl, x509_certificate, x509_certificate_info - when parsing absolute timestamps which omitted the second count, the first digit of the minutes was used as a one-digit minutes count, and the second digit of the minutes as a one-digit second count (https://github.com/ansible-collections/community.crypto/pull/745).
+
+New Modules
+-----------
+
+- community.crypto.acme_ari_info - Retrieves ACME Renewal Information (ARI) for a certificate.
+- community.crypto.acme_certificate_deactivate_authz - Deactivate all authz for an ACME v2 order.
+- community.crypto.acme_certificate_renewal_info - Determine whether a certificate should be renewed or not.
+
 v2.19.1
 =======
 
