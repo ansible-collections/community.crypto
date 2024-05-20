@@ -262,7 +262,7 @@ Bugfix and feature release\.
 <a id="new-modules"></a>
 ### New Modules
 
-* x509\_certificate\_convert \- Convert X\.509 certificates
+* community\.crypto\.x509\_certificate\_convert \- Convert X\.509 certificates
 
 <a id="v2-18-0"></a>
 ## v2\.18\.0
@@ -295,8 +295,8 @@ Bugfix and feature release\.
 <a id="filter"></a>
 #### Filter
 
-* parse\_serial \- Convert a serial number as a colon\-separated list of hex numbers to an integer
-* to\_serial \- Convert an integer to a colon\-separated list of hex numbers
+* community\.crypto\.parse\_serial \- Convert a serial number as a colon\-separated list of hex numbers to an integer
+* community\.crypto\.to\_serial \- Convert an integer to a colon\-separated list of hex numbers
 
 <a id="v2-17-1"></a>
 ## v2\.17\.1
@@ -416,12 +416,12 @@ Bugfix and feature release\.
 <a id="filter-1"></a>
 #### Filter
 
-* gpg\_fingerprint \- Retrieve a GPG fingerprint from a GPG public or private key
+* community\.crypto\.gpg\_fingerprint \- Retrieve a GPG fingerprint from a GPG public or private key
 
 <a id="lookup"></a>
 #### Lookup
 
-* gpg\_fingerprint \- Retrieve a GPG fingerprint from a GPG public or private key file
+* community\.crypto\.gpg\_fingerprint \- Retrieve a GPG fingerprint from a GPG public or private key file
 
 <a id="v2-14-1"></a>
 ## v2\.14\.1
@@ -563,12 +563,12 @@ Bugfix and feature release\.
 <a id="filter-2"></a>
 #### Filter
 
-* openssl\_csr\_info \- Retrieve information from OpenSSL Certificate Signing Requests \(CSR\)
-* openssl\_privatekey\_info \- Retrieve information from OpenSSL private keys
-* openssl\_publickey\_info \- Retrieve information from OpenSSL public keys in PEM format
-* split\_pem \- Split PEM file contents into multiple objects
-* x509\_certificate\_info \- Retrieve information from X\.509 certificates in PEM format
-* x509\_crl\_info \- Retrieve information from X\.509 CRLs in PEM format
+* community\.crypto\.openssl\_csr\_info \- Retrieve information from OpenSSL Certificate Signing Requests \(CSR\)
+* community\.crypto\.openssl\_privatekey\_info \- Retrieve information from OpenSSL private keys
+* community\.crypto\.openssl\_publickey\_info \- Retrieve information from OpenSSL public keys in PEM format
+* community\.crypto\.split\_pem \- Split PEM file contents into multiple objects
+* community\.crypto\.x509\_certificate\_info \- Retrieve information from X\.509 certificates in PEM format
+* community\.crypto\.x509\_crl\_info \- Retrieve information from X\.509 CRLs in PEM format
 
 <a id="v2-9-0"></a>
 ## v2\.9\.0
@@ -867,8 +867,8 @@ Feature and bugfix release\.
 <a id="new-modules-1"></a>
 ### New Modules
 
-* crypto\_info \- Retrieve cryptographic capabilities
-* openssl\_privatekey\_convert \- Convert OpenSSL private keys
+* community\.crypto\.crypto\_info \- Retrieve cryptographic capabilities
+* community\.crypto\.openssl\_privatekey\_convert \- Convert OpenSSL private keys
 
 <a id="v2-0-2"></a>
 ## v2\.0\.2
@@ -1114,7 +1114,7 @@ Regular feature and bugfix release\.
 <a id="new-modules-2"></a>
 ### New Modules
 
-* openssl\_publickey\_info \- Provide information for OpenSSL public keys
+* community\.crypto\.openssl\_publickey\_info \- Provide information for OpenSSL public keys
 
 <a id="v1-6-2"></a>
 ## v1\.6\.2
@@ -1245,9 +1245,9 @@ Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr
 <a id="new-modules-3"></a>
 ### New Modules
 
-* openssl\_csr\_pipe \- Generate OpenSSL Certificate Signing Request \(CSR\)
-* openssl\_privatekey\_pipe \- Generate OpenSSL private keys without disk access
-* x509\_certificate\_pipe \- Generate and/or check OpenSSL certificates
+* community\.crypto\.openssl\_csr\_pipe \- Generate OpenSSL Certificate Signing Request \(CSR\)
+* community\.crypto\.openssl\_privatekey\_pipe \- Generate OpenSSL private keys without disk access
+* community\.crypto\.x509\_certificate\_pipe \- Generate and/or check OpenSSL certificates
 
 <a id="v1-2-0"></a>
 ## v1\.2\.0
@@ -1323,8 +1323,8 @@ Release for Ansible 2\.10\.0\.
 <a id="new-modules-4"></a>
 ### New Modules
 
-* openssl\_signature \- Sign data with openssl
-* openssl\_signature\_info \- Verify signatures with openssl
+* community\.crypto\.openssl\_signature \- Sign data with openssl
+* community\.crypto\.openssl\_signature\_info \- Verify signatures with openssl
 
 <a id="v1-0-0"></a>
 ## v1\.0\.0
@@ -1399,6 +1399,6 @@ This is the first proper release of the <code>community\.crypto</code> collectio
 <a id="new-modules-5"></a>
 ### New Modules
 
-* ecs\_domain \- Request validation of a domain with the Entrust Certificate Services \(ECS\) API
-* x509\_crl \- Generate Certificate Revocation Lists \(CRLs\)
-* x509\_crl\_info \- Retrieve information on Certificate Revocation Lists \(CRLs\)
+* community\.crypto\.ecs\_domain \- Request validation of a domain with the Entrust Certificate Services \(ECS\) API
+* community\.crypto\.x509\_crl \- Generate Certificate Revocation Lists \(CRLs\)
+* community\.crypto\.x509\_crl\_info \- Retrieve information on Certificate Revocation Lists \(CRLs\)
