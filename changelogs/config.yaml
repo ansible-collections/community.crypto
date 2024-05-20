@@ -34,3 +34,6 @@ sections:
 - - known_issues
   - Known Issues
 title: Community Crypto
+trivial_section_name: trivial
+use_fqcn: true
+add_plugin_period: true

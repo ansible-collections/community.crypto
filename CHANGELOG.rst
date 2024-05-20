@@ -46,7 +46,7 @@ Bugfixes
 New Modules
 -----------
 
-- x509_certificate_convert - Convert X.509 certificates
+- community.crypto.x509_certificate_convert - Convert X.509 certificates
 
 v2.18.0
 =======
@@ -79,8 +79,8 @@ New Plugins
 Filter
 ~~~~~~
 
-- parse_serial - Convert a serial number as a colon-separated list of hex numbers to an integer
-- to_serial - Convert an integer to a colon-separated list of hex numbers
+- community.crypto.parse_serial - Convert a serial number as a colon-separated list of hex numbers to an integer
+- community.crypto.to_serial - Convert an integer to a colon-separated list of hex numbers
 
 v2.17.1
 =======
@@ -200,12 +200,12 @@ New Plugins
 Filter
 ~~~~~~
 
-- gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key
+- community.crypto.gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key
 
 Lookup
 ~~~~~~
 
-- gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key file
+- community.crypto.gpg_fingerprint - Retrieve a GPG fingerprint from a GPG public or private key file
 
 v2.14.1
 =======
@@ -348,12 +348,12 @@ New Plugins
 Filter
 ~~~~~~
 
-- openssl_csr_info - Retrieve information from OpenSSL Certificate Signing Requests (CSR)
-- openssl_privatekey_info - Retrieve information from OpenSSL private keys
-- openssl_publickey_info - Retrieve information from OpenSSL public keys in PEM format
-- split_pem - Split PEM file contents into multiple objects
-- x509_certificate_info - Retrieve information from X.509 certificates in PEM format
-- x509_crl_info - Retrieve information from X.509 CRLs in PEM format
+- community.crypto.openssl_csr_info - Retrieve information from OpenSSL Certificate Signing Requests (CSR)
+- community.crypto.openssl_privatekey_info - Retrieve information from OpenSSL private keys
+- community.crypto.openssl_publickey_info - Retrieve information from OpenSSL public keys in PEM format
+- community.crypto.split_pem - Split PEM file contents into multiple objects
+- community.crypto.x509_certificate_info - Retrieve information from X.509 certificates in PEM format
+- community.crypto.x509_crl_info - Retrieve information from X.509 CRLs in PEM format
 
 v2.9.0
 ======
@@ -652,8 +652,8 @@ Bugfixes
 New Modules
 -----------
 
-- crypto_info - Retrieve cryptographic capabilities
-- openssl_privatekey_convert - Convert OpenSSL private keys
+- community.crypto.crypto_info - Retrieve cryptographic capabilities
+- community.crypto.openssl_privatekey_convert - Convert OpenSSL private keys
 
 v2.0.2
 ======
@@ -899,7 +899,7 @@ Bugfixes
 New Modules
 -----------
 
-- openssl_publickey_info - Provide information for OpenSSL public keys
+- community.crypto.openssl_publickey_info - Provide information for OpenSSL public keys
 
 v1.6.2
 ======
@@ -1030,9 +1030,9 @@ Bugfixes
 New Modules
 -----------
 
-- openssl_csr_pipe - Generate OpenSSL Certificate Signing Request (CSR)
-- openssl_privatekey_pipe - Generate OpenSSL private keys without disk access
-- x509_certificate_pipe - Generate and/or check OpenSSL certificates
+- community.crypto.openssl_csr_pipe - Generate OpenSSL Certificate Signing Request (CSR)
+- community.crypto.openssl_privatekey_pipe - Generate OpenSSL private keys without disk access
+- community.crypto.x509_certificate_pipe - Generate and/or check OpenSSL certificates
 
 v1.2.0
 ======
@@ -1108,8 +1108,8 @@ Bugfixes
 New Modules
 -----------
 
-- openssl_signature - Sign data with openssl
-- openssl_signature_info - Verify signatures with openssl
+- community.crypto.openssl_signature - Sign data with openssl
+- community.crypto.openssl_signature_info - Verify signatures with openssl
 
 v1.0.0
 ======
@@ -1184,6 +1184,6 @@ Bugfixes
 New Modules
 -----------
 
-- ecs_domain - Request validation of a domain with the Entrust Certificate Services (ECS) API
-- x509_crl - Generate Certificate Revocation Lists (CRLs)
-- x509_crl_info - Retrieve information on Certificate Revocation Lists (CRLs)
+- community.crypto.ecs_domain - Request validation of a domain with the Entrust Certificate Services (ECS) API
+- community.crypto.x509_crl - Generate Certificate Revocation Lists (CRLs)
+- community.crypto.x509_crl_info - Retrieve information on Certificate Revocation Lists (CRLs)
