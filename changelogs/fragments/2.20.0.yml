@@ -1,0 +1,5 @@
+release_summary: |
+  Feature and bugfix release.
+
+  The deprecations in this release are only relevant for collections that use shared
+  code or docs fragments from this collection.
