@@ -1172,6 +1172,54 @@ releases:
     - 2.2.4.yml
     - 417-openssh_modules-fix-exception-reporting.yml
     release_date: '2022-03-22'
+  2.20.0:
+    changes:
+      bugfixes:
+      - x509_crl, x509_certificate, x509_certificate_info - when parsing absolute
+        timestamps which omitted the second count, the first digit of the minutes
+        was used as a one-digit minutes count, and the second digit of the minutes
+        as a one-digit second count (https://github.com/ansible-collections/community.crypto/pull/745).
+      deprecated_features:
+      - acme documentation fragment - the default ``community.crypto.acme[.documentation]``
+        docs fragment is deprecated and will be removed from community.crypto 3.0.0.
+        Replace it with both the new ``community.crypto.acme.basic`` and ``community.crypto.acme.account``
+        fragments (https://github.com/ansible-collections/community.crypto/pull/735).
+      - acme.backends module utils - the ``get_cert_information()`` method for a ACME
+        crypto backend must be implemented from community.crypto 3.0.0 on (https://github.com/ansible-collections/community.crypto/pull/736).
+      - crypto.module_backends.common module utils - the ``crypto.module_backends.common``
+        module utils is deprecated and will be removed from community.crypto 3.0.0.
+        Use the improved ``argspec`` module util instead (https://github.com/ansible-collections/community.crypto/pull/749).
+      minor_changes:
+      - acme_certificate - add ``include_renewal_cert_id`` option to allow requesting
+        renewal of a specific certificate according to the current ACME Renewal Information
+        specification draft (https://github.com/ansible-collections/community.crypto/pull/739).
+      release_summary: 'Feature and bugfix release.
+
+
+        The deprecations in this release are only relevant for collections that use
+        shared
+
+        code or docs fragments from this collection.
+
+        '
+    fragments:
+    - 2.20.0.yml
+    - 735-acme-docs-fragment.yml
+    - 736-cert-info.yml
+    - 739-acme_certificate-include_renewal_cert_id.yml
+    - 745-absolute-time.yml
+    - 749-argspec.yml
+    modules:
+    - description: Retrieves ACME Renewal Information (ARI) for a certificate.
+      name: acme_ari_info
+      namespace: ''
+    - description: Deactivate all authz for an ACME v2 order.
+      name: acme_certificate_deactivate_authz
+      namespace: ''
+    - description: Determine whether a certificate should be renewed or not.
+      name: acme_certificate_renewal_info
+      namespace: ''
+    release_date: '2024-05-20'
   2.3.0:
     changes:
       bugfixes:
