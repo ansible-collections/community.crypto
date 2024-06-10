@@ -215,7 +215,7 @@ jobs:
             docker: centos7
             python: ''
             target: shippable/posix/group1/
-            runs_on: ubuntu-2004
+            runs_on: ubuntu-20.04
           - ansible: '2.13'
             docker: fedora34
             python: ''
@@ -308,7 +308,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+          path: ansible_collections/community/crypto
 
       - name: Set up Python
         uses: actions/setup-python@v5
