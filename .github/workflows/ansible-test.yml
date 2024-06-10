@@ -26,6 +26,7 @@ jobs:
           - '2.10'
           - '2.11'
           - '2.12'
+          - '2.13'
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
     # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
     # image for these stable branches. The list of branches where this is necessary will
@@ -66,6 +67,7 @@ jobs:
           - '2.10'
           - '2.11'
           - '2.12'
+          - '2.13'
 
     steps:
       - name: >-
@@ -193,6 +195,59 @@ jobs:
             docker: default
             python: '3.9'
             target: shippable/cloud/group1/
+          # 2.13
+          - ansible: '2.13'
+            docker: centos7
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: fedora34
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: fedora35
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: opensuse15py2
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: opensuse15
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: ubuntu1804
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: ubuntu2004
+            python: ''
+            target: shippable/posix/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '2.7'
+            target: shippable/cloud/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '3.5'
+            target: shippable/cloud/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '3.6'
+            target: shippable/cloud/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '3.7'
+            target: shippable/cloud/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '3.9'
+            target: shippable/cloud/group1/
+          - ansible: '2.13'
+            docker: default
+            python: '3.10'
+            target: shippable/cloud/group1/
     steps:
       - name: >-
           Perform integration testing against
@@ -216,3 +271,30 @@ jobs:
           target: ${{ matrix.target }}
           target-python-version: ${{ matrix.python }}
           testing-type: integration
+
+  extra-sanity:
+    name: Extra Sanity
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install ansible-core
+        run: pip install https://github.com/ansible/ansible/archive/stable-2.13.tar.gz --disable-pip-version-check
+
+      - name: Install collection dependencies
+        run: >-
+          ansible-galaxy collection install -p .
+          git+https://github.com/ansible-collections/community.internal_test_tools.git,main
+
+      - name: Run sanity tests
+        run: ../../community/internal_test_tools/tools/run.py --color
+        working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
