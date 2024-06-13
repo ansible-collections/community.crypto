@@ -290,7 +290,7 @@ stages:
             # - test: 3.9
             # - test: "3.10"
             - test: "3.11"
-            - test: "3.12"
+            - test: "3.13"
           groups:
             - 1
             - 2
