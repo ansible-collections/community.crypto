@@ -118,14 +118,6 @@ jobs:
         include:
           # 2.9
           - ansible: '2.9'
-            docker: fedora31
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.9'
-            docker: fedora31
-            python: ''
-            target: azp/posix/2/
-          - ansible: '2.9'
             docker: ubuntu1804
             python: ''
             target: azp/posix/1/
@@ -159,14 +151,6 @@ jobs:
             python: '3.6'
             target: azp/generic/2/
           # 2.11
-          - ansible: '2.11'
-            docker: fedora32
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.11'
-            docker: fedora32
-            python: ''
-            target: azp/posix/2/
           - ansible: '2.11'
             docker: alpine3
             python: ''
