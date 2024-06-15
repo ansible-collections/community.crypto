@@ -113,11 +113,6 @@ jobs:
           #  target: shippable/posix/group1/
           #  runs_on: ubuntu-20.04
           - ansible: '2.9'
-            docker: fedora31
-            python: ''
-            target: shippable/posix/group1/
-            runs_on: ubuntu-20.04
-          - ansible: '2.9'
             docker: ubuntu1604
             python: ''
             target: shippable/posix/group1/
@@ -139,11 +134,6 @@ jobs:
             target: shippable/posix/group1/
             runs_on: ubuntu-20.04
           - ansible: '2.10'
-            docker: fedora31
-            python: ''
-            target: shippable/posix/group1/
-            runs_on: ubuntu-20.04
-          - ansible: '2.10'
             docker: ubuntu1604
             python: ''
             target: shippable/posix/group1/
@@ -159,11 +149,6 @@ jobs:
           #  python: ''
           #  target: shippable/posix/group1/
           #  runs_on: ubuntu-20.04
-          - ansible: '2.11'
-            docker: fedora32
-            python: ''
-            target: shippable/posix/group1/
-            runs_on: ubuntu-20.04
           - ansible: '2.11'
             docker: opensuse15py2
             python: ''
