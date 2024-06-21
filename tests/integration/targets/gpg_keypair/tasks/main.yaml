@@ -1,0 +1,364 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the community.crypto.gpg_keypair module.
+#
+# Copyright (c) 2024 Austin Lucas Lake <git@austinlucaslake.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create default key
+  community.crypto.gpg_keypair:
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key using fingerprint 
+  community.crypto.gpg_keypair:
+    state: absent
+    fingerprints: created_key.fingerprints
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key
+  community.crypto.gpg_keypair:
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key using user-id 
+  community.crypto.gpg_keypair:
+    state: absent
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with passphrase
+  community.crypto.gpg_keypair:
+    name: name
+    comment: comment
+    email: name@email.com
+    passphrase: '{{ passphrase }}'
+  register: created_key
+- name: Delete default key 
+  community.crypto.gpg_keypair:
+    state: absent
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default RSA key
+  community.crypto.gpg_keypair:
+    key_type: RSA
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default RSA key
+  community.crypto.gpg_keypair:
+    state: absent
+    key_type: RSA
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create 2048-bit RSA key
+  community.crypto.gpg_keypair:
+    key_type: RSA
+    key_size: 2048
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default RSA key
+  community.crypto.gpg_keypair:
+    state: absent
+    key_size: 2048
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default DSA key
+  community.crypto.gpg_keypair:
+    key_type: DSA
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default DSA key
+  community.crypto.gpg_keypair:
+    state: absent
+    key_type: DSA
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create brainpoolP512r1 ECDSA key
+  community.crypto.gpg_keypair:
+    key_type: ECDSA
+    key_curve: brainpoolP512r1
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete brainpoolP512r1 ECDSA key
+  community.crypto.gpg_keypair:
+    state: absent
+    key_type: ECDSA
+    key_curve: brainpoolP512r1
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create Ed25519 key
+  community.crypto.gpg_keypair:
+    key_type: EDDSA
+    key_curve: ed25519
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete Ed25519 key 
+  community.crypto.gpg_keypair:
+    state: absent
+    key_type: EDDSA
+    key_curve: ed25519
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with custom usage
+  community.crypto.gpg_keypair:
+    key_usage:
+      - sign
+      - auth
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with custom usage
+  community.crypto.gpg_keypair:
+    state: absent
+    key_usage:
+      - sign
+      - auth
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with default RSA subkey 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - { key_type: RSA }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with default RSA subkey
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - { key_type: RSA }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with default DSA subkey 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - { key_type: DSA }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with default DSA subkey
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - { key_type: DSA }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with default ELG subkey 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - { key_type: ELG }
+    name: name
+    comment: comment
+    email: name@email.com
+    force: True
+  register: created_key
+- name: Delete default key with default ELG subkey
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - { key_type: ELG }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with Ed25519 subkey 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - { key_type: EDDSA, key_curve: ed25519 }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with Ed25519 subkey
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - { key_type: EDDSA, key_curve: ed25519 }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with Cv25519 ECDH subkey 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - { key_type: ECDH, key_curve: cv25519 }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with Cv25519 ECDH subkey 
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - { key_type: ECDH, key_curve: cv25519 }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
+
+
+- name: Create default key with RSA subkey with custom usage 
+  community.crypto.gpg_keypair:
+    subkeys:
+      - {
+          key_type: RSA,
+          key_usage: 
+            - auth
+            - encr
+        }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: created_key
+- name: Delete default key with RSA subkey with custom usage 
+  community.crypto.gpg_keypair:
+    state: absent
+    subkeys:
+      - {
+          key_type: RSA,
+          key_usage: 
+            - auth
+            - encr
+        }
+    name: name
+    comment: comment
+    email: name@email.com
+  register: deleted_key
+- ansible.builtin.assert:
+    that:
+      - created_key.changed
+      - deleted_key.changed
+      - created_key.fingerprints == deleted_key.fingerprints
