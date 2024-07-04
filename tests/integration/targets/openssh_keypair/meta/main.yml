@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependencies:
+  - prepare_jinja2_compat
   - setup_ssh_keygen
   - setup_openssl
   - setup_bcrypt

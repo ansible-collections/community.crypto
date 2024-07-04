@@ -264,90 +264,95 @@
     - [ '', '.pub' ]
   when: "item.0 != 'always'"
 
-- name: "({{ backend }}) Regenerate - adjust key type (check mode)"
-  openssh_keypair:
-    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
-    type: dsa
-    size: 1024
-    regenerate: '{{ item }}'
-    backend: "{{ backend }}"
-  check_mode: true
-  loop: "{{ regenerate_values }}"
-  ignore_errors: true
-  register: result
-- assert:
-    that:
-      - result.results[0] is success and result.results[0] is not changed
-      - result.results[1] is failed
-      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
-      - result.results[2] is changed
-      - result.results[3] is changed
-      - result.results[4] is changed
+- vars:
+    ssh_type: '{{ "dsa" if openssh_supports_dsa else "ecdsa" }}'
+    ssh_size: '{{ 1024 if openssh_supports_dsa else omit }}'
 
-- name: "({{ backend }}) Regenerate - adjust key type"
-  openssh_keypair:
-    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
-    type: dsa
-    size: 1024
-    regenerate: '{{ item }}'
-    backend: "{{ backend }}"
-  loop: "{{ regenerate_values }}"
-  ignore_errors: true
-  register: result
-- assert:
-    that:
-      - result.results[0] is success and result.results[0] is not changed
-      - result.results[1] is failed
-      - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
-      - result.results[2] is changed
-      - result.results[3] is changed
-      - result.results[4] is changed
-
-- name: "({{ backend }}) Regenerate - redistribute keys"
-  copy:
-    src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
-    dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
-    remote_src: true
-  with_nested:
-    - "{{ regenerate_values }}"
-    - [ '', '.pub' ]
-  when: "item.0 != 'always'"
-
-- name: "({{ backend }}) Regenerate - adjust comment (check mode)"
-  openssh_keypair:
-    path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
-    type: dsa
-    size: 1024
-    comment: test comment
-    regenerate: '{{ item }}'
-    backend: "{{ backend }}"
-  check_mode: true
-  loop: "{{ regenerate_values }}"
-  ignore_errors: true
-  register: result
-- assert:
-    that:
-      - result is changed
-
-# Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
-- when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
   block:
-  - name: "({{ backend }}) Regenerate - adjust comment"
+  - name: "({{ backend }}) Regenerate - adjust key type (check mode)"
     openssh_keypair:
       path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
-      type: dsa
-      size: 1024
-      comment: test comment
+      type: '{{ ssh_type }}'
+      size: '{{ ssh_size }}'
+      regenerate: '{{ item }}'
+      backend: "{{ backend }}"
+    check_mode: true
+    loop: "{{ regenerate_values }}"
+    ignore_errors: true
+    register: result
+  - assert:
+      that:
+        - result.results[0] is success and result.results[0] is not changed
+        - result.results[1] is failed
+        - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+        - result.results[2] is changed
+        - result.results[3] is changed
+        - result.results[4] is changed
+
+  - name: "({{ backend }}) Regenerate - adjust key type"
+    openssh_keypair:
+      path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
+      type: '{{ ssh_type }}'
+      size: '{{ ssh_size }}'
       regenerate: '{{ item }}'
       backend: "{{ backend }}"
     loop: "{{ regenerate_values }}"
+    ignore_errors: true
+    register: result
+  - assert:
+      that:
+        - result.results[0] is success and result.results[0] is not changed
+        - result.results[1] is failed
+        - "'Key has wrong type and/or size. Will not proceed.' in result.results[1].msg"
+        - result.results[2] is changed
+        - result.results[3] is changed
+        - result.results[4] is changed
+
+  - name: "({{ backend }}) Regenerate - redistribute keys"
+    copy:
+      src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
+      dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
+      remote_src: true
+    with_nested:
+      - "{{ regenerate_values }}"
+      - [ '', '.pub' ]
+    when: "item.0 != 'always'"
+
+  - name: "({{ backend }}) Regenerate - adjust comment (check mode)"
+    openssh_keypair:
+      path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
+      type: '{{ ssh_type }}'
+      size: '{{ ssh_size }}'
+      comment: test comment
+      regenerate: '{{ item }}'
+      backend: "{{ backend }}"
+    check_mode: true
+    loop: "{{ regenerate_values }}"
+    ignore_errors: true
     register: result
   - assert:
       that:
         - result is changed
-        # for all values but 'always', the key should not be regenerated.
-        # verify this by comparing fingerprints:
-        - result.results[0].fingerprint == result.results[1].fingerprint
-        - result.results[0].fingerprint == result.results[2].fingerprint
-        - result.results[0].fingerprint == result.results[3].fingerprint
-        - result.results[0].fingerprint != result.results[4].fingerprint
+
+  # Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2
+  - when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
+    block:
+    - name: "({{ backend }}) Regenerate - adjust comment"
+      openssh_keypair:
+        path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
+        type: '{{ ssh_type }}'
+        size: '{{ ssh_size }}'
+        comment: test comment
+        regenerate: '{{ item }}'
+        backend: "{{ backend }}"
+      loop: "{{ regenerate_values }}"
+      register: result
+    - assert:
+        that:
+          - result is changed
+          # for all values but 'always', the key should not be regenerated.
+          # verify this by comparing fingerprints:
+          - result.results[0].fingerprint == result.results[1].fingerprint
+          - result.results[0].fingerprint == result.results[2].fingerprint
+          - result.results[0].fingerprint == result.results[3].fingerprint
+          - result.results[0].fingerprint != result.results[4].fingerprint

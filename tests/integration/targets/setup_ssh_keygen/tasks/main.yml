@@ -25,3 +25,7 @@
 - name: Set ssh version facts
   set_fact:
     openssh_version: "{{ rc_openssh_version_output.stdout.strip() }}"
+
+- name: Set ssh support facts
+  set_fact:
+    openssh_supports_dsa: "{{ openssh_version is version('9.8', '<') }}"
