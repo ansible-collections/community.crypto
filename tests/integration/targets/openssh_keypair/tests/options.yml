@@ -9,9 +9,11 @@
 ####################################################################
 
 - set_fact:
-    key_types:
+    key_types: "{{ key_types_src | reject('equalto', '') | list }}"
+  vars:
+    key_types_src:
       - rsa
-      - dsa
+      - "{{ 'dsa' if openssh_supports_dsa else '' }}"
       - ecdsa
 
 - name: "({{ backend }}) Generate keys with default size - size"
@@ -29,9 +31,9 @@
 - name: "({{ backend }}) Assert key sizes match default size - size"
   assert:
     that:
-      - key_size_output.results[0].stdout == '4096'
-      - key_size_output.results[1].stdout == '1024'
-      - key_size_output.results[2].stdout == '256'
+      - (key_size_output.results | selectattr('item', 'equalto', 'rsa') | first).stdout == '4096'
+      - not openssh_supports_dsa or (key_size_output.results | selectattr('item', 'equalto', 'dsa') | first).stdout == '1024'
+      - (key_size_output.results | selectattr('item', 'equalto', 'ecdsa') | first).stdout == '256'
 
 - name: "({{ backend }}) Remove keys - size"
   openssh_keypair:

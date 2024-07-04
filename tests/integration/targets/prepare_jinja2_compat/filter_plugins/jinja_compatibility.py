@@ -85,6 +85,20 @@ def call_filter(environment, name, value, args=None, kwargs=None,
     return func(value, *args, **(kwargs or {}))
 
 
+@contextfilter
+def compatibility_select_filter(context, sequence, test_name, *args, **kwargs):
+    for item in sequence:
+        if call_test(context.environment, test_name, item, args, kwargs):
+            yield item
+
+
+@contextfilter
+def compatibility_reject_filter(context, sequence, test_name, *args, **kwargs):
+    for item in sequence:
+        if not call_test(context.environment, test_name, item, args, kwargs):
+            yield item
+
+
 def make_attrgetter(environment, attribute_str, default=None):
     attributes = [int(attribute) if attribute.isdigit() else attribute for attribute in attribute_str.split(".")]
 
@@ -103,6 +117,14 @@ def compatibility_selectattr_filter(context, sequence, attribute_str, test_name,
     f = make_attrgetter(context.environment, attribute_str)
     for item in sequence:
         if call_test(context.environment, test_name, f(item), args, kwargs):
+            yield item
+
+
+@contextfilter
+def compatibility_rejectattr_filter(context, sequence, attribute_str, test_name, *args, **kwargs):
+    f = make_attrgetter(context.environment, attribute_str)
+    for item in sequence:
+        if not call_test(context.environment, test_name, f(item), args, kwargs):
             yield item
 
 
@@ -139,6 +161,9 @@ class FilterModule:
 
     def filters(self):
         return {
+            'select': compatibility_select_filter,
             'selectattr': compatibility_selectattr_filter,
+            'reject': compatibility_reject_filter,
+            'rejectattr': compatibility_rejectattr_filter,
             'map': compatibility_map_filter,
         }
