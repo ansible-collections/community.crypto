@@ -334,12 +334,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-tls_ctx_options"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-tls-ctx-options"><strong>tls_ctx_options</strong></p>
-<a class="ansibleOptionLink" href="#parameter-tls_ctx_options" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+<a class="ansibleOptionLink" href="#parameter-tls_ctx_options" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=any</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.21.0</em></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>SSL CTX options (SSL OP flags) to use for the request.</p>
+<td><div class="ansible-option-cell"><p>TLS CTX options (TLS/SSL OP flags) to use for the request.</p>
 <p>See the <a class="reference external" href="https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags">List of SSL OP Flags</a> for more details.</p>
-<p>The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.</p>
+<p>The available TLS CTX options is dependent on the Python and OpenSSL/LibreSSL versions.</p>
 </div></td>
 </tr>
 </tbody>
@@ -425,7 +425,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">443</span>
 <span class="w">    </span><span class="nt">ciphers</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HIGH</span>
-<span class="w">    </span><span class="nt">ssl_ctx_options</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">tls_ctx_options</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OP_ALL</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OP_NO_SSLv3</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OP_CIPHER_SERVER_PREFERENCE</span>
