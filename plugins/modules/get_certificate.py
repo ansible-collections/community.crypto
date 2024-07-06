@@ -105,6 +105,7 @@ options:
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
         - The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
+      elements: [ str, int ]
       version_added: tbd
 
 notes:
@@ -220,7 +221,12 @@ EXAMPLES = '''
     ciphers:
       - HIGH
     ssl_ctx_options:
-      - 0x4
+      - OP_ALL
+      - OP_NO_SSLv3
+      - OP_CIPHER_SERVER_PREFERENCE
+      - OP_ENABLE_MIDDLEBOX_COMPAT
+      - OP_NO_COMPRESSION
+      - 4 # OP_LEGACY_SERVER_CONNECT
   delegate_to: localhost
   run_once: true
   register: legacy_cert
@@ -229,6 +235,7 @@ EXAMPLES = '''
 import atexit
 import base64
 import traceback
+import ssl
 
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
@@ -406,8 +413,19 @@ def main():
                 ctx.set_ciphers(ciphers_joined)
 
             if ssl_ctx_options is not None:
+                # Clear default options
+                ctx.options = 0
+
+                # For each item in the ssl_ctx_options list
                 for ssl_ctx_option in ssl_ctx_options:
-                    ctx.options |= ssl_ctx_option
+                    # If the item is a string
+                    if isinstance(ssl_ctx_option, str):
+                        # Get the int value for the option and add it to ctx options
+                        ctx.options |= getattr(ssl, ssl_ctx_option)
+                    # If the item is an integer
+                    elif isinstance(ssl_ctx_option, int):
+                        # Add the int value of the option to ctx options
+                        ctx.options |= ssl_ctx_option
 
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
