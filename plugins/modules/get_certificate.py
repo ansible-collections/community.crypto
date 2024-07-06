@@ -99,6 +99,13 @@ options:
         - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
       type: bool
       version_added: 2.12.0
+    ssl_ctx_options:
+      description:
+        - SSL CTX options (SSL OP flags) to use for the request.
+        - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
+        - The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
+      type: list
+      version_added: tbd
 
 notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
@@ -205,6 +212,18 @@ EXAMPLES = '''
     msg: "cert expires in: {{ expire_days }} days."
   vars:
     expire_days: "{{ (( cert.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ')) ).days }}"
+
+- name: Allow legacy insecure renegotiation to get a cert from a legacy device
+  community.crypto.get_certificate:
+    host: "legacy-device.domain.com"
+    port: 443
+    ciphers:
+      - HIGH
+    ssl_ctx_options:
+      - 0x4
+  delegate_to: localhost
+  run_once: true
+  register: legacy_cert
 '''
 
 import atexit
@@ -285,6 +304,7 @@ def main():
             starttls=dict(type='str', choices=['mysql']),
             ciphers=dict(type='list', elements='str'),
             asn1_base64=dict(type='bool'),
+            ssl_ctx_options=dict(type='list', default=None),
         ),
     )
 
@@ -298,6 +318,7 @@ def main():
     start_tls_server_type = module.params.get('starttls')
     ciphers = module.params.get('ciphers')
     asn1_base64 = module.params['asn1_base64']
+    ssl_ctx_options = module.params.get('ssl_ctx_options')
     if asn1_base64 is None:
         module.deprecate(
             'The default value `false` for asn1_base64 is deprecated and will change to `true` in '
@@ -346,6 +367,9 @@ def main():
         if ciphers is not None:
             module.fail_json(msg='To use ciphers, you must run the get_certificate module with Python 2.7 or newer.',
                              exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+        if ssl_ctx_options is not None:
+            module.fail_json(msg='To use ssl_ctx_options, you must run the get_certificate module with Python 2.7 or newer.',
+                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
         try:
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
@@ -380,6 +404,10 @@ def main():
             if ciphers is not None:
                 ciphers_joined = ":".join(ciphers)
                 ctx.set_ciphers(ciphers_joined)
+
+            if ssl_ctx_options is not None:
+                for ssl_ctx_option in ssl_ctx_options:
+                    ctx.options |= ssl_ctx_option
 
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
