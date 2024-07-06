@@ -99,7 +99,7 @@ options:
         - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
       type: bool
       version_added: 2.12.0
-    ssl_ctx_options:
+    tls_ctx_options:
       description:
         - SSL CTX options (SSL OP flags) to use for the request.
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
@@ -310,7 +310,7 @@ def main():
             starttls=dict(type='str', choices=['mysql']),
             ciphers=dict(type='list', elements='str'),
             asn1_base64=dict(type='bool'),
-            ssl_ctx_options=dict(type='list', default=None),
+            ssl_ctx_options=dict(type='list', elements='raw'),
         ),
     )
 
