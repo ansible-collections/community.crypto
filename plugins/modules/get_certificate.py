@@ -105,7 +105,6 @@ options:
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
         - The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
-      elements: [ str, int ]
       version_added: tbd
 
 notes:
