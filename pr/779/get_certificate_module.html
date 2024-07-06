@@ -312,16 +312,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-ssl_ctx_options"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-ssl-ctx-options"><strong>ssl_ctx_options</strong></p>
-<a class="ansibleOptionLink" href="#parameter-ssl_ctx_options" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
-<p><em class="ansible-option-versionadded">added in community.crypto 2.21.0</em></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>SSL CTX options (SSL OP flags) to use for the request.</p>
-<p>See the <a class="reference external" href="https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags">List of SSL OP Flags</a> for more details.</p>
-<p>The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-starttls"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-starttls"><strong>starttls</strong></p>
 <a class="ansibleOptionLink" href="#parameter-starttls" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.9.0</em></p>
@@ -334,12 +324,22 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-timeout"><strong>timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The timeout in seconds</p>
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-tls_ctx_options"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-get-certificate-module-parameter-tls-ctx-options"><strong>tls_ctx_options</strong></p>
+<a class="ansibleOptionLink" href="#parameter-tls_ctx_options" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.21.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>SSL CTX options (SSL OP flags) to use for the request.</p>
+<p>See the <a class="reference external" href="https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags">List of SSL OP Flags</a> for more details.</p>
+<p>The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.</p>
 </div></td>
 </tr>
 </tbody>
