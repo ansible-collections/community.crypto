@@ -105,7 +105,7 @@ options:
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
         - The available SSL CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
-      version_added: tbd
+      version_added: 2.21.0
 
 notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
