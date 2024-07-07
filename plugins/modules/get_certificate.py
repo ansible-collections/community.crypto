@@ -101,7 +101,7 @@ options:
       version_added: 2.12.0
     tls_ctx_options:
       description:
-        - TLS CTX options (TLS/SSL OP flags) to use for the request.
+        - TLS context options (TLS/SSL OP flags) to use for the request.
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
         - The available TLS CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
