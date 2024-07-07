@@ -103,7 +103,7 @@ options:
       description:
         - TLS context options (TLS/SSL OP flags) to use for the request.
         - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
-        - The available TLS CTX options is dependent on the Python and OpenSSL/LibreSSL versions.
+        - The available TLS context options is dependent on the Python and OpenSSL/LibreSSL versions.
       type: list
       elements: raw
       version_added: 2.21.0
