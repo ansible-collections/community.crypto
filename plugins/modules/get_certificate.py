@@ -424,7 +424,7 @@ def main():
                         # Convert tls_ctx_option to a native string
                         tls_ctx_option_str = to_native(tls_ctx_option)
                         # Get the tls_ctx_option_str attribute from ssl
-                        tls_ctx_option_attr = getattr(ssl, tls_ctx_option_str)
+                        tls_ctx_option_attr = getattr(ssl, tls_ctx_option_str, None)
                         # If tls_ctx_option_attr is an integer
                         if isinstance(tls_ctx_option_attr, int):
                             # Set tls_ctx_option_int to the attribute value
