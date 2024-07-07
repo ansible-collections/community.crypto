@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - get_certificate - adds ``tls_ctx_options`` option for specifying SSL CTX options (https://github.com/ansible-collections/community.crypto/pull/779).
+...

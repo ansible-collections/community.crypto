@@ -99,6 +99,14 @@ options:
         - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
       type: bool
       version_added: 2.12.0
+    tls_ctx_options:
+      description:
+        - TLS context options (TLS/SSL OP flags) to use for the request.
+        - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
+        - The available TLS context options is dependent on the Python and OpenSSL/LibreSSL versions.
+      type: list
+      elements: raw
+      version_added: 2.21.0
 
 notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
@@ -205,18 +213,37 @@ EXAMPLES = '''
     msg: "cert expires in: {{ expire_days }} days."
   vars:
     expire_days: "{{ (( cert.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ')) ).days }}"
+
+- name: Allow legacy insecure renegotiation to get a cert from a legacy device
+  community.crypto.get_certificate:
+    host: "legacy-device.domain.com"
+    port: 443
+    ciphers:
+      - HIGH
+    tls_ctx_options:
+      - OP_ALL
+      - OP_NO_SSLv3
+      - OP_CIPHER_SERVER_PREFERENCE
+      - OP_ENABLE_MIDDLEBOX_COMPAT
+      - OP_NO_COMPRESSION
+      - 4 # OP_LEGACY_SERVER_CONNECT
+  delegate_to: localhost
+  run_once: true
+  register: legacy_cert
 '''
 
 import atexit
 import base64
 import traceback
+import ssl
 
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
 from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_REQUIRED
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.six import string_types
 
 from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
@@ -285,6 +312,7 @@ def main():
             starttls=dict(type='str', choices=['mysql']),
             ciphers=dict(type='list', elements='str'),
             asn1_base64=dict(type='bool'),
+            tls_ctx_options=dict(type='list', elements='raw'),
         ),
     )
 
@@ -298,6 +326,7 @@ def main():
     start_tls_server_type = module.params.get('starttls')
     ciphers = module.params.get('ciphers')
     asn1_base64 = module.params['asn1_base64']
+    tls_ctx_options = module.params.get('tls_ctx_options')
     if asn1_base64 is None:
         module.deprecate(
             'The default value `false` for asn1_base64 is deprecated and will change to `true` in '
@@ -346,6 +375,9 @@ def main():
         if ciphers is not None:
             module.fail_json(msg='To use ciphers, you must run the get_certificate module with Python 2.7 or newer.',
                              exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+        if tls_ctx_options is not None:
+            module.fail_json(msg='To use tls_ctx_options, you must run the get_certificate module with Python 2.7 or newer.',
+                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
         try:
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
@@ -380,6 +412,39 @@ def main():
             if ciphers is not None:
                 ciphers_joined = ":".join(ciphers)
                 ctx.set_ciphers(ciphers_joined)
+
+            if tls_ctx_options is not None:
+                # Clear default ctx options
+                ctx.options = 0
+
+                # For each item in the tls_ctx_options list
+                for tls_ctx_option in tls_ctx_options:
+                    # If the item is a string_type
+                    if isinstance(tls_ctx_option, string_types):
+                        # Convert tls_ctx_option to a native string
+                        tls_ctx_option_str = to_native(tls_ctx_option)
+                        # Get the tls_ctx_option_str attribute from ssl
+                        tls_ctx_option_attr = getattr(ssl, tls_ctx_option_str, None)
+                        # If tls_ctx_option_attr is an integer
+                        if isinstance(tls_ctx_option_attr, int):
+                            # Set tls_ctx_option_int to the attribute value
+                            tls_ctx_option_int = tls_ctx_option_attr
+                        # If tls_ctx_option_attr is not an integer
+                        else:
+                            module.fail_json(msg="Failed to determine the numeric value for {0}".format(tls_ctx_option_str))
+                    # If the item is an integer
+                    elif isinstance(tls_ctx_option, int):
+                        # Set tls_ctx_option_int to the item value
+                        tls_ctx_option_int = tls_ctx_option
+                    # If the item is not a string nor integer
+                    else:
+                        module.fail_json(msg="tls_ctx_options must be a string or integer, got {0!r}".format(tls_ctx_option))
+
+                    try:
+                        # Add the int value of the item to ctx options
+                        ctx.options |= tls_ctx_option_int
+                    except Exception as e:
+                        module.fail_json(msg="Failed to add {0} to CTX options".format(tls_ctx_option_str or tls_ctx_option_int))
 
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
