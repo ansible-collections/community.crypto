@@ -150,6 +150,7 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.ec
+    import cryptography.hazmat.primitives.asymmetric.ed25519
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.hashes
     import cryptography.hazmat.primitives.asymmetric.utils
@@ -195,6 +196,11 @@ def is_parent(module, cert, potential_parent):
                 cert.cert.signature,
                 cert.cert.tbs_certificate_bytes,
                 cryptography.hazmat.primitives.asymmetric.ec.ECDSA(cert.cert.signature_hash_algorithm),
+            )
+        elif isinstance(public_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey):
+            public_key.verify(
+                cert.cert.signature,
+                cert.cert.tbs_certificate_bytes
             )
         else:
             # Unknown public key type
