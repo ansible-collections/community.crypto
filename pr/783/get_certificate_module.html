@@ -419,8 +419,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <span class="w">  </span><span class="nt">vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">expire_days</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">      </span><span class="cp">{{</span> <span class="o">(</span>
-        <span class="o">(</span><span class="nv">cert.not_after</span> <span class="o">|</span> <span class="nf">to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y%m%d%H%M%SZ&#39;</span><span class="o">))</span> <span class="o">-</span>
-        <span class="o">(</span><span class="nv">ansible_date_time.iso8601</span> <span class="o">|</span> <span class="nf">to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y-%m-%dT%H:%M:%SZ&#39;</span><span class="o">))</span>
+        <span class="o">(</span><span class="nv">cert.not_after</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y%m%d%H%M%SZ&#39;</span><span class="o">))</span> <span class="o">-</span>
+        <span class="o">(</span><span class="nv">ansible_date_time.iso8601</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y-%m-%dT%H:%M:%SZ&#39;</span><span class="o">))</span>
       <span class="o">)</span><span class="nv">.days</span> <span class="cp">}}</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Allow legacy insecure renegotiation to get a cert from a legacy device</span>
