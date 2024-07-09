@@ -15,180 +15,180 @@ module: get_certificate
 author: "John Westcott IV (@john-westcott-iv)"
 short_description: Get a certificate from a host:port
 description:
-    - Makes a secure connection and returns information about the presented certificate
-    - The module uses the cryptography Python library.
-    - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with python >= 2.7.
+  - Makes a secure connection and returns information about the presented certificate.
+  - The module uses the cryptography Python library.
+  - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with Python 2.7 and newer.
 extends_documentation_fragment:
-    - community.crypto.attributes
+  - community.crypto.attributes
 attributes:
-    check_mode:
-        support: none
-        details:
-            - This action does not modify state.
-    diff_mode:
-        support: N/A
-        details:
-            - This action does not modify state.
+  check_mode:
+    support: none
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
-    host:
-      description:
-        - The host to get the cert for (IP is fine)
-      type: str
-      required: true
-    ca_cert:
-      description:
-        - A PEM file containing one or more root certificates; if present, the cert will be validated against these root certs.
-        - Note that this only validates the certificate is signed by the chain; not that the cert is valid for the host presenting it.
-      type: path
-    port:
-      description:
-        - The port to connect to
-      type: int
-      required: true
-    server_name:
-      description:
-       - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
-         is an IP or is different from server name.
-      type: str
-      version_added: 1.4.0
-    proxy_host:
-      description:
-        - Proxy host used when get a certificate.
-      type: str
-    proxy_port:
-      description:
-        - Proxy port used when get a certificate.
-      type: int
-      default: 8080
-    starttls:
-      description:
-        - Requests a secure connection for protocols which require clients to initiate encryption.
-        - Only available for V(mysql) currently.
-      type: str
-      choices:
-        - mysql
-      version_added: 1.9.0
-    timeout:
-      description:
-        - The timeout in seconds
-      type: int
-      default: 10
-    select_crypto_backend:
-      description:
-        - Determines which crypto backend to use.
-        - The default choice is V(auto), which tries to use C(cryptography) if available.
-        - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-      type: str
-      default: auto
-      choices: [ auto, cryptography ]
-    ciphers:
-      description:
-        - SSL/TLS Ciphers to use for the request.
-        - 'When a list is provided, all ciphers are joined in order with V(:).'
-        - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
-          for more details.
-        - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
-      type: list
-      elements: str
-      version_added: 2.11.0
-    asn1_base64:
-      description:
-        - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
-        - The documentation claimed for a long time that the values are Base64 encoded, but they
-          never were. For compatibility this option is set to V(false).
-        - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
-      type: bool
-      version_added: 2.12.0
-    tls_ctx_options:
-      description:
-        - TLS context options (TLS/SSL OP flags) to use for the request.
-        - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
-        - The available TLS context options is dependent on the Python and OpenSSL/LibreSSL versions.
-      type: list
-      elements: raw
-      version_added: 2.21.0
+  host:
+    description:
+      - The host to get the cert for (IP is fine).
+    type: str
+    required: true
+  ca_cert:
+    description:
+      - A PEM file containing one or more root certificates; if present, the cert will be validated against these root certs.
+      - Note that this only validates the certificate is signed by the chain; not that the cert is valid for the host presenting it.
+    type: path
+  port:
+    description:
+      - The port to connect to.
+    type: int
+    required: true
+  server_name:
+    description:
+     - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
+       is an IP or is different from server name.
+    type: str
+    version_added: 1.4.0
+  proxy_host:
+    description:
+      - Proxy host used when get a certificate.
+    type: str
+  proxy_port:
+    description:
+      - Proxy port used when get a certificate.
+    type: int
+    default: 8080
+  starttls:
+    description:
+      - Requests a secure connection for protocols which require clients to initiate encryption.
+      - Only available for V(mysql) currently.
+    type: str
+    choices:
+      - mysql
+    version_added: 1.9.0
+  timeout:
+    description:
+      - The timeout in seconds.
+    type: int
+    default: 10
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [ auto, cryptography ]
+  ciphers:
+    description:
+      - SSL/TLS Ciphers to use for the request.
+      - 'When a list is provided, all ciphers are joined in order with V(:).'
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
+      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
+    type: list
+    elements: str
+    version_added: 2.11.0
+  asn1_base64:
+    description:
+      - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
+      - The documentation claimed for a long time that the values are Base64 encoded, but they
+        never were. For compatibility this option is set to V(false).
+      - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
+    type: bool
+    version_added: 2.12.0
+  tls_ctx_options:
+    description:
+      - TLS context options (TLS/SSL OP flags) to use for the request.
+      - See the L(List of SSL OP Flags,https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags) for more details.
+      - The available TLS context options is dependent on the Python and OpenSSL/LibreSSL versions.
+    type: list
+    elements: raw
+    version_added: 2.21.0
 
 notes:
-    - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
+  - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 
 requirements:
-    - "python >= 2.7 when using O(proxy_host)"
-    - "cryptography >= 1.6"
+  - "Python >= 2.7 when using O(proxy_host)"
+  - "cryptography >= 1.6"
 
 seealso:
-    - plugin: community.crypto.to_serial
-      plugin_type: filter
+  - plugin: community.crypto.to_serial
+    plugin_type: filter
 '''
 
 RETURN = '''
 cert:
-    description: The certificate retrieved from the port
-    returned: success
-    type: str
+  description: The certificate retrieved from the port.
+  returned: success
+  type: str
 expired:
-    description: Boolean indicating if the cert is expired
-    returned: success
-    type: bool
+  description: Boolean indicating if the cert is expired.
+  returned: success
+  type: bool
 extensions:
-    description: Extensions applied to the cert
-    returned: success
-    type: list
-    elements: dict
-    contains:
-        critical:
-            returned: success
-            type: bool
-            description: Whether the extension is critical.
-        asn1_data:
-            returned: success
-            type: str
-            description:
-              - The ASN.1 content of the extension.
-              - If O(asn1_base64=true) this will be Base64 encoded, otherwise the raw
-                binary value will be returned.
-              - Please note that the raw binary value might not survive JSON serialization
-                to the Ansible controller, and also might cause failures when displaying it.
-                See U(https://github.com/ansible/ansible/issues/80258) for more information.
-              - B(Note) that depending on the C(cryptography) version used, it is
-                not possible to extract the ASN.1 content of the extension, but only
-                to provide the re-encoded content of the extension in case it was
-                parsed by C(cryptography). This should usually result in exactly the
-                same value, except if the original extension value was malformed.
-        name:
-            returned: success
-            type: str
-            description: The extension's name.
+  description: Extensions applied to the cert.
+  returned: success
+  type: list
+  elements: dict
+  contains:
+    critical:
+      returned: success
+      type: bool
+      description: Whether the extension is critical.
+    asn1_data:
+      returned: success
+      type: str
+      description:
+        - The ASN.1 content of the extension.
+        - If O(asn1_base64=true) this will be Base64 encoded, otherwise the raw
+          binary value will be returned.
+        - Please note that the raw binary value might not survive JSON serialization
+          to the Ansible controller, and also might cause failures when displaying it.
+          See U(https://github.com/ansible/ansible/issues/80258) for more information.
+        - B(Note) that depending on the C(cryptography) version used, it is
+          not possible to extract the ASN.1 content of the extension, but only
+          to provide the re-encoded content of the extension in case it was
+          parsed by C(cryptography). This should usually result in exactly the
+          same value, except if the original extension value was malformed.
+    name:
+      returned: success
+      type: str
+      description: The extension's name.
 issuer:
-    description: Information about the issuer of the cert.
-    returned: success
-    type: dict
+  description: Information about the issuer of the cert.
+  returned: success
+  type: dict
 not_after:
-    description: Expiration date of the cert.
-    returned: success
-    type: str
+  description: Expiration date of the cert.
+  returned: success
+  type: str
 not_before:
-    description: Issue date of the cert.
-    returned: success
-    type: str
+  description: Issue date of the cert.
+  returned: success
+  type: str
 serial_number:
-    description:
-        - The serial number of the cert.
-        - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
-          such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
-    returned: success
-    type: int
+  description:
+    - The serial number of the cert.
+    - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
+      such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
+  returned: success
+  type: int
 signature_algorithm:
-    description: The algorithm used to sign the cert.
-    returned: success
-    type: str
+  description: The algorithm used to sign the cert.
+  returned: success
+  type: str
 subject:
-    description: Information about the subject of the cert (C(OU), C(CN), etc).
-    returned: success
-    type: dict
+  description: Information about the subject of the cert (C(OU), C(CN), and so on).
+  returned: success
+  type: dict
 version:
-    description: The version number of the certificate.
-    returned: success
-    type: str
+  description: The version number of the certificate.
+  returned: success
+  type: str
 '''
 
 EXAMPLES = '''
@@ -212,7 +212,11 @@ EXAMPLES = '''
   ansible.builtin.debug:
     msg: "cert expires in: {{ expire_days }} days."
   vars:
-    expire_days: "{{ (( cert.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ')) ).days }}"
+    expire_days: >-
+      {{ (
+        (cert.not_after | ansible.builtin.to_datetime('%Y%m%d%H%M%SZ')) -
+        (ansible_date_time.iso8601 | ansible.builtin.to_datetime('%Y-%m-%dT%H:%M:%SZ'))
+      ).days }}
 
 - name: Allow legacy insecure renegotiation to get a cert from a legacy device
   community.crypto.get_certificate:
