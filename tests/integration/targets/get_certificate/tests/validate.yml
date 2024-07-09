@@ -123,12 +123,37 @@
     port: 443
     select_crypto_backend: "{{ select_crypto_backend }}"
     asn1_base64: true
+    get_certificate_chain: "{{ has_get_certificate_chain }}"
   register: result
 
 - assert:
     that:
       - result is not changed
       - result is not failed
+
+- name: Read CA cert
+  slurp:
+    src: '{{ remote_tmp_dir }}/temp.pem'
+  register: cacert
+  when: has_get_certificate_chain
+
+- name: Validate get_certificate_chain=true results
+  assert:
+    that:
+      - result.verified_chain is sequence
+      - result.unverified_chain is sequence
+      - result.verified_chain[0] == result.cert
+      - result.unverified_chain[0] == result.cert
+      - result.verified_chain[-1] == cacert.content | b64decode
+      - result.verified_chain == result.unverified_chain + [cacert.content | b64decode]
+  when: has_get_certificate_chain
+
+- name: Validate get_certificate_chain=false results
+  assert:
+    that:
+      - result.verified_chain is undefined
+      - result.unverified_chain is undefined
+  when: not has_get_certificate_chain
 
 - name: Generate bogus CA privatekey
   openssl_privatekey:
