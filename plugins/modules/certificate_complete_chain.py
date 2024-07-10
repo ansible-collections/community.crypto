@@ -141,8 +141,11 @@ from ansible_collections.community.crypto.plugins.module_utils.version import Lo
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448_SIGN, CRYPTOGRAPHY_HAS_ED25519_SIGN)
+    CRYPTOGRAPHY_HAS_ED448_SIGN,
+    CRYPTOGRAPHY_HAS_ED25519_SIGN,
+)
 
 
 CRYPTOGRAPHY_IMP_ERR = None
