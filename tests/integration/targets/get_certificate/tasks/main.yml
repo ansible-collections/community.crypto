@@ -10,6 +10,8 @@
 
 - set_fact:
     skip_tests: false
+    has_get_certificate_chain: >-
+      {{ ansible_facts.python_version is version('3.10.0', '>=') }}
 
 - block:
 
