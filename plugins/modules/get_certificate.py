@@ -509,13 +509,24 @@ def main():
                             return []
                         return [c.public_bytes(ssl._ssl.ENCODING_DER) for c in chain]
 
-                    ssl_obj = tls_sock._sslobj  # This is of type _ssl._SSLSocket
+                    ssl_obj = tls_sock._sslobj  # This is of type ssl._ssl._SSLSocket
                     verified_der_chain = _convert_chain(ssl_obj.get_verified_chain())
                     unverified_der_chain = _convert_chain(ssl_obj.get_unverified_chain())
                 else:
                     # This works with Python 3.13+
-                    verified_der_chain = tls_sock.get_verified_chain()
-                    unverified_der_chain = tls_sock.get_unverified_chain()
+
+                    # Unfortunately due to a bug (https://github.com/python/cpython/issues/118658) some early pre-releases of
+                    # Python 3.13 do not return lists of byte strings, but lists of _ssl.Certificate objects. This is going to
+                    # be fixed by https://github.com/python/cpython/pull/118669. For now we convert the certificates ourselves
+                    # if they are not byte strings to work around this.
+                    def _convert_chain(chain):
+                        return [
+                            c if isinstance(c, bytes) else c.public_bytes(ssl._ssl.ENCODING_DER)
+                            for c in chain
+                        ]
+
+                    verified_der_chain = _convert_chain(tls_sock.get_verified_chain())
+                    unverified_der_chain = _convert_chain(tls_sock.get_unverified_chain())
 
                 verified_chain = [DER_cert_to_PEM_cert(c) for c in verified_der_chain]
                 unverified_chain = [DER_cert_to_PEM_cert(c) for c in unverified_der_chain]
