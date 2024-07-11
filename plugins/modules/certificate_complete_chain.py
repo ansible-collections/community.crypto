@@ -147,7 +147,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
     CRYPTOGRAPHY_HAS_ED25519_SIGN,
 )
 
-
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
