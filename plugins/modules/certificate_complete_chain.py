@@ -142,6 +142,11 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
     split_pem_list,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    CRYPTOGRAPHY_HAS_ED448_SIGN,
+    CRYPTOGRAPHY_HAS_ED25519_SIGN,
+)
+
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
@@ -196,6 +201,12 @@ def is_parent(module, cert, potential_parent):
                 cert.cert.tbs_certificate_bytes,
                 cryptography.hazmat.primitives.asymmetric.ec.ECDSA(cert.cert.signature_hash_algorithm),
             )
+        elif CRYPTOGRAPHY_HAS_ED25519_SIGN and isinstance(
+                public_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey):
+            public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
+        elif CRYPTOGRAPHY_HAS_ED448_SIGN and isinstance(
+                public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey):
+            public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
         else:
             # Unknown public key type
             module.warn('Unknown public key type "{0}"'.format(public_key))
