@@ -156,8 +156,6 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.ec
-    import cryptography.hazmat.primitives.asymmetric.ed448
-    import cryptography.hazmat.primitives.asymmetric.ed25519
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.hashes
     import cryptography.hazmat.primitives.asymmetric.utils
