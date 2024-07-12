@@ -4,6 +4,21 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.21.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- certificate_complete_chain - add ability to identify Ed25519 and Ed448 complete chains (https://github.com/ansible-collections/community.crypto/pull/777).
+- get_certificate - adds ``tls_ctx_options`` option for specifying SSL CTX options (https://github.com/ansible-collections/community.crypto/pull/779).
+- get_certificate - allow to obtain the certificate chain sent by the server, and the one used for validation, with the new ``get_certificate_chain`` option. Note that this option only works if the module is run with Python 3.10 or newer (https://github.com/ansible-collections/community.crypto/issues/568, https://github.com/ansible-collections/community.crypto/pull/784).
+
 v2.20.0
 =======
 

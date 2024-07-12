@@ -1,2 +1,0 @@
-minor_changes:
-  - certificate_complete_chain - add ability to identify Ed25519 and Ed448 complete chains (https://github.com/ansible-collections/community.crypto/pull/777).
