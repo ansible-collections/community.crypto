@@ -1465,3 +1465,15 @@ releases:
       - 779-add-tls_ctx_options-option.yml
       - 784-get_certificate-get_certificate_chain.yml
     release_date: '2024-07-12'
+  2.21.1:
+    changes:
+      bugfixes:
+        - When using cryptography >= 43.0.0, use offset-aware ``datetime.datetime``
+          objects (with timezone UTC) instead of offset-naive UTC timestamps for the
+          ``InvalidityDate`` X.509 CRL extension (https://github.com/ansible-collections/community.crypto/issues/726,
+          https://github.com/ansible-collections/community.crypto/pull/730).
+      release_summary: Maintenance release.
+    fragments:
+      - 2.21.1.yml
+      - 730-cryptography-invalidity_date.yml
+    release_date: '2024-07-21'
