@@ -130,7 +130,8 @@ def test_parse_dn_component(name, options, expected):
 
 # Cryptography < 2.9 does not allow empty strings
 # (https://github.com/pyca/cryptography/commit/87b2749c52e688c809f1861e55d958c64147493c)
-if LooseVersion(cryptography.__version__) >= LooseVersion('2.9'):
+# Cryptoraphy 43.0.0+ also doesn't allow this anymore
+if LooseVersion('2.9') <= LooseVersion(cryptography.__version__) < LooseVersion('43.0.0'):
     @pytest.mark.parametrize('name, options, expected', [
         (b'CN=', {}, (NameAttribute(oid.NameOID.COMMON_NAME, u''), b'')),
         (b'CN= ', {}, (NameAttribute(oid.NameOID.COMMON_NAME, u''), b'')),
