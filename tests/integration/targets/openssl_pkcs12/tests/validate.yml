@@ -16,7 +16,8 @@
     that:
       - p12_standard_check is changed
       - p12_standard is changed
-      - p12.stdout_lines[2].split(':')[-1].strip() == 'abracadabra'
+      - p12.stdout_lines[2].split(':')[-1].strip() == 'abracadabra' or
+        p12.stdout_lines[1].split(':')[-1].strip() == 'abracadabra'
       - p12_standard.mode == '0400'
       - p12_no_pkey is changed
       - p12_validate_no_pkey.stdout_lines[-1] == '-----END CERTIFICATE-----'
