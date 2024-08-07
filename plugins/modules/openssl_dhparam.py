@@ -398,6 +398,8 @@ def main():
                 module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
                                  exception=CRYPTOGRAPHY_IMP_ERR)
             dhparam = DHParameterCryptography(module)
+        else:
+            raise AssertionError('Internal error: unknown backend')
 
         if module.check_mode:
             result = dhparam.dump()

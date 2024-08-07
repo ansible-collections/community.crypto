@@ -487,6 +487,7 @@ def main():
                     # If the item is not a string nor integer
                     else:
                         module.fail_json(msg="tls_ctx_options must be a string or integer, got {0!r}".format(tls_ctx_option))
+                        tls_ctx_option_int = 0  # make pylint happy; this code is actually unreachable
 
                     try:
                         # Add the int value of the item to ctx options
