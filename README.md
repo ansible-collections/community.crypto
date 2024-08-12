@@ -20,8 +20,8 @@ Please note that this collection does **not** support Windows targets.
 
 * Join the Ansible forum:
   * [Get Help](https://forum.ansible.com/c/help/6): get help or help others.
-  * [Posts tagged with 'your tag'](https://forum.ansible.com/tag/YOUR_TAG): subscribe to participate in collection-related conversations.
-  * [Refer to your forum group here if exists](https://forum.ansible.com/g/): by joining the team you will automatically get subscribed to the posts tagged with [your group forum tag here](https://forum.ansible.com/tags).
+  * [Posts tagged with 'crypto'](https://forum.ansible.com/tag/crypto): subscribe to participate in cryptography related conversations.
+  * [Posts tagged with 'acme'](https://forum.ansible.com/tag/acme): subscribe to participate in ACME (RFC 8555) related conversations.
   * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
   * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
 
