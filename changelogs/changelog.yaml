@@ -754,6 +754,23 @@ releases:
     - 733-math-prime.yml
     - 740-ecs_certificate-renewal-without-csr.yml
     release_date: '2024-05-20'
+  1.9.26:
+    changes:
+      major_changes:
+      - 'The 1.x.y release train of community.crypto is **End of Life**. There will
+        be no further community.crypto 1.x.y releases.
+
+        Please upgrade to community.crypto 2.x.y.
+
+
+        Thanks to everyone who contributed to community.crypto 1.x.y!
+
+        '
+      release_summary: Last release.
+    fragments:
+    - 0-readme.yml
+    - eol.yml
+    release_date: '2024-08-28'
   1.9.3:
     changes:
       bugfixes:

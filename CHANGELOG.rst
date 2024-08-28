@@ -4,6 +4,22 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v1.9.26
+=======
+
+Release Summary
+---------------
+
+Last release.
+
+Major Changes
+-------------
+
+- The 1.x.y release train of community.crypto is **End of Life**. There will be no further community.crypto 1.x.y releases.
+  Please upgrade to community.crypto 2.x.y.
+
+  Thanks to everyone who contributed to community.crypto 1.x.y!
+
 v1.9.25
 =======
 

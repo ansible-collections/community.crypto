@@ -2,145 +2,164 @@
 
 **Topics**
 
-- <a href="#v1-9-25">v1\.9\.25</a>
+- <a href="#v1-9-26">v1\.9\.26</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#major-changes">Major Changes</a>
+- <a href="#v1-9-25">v1\.9\.25</a>
+    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v1-9-24">v1\.9\.24</a>
-    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#release-summary-2">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v1-9-23">v1\.9\.23</a>
-    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#release-summary-3">Release Summary</a>
     - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v1-9-22">v1\.9\.22</a>
-    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#bugfixes-3">Bugfixes</a>
 - <a href="#v1-9-21">v1\.9\.21</a>
-    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#bugfixes-4">Bugfixes</a>
 - <a href="#v1-9-20">v1\.9\.20</a>
-    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#release-summary-6">Release Summary</a>
     - <a href="#bugfixes-5">Bugfixes</a>
 - <a href="#v1-9-19">v1\.9\.19</a>
-    - <a href="#release-summary-6">Release Summary</a>
+    - <a href="#release-summary-7">Release Summary</a>
     - <a href="#bugfixes-6">Bugfixes</a>
 - <a href="#v1-9-18">v1\.9\.18</a>
-    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#release-summary-8">Release Summary</a>
     - <a href="#bugfixes-7">Bugfixes</a>
 - <a href="#v1-9-17">v1\.9\.17</a>
-    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#release-summary-9">Release Summary</a>
     - <a href="#bugfixes-8">Bugfixes</a>
 - <a href="#v1-9-16">v1\.9\.16</a>
-    - <a href="#release-summary-9">Release Summary</a>
+    - <a href="#release-summary-10">Release Summary</a>
     - <a href="#bugfixes-9">Bugfixes</a>
 - <a href="#v1-9-15">v1\.9\.15</a>
-    - <a href="#release-summary-10">Release Summary</a>
+    - <a href="#release-summary-11">Release Summary</a>
     - <a href="#bugfixes-10">Bugfixes</a>
 - <a href="#v1-9-14">v1\.9\.14</a>
-    - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#release-summary-12">Release Summary</a>
     - <a href="#bugfixes-11">Bugfixes</a>
 - <a href="#v1-9-13">v1\.9\.13</a>
-    - <a href="#release-summary-12">Release Summary</a>
+    - <a href="#release-summary-13">Release Summary</a>
     - <a href="#bugfixes-12">Bugfixes</a>
 - <a href="#v1-9-12">v1\.9\.12</a>
-    - <a href="#release-summary-13">Release Summary</a>
+    - <a href="#release-summary-14">Release Summary</a>
     - <a href="#bugfixes-13">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
 - <a href="#v1-9-11">v1\.9\.11</a>
-    - <a href="#release-summary-14">Release Summary</a>
+    - <a href="#release-summary-15">Release Summary</a>
     - <a href="#bugfixes-14">Bugfixes</a>
 - <a href="#v1-9-10">v1\.9\.10</a>
-    - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#release-summary-16">Release Summary</a>
     - <a href="#bugfixes-15">Bugfixes</a>
 - <a href="#v1-9-9">v1\.9\.9</a>
     - <a href="#bugfixes-16">Bugfixes</a>
 - <a href="#v1-9-8">v1\.9\.8</a>
-    - <a href="#release-summary-16">Release Summary</a>
-- <a href="#v1-9-7">v1\.9\.7</a>
     - <a href="#release-summary-17">Release Summary</a>
+- <a href="#v1-9-7">v1\.9\.7</a>
+    - <a href="#release-summary-18">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#bugfixes-17">Bugfixes</a>
 - <a href="#v1-9-6">v1\.9\.6</a>
-    - <a href="#release-summary-18">Release Summary</a>
+    - <a href="#release-summary-19">Release Summary</a>
     - <a href="#bugfixes-18">Bugfixes</a>
 - <a href="#v1-9-5">v1\.9\.5</a>
-    - <a href="#release-summary-19">Release Summary</a>
+    - <a href="#release-summary-20">Release Summary</a>
     - <a href="#bugfixes-19">Bugfixes</a>
 - <a href="#v1-9-4">v1\.9\.4</a>
-    - <a href="#release-summary-20">Release Summary</a>
+    - <a href="#release-summary-21">Release Summary</a>
     - <a href="#bugfixes-20">Bugfixes</a>
 - <a href="#v1-9-3">v1\.9\.3</a>
-    - <a href="#release-summary-21">Release Summary</a>
+    - <a href="#release-summary-22">Release Summary</a>
     - <a href="#bugfixes-21">Bugfixes</a>
 - <a href="#v1-9-2">v1\.9\.2</a>
-    - <a href="#release-summary-22">Release Summary</a>
-- <a href="#v1-9-1">v1\.9\.1</a>
     - <a href="#release-summary-23">Release Summary</a>
-- <a href="#v1-9-0">v1\.9\.0</a>
+- <a href="#v1-9-1">v1\.9\.1</a>
     - <a href="#release-summary-24">Release Summary</a>
+- <a href="#v1-9-0">v1\.9\.0</a>
+    - <a href="#release-summary-25">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-22">Bugfixes</a>
 - <a href="#v1-8-0">v1\.8\.0</a>
-    - <a href="#release-summary-25">Release Summary</a>
+    - <a href="#release-summary-26">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#bugfixes-23">Bugfixes</a>
 - <a href="#v1-7-1">v1\.7\.1</a>
-    - <a href="#release-summary-26">Release Summary</a>
+    - <a href="#release-summary-27">Release Summary</a>
     - <a href="#bugfixes-24">Bugfixes</a>
 - <a href="#v1-7-0">v1\.7\.0</a>
-    - <a href="#release-summary-27">Release Summary</a>
+    - <a href="#release-summary-28">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#bugfixes-25">Bugfixes</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v1-6-2">v1\.6\.2</a>
-    - <a href="#release-summary-28">Release Summary</a>
+    - <a href="#release-summary-29">Release Summary</a>
     - <a href="#bugfixes-26">Bugfixes</a>
 - <a href="#v1-6-1">v1\.6\.1</a>
-    - <a href="#release-summary-29">Release Summary</a>
+    - <a href="#release-summary-30">Release Summary</a>
     - <a href="#bugfixes-27">Bugfixes</a>
 - <a href="#v1-6-0">v1\.6\.0</a>
-    - <a href="#release-summary-30">Release Summary</a>
+    - <a href="#release-summary-31">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-28">Bugfixes</a>
 - <a href="#v1-5-0">v1\.5\.0</a>
-    - <a href="#release-summary-31">Release Summary</a>
+    - <a href="#release-summary-32">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-29">Bugfixes</a>
 - <a href="#v1-4-0">v1\.4\.0</a>
-    - <a href="#release-summary-32">Release Summary</a>
+    - <a href="#release-summary-33">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
     - <a href="#bugfixes-30">Bugfixes</a>
 - <a href="#v1-3-0">v1\.3\.0</a>
-    - <a href="#release-summary-33">Release Summary</a>
+    - <a href="#release-summary-34">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#bugfixes-31">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v1-2-0">v1\.2\.0</a>
-    - <a href="#release-summary-34">Release Summary</a>
+    - <a href="#release-summary-35">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
     - <a href="#security-fixes">Security Fixes</a>
     - <a href="#bugfixes-32">Bugfixes</a>
 - <a href="#v1-1-1">v1\.1\.1</a>
-    - <a href="#release-summary-35">Release Summary</a>
+    - <a href="#release-summary-36">Release Summary</a>
     - <a href="#bugfixes-33">Bugfixes</a>
 - <a href="#v1-1-0">v1\.1\.0</a>
-    - <a href="#release-summary-36">Release Summary</a>
+    - <a href="#release-summary-37">Release Summary</a>
     - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#bugfixes-34">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v1-0-0">v1\.0\.0</a>
-    - <a href="#release-summary-37">Release Summary</a>
+    - <a href="#release-summary-38">Release Summary</a>
     - <a href="#minor-changes-10">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#bugfixes-35">Bugfixes</a>
     - <a href="#new-modules-3">New Modules</a>
 
+<a id="v1-9-26"></a>
+## v1\.9\.26
+
+<a id="release-summary"></a>
+### Release Summary
+
+Last release\.
+
+<a id="major-changes"></a>
+### Major Changes
+
+* The 1\.x\.y release train of community\.crypto is <strong>End of Life</strong>\. There will be no further community\.crypto 1\.x\.y releases\.
+  Please upgrade to community\.crypto 2\.x\.y\.
+
+  Thanks to everyone who contributed to community\.crypto 1\.x\.y\!
+
 <a id="v1-9-25"></a>
 ## v1\.9\.25
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -154,7 +173,7 @@ Bugfix release\.
 <a id="v1-9-24"></a>
 ## v1\.9\.24
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -169,7 +188,7 @@ Bugfix release\.
 <a id="v1-9-23"></a>
 ## v1\.9\.23
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -182,7 +201,7 @@ Bugfix release\.
 <a id="v1-9-22"></a>
 ## v1\.9\.22
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -195,7 +214,7 @@ Bugfix release\.
 <a id="v1-9-21"></a>
 ## v1\.9\.21
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -209,7 +228,7 @@ Bugfix release\.
 <a id="v1-9-20"></a>
 ## v1\.9\.20
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -222,7 +241,7 @@ Bugfix release\.
 <a id="v1-9-19"></a>
 ## v1\.9\.19
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -235,7 +254,7 @@ Bugfix release\.
 <a id="v1-9-18"></a>
 ## v1\.9\.18
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -248,7 +267,7 @@ Bugfix release\.
 <a id="v1-9-17"></a>
 ## v1\.9\.17
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -263,7 +282,7 @@ Bugfix release\.
 <a id="v1-9-16"></a>
 ## v1\.9\.16
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Maintenance and bugfix release\.
@@ -277,7 +296,7 @@ Maintenance and bugfix release\.
 <a id="v1-9-15"></a>
 ## v1\.9\.15
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Maintenance release\.
@@ -290,7 +309,7 @@ Maintenance release\.
 <a id="v1-9-14"></a>
 ## v1\.9\.14
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -305,7 +324,7 @@ Regular bugfix release\.
 <a id="v1-9-13"></a>
 ## v1\.9\.13
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -318,7 +337,7 @@ Regular bugfix release\.
 <a id="v1-9-12"></a>
 ## v1\.9\.12
 
-<a id="release-summary-13"></a>
+<a id="release-summary-14"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -342,7 +361,7 @@ Regular bugfix release\.
 <a id="v1-9-11"></a>
 ## v1\.9\.11
 
-<a id="release-summary-14"></a>
+<a id="release-summary-15"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -355,7 +374,7 @@ Bugfix release\.
 <a id="v1-9-10"></a>
 ## v1\.9\.10
 
-<a id="release-summary-15"></a>
+<a id="release-summary-16"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -378,7 +397,7 @@ Regular bugfix release\.
 <a id="v1-9-8"></a>
 ## v1\.9\.8
 
-<a id="release-summary-16"></a>
+<a id="release-summary-17"></a>
 ### Release Summary
 
 Documentation fix release\. No actual code changes\.
@@ -386,7 +405,7 @@ Documentation fix release\. No actual code changes\.
 <a id="v1-9-7"></a>
 ## v1\.9\.7
 
-<a id="release-summary-17"></a>
+<a id="release-summary-18"></a>
 ### Release Summary
 
 Bugfix release with extra forward compatibility for newer versions of cryptography\.
@@ -407,7 +426,7 @@ Bugfix release with extra forward compatibility for newer versions of cryptograp
 <a id="v1-9-6"></a>
 ## v1\.9\.6
 
-<a id="release-summary-18"></a>
+<a id="release-summary-19"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -420,7 +439,7 @@ Regular bugfix release\.
 <a id="v1-9-5"></a>
 ## v1\.9\.5
 
-<a id="release-summary-19"></a>
+<a id="release-summary-20"></a>
 ### Release Summary
 
 Bugfix release to fully support cryptography 35\.0\.0\.
@@ -438,7 +457,7 @@ Bugfix release to fully support cryptography 35\.0\.0\.
 <a id="v1-9-4"></a>
 ## v1\.9\.4
 
-<a id="release-summary-20"></a>
+<a id="release-summary-21"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -452,7 +471,7 @@ Regular bugfix release\.
 <a id="v1-9-3"></a>
 ## v1\.9\.3
 
-<a id="release-summary-21"></a>
+<a id="release-summary-22"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -465,7 +484,7 @@ Regular bugfix release\.
 <a id="v1-9-2"></a>
 ## v1\.9\.2
 
-<a id="release-summary-22"></a>
+<a id="release-summary-23"></a>
 ### Release Summary
 
 Bugfix release to fix the changelog\. No other change compared to 1\.9\.0\.
@@ -473,7 +492,7 @@ Bugfix release to fix the changelog\. No other change compared to 1\.9\.0\.
 <a id="v1-9-1"></a>
 ## v1\.9\.1
 
-<a id="release-summary-23"></a>
+<a id="release-summary-24"></a>
 ### Release Summary
 
 Accidental 1\.9\.1 release\. Identical to 1\.9\.0\.
@@ -481,7 +500,7 @@ Accidental 1\.9\.1 release\. Identical to 1\.9\.0\.
 <a id="v1-9-0"></a>
 ## v1\.9\.0
 
-<a id="release-summary-24"></a>
+<a id="release-summary-25"></a>
 ### Release Summary
 
 Regular feature release\.
@@ -503,7 +522,7 @@ Regular feature release\.
 <a id="v1-8-0"></a>
 ## v1\.8\.0
 
-<a id="release-summary-25"></a>
+<a id="release-summary-26"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -525,7 +544,7 @@ Regular bugfix and feature release\.
 <a id="v1-7-1"></a>
 ## v1\.7\.1
 
-<a id="release-summary-26"></a>
+<a id="release-summary-27"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -538,7 +557,7 @@ Bugfix release\.
 <a id="v1-7-0"></a>
 ## v1\.7\.0
 
-<a id="release-summary-27"></a>
+<a id="release-summary-28"></a>
 ### Release Summary
 
 Regular feature and bugfix release\.
@@ -581,7 +600,7 @@ Regular feature and bugfix release\.
 <a id="v1-6-2"></a>
 ## v1\.6\.2
 
-<a id="release-summary-28"></a>
+<a id="release-summary-29"></a>
 ### Release Summary
 
 Bugfix release\. Fixes compatibility issue of ACME modules with step\-ca\.
@@ -594,7 +613,7 @@ Bugfix release\. Fixes compatibility issue of ACME modules with step\-ca\.
 <a id="v1-6-1"></a>
 ## v1\.6\.1
 
-<a id="release-summary-29"></a>
+<a id="release-summary-30"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -607,7 +626,7 @@ Bugfix release\.
 <a id="v1-6-0"></a>
 ## v1\.6\.0
 
-<a id="release-summary-30"></a>
+<a id="release-summary-31"></a>
 ### Release Summary
 
 Fixes compatibility issues with the latest ansible\-core 2\.11 beta\, and contains a lot of internal refactoring for the ACME modules and support for private key passphrases for them\.
@@ -635,7 +654,7 @@ Fixes compatibility issues with the latest ansible\-core 2\.11 beta\, and contai
 <a id="v1-5-0"></a>
 ## v1\.5\.0
 
-<a id="release-summary-31"></a>
+<a id="release-summary-32"></a>
 ### Release Summary
 
 Regular feature and bugfix release\. Deprecates a return value\.
@@ -659,7 +678,7 @@ Regular feature and bugfix release\. Deprecates a return value\.
 <a id="v1-4-0"></a>
 ## v1\.4\.0
 
-<a id="release-summary-32"></a>
+<a id="release-summary-33"></a>
 ### Release Summary
 
 Release with several new features and bugfixes\.
@@ -682,7 +701,7 @@ Release with several new features and bugfixes\.
 <a id="v1-3-0"></a>
 ## v1\.3\.0
 
-<a id="release-summary-33"></a>
+<a id="release-summary-34"></a>
 ### Release Summary
 
 Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr\_pipe</code> and <code>x509\_certificate\_pipe</code> which allow to create or update private keys\, CSRs and X\.509 certificates without having to write them to disk\.
@@ -714,7 +733,7 @@ Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr
 <a id="v1-2-0"></a>
 ## v1\.2\.0
 
-<a id="release-summary-34"></a>
+<a id="release-summary-35"></a>
 ### Release Summary
 
 Please note that this release fixes a security issue \(CVE\-2020\-25646\)\.
@@ -743,7 +762,7 @@ Please note that this release fixes a security issue \(CVE\-2020\-25646\)\.
 <a id="v1-1-1"></a>
 ## v1\.1\.1
 
-<a id="release-summary-35"></a>
+<a id="release-summary-36"></a>
 ### Release Summary
 
 Bugfixes for Ansible 2\.10\.0\.
@@ -757,7 +776,7 @@ Bugfixes for Ansible 2\.10\.0\.
 <a id="v1-1-0"></a>
 ## v1\.1\.0
 
-<a id="release-summary-36"></a>
+<a id="release-summary-37"></a>
 ### Release Summary
 
 Release for Ansible 2\.10\.0\.
@@ -791,7 +810,7 @@ Release for Ansible 2\.10\.0\.
 <a id="v1-0-0"></a>
 ## v1\.0\.0
 
-<a id="release-summary-37"></a>
+<a id="release-summary-38"></a>
 ### Release Summary
 
 This is the first proper release of the <code>community\.crypto</code> collection\. This changelog contains all changes to the modules in this collection that were added after the release of Ansible 2\.9\.0\.
