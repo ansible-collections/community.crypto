@@ -269,7 +269,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: auto
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 

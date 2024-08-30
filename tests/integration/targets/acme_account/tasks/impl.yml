@@ -8,7 +8,6 @@
     openssl_privatekey:
       path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
       passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
-      cipher: "{{ 'auto' if (item.pass | default(false)) else omit }}"
       type: ECC
       curve: secp256r1
       force: true

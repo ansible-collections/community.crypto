@@ -94,7 +94,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey3.pem'
     passphrase: ansible
-    cipher: auto
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey3 - with passphrase protected privatekey"
@@ -156,7 +155,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: auto
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 

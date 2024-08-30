@@ -88,7 +88,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey6.pem'
     passphrase: ànsïblé
-    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
@@ -221,7 +220,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: true
@@ -257,7 +255,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: true
@@ -278,7 +275,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
-    cipher: auto
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
     backup: true

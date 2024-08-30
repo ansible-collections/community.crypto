@@ -68,7 +68,6 @@
   openssl_privatekey:
     path: '{{ privatekey_path }}'
     passphrase: '{{ privatekey_passphrase }}'
-    cipher: auto
     type: RSA
     size: 2048
 
