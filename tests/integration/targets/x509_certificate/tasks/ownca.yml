@@ -12,7 +12,6 @@
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/ca_privatekey_pw.pem'
     passphrase: hunter2
-    cipher: auto
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size_certifiates }}'
 
@@ -589,7 +588,6 @@
           openssl_privatekey:
             path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
             type: '{{ item }}'
-            cipher: auto
             passphrase: Test123
           ignore_errors: true
           loop:

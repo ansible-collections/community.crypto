@@ -16,7 +16,6 @@
          'secp521r1' if key_type == 'ec521' else
          'invalid value for key_type!' }}
     passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
-    cipher: "{{ 'auto' if certificate_passphrase | default() else omit }}"
     force: true
 ## CSR ########################################################################################
 - name: ({{ certgen_title }}) Create cert CSR

@@ -28,7 +28,6 @@
     type: '{{ item.type | default(omit) }}'
     curve: '{{ item.curve | default(omit) }}'
     passphrase: '{{ item.passphrase | default(omit) }}'
-    cipher: '{{ "auto" if item.passphrase is defined else omit }}'
     format: '{{ item.format }}'
   when: item.condition | default(true)
   loop:

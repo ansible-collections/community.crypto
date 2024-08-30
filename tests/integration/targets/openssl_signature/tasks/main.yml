@@ -22,7 +22,6 @@
       - passwd: nopasswd
       - passwd: passwd
         privatekey_passphrase: hunter2
-        privatekey_cipher: auto
 
 - name: Add cryptography backend
   set_fact:
@@ -72,7 +71,6 @@
     curve: '{{ item.curve | default(omit) }}'
     size: '{{ item.size | default(omit) }}'
     passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
-    cipher: '{{ item.privatekey_cipher | default(omit) }}'
     select_crypto_backend: cryptography
   loop: '{{ all_tests }}'
 
