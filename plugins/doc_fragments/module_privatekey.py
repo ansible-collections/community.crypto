@@ -71,7 +71,8 @@ options:
         type: str
     cipher:
         description:
-            - The cipher to encrypt the private key. Must be V(auto).
+            - The cipher to encrypt the private key. This is only used when O(passphrase) is provided.
+            - Must be V(auto).
         type: str
         default: auto
     select_crypto_backend:
