@@ -514,7 +514,7 @@ def get_privatekey_argument_spec():
                 'sect283r1', 'sect409k1', 'sect409r1', 'sect571k1', 'sect571r1',
             ]),
             passphrase=dict(type='str', no_log=True),
-            cipher=dict(type='str'),
+            cipher=dict(type='str', default='auto'),
             format=dict(type='str', default='auto_ignore', choices=['pkcs1', 'pkcs8', 'raw', 'auto', 'auto_ignore']),
             format_mismatch=dict(type='str', default='regenerate', choices=['regenerate', 'convert']),
             select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
@@ -524,9 +524,6 @@ def get_privatekey_argument_spec():
                 choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
             ),
         ),
-        required_together=[
-            ['cipher', 'passphrase']
-        ],
         required_if=[
             ['type', 'ECC', ['curve']],
         ],

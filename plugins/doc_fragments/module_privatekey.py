@@ -73,6 +73,7 @@ options:
         description:
             - The cipher to encrypt the private key. Must be V(auto).
         type: str
+        default: auto
     select_crypto_backend:
         description:
             - Determines which crypto backend to use.
