@@ -1477,3 +1477,17 @@ releases:
       - 2.21.1.yml
       - 730-cryptography-invalidity_date.yml
     release_date: '2024-07-21'
+  2.22.0:
+    changes:
+      minor_changes:
+        - openssl_privatekey, openssl_privatekey_pipe - add default value ``auto``
+          for ``cipher`` option, which happens to be the only supported value for
+          this option anyway. Therefore it is no longer necessary to specify ``cipher=auto``
+          when providing ``passphrase`` (https://github.com/ansible-collections/community.crypto/issues/793,
+          https://github.com/ansible-collections/community.crypto/pull/794).
+      release_summary: Feature release.
+    fragments:
+      - 0-readme.yml
+      - 2.22.0.yml
+      - 794-openssl_privatekey-cipher.yml
+    release_date: '2024-09-08'
