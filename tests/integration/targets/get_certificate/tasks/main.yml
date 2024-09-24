@@ -19,6 +19,7 @@
     get_certificate:
       host: "{{ httpbin_host }}"
       port: 443
+      asn1_base64: "{{ true if ansible_version.full is version('2.18', '>=') else omit }}"
     ignore_errors: true
     register: result
 
