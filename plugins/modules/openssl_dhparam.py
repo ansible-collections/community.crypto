@@ -284,7 +284,7 @@ class DHParameterOpenSSL(DHParameterBase):
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         try:
-            module.atomic_move(tmpsrc, self.path)
+            module.atomic_move(os.path.abspath(tmpsrc), os.path.abspath(self.path))
         except Exception as e:
             module.fail_json(msg="Failed to write to file %s: %s" % (self.path, str(e)))
 
