@@ -835,10 +835,10 @@ class ACMECertificateClient(object):
         with an error.
         '''
         for identifier_type, identifier in self.identifiers:
-            authz = self.authorizations.get(combine_identifier(identifier_type, identifier))
+            authz = self.authorizations.get(combine_identifier(identifier_type, identifier.lower()))
             if authz is None:
-                raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
-                    identifier=combine_identifier(identifier_type, identifier)))
+                raise ModuleFailException('Found no authorization information for "{identifier.lower()}"!'.format(
+                    identifier=combine_identifier(identifier_type, identifier.lower())))
             if authz.status != 'valid':
                 authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status), module=self.module)
 
