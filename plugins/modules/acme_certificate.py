@@ -721,7 +721,7 @@ class ACMECertificateClient(object):
                     raise ModuleFailException('ACME v1 only supports DNS identifiers!')
             for identifier_type, identifier in self.identifiers:
                 authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[authz.combined_identifier] = authz
+                self.authorizations[authz.combined_identifier.lower()] = authz
         else:
             replaces_cert_id = None
             if (
