@@ -1,2 +1,0 @@
-bugfixes:
-  - "various modules - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950, https://github.com/ansible-collections/community.crypto/pull/799)."

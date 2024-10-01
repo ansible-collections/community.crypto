@@ -1,3 +1,0 @@
-bugfixes:
-  - "acme_* modules - when querying renewal information, make sure to insert a slash between the base URL and the certificate identifier
-     (https://github.com/ansible-collections/community.crypto/issues/801, https://github.com/ansible-collections/community.crypto/pull/802)."
