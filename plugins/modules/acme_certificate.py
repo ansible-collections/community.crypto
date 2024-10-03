@@ -721,7 +721,7 @@ class ACMECertificateClient(object):
                     raise ModuleFailException('ACME v1 only supports DNS identifiers!')
             for identifier_type, identifier in self.identifiers:
                 authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[authz.combined_identifier] = authz
+                self.authorizations[authz.combined_identifier.lower()] = authz
         else:
             replaces_cert_id = None
             if (
@@ -835,10 +835,10 @@ class ACMECertificateClient(object):
         with an error.
         '''
         for identifier_type, identifier in self.identifiers:
-            authz = self.authorizations.get(combine_identifier(identifier_type, identifier))
+            authz = self.authorizations.get(combine_identifier(identifier_type, identifier.lower()))
             if authz is None:
                 raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
-                    identifier=combine_identifier(identifier_type, identifier)))
+                    identifier=combine_identifier(identifier_type, identifier.lower())))
             if authz.status != 'valid':
                 authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status), module=self.module)
 
