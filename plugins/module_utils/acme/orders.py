@@ -93,7 +93,7 @@ class Order(object):
     def load_authorizations(self, client):
         for auth_uri in self.authorization_uris:
             authz = Authorization.from_url(client, auth_uri)
-            self.authorizations[authz.combined_identifier] = authz
+            self.authorizations[authz.combined_identifier.lower()] = authz
 
     def wait_for_finalization(self, client):
         while True:
