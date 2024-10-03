@@ -495,9 +495,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">  </span><span class="c1"># DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!</span>
 
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate or update a Mozilla sops encrypted key</span>
+<span class="c1"># The following example needs CNCF SOPS (https://github.com/getsops/sops) set up and</span>
+<span class="c1"># the community.sops collection installed. See also</span>
+<span class="c1"># https://docs.ansible.com/ansible/latest/collections/community/sops/docsite/guide.html</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate or update a CNCF SOPS encrypted key</span>
 <span class="w">  </span><span class="nt">block</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Update sops-encrypted key with the community.sops collection</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Update SOPS-encrypted key with the community.sops collection</span>
 <span class="w">      </span><span class="nt">community.crypto.openssl_privatekey_pipe</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.sops.sops&#39;</span><span class="o">,</span> <span class="s1">&#39;private_key.pem.sops&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">        </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
