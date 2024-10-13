@@ -46,9 +46,11 @@ def create_key_authorization(client, token):
 def combine_identifier(identifier_type, identifier):
     return '{type}:{identifier}'.format(type=identifier_type, identifier=identifier)
 
+
 def normalize_combined_identifier(identifier):
     parts = split_identifier(identifier)
     return '{type}:{identifier}'.format(type=parts[0], identifier=parts[1].lower())
+
 
 def split_identifier(identifier):
     parts = identifier.split(':', 1)
