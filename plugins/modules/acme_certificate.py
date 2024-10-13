@@ -580,6 +580,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    normalize_combined_identifier,
     combine_identifier,
     split_identifier,
     wait_for_validation,
@@ -721,7 +722,7 @@ class ACMECertificateClient(object):
                     raise ModuleFailException('ACME v1 only supports DNS identifiers!')
             for identifier_type, identifier in self.identifiers:
                 authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[authz.combined_identifier.lower()] = authz
+                self.authorizations[normalize_combined_identifier(authz.combined_identifier)] = authz
         else:
             replaces_cert_id = None
             if (
@@ -755,8 +756,8 @@ class ACMECertificateClient(object):
             if authz.status == 'valid':
                 continue
             # We drop the type from the key to preserve backwards compatibility
-            data[identifier] = authz.get_challenge_data(self.client)
-            if first_step and self.challenge is not None and self.challenge not in data[identifier]:
+            data[authz.identifier] = authz.get_challenge_data(self.client)
+            if first_step and self.challenge is not None and self.challenge not in data[authz.identifier]:
                 raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
                     self.challenge, type_identifier))
         # Get DNS challenge data
@@ -835,10 +836,10 @@ class ACMECertificateClient(object):
         with an error.
         '''
         for identifier_type, identifier in self.identifiers:
-            authz = self.authorizations.get(combine_identifier(identifier_type, identifier.lower()))
+            authz = self.authorizations.get(normalize_combined_identifier(combine_identifier(identifier_type, identifier)))
             if authz is None:
                 raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
-                    identifier=combine_identifier(identifier_type, identifier.lower())))
+                    identifier=combine_identifier(identifier_type, identifier)))
             if authz.status != 'valid':
                 authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status), module=self.module)
 
@@ -965,7 +966,7 @@ def main():
                 auths = dict()
                 for k, v in client.authorizations.items():
                     # Remove "type:" from key
-                    auths[split_identifier(k)[1]] = v.to_json()
+                    auths[v.identifier] = v.to_json()
                 module.exit_json(
                     changed=client.changed,
                     authorizations=auths,
