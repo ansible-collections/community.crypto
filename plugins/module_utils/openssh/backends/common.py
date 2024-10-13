@@ -28,7 +28,7 @@ def restore_on_failure(f):
             f(module, path, *args, **kwargs)
         except Exception:
             if backup_file is not None:
-                module.atomic_move(backup_file, path)
+                module.atomic_move(os.path.abspath(backup_file), os.path.abspath(path))
             raise
         else:
             module.add_cleanup_file(backup_file)
@@ -38,7 +38,7 @@ def restore_on_failure(f):
 
 @restore_on_failure
 def safe_atomic_move(module, path, destination):
-    module.atomic_move(path, destination)
+    module.atomic_move(os.path.abspath(path), os.path.abspath(destination))
 
 
 def _restore_all_on_failure(f):
@@ -49,7 +49,7 @@ def _restore_all_on_failure(f):
             f(self, sources_and_destinations, *args, **kwargs)
         except Exception:
             for destination, backup in backups:
-                self.module.atomic_move(backup, destination)
+                self.module.atomic_move(os.path.abspath(backup), os.path.abspath(destination))
             raise
         else:
             for destination, backup in backups:
@@ -138,7 +138,7 @@ class OpensshModule(object):
         """
         for source, destination in sources_and_destinations:
             if os.path.exists(destination):
-                self.module.atomic_move(source, destination)
+                self.module.atomic_move(os.path.abspath(source), os.path.abspath(destination))
             else:
                 self.module.preserved_copy(source, destination)
 

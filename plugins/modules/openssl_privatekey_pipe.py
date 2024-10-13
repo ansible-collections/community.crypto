@@ -102,9 +102,13 @@ EXAMPLES = r'''
   # DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
 
 
-- name: Generate or update a Mozilla sops encrypted key
+# The following example needs CNCF SOPS (https://github.com/getsops/sops) set up and
+# the community.sops collection installed. See also
+# https://docs.ansible.com/ansible/latest/collections/community/sops/docsite/guide.html
+
+- name: Generate or update a CNCF SOPS encrypted key
   block:
-    - name: Update sops-encrypted key with the community.sops collection
+    - name: Update SOPS-encrypted key with the community.sops collection
       community.crypto.openssl_privatekey_pipe:
         content: "{{ lookup('community.sops.sops', 'private_key.pem.sops') }}"
         size: 2048
