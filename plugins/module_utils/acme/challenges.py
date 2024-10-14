@@ -48,8 +48,10 @@ def combine_identifier(identifier_type, identifier):
 
 
 def normalize_combined_identifier(identifier):
-    parts = split_identifier(identifier)
-    return '{type}:{identifier}'.format(type=parts[0], identifier=parts[1].lower())
+    identifier_type, identifier = split_identifier(identifier)
+    # Normalize DNS names and IPs
+    identifier = identifier.lower()
+    return combine_identifier(identifier_type, identifier)
 
 
 def split_identifier(identifier):
