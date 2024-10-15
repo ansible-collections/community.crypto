@@ -160,7 +160,7 @@
     certificate_name: cert-4
     key_type: rsa
     rsa_bits: "{{ default_rsa_key_size }}"
-    subject_alt_name: "DNS:example.com,DNS:t1.example.com,DNS:test.t2.example.com,DNS:example.org,DNS:test.example.org"
+    subject_alt_name: "DNS:example.com,DNS:t1.example.com,DNS:test.t2.example.com,DNS:example.org,DNS:TesT.example.org"
     subject_alt_name_critical: false
     account_key: account-rsa
     challenge: http-01
