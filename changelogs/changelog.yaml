@@ -1505,3 +1505,13 @@ releases:
       - 799-atomic.yml
       - 802-renewal-info.yml
     release_date: '2024-10-01'
+  2.22.2:
+    changes:
+      bugfixes:
+        - acme_certificate - fix authorization failure when CSR contains SANs with
+          mixed case (https://github.com/ansible-collections/community.crypto/pull/803).
+      release_summary: Bugfix release.
+    fragments:
+      - 2.22.2.yml
+      - 803-fix-authorization-failure-with-mixed-case-sans.yml
+    release_date: '2024-10-15'

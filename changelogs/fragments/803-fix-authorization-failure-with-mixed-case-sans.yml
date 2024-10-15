@@ -1,2 +1,0 @@
-bugfixes:
-  - acme_certificate - fix authorization failure when CSR contains SANs with mixed case (https://github.com/ansible-collections/community.crypto/pull/803).
