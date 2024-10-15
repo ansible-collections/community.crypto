@@ -21,6 +21,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     Authorization,
+    normalize_combined_identifier,
 )
 
 
@@ -93,7 +94,7 @@ class Order(object):
     def load_authorizations(self, client):
         for auth_uri in self.authorization_uris:
             authz = Authorization.from_url(client, auth_uri)
-            self.authorizations[authz.combined_identifier] = authz
+            self.authorizations[normalize_combined_identifier(authz.combined_identifier)] = authz
 
     def wait_for_finalization(self, client):
         while True:
