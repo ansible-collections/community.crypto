@@ -101,7 +101,7 @@
       - "'DNS:t1.example.com' in cert_4_text.stdout"
       - "'DNS:test.t2.example.com' in cert_4_text.stdout"
       - "'DNS:example.org' in cert_4_text.stdout"
-      - "'DNS:test.example.org' in cert_4_text.stdout"
+      - "'DNS:TesT.example.org' in cert_4_text.stdout"
 - name: Check that certificate 4 retrieval did not get all chains
   assert:
     that:
