@@ -11,7 +11,6 @@ __metaclass__ = type
 
 import base64
 import binascii
-import datetime
 import os
 import traceback
 
@@ -22,7 +21,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import Lo
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
     CryptoBackend,
-    _parse_acme_timestamp,
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
@@ -37,10 +35,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-)
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     convert_int_to_bytes,
@@ -65,11 +59,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     ensure_utc_timezone,
-    from_epoch_seconds,
-    get_epoch_seconds,
-    get_now_datetime,
-    get_relative_time_option,
-    UTC,
 )
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
@@ -184,33 +173,7 @@ class CryptographyChainMatcher(ChainMatcher):
 
 class CryptographyBackend(CryptoBackend):
     def __init__(self, module):
-        super(CryptographyBackend, self).__init__(module)
-
-    def get_now(self):
-        return get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def parse_acme_timestamp(self, timestamp_str):
-        return _parse_acme_timestamp(timestamp_str, with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def parse_module_parameter(self, value, name):
-        try:
-            return get_relative_time_option(value, name, backend='cryptography', with_timezone=CRYPTOGRAPHY_TIMEZONE)
-        except OpenSSLObjectError as exc:
-            raise BackendException(to_native(exc))
-
-    def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
-        start = get_epoch_seconds(timestamp_start)
-        end = get_epoch_seconds(timestamp_end)
-        return from_epoch_seconds(start + percentage * (end - start), with_timezone=CRYPTOGRAPHY_TIMEZONE)
-
-    def get_utc_datetime(self, *args, **kwargs):
-        kwargs_ext = dict(kwargs)
-        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' not in kwargs_ext and len(args) < 8):
-            kwargs_ext['tzinfo'] = UTC
-        result = datetime.datetime(*args, **kwargs_ext)
-        if CRYPTOGRAPHY_TIMEZONE and ('tzinfo' in kwargs or len(args) >= 8):
-            result = ensure_utc_timezone(result)
-        return result
+        super(CryptographyBackend, self).__init__(module, with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         '''
