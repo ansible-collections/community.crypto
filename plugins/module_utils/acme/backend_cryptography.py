@@ -58,7 +58,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.time import (
-    ensure_utc_timezone,
+    add_or_remove_timezone,
 )
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
@@ -382,8 +382,8 @@ class CryptographyBackend(CryptoBackend):
 
         if now is None:
             now = self.get_now()
-        elif CRYPTOGRAPHY_TIMEZONE:
-            now = ensure_utc_timezone(now)
+        else:
+            now = add_or_remove_timezone(now, with_timezone=CRYPTOGRAPHY_TIMEZONE)
         return (get_not_valid_after(cert) - now).days
 
     def create_chain_matcher(self, criterium):

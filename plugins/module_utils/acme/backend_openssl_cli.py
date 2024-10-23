@@ -33,6 +33,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_bytes_to_int
 
+from ansible_collections.community.crypto.plugins.module_utils.time import ensure_utc_timezone
+
 try:
     import ipaddress
 except ImportError:
@@ -45,7 +47,11 @@ _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTY
 def _extract_date(out_text, name, cert_filename_suffix=""):
     try:
         date_str = re.search(r"\s+%s\s*:\s+(.*)" % name, out_text).group(1)
-        return datetime.datetime.strptime(date_str, '%b %d %H:%M:%S %Y %Z')
+        # For some reason Python's strptime() doesn't return any timezone information,
+        # even though the information is there and a supported timezone for all supported
+        # Python implementations (GMT). So we have to modify the datetime object by
+        # replacing it by UTC.
+        return ensure_utc_timezone(datetime.datetime.strptime(date_str, '%b %d %H:%M:%S %Y %Z'))
     except AttributeError:
         raise BackendException("No '{0}' date found{1}".format(name, cert_filename_suffix))
     except ValueError as exc:
@@ -71,7 +77,7 @@ def _extract_octets(out_text, name, required=True, potential_prefixes=None):
 
 class OpenSSLCLIBackend(CryptoBackend):
     def __init__(self, module, openssl_binary=None):
-        super(OpenSSLCLIBackend, self).__init__(module)
+        super(OpenSSLCLIBackend, self).__init__(module, with_timezone=True)
         if openssl_binary is None:
             openssl_binary = module.get_bin_path('openssl', True)
         self.openssl_binary = openssl_binary
@@ -340,7 +346,9 @@ class OpenSSLCLIBackend(CryptoBackend):
         out_text = to_text(out, errors='surrogate_or_strict')
         not_after = _extract_date(out_text, 'Not After', cert_filename_suffix=cert_filename_suffix)
         if now is None:
-            now = datetime.datetime.now()
+            now = self.get_now()
+        else:
+            now = ensure_utc_timezone(now)
         return (not_after - now).days
 
     def create_chain_matcher(self, criterium):
