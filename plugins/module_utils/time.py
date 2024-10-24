@@ -83,6 +83,9 @@ if sys.version_info < (3, 3):
             return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
 else:
     def get_epoch_seconds(timestamp):
+        if timestamp.tzinfo is None:
+            # timestamp.timestamp() is offset by the local timezone if timestamp has no timezone
+            timestamp = ensure_utc_timezone(timestamp)
         return timestamp.timestamp()
 
 

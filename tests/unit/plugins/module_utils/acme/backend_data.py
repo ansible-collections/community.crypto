@@ -20,6 +20,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
     BackendException,
 )
 
+from ..test_time import cartesian_product, TIMEZONES
+
 
 def load_fixture(name):
     with open(os.path.join(os.path.dirname(__file__), 'fixtures', name)) as f:
@@ -89,11 +91,11 @@ TEST_CERT_OPENSSL_OUTPUT_2 = load_fixture("cert_2.txt")  # OpenSSL 3.3.0 output
 TEST_CERT_OPENSSL_OUTPUT_2B = load_fixture("cert_2-b.txt")  # OpenSSL 1.1.1f output
 
 
-TEST_CERT_DAYS = [
+TEST_CERT_DAYS = cartesian_product(TIMEZONES, [
     (datetime.datetime(2018, 11, 15, 1, 2, 3), 11),
     (datetime.datetime(2018, 11, 25, 15, 20, 0), 1),
     (datetime.datetime(2018, 11, 25, 15, 30, 0), 0),
-]
+])
 
 
 TEST_CERT_INFO = CertificateInformation(
@@ -121,7 +123,7 @@ TEST_CERT_INFO = [
 ]
 
 
-TEST_PARSE_ACME_TIMESTAMP = [
+TEST_PARSE_ACME_TIMESTAMP = cartesian_product(TIMEZONES, [
     (
         '2024-01-01T00:11:22Z',
         dict(year=2024, month=1, day=1, hour=0, minute=11, second=22),
@@ -134,10 +136,10 @@ TEST_PARSE_ACME_TIMESTAMP = [
         '2024-04-17T06:54:13.333333334Z',
         dict(year=2024, month=4, day=17, hour=6, minute=54, second=13, microsecond=333333),
     ),
-]
+])
 
 if sys.version_info >= (3, 5):
-    TEST_PARSE_ACME_TIMESTAMP.extend([
+    TEST_PARSE_ACME_TIMESTAMP.extend(cartesian_product(TIMEZONES, [
         (
             '2024-01-01T00:11:22+0100',
             dict(year=2023, month=12, day=31, hour=23, minute=11, second=22),
@@ -146,10 +148,10 @@ if sys.version_info >= (3, 5):
             '2024-01-01T00:11:22.123+0100',
             dict(year=2023, month=12, day=31, hour=23, minute=11, second=22, microsecond=123000),
         ),
-    ])
+    ]))
 
 
-TEST_INTERPOLATE_TIMESTAMP = [
+TEST_INTERPOLATE_TIMESTAMP = cartesian_product(TIMEZONES, [
     (
         dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
         dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
@@ -168,7 +170,7 @@ TEST_INTERPOLATE_TIMESTAMP = [
         1.0,
         dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
     ),
-]
+])
 
 
 class FakeBackend(CryptoBackend):

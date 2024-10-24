@@ -10,7 +10,9 @@ import datetime
 import sys
 
 import pytest
+from freezegun import freeze_time
 
+from ansible.module_utils.common.collections import is_sequence
 
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     add_or_remove_timezone,
@@ -25,18 +27,42 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
-TEST_REMOVE_TIMEZONE = [
-    (
-        datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=UTC),
-        datetime.datetime(2024, 1, 1, 0, 1, 2),
-    ),
-    (
-        datetime.datetime(2024, 1, 1, 0, 1, 2),
-        datetime.datetime(2024, 1, 1, 0, 1, 2),
-    ),
+TIMEZONES = [
+    datetime.timedelta(hours=0),
+    datetime.timedelta(hours=1),
+    datetime.timedelta(hours=2),
+    datetime.timedelta(hours=-6),
 ]
 
-TEST_UTC_TIMEZONE = [
+
+def cartesian_product(list1, list2):
+    result = []
+    for item1 in list1:
+        if not is_sequence(item1):
+            item1 = (item1, )
+        elif not isinstance(item1, tuple):
+            item1 = tuple(item1)
+        for item2 in list2:
+            if not is_sequence(item2):
+                item2 = (item2, )
+            elif not isinstance(item2, tuple):
+                item2 = tuple(item2)
+            result.append(item1 + item2)
+    return result
+
+
+TEST_REMOVE_TIMEZONE = cartesian_product(TIMEZONES, [
+    (
+        datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=UTC),
+        datetime.datetime(2024, 1, 1, 0, 1, 2),
+    ),
+    (
+        datetime.datetime(2024, 1, 1, 0, 1, 2),
+        datetime.datetime(2024, 1, 1, 0, 1, 2),
+    ),
+])
+
+TEST_UTC_TIMEZONE = cartesian_product(TIMEZONES, [
     (
         datetime.datetime(2024, 1, 1, 0, 1, 2),
         datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=UTC),
@@ -45,21 +71,21 @@ TEST_UTC_TIMEZONE = [
         datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=UTC),
         datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=UTC),
     ),
-]
+])
 
-TEST_EPOCH_SECONDS = [
+TEST_EPOCH_SECONDS = cartesian_product(TIMEZONES, [
     (0, dict(year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=0)),
     (1E-6, dict(year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1)),
     (1E-3, dict(year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1000)),
     (3691.2, dict(year=1970, day=1, month=1, hour=1, minute=1, second=31, microsecond=200000)),
-]
+])
 
-TEST_EPOCH_TO_SECONDS = [
+TEST_EPOCH_TO_SECONDS = cartesian_product(TIMEZONES, [
     (datetime.datetime(1970, 1, 1, 0, 1, 2, 0), 62),
     (datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=UTC), 62),
-]
+])
 
-TEST_CONVERT_RELATIVE_TO_DATETIME = [
+TEST_CONVERT_RELATIVE_TO_DATETIME = cartesian_product(TIMEZONES, [
     (
         '+0',
         False,
@@ -96,9 +122,9 @@ TEST_CONVERT_RELATIVE_TO_DATETIME = [
         datetime.datetime(2024, 1, 1, 0, 0, 0),
         datetime.datetime(2023, 10, 1, 17, 19, 10, tzinfo=UTC),
     ),
-]
+])
 
-TEST_GET_RELATIVE_TIME_OPTION = [
+TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(TIMEZONES, [
     (
         '+1d2h3m4s',
         'foo',
@@ -195,28 +221,28 @@ TEST_GET_RELATIVE_TIME_OPTION = [
         datetime.datetime(2024, 1, 1, 0, 0, 0),
         '202401020405Z',
     ),
-]
+])
 
 
 if sys.version_info >= (3, 5):
     ONE_HOUR_PLUS = datetime.timezone(datetime.timedelta(hours=1))
 
-    TEST_REMOVE_TIMEZONE.extend([
+    TEST_REMOVE_TIMEZONE.extend(cartesian_product(TIMEZONES, [
         (
             datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=ONE_HOUR_PLUS),
             datetime.datetime(2023, 12, 31, 23, 1, 2),
         ),
-    ])
-    TEST_UTC_TIMEZONE.extend([
+    ]))
+    TEST_UTC_TIMEZONE.extend(cartesian_product(TIMEZONES, [
         (
             datetime.datetime(2024, 1, 1, 0, 1, 2, tzinfo=ONE_HOUR_PLUS),
             datetime.datetime(2023, 12, 31, 23, 1, 2, tzinfo=UTC),
         ),
-    ])
-    TEST_EPOCH_TO_SECONDS.extend([
+    ]))
+    TEST_EPOCH_TO_SECONDS.extend(cartesian_product(TIMEZONES, [
         (datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=ONE_HOUR_PLUS), 62 - 3600),
-    ])
-    TEST_GET_RELATIVE_TIME_OPTION.extend([
+    ]))
+    TEST_GET_RELATIVE_TIME_OPTION.extend(cartesian_product(TIMEZONES, [
         (
             '20240102040506+0100',
             'foo',
@@ -265,59 +291,77 @@ if sys.version_info >= (3, 5):
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             '202401020405+0100',
         ),
-    ])
+    ]))
 
 
-@pytest.mark.parametrize("input, expected", TEST_REMOVE_TIMEZONE)
-def test_remove_timezone(input, expected):
-    output_1 = remove_timezone(input)
-    assert expected == output_1
-    output_2 = add_or_remove_timezone(input, with_timezone=False)
-    assert expected == output_2
+@pytest.mark.parametrize("timezone, input, expected", TEST_REMOVE_TIMEZONE)
+def test_remove_timezone(timezone, input, expected):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output_1 = remove_timezone(input)
+        assert expected == output_1
+        output_2 = add_or_remove_timezone(input, with_timezone=False)
+        assert expected == output_2
 
 
-@pytest.mark.parametrize("input, expected", TEST_UTC_TIMEZONE)
-def test_utc_timezone(input, expected):
-    output_1 = ensure_utc_timezone(input)
-    assert expected == output_1
-    output_2 = add_or_remove_timezone(input, with_timezone=True)
-    assert expected == output_2
+@pytest.mark.parametrize("timezone, input, expected", TEST_UTC_TIMEZONE)
+def test_utc_timezone(timezone, input, expected):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output_1 = ensure_utc_timezone(input)
+        assert expected == output_1
+        output_2 = add_or_remove_timezone(input, with_timezone=True)
+        assert expected == output_2
 
 
-def test_get_now_datetime():
-    output_1 = get_now_datetime(with_timezone=False)
-    assert output_1.tzinfo is None
-    output_2 = get_now_datetime(with_timezone=True)
-    assert output_2.tzinfo is not None
-    assert output_2.tzinfo == UTC
+# @pytest.mark.parametrize("timezone", TIMEZONES)
+# Due to a bug in freezegun (https://github.com/spulec/freezegun/issues/348, https://github.com/spulec/freezegun/issues/553)
+# this only works with timezone = UTC
+@pytest.mark.parametrize("timezone", [datetime.timedelta(hours=0)])
+def test_get_now_datetime_w_timezone(timezone):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output_2 = get_now_datetime(with_timezone=True)
+        assert output_2.tzinfo is not None
+        assert output_2.tzinfo == UTC
+        assert output_2 == datetime.datetime(2024, 2, 3, 4, 5, 6, tzinfo=UTC)
 
 
-@pytest.mark.parametrize("seconds, timestamp", TEST_EPOCH_SECONDS)
-def test_epoch_seconds(seconds, timestamp):
-    ts_wo_tz = datetime.datetime(**timestamp)
-    assert seconds == get_epoch_seconds(ts_wo_tz)
-    timestamp_w_tz = dict(timestamp)
-    timestamp_w_tz['tzinfo'] = UTC
-    ts_w_tz = datetime.datetime(**timestamp_w_tz)
-    assert seconds == get_epoch_seconds(ts_w_tz)
-    output_1 = from_epoch_seconds(seconds, with_timezone=False)
-    assert ts_wo_tz == output_1
-    output_2 = from_epoch_seconds(seconds, with_timezone=True)
-    assert ts_w_tz == output_2
+@pytest.mark.parametrize("timezone", TIMEZONES)
+def test_get_now_datetime_wo_timezone(timezone):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output_1 = get_now_datetime(with_timezone=False)
+        assert output_1.tzinfo is None
+        assert output_1 == datetime.datetime(2024, 2, 3, 4, 5, 6)
 
 
-@pytest.mark.parametrize("timestamp, expected_seconds", TEST_EPOCH_TO_SECONDS)
-def test_epoch_to_seconds(timestamp, expected_seconds):
-    assert expected_seconds == get_epoch_seconds(timestamp)
+@pytest.mark.parametrize("timezone, seconds, timestamp", TEST_EPOCH_SECONDS)
+def test_epoch_seconds(timezone, seconds, timestamp):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        ts_wo_tz = datetime.datetime(**timestamp)
+        assert seconds == get_epoch_seconds(ts_wo_tz)
+        timestamp_w_tz = dict(timestamp)
+        timestamp_w_tz['tzinfo'] = UTC
+        ts_w_tz = datetime.datetime(**timestamp_w_tz)
+        assert seconds == get_epoch_seconds(ts_w_tz)
+        output_1 = from_epoch_seconds(seconds, with_timezone=False)
+        assert ts_wo_tz == output_1
+        output_2 = from_epoch_seconds(seconds, with_timezone=True)
+        assert ts_w_tz == output_2
 
 
-@pytest.mark.parametrize("relative_time_string, with_timezone, now, expected", TEST_CONVERT_RELATIVE_TO_DATETIME)
-def test_convert_relative_to_datetime(relative_time_string, with_timezone, now, expected):
-    output = convert_relative_to_datetime(relative_time_string, with_timezone=with_timezone, now=now)
-    assert expected == output
+@pytest.mark.parametrize("timezone, timestamp, expected_seconds", TEST_EPOCH_TO_SECONDS)
+def test_epoch_to_seconds(timezone, timestamp, expected_seconds):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        assert expected_seconds == get_epoch_seconds(timestamp)
 
 
-@pytest.mark.parametrize("input_string, input_name, backend, with_timezone, now, expected", TEST_GET_RELATIVE_TIME_OPTION)
-def test_get_relative_time_option(input_string, input_name, backend, with_timezone, now, expected):
-    output = get_relative_time_option(input_string, input_name, backend=backend, with_timezone=with_timezone, now=now)
-    assert expected == output
+@pytest.mark.parametrize("timezone, relative_time_string, with_timezone, now, expected", TEST_CONVERT_RELATIVE_TO_DATETIME)
+def test_convert_relative_to_datetime(timezone, relative_time_string, with_timezone, now, expected):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output = convert_relative_to_datetime(relative_time_string, with_timezone=with_timezone, now=now)
+        assert expected == output
+
+
+@pytest.mark.parametrize("timezone, input_string, input_name, backend, with_timezone, now, expected", TEST_GET_RELATIVE_TIME_OPTION)
+def test_get_relative_time_option(timezone, input_string, input_name, backend, with_timezone, now, expected):
+    with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
+        output = get_relative_time_option(input_string, input_name, backend=backend, with_timezone=with_timezone, now=now)
+        assert expected == output
