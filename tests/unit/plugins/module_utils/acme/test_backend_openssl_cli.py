@@ -17,6 +17,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backend_open
     OpenSSLCLIBackend,
 )
 
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    ensure_utc_timezone,
+    UTC,
+)
+
 from .backend_data import (
     TEST_KEYS,
     TEST_CSRS,
@@ -28,7 +33,7 @@ from .backend_data import (
     TEST_INTERPOLATE_TIMESTAMP,
 )
 
-from ..test_time import TIMEZONES
+# from ..test_time import TIMEZONES
 
 
 TEST_IPS = [
@@ -94,20 +99,29 @@ def test_get_cert_information(cert_content, expected_cert_info, openssl_output, 
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
     backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+
+    expected_cert_info = expected_cert_info._replace(
+        not_valid_after=ensure_utc_timezone(expected_cert_info.not_valid_after),
+        not_valid_before=ensure_utc_timezone(expected_cert_info.not_valid_before),
+    )
+
     cert_info = backend.get_cert_information(cert_filename=str(fn))
     assert cert_info == expected_cert_info
     cert_info = backend.get_cert_information(cert_content=cert_content)
     assert cert_info == expected_cert_info
 
 
-@pytest.mark.parametrize("timezone", TIMEZONES)
+# @pytest.mark.parametrize("timezone", TIMEZONES)
+# Due to a bug in freezegun (https://github.com/spulec/freezegun/issues/348, https://github.com/spulec/freezegun/issues/553)
+# this only works with timezone = UTC if CRYPTOGRAPHY_TIMEZONE is truish
+@pytest.mark.parametrize("timezone", [datetime.timedelta(hours=0)])
 def test_now(timezone):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
         backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
         now = backend.get_now()
-        assert now.tzinfo is None
-        assert now == datetime.datetime(2024, 2, 3, 4, 5, 6)
+        assert now.tzinfo is not None
+        assert now == datetime.datetime(2024, 2, 3, 4, 5, 6, tzinfo=UTC)
 
 
 @pytest.mark.parametrize("timezone, input, expected", TEST_PARSE_ACME_TIMESTAMP)

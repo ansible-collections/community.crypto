@@ -32,6 +32,7 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
     get_relative_time_option,
     remove_timezone,
+    UTC,
 )
 
 
@@ -85,31 +86,35 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
 
 @six.add_metaclass(abc.ABCMeta)
 class CryptoBackend(object):
-    def __init__(self, module):
+    def __init__(self, module, with_timezone=False):
         self.module = module
+        self._with_timezone = with_timezone
 
     def get_now(self):
-        return get_now_datetime(with_timezone=False)
+        return get_now_datetime(with_timezone=self._with_timezone)
 
     def parse_acme_timestamp(self, timestamp_str):
         # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
-        return _parse_acme_timestamp(timestamp_str, with_timezone=False)
+        return _parse_acme_timestamp(timestamp_str, with_timezone=self._with_timezone)
 
     def parse_module_parameter(self, value, name):
         try:
-            return get_relative_time_option(value, name, backend='cryptography', with_timezone=False)
+            return get_relative_time_option(value, name, backend='cryptography', with_timezone=self._with_timezone)
         except OpenSSLObjectError as exc:
             raise BackendException(to_native(exc))
 
     def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
         start = get_epoch_seconds(timestamp_start)
         end = get_epoch_seconds(timestamp_end)
-        return from_epoch_seconds(start + percentage * (end - start), with_timezone=False)
+        return from_epoch_seconds(start + percentage * (end - start), with_timezone=self._with_timezone)
 
     def get_utc_datetime(self, *args, **kwargs):
-        result = datetime.datetime(*args, **kwargs)
-        if 'tzinfo' in kwargs or len(args) >= 8:
-            result = remove_timezone(result)
+        kwargs_ext = dict(kwargs)
+        if self._with_timezone and ('tzinfo' not in kwargs_ext and len(args) < 8):
+            kwargs_ext['tzinfo'] = UTC
+        result = datetime.datetime(*args, **kwargs_ext)
+        if self._with_timezone and ('tzinfo' in kwargs or len(args) >= 8):
+            result = ensure_utc_timezone(result)
         return result
 
     @abc.abstractmethod

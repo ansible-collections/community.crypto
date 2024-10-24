@@ -12,19 +12,18 @@ from freezegun import freeze_time
 
 from ansible_collections.community.crypto.tests.unit.compat.mock import MagicMock
 
-from ansible_collections.community.crypto.plugins.module_utils.time import UTC
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     HAS_CURRENT_CRYPTOGRAPHY,
     CryptographyBackend,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    ensure_utc_timezone,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
+)
+
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    ensure_utc_timezone,
+    UTC,
 )
 
 from .backend_data import (
