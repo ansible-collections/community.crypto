@@ -87,6 +87,7 @@ def secure_write(path, mode, content):
 class OpensshParser(object):
     """Parser for OpenSSH encoded objects"""
     BOOLEAN_OFFSET = 1
+    UINT8_OFFSET = 1
     UINT32_OFFSET = 4
     UINT64_OFFSET = 8
 
@@ -101,6 +102,13 @@ class OpensshParser(object):
         next_pos = self._check_position(self.BOOLEAN_OFFSET)
 
         value = _BOOLEAN.unpack(self._data[self._pos:next_pos])[0]
+        self._pos = next_pos
+        return value
+
+    def uint8(self):
+        next_pos = self._check_position(self.UINT8_OFFSET)
+
+        value = _UBYTE.unpack(self._data[self._pos:next_pos])[0]
         self._pos = next_pos
         return value
 
@@ -189,7 +197,6 @@ class OpensshParser(object):
         signature_type = parser.string()
         signature_blob = parser.string()
 
-        blob_parser = cls(signature_blob)
         if signature_type in (b'ssh-rsa', b'rsa-sha2-256', b'rsa-sha2-512'):
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
             # https://datatracker.ietf.org/doc/html/rfc8332#section-3
@@ -198,16 +205,21 @@ class OpensshParser(object):
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
             signature_data['r'] = cls._big_int(signature_blob[:20], "big")
             signature_data['s'] = cls._big_int(signature_blob[20:], "big")
-        elif signature_type in (b'ecdsa-sha2-nistp256', b'ecdsa-sha2-nistp384', b'ecdsa-sha2-nistp521'):
+        elif signature_type in (b'ecdsa-sha2-nistp256', b'ecdsa-sha2-nistp384', b'ecdsa-sha2-nistp521', b'sk-ecdsa-sha2-nistp256@openssh.com'):
             # https://datatracker.ietf.org/doc/html/rfc5656#section-3.1.2
+            blob_parser = cls(signature_blob)
             signature_data['r'] = blob_parser.mpint()
             signature_data['s'] = blob_parser.mpint()
-        elif signature_type == b'ssh-ed25519':
+        elif signature_type in (b'ssh-ed25519', b'sk-ssh-ed25519@openssh.com'):
             # https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.2
             signature_data['R'] = cls._big_int(signature_blob[:32], "little")
             signature_data['S'] = cls._big_int(signature_blob[32:], "little")
         else:
             raise ValueError("%s is not a valid signature type" % signature_type)
+
+        if signature_type.startswith(b'sk-'):
+            signature_data['signature_flags'] = parser.uint8()
+            signature_data['signature_counter'] = parser.uint32()
 
         signature_data['signature_type'] = signature_type
 
