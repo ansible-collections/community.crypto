@@ -4,6 +4,20 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.22.3
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- acme_* modules - when using the OpenSSL backend, explicitly use the UTC timezone in Python code (https://github.com/ansible-collections/community.crypto/pull/811).
+- time module utils - fix conversion of naive ``datetime`` objects to UNIX timestamps for Python 3 (https://github.com/ansible-collections/community.crypto/issues/808, https://github.com/ansible-collections/community.crypto/pull/810).
+
 v2.22.2
 =======
 

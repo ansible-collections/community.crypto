@@ -2,247 +2,250 @@
 
 **Topics**
 
-- <a href="#v2-22-2">v2\.22\.2</a>
+- <a href="#v2-22-3">v2\.22\.3</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
-- <a href="#v2-22-1">v2\.22\.1</a>
+- <a href="#v2-22-2">v2\.22\.2</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-- <a href="#v2-22-0">v2\.22\.0</a>
+- <a href="#v2-22-1">v2\.22\.1</a>
     - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
+- <a href="#v2-22-0">v2\.22\.0</a>
+    - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
 - <a href="#v2-21-1">v2\.21\.1</a>
-    - <a href="#release-summary-3">Release Summary</a>
-    - <a href="#bugfixes-2">Bugfixes</a>
-- <a href="#v2-21-0">v2\.21\.0</a>
     - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
+- <a href="#v2-21-0">v2\.21\.0</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
 - <a href="#v2-20-0">v2\.20\.0</a>
-    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
-    - <a href="#bugfixes-3">Bugfixes</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v2-19-1">v2\.19\.1</a>
-    - <a href="#release-summary-6">Release Summary</a>
-    - <a href="#bugfixes-4">Bugfixes</a>
-- <a href="#v2-19-0">v2\.19\.0</a>
     - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
+- <a href="#v2-19-0">v2\.19\.0</a>
+    - <a href="#release-summary-8">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-5">Bugfixes</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v2-18-0">v2\.18\.0</a>
-    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#release-summary-9">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
-    - <a href="#bugfixes-6">Bugfixes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#filter">Filter</a>
 - <a href="#v2-17-1">v2\.17\.1</a>
-    - <a href="#release-summary-9">Release Summary</a>
-    - <a href="#bugfixes-7">Bugfixes</a>
-- <a href="#v2-17-0">v2\.17\.0</a>
     - <a href="#release-summary-10">Release Summary</a>
+    - <a href="#bugfixes-8">Bugfixes</a>
+- <a href="#v2-17-0">v2\.17\.0</a>
+    - <a href="#release-summary-11">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
 - <a href="#v2-16-2">v2\.16\.2</a>
-    - <a href="#release-summary-11">Release Summary</a>
-    - <a href="#bugfixes-8">Bugfixes</a>
-- <a href="#v2-16-1">v2\.16\.1</a>
     - <a href="#release-summary-12">Release Summary</a>
     - <a href="#bugfixes-9">Bugfixes</a>
-- <a href="#v2-16-0">v2\.16\.0</a>
+- <a href="#v2-16-1">v2\.16\.1</a>
     - <a href="#release-summary-13">Release Summary</a>
-    - <a href="#minor-changes-6">Minor Changes</a>
     - <a href="#bugfixes-10">Bugfixes</a>
-- <a href="#v2-15-1">v2\.15\.1</a>
+- <a href="#v2-16-0">v2\.16\.0</a>
     - <a href="#release-summary-14">Release Summary</a>
+    - <a href="#minor-changes-6">Minor Changes</a>
     - <a href="#bugfixes-11">Bugfixes</a>
-- <a href="#v2-15-0">v2\.15\.0</a>
+- <a href="#v2-15-1">v2\.15\.1</a>
     - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#bugfixes-12">Bugfixes</a>
+- <a href="#v2-15-0">v2\.15\.0</a>
+    - <a href="#release-summary-16">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
-    - <a href="#bugfixes-12">Bugfixes</a>
+    - <a href="#bugfixes-13">Bugfixes</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#filter-1">Filter</a>
         - <a href="#lookup">Lookup</a>
 - <a href="#v2-14-1">v2\.14\.1</a>
-    - <a href="#release-summary-16">Release Summary</a>
-    - <a href="#bugfixes-13">Bugfixes</a>
+    - <a href="#release-summary-17">Release Summary</a>
+    - <a href="#bugfixes-14">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
 - <a href="#v2-14-0">v2\.14\.0</a>
-    - <a href="#release-summary-17">Release Summary</a>
+    - <a href="#release-summary-18">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
 - <a href="#v2-13-1">v2\.13\.1</a>
-    - <a href="#release-summary-18">Release Summary</a>
-    - <a href="#bugfixes-14">Bugfixes</a>
-- <a href="#v2-13-0">v2\.13\.0</a>
     - <a href="#release-summary-19">Release Summary</a>
+    - <a href="#bugfixes-15">Bugfixes</a>
+- <a href="#v2-13-0">v2\.13\.0</a>
+    - <a href="#release-summary-20">Release Summary</a>
     - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#deprecated-features-4">Deprecated Features</a>
-    - <a href="#bugfixes-15">Bugfixes</a>
+    - <a href="#bugfixes-16">Bugfixes</a>
 - <a href="#v2-12-0">v2\.12\.0</a>
-    - <a href="#release-summary-20">Release Summary</a>
+    - <a href="#release-summary-21">Release Summary</a>
     - <a href="#minor-changes-10">Minor Changes</a>
 - <a href="#v2-11-1">v2\.11\.1</a>
-    - <a href="#release-summary-21">Release Summary</a>
-- <a href="#v2-11-0">v2\.11\.0</a>
     - <a href="#release-summary-22">Release Summary</a>
-    - <a href="#minor-changes-11">Minor Changes</a>
-    - <a href="#bugfixes-16">Bugfixes</a>
-- <a href="#v2-10-0">v2\.10\.0</a>
+- <a href="#v2-11-0">v2\.11\.0</a>
     - <a href="#release-summary-23">Release Summary</a>
+    - <a href="#minor-changes-11">Minor Changes</a>
     - <a href="#bugfixes-17">Bugfixes</a>
+- <a href="#v2-10-0">v2\.10\.0</a>
+    - <a href="#release-summary-24">Release Summary</a>
+    - <a href="#bugfixes-18">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#filter-2">Filter</a>
 - <a href="#v2-9-0">v2\.9\.0</a>
-    - <a href="#release-summary-24">Release Summary</a>
+    - <a href="#release-summary-25">Release Summary</a>
     - <a href="#minor-changes-12">Minor Changes</a>
 - <a href="#v2-8-1">v2\.8\.1</a>
-    - <a href="#release-summary-25">Release Summary</a>
-- <a href="#v2-8-0">v2\.8\.0</a>
     - <a href="#release-summary-26">Release Summary</a>
+- <a href="#v2-8-0">v2\.8\.0</a>
+    - <a href="#release-summary-27">Release Summary</a>
     - <a href="#minor-changes-13">Minor Changes</a>
 - <a href="#v2-7-1">v2\.7\.1</a>
-    - <a href="#release-summary-27">Release Summary</a>
-    - <a href="#bugfixes-18">Bugfixes</a>
-- <a href="#v2-7-0">v2\.7\.0</a>
     - <a href="#release-summary-28">Release Summary</a>
-    - <a href="#minor-changes-14">Minor Changes</a>
     - <a href="#bugfixes-19">Bugfixes</a>
-- <a href="#v2-6-0">v2\.6\.0</a>
+- <a href="#v2-7-0">v2\.7\.0</a>
     - <a href="#release-summary-29">Release Summary</a>
+    - <a href="#minor-changes-14">Minor Changes</a>
+    - <a href="#bugfixes-20">Bugfixes</a>
+- <a href="#v2-6-0">v2\.6\.0</a>
+    - <a href="#release-summary-30">Release Summary</a>
     - <a href="#minor-changes-15">Minor Changes</a>
 - <a href="#v2-5-0">v2\.5\.0</a>
-    - <a href="#release-summary-30">Release Summary</a>
+    - <a href="#release-summary-31">Release Summary</a>
     - <a href="#minor-changes-16">Minor Changes</a>
 - <a href="#v2-4-0">v2\.4\.0</a>
-    - <a href="#release-summary-31">Release Summary</a>
-    - <a href="#deprecated-features-5">Deprecated Features</a>
-    - <a href="#bugfixes-20">Bugfixes</a>
-- <a href="#v2-3-4">v2\.3\.4</a>
     - <a href="#release-summary-32">Release Summary</a>
-- <a href="#v2-3-3">v2\.3\.3</a>
-    - <a href="#release-summary-33">Release Summary</a>
+    - <a href="#deprecated-features-5">Deprecated Features</a>
     - <a href="#bugfixes-21">Bugfixes</a>
-- <a href="#v2-3-2">v2\.3\.2</a>
+- <a href="#v2-3-4">v2\.3\.4</a>
+    - <a href="#release-summary-33">Release Summary</a>
+- <a href="#v2-3-3">v2\.3\.3</a>
     - <a href="#release-summary-34">Release Summary</a>
     - <a href="#bugfixes-22">Bugfixes</a>
-- <a href="#v2-3-1">v2\.3\.1</a>
+- <a href="#v2-3-2">v2\.3\.2</a>
     - <a href="#release-summary-35">Release Summary</a>
     - <a href="#bugfixes-23">Bugfixes</a>
-- <a href="#v2-3-0">v2\.3\.0</a>
+- <a href="#v2-3-1">v2\.3\.1</a>
     - <a href="#release-summary-36">Release Summary</a>
-    - <a href="#minor-changes-17">Minor Changes</a>
     - <a href="#bugfixes-24">Bugfixes</a>
-- <a href="#v2-2-4">v2\.2\.4</a>
+- <a href="#v2-3-0">v2\.3\.0</a>
     - <a href="#release-summary-37">Release Summary</a>
+    - <a href="#minor-changes-17">Minor Changes</a>
     - <a href="#bugfixes-25">Bugfixes</a>
-- <a href="#v2-2-3">v2\.2\.3</a>
+- <a href="#v2-2-4">v2\.2\.4</a>
     - <a href="#release-summary-38">Release Summary</a>
     - <a href="#bugfixes-26">Bugfixes</a>
-- <a href="#v2-2-2">v2\.2\.2</a>
+- <a href="#v2-2-3">v2\.2\.3</a>
     - <a href="#release-summary-39">Release Summary</a>
     - <a href="#bugfixes-27">Bugfixes</a>
-- <a href="#v2-2-1">v2\.2\.1</a>
+- <a href="#v2-2-2">v2\.2\.2</a>
     - <a href="#release-summary-40">Release Summary</a>
     - <a href="#bugfixes-28">Bugfixes</a>
-- <a href="#v2-2-0">v2\.2\.0</a>
+- <a href="#v2-2-1">v2\.2\.1</a>
     - <a href="#release-summary-41">Release Summary</a>
-    - <a href="#minor-changes-18">Minor Changes</a>
     - <a href="#bugfixes-29">Bugfixes</a>
-- <a href="#v2-1-0">v2\.1\.0</a>
+- <a href="#v2-2-0">v2\.2\.0</a>
     - <a href="#release-summary-42">Release Summary</a>
-    - <a href="#minor-changes-19">Minor Changes</a>
+    - <a href="#minor-changes-18">Minor Changes</a>
     - <a href="#bugfixes-30">Bugfixes</a>
+- <a href="#v2-1-0">v2\.1\.0</a>
+    - <a href="#release-summary-43">Release Summary</a>
+    - <a href="#minor-changes-19">Minor Changes</a>
+    - <a href="#bugfixes-31">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v2-0-2">v2\.0\.2</a>
-    - <a href="#release-summary-43">Release Summary</a>
-- <a href="#v2-0-1">v2\.0\.1</a>
     - <a href="#release-summary-44">Release Summary</a>
-    - <a href="#minor-changes-20">Minor Changes</a>
-    - <a href="#bugfixes-31">Bugfixes</a>
-- <a href="#v2-0-0">v2\.0\.0</a>
+- <a href="#v2-0-1">v2\.0\.1</a>
     - <a href="#release-summary-45">Release Summary</a>
+    - <a href="#minor-changes-20">Minor Changes</a>
+    - <a href="#bugfixes-32">Bugfixes</a>
+- <a href="#v2-0-0">v2\.0\.0</a>
+    - <a href="#release-summary-46">Release Summary</a>
     - <a href="#minor-changes-21">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-6">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes-32">Bugfixes</a>
-- <a href="#v1-9-4">v1\.9\.4</a>
-    - <a href="#release-summary-46">Release Summary</a>
     - <a href="#bugfixes-33">Bugfixes</a>
-- <a href="#v1-9-3">v1\.9\.3</a>
+- <a href="#v1-9-4">v1\.9\.4</a>
     - <a href="#release-summary-47">Release Summary</a>
     - <a href="#bugfixes-34">Bugfixes</a>
-- <a href="#v1-9-2">v1\.9\.2</a>
+- <a href="#v1-9-3">v1\.9\.3</a>
     - <a href="#release-summary-48">Release Summary</a>
-- <a href="#v1-9-1">v1\.9\.1</a>
-    - <a href="#release-summary-49">Release Summary</a>
-- <a href="#v1-9-0">v1\.9\.0</a>
-    - <a href="#release-summary-50">Release Summary</a>
-    - <a href="#minor-changes-22">Minor Changes</a>
     - <a href="#bugfixes-35">Bugfixes</a>
-- <a href="#v1-8-0">v1\.8\.0</a>
+- <a href="#v1-9-2">v1\.9\.2</a>
+    - <a href="#release-summary-49">Release Summary</a>
+- <a href="#v1-9-1">v1\.9\.1</a>
+    - <a href="#release-summary-50">Release Summary</a>
+- <a href="#v1-9-0">v1\.9\.0</a>
     - <a href="#release-summary-51">Release Summary</a>
-    - <a href="#minor-changes-23">Minor Changes</a>
+    - <a href="#minor-changes-22">Minor Changes</a>
     - <a href="#bugfixes-36">Bugfixes</a>
-- <a href="#v1-7-1">v1\.7\.1</a>
+- <a href="#v1-8-0">v1\.8\.0</a>
     - <a href="#release-summary-52">Release Summary</a>
+    - <a href="#minor-changes-23">Minor Changes</a>
     - <a href="#bugfixes-37">Bugfixes</a>
-- <a href="#v1-7-0">v1\.7\.0</a>
+- <a href="#v1-7-1">v1\.7\.1</a>
     - <a href="#release-summary-53">Release Summary</a>
-    - <a href="#minor-changes-24">Minor Changes</a>
     - <a href="#bugfixes-38">Bugfixes</a>
+- <a href="#v1-7-0">v1\.7\.0</a>
+    - <a href="#release-summary-54">Release Summary</a>
+    - <a href="#minor-changes-24">Minor Changes</a>
+    - <a href="#bugfixes-39">Bugfixes</a>
     - <a href="#new-modules-3">New Modules</a>
 - <a href="#v1-6-2">v1\.6\.2</a>
-    - <a href="#release-summary-54">Release Summary</a>
-    - <a href="#bugfixes-39">Bugfixes</a>
-- <a href="#v1-6-1">v1\.6\.1</a>
     - <a href="#release-summary-55">Release Summary</a>
     - <a href="#bugfixes-40">Bugfixes</a>
-- <a href="#v1-6-0">v1\.6\.0</a>
+- <a href="#v1-6-1">v1\.6\.1</a>
     - <a href="#release-summary-56">Release Summary</a>
+    - <a href="#bugfixes-41">Bugfixes</a>
+- <a href="#v1-6-0">v1\.6\.0</a>
+    - <a href="#release-summary-57">Release Summary</a>
     - <a href="#minor-changes-25">Minor Changes</a>
     - <a href="#deprecated-features-7">Deprecated Features</a>
-    - <a href="#bugfixes-41">Bugfixes</a>
+    - <a href="#bugfixes-42">Bugfixes</a>
 - <a href="#v1-5-0">v1\.5\.0</a>
-    - <a href="#release-summary-57">Release Summary</a>
+    - <a href="#release-summary-58">Release Summary</a>
     - <a href="#minor-changes-26">Minor Changes</a>
     - <a href="#deprecated-features-8">Deprecated Features</a>
-    - <a href="#bugfixes-42">Bugfixes</a>
-- <a href="#v1-4-0">v1\.4\.0</a>
-    - <a href="#release-summary-58">Release Summary</a>
-    - <a href="#minor-changes-27">Minor Changes</a>
     - <a href="#bugfixes-43">Bugfixes</a>
-- <a href="#v1-3-0">v1\.3\.0</a>
+- <a href="#v1-4-0">v1\.4\.0</a>
     - <a href="#release-summary-59">Release Summary</a>
-    - <a href="#minor-changes-28">Minor Changes</a>
+    - <a href="#minor-changes-27">Minor Changes</a>
     - <a href="#bugfixes-44">Bugfixes</a>
+- <a href="#v1-3-0">v1\.3\.0</a>
+    - <a href="#release-summary-60">Release Summary</a>
+    - <a href="#minor-changes-28">Minor Changes</a>
+    - <a href="#bugfixes-45">Bugfixes</a>
     - <a href="#new-modules-4">New Modules</a>
 - <a href="#v1-2-0">v1\.2\.0</a>
-    - <a href="#release-summary-60">Release Summary</a>
+    - <a href="#release-summary-61">Release Summary</a>
     - <a href="#minor-changes-29">Minor Changes</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-45">Bugfixes</a>
-- <a href="#v1-1-1">v1\.1\.1</a>
-    - <a href="#release-summary-61">Release Summary</a>
     - <a href="#bugfixes-46">Bugfixes</a>
-- <a href="#v1-1-0">v1\.1\.0</a>
+- <a href="#v1-1-1">v1\.1\.1</a>
     - <a href="#release-summary-62">Release Summary</a>
-    - <a href="#minor-changes-30">Minor Changes</a>
     - <a href="#bugfixes-47">Bugfixes</a>
+- <a href="#v1-1-0">v1\.1\.0</a>
+    - <a href="#release-summary-63">Release Summary</a>
+    - <a href="#minor-changes-30">Minor Changes</a>
+    - <a href="#bugfixes-48">Bugfixes</a>
     - <a href="#new-modules-5">New Modules</a>
 - <a href="#v1-0-0">v1\.0\.0</a>
-    - <a href="#release-summary-63">Release Summary</a>
+    - <a href="#release-summary-64">Release Summary</a>
     - <a href="#minor-changes-31">Minor Changes</a>
     - <a href="#deprecated-features-9">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated-1">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes-48">Bugfixes</a>
+    - <a href="#bugfixes-49">Bugfixes</a>
     - <a href="#new-modules-6">New Modules</a>
 
-<a id="v2-22-2"></a>
-## v2\.22\.2
+<a id="v2-22-3"></a>
+## v2\.22\.3
 
 <a id="release-summary"></a>
 ### Release Summary
@@ -252,10 +255,11 @@ Bugfix release\.
 <a id="bugfixes"></a>
 ### Bugfixes
 
-* acme\_certificate \- fix authorization failure when CSR contains SANs with mixed case \([https\://github\.com/ansible\-collections/community\.crypto/pull/803](https\://github\.com/ansible\-collections/community\.crypto/pull/803)\)\.
+* acme\_\* modules \- when using the OpenSSL backend\, explicitly use the UTC timezone in Python code \([https\://github\.com/ansible\-collections/community\.crypto/pull/811](https\://github\.com/ansible\-collections/community\.crypto/pull/811)\)\.
+* time module utils \- fix conversion of naive <code>datetime</code> objects to UNIX timestamps for Python 3 \([https\://github\.com/ansible\-collections/community\.crypto/issues/808](https\://github\.com/ansible\-collections/community\.crypto/issues/808)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/810](https\://github\.com/ansible\-collections/community\.crypto/pull/810)\)\.
 
-<a id="v2-22-1"></a>
-## v2\.22\.1
+<a id="v2-22-2"></a>
+## v2\.22\.2
 
 <a id="release-summary-1"></a>
 ### Release Summary
@@ -265,13 +269,26 @@ Bugfix release\.
 <a id="bugfixes-1"></a>
 ### Bugfixes
 
+* acme\_certificate \- fix authorization failure when CSR contains SANs with mixed case \([https\://github\.com/ansible\-collections/community\.crypto/pull/803](https\://github\.com/ansible\-collections/community\.crypto/pull/803)\)\.
+
+<a id="v2-22-1"></a>
+## v2\.22\.1
+
+<a id="release-summary-2"></a>
+### Release Summary
+
+Bugfix release\.
+
+<a id="bugfixes-2"></a>
+### Bugfixes
+
 * acme\_\* modules \- when querying renewal information\, make sure to insert a slash between the base URL and the certificate identifier \([https\://github\.com/ansible\-collections/community\.crypto/issues/801](https\://github\.com/ansible\-collections/community\.crypto/issues/801)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/802](https\://github\.com/ansible\-collections/community\.crypto/pull/802)\)\.
 * various modules \- pass absolute paths to <code>module\.atomic\_move\(\)</code> \([https\://github\.com/ansible/ansible/issues/83950](https\://github\.com/ansible/ansible/issues/83950)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/799](https\://github\.com/ansible\-collections/community\.crypto/pull/799)\)\.
 
 <a id="v2-22-0"></a>
 ## v2\.22\.0
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Feature release\.
@@ -284,12 +301,12 @@ Feature release\.
 <a id="v2-21-1"></a>
 ## v2\.21\.1
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Maintenance release\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * When using cryptography \>\= 43\.0\.0\, use offset\-aware <code>datetime\.datetime</code> objects \(with timezone UTC\) instead of offset\-naive UTC timestamps for the <code>InvalidityDate</code> X\.509 CRL extension \([https\://github\.com/ansible\-collections/community\.crypto/issues/726](https\://github\.com/ansible\-collections/community\.crypto/issues/726)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/730](https\://github\.com/ansible\-collections/community\.crypto/pull/730)\)\.
@@ -297,7 +314,7 @@ Maintenance release\.
 <a id="v2-21-0"></a>
 ## v2\.21\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Feature release\.
@@ -312,7 +329,7 @@ Feature release\.
 <a id="v2-20-0"></a>
 ## v2\.20\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Feature and bugfix release\.
@@ -332,7 +349,7 @@ code or docs fragments from this collection\.
 * acme\.backends module utils \- the <code>get\_cert\_information\(\)</code> method for a ACME crypto backend must be implemented from community\.crypto 3\.0\.0 on \([https\://github\.com/ansible\-collections/community\.crypto/pull/736](https\://github\.com/ansible\-collections/community\.crypto/pull/736)\)\.
 * crypto\.module\_backends\.common module utils \- the <code>crypto\.module\_backends\.common</code> module utils is deprecated and will be removed from community\.crypto 3\.0\.0\. Use the improved <code>argspec</code> module util instead \([https\://github\.com/ansible\-collections/community\.crypto/pull/749](https\://github\.com/ansible\-collections/community\.crypto/pull/749)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * x509\_crl\, x509\_certificate\, x509\_certificate\_info \- when parsing absolute timestamps which omitted the second count\, the first digit of the minutes was used as a one\-digit minutes count\, and the second digit of the minutes as a one\-digit second count \([https\://github\.com/ansible\-collections/community\.crypto/pull/745](https\://github\.com/ansible\-collections/community\.crypto/pull/745)\)\.
@@ -347,12 +364,12 @@ code or docs fragments from this collection\.
 <a id="v2-19-1"></a>
 ## v2\.19\.1
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * crypto\.math module utils \- change return values for <code>quick\_is\_not\_prime\(\)</code> and <code>convert\_int\_to\_bytes\(0\, 0\)</code> for special cases that do not appear when using the collection \([https\://github\.com/ansible\-collections/community\.crypto/pull/733](https\://github\.com/ansible\-collections/community\.crypto/pull/733)\)\.
@@ -362,7 +379,7 @@ Bugfix release\.
 <a id="v2-19-0"></a>
 ## v2\.19\.0
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -378,7 +395,7 @@ Bugfix and feature release\.
 
 * acme\.backends module utils \- from community\.crypto on\, all implementations of <code>CryptoBackend</code> must override <code>get\_ordered\_csr\_identifiers\(\)</code>\. The current default implementation\, which simply sorts the result of <code>get\_csr\_identifiers\(\)</code>\, will then be removed \([https\://github\.com/ansible\-collections/community\.crypto/pull/725](https\://github\.com/ansible\-collections/community\.crypto/pull/725)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * acme\_certificate \- respect the order of the CNAME and SAN identifiers that are passed on when creating an ACME order \([https\://github\.com/ansible\-collections/community\.crypto/issues/723](https\://github\.com/ansible\-collections/community\.crypto/issues/723)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/725](https\://github\.com/ansible\-collections/community\.crypto/pull/725)\)\.
@@ -391,7 +408,7 @@ Bugfix and feature release\.
 <a id="v2-18-0"></a>
 ## v2\.18\.0
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -406,7 +423,7 @@ Bugfix and feature release\.
 
 * openssl\_csr\_pipe\, openssl\_privatekey\_pipe\, x509\_certificate\_pipe \- the current behavior of check mode is deprecated and will change in community\.crypto 3\.0\.0\. The current behavior is similar to the modules without <code>\_pipe</code>\: if the object needs to be \(re\-\)generated\, only the <code>changed</code> status is set\, but the object is not updated\. From community\.crypto 3\.0\.0 on\, the modules will ignore check mode and always act as if check mode is not active\. This behavior can already achieved now by adding <code>check\_mode\: false</code> to the task\. If you think this breaks your use\-case of this module\, please [create an issue in the community\.crypto repository](https\://github\.com/ansible\-collections/community\.crypto/issues/new/choose) \([https\://github\.com/ansible\-collections/community\.crypto/issues/712](https\://github\.com/ansible\-collections/community\.crypto/issues/712)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/714](https\://github\.com/ansible\-collections/community\.crypto/pull/714)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * luks\_device \- fixed module a bug that prevented using <code>remove\_keyslot</code> with the value <code>0</code> \([https\://github\.com/ansible\-collections/community\.crypto/pull/710](https\://github\.com/ansible\-collections/community\.crypto/pull/710)\)\.
@@ -425,12 +442,12 @@ Bugfix and feature release\.
 <a id="v2-17-1"></a>
 ## v2\.17\.1
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Bugfix release for compatibility with cryptography 42\.0\.0\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * openssl\_dhparam \- was using an internal function instead of the public API to load DH param files when using the <code>cryptography</code> backend\. The internal function was removed in cryptography 42\.0\.0\. The module now uses the public API\, which has been available since support for DH params was added to cryptography \([https\://github\.com/ansible\-collections/community\.crypto/pull/698](https\://github\.com/ansible\-collections/community\.crypto/pull/698)\)\.
@@ -440,7 +457,7 @@ Bugfix release for compatibility with cryptography 42\.0\.0\.
 <a id="v2-17-0"></a>
 ## v2\.17\.0
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Feature release\.
@@ -453,12 +470,12 @@ Feature release\.
 <a id="v2-16-2"></a>
 ## v2\.16\.2
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * acme\_\* modules \- directly react on bad return data for account creation/retrieval/updating requests \([https\://github\.com/ansible\-collections/community\.crypto/pull/682](https\://github\.com/ansible\-collections/community\.crypto/pull/682)\)\.
@@ -469,12 +486,12 @@ Bugfix release\.
 <a id="v2-16-1"></a>
 ## v2\.16\.1
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-9"></a>
+<a id="bugfixes-10"></a>
 ### Bugfixes
 
 * acme\_\* modules \- also retry requests in case of socket errors\, bad status lines\, and unknown connection errors\; improve error messages in these cases \([https\://github\.com/ansible\-collections/community\.crypto/issues/680](https\://github\.com/ansible\-collections/community\.crypto/issues/680)\)\.
@@ -482,7 +499,7 @@ Bugfix release\.
 <a id="v2-16-0"></a>
 ## v2\.16\.0
 
-<a id="release-summary-13"></a>
+<a id="release-summary-14"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -492,7 +509,7 @@ Bugfix release\.
 
 * luks\_devices \- add new options <code>keyslot</code>\, <code>new\_keyslot</code>\, and <code>remove\_keyslot</code> to allow adding/removing keys to/from specific keyslots \([https\://github\.com/ansible\-collections/community\.crypto/pull/664](https\://github\.com/ansible\-collections/community\.crypto/pull/664)\)\.
 
-<a id="bugfixes-10"></a>
+<a id="bugfixes-11"></a>
 ### Bugfixes
 
 * openssl\_pkcs12 \- modify autodetect to not detect pyOpenSSL \>\= 23\.3\.0\, which removed PKCS\#12 support \([https\://github\.com/ansible\-collections/community\.crypto/pull/666](https\://github\.com/ansible\-collections/community\.crypto/pull/666)\)\.
@@ -500,12 +517,12 @@ Bugfix release\.
 <a id="v2-15-1"></a>
 ## v2\.15\.1
 
-<a id="release-summary-14"></a>
+<a id="release-summary-15"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-11"></a>
+<a id="bugfixes-12"></a>
 ### Bugfixes
 
 * acme\_\* modules \- correctly handle error documents without <code>type</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/651](https\://github\.com/ansible\-collections/community\.crypto/issues/651)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/652](https\://github\.com/ansible\-collections/community\.crypto/pull/652)\)\.
@@ -513,7 +530,7 @@ Bugfix release\.
 <a id="v2-15-0"></a>
 ## v2\.15\.0
 
-<a id="release-summary-15"></a>
+<a id="release-summary-16"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -528,7 +545,7 @@ Bugfix and feature release\.
 
 * get\_certificate \- the default <code>false</code> of the <code>asn1\_base64</code> option is deprecated and will change to <code>true</code> in community\.crypto 3\.0\.0 \([https\://github\.com/ansible\-collections/community\.crypto/pull/600](https\://github\.com/ansible\-collections/community\.crypto/pull/600)\)\.
 
-<a id="bugfixes-12"></a>
+<a id="bugfixes-13"></a>
 ### Bugfixes
 
 * openssh\_cert\, openssh\_keypair \- the modules ignored return codes of <code>ssh</code> and <code>ssh\-keygen</code> in some cases \([https\://github\.com/ansible\-collections/community\.crypto/issues/645](https\://github\.com/ansible\-collections/community\.crypto/issues/645)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/646](https\://github\.com/ansible\-collections/community\.crypto/pull/646)\)\.
@@ -550,7 +567,7 @@ Bugfix and feature release\.
 <a id="v2-14-1"></a>
 ## v2\.14\.1
 
-<a id="release-summary-16"></a>
+<a id="release-summary-17"></a>
 ### Release Summary
 
 Bugfix and maintenance release with updated documentation\.
@@ -563,7 +580,7 @@ ansible\-core 2\.15 or later to see it as it is intended\. Alternatively you can
 look at [the devel docsite](https\://docs\.ansible\.com/ansible/devel/collections/community/crypto/)
 for the rendered HTML version of the documentation of the latest release\.
 
-<a id="bugfixes-13"></a>
+<a id="bugfixes-14"></a>
 ### Bugfixes
 
 * Fix PEM detection/identification to also accept random other lines before the line starting with <code>\-\-\-\-\-BEGIN</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/627](https\://github\.com/ansible\-collections/community\.crypto/issues/627)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/628](https\://github\.com/ansible\-collections/community\.crypto/pull/628)\)\.
@@ -576,7 +593,7 @@ for the rendered HTML version of the documentation of the latest release\.
 <a id="v2-14-0"></a>
 ## v2\.14\.0
 
-<a id="release-summary-17"></a>
+<a id="release-summary-18"></a>
 ### Release Summary
 
 Feature release\.
@@ -591,12 +608,12 @@ Feature release\.
 <a id="v2-13-1"></a>
 ## v2\.13\.1
 
-<a id="release-summary-18"></a>
+<a id="release-summary-19"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-14"></a>
+<a id="bugfixes-15"></a>
 ### Bugfixes
 
 * execution environment definition \- fix installation of <code>python3\-pyOpenSSL</code> package on CentOS and RHEL \([https\://github\.com/ansible\-collections/community\.crypto/pull/606](https\://github\.com/ansible\-collections/community\.crypto/pull/606)\)\.
@@ -605,7 +622,7 @@ Bugfix release\.
 <a id="v2-13-0"></a>
 ## v2\.13\.0
 
-<a id="release-summary-19"></a>
+<a id="release-summary-20"></a>
 ### Release Summary
 
 Bugfix and maintenance release\.
@@ -620,7 +637,7 @@ Bugfix and maintenance release\.
 
 * x509\_crl \- the <code>mode</code> option is deprecated\; use <code>crl\_mode</code> instead\. The <code>mode</code> option will change its meaning in community\.crypto 3\.0\.0\, and will refer to the CRL file\'s mode instead \([https\://github\.com/ansible\-collections/community\.crypto/issues/596](https\://github\.com/ansible\-collections/community\.crypto/issues/596)\)\.
 
-<a id="bugfixes-15"></a>
+<a id="bugfixes-16"></a>
 ### Bugfixes
 
 * openssh\_keypair \- always generate a new key pair if the private key does not exist\. Previously\, the module would fail when <code>regenerate\=fail</code> without an existing key\, contradicting the documentation \([https\://github\.com/ansible\-collections/community\.crypto/pull/598](https\://github\.com/ansible\-collections/community\.crypto/pull/598)\)\.
@@ -629,7 +646,7 @@ Bugfix and maintenance release\.
 <a id="v2-12-0"></a>
 ## v2\.12\.0
 
-<a id="release-summary-20"></a>
+<a id="release-summary-21"></a>
 ### Release Summary
 
 Feature release\.
@@ -642,7 +659,7 @@ Feature release\.
 <a id="v2-11-1"></a>
 ## v2\.11\.1
 
-<a id="release-summary-21"></a>
+<a id="release-summary-22"></a>
 ### Release Summary
 
 Maintenance release with improved documentation\.
@@ -650,7 +667,7 @@ Maintenance release with improved documentation\.
 <a id="v2-11-0"></a>
 ## v2\.11\.0
 
-<a id="release-summary-22"></a>
+<a id="release-summary-23"></a>
 ### Release Summary
 
 Feature and bugfix release\.
@@ -660,7 +677,7 @@ Feature and bugfix release\.
 
 * get\_certificate \- adds <code>ciphers</code> option for custom cipher selection \([https\://github\.com/ansible\-collections/community\.crypto/pull/571](https\://github\.com/ansible\-collections/community\.crypto/pull/571)\)\.
 
-<a id="bugfixes-16"></a>
+<a id="bugfixes-17"></a>
 ### Bugfixes
 
 * action plugin helper \- fix handling of deprecations for ansible\-core 2\.14\.2 \([https\://github\.com/ansible\-collections/community\.crypto/pull/572](https\://github\.com/ansible\-collections/community\.crypto/pull/572)\)\.
@@ -670,12 +687,12 @@ Feature and bugfix release\.
 <a id="v2-10-0"></a>
 ## v2\.10\.0
 
-<a id="release-summary-23"></a>
+<a id="release-summary-24"></a>
 ### Release Summary
 
 Bugfix and feature release\.
 
-<a id="bugfixes-17"></a>
+<a id="bugfixes-18"></a>
 ### Bugfixes
 
 * openssl\_csr\, openssl\_csr\_pipe \- prevent invalid values for <code>crl\_distribution\_points</code> that do not have one of <code>full\_name</code>\, <code>relative\_name</code>\, and <code>crl\_issuer</code> \([https\://github\.com/ansible\-collections/community\.crypto/pull/560](https\://github\.com/ansible\-collections/community\.crypto/pull/560)\)\.
@@ -697,7 +714,7 @@ Bugfix and feature release\.
 <a id="v2-9-0"></a>
 ## v2\.9\.0
 
-<a id="release-summary-24"></a>
+<a id="release-summary-25"></a>
 ### Release Summary
 
 Regular feature release\.
@@ -710,7 +727,7 @@ Regular feature release\.
 <a id="v2-8-1"></a>
 ## v2\.8\.1
 
-<a id="release-summary-25"></a>
+<a id="release-summary-26"></a>
 ### Release Summary
 
 Maintenance release with improved documentation\.
@@ -718,7 +735,7 @@ Maintenance release with improved documentation\.
 <a id="v2-8-0"></a>
 ## v2\.8\.0
 
-<a id="release-summary-26"></a>
+<a id="release-summary-27"></a>
 ### Release Summary
 
 Feature release\.
@@ -733,12 +750,12 @@ Feature release\.
 <a id="v2-7-1"></a>
 ## v2\.7\.1
 
-<a id="release-summary-27"></a>
+<a id="release-summary-28"></a>
 ### Release Summary
 
 Maintenance release\.
 
-<a id="bugfixes-18"></a>
+<a id="bugfixes-19"></a>
 ### Bugfixes
 
 * acme\_\* modules \- improve feedback when importing <code>cryptography</code> does not work \([https\://github\.com/ansible\-collections/community\.crypto/issues/518](https\://github\.com/ansible\-collections/community\.crypto/issues/518)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/519](https\://github\.com/ansible\-collections/community\.crypto/pull/519)\)\.
@@ -746,7 +763,7 @@ Maintenance release\.
 <a id="v2-7-0"></a>
 ## v2\.7\.0
 
-<a id="release-summary-28"></a>
+<a id="release-summary-29"></a>
 ### Release Summary
 
 Feature release\.
@@ -756,7 +773,7 @@ Feature release\.
 
 * acme\* modules \- also support the HTTP 503 Service Unavailable and 408 Request Timeout response status for automatic retries \([https\://github\.com/ansible\-collections/community\.crypto/pull/513](https\://github\.com/ansible\-collections/community\.crypto/pull/513)\)\.
 
-<a id="bugfixes-19"></a>
+<a id="bugfixes-20"></a>
 ### Bugfixes
 
 * openssl\_privatekey\_pipe \- ensure compatibility with newer versions of ansible\-core \([https\://github\.com/ansible\-collections/community\.crypto/pull/515](https\://github\.com/ansible\-collections/community\.crypto/pull/515)\)\.
@@ -764,7 +781,7 @@ Feature release\.
 <a id="v2-6-0"></a>
 ## v2\.6\.0
 
-<a id="release-summary-29"></a>
+<a id="release-summary-30"></a>
 ### Release Summary
 
 Feature release\.
@@ -778,7 +795,7 @@ Feature release\.
 <a id="v2-5-0"></a>
 ## v2\.5\.0
 
-<a id="release-summary-30"></a>
+<a id="release-summary-31"></a>
 ### Release Summary
 
 Maintenance release with improved licensing declaration and documentation fixes\.
@@ -791,7 +808,7 @@ Maintenance release with improved licensing declaration and documentation fixes\
 <a id="v2-4-0"></a>
 ## v2\.4\.0
 
-<a id="release-summary-31"></a>
+<a id="release-summary-32"></a>
 ### Release Summary
 
 Deprecation and bugfix release\. No new features this time\.
@@ -801,7 +818,7 @@ Deprecation and bugfix release\. No new features this time\.
 
 * Support for Ansible 2\.9 and ansible\-base 2\.10 is deprecated\, and will be removed in the next major release \(community\.crypto 3\.0\.0\)\. Some modules might still work with these versions afterwards\, but we will no longer keep compatibility code that was needed to support them \([https\://github\.com/ansible\-collections/community\.crypto/pull/460](https\://github\.com/ansible\-collections/community\.crypto/pull/460)\)\.
 
-<a id="bugfixes-20"></a>
+<a id="bugfixes-21"></a>
 ### Bugfixes
 
 * openssl\_pkcs12 \- when using the pyOpenSSL backend\, do not crash when trying to read non\-existing other certificates \([https\://github\.com/ansible\-collections/community\.crypto/issues/486](https\://github\.com/ansible\-collections/community\.crypto/issues/486)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/487](https\://github\.com/ansible\-collections/community\.crypto/pull/487)\)\.
@@ -809,7 +826,7 @@ Deprecation and bugfix release\. No new features this time\.
 <a id="v2-3-4"></a>
 ## v2\.3\.4
 
-<a id="release-summary-32"></a>
+<a id="release-summary-33"></a>
 ### Release Summary
 
 Re\-release of what was intended to be 2\.3\.3\.
@@ -825,12 +842,12 @@ has been added\.
 <a id="v2-3-3"></a>
 ## v2\.3\.3
 
-<a id="release-summary-33"></a>
+<a id="release-summary-34"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-21"></a>
+<a id="bugfixes-22"></a>
 ### Bugfixes
 
 * Include <code>Apache\-2\.0\.txt</code> file for <code>plugins/module\_utils/crypto/\_obj2txt\.py</code> and <code>plugins/module\_utils/crypto/\_objects\_data\.py</code>\.
@@ -840,12 +857,12 @@ Bugfix release\.
 <a id="v2-3-2"></a>
 ## v2\.3\.2
 
-<a id="release-summary-34"></a>
+<a id="release-summary-35"></a>
 ### Release Summary
 
 Maintenance and bugfix release\.
 
-<a id="bugfixes-22"></a>
+<a id="bugfixes-23"></a>
 ### Bugfixes
 
 * Include <code>simplified\_bsd\.txt</code> license file for the ECS module utils\.
@@ -854,12 +871,12 @@ Maintenance and bugfix release\.
 <a id="v2-3-1"></a>
 ## v2\.3\.1
 
-<a id="release-summary-35"></a>
+<a id="release-summary-36"></a>
 ### Release Summary
 
 Maintenance release\.
 
-<a id="bugfixes-23"></a>
+<a id="bugfixes-24"></a>
 ### Bugfixes
 
 * Include <code>PSF\-license\.txt</code> file for <code>plugins/module\_utils/\_version\.py</code>\.
@@ -867,7 +884,7 @@ Maintenance release\.
 <a id="v2-3-0"></a>
 ## v2\.3\.0
 
-<a id="release-summary-36"></a>
+<a id="release-summary-37"></a>
 ### Release Summary
 
 Feature and bugfix release\.
@@ -886,7 +903,7 @@ Feature and bugfix release\.
 * x509\_crl \- add <code>name\_encoding</code> option to control the encoding \(IDNA\, Unicode\) used to return domain names in general names \([https\://github\.com/ansible\-collections/community\.crypto/pull/436](https\://github\.com/ansible\-collections/community\.crypto/pull/436)\)\.
 * x509\_crl\_info \- add <code>name\_encoding</code> option to control the encoding \(IDNA\, Unicode\) used to return domain names in general names \([https\://github\.com/ansible\-collections/community\.crypto/pull/436](https\://github\.com/ansible\-collections/community\.crypto/pull/436)\)\.
 
-<a id="bugfixes-24"></a>
+<a id="bugfixes-25"></a>
 ### Bugfixes
 
 * Make collection more robust when PyOpenSSL is used with an incompatible cryptography version \([https\://github\.com/ansible\-collections/community\.crypto/pull/445](https\://github\.com/ansible\-collections/community\.crypto/pull/445)\)\.
@@ -895,12 +912,12 @@ Feature and bugfix release\.
 <a id="v2-2-4"></a>
 ## v2\.2\.4
 
-<a id="release-summary-37"></a>
+<a id="release-summary-38"></a>
 ### Release Summary
 
 Regular maintenance release\.
 
-<a id="bugfixes-25"></a>
+<a id="bugfixes-26"></a>
 ### Bugfixes
 
 * openssh\_\* modules \- fix exception handling to report traceback to users for enhanced traceability \([https\://github\.com/ansible\-collections/community\.crypto/pull/417](https\://github\.com/ansible\-collections/community\.crypto/pull/417)\)\.
@@ -908,12 +925,12 @@ Regular maintenance release\.
 <a id="v2-2-3"></a>
 ## v2\.2\.3
 
-<a id="release-summary-38"></a>
+<a id="release-summary-39"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="bugfixes-26"></a>
+<a id="bugfixes-27"></a>
 ### Bugfixes
 
 * luks\_device \- fix parsing of <code>lsblk</code> output when device name ends with <code>crypt</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/409](https\://github\.com/ansible\-collections/community\.crypto/issues/409)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/410](https\://github\.com/ansible\-collections/community\.crypto/pull/410)\)\.
@@ -921,14 +938,14 @@ Regular bugfix release\.
 <a id="v2-2-2"></a>
 ## v2\.2\.2
 
-<a id="release-summary-39"></a>
+<a id="release-summary-40"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
 In this release\, we extended the test matrix to include Alpine 3\, ArchLinux\, Debian Bullseye\, and CentOS Stream 8\. CentOS 8 was removed from the test matrix\.
 
-<a id="bugfixes-27"></a>
+<a id="bugfixes-28"></a>
 ### Bugfixes
 
 * certificate\_complete\_chain \- allow multiple potential intermediate certificates to have the same subject \([https\://github\.com/ansible\-collections/community\.crypto/issues/399](https\://github\.com/ansible\-collections/community\.crypto/issues/399)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/403](https\://github\.com/ansible\-collections/community\.crypto/pull/403)\)\.
@@ -940,12 +957,12 @@ In this release\, we extended the test matrix to include Alpine 3\, ArchLinux\, 
 <a id="v2-2-1"></a>
 ## v2\.2\.1
 
-<a id="release-summary-40"></a>
+<a id="release-summary-41"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-28"></a>
+<a id="bugfixes-29"></a>
 ### Bugfixes
 
 * openssh\_cert \- fixed false <code>changed</code> status for <code>host</code> certificates when using <code>full\_idempotence</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/395](https\://github\.com/ansible\-collections/community\.crypto/issues/395)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/396](https\://github\.com/ansible\-collections/community\.crypto/pull/396)\)\.
@@ -953,7 +970,7 @@ Bugfix release\.
 <a id="v2-2-0"></a>
 ## v2\.2\.0
 
-<a id="release-summary-41"></a>
+<a id="release-summary-42"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -963,7 +980,7 @@ Regular bugfix and feature release\.
 
 * openssh\_cert \- added <code>ignore\_timestamps</code> parameter so it can be used semi\-idempotent with relative timestamps in <code>valid\_to</code>/<code>valid\_from</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/379](https\://github\.com/ansible\-collections/community\.crypto/issues/379)\)\.
 
-<a id="bugfixes-29"></a>
+<a id="bugfixes-30"></a>
 ### Bugfixes
 
 * luks\_devices \- set <code>LANG</code> and similar environment variables to avoid translated output\, which can break some of the module\'s functionality like key management \([https\://github\.com/ansible\-collections/community\.crypto/pull/388](https\://github\.com/ansible\-collections/community\.crypto/pull/388)\, [https\://github\.com/ansible\-collections/community\.crypto/issues/385](https\://github\.com/ansible\-collections/community\.crypto/issues/385)\)\.
@@ -971,7 +988,7 @@ Regular bugfix and feature release\.
 <a id="v2-1-0"></a>
 ## v2\.1\.0
 
-<a id="release-summary-42"></a>
+<a id="release-summary-43"></a>
 ### Release Summary
 
 Feature and bugfix release\.
@@ -981,7 +998,7 @@ Feature and bugfix release\.
 
 * Adjust error messages that indicate <code>cryptography</code> is not installed from <code>Can\'t</code> to <code>Cannot</code> \([https\://github\.com/ansible\-collections/community\.crypto/pull/374](https\://github\.com/ansible\-collections/community\.crypto/pull/374)\)\.
 
-<a id="bugfixes-30"></a>
+<a id="bugfixes-31"></a>
 ### Bugfixes
 
 * Various modules and plugins \- use vendored version of <code>distutils\.version</code> instead of the deprecated Python standard library <code>distutils</code> \([https\://github\.com/ansible\-collections/community\.crypto/pull/353](https\://github\.com/ansible\-collections/community\.crypto/pull/353)\)\.
@@ -997,7 +1014,7 @@ Feature and bugfix release\.
 <a id="v2-0-2"></a>
 ## v2\.0\.2
 
-<a id="release-summary-43"></a>
+<a id="release-summary-44"></a>
 ### Release Summary
 
 Documentation fix release\. No actual code changes\.
@@ -1005,7 +1022,7 @@ Documentation fix release\. No actual code changes\.
 <a id="v2-0-1"></a>
 ## v2\.0\.1
 
-<a id="release-summary-44"></a>
+<a id="release-summary-45"></a>
 ### Release Summary
 
 Bugfix release with extra forward compatibility for newer versions of cryptography\.
@@ -1015,7 +1032,7 @@ Bugfix release with extra forward compatibility for newer versions of cryptograp
 
 * acme\_\* modules \- fix usage of <code>fetch\_url</code> with changes in latest ansible\-core <code>devel</code> branch \([https\://github\.com/ansible\-collections/community\.crypto/pull/339](https\://github\.com/ansible\-collections/community\.crypto/pull/339)\)\.
 
-<a id="bugfixes-31"></a>
+<a id="bugfixes-32"></a>
 ### Bugfixes
 
 * acme\_certificate \- avoid passing multiple certificates to <code>cryptography</code>\'s X\.509 certificate loader when <code>fullchain\_dest</code> is used \([https\://github\.com/ansible\-collections/community\.crypto/pull/324](https\://github\.com/ansible\-collections/community\.crypto/pull/324)\)\.
@@ -1026,7 +1043,7 @@ Bugfix release with extra forward compatibility for newer versions of cryptograp
 <a id="v2-0-0"></a>
 ## v2\.0\.0
 
-<a id="release-summary-45"></a>
+<a id="release-summary-46"></a>
 ### Release Summary
 
 A new major release of the <code>community\.crypto</code> collection\. The main changes are removal of the PyOpenSSL backends for almost all modules \(<code>openssl\_pkcs12</code> being the only exception\)\, and removal of the <code>assertonly</code> provider in the <code>x509\_certificate</code> provider\. There are also some other breaking changes which should improve the user interface/experience of this collection long\-term\.
@@ -1088,7 +1105,7 @@ A new major release of the <code>community\.crypto</code> collection\. The main 
 * x509\_certificate\_info \- removed the <code>pyopenssl</code> backend \([https\://github\.com/ansible\-collections/community\.crypto/pull/273](https\://github\.com/ansible\-collections/community\.crypto/pull/273)\)\.
 * x509\_certificate\_pipe \- removed the <code>pyopenssl</code> backend \([https\://github\.com/ansible\-collections/community\.crypto/pull/273](https\://github\.com/ansible\-collections/community\.crypto/pull/273)\)\.
 
-<a id="bugfixes-32"></a>
+<a id="bugfixes-33"></a>
 ### Bugfixes
 
 * cryptography backend \- improve Unicode handling for Python 2 \([https\://github\.com/ansible\-collections/community\.crypto/pull/313](https\://github\.com/ansible\-collections/community\.crypto/pull/313)\)\.
@@ -1100,20 +1117,6 @@ A new major release of the <code>community\.crypto</code> collection\. The main 
 <a id="v1-9-4"></a>
 ## v1\.9\.4
 
-<a id="release-summary-46"></a>
-### Release Summary
-
-Regular bugfix release\.
-
-<a id="bugfixes-33"></a>
-### Bugfixes
-
-* acme\_\* modules \- fix commands composed for OpenSSL backend to retrieve information on CSRs and certificates from stdin to use <code>/dev/stdin</code> instead of <code>\-</code>\. This is needed for OpenSSL 1\.0\.1 and 1\.0\.2\, apparently \([https\://github\.com/ansible\-collections/community\.crypto/pull/279](https\://github\.com/ansible\-collections/community\.crypto/pull/279)\)\.
-* acme\_challenge\_cert\_helper \- only return exception when cryptography is not installed\, not when a too old version of it is installed\. This prevents Ansible\'s callback to crash \([https\://github\.com/ansible\-collections/community\.crypto/pull/281](https\://github\.com/ansible\-collections/community\.crypto/pull/281)\)\.
-
-<a id="v1-9-3"></a>
-## v1\.9\.3
-
 <a id="release-summary-47"></a>
 ### Release Summary
 
@@ -1122,12 +1125,26 @@ Regular bugfix release\.
 <a id="bugfixes-34"></a>
 ### Bugfixes
 
+* acme\_\* modules \- fix commands composed for OpenSSL backend to retrieve information on CSRs and certificates from stdin to use <code>/dev/stdin</code> instead of <code>\-</code>\. This is needed for OpenSSL 1\.0\.1 and 1\.0\.2\, apparently \([https\://github\.com/ansible\-collections/community\.crypto/pull/279](https\://github\.com/ansible\-collections/community\.crypto/pull/279)\)\.
+* acme\_challenge\_cert\_helper \- only return exception when cryptography is not installed\, not when a too old version of it is installed\. This prevents Ansible\'s callback to crash \([https\://github\.com/ansible\-collections/community\.crypto/pull/281](https\://github\.com/ansible\-collections/community\.crypto/pull/281)\)\.
+
+<a id="v1-9-3"></a>
+## v1\.9\.3
+
+<a id="release-summary-48"></a>
+### Release Summary
+
+Regular bugfix release\.
+
+<a id="bugfixes-35"></a>
+### Bugfixes
+
 * openssl\_csr and openssl\_csr\_pipe \- make sure that Unicode strings are used to compare strings with the cryptography backend\. This fixes idempotency problems with non\-ASCII letters on Python 2 \([https\://github\.com/ansible\-collections/community\.crypto/issues/270](https\://github\.com/ansible\-collections/community\.crypto/issues/270)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/271](https\://github\.com/ansible\-collections/community\.crypto/pull/271)\)\.
 
 <a id="v1-9-2"></a>
 ## v1\.9\.2
 
-<a id="release-summary-48"></a>
+<a id="release-summary-49"></a>
 ### Release Summary
 
 Bugfix release to fix the changelog\. No other change compared to 1\.9\.0\.
@@ -1135,7 +1152,7 @@ Bugfix release to fix the changelog\. No other change compared to 1\.9\.0\.
 <a id="v1-9-1"></a>
 ## v1\.9\.1
 
-<a id="release-summary-49"></a>
+<a id="release-summary-50"></a>
 ### Release Summary
 
 Accidental 1\.9\.1 release\. Identical to 1\.9\.0\.
@@ -1143,7 +1160,7 @@ Accidental 1\.9\.1 release\. Identical to 1\.9\.0\.
 <a id="v1-9-0"></a>
 ## v1\.9\.0
 
-<a id="release-summary-50"></a>
+<a id="release-summary-51"></a>
 ### Release Summary
 
 Regular feature release\.
@@ -1154,7 +1171,7 @@ Regular feature release\.
 * get\_certificate \- added <code>starttls</code> option to retrieve certificates from servers which require clients to request an encrypted connection \([https\://github\.com/ansible\-collections/community\.crypto/pull/264](https\://github\.com/ansible\-collections/community\.crypto/pull/264)\)\.
 * openssh\_keypair \- added <code>diff</code> support \([https\://github\.com/ansible\-collections/community\.crypto/pull/260](https\://github\.com/ansible\-collections/community\.crypto/pull/260)\)\.
 
-<a id="bugfixes-35"></a>
+<a id="bugfixes-36"></a>
 ### Bugfixes
 
 * keypair\_backend module utils \- simplify code to pass sanity tests \([https\://github\.com/ansible\-collections/community\.crypto/pull/263](https\://github\.com/ansible\-collections/community\.crypto/pull/263)\)\.
@@ -1165,7 +1182,7 @@ Regular feature release\.
 <a id="v1-8-0"></a>
 ## v1\.8\.0
 
-<a id="release-summary-51"></a>
+<a id="release-summary-52"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -1178,7 +1195,7 @@ Regular bugfix and feature release\.
 * openssh\_cert \- added <code>regenerate</code> option to validate additional certificate parameters which trigger regeneration of an existing certificate \([https\://github\.com/ansible\-collections/community\.crypto/pull/256](https\://github\.com/ansible\-collections/community\.crypto/pull/256)\)\.
 * openssh\_cert \- adding <code>diff</code> support \([https\://github\.com/ansible\-collections/community\.crypto/pull/255](https\://github\.com/ansible\-collections/community\.crypto/pull/255)\)\.
 
-<a id="bugfixes-36"></a>
+<a id="bugfixes-37"></a>
 ### Bugfixes
 
 * openssh\_cert \- fixed certificate generation to restore original certificate if an error is encountered \([https\://github\.com/ansible\-collections/community\.crypto/pull/255](https\://github\.com/ansible\-collections/community\.crypto/pull/255)\)\.
@@ -1187,12 +1204,12 @@ Regular bugfix and feature release\.
 <a id="v1-7-1"></a>
 ## v1\.7\.1
 
-<a id="release-summary-52"></a>
+<a id="release-summary-53"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-37"></a>
+<a id="bugfixes-38"></a>
 ### Bugfixes
 
 * openssl\_pkcs12 \- fix crash when loading passphrase\-protected PKCS\#12 files with <code>cryptography</code> backend \([https\://github\.com/ansible\-collections/community\.crypto/issues/247](https\://github\.com/ansible\-collections/community\.crypto/issues/247)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/248](https\://github\.com/ansible\-collections/community\.crypto/pull/248)\)\.
@@ -1200,7 +1217,7 @@ Bugfix release\.
 <a id="v1-7-0"></a>
 ## v1\.7\.0
 
-<a id="release-summary-53"></a>
+<a id="release-summary-54"></a>
 ### Release Summary
 
 Regular feature and bugfix release\.
@@ -1228,7 +1245,7 @@ Regular feature and bugfix release\.
 * x509\_crl\_info \- add <code>list\_revoked\_certificates</code> option to avoid enumerating all revoked certificates \([https\://github\.com/ansible\-collections/community\.crypto/pull/232](https\://github\.com/ansible\-collections/community\.crypto/pull/232)\)\.
 * x509\_crl\_info \- refactor module to allow code reuse for diff mode \([https\://github\.com/ansible\-collections/community\.crypto/pull/203](https\://github\.com/ansible\-collections/community\.crypto/pull/203)\)\.
 
-<a id="bugfixes-38"></a>
+<a id="bugfixes-39"></a>
 ### Bugfixes
 
 * openssh\_keypair \- fix <code>check\_mode</code> to populate return values for existing keypairs \([https\://github\.com/ansible\-collections/community\.crypto/issues/113](https\://github\.com/ansible\-collections/community\.crypto/issues/113)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/230](https\://github\.com/ansible\-collections/community\.crypto/pull/230)\)\.
@@ -1243,12 +1260,12 @@ Regular feature and bugfix release\.
 <a id="v1-6-2"></a>
 ## v1\.6\.2
 
-<a id="release-summary-54"></a>
+<a id="release-summary-55"></a>
 ### Release Summary
 
 Bugfix release\. Fixes compatibility issue of ACME modules with step\-ca\.
 
-<a id="bugfixes-39"></a>
+<a id="bugfixes-40"></a>
 ### Bugfixes
 
 * acme\_\* modules \- avoid crashing for ACME servers where the <code>meta</code> directory key is not present \([https\://github\.com/ansible\-collections/community\.crypto/issues/220](https\://github\.com/ansible\-collections/community\.crypto/issues/220)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/221](https\://github\.com/ansible\-collections/community\.crypto/pull/221)\)\.
@@ -1256,12 +1273,12 @@ Bugfix release\. Fixes compatibility issue of ACME modules with step\-ca\.
 <a id="v1-6-1"></a>
 ## v1\.6\.1
 
-<a id="release-summary-55"></a>
+<a id="release-summary-56"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-40"></a>
+<a id="bugfixes-41"></a>
 ### Bugfixes
 
 * acme\_\* modules \- fix wrong usages of <code>ACMEProtocolException</code> \([https\://github\.com/ansible\-collections/community\.crypto/pull/216](https\://github\.com/ansible\-collections/community\.crypto/pull/216)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/217](https\://github\.com/ansible\-collections/community\.crypto/pull/217)\)\.
@@ -1269,7 +1286,7 @@ Bugfix release\.
 <a id="v1-6-0"></a>
 ## v1\.6\.0
 
-<a id="release-summary-56"></a>
+<a id="release-summary-57"></a>
 ### Release Summary
 
 Fixes compatibility issues with the latest ansible\-core 2\.11 beta\, and contains a lot of internal refactoring for the ACME modules and support for private key passphrases for them\.
@@ -1288,7 +1305,7 @@ Fixes compatibility issues with the latest ansible\-core 2\.11 beta\, and contai
 
 * acme module\_utils \- the <code>acme</code> module\_utils \(<code>ansible\_collections\.community\.crypto\.plugins\.module\_utils\.acme</code>\) is deprecated and will be removed in community\.crypto 2\.0\.0\. Use the new Python modules in the <code>acme</code> package instead \(<code>ansible\_collections\.community\.crypto\.plugins\.module\_utils\.acme\.xxx</code>\) \([https\://github\.com/ansible\-collections/community\.crypto/pull/184](https\://github\.com/ansible\-collections/community\.crypto/pull/184)\)\.
 
-<a id="bugfixes-41"></a>
+<a id="bugfixes-42"></a>
 ### Bugfixes
 
 * action\_module plugin helper \- make compatible with latest changes in ansible\-core 2\.11\.0b3 \([https\://github\.com/ansible\-collections/community\.crypto/pull/202](https\://github\.com/ansible\-collections/community\.crypto/pull/202)\)\.
@@ -1297,7 +1314,7 @@ Fixes compatibility issues with the latest ansible\-core 2\.11 beta\, and contai
 <a id="v1-5-0"></a>
 ## v1\.5\.0
 
-<a id="release-summary-57"></a>
+<a id="release-summary-58"></a>
 ### Release Summary
 
 Regular feature and bugfix release\. Deprecates a return value\.
@@ -1313,7 +1330,7 @@ Regular feature and bugfix release\. Deprecates a return value\.
 
 * acme\_account\_info \- when <code>retrieve\_orders\=url\_list</code>\, <code>orders</code> will no longer be returned in community\.crypto 2\.0\.0\. Use <code>order\_uris</code> instead \([https\://github\.com/ansible\-collections/community\.crypto/pull/178](https\://github\.com/ansible\-collections/community\.crypto/pull/178)\)\.
 
-<a id="bugfixes-42"></a>
+<a id="bugfixes-43"></a>
 ### Bugfixes
 
 * openssl\_csr \- no longer fails when comparing CSR without basic constraint when <code>basic\_constraints</code> is specified \([https\://github\.com/ansible\-collections/community\.crypto/issues/179](https\://github\.com/ansible\-collections/community\.crypto/issues/179)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/180](https\://github\.com/ansible\-collections/community\.crypto/pull/180)\)\.
@@ -1321,7 +1338,7 @@ Regular feature and bugfix release\. Deprecates a return value\.
 <a id="v1-4-0"></a>
 ## v1\.4\.0
 
-<a id="release-summary-58"></a>
+<a id="release-summary-59"></a>
 ### Release Summary
 
 Release with several new features and bugfixes\.
@@ -1336,7 +1353,7 @@ Release with several new features and bugfixes\.
 * openssl\_csr\, openssl\_csr\_pipe \- allow to specify CRL distribution endpoints with <code>crl\_distribution\_points</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/147](https\://github\.com/ansible\-collections/community\.crypto/issues/147)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/167](https\://github\.com/ansible\-collections/community\.crypto/pull/167)\)\.
 * openssl\_pkcs12 \- allow to specify certificate bundles in <code>other\_certificates</code> by using new option <code>other\_certificates\_parse\_all</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/149](https\://github\.com/ansible\-collections/community\.crypto/issues/149)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/166](https\://github\.com/ansible\-collections/community\.crypto/pull/166)\)\.
 
-<a id="bugfixes-43"></a>
+<a id="bugfixes-44"></a>
 ### Bugfixes
 
 * acme\_certificate \- error when requested challenge type is not found for non\-valid challenges\, instead of hanging on step 2 \([https\://github\.com/ansible\-collections/community\.crypto/issues/171](https\://github\.com/ansible\-collections/community\.crypto/issues/171)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/173](https\://github\.com/ansible\-collections/community\.crypto/pull/173)\)\.
@@ -1344,7 +1361,7 @@ Release with several new features and bugfixes\.
 <a id="v1-3-0"></a>
 ## v1\.3\.0
 
-<a id="release-summary-59"></a>
+<a id="release-summary-60"></a>
 ### Release Summary
 
 Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr\_pipe</code> and <code>x509\_certificate\_pipe</code> which allow to create or update private keys\, CSRs and X\.509 certificates without having to write them to disk\.
@@ -1359,7 +1376,7 @@ Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr
 * x509\_certificate \- for the <code>selfsigned</code> provider\, a CSR is not required anymore\. If no CSR is provided\, the module behaves as if a minimal CSR which only contains the public key has been provided \([https\://github\.com/ansible\-collections/community\.crypto/issues/32](https\://github\.com/ansible\-collections/community\.crypto/issues/32)\, [https\://github\.com/ansible\-collections/community\.crypto/pull/129](https\://github\.com/ansible\-collections/community\.crypto/pull/129)\)\.
 * x509\_certificate \- refactor module to allow code reuse by x509\_certificate\_pipe \([https\://github\.com/ansible\-collections/community\.crypto/pull/135](https\://github\.com/ansible\-collections/community\.crypto/pull/135)\)\.
 
-<a id="bugfixes-44"></a>
+<a id="bugfixes-45"></a>
 ### Bugfixes
 
 * openssl\_pkcs12 \- report the correct state when <code>action</code> is <code>parse</code> \([https\://github\.com/ansible\-collections/community\.crypto/issues/143](https\://github\.com/ansible\-collections/community\.crypto/issues/143)\)\.
@@ -1376,7 +1393,7 @@ Contains new modules <code>openssl\_privatekey\_pipe</code>\, <code>openssl\_csr
 <a id="v1-2-0"></a>
 ## v1\.2\.0
 
-<a id="release-summary-60"></a>
+<a id="release-summary-61"></a>
 ### Release Summary
 
 Please note that this release fixes a security issue \(CVE\-2020\-25646\)\.
@@ -1397,7 +1414,7 @@ Please note that this release fixes a security issue \(CVE\-2020\-25646\)\.
 * x509\_certificate \- the options <code>privatekey\_content</code> and <code>ownca\_privatekey\_content</code> were not marked as <code>no\_log</code>\, resulting in it being dumped into the system log by default\, and returned in the registered results in the <code>invocation</code> field \(CVE\-2020\-25646\, [https\://github\.com/ansible\-collections/community\.crypto/pull/125](https\://github\.com/ansible\-collections/community\.crypto/pull/125)\)\.
 * x509\_crl \- the option <code>privatekey\_content</code> was not marked as <code>no\_log</code>\, resulting in it being dumped into the system log by default\, and returned in the registered results in the <code>invocation</code> field \(CVE\-2020\-25646\, [https\://github\.com/ansible\-collections/community\.crypto/pull/125](https\://github\.com/ansible\-collections/community\.crypto/pull/125)\)\.
 
-<a id="bugfixes-45"></a>
+<a id="bugfixes-46"></a>
 ### Bugfixes
 
 * openssl\_pkcs12 \- do not crash when reading PKCS\#12 file which has no private key and/or no main certificate \([https\://github\.com/ansible\-collections/community\.crypto/issues/103](https\://github\.com/ansible\-collections/community\.crypto/issues/103)\)\.
@@ -1405,12 +1422,12 @@ Please note that this release fixes a security issue \(CVE\-2020\-25646\)\.
 <a id="v1-1-1"></a>
 ## v1\.1\.1
 
-<a id="release-summary-61"></a>
+<a id="release-summary-62"></a>
 ### Release Summary
 
 Bugfixes for Ansible 2\.10\.0\.
 
-<a id="bugfixes-46"></a>
+<a id="bugfixes-47"></a>
 ### Bugfixes
 
 * meta/runtime\.yml \- convert Ansible version numbers for old names of modules to collection version numbers \([https\://github\.com/ansible\-collections/community\.crypto/pull/108](https\://github\.com/ansible\-collections/community\.crypto/pull/108)\)\.
@@ -1419,7 +1436,7 @@ Bugfixes for Ansible 2\.10\.0\.
 <a id="v1-1-0"></a>
 ## v1\.1\.0
 
-<a id="release-summary-62"></a>
+<a id="release-summary-63"></a>
 ### Release Summary
 
 Release for Ansible 2\.10\.0\.
@@ -1437,7 +1454,7 @@ Release for Ansible 2\.10\.0\.
 * openssl\_csr \- add support for name constraints extension \([https\://github\.com/ansible\-collections/community\.crypto/issues/46](https\://github\.com/ansible\-collections/community\.crypto/issues/46)\)\.
 * openssl\_csr\_info \- add support for name constraints extension \([https\://github\.com/ansible\-collections/community\.crypto/issues/46](https\://github\.com/ansible\-collections/community\.crypto/issues/46)\)\.
 
-<a id="bugfixes-47"></a>
+<a id="bugfixes-48"></a>
 ### Bugfixes
 
 * acme\_inspect \- fix problem with Python 3\.5 that JSON was not decoded \([https\://github\.com/ansible\-collections/community\.crypto/issues/86](https\://github\.com/ansible\-collections/community\.crypto/issues/86)\)\.
@@ -1453,7 +1470,7 @@ Release for Ansible 2\.10\.0\.
 <a id="v1-0-0"></a>
 ## v1\.0\.0
 
-<a id="release-summary-63"></a>
+<a id="release-summary-64"></a>
 ### Release Summary
 
 This is the first proper release of the <code>community\.crypto</code> collection\. This changelog contains all changes to the modules in this collection that were added after the release of Ansible 2\.9\.0\.
@@ -1497,7 +1514,7 @@ This is the first proper release of the <code>community\.crypto</code> collectio
 
 * The <code>letsencrypt</code> module has been removed\. Use <code>acme\_certificate</code> instead\.
 
-<a id="bugfixes-48"></a>
+<a id="bugfixes-49"></a>
 ### Bugfixes
 
 * ACME modules\: fix bug in ACME v1 account update code
