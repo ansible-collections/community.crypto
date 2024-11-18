@@ -11,6 +11,7 @@
 - name: SSH-agent test block
   environment:
     SSH_AUTH_SOCK: "{{ openssh_agent_sock }}"
+
   block:
     - name: Generate always valid cert using agent without key in agent (should fail)
       openssh_cert:
