@@ -1,0 +1,62 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Fix name
+  set_fact:
+    cryptname: "crypt{{ '%0x' % ((2**32) | random) }}"
+
+- name: Create
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    name: "{{ cryptname }}"
+    state: present
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  register: create
+- name: Open
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    name: "{{ cryptname }}"
+    state: opened
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+  become: true
+  register: open
+- name: Open (idempotent)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    name: "{{ cryptname }}"
+    state: opened
+    keyfile: "{{ remote_tmp_dir }}/keyfile1"
+  become: true
+  register: open_idem
+- name: Closed (via name)
+  luks_device:
+    name: "{{ cryptname }}"
+    state: closed
+  become: true
+  register: close
+- name: Closed (via name, idempotent)
+  luks_device:
+    name: "{{ cryptname }}"
+    state: closed
+  become: true
+  register: close_idem
+- name: Absent
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    name: "{{ cryptname }}"
+    state: absent
+  become: true
+  register: absent
+- assert:
+    that:
+    - create is changed
+    - open is changed
+    - open_idem is not changed
+    - close is changed
+    - close_idem is not changed
+    - absent is changed
