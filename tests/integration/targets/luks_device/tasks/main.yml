@@ -31,7 +31,7 @@
 
 - name: Make sure cryptsetup is installed
   package:
-    name: cryptsetup
+    name: '{{ cryptsetup_package }}'
     state: present
   become: true
 
