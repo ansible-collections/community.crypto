@@ -21,10 +21,10 @@
   vars:
     search:
       files:
-      - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-      - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-      - '{{ ansible_distribution }}.yml'
-      - '{{ ansible_os_family }}.yml'
+      - '{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml'
+      - '{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}.yml'
+      - '{{ ansible_distribution | lower }}.yml'
+      - '{{ ansible_os_family | lower }}.yml'
       - default.yml
       paths:
       - vars
