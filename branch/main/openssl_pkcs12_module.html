@@ -378,7 +378,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The PKCS#12 password.</p>
-<p><strong>Note:</strong> PKCS12 encryption is not secure and should not be used as a security mechanism. If you need to store or send a PKCS12 file safely, you should additionally encrypt it with something else.</p>
+<p><strong>Note:</strong> PKCS12 encryption is typically not secure and should not be used as a security mechanism. If you need to store or send a PKCS12 file safely, you should additionally encrypt it with something else. (<a class="reference external" href="https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates">Source</a>.)</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
