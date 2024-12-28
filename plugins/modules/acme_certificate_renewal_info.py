@@ -111,7 +111,8 @@ msg:
 
 supports_ari:
   description:
-    - Whether ARI information was used to determine renewal. This can be used to determine whether to specify O(community.crypto.acme_certificate#module:include_renewal_cert_id=when_ari_supported)
+    - Whether ARI information was used to determine renewal. This can be used to determine whether to specify
+      O(community.crypto.acme_certificate#module:include_renewal_cert_id=when_ari_supported)
       for the M(community.crypto.acme_certificate) module.
     - If O(use_ari=false), this will always be V(false).
   returned: success
