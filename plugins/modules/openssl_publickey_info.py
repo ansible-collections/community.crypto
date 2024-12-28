@@ -9,50 +9,49 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: openssl_publickey_info
 short_description: Provide information for OpenSSL public keys
 description:
-    - This module allows one to query information on OpenSSL public keys.
-    - It uses the cryptography python library to interact with OpenSSL.
+  - This module allows one to query information on OpenSSL public keys.
+  - It uses the cryptography python library to interact with OpenSSL.
 version_added: 1.7.0
 requirements:
-    - cryptography >= 1.2.3
+  - cryptography >= 1.2.3
 author:
-    - Felix Fontein (@felixfontein)
+  - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-    - community.crypto.attributes
-    - community.crypto.attributes.info_module
+  - community.crypto.attributes
+  - community.crypto.attributes.info_module
 options:
-    path:
-        description:
-            - Remote absolute path where the public key file is loaded from.
-        type: path
-    content:
-        description:
-            - Content of the public key file.
-            - Either O(path) or O(content) must be specified, but not both.
-        type: str
+  path:
+    description:
+      - Remote absolute path where the public key file is loaded from.
+    type: path
+  content:
+    description:
+      - Content of the public key file.
+      - Either O(path) or O(content) must be specified, but not both.
+    type: str
 
-    select_crypto_backend:
-        description:
-            - Determines which crypto backend to use.
-            - The default choice is V(auto), which tries to use C(cryptography) if available.
-            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-        type: str
-        default: auto
-        choices: [ auto, cryptography ]
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [auto, cryptography]
 
 seealso:
-    - module: community.crypto.openssl_publickey
-    - module: community.crypto.openssl_privatekey_info
-    - plugin: community.crypto.openssl_publickey_info
-      plugin_type: filter
-      description: A filter variant of this module.
-'''
+  - module: community.crypto.openssl_publickey
+  - module: community.crypto.openssl_privatekey_info
+  - plugin: community.crypto.openssl_publickey_info
+    plugin_type: filter
+    description: A filter variant of this module.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem
@@ -70,87 +69,87 @@ EXAMPLES = r'''
 - name: Dump information
   ansible.builtin.debug:
     var: result
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 fingerprints:
-    description:
-        - Fingerprints of public key.
-        - For every hash algorithm available, the fingerprint is computed.
-    returned: success
-    type: dict
-    sample: "{'sha256': 'd4:b3:aa:6d:c8:04:ce:4e:ba:f6:29:4d:92:a3:94:b0:c2:ff:bd:bf:33:63:11:43:34:0f:51:b0:95:09:2f:63',
-              'sha512': 'f7:07:4a:f0:b0:f0:e6:8b:95:5f:f9:e6:61:0a:32:68:f1..."
+  description:
+    - Fingerprints of public key.
+    - For every hash algorithm available, the fingerprint is computed.
+  returned: success
+  type: dict
+  sample: "{'sha256': 'd4:b3:aa:6d:c8:04:ce:4e:ba:f6:29:4d:92:a3:94:b0:c2:ff:bd:bf:33:63:11:43:34:0f:51:b0:95:09:2f:63', 'sha512':
+    'f7:07:4a:f0:b0:f0:e6:8b:95:5f:f9:e6:61:0a:32:68:f1..."
 type:
-    description:
-        - The key's type.
-        - One of V(RSA), V(DSA), V(ECC), V(Ed25519), V(X25519), V(Ed448), or V(X448).
-        - Will start with V(unknown) if the key type cannot be determined.
-    returned: success
-    type: str
-    sample: RSA
+  description:
+    - The key's type.
+    - One of V(RSA), V(DSA), V(ECC), V(Ed25519), V(X25519), V(Ed448), or V(X448).
+    - Will start with V(unknown) if the key type cannot be determined.
+  returned: success
+  type: str
+  sample: RSA
 public_data:
-    description:
-        - Public key data. Depends on key type.
-    returned: success
-    type: dict
-    contains:
-        size:
-            description:
-                - Bit size of modulus (RSA) or prime number (DSA).
-            type: int
-            returned: When RV(type=RSA) or RV(type=DSA)
-        modulus:
-            description:
-                - The RSA key's modulus.
-            type: int
-            returned: When RV(type=RSA)
-        exponent:
-            description:
-                - The RSA key's public exponent.
-            type: int
-            returned: When RV(type=RSA)
-        p:
-            description:
-                - The C(p) value for DSA.
-                - This is the prime modulus upon which arithmetic takes place.
-            type: int
-            returned: When RV(type=DSA)
-        q:
-            description:
-                - The C(q) value for DSA.
-                - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the
-                  multiplicative group of the prime field used.
-            type: int
-            returned: When RV(type=DSA)
-        g:
-            description:
-                - The C(g) value for DSA.
-                - This is the element spanning the subgroup of the multiplicative group of the prime field used.
-            type: int
-            returned: When RV(type=DSA)
-        curve:
-            description:
-                - The curve's name for ECC.
-            type: str
-            returned: When RV(type=ECC)
-        exponent_size:
-            description:
-                - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
-            type: int
-            returned: When RV(type=ECC)
-        x:
-            description:
-                - The C(x) coordinate for the public point on the elliptic curve.
-            type: int
-            returned: When RV(type=ECC)
-        y:
-            description:
-                - For RV(type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
-                - For RV(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
-            type: int
-            returned: When RV(type=DSA) or RV(type=ECC)
-'''
+  description:
+    - Public key data. Depends on key type.
+  returned: success
+  type: dict
+  contains:
+    size:
+      description:
+        - Bit size of modulus (RSA) or prime number (DSA).
+      type: int
+      returned: When RV(type=RSA) or RV(type=DSA)
+    modulus:
+      description:
+        - The RSA key's modulus.
+      type: int
+      returned: When RV(type=RSA)
+    exponent:
+      description:
+        - The RSA key's public exponent.
+      type: int
+      returned: When RV(type=RSA)
+    p:
+      description:
+        - The C(p) value for DSA.
+        - This is the prime modulus upon which arithmetic takes place.
+      type: int
+      returned: When RV(type=DSA)
+    q:
+      description:
+        - The C(q) value for DSA.
+        - This is a prime that divides C(p - 1), and at the same time the order of the subgroup of the multiplicative group
+          of the prime field used.
+      type: int
+      returned: When RV(type=DSA)
+    g:
+      description:
+        - The C(g) value for DSA.
+        - This is the element spanning the subgroup of the multiplicative group of the prime field used.
+      type: int
+      returned: When RV(type=DSA)
+    curve:
+      description:
+        - The curve's name for ECC.
+      type: str
+      returned: When RV(type=ECC)
+    exponent_size:
+      description:
+        - The maximum number of bits of a private key. This is basically the bit size of the subgroup used.
+      type: int
+      returned: When RV(type=ECC)
+    x:
+      description:
+        - The C(x) coordinate for the public point on the elliptic curve.
+      type: int
+      returned: When RV(type=ECC)
+    y:
+      description:
+        - For RV(type=ECC), this is the C(y) coordinate for the public point on the elliptic curve.
+        - For RV(type=DSA), this is the publicly known group element whose discrete logarithm w.r.t. C(g) is the private key.
+      type: int
+      returned: When RV(type=DSA) or RV(type=ECC)
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

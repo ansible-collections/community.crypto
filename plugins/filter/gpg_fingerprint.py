@@ -6,13 +6,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: gpg_fingerprint
 short_description: Retrieve a GPG fingerprint from a GPG public or private key
 author: Felix Fontein (@felixfontein)
 version_added: 2.15.0
 description:
-  - "Takes the content of a private or public GPG key as input and returns its fingerprint."
+  - Takes the content of a private or public GPG key as input and returns its fingerprint.
 options:
   _input:
     description:
@@ -26,17 +26,17 @@ seealso:
     plugin_type: lookup
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Show fingerprint of GPG public key
   ansible.builtin.debug:
     msg: "{{ lookup('file', '/path/to/public_key.gpg') | community.crypto.gpg_fingerprint }}"
 """
 
-RETURN = """
-  _value:
-    description:
-      - The fingerprint of the provided public or private GPG key.
-    type: string
+RETURN = r"""
+_value:
+  description:
+    - The fingerprint of the provided public or private GPG key.
+  type: string
 """
 
 from ansible.errors import AnsibleFilterError

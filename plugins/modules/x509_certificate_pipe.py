@@ -11,55 +11,52 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: x509_certificate_pipe
 short_description: Generate and/or check OpenSSL certificates
 version_added: 1.3.0
 description:
-    - It implements a notion of provider (one of V(selfsigned), V(ownca), V(entrust))
-      for your certificate.
+  - It implements a notion of provider (one of V(selfsigned), V(ownca), V(entrust)) for your certificate.
 author:
-    - Yanis Guenane (@Spredzy)
-    - Markus Teufelberger (@MarkusTeufelberger)
-    - Felix Fontein (@felixfontein)
+  - Yanis Guenane (@Spredzy)
+  - Markus Teufelberger (@MarkusTeufelberger)
+  - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-    - community.crypto.attributes
-    - community.crypto.module_certificate
-    - community.crypto.module_certificate.backend_entrust_documentation
-    - community.crypto.module_certificate.backend_ownca_documentation
-    - community.crypto.module_certificate.backend_selfsigned_documentation
+  - community.crypto.attributes
+  - community.crypto.module_certificate
+  - community.crypto.module_certificate.backend_entrust_documentation
+  - community.crypto.module_certificate.backend_ownca_documentation
+  - community.crypto.module_certificate.backend_selfsigned_documentation
 attributes:
-    check_mode:
-        support: full
-        details:
-            - Currently in check mode, private keys will not be (re-)generated, only the changed status is
-              set. This will change in community.crypto 3.0.0.
-            - From community.crypto 3.0.0 on, the module will ignore check mode and always behave as if
-              check mode is not active. If you think this breaks your use-case of this module, please
-              create an issue in the community.crypto repository.
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+    details:
+      - Currently in check mode, private keys will not be (re-)generated, only the changed status is set. This will change
+        in community.crypto 3.0.0.
+      - From community.crypto 3.0.0 on, the module will ignore check mode and always behave as if check mode is not active.
+        If you think this breaks your use-case of this module, please create an issue in the community.crypto repository.
+  diff_mode:
+    support: full
 options:
-    provider:
-        description:
-            - Name of the provider to use to generate/retrieve the OpenSSL certificate.
-            - "The V(entrust) provider requires credentials for the
-               L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API."
-        type: str
-        choices: [ entrust, ownca, selfsigned ]
-        required: true
+  provider:
+    description:
+      - Name of the provider to use to generate/retrieve the OpenSSL certificate.
+      - The V(entrust) provider requires credentials for the L(Entrust Certificate Services,
+        https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API.
+    type: str
+    choices: [entrust, ownca, selfsigned]
+    required: true
 
-    content:
-        description:
-            - The existing certificate.
-        type: str
+  content:
+    description:
+      - The existing certificate.
+    type: str
 
 seealso:
-    - module: community.crypto.x509_certificate
-'''
+  - module: community.crypto.x509_certificate
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Generate a Self Signed OpenSSL certificate
   community.crypto.x509_certificate_pipe:
     provider: selfsigned
@@ -119,14 +116,14 @@ EXAMPLES = r'''
     dest: /etc/ssl/csr/www.ansible.com.crt
     content: "{{ result.certificate }}"
   when: result is changed
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 certificate:
-    description: The (current or generated) certificate's content.
-    returned: changed or success
-    type: str
-'''
+  description: The (current or generated) certificate's content.
+  returned: changed or success
+  type: str
+"""
 
 
 from ansible.module_utils.common.text.converters import to_native

@@ -9,21 +9,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_account_info
 author: "Felix Fontein (@felixfontein)"
 short_description: Retrieves information on ACME accounts
 description:
-  - "Allows to retrieve information on accounts a CA supporting the
-     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-     such as L(Let's Encrypt,https://letsencrypt.org/)."
-  - "This module only works with the ACME v2 protocol."
+  - Allows to retrieve information on accounts a CA supporting the L(ACME protocol,https://tools.ietf.org/html/rfc8555), such
+    as L(Let's Encrypt,https://letsencrypt.org/).
+  - This module only works with the ACME v2 protocol.
 notes:
-  - "The M(community.crypto.acme_account) module allows to modify, create and delete ACME
-     accounts."
-  - "This module was called C(acme_account_facts) before Ansible 2.8. The usage
-     did not change."
+  - The M(community.crypto.acme_account) module allows to modify, create and delete ACME accounts.
+  - This module was called C(acme_account_facts) before Ansible 2.8. The usage did not change.
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.account
@@ -33,14 +29,11 @@ extends_documentation_fragment:
 options:
   retrieve_orders:
     description:
-      - "Whether to retrieve the list of order URLs or order objects, if provided
-         by the ACME server."
-      - "A value of V(ignore) will not fetch the list of orders."
-      - "If the value is not V(ignore) and the ACME server supports orders, the RV(order_uris)
-         return value is always populated. The RV(orders) return value is only returned
-         if this option is set to V(object_list)."
-      - "Currently, Let's Encrypt does not return orders, so the RV(orders) result
-         will always be empty."
+      - Whether to retrieve the list of order URLs or order objects, if provided by the ACME server.
+      - A value of V(ignore) will not fetch the list of orders.
+      - If the value is not V(ignore) and the ACME server supports orders, the RV(order_uris) return value is always populated.
+        The RV(orders) return value is only returned if this option is set to V(object_list).
+      - Currently, Let's Encrypt does not return orders, so the RV(orders) result will always be empty.
     type: str
     choices:
       - ignore
@@ -50,10 +43,9 @@ options:
 seealso:
   - module: community.crypto.acme_account
     description: Allows to create, modify or delete an ACME account.
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Check whether an account with the given account key exists
   community.crypto.acme_account_info:
     account_key_src: /etc/pki/cert/private/account.key
@@ -81,9 +73,9 @@ EXAMPLES = '''
 - name: Print account contacts
   ansible.builtin.debug:
     var: account_data.account.contact
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 exists:
   description: Whether the account exists.
   returned: always
@@ -100,13 +92,13 @@ account:
   type: dict
   contains:
     contact:
-      description: the challenge resource that must be created for validation
+      description: The challenge resource that must be created for validation.
       returned: always
       type: list
       elements: str
       sample: ['mailto:me@example.com', 'tel:00123456789']
     status:
-      description: the account's status
+      description: The account's status.
       returned: always
       type: str
       choices: ['valid', 'deactivated', 'revoked']
@@ -114,20 +106,19 @@ account:
     orders:
       description:
         - A URL where a list of orders can be retrieved for this account.
-        - Use the O(retrieve_orders) option to query this URL and retrieve the
-          complete list of orders.
+        - Use the O(retrieve_orders) option to query this URL and retrieve the complete list of orders.
       returned: always
       type: str
       sample: https://example.ca/account/1/orders
     public_account_key:
-      description: the public account key as a L(JSON Web Key,https://tools.ietf.org/html/rfc7517).
+      description: The public account key as a L(JSON Web Key,https://tools.ietf.org/html/rfc7517).
       returned: always
       type: str
       sample: '{"kty":"EC","crv":"P-256","x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4","y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM"}'
 
 orders:
   description:
-    - "The list of orders."
+    - The list of orders.
   type: list
   elements: dict
   returned: if account exists, O(retrieve_orders) is V(object_list), and server supports order listing
@@ -164,8 +155,8 @@ orders:
           description: Name of identifier. Hostname or IP address.
           type: str
         wildcard:
-          description: "Whether RV(orders[].identifiers[].value) is actually a wildcard. The wildcard
-                        prefix C(*.) is not included in RV(orders[].identifiers[].value) if this is V(true)."
+          description: "Whether RV(orders[].identifiers[].value) is actually a wildcard. The wildcard prefix C(*.) is not
+            included in RV(orders[].identifiers[].value) if this is V(true)."
           type: bool
           returned: required to be included if the identifier is wildcarded
     notBefore:
@@ -205,14 +196,14 @@ orders:
 
 order_uris:
   description:
-    - "The list of orders."
-    - "If O(retrieve_orders) is V(url_list), this will be a list of URLs."
-    - "If O(retrieve_orders) is V(object_list), this will be a list of objects."
+    - The list of orders.
+    - If O(retrieve_orders) is V(url_list), this will be a list of URLs.
+    - If O(retrieve_orders) is V(object_list), this will be a list of objects.
   type: list
   elements: str
   returned: if account exists, O(retrieve_orders) is not V(ignore), and server supports order listing
   version_added: 1.5.0
-'''
+"""
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,

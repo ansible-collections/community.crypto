@@ -9,31 +9,24 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: acme_inspect
 author: "Felix Fontein (@felixfontein)"
 short_description: Send direct requests to an ACME server
 description:
-  - "Allows to send direct requests to an ACME server with the
-     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-     which is supported by CAs such as L(Let's Encrypt,https://letsencrypt.org/)."
-  - "This module can be used to debug failed certificate request attempts,
-     for example when M(community.crypto.acme_certificate) fails or encounters a problem which
-     you wish to investigate."
-  - "The module can also be used to directly access features of an ACME servers
-     which are not yet supported by the Ansible ACME modules."
+  - Allows to send direct requests to an ACME server with the L(ACME protocol,https://tools.ietf.org/html/rfc8555), which
+    is supported by CAs such as L(Let's Encrypt,https://letsencrypt.org/).
+  - This module can be used to debug failed certificate request attempts, for example when M(community.crypto.acme_certificate)
+    fails or encounters a problem which you wish to investigate.
+  - The module can also be used to directly access features of an ACME servers which are not yet supported by the Ansible
+    ACME modules.
 notes:
-  - "The O(account_uri) option must be specified for properly authenticated
-     ACME v2 requests (except a C(new-account) request)."
-  - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute
-     ACME requests without the need of writing a playbook. For example, the
-     following command retrieves the ACME account with ID 1 from Let's Encrypt
-     (assuming C(/path/to/key) is the correct private account key):
-     C(ansible localhost -m acme_inspect -a \"account_key_src=/path/to/key
-     acme_directory=https://acme-v02.api.letsencrypt.org/directory acme_version=2
-     account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1 method=get
-     url=https://acme-v02.api.letsencrypt.org/acme/acct/1\")"
+  - The O(account_uri) option must be specified for properly authenticated ACME v2 requests (except a C(new-account) request).
+  - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute ACME requests without the
+    need of writing a playbook. For example, the following command retrieves the ACME account with ID 1 from Let's Encrypt
+    (assuming C(/path/to/key) is the correct private account key): C(ansible localhost -m acme_inspect -a \"account_key_src=/path/to/key
+    acme_directory=https://acme-v02.api.letsencrypt.org/directory acme_version=2 account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1
+    method=get url=https://acme-v02.api.letsencrypt.org/acme/acct/1\")."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -54,39 +47,34 @@ attributes:
 options:
   url:
     description:
-      - "The URL to send the request to."
-      - "Must be specified if O(method) is not V(directory-only)."
+      - The URL to send the request to.
+      - Must be specified if O(method) is not V(directory-only).
     type: str
   method:
     description:
-      - "The method to use to access the given URL on the ACME server."
-      - "The value V(post) executes an authenticated POST request. The content
-         must be specified in the O(content) option."
-      - "The value V(get) executes an authenticated POST-as-GET request for ACME v2,
-         and a regular GET request for ACME v1."
-      - "The value V(directory-only) only retrieves the directory, without doing
-         a request."
+      - The method to use to access the given URL on the ACME server.
+      - The value V(post) executes an authenticated POST request. The content must be specified in the O(content) option.
+      - The value V(get) executes an authenticated POST-as-GET request for ACME v2, and a regular GET request for ACME v1.
+      - The value V(directory-only) only retrieves the directory, without doing a request.
     type: str
     default: get
     choices:
-    - get
-    - post
-    - directory-only
+      - get
+      - post
+      - directory-only
   content:
     description:
-      - "An encoded JSON object which will be sent as the content if O(method)
-         is V(post)."
-      - "Required when O(method) is V(post), and not allowed otherwise."
+      - An encoded JSON object which will be sent as the content if O(method) is V(post).
+      - Required when O(method) is V(post), and not allowed otherwise.
     type: str
   fail_on_acme_error:
     description:
-      - "If O(method) is V(post) or V(get), make the module fail in case an ACME
-         error is returned."
+      - If O(method) is V(post) or V(get), make the module fail in case an ACME error is returned.
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get directory
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
@@ -129,7 +117,7 @@ EXAMPLES = r'''
       # For valid values, see
       # https://tools.ietf.org/html/rfc8555#section-7.3
       contact:
-      - mailto:me@example.com
+        - mailto:me@example.com
 
 - name: Create certificate order
   community.crypto.acme_certificate:
@@ -184,69 +172,46 @@ EXAMPLES = r'''
     url: "{{ http01challenge.url }}"
     method: post
     content: '{}'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 directory:
-  description: The ACME directory's content
+  description: The ACME directory's content.
   returned: always
   type: dict
-  sample:
-    {
-      "a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
-      "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
-      "meta": {
-          "caaIdentities": [
-              "letsencrypt.org"
-          ],
-          "termsOfService": "https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf",
-          "website": "https://letsencrypt.org"
-      },
-      "newAccount": "https://acme-v02.api.letsencrypt.org/acme/new-acct",
-      "newNonce": "https://acme-v02.api.letsencrypt.org/acme/new-nonce",
-      "newOrder": "https://acme-v02.api.letsencrypt.org/acme/new-order",
-      "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"
-    }
+  sample: {"a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
+    "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
+    "meta": {"caaIdentities": ["letsencrypt.org"], "termsOfService": "https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf",
+      "website": "https://letsencrypt.org"},
+    "newAccount": "https://acme-v02.api.letsencrypt.org/acme/new-acct",
+    "newNonce": "https://acme-v02.api.letsencrypt.org/acme/new-nonce",
+    "newOrder": "https://acme-v02.api.letsencrypt.org/acme/new-order",
+    "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"}
 headers:
-  description: The request's HTTP headers (with lowercase keys)
+  description: The request's HTTP headers (with lowercase keys).
   returned: always
   type: dict
-  sample:
-    {
-      "boulder-requester": "12345",
-      "cache-control": "max-age=0, no-cache, no-store",
-      "connection": "close",
-      "content-length": "904",
-      "content-type": "application/json",
-      "cookies": {},
-      "cookies_string": "",
-      "date": "Wed, 07 Nov 2018 12:34:56 GMT",
-      "expires": "Wed, 07 Nov 2018 12:44:56 GMT",
-      "link": '<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel="terms-of-service"',
-      "msg": "OK (904 bytes)",
-      "pragma": "no-cache",
-      "replay-nonce": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH",
-      "server": "nginx",
-      "status": 200,
-      "strict-transport-security": "max-age=604800",
-      "url": "https://acme-v02.api.letsencrypt.org/acme/acct/46161",
-      "x-frame-options": "DENY"
-    }
+  sample: {"boulder-requester": "12345", "cache-control": "max-age=0, no-cache, no-store", "connection": "close", "content-length": "904",
+    "content-type": "application/json", "cookies": {}, "cookies_string": "", "date": "Wed, 07 Nov 2018 12:34:56 GMT", "expires": "Wed,
+      07 Nov 2018 12:44:56 GMT", "link": '<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel="terms-of-service"',
+    "msg": "OK (904 bytes)", "pragma": "no-cache", "replay-nonce": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH", "server": "nginx",
+    "status": 200, "strict-transport-security": "max-age=604800", "url": "https://acme-v02.api.letsencrypt.org/acme/acct/46161",
+    "x-frame-options": "DENY"}
 output_text:
-  description: The raw text output
+  description: The raw text output.
   returned: always
   type: str
   sample: "{\\n  \\\"id\\\": 12345,\\n  \\\"key\\\": {\\n    \\\"kty\\\": \\\"RSA\\\",\\n ..."
 output_json:
-  description: The output parsed as JSON
+  description: The output parsed as JSON.
   returned: if output can be parsed as JSON
   type: dict
   sample:
     - id: 12345
     - key:
-      - kty: RSA
-      - ...
-'''
+        - kty: RSA
+        - '...'
+"""
 
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 

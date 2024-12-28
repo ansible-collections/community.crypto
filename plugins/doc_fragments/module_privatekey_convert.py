@@ -11,38 +11,37 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard files documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 requirements:
-    - cryptography >= 1.2.3 (older versions might work as well)
+  - cryptography >= 1.2.3 (older versions might work as well)
 options:
-    src_path:
-        description:
-            - Name of the file containing the OpenSSL private key to convert.
-            - Exactly one of O(src_path) or O(src_content) must be specified.
-        type: path
-    src_content:
-        description:
-            - The content of the file containing the OpenSSL private key to convert.
-            - Exactly one of O(src_path) or O(src_content) must be specified.
-        type: str
-    src_passphrase:
-        description:
-            - The passphrase for the private key to load.
-        type: str
-    dest_passphrase:
-        description:
-            - The passphrase for the private key to store.
-        type: str
-    format:
-        description:
-            - Determines which format the destination private key should be written in.
-            - Please note that not every key can be exported in any format, and that not every
-              format supports encryption.
-        type: str
-        choices: [ pkcs1, pkcs8, raw ]
-        required: true
+  src_path:
+    description:
+      - Name of the file containing the OpenSSL private key to convert.
+      - Exactly one of O(src_path) or O(src_content) must be specified.
+    type: path
+  src_content:
+    description:
+      - The content of the file containing the OpenSSL private key to convert.
+      - Exactly one of O(src_path) or O(src_content) must be specified.
+    type: str
+  src_passphrase:
+    description:
+      - The passphrase for the private key to load.
+    type: str
+  dest_passphrase:
+    description:
+      - The passphrase for the private key to store.
+    type: str
+  format:
+    description:
+      - Determines which format the destination private key should be written in.
+      - Please note that not every key can be exported in any format, and that not every format supports encryption.
+    type: str
+    choices: [pkcs1, pkcs8, raw]
+    required: true
 seealso:
-    - module: community.crypto.openssl_privatekey
-    - module: community.crypto.openssl_privatekey_pipe
-    - module: community.crypto.openssl_publickey
-'''
+  - module: community.crypto.openssl_privatekey
+  - module: community.crypto.openssl_privatekey_pipe
+  - module: community.crypto.openssl_publickey
+"""

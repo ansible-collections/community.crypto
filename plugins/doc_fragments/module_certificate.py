@@ -12,80 +12,79 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard files documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 description:
-    - This module allows one to (re)generate OpenSSL certificates.
-    - It uses the cryptography python library to interact with OpenSSL.
+  - This module allows one to (re)generate OpenSSL certificates.
+  - It uses the cryptography python library to interact with OpenSSL.
 requirements:
-    - cryptography >= 1.6 (if using V(selfsigned) or V(ownca) provider)
+  - cryptography >= 1.6 (if using V(selfsigned) or V(ownca) provider)
 options:
-    force:
-        description:
-            - Generate the certificate, even if it already exists.
-        type: bool
-        default: false
+  force:
+    description:
+      - Generate the certificate, even if it already exists.
+    type: bool
+    default: false
 
-    csr_path:
-        description:
-            - Path to the Certificate Signing Request (CSR) used to generate this certificate.
-            - This is mutually exclusive with O(csr_content).
-        type: path
-    csr_content:
-        description:
-            - Content of the Certificate Signing Request (CSR) used to generate this certificate.
-            - This is mutually exclusive with O(csr_path).
-        type: str
+  csr_path:
+    description:
+      - Path to the Certificate Signing Request (CSR) used to generate this certificate.
+      - This is mutually exclusive with O(csr_content).
+    type: path
+  csr_content:
+    description:
+      - Content of the Certificate Signing Request (CSR) used to generate this certificate.
+      - This is mutually exclusive with O(csr_path).
+    type: str
 
-    privatekey_path:
-        description:
-            - Path to the private key to use when signing the certificate.
-            - This is mutually exclusive with O(privatekey_content).
-        type: path
-    privatekey_content:
-        description:
-            - Content of the private key to use when signing the certificate.
-            - This is mutually exclusive with O(privatekey_path).
-        type: str
+  privatekey_path:
+    description:
+      - Path to the private key to use when signing the certificate.
+      - This is mutually exclusive with O(privatekey_content).
+    type: path
+  privatekey_content:
+    description:
+      - Content of the private key to use when signing the certificate.
+      - This is mutually exclusive with O(privatekey_path).
+    type: str
 
-    privatekey_passphrase:
-        description:
-            - The passphrase for the O(privatekey_path) resp. O(privatekey_content).
-            - This is required if the private key is password protected.
-        type: str
+  privatekey_passphrase:
+    description:
+      - The passphrase for the O(privatekey_path) resp. O(privatekey_content).
+      - This is required if the private key is password protected.
+    type: str
 
-    ignore_timestamps:
-        description:
-            - Whether the "not before" and "not after" timestamps should be ignored for idempotency checks.
-            - It is better to keep the default value V(true) when using relative timestamps (like V(+0s) for now).
-        type: bool
-        default: true
-        version_added: 2.0.0
+  ignore_timestamps:
+    description:
+      - Whether the "not before" and "not after" timestamps should be ignored for idempotency checks.
+      - It is better to keep the default value V(true) when using relative timestamps (like V(+0s) for now).
+    type: bool
+    default: true
+    version_added: 2.0.0
 
-    select_crypto_backend:
-        description:
-            - Determines which crypto backend to use.
-            - The default choice is V(auto), which tries to use C(cryptography) if available.
-            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-        type: str
-        default: auto
-        choices: [ auto, cryptography ]
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [auto, cryptography]
 
 notes:
-    - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
-    - Date specified should be UTC. Minutes and seconds are mandatory.
-    - For security reason, when you use V(ownca) provider, you should NOT run
-      M(community.crypto.x509_certificate) on a target machine, but on a dedicated CA machine. It
-      is recommended not to store the CA private key on the target machine. Once signed, the
-      certificate can be moved to the target machine.
+  - All ASN.1 TIME values should be specified following the YYYYMMDDHHMMSSZ pattern.
+  - Date specified should be UTC. Minutes and seconds are mandatory.
+  - For security reason, when you use V(ownca) provider, you should NOT run M(community.crypto.x509_certificate) on a target
+    machine, but on a dedicated CA machine. It is recommended not to store the CA private key on the target machine. Once
+    signed, the certificate can be moved to the target machine.
 seealso:
-- module: community.crypto.openssl_csr
-- module: community.crypto.openssl_csr_pipe
-- module: community.crypto.openssl_dhparam
-- module: community.crypto.openssl_pkcs12
-- module: community.crypto.openssl_privatekey
-- module: community.crypto.openssl_privatekey_pipe
-- module: community.crypto.openssl_publickey
-'''
+  - module: community.crypto.openssl_csr
+  - module: community.crypto.openssl_csr_pipe
+  - module: community.crypto.openssl_dhparam
+  - module: community.crypto.openssl_pkcs12
+  - module: community.crypto.openssl_privatekey
+  - module: community.crypto.openssl_privatekey_pipe
+  - module: community.crypto.openssl_publickey
+"""
 
     BACKEND_ACME_DOCUMENTATION = r'''
 description:

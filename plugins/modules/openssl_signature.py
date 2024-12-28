@@ -9,70 +9,67 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: openssl_signature
 version_added: 1.1.0
 short_description: Sign data with openssl
 description:
-    - This module allows one to sign data using a private key.
-    - The module uses the cryptography Python library.
+  - This module allows one to sign data using a private key.
+  - The module uses the cryptography Python library.
 requirements:
-    - cryptography >= 1.4 (some key types require newer versions)
+  - cryptography >= 1.4 (some key types require newer versions)
 author:
-    - Patrick Pichler (@aveexy)
-    - Markus Teufelberger (@MarkusTeufelberger)
+  - Patrick Pichler (@aveexy)
+  - Markus Teufelberger (@MarkusTeufelberger)
 extends_documentation_fragment:
-    - community.crypto.attributes
+  - community.crypto.attributes
 attributes:
-    check_mode:
-        support: full
-        details:
-            - This action does not modify state.
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: none
 options:
-    privatekey_path:
-        description:
-            - The path to the private key to use when signing.
-            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
-        type: path
-    privatekey_content:
-        description:
-            - The content of the private key to use when signing the certificate signing request.
-            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
-        type: str
-    privatekey_passphrase:
-        description:
-            - The passphrase for the private key.
-            - This is required if the private key is password protected.
-        type: str
-    path:
-        description:
-            - The file to sign.
-            - This file will only be read and not modified.
-        type: path
-        required: true
-    select_crypto_backend:
-        description:
-            - Determines which crypto backend to use.
-            - The default choice is V(auto), which tries to use C(cryptography) if available.
-            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-        type: str
-        default: auto
-        choices: [ auto, cryptography ]
+  privatekey_path:
+    description:
+      - The path to the private key to use when signing.
+      - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
+    type: path
+  privatekey_content:
+    description:
+      - The content of the private key to use when signing the certificate signing request.
+      - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
+    type: str
+  privatekey_passphrase:
+    description:
+      - The passphrase for the private key.
+      - This is required if the private key is password protected.
+    type: str
+  path:
+    description:
+      - The file to sign.
+      - This file will only be read and not modified.
+    type: path
+    required: true
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [auto, cryptography]
 notes:
-    - |
-      When using the C(cryptography) backend, the following key types require at least the following C(cryptography) version:
-      RSA keys: C(cryptography) >= 1.4
-      DSA and ECDSA keys: C(cryptography) >= 1.5
-      ed448 and ed25519 keys: C(cryptography) >= 2.6
+  - "When using the C(cryptography) backend, the following key types require at least the following C(cryptography) version:\n
+    RSA keys: C(cryptography) >= 1.4\nDSA and ECDSA keys: C(cryptography) >= 1.5\ned448 and ed25519 keys: C(cryptography)
+    >= 2.6."
 seealso:
-    - module: community.crypto.openssl_signature_info
-    - module: community.crypto.openssl_privatekey
-'''
+  - module: community.crypto.openssl_signature_info
+  - module: community.crypto.openssl_privatekey
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Sign example file
   community.crypto.openssl_signature:
     privatekey_path: private.key
@@ -90,14 +87,14 @@ EXAMPLES = r'''
   ansible.builtin.assert:
     that:
       - verify.valid
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 signature:
-    description: Base64 encoded signature.
-    returned: success
-    type: str
-'''
+  description: Base64 encoded signature.
+  returned: success
+  type: str
+"""
 
 import os
 import traceback

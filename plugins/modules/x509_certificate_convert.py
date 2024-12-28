@@ -9,96 +9,92 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: x509_certificate_convert
 short_description: Convert X.509 certificates
 version_added: 2.19.0
 description:
-    - This module allows to convert X.509 certificates between different formats.
+  - This module allows to convert X.509 certificates between different formats.
 author:
-    - Felix Fontein (@felixfontein)
+  - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.attributes
-    - community.crypto.attributes.files
+  - ansible.builtin.files
+  - community.crypto.attributes
+  - community.crypto.attributes.files
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
-    safe_file_operations:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  safe_file_operations:
+    support: full
 options:
-    src_path:
-        description:
-            - Name of the file containing the X.509 certificate to convert.
-            - Exactly one of O(src_path) or O(src_content) must be specified.
-        type: path
-    src_content:
-        description:
-            - The content of the file containing the X.509 certificate to convert.
-            - This must be text. If you are not sure that the input file is PEM, you must Base64 encode
-              the value and set O(src_content_base64=true). You can use the
-              P(ansible.builtin.b64encode#filter) filter plugin for this.
-            - Exactly one of O(src_path) or O(src_content) must be specified.
-        type: str
-    src_content_base64:
-        description:
-            - If set to V(true) when O(src_content) is provided, the module assumes that the value
-              of O(src_content) is Base64 encoded.
-        type: bool
-        default: false
-    format:
-        description:
-            - Determines which format the destination X.509 certificate should be written in.
-            - Please note that not every key can be exported in any format, and that not every
-              format supports encryption.
-        type: str
-        choices:
-            - pem
-            - der
-        required: true
-    strict:
-        description:
-            - If the input is a PEM file, ensure that it contains a single PEM object, that
-              the header and footer match, and are of type C(CERTIFICATE) or C(X509 CERTIFICATE).
-        type: bool
-        default: false
-    dest_path:
-        description:
-            - Name of the file in which the generated TLS/SSL X.509 certificate will be written.
-        type: path
-        required: true
-    backup:
-        description:
-            - Create a backup file including a timestamp so you can get
-              the original X.509 certificate back if you overwrote it with a new one by accident.
-        type: bool
-        default: false
+  src_path:
+    description:
+      - Name of the file containing the X.509 certificate to convert.
+      - Exactly one of O(src_path) or O(src_content) must be specified.
+    type: path
+  src_content:
+    description:
+      - The content of the file containing the X.509 certificate to convert.
+      - This must be text. If you are not sure that the input file is PEM, you must Base64 encode the value and set O(src_content_base64=true).
+        You can use the P(ansible.builtin.b64encode#filter) filter plugin for this.
+      - Exactly one of O(src_path) or O(src_content) must be specified.
+    type: str
+  src_content_base64:
+    description:
+      - If set to V(true) when O(src_content) is provided, the module assumes that the value of O(src_content) is Base64 encoded.
+    type: bool
+    default: false
+  format:
+    description:
+      - Determines which format the destination X.509 certificate should be written in.
+      - Please note that not every key can be exported in any format, and that not every format supports encryption.
+    type: str
+    choices:
+      - pem
+      - der
+    required: true
+  strict:
+    description:
+      - If the input is a PEM file, ensure that it contains a single PEM object, that the header and footer match, and are
+        of type C(CERTIFICATE) or C(X509 CERTIFICATE).
+    type: bool
+    default: false
+  dest_path:
+    description:
+      - Name of the file in which the generated TLS/SSL X.509 certificate will be written.
+    type: path
+    required: true
+  backup:
+    description:
+      - Create a backup file including a timestamp so you can get the original X.509 certificate back if you overwrote it
+        with a new one by accident.
+    type: bool
+    default: false
 seealso:
-    - plugin: ansible.builtin.b64encode
-      plugin_type: filter
-    - module: community.crypto.x509_certificate
-    - module: community.crypto.x509_certificate_pipe
-    - module: community.crypto.x509_certificate_info
-'''
+  - plugin: ansible.builtin.b64encode
+    plugin_type: filter
+  - module: community.crypto.x509_certificate
+  - module: community.crypto.x509_certificate_pipe
+  - module: community.crypto.x509_certificate_info
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Convert PEM X.509 certificate to DER format
   community.crypto.x509_certificate_convert:
     src_path: /etc/ssl/cert/ansible.com.pem
     dest_path: /etc/ssl/cert/ansible.com.der
     format: der
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 backup_file:
-    description: Name of backup file created.
-    returned: changed and if O(backup) is V(true)
-    type: str
-    sample: /path/to/cert.pem.2019-03-09@11:22~
-'''
+  description: Name of backup file created.
+  returned: changed and if O(backup) is V(true)
+  type: str
+  sample: /path/to/cert.pem.2019-03-09@11:22~
+"""
 
 import base64
 import os

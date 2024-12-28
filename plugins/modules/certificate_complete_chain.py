@@ -9,78 +9,70 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: certificate_complete_chain
 author: "Felix Fontein (@felixfontein)"
 short_description: Complete certificate chain given a set of untrusted and root certificates
 description:
-    - "This module completes a given chain of certificates in PEM format by finding
-       intermediate certificates from a given set of certificates, until it finds a root
-       certificate in another given set of certificates."
-    - "This can for example be used to find the root certificate for a certificate chain
-       returned by M(community.crypto.acme_certificate)."
-    - "Note that this module does I(not) check for validity of the chains. It only
-       checks that issuer and subject match, and that the signature is correct. It
-       ignores validity dates and key usage completely. If you need to verify that a
-       generated chain is valid, please use C(openssl verify ...)."
+  - This module completes a given chain of certificates in PEM format by finding intermediate certificates from a given set
+    of certificates, until it finds a root certificate in another given set of certificates.
+  - This can for example be used to find the root certificate for a certificate chain returned by M(community.crypto.acme_certificate).
+  - Note that this module does I(not) check for validity of the chains. It only checks that issuer and subject match, and
+    that the signature is correct. It ignores validity dates and key usage completely. If you need to verify that a generated
+    chain is valid, please use C(openssl verify ...).
 requirements:
-    - "cryptography >= 1.5"
+  - "cryptography >= 1.5"
 extends_documentation_fragment:
-    - community.crypto.attributes
+  - community.crypto.attributes
 attributes:
-    check_mode:
-        support: full
-        details:
-            - This action does not modify state.
-    diff_mode:
-        support: N/A
-        details:
-            - This action does not modify state.
+  check_mode:
+    support: full
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
-    input_chain:
-        description:
-            - A concatenated set of certificates in PEM format forming a chain.
-            - The module will try to complete this chain.
-        type: str
-        required: true
-    root_certificates:
-        description:
-            - "A list of filenames or directories."
-            - "A filename is assumed to point to a file containing one or more certificates
-               in PEM format. All certificates in this file will be added to the set of
-               root certificates."
-            - "If a directory name is given, all files in the directory and its
-               subdirectories will be scanned and tried to be parsed as concatenated
-               certificates in PEM format."
-            - "Symbolic links will be followed."
-        type: list
-        elements: path
-        required: true
-    intermediate_certificates:
-        description:
-            - "A list of filenames or directories."
-            - "A filename is assumed to point to a file containing one or more certificates
-               in PEM format. All certificates in this file will be added to the set of
-               root certificates."
-            - "If a directory name is given, all files in the directory and its
-               subdirectories will be scanned and tried to be parsed as concatenated
-               certificates in PEM format."
-            - "Symbolic links will be followed."
-        type: list
-        elements: path
-        default: []
-'''
+  input_chain:
+    description:
+      - A concatenated set of certificates in PEM format forming a chain.
+      - The module will try to complete this chain.
+    type: str
+    required: true
+  root_certificates:
+    description:
+      - A list of filenames or directories.
+      - A filename is assumed to point to a file containing one or more certificates in PEM format. All certificates in this
+        file will be added to the set of root certificates.
+      - If a directory name is given, all files in the directory and its subdirectories will be scanned and tried to be parsed
+        as concatenated certificates in PEM format.
+      - Symbolic links will be followed.
+    type: list
+    elements: path
+    required: true
+  intermediate_certificates:
+    description:
+      - A list of filenames or directories.
+      - A filename is assumed to point to a file containing one or more certificates in PEM format. All certificates in this
+        file will be added to the set of root certificates.
+      - If a directory name is given, all files in the directory and its subdirectories will be scanned and tried to be parsed
+        as concatenated certificates in PEM format.
+      - Symbolic links will be followed.
+    type: list
+    elements: path
+    default: []
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Given a leaf certificate for www.ansible.com and one or more intermediate
 # certificates, finds the associated root certificate.
 - name: Find root certificate
   community.crypto.certificate_complete_chain:
     input_chain: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com-fullchain.pem') }}"
     root_certificates:
-    - /etc/ca-certificates/
+      - /etc/ca-certificates/
   register: www_ansible_com
 - name: Write root certificate to disk
   ansible.builtin.copy:
@@ -93,9 +85,9 @@ EXAMPLES = '''
   community.crypto.certificate_complete_chain:
     input_chain: "{{ lookup('ansible.builtin.file', '/etc/ssl/csr/www.ansible.com.pem') }}"
     intermediate_certificates:
-    - /etc/ssl/csr/www.ansible.com-chain.pem
+      - /etc/ssl/csr/www.ansible.com-chain.pem
     root_certificates:
-    - /etc/ca-certificates/
+      - /etc/ca-certificates/
   register: www_ansible_com
 - name: Write complete chain to disk
   ansible.builtin.copy:
@@ -105,30 +97,30 @@ EXAMPLES = '''
   ansible.builtin.copy:
     dest: /etc/ssl/csr/www.ansible.com-rootchain.pem
     content: "{{ ''.join(www_ansible_com.chain) }}"
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 root:
-    description:
-        - "The root certificate in PEM format."
-    returned: success
-    type: str
+  description:
+    - The root certificate in PEM format.
+  returned: success
+  type: str
 chain:
-    description:
-        - "The chain added to the given input chain. Includes the root certificate."
-        - "Returned as a list of PEM certificates."
-    returned: success
-    type: list
-    elements: str
+  description:
+    - The chain added to the given input chain. Includes the root certificate.
+    - Returned as a list of PEM certificates.
+  returned: success
+  type: list
+  elements: str
 complete_chain:
-    description:
-        - "The completed chain, including leaf, all intermediates, and root."
-        - "Returned as a list of PEM certificates."
-    returned: success
-    type: list
-    elements: str
-'''
+  description:
+    - The completed chain, including leaf, all intermediates, and root.
+    - Returned as a list of PEM certificates.
+  returned: success
+  type: list
+  elements: str
+"""
 
 import os
 import traceback
