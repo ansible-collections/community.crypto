@@ -61,8 +61,22 @@ options:
     description:
       - Used to unlock the container. Either a O(passphrase) or a O(keyfile) is needed for most of the operations. Parameter
         value is a string with the passphrase.
+      - B(Note) that the passphrase must be UTF-8 encoded text. If you want to use arbitrary binary data, or text using
+        another encoding, use the O(passphrase_encoding) option and provide the passphrase Base64 encoded.
     type: str
     version_added: '1.0.0'
+  passphrase_encoding:
+    description:
+      - Determine how passphrases are provided to parameters such as O(passphrase), O(new_passphrase), and O(remove_passphrase).
+    type: str
+    default: text
+    choices:
+      text:
+        - The passphrase is provided as UTF-8 encoded text.
+      base64:
+        - The passphrase is provided as Base64 encoded bytes.
+        - Use the P(ansible.builtin.b64encode#filter) filter to Base64-encode binary data.
+    version_added: 2.23.0
   keyslot:
     description:
       - Adds the O(keyfile) or O(passphrase) to a specific keyslot when creating a new container on O(device). Parameter value
@@ -91,6 +105,8 @@ options:
         LUKS container supports up to 8 keyslots. Parameter value is a string with the new passphrase.
       - NOTE that adding additional passphrase is idempotent only since community.crypto 1.4.0. For older versions, a new
         keyslot will be used even if another keyslot already exists for this passphrase.
+      - B(Note) that the passphrase must be UTF-8 encoded text. If you want to use arbitrary binary data, or text using
+        another encoding, use the O(passphrase_encoding) option and provide the passphrase Base64 encoded.
     type: str
     version_added: '1.0.0'
   new_keyslot:
@@ -116,6 +132,8 @@ options:
       - NOTE that removing passphrases is idempotent only since community.crypto 1.4.0. For older versions, trying to remove
         a passphrase which no longer exists results in an error.
       - NOTE that to remove the last keyslot from a LUKS container, the O(force_remove_last_key) option must be set to V(true).
+      - B(Note) that the passphrase must be UTF-8 encoded text. If you want to use arbitrary binary data, or text using
+        another encoding, use the O(passphrase_encoding) option and provide the passphrase Base64 encoded.
     type: str
     version_added: '1.0.0'
   remove_keyslot:
@@ -401,7 +419,10 @@ import os
 import re
 import stat
 
+from base64 import b64decode
+
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 RETURN_CODE = 0
 STDOUT = 1
@@ -448,9 +469,23 @@ class Handler(object):
     def __init__(self, module):
         self._module = module
         self._lsblk_bin = self._module.get_bin_path('lsblk', True)
+        self._passphrase_encoding = module.params['passphrase_encoding']
+
+    def get_passphrase_from_module_params(self, parameter_name):
+        passphrase = self._module.params[parameter_name]
+        if passphrase is None:
+            return None
+        if self._passphrase_encoding == 'text':
+            return to_bytes(passphrase)
+        try:
+            return b64decode(to_native(passphrase))
+        except Exception as exc:
+            self._module.fail_json("Error while base64-decoding '{parameter_name}': {exc}".format(parameter_name=parameter_name, exc=exc))
 
     def _run_command(self, command, data=None):
-        return self._module.run_command(command, data=data)
+        if data is not None:
+            data += b'\n'
+        return self._module.run_command(command, data=data, binary_data=True)
 
     def get_device_by_uuid(self, uuid):
         ''' Returns the device that holds UUID passed by user
@@ -673,7 +708,7 @@ class CryptHandler(Handler):
         else:
             data.extend([new_passphrase, new_passphrase])
 
-        result = self._run_command(args, data='\n'.join(data) or None)
+        result = self._run_command(args, data=b'\n'.join(data) or None)
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while adding new LUKS keyslot to %s: %s'
                              % (device, result[STDERR]))
@@ -863,10 +898,17 @@ class ConditionsHandler(Handler):
             self._module.fail_json(msg="Contradiction in setup: Asking to "
                                    "add a key to absent LUKS.")
 
-        key_present = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'])
+        key_present = self._crypthandler.luks_test_key(
+            self.device,
+            self._module.params['new_keyfile'],
+            self.get_passphrase_from_module_params('new_passphrase'),
+        )
         if self._module.params['new_keyslot'] is not None:
-            key_present_slot = self._crypthandler.luks_test_key(self.device, self._module.params['new_keyfile'], self._module.params['new_passphrase'],
-                                                                self._module.params['new_keyslot'])
+            key_present_slot = self._crypthandler.luks_test_key(
+                self.device, self._module.params['new_keyfile'],
+                self.get_passphrase_from_module_params('new_passphrase'),
+                self._module.params['new_keyslot'],
+            )
             if key_present and not key_present_slot:
                 self._module.fail_json(msg="Trying to add key that is already present in another slot")
 
@@ -887,13 +929,25 @@ class ConditionsHandler(Handler):
         if self._module.params['remove_keyslot'] is not None:
             if not self._crypthandler.is_luks_slot_set(self.device, self._module.params['remove_keyslot']):
                 return False
-            result = self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'])
-            if self._crypthandler.luks_test_key(self.device, self._module.params['keyfile'], self._module.params['passphrase'],
-                                                self._module.params['remove_keyslot']):
+            result = self._crypthandler.luks_test_key(
+                self.device,
+                self._module.params['keyfile'],
+                self.get_passphrase_from_module_params('passphrase'),
+            )
+            if self._crypthandler.luks_test_key(
+                self.device,
+                self._module.params['keyfile'],
+                self.get_passphrase_from_module_params('passphrase'),
+                self._module.params['remove_keyslot'],
+            ):
                 self._module.fail_json(msg='Cannot remove keyslot with keyfile or passphrase in same slot.')
             return result
 
-        return self._crypthandler.luks_test_key(self.device, self._module.params['remove_keyfile'], self._module.params['remove_passphrase'])
+        return self._crypthandler.luks_test_key(
+            self.device,
+            self._module.params['remove_keyfile'],
+            self.get_passphrase_from_module_params('remove_passphrase'),
+        )
 
     def luks_remove(self):
         return (self.device is not None and
@@ -926,6 +980,7 @@ def run_module():
         passphrase=dict(type='str', no_log=True),
         new_passphrase=dict(type='str', no_log=True),
         remove_passphrase=dict(type='str', no_log=True),
+        passphrase_encoding=dict(type='str', default='text', choices=['text', 'base64']),
         keyslot=dict(type='int', no_log=False),
         new_keyslot=dict(type='int', no_log=False),
         remove_keyslot=dict(type='int', no_log=False),
@@ -1007,16 +1062,17 @@ def run_module():
     if conditions.luks_create():
         if not module.check_mode:
             try:
-                crypt.run_luks_create(conditions.device,
-                                      module.params['keyfile'],
-                                      module.params['passphrase'],
-                                      module.params['keyslot'],
-                                      module.params['keysize'],
-                                      module.params['cipher'],
-                                      module.params['hash'],
-                                      module.params['sector_size'],
-                                      module.params['pbkdf'],
-                                      )
+                crypt.run_luks_create(
+                    conditions.device,
+                    module.params['keyfile'],
+                    conditions.get_passphrase_from_module_params('passphrase'),
+                    module.params['keyslot'],
+                    module.params['keysize'],
+                    module.params['cipher'],
+                    module.params['hash'],
+                    module.params['sector_size'],
+                    module.params['pbkdf'],
+                )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['changed'] = True
@@ -1038,16 +1094,18 @@ def run_module():
                 module.fail_json(msg="luks_device error: %s" % e)
         if not module.check_mode:
             try:
-                crypt.run_luks_open(conditions.device,
-                                    module.params['keyfile'],
-                                    module.params['passphrase'],
-                                    module.params['perf_same_cpu_crypt'],
-                                    module.params['perf_submit_from_crypt_cpus'],
-                                    module.params['perf_no_read_workqueue'],
-                                    module.params['perf_no_write_workqueue'],
-                                    module.params['persistent'],
-                                    module.params['allow_discards'],
-                                    name)
+                crypt.run_luks_open(
+                    conditions.device,
+                    module.params['keyfile'],
+                    conditions.get_passphrase_from_module_params('passphrase'),
+                    module.params['perf_same_cpu_crypt'],
+                    module.params['perf_submit_from_crypt_cpus'],
+                    module.params['perf_no_read_workqueue'],
+                    module.params['perf_no_write_workqueue'],
+                    module.params['persistent'],
+                    module.params['allow_discards'],
+                    name,
+                )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['name'] = name
@@ -1079,13 +1137,15 @@ def run_module():
     if conditions.luks_add_key():
         if not module.check_mode:
             try:
-                crypt.run_luks_add_key(conditions.device,
-                                       module.params['keyfile'],
-                                       module.params['passphrase'],
-                                       module.params['new_keyfile'],
-                                       module.params['new_passphrase'],
-                                       module.params['new_keyslot'],
-                                       module.params['pbkdf'])
+                crypt.run_luks_add_key(
+                    conditions.device,
+                    module.params['keyfile'],
+                    conditions.get_passphrase_from_module_params('passphrase'),
+                    module.params['new_keyfile'],
+                    conditions.get_passphrase_from_module_params('new_passphrase'),
+                    module.params['new_keyslot'],
+                    module.params['pbkdf'],
+                )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['changed'] = True
@@ -1097,11 +1157,13 @@ def run_module():
         if not module.check_mode:
             try:
                 last_key = module.params['force_remove_last_key']
-                crypt.run_luks_remove_key(conditions.device,
-                                          module.params['remove_keyfile'],
-                                          module.params['remove_passphrase'],
-                                          module.params['remove_keyslot'],
-                                          force_remove_last_key=last_key)
+                crypt.run_luks_remove_key(
+                    conditions.device,
+                    module.params['remove_keyfile'],
+                    conditions.get_passphrase_from_module_params('remove_passphrase'),
+                    module.params['remove_keyslot'],
+                    force_remove_last_key=last_key,
+                )
             except ValueError as e:
                 module.fail_json(msg="luks_device error: %s" % e)
         result['changed'] = True

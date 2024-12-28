@@ -39,7 +39,9 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    passphrase: "{{ cryptfile_passphrase1 }}"
+    # Encode passphrase with Base64 to test passphrase_encoding
+    passphrase: "{{ cryptfile_passphrase1 | b64encode }}"
+    passphrase_encoding: base64
   become: true
   ignore_errors: true
   register: open_try
