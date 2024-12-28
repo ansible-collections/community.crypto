@@ -21,7 +21,7 @@ description:
     that the output of the first run needs to be recorded and passed to the second run as the module argument O(data).
   - Between these two tasks you have to fulfill the required steps for the chosen challenge by whatever means necessary. For
     V(http-01) that means creating the necessary challenge file on the destination webserver. For V(dns-01) the necessary
-    dns record has to be created. For V(tls-alpn-01) the necessary certificate has to be created and served. It is I(not)
+    DNS record has to be created. For V(tls-alpn-01) the necessary certificate has to be created and served. It is I(not)
     the responsibility of this module to perform these steps.
   - For details on how to fulfill these challenges, you might have to read through L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3). Also, consider the examples

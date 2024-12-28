@@ -16,8 +16,8 @@ description:
   - This module allows one to (re)generate OpenSSL private keys.
   - The default mode for the private key file will be V(0600) if O(mode) is not explicitly set.
   - Please note that the module regenerates private keys if they do not match the module's options. In particular, if you
-    provide another passphrase (or specify none), change the keysize, etc., the private key will be regenerated. If you are
-    concerned that this could B(overwrite your private key), consider using the O(backup) option.
+    provide another passphrase (or specify none), change the keysize, and so on, the private key will be regenerated.
+    If you are concerned that this could B(overwrite your private key), consider using the O(backup) option.
 author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
@@ -65,7 +65,7 @@ options:
     description:
       - If set to V(true), will return the (current or generated) private key's content as RV(privatekey).
       - Note that especially if the private key is not encrypted, you have to make sure that the returned value is treated
-        appropriately and not accidentally written to logs etc.! Use with care!
+        appropriately and not accidentally written to logs, and so on! Use with care!
       - Use Ansible's C(no_log) task option to avoid the output being shown. See also
         U(https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook).
     type: bool
