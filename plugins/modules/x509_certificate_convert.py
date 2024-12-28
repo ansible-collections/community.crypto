@@ -59,6 +59,7 @@ options:
     description:
       - If the input is a PEM file, ensure that it contains a single PEM object, that the header and footer match, and are
         of type C(CERTIFICATE) or C(X509 CERTIFICATE).
+      - See also the O(verify_cert_parsable) option, which checks whether the certificate is parsable.
     type: bool
     default: false
   dest_path:
@@ -72,12 +73,21 @@ options:
         with a new one by accident.
     type: bool
     default: false
+  verify_cert_parsable:
+    description:
+      - If set to V(true), ensures that the certificate can be parsed.
+      - To ensure that a PEM file does not contain multiple certificates, use the O(strict) option.
+    type: bool
+    default: false
+    version_added: 2.23.0
 seealso:
   - plugin: ansible.builtin.b64encode
     plugin_type: filter
   - module: community.crypto.x509_certificate
   - module: community.crypto.x509_certificate_pipe
   - module: community.crypto.x509_certificate_info
+requirements:
+  - cryptography >= 1.6 if O(verify_cert_parsable=true)
 """
 
 EXAMPLES = r"""
@@ -98,8 +108,9 @@ backup_file:
 
 import base64
 import os
+import traceback
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
 
 from ansible_collections.community.crypto.plugins.module_utils.io import (
@@ -123,6 +134,19 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
 )
+
+MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
+
+CRYPTOGRAPHY_IMP_ERR = None
+try:
+    import cryptography  # noqa: F401, pylint: disable=unused-import
+    from cryptography.x509 import load_der_x509_certificate
+    from cryptography.hazmat.backends import default_backend
+except ImportError:
+    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
+    CRYPTOGRAPHY_FOUND = False
+else:
+    CRYPTOGRAPHY_FOUND = True
 
 
 def parse_certificate(input, strict=False):
@@ -175,6 +199,9 @@ class X509CertificateConvertModule(OpenSSLObject):
         except Exception as exc:
             module.fail_json(msg='Error while parsing PEM: {exc}'.format(exc=exc))
 
+        if module.params['verify_cert_parsable']:
+            self.verify_cert_parsable(module)
+
         self.backup = module.params['backup']
         self.backup_file = None
 
@@ -189,6 +216,17 @@ class X509CertificateConvertModule(OpenSSLObject):
                     self.dest_content, strict=True)
             except Exception:
                 pass
+
+    def verify_cert_parsable(self, module):
+        if not CRYPTOGRAPHY_FOUND:
+            module.fail_json(
+                msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
+                exception=CRYPTOGRAPHY_IMP_ERR,
+            )
+        try:
+            load_der_x509_certificate(self.input, default_backend())
+        except Exception as exc:
+            module.fail_json(msg='Error while parsing certificate: {exc}'.format(exc=exc))
 
     def needs_conversion(self):
         if self.dest_content is None or self.dest_content_format is None:
@@ -247,6 +285,7 @@ def main():
         strict=dict(type='bool', default=False),
         dest_path=dict(type='path', required=True),
         backup=dict(type='bool', default=False),
+        verify_cert_parsable=dict(type='bool', default=False),
     )
     module = AnsibleModule(
         argument_spec,
