@@ -68,6 +68,9 @@ options:
   passphrase_encoding:
     description:
       - Determine how passphrases are provided to parameters such as O(passphrase), O(new_passphrase), and O(remove_passphrase).
+      - Please note that binary passphrases cannot contain all possible binary octets. For example, a newline (0x0A)
+        cannot be used since it indicates that the passphrase is over. If you want to use arbitrary binary data, you must
+        use keyfiles.
     type: str
     default: text
     choices:
