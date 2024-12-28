@@ -153,6 +153,7 @@ options:
         V(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
       - If set to V(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+      - B(Note) that the V(pyopenssl) backend is deprecated and will be removed from community.crypto 3.0.0.
     type: str
     default: auto
     choices: [auto, cryptography, pyopenssl]
@@ -737,8 +738,8 @@ def select_backend(module, backend):
                 'pyOpenSSL >= {0}, < {1}'.format(MINIMAL_PYOPENSSL_VERSION, MAXIMAL_PYOPENSSL_VERSION)
             )
             module.fail_json(msg=msg, exception=PYOPENSSL_IMP_ERR)
-        # module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-        #                  version='x.0.0', collection_name='community.crypto')
+        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
+                         version='3.0.0', collection_name='community.crypto')
         return backend, PkcsPyOpenSSL(module)
     elif backend == 'cryptography':
         if not CRYPTOGRAPHY_FOUND:
