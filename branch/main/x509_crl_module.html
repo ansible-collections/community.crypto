@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -107,7 +107,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -492,7 +492,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The certificate’s issuer.</p>
-<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code></p>
+<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -587,8 +587,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p><em class="ansible-option-versionadded">added in community.crypto 2.18.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>This option determines which values will be accepted for <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-serial-number"><span class="std std-ref"><span class="pre">revoked_certificates[].serial_number</span></span></a></strong></code>.</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">integer</span></code> (default), serial numbers are assumed to be integers, for example <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>. (This example value is equivalent to the hex octet string <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>.)</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">hex-octets</span></code>, serial numbers are assumed to be colon-separated hex octet strings, for example <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>. (This example value is equivalent to the integer <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>.)</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">integer</span></code> (default), serial numbers are assumed to be integers, for example <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>. (This example value is equivalent to the hex octet string <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>).</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">hex-octets</span></code>, serial numbers are assumed to be colon-separated hex octet strings, for example <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>. (This example value is equivalent to the integer <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>).</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;integer&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>

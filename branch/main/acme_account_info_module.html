@@ -110,7 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -121,7 +121,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -268,7 +268,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 <td><div class="ansible-option-cell"><p>The ACME directory to use. This is the entry point URL to access the ACME CA server API.</p>
 <p>For safety reasons the default is set to the Let’s Encrypt staging server (for the ACME v1 protocol). This will create technically correct, but untrusted certificates.</p>
-<p>For Let’s Encrypt, all staging endpoints can be found here: <a class="reference external" href="https://letsencrypt.org/docs/staging-environment/">https://letsencrypt.org/docs/staging-environment/</a>. For Buypass, all endpoints can be found here: <a class="reference external" href="https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints">https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints</a></p>
+<p>For Let’s Encrypt, all staging endpoints can be found here: <a class="reference external" href="https://letsencrypt.org/docs/staging-environment/">https://letsencrypt.org/docs/staging-environment/</a>. For Buypass, all endpoints can be found here: <a class="reference external" href="https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints">https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints</a>.</p>
 <p>For <strong>Let’s Encrypt</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme-v02.api.letsencrypt.org/directory">https://acme-v02.api.letsencrypt.org/directory</a>.</p>
 <p>For <strong>Buypass</strong>, the production directory URL for ACME v2 and v1 is <a class="reference external" href="https://api.buypass.com/acme/directory">https://api.buypass.com/acme/directory</a>.</p>
 <p>For <strong>ZeroSSL</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme.zerossl.com/v2/DV90">https://acme.zerossl.com/v2/DV90</a>.</p>
@@ -464,7 +464,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-account/contact"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-info-module-return-account-contact"><strong>contact</strong></p>
 <a class="ansibleOptionLink" href="#return-account/contact" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>the challenge resource that must be created for validation</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The challenge resource that must be created for validation.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;mailto:me&#64;example.com&quot;,</span> <span class="pre">&quot;tel:00123456789&quot;]</span></code></p>
 </div></td>
@@ -483,7 +483,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-account/public_account_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-info-module-return-account-public-account-key"><strong>public_account_key</strong></p>
 <a class="ansibleOptionLink" href="#return-account/public_account_key" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>the public account key as a <a class="reference external" href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a>.</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The public account key as a <a class="reference external" href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;{\&quot;kty\&quot;:\&quot;EC\&quot;,\&quot;crv\&quot;:\&quot;P-256\&quot;,\&quot;x\&quot;:\&quot;MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\&quot;,\&quot;y\&quot;:\&quot;4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\&quot;}&quot;</span></code></p>
 </div></td>
@@ -492,7 +492,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-account/status"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-info-module-return-account-status"><strong>status</strong></p>
 <a class="ansibleOptionLink" href="#return-account/status" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>the account’s status</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The account’s status.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Can only return:</strong></p>
 <ul class="simple">

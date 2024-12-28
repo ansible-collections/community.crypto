@@ -7,7 +7,7 @@
 <meta content="2.16.1" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates. &mdash; Community.Crypto Collection  documentation</title>
+  <title>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates &mdash; Community.Crypto Collection  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5707b69d" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
@@ -120,7 +120,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -161,7 +161,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</li>
+      <li class="breadcrumb-item active">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
               <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/openssh_cert.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
@@ -175,7 +175,7 @@
            <div itemprop="articleBody">
              
   <span class="target" id="ansible-collections-community-crypto-openssh-cert-module"></span><section id="community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates">
-<h1>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.<a class="headerlink" href="#community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates" title="Link to this heading"></a></h1>
+<h1>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates<a class="headerlink" href="#community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.23.0).</p>
@@ -297,7 +297,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-port-forwarding</span></code>: Disable port forwarding (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-pty</span></code>: Disable PTY allocation (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-user-rc</span></code>: Disable execution of <code class="docutils literal notranslate"><span class="pre">~/.ssh/rc</span></code> by sshd (permitted by default).</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">no-x11-forwarding</span></code>: Disable X11 forwarding (permitted by default)</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">no-x11-forwarding</span></code>: Disable X11 forwarding (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-agent-forwarding</span></code>: Allows ssh-agent forwarding.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-port-forwarding</span></code>: Allows port forwarding.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-pty</span></code>: Allows PTY allocation.</p>
@@ -597,8 +597,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">valid_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
 <span class="w">    </span><span class="nt">valid_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forever</span>
 <span class="w">    </span><span class="nt">principals</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example.com</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">examplehost</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example.com</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">examplehost</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019</span>
 <span class="w">  </span><span class="nt">community.crypto.openssh_cert</span><span class="p">:</span>
@@ -618,8 +618,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">valid_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
 <span class="w">    </span><span class="nt">valid_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forever</span>
 <span class="w">    </span><span class="nt">options</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;clear&quot;</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;force-command=/tmp/bla/foo&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;clear&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;force-command=/tmp/bla/foo&quot;</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSH user certificate using a PKCS#11 token</span>
 <span class="w">  </span><span class="nt">community.crypto.openssh_cert</span><span class="p">:</span>
@@ -647,7 +647,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-filename"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-return-filename"><strong>filename</strong></p>
 <a class="ansibleOptionLink" href="#return-filename" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>path to the certificate</p>
+<td><div class="ansible-option-cell"><p>Path to the certificate.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/tmp/certificate-cert.pub&quot;</span></code></p>
 </div></td>
@@ -664,7 +664,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-return-type"><strong>type</strong></p>
 <a class="ansibleOptionLink" href="#return-type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>type of the certificate (host or user)</p>
+<td><div class="ansible-option-cell"><p>Type of the certificate (host or user).</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;host&quot;</span></code></p>
 </div></td>

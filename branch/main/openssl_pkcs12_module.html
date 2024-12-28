@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -120,7 +120,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -378,7 +378,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The PKCS#12 password.</p>
-<p><strong>Note:</strong> PKCS12 encryption is typically not secure and should not be used as a security mechanism. If you need to store or send a PKCS12 file safely, you should additionally encrypt it with something else. (<a class="reference external" href="https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates">Source</a>.)</p>
+<p><strong>Note:</strong> PKCS12 encryption is typically not secure and should not be used as a security mechanism. If you need to store or send a PKCS12 file safely, you should additionally encrypt it with something else. (<a class="reference external" href="https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates">Source</a>).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -578,9 +578,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/keys/key.pem</span>
 <span class="w">    </span><span class="nt">certificate_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/cert.pem</span>
 <span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca.pem</span>
-<span class="w">    </span><span class="c1"># Note that if /opt/certs/ca.pem contains multiple certificates,</span>
-<span class="w">    </span><span class="c1"># only the first one will be used. See the other_certificates_parse_all</span>
-<span class="w">    </span><span class="c1"># option for changing this behavior.</span>
+<span class="w">  </span><span class="c1"># Note that if /opt/certs/ca.pem contains multiple certificates,</span>
+<span class="w">  </span><span class="c1"># only the first one will be used. See the other_certificates_parse_all</span>
+<span class="w">  </span><span class="c1"># option for changing this behavior.</span>
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PKCS#12 file</span>
@@ -593,12 +593,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">other_certificates_parse_all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">other_certificates</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/ca_bundle.pem</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># Since we set other_certificates_parse_all to true, all</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># certificates in the CA bundle are included and not just</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># the first one.</span>
+<span class="w">      </span><span class="c1"># Since we set other_certificates_parse_all to true, all</span>
+<span class="w">      </span><span class="c1"># certificates in the CA bundle are included and not just</span>
+<span class="w">      </span><span class="c1"># the first one.</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/certs/intermediate.pem</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># In case this file has multiple certificates in it,</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># all will be included as well.</span>
+<span class="w">      </span><span class="c1"># In case this file has multiple certificates in it,</span>
+<span class="w">      </span><span class="c1"># all will be included as well.</span>
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Change PKCS#12 file permission</span>
