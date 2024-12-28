@@ -11,14 +11,14 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options: {}
 attributes:
-    check_mode:
-      description: Can run in C(check_mode) and return changed status prediction without modifying target.
-    diff_mode:
-      description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
-'''
+  check_mode:
+    description: Can run in C(check_mode) and return changed status prediction without modifying target.
+  diff_mode:
+    description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
+"""
 
     # Should be used together with the standard fragment
     INFO_MODULE = r'''
@@ -45,12 +45,12 @@ attributes:
         - acme
 '''
 
-    FACTS = r'''
+    FACTS = r"""
 options: {}
 attributes:
-    facts:
-      description: Action returns an C(ansible_facts) dictionary that will update existing host facts.
-'''
+  facts:
+    description: Action returns an C(ansible_facts) dictionary that will update existing host facts.
+"""
 
     # Should be used together with the standard fragment and the FACTS fragment
     FACTS_MODULE = r'''
@@ -68,18 +68,18 @@ attributes:
       support: full
 '''
 
-    FILES = r'''
+    FILES = r"""
 options: {}
 attributes:
-    safe_file_operations:
-      description: Uses Ansible's strict file operation functions to ensure proper permissions and avoid data corruption.
-'''
+  safe_file_operations:
+    description: Uses Ansible's strict file operation functions to ensure proper permissions and avoid data corruption.
+"""
 
-    FLOW = r'''
+    FLOW = r"""
 options: {}
 attributes:
-    action:
-      description: Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller.
-    async:
-      description: Supports being used with the C(async) keyword.
-'''
+  action:
+    description: Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller.
+  async:
+    description: Supports being used with the C(async) keyword.
+"""

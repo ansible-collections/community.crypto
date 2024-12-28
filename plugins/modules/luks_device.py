@@ -7,318 +7,269 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: luks_device
 
 short_description: Manage encrypted (LUKS) devices
 
 description:
-    - "Module manages L(LUKS,https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup)
-      on given device. Supports creating, destroying, opening and closing of
-      LUKS container and adding or removing new keys and passphrases."
-
+  - Module manages L(LUKS,https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup) on given device. Supports creating, destroying,
+    opening and closing of LUKS container and adding or removing new keys and passphrases.
 extends_documentation_fragment:
-    - community.crypto.attributes
+  - community.crypto.attributes
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
-    device:
+  device:
+    description:
+      - Device to work with (for example V(/dev/sda1)). Needed in most cases. Can be omitted only when O(state=closed) together
+        with O(name) is provided.
+    type: str
+  state:
+    description:
+      - Desired state of the LUKS container. Based on its value creates, destroys, opens or closes the LUKS container on a
+        given device.
+      - V(present) will create LUKS container unless already present. Requires O(device) and either O(keyfile) or O(passphrase)
+        options to be provided.
+      - V(absent) will remove existing LUKS container if it exists. Requires O(device) or O(name) to be specified.
+      - V(opened) will unlock the LUKS container. If it does not exist it will be created first. Requires O(device) and either
+        O(keyfile) or O(passphrase) to be specified. Use the O(name) option to set the name of the opened container. Otherwise
+        the name will be generated automatically and returned as a part of the result.
+      - V(closed) will lock the LUKS container. However if the container does not exist it will be created. Requires O(device)
+        and either O(keyfile) or O(passphrase) options to be provided. If container does already exist O(device) or O(name)
+        will suffice.
+    type: str
+    default: present
+    choices: [present, absent, opened, closed]
+  name:
+    description:
+      - Sets container name when O(state=opened). Can be used instead of O(device) when closing the existing container (that
+        is, when O(state=closed)).
+    type: str
+  keyfile:
+    description:
+      - Used to unlock the container. Either a O(keyfile) or a O(passphrase) is needed for most of the operations. Parameter
+        value is the path to the keyfile with the passphrase.
+      - BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.
+    type: path
+  passphrase:
+    description:
+      - Used to unlock the container. Either a O(passphrase) or a O(keyfile) is needed for most of the operations. Parameter
+        value is a string with the passphrase.
+    type: str
+    version_added: '1.0.0'
+  keyslot:
+    description:
+      - Adds the O(keyfile) or O(passphrase) to a specific keyslot when creating a new container on O(device). Parameter value
+        is the number of the keyslot.
+      - B(Note) that a device of O(type=luks1) supports the keyslot numbers V(0)-V(7) and a device of O(type=luks2) supports
+        the keyslot numbers V(0)-V(31). In order to use the keyslots V(8)-V(31) when creating a new container, setting O(type)
+        to V(luks2) is required.
+    type: int
+    version_added: '2.16.0'
+  keysize:
+    description:
+      - Sets the key size only if LUKS container does not exist.
+    type: int
+    version_added: '1.0.0'
+  new_keyfile:
+    description:
+      - Adds additional key to given container on O(device). Needs O(keyfile) or O(passphrase) option for authorization. LUKS
+        container supports up to 8 keyslots. Parameter value is the path to the keyfile with the passphrase.
+      - NOTE that adding additional keys is idempotent only since community.crypto 1.4.0. For older versions, a new keyslot
+        will be used even if another keyslot already exists for this keyfile.
+      - BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.
+    type: path
+  new_passphrase:
+    description:
+      - Adds additional passphrase to given container on O(device). Needs O(keyfile) or O(passphrase) option for authorization.
+        LUKS container supports up to 8 keyslots. Parameter value is a string with the new passphrase.
+      - NOTE that adding additional passphrase is idempotent only since community.crypto 1.4.0. For older versions, a new
+        keyslot will be used even if another keyslot already exists for this passphrase.
+    type: str
+    version_added: '1.0.0'
+  new_keyslot:
+    description:
+      - Adds the additional O(new_keyfile) or O(new_passphrase) to a specific keyslot on the given O(device). Parameter value
+        is the number of the keyslot.
+      - B(Note) that a device of O(type=luks1) supports the keyslot numbers V(0)-V(7) and a device of O(type=luks2) supports
+        the keyslot numbers V(0)-V(31).
+    type: int
+    version_added: '2.16.0'
+  remove_keyfile:
+    description:
+      - Removes given key from the container on O(device). Does not remove the keyfile from filesystem. Parameter value is
+        the path to the keyfile with the passphrase.
+      - NOTE that removing keys is idempotent only since community.crypto 1.4.0. For older versions, trying to remove a key
+        which no longer exists results in an error.
+      - NOTE that to remove the last key from a LUKS container, the O(force_remove_last_key) option must be set to V(true).
+      - BEWARE that working with keyfiles in plaintext is dangerous. Make sure that they are protected.
+    type: path
+  remove_passphrase:
+    description:
+      - Removes given passphrase from the container on O(device). Parameter value is a string with the passphrase to remove.
+      - NOTE that removing passphrases is idempotent only since community.crypto 1.4.0. For older versions, trying to remove
+        a passphrase which no longer exists results in an error.
+      - NOTE that to remove the last keyslot from a LUKS container, the O(force_remove_last_key) option must be set to V(true).
+    type: str
+    version_added: '1.0.0'
+  remove_keyslot:
+    description:
+      - Removes the key in the given slot on O(device). Needs O(keyfile) or O(passphrase) for authorization.
+      - B(Note) that a device of O(type=luks1) supports the keyslot numbers V(0)-V(7) and a device of O(type=luks2) supports
+        the keyslot numbers V(0)-V(31).
+      - B(Note) that the given O(keyfile) or O(passphrase) must not be in the slot to be removed.
+    type: int
+    version_added: '2.16.0'
+  force_remove_last_key:
+    description:
+      - If set to V(true), allows removing the last key from a container.
+      - BEWARE that when the last key has been removed from a container, the container can no longer be opened!
+    type: bool
+    default: false
+  label:
+    description:
+      - This option allow the user to create a LUKS2 format container with label support, respectively to identify the container
+        by label on later usages.
+      - Will only be used on container creation, or when O(device) is not specified.
+      - This cannot be specified if O(type) is set to V(luks1).
+    type: str
+    version_added: '1.0.0'
+  uuid:
+    description:
+      - With this option user can identify the LUKS container by UUID.
+      - Will only be used when O(device) and O(label) are not specified.
+    type: str
+    version_added: '1.0.0'
+  type:
+    description:
+      - This option allow the user explicit define the format of LUKS container that wants to work with. Options are V(luks1)
+        or V(luks2).
+    type: str
+    choices: [luks1, luks2]
+    version_added: '1.0.0'
+  cipher:
+    description:
+      - This option allows the user to define the cipher specification string for the LUKS container.
+      - Will only be used on container creation.
+      - For pre-2.6.10 kernels, use V(aes-plain) as they do not understand the new cipher spec strings. To use ESSIV, use
+        V(aes-cbc-essiv:sha256).
+    type: str
+    version_added: '1.1.0'
+  hash:
+    description:
+      - This option allows the user to specify the hash function used in LUKS key setup scheme and volume key digest.
+      - Will only be used on container creation.
+    type: str
+    version_added: '1.1.0'
+  pbkdf:
+    description:
+      - This option allows the user to configure the Password-Based Key Derivation Function (PBKDF) used.
+      - Will only be used on container creation, and when adding keys to an existing container.
+    type: dict
+    version_added: '1.4.0'
+    suboptions:
+      iteration_time:
         description:
-            - "Device to work with (for example V(/dev/sda1)). Needed in most cases.
-              Can be omitted only when O(state=closed) together with O(name)
-              is provided."
-        type: str
-    state:
+          - Specify the iteration time used for the PBKDF.
+          - Note that this is in B(seconds), not in milliseconds as on the command line.
+          - Mutually exclusive with O(pbkdf.iteration_count).
+        type: float
+      iteration_count:
         description:
-            - "Desired state of the LUKS container. Based on its value creates,
-              destroys, opens or closes the LUKS container on a given device."
-            - "V(present) will create LUKS container unless already present.
-              Requires O(device) and either O(keyfile) or O(passphrase) options
-              to be provided."
-            - "V(absent) will remove existing LUKS container if it exists.
-              Requires O(device) or O(name) to be specified."
-            - "V(opened) will unlock the LUKS container. If it does not exist
-              it will be created first.
-              Requires O(device) and either O(keyfile) or O(passphrase)
-              to be specified. Use the O(name) option to set the name of
-              the opened container.  Otherwise the name will be
-              generated automatically and returned as a part of the
-              result."
-            - "V(closed) will lock the LUKS container. However if the container
-              does not exist it will be created.
-              Requires O(device) and either O(keyfile) or O(passphrase)
-              options to be provided. If container does already exist
-              O(device) or O(name) will suffice."
-        type: str
-        default: present
-        choices: [present, absent, opened, closed]
-    name:
-        description:
-            - "Sets container name when O(state=opened). Can be used
-              instead of O(device) when closing the existing container
-              (that is, when O(state=closed))."
-        type: str
-    keyfile:
-        description:
-            - "Used to unlock the container. Either a O(keyfile) or a
-              O(passphrase) is needed for most of the operations. Parameter
-              value is the path to the keyfile with the passphrase."
-            - "BEWARE that working with keyfiles in plaintext is dangerous.
-              Make sure that they are protected."
-        type: path
-    passphrase:
-        description:
-            - "Used to unlock the container. Either a O(passphrase) or a
-              O(keyfile) is needed for most of the operations. Parameter
-              value is a string with the passphrase."
-        type: str
-        version_added: '1.0.0'
-    keyslot:
-        description:
-            - "Adds the O(keyfile) or O(passphrase) to a specific keyslot when
-              creating a new container on O(device). Parameter value is the
-              number of the keyslot."
-            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
-              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(31). In order to use the keyslots V(8)-V(31) when creating a new
-              container, setting O(type) to V(luks2) is required."
+          - Specify the iteration count used for the PBKDF.
+          - Mutually exclusive with O(pbkdf.iteration_time).
         type: int
-        version_added: '2.16.0'
-    keysize:
+      algorithm:
         description:
-            - "Sets the key size only if LUKS container does not exist."
+          - The algorithm to use.
+          - Only available for the LUKS 2 format.
+        choices:
+          - argon2i
+          - argon2id
+          - pbkdf2
+        type: str
+      memory:
+        description:
+          - The memory cost limit in kilobytes for the PBKDF.
+          - This is not used for PBKDF2, but only for the Argon PBKDFs.
         type: int
-        version_added: '1.0.0'
-    new_keyfile:
+      parallel:
         description:
-            - "Adds additional key to given container on O(device).
-              Needs O(keyfile) or O(passphrase) option for authorization.
-              LUKS container supports up to 8 keyslots. Parameter value
-              is the path to the keyfile with the passphrase."
-            - "NOTE that adding additional keys is idempotent only since
-              community.crypto 1.4.0. For older versions, a new keyslot
-              will be used even if another keyslot already exists for this
-              keyfile."
-            - "BEWARE that working with keyfiles in plaintext is dangerous.
-              Make sure that they are protected."
-        type: path
-    new_passphrase:
-        description:
-            - "Adds additional passphrase to given container on O(device).
-              Needs O(keyfile) or O(passphrase) option for authorization. LUKS
-              container supports up to 8 keyslots. Parameter value is a string
-              with the new passphrase."
-            - "NOTE that adding additional passphrase is idempotent only since
-              community.crypto 1.4.0. For older versions, a new keyslot will
-              be used even if another keyslot already exists for this passphrase."
-        type: str
-        version_added: '1.0.0'
-    new_keyslot:
-        description:
-            - "Adds the additional O(new_keyfile) or O(new_passphrase) to a
-              specific keyslot on the given O(device). Parameter value is the number
-              of the keyslot."
-            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
-              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(31)."
+          - The parallel cost for the PBKDF. This is the number of threads that run in parallel.
+          - This is not used for PBKDF2, but only for the Argon PBKDFs.
         type: int
-        version_added: '2.16.0'
-    remove_keyfile:
-        description:
-            - "Removes given key from the container on O(device). Does not
-              remove the keyfile from filesystem.
-              Parameter value is the path to the keyfile with the passphrase."
-            - "NOTE that removing keys is idempotent only since
-              community.crypto 1.4.0. For older versions, trying to remove
-              a key which no longer exists results in an error."
-            - "NOTE that to remove the last key from a LUKS container, the
-              O(force_remove_last_key) option must be set to V(true)."
-            - "BEWARE that working with keyfiles in plaintext is dangerous.
-              Make sure that they are protected."
-        type: path
-    remove_passphrase:
-        description:
-            - "Removes given passphrase from the container on O(device).
-              Parameter value is a string with the passphrase to remove."
-            - "NOTE that removing passphrases is idempotent only since
-              community.crypto 1.4.0. For older versions, trying to remove
-              a passphrase which no longer exists results in an error."
-            - "NOTE that to remove the last keyslot from a LUKS
-              container, the O(force_remove_last_key) option must be set
-              to V(true)."
-        type: str
-        version_added: '1.0.0'
-    remove_keyslot:
-        description:
-            - "Removes the key in the given slot on O(device). Needs
-              O(keyfile) or O(passphrase) for authorization."
-            - "B(Note) that a device of O(type=luks1) supports the keyslot numbers
-              V(0)-V(7) and a device of O(type=luks2) supports the keyslot numbers
-              V(0)-V(31)."
-            - "B(Note) that the given O(keyfile) or O(passphrase) must not be
-              in the slot to be removed."
-        type: int
-        version_added: '2.16.0'
-    force_remove_last_key:
-        description:
-            - "If set to V(true), allows removing the last key from a container."
-            - "BEWARE that when the last key has been removed from a container,
-              the container can no longer be opened!"
-        type: bool
-        default: false
-    label:
-        description:
-            - "This option allow the user to create a LUKS2 format container
-              with label support, respectively to identify the container by
-              label on later usages."
-            - "Will only be used on container creation, or when O(device) is
-              not specified."
-            - "This cannot be specified if O(type) is set to V(luks1)."
-        type: str
-        version_added: '1.0.0'
-    uuid:
-        description:
-            - "With this option user can identify the LUKS container by UUID."
-            - "Will only be used when O(device) and O(label) are not specified."
-        type: str
-        version_added: '1.0.0'
-    type:
-        description:
-            - "This option allow the user explicit define the format of LUKS
-              container that wants to work with. Options are V(luks1) or V(luks2)"
-        type: str
-        choices: [luks1, luks2]
-        version_added: '1.0.0'
-    cipher:
-        description:
-            - "This option allows the user to define the cipher specification
-              string for the LUKS container."
-            - "Will only be used on container creation."
-            - "For pre-2.6.10 kernels, use V(aes-plain) as they do not understand
-              the new cipher spec strings. To use ESSIV, use V(aes-cbc-essiv:sha256)."
-        type: str
-        version_added: '1.1.0'
-    hash:
-        description:
-            - "This option allows the user to specify the hash function used in LUKS
-              key setup scheme and volume key digest."
-            - "Will only be used on container creation."
-        type: str
-        version_added: '1.1.0'
-    pbkdf:
-        description:
-            - This option allows the user to configure the Password-Based Key Derivation
-              Function (PBKDF) used.
-            - Will only be used on container creation, and when adding keys to an existing
-              container.
-        type: dict
-        version_added: '1.4.0'
-        suboptions:
-            iteration_time:
-                description:
-                    - Specify the iteration time used for the PBKDF.
-                    - Note that this is in B(seconds), not in milliseconds as on the
-                      command line.
-                    - Mutually exclusive with O(pbkdf.iteration_count).
-                type: float
-            iteration_count:
-                description:
-                    - Specify the iteration count used for the PBKDF.
-                    - Mutually exclusive with O(pbkdf.iteration_time).
-                type: int
-            algorithm:
-                description:
-                    - The algorithm to use.
-                    - Only available for the LUKS 2 format.
-                choices:
-                    - argon2i
-                    - argon2id
-                    - pbkdf2
-                type: str
-            memory:
-                description:
-                    - The memory cost limit in kilobytes for the PBKDF.
-                    - This is not used for PBKDF2, but only for the Argon PBKDFs.
-                type: int
-            parallel:
-                description:
-                    - The parallel cost for the PBKDF. This is the number of threads that
-                      run in parallel.
-                    - This is not used for PBKDF2, but only for the Argon PBKDFs.
-                type: int
-    sector_size:
-        description:
-            - "This option allows the user to specify the sector size (in bytes) used for LUKS2 containers."
-            - "Will only be used on container creation."
-        type: int
-        version_added: '1.5.0'
-    perf_same_cpu_crypt:
-        description:
-            - "Allows the user to perform encryption using the same CPU that IO was submitted on."
-            - "The default is to use an unbound workqueue so that encryption work is automatically balanced between available CPUs."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.3.0'
-    perf_submit_from_crypt_cpus:
-        description:
-            - "Allows the user to disable offloading writes to a separate thread after encryption."
-            - "There are some situations where offloading block write IO operations from the encryption threads
-              to a single thread degrades performance significantly."
-            - "The default is to offload block write IO operations to the same thread."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.3.0'
-    perf_no_read_workqueue:
-        description:
-            - "Allows the user to bypass dm-crypt internal workqueue and process read requests synchronously."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.3.0'
-    perf_no_write_workqueue:
-        description:
-            - "Allows the user to bypass dm-crypt internal workqueue and process write requests synchronously."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.3.0'
-    persistent:
-        description:
-            - "Allows the user to store options into container's metadata persistently and automatically use them next time.
-              Only O(perf_same_cpu_crypt), O(perf_submit_from_crypt_cpus), O(perf_no_read_workqueue), O(perf_no_write_workqueue),
-              and O(allow_discards) can be stored persistently."
-            - "Will only work with LUKS2 containers."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.3.0'
-    allow_discards:
-        description:
-            - "Allow discards (also known as TRIM) requests for device."
-            - "Will only be used when opening containers."
-        type: bool
-        default: false
-        version_added: '2.17.0'
+  sector_size:
+    description:
+      - This option allows the user to specify the sector size (in bytes) used for LUKS2 containers.
+      - Will only be used on container creation.
+    type: int
+    version_added: '1.5.0'
+  perf_same_cpu_crypt:
+    description:
+      - Allows the user to perform encryption using the same CPU that IO was submitted on.
+      - The default is to use an unbound workqueue so that encryption work is automatically balanced between available CPUs.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.3.0'
+  perf_submit_from_crypt_cpus:
+    description:
+      - Allows the user to disable offloading writes to a separate thread after encryption.
+      - There are some situations where offloading block write IO operations from the encryption threads to a single thread
+        degrades performance significantly.
+      - The default is to offload block write IO operations to the same thread.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.3.0'
+  perf_no_read_workqueue:
+    description:
+      - Allows the user to bypass dm-crypt internal workqueue and process read requests synchronously.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.3.0'
+  perf_no_write_workqueue:
+    description:
+      - Allows the user to bypass dm-crypt internal workqueue and process write requests synchronously.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.3.0'
+  persistent:
+    description:
+      - Allows the user to store options into container's metadata persistently and automatically use them next time. Only
+        O(perf_same_cpu_crypt), O(perf_submit_from_crypt_cpus), O(perf_no_read_workqueue), O(perf_no_write_workqueue), and
+        O(allow_discards) can be stored persistently.
+      - Will only work with LUKS2 containers.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.3.0'
+  allow_discards:
+    description:
+      - Allow discards (also known as TRIM) requests for device.
+      - Will only be used when opening containers.
+    type: bool
+    default: false
+    version_added: '2.17.0'
 
 requirements:
-    - "cryptsetup"
-    - "wipefs (when O(state) is V(absent))"
-    - "lsblk"
-    - "blkid (when O(label) or O(uuid) options are used)"
+  - "cryptsetup"
+  - "wipefs (when O(state) is V(absent))"
+  - "lsblk"
+  - "blkid (when O(label) or O(uuid) options are used)"
 
 author: Jan Pokorny (@japokorn)
-'''
+"""
 
-EXAMPLES = '''
-
+EXAMPLES = r"""
 - name: Create LUKS container (remains unchanged if it already exists)
   community.crypto.luks_device:
     device: "/dev/loop0"
@@ -436,17 +387,15 @@ EXAMPLES = '''
     device: "/dev/loop0"
     keyfile: "/vault/keyfile"
     remove_keyslot: 4
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 name:
-    description:
-        When O(state=opened) returns (generated or given) name
-        of LUKS container. Returns None if no name is supplied.
-    returned: success
-    type: str
-    sample: "luks-c1da9a58-2fde-4256-9d9f-6ab008b4dd1b"
-'''
+  description: When O(state=opened) returns (generated or given) name of LUKS container. Returns None if no name is supplied.
+  returned: success
+  type: str
+  sample: "luks-c1da9a58-2fde-4256-9d9f-6ab008b4dd1b"
+"""
 
 import os
 import re

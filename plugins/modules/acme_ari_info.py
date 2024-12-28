@@ -9,18 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_ari_info
 author: "Felix Fontein (@felixfontein)"
 version_added: 2.20.0
 short_description: Retrieves ACME Renewal Information (ARI) for a certificate
 description:
-  - "Allows to retrieve renewal information on a certificate obtained with the
-     L(ACME protocol,https://tools.ietf.org/html/rfc8555)."
-  - "This module only works with the ACME v2 protocol, and requires the ACME server
-     to support the ARI extension (U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)).
-     This module implements version 3 of the ARI draft."
+  - Allows to retrieve renewal information on a certificate obtained with the L(ACME protocol,https://tools.ietf.org/html/rfc8555).
+  - This module only works with the ACME v2 protocol, and requires the ACME server to support the ARI extension (U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)).
+    This module implements version 3 of the ARI draft.
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.no_account
@@ -39,12 +36,12 @@ options:
     type: str
 seealso:
   - module: community.crypto.acme_certificate
-    description: Allows to obtain a certificate using the ACME protocol
+    description: Allows to obtain a certificate using the ACME protocol.
   - module: community.crypto.acme_certificate_revoke
-    description: Allows to revoke a certificate using the ACME protocol
-'''
+    description: Allows to revoke a certificate using the ACME protocol.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Retrieve renewal information for a certificate
   community.crypto.acme_ari_info:
     certificate_path: /etc/httpd/ssl/sample.com.crt
@@ -53,9 +50,9 @@ EXAMPLES = '''
 - name: Show the certificate renewal information
   ansible.builtin.debug:
     var: cert_data.renewal_info
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 renewal_info:
   description: The ARI renewal info object (U(https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.2)).
   returned: success
@@ -84,9 +81,8 @@ renewal_info:
     explanationURL:
       description:
         - A URL pointing to a page which may explain why the suggested renewal window is what it is.
-        - For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a
-          page documenting which certificates are affected by a mass revocation event. Should be shown
-          to the user.
+        - For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates
+          are affected by a mass revocation event. Should be shown to the user.
       returned: depends on the ACME server
       type: str
       sample: https://example.com/docs/ari
@@ -96,7 +92,7 @@ renewal_info:
       returned: depends on the ACME server
       type: str
       sample: '2024-04-29T01:17:10.236921+00:00'
-'''
+"""
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,

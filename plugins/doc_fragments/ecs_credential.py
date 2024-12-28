@@ -11,34 +11,34 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Plugin options for Entrust Certificate Services (ECS) credentials
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
-    entrust_api_user:
-        description:
-            - The username for authentication to the Entrust Certificate Services (ECS) API.
-        type: str
-        required: true
-    entrust_api_key:
-        description:
-            - The key (password) for authentication to the Entrust Certificate Services (ECS) API.
-        type: str
-        required: true
-    entrust_api_client_cert_path:
-        description:
-            - The path to the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.
-        type: path
-        required: true
-    entrust_api_client_cert_key_path:
-        description:
-            - The path to the key for the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.
-        type: path
-        required: true
-    entrust_api_specification_path:
-        description:
-            - The path to the specification file defining the Entrust Certificate Services (ECS) API configuration.
-            - You can use this to keep a local copy of the specification to avoid downloading it every time the module is used.
-        type: path
-        default: https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml
+  entrust_api_user:
+    description:
+      - The username for authentication to the Entrust Certificate Services (ECS) API.
+    type: str
+    required: true
+  entrust_api_key:
+    description:
+      - The key (password) for authentication to the Entrust Certificate Services (ECS) API.
+    type: str
+    required: true
+  entrust_api_client_cert_path:
+    description:
+      - The path to the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.
+    type: path
+    required: true
+  entrust_api_client_cert_key_path:
+    description:
+      - The path to the key for the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.
+    type: path
+    required: true
+  entrust_api_specification_path:
+    description:
+      - The path to the specification file defining the Entrust Certificate Services (ECS) API configuration.
+      - You can use this to keep a local copy of the specification to avoid downloading it every time the module is used.
+    type: path
+    default: https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml
 requirements:
-    - "PyYAML >= 3.11"
-'''
+  - "PyYAML >= 3.11"
+"""

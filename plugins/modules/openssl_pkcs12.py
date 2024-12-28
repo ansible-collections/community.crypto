@@ -9,173 +9,163 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: openssl_pkcs12
 author:
-- Guillaume Delpierre (@gdelpierre)
+  - Guillaume Delpierre (@gdelpierre)
 short_description: Generate OpenSSL PKCS#12 archive
 description:
-    - This module allows one to (re-)generate PKCS#12.
-    - The module can use the cryptography Python library, or the pyOpenSSL Python
-      library. By default, it tries to detect which one is available, assuming none of the
-      O(iter_size) and O(maciter_size) options are used. This can be overridden with the
-      O(select_crypto_backend) option.
-    # Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0,
-    # and will be removed in community.crypto (x+1).0.0.
+  - This module allows one to (re-)generate PKCS#12.
+  - The module can use the cryptography Python library, or the pyOpenSSL Python library. By default, it tries to detect which
+    one is available, assuming none of the O(iter_size) and O(maciter_size) options are used. This can be overridden with
+    the O(select_crypto_backend) option.
 requirements:
-    - PyOpenSSL >= 0.15, < 23.3.0 or cryptography >= 3.0
+  - PyOpenSSL >= 0.15, < 23.3.0 or cryptography >= 3.0
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.attributes
-    - community.crypto.attributes.files
+  - ansible.builtin.files
+  - community.crypto.attributes
+  - community.crypto.attributes.files
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
-    safe_file_operations:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  safe_file_operations:
+    support: full
 options:
-    action:
-        description:
-            - V(export) or V(parse) a PKCS#12.
-        type: str
-        default: export
-        choices: [ export, parse ]
-    other_certificates:
-        description:
-            - List of other certificates to include. Pre Ansible 2.8 this parameter was called O(ca_certificates).
-            - Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates,
-              set O(other_certificates_parse_all) to V(true).
-        type: list
-        elements: path
-        aliases: [ ca_certificates ]
-    other_certificates_parse_all:
-        description:
-            - If set to V(true), assumes that the files mentioned in O(other_certificates) can contain more than one
-              certificate per file (or even none per file).
-        type: bool
-        default: false
-        version_added: 1.4.0
-    certificate_path:
-        description:
-            - The path to read certificates and private keys from.
-            - Must be in PEM format.
-        type: path
-    force:
-        description:
-            - Should the file be regenerated even if it already exists.
-        type: bool
-        default: false
-    friendly_name:
-        description:
-            - Specifies the friendly name for the certificate and private key.
-        type: str
-        aliases: [ name ]
-    iter_size:
-        description:
-            - Number of times to repeat the encryption step.
-            - This is B(not considered during idempotency checks).
-            - This is only used by the C(pyopenssl) backend, or when O(encryption_level=compatibility2022).
-            - When using it, the default is V(2048) for C(pyopenssl) and V(50000) for C(cryptography).
-        type: int
-    maciter_size:
-        description:
-            - Number of times to repeat the MAC step.
-            - This is B(not considered during idempotency checks).
-            - This is only used by the C(pyopenssl) backend. When using it, the default is V(1).
-        type: int
-    encryption_level:
-        description:
-            - Determines the encryption level used.
-            - V(auto) uses the default of the selected backend. For C(cryptography), this is what the
-              cryptography library's specific version considers the best available encryption.
-            - V(compatibility2022) uses compatibility settings for older software in 2022.
-              This is only supported by the C(cryptography) backend if cryptography >= 38.0.0 is available.
-            - B(Note) that this option is B(not used for idempotency).
-        choices:
-            - auto
-            - compatibility2022
-        default: auto
-        type: str
-        version_added: 2.8.0
-    passphrase:
-        description:
-            - The PKCS#12 password.
-            - "B(Note:) PKCS12 encryption is typically not secure and should not be used as a security mechanism.
-              If you need to store or send a PKCS12 file safely, you should additionally encrypt it
-              with something else.
-              (L(Source,
-              https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates).)"
-        type: str
-    path:
-        description:
-            - Filename to write the PKCS#12 file to.
-        type: path
-        required: true
-    privatekey_passphrase:
-        description:
-            - Passphrase source to decrypt any input private keys with.
-        type: str
-    privatekey_path:
-        description:
-            - File to read private key from.
-            - Mutually exclusive with O(privatekey_content).
-        type: path
-    privatekey_content:
-        description:
-            - Content of the private key file.
-            - Mutually exclusive with O(privatekey_path).
-        type: str
-        version_added: "2.3.0"
-    state:
-        description:
-            - Whether the file should exist or not.
-              All parameters except O(path) are ignored when state is V(absent).
-        choices: [ absent, present ]
-        default: present
-        type: str
-    src:
-        description:
-            - PKCS#12 file path to parse.
-        type: path
-    backup:
-        description:
-            - Create a backup file including a timestamp so you can get the original
-              output file back if you overwrote it with a new one by accident.
-        type: bool
-        default: false
-    return_content:
-        description:
-            - If set to V(true), will return the (current or generated) PKCS#12's content as RV(pkcs12).
-        type: bool
-        default: false
-        version_added: "1.0.0"
-    select_crypto_backend:
-        description:
-            - Determines which crypto backend to use.
-            - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl).
-              If O(iter_size) is used together with O(encryption_level) is not V(compatibility2022), or if O(maciter_size) is used,
-              V(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
-            - If set to V(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
-            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-            # - Please note that the C(pyopenssl) backend has been deprecated in community.crypto x.y.0, and will be
-            #   removed in community.crypto (x+1).0.0.
-            #   From that point on, only the C(cryptography) backend will be available.
-        type: str
-        default: auto
-        choices: [ auto, cryptography, pyopenssl ]
-        version_added: 1.7.0
+  action:
+    description:
+      - V(export) or V(parse) a PKCS#12.
+    type: str
+    default: export
+    choices: [export, parse]
+  other_certificates:
+    description:
+      - List of other certificates to include. Pre Ansible 2.8 this parameter was called O(ca_certificates).
+      - Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates, set O(other_certificates_parse_all)
+        to V(true).
+    type: list
+    elements: path
+    aliases: [ca_certificates]
+  other_certificates_parse_all:
+    description:
+      - If set to V(true), assumes that the files mentioned in O(other_certificates) can contain more than one certificate
+        per file (or even none per file).
+    type: bool
+    default: false
+    version_added: 1.4.0
+  certificate_path:
+    description:
+      - The path to read certificates and private keys from.
+      - Must be in PEM format.
+    type: path
+  force:
+    description:
+      - Should the file be regenerated even if it already exists.
+    type: bool
+    default: false
+  friendly_name:
+    description:
+      - Specifies the friendly name for the certificate and private key.
+    type: str
+    aliases: [name]
+  iter_size:
+    description:
+      - Number of times to repeat the encryption step.
+      - This is B(not considered during idempotency checks).
+      - This is only used by the C(pyopenssl) backend, or when O(encryption_level=compatibility2022).
+      - When using it, the default is V(2048) for C(pyopenssl) and V(50000) for C(cryptography).
+    type: int
+  maciter_size:
+    description:
+      - Number of times to repeat the MAC step.
+      - This is B(not considered during idempotency checks).
+      - This is only used by the C(pyopenssl) backend. When using it, the default is V(1).
+    type: int
+  encryption_level:
+    description:
+      - Determines the encryption level used.
+      - V(auto) uses the default of the selected backend. For C(cryptography), this is what the cryptography library's specific
+        version considers the best available encryption.
+      - V(compatibility2022) uses compatibility settings for older software in 2022. This is only supported by the C(cryptography)
+        backend if cryptography >= 38.0.0 is available.
+      - B(Note) that this option is B(not used for idempotency).
+    choices:
+      - auto
+      - compatibility2022
+    default: auto
+    type: str
+    version_added: 2.8.0
+  passphrase:
+    description:
+      - The PKCS#12 password.
+      - B(Note:) PKCS12 encryption is typically not secure and should not be used as a security mechanism. If you need to
+        store or send a PKCS12 file safely, you should additionally encrypt it with something else. (L(Source, 
+        https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates)).
+    type: str
+  path:
+    description:
+      - Filename to write the PKCS#12 file to.
+    type: path
+    required: true
+  privatekey_passphrase:
+    description:
+      - Passphrase source to decrypt any input private keys with.
+    type: str
+  privatekey_path:
+    description:
+      - File to read private key from.
+      - Mutually exclusive with O(privatekey_content).
+    type: path
+  privatekey_content:
+    description:
+      - Content of the private key file.
+      - Mutually exclusive with O(privatekey_path).
+    type: str
+    version_added: "2.3.0"
+  state:
+    description:
+      - Whether the file should exist or not. All parameters except O(path) are ignored when state is V(absent).
+    choices: [absent, present]
+    default: present
+    type: str
+  src:
+    description:
+      - PKCS#12 file path to parse.
+    type: path
+  backup:
+    description:
+      - Create a backup file including a timestamp so you can get the original output file back if you overwrote it with a
+        new one by accident.
+    type: bool
+    default: false
+  return_content:
+    description:
+      - If set to V(true), will return the (current or generated) PKCS#12's content as RV(pkcs12).
+    type: bool
+    default: false
+    version_added: "1.0.0"
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl). If
+        O(iter_size) is used together with O(encryption_level) is not V(compatibility2022), or if O(maciter_size) is used,
+        V(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
+      - If set to V(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [auto, cryptography, pyopenssl]
+    version_added: 1.7.0
 seealso:
-    - module: community.crypto.x509_certificate
-    - module: community.crypto.openssl_csr
-    - module: community.crypto.openssl_dhparam
-    - module: community.crypto.openssl_privatekey
-    - module: community.crypto.openssl_publickey
-'''
+  - module: community.crypto.x509_certificate
+  - module: community.crypto.openssl_csr
+  - module: community.crypto.openssl_dhparam
+  - module: community.crypto.openssl_privatekey
+  - module: community.crypto.openssl_publickey
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Generate PKCS#12 file
   community.crypto.openssl_pkcs12:
     action: export
@@ -184,9 +174,9 @@ EXAMPLES = r'''
     privatekey_path: /opt/certs/keys/key.pem
     certificate_path: /opt/certs/cert.pem
     other_certificates: /opt/certs/ca.pem
-    # Note that if /opt/certs/ca.pem contains multiple certificates,
-    # only the first one will be used. See the other_certificates_parse_all
-    # option for changing this behavior.
+  # Note that if /opt/certs/ca.pem contains multiple certificates,
+  # only the first one will be used. See the other_certificates_parse_all
+  # option for changing this behavior.
     state: present
 
 - name: Generate PKCS#12 file
@@ -199,12 +189,12 @@ EXAMPLES = r'''
     other_certificates_parse_all: true
     other_certificates:
       - /opt/certs/ca_bundle.pem
-        # Since we set other_certificates_parse_all to true, all
-        # certificates in the CA bundle are included and not just
-        # the first one.
+      # Since we set other_certificates_parse_all to true, all
+      # certificates in the CA bundle are included and not just
+      # the first one.
       - /opt/certs/intermediate.pem
-        # In case this file has multiple certificates in it,
-        # all will be included as well.
+      # In case this file has multiple certificates in it,
+      # all will be included as well.
     state: present
 
 - name: Change PKCS#12 file permission
@@ -242,30 +232,30 @@ EXAMPLES = r'''
   community.crypto.openssl_pkcs12:
     path: /opt/certs/ansible.p12
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 filename:
-    description: Path to the generate PKCS#12 file.
-    returned: changed or success
-    type: str
-    sample: /opt/certs/ansible.p12
+  description: Path to the generate PKCS#12 file.
+  returned: changed or success
+  type: str
+  sample: /opt/certs/ansible.p12
 privatekey:
-    description: Path to the TLS/SSL private key the public key was generated from.
-    returned: changed or success
-    type: str
-    sample: /etc/ssl/private/ansible.com.pem
+  description: Path to the TLS/SSL private key the public key was generated from.
+  returned: changed or success
+  type: str
+  sample: /etc/ssl/private/ansible.com.pem
 backup_file:
-    description: Name of backup file created.
-    returned: changed and if O(backup) is V(true)
-    type: str
-    sample: /path/to/ansible.com.pem.2019-03-09@11:22~
+  description: Name of backup file created.
+  returned: changed and if O(backup) is V(true)
+  type: str
+  sample: /path/to/ansible.com.pem.2019-03-09@11:22~
 pkcs12:
-    description: The (current or generated) PKCS#12's content Base64 encoded.
-    returned: if O(state) is V(present) and O(return_content) is V(true)
-    type: str
-    version_added: "1.0.0"
-'''
+  description: The (current or generated) PKCS#12's content Base64 encoded.
+  returned: if O(state) is V(present) and O(return_content) is V(true)
+  type: str
+  version_added: "1.0.0"
+"""
 
 import abc
 import base64

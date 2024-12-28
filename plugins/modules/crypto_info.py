@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: crypto_info
 author: "Felix Fontein (@felixfontein)"
 short_description: Retrieve cryptographic capabilities
@@ -23,9 +22,9 @@ extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
 options: {}
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Retrieve information
   community.crypto.crypto_info:
     account_key_src: /etc/pki/cert/private/account.key
@@ -34,9 +33,9 @@ EXAMPLES = r'''
 - name: Show retrieved information
   ansible.builtin.debug:
     var: crypto_information
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 python_cryptography_installed:
   description: Whether the L(Python cryptography library, https://cryptography.io/) is installed.
   returned: always
@@ -151,7 +150,7 @@ openssl:
       description: The complete output of C(openssl version).
       type: str
       sample: 'OpenSSL 1.1.1m  14 Dec 2021\n'
-'''
+"""
 
 import traceback
 

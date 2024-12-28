@@ -9,15 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: get_certificate
 author: "John Westcott IV (@john-westcott-iv)"
 short_description: Get a certificate from a host:port
 description:
   - Makes a secure connection and returns information about the presented certificate.
   - The module uses the cryptography Python library.
-  - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with Python 2.7 and newer.
+  - Support SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) only with Python 2.7 and
+    newer.
 extends_documentation_fragment:
   - community.crypto.attributes
 attributes:
@@ -38,7 +38,8 @@ options:
   ca_cert:
     description:
       - A PEM file containing one or more root certificates; if present, the cert will be validated against these root certs.
-      - Note that this only validates the certificate is signed by the chain; not that the cert is valid for the host presenting it.
+      - Note that this only validates the certificate is signed by the chain; not that the cert is valid for the host presenting
+        it.
     type: path
   port:
     description:
@@ -47,8 +48,8 @@ options:
     required: true
   server_name:
     description:
-     - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
-       is an IP or is different from server name.
+      - Server name used for SNI (L(Server Name Indication,https://en.wikipedia.org/wiki/Server_Name_Indication)) when hostname
+        is an IP or is different from server name.
     type: str
     version_added: 1.4.0
   proxy_host:
@@ -80,11 +81,11 @@ options:
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
     type: str
     default: auto
-    choices: [ auto, cryptography ]
+    choices: [auto, cryptography]
   ciphers:
     description:
       - SSL/TLS Ciphers to use for the request.
-      - 'When a list is provided, all ciphers are joined in order with V(:).'
+      - When a list is provided, all ciphers are joined in order with V(:).
       - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
         for more details.
       - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
@@ -94,8 +95,8 @@ options:
   asn1_base64:
     description:
       - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
-      - The documentation claimed for a long time that the values are Base64 encoded, but they
-        never were. For compatibility this option is set to V(false).
+      - The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility
+        this option is set to V(false).
       - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
     type: bool
     version_added: 2.12.0
@@ -110,8 +111,8 @@ options:
   get_certificate_chain:
     description:
       - If set to V(true), will obtain the certificate chain next to the certificate itself.
-      - The chain as returned by the server can be found in RV(unverified_chain), and the chain that passed validation
-        in RV(verified_chain).
+      - The chain as returned by the server can be found in RV(unverified_chain), and the chain that passed validation in
+        RV(verified_chain).
       - B(Note) that this needs B(Python 3.10 or newer). Also note that only Python 3.13 or newer officially supports this.
         The module uses internal APIs of Python 3.10, 3.11, and 3.12 to achieve the same. It can be that future versions of
         Python 3.10, 3.11, or 3.12 break this.
@@ -121,7 +122,6 @@ options:
 
 notes:
   - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
-
 requirements:
   - "Python >= 2.7 when using O(proxy_host), and Python >= 3.10 when O(get_certificate_chain=true)"
   - "cryptography >= 1.6"
@@ -129,9 +129,9 @@ requirements:
 seealso:
   - plugin: community.crypto.to_serial
     plugin_type: filter
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 cert:
   description: The certificate retrieved from the port.
   returned: success
@@ -155,16 +155,12 @@ extensions:
       type: str
       description:
         - The ASN.1 content of the extension.
-        - If O(asn1_base64=true) this will be Base64 encoded, otherwise the raw
-          binary value will be returned.
-        - Please note that the raw binary value might not survive JSON serialization
-          to the Ansible controller, and also might cause failures when displaying it.
-          See U(https://github.com/ansible/ansible/issues/80258) for more information.
-        - B(Note) that depending on the C(cryptography) version used, it is
-          not possible to extract the ASN.1 content of the extension, but only
-          to provide the re-encoded content of the extension in case it was
-          parsed by C(cryptography). This should usually result in exactly the
-          same value, except if the original extension value was malformed.
+        - If O(asn1_base64=true) this will be Base64 encoded, otherwise the raw binary value will be returned.
+        - Please note that the raw binary value might not survive JSON serialization to the Ansible controller, and also might
+          cause failures when displaying it. See U(https://github.com/ansible/ansible/issues/80258) for more information.
+        - B(Note) that depending on the C(cryptography) version used, it is not possible to extract the ASN.1 content of the
+          extension, but only to provide the re-encoded content of the extension in case it was parsed by C(cryptography).
+          This should usually result in exactly the same value, except if the original extension value was malformed.
     name:
       returned: success
       type: str
@@ -184,8 +180,8 @@ not_before:
 serial_number:
   description:
     - The serial number of the cert.
-    - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string,
-      such as C(11:22:33), you need to convert it to that form with P(community.crypto.to_serial#filter).
+    - This return value is an B(integer). If you need the serial numbers as a colon-separated hex string, such as C(11:22:33),
+      you need to convert it to that form with P(community.crypto.to_serial#filter).
   returned: success
   type: int
 signature_algorithm:
@@ -204,10 +200,10 @@ verified_chain:
   description:
     - The verified certificate chain retrieved from the port.
     - The first entry is always RV(cert).
-    - The last certificate the root certificate the chain is traced to. If O(ca_cert) is provided this certificate is part of that store;
-      otherwise it is part of the store used by default by Python.
-    - Note that RV(unverified_chain) generally does not contain the root certificate, and might contain other certificates that are not part
-      of the validated chain.
+    - The last certificate the root certificate the chain is traced to. If O(ca_cert) is provided this certificate is part
+      of that store; otherwise it is part of the store used by default by Python.
+    - Note that RV(unverified_chain) generally does not contain the root certificate, and might contain other certificates
+      that are not part of the validated chain.
   returned: success and O(get_certificate_chain=true)
   type: list
   elements: str
@@ -220,9 +216,9 @@ unverified_chain:
   type: list
   elements: str
   version_added: 2.21.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get the cert from an RDP port
   community.crypto.get_certificate:
     host: "1.2.3.4"
@@ -265,7 +261,7 @@ EXAMPLES = '''
   delegate_to: localhost
   run_once: true
   register: legacy_cert
-'''
+"""
 
 import atexit
 import base64

@@ -9,104 +9,103 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: openssl_publickey
-short_description: Generate an OpenSSL public key from its private key.
+short_description: Generate an OpenSSL public key from its private key
 description:
-    - This module allows one to (re)generate public keys from their private keys.
-    - Public keys are generated in PEM or OpenSSH format. Private keys must be OpenSSL PEM keys.
-      B(OpenSSH private keys are not supported), use the M(community.crypto.openssh_keypair) module to manage these.
-    - The module uses the cryptography Python library.
+  - This module allows one to (re)generate public keys from their private keys.
+  - Public keys are generated in PEM or OpenSSH format. Private keys must be OpenSSL PEM keys. B(OpenSSH private keys are
+    not supported), use the M(community.crypto.openssh_keypair) module to manage these.
+  - The module uses the cryptography Python library.
 requirements:
-    - cryptography >= 1.2.3 (older versions might work as well)
-    - Needs cryptography >= 1.4 if O(format) is C(OpenSSH)
+  - cryptography >= 1.2.3 (older versions might work as well)
+  - Needs cryptography >= 1.4 if O(format) is C(OpenSSH)
 author:
-    - Yanis Guenane (@Spredzy)
-    - Felix Fontein (@felixfontein)
+  - Yanis Guenane (@Spredzy)
+  - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.attributes
-    - community.crypto.attributes.files
+  - ansible.builtin.files
+  - community.crypto.attributes
+  - community.crypto.attributes.files
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
-    safe_file_operations:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  safe_file_operations:
+    support: full
 options:
-    state:
-        description:
-            - Whether the public key should exist or not, taking action if the state is different from what is stated.
-        type: str
-        default: present
-        choices: [ absent, present ]
-    force:
-        description:
-            - Should the key be regenerated even it it already exists.
-        type: bool
-        default: false
-    format:
-        description:
-            - The format of the public key.
-        type: str
-        default: PEM
-        choices: [ OpenSSH, PEM ]
-    path:
-        description:
-            - Name of the file in which the generated TLS/SSL public key will be written.
-        type: path
-        required: true
-    privatekey_path:
-        description:
-            - Path to the TLS/SSL private key from which to generate the public key.
-            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
-              If O(state) is V(present), one of them is required.
-        type: path
-    privatekey_content:
-        description:
-            - The content of the TLS/SSL private key from which to generate the public key.
-            - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both.
-              If O(state) is V(present), one of them is required.
-        type: str
-        version_added: '1.0.0'
-    privatekey_passphrase:
-        description:
-            - The passphrase for the private key.
-        type: str
-    backup:
-        description:
-            - Create a backup file including a timestamp so you can get the original
-              public key back if you overwrote it with a different one by accident.
-        type: bool
-        default: false
-    select_crypto_backend:
-        description:
-            - Determines which crypto backend to use.
-            - The default choice is V(auto), which tries to use C(cryptography) if available.
-            - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-        type: str
-        default: auto
-        choices: [ auto, cryptography ]
-    return_content:
-        description:
-            - If set to V(true), will return the (current or generated) public key's content as RV(publickey).
-        type: bool
-        default: false
-        version_added: '1.0.0'
+  state:
+    description:
+      - Whether the public key should exist or not, taking action if the state is different from what is stated.
+    type: str
+    default: present
+    choices: [absent, present]
+  force:
+    description:
+      - Should the key be regenerated even it it already exists.
+    type: bool
+    default: false
+  format:
+    description:
+      - The format of the public key.
+    type: str
+    default: PEM
+    choices: [OpenSSH, PEM]
+  path:
+    description:
+      - Name of the file in which the generated TLS/SSL public key will be written.
+    type: path
+    required: true
+  privatekey_path:
+    description:
+      - Path to the TLS/SSL private key from which to generate the public key.
+      - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both. If O(state) is V(present), one
+        of them is required.
+    type: path
+  privatekey_content:
+    description:
+      - The content of the TLS/SSL private key from which to generate the public key.
+      - Either O(privatekey_path) or O(privatekey_content) must be specified, but not both. If O(state) is V(present), one
+        of them is required.
+    type: str
+    version_added: '1.0.0'
+  privatekey_passphrase:
+    description:
+      - The passphrase for the private key.
+    type: str
+  backup:
+    description:
+      - Create a backup file including a timestamp so you can get the original public key back if you overwrote it with a
+        different one by accident.
+    type: bool
+    default: false
+  select_crypto_backend:
+    description:
+      - Determines which crypto backend to use.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
+      - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+    type: str
+    default: auto
+    choices: [auto, cryptography]
+  return_content:
+    description:
+      - If set to V(true), will return the (current or generated) public key's content as RV(publickey).
+    type: bool
+    default: false
+    version_added: '1.0.0'
 seealso:
-    - module: community.crypto.x509_certificate
-    - module: community.crypto.x509_certificate_pipe
-    - module: community.crypto.openssl_csr
-    - module: community.crypto.openssl_csr_pipe
-    - module: community.crypto.openssl_dhparam
-    - module: community.crypto.openssl_pkcs12
-    - module: community.crypto.openssl_privatekey
-    - module: community.crypto.openssl_privatekey_pipe
-'''
+  - module: community.crypto.x509_certificate
+  - module: community.crypto.x509_certificate_pipe
+  - module: community.crypto.openssl_csr
+  - module: community.crypto.openssl_csr_pipe
+  - module: community.crypto.openssl_dhparam
+  - module: community.crypto.openssl_pkcs12
+  - module: community.crypto.openssl_privatekey
+  - module: community.crypto.openssl_privatekey_pipe
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Generate an OpenSSL public key in PEM format
   community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
@@ -139,49 +138,49 @@ EXAMPLES = r'''
   community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 privatekey:
-    description:
+  description:
     - Path to the TLS/SSL private key the public key was generated from.
     - Will be V(none) if the private key has been provided in O(privatekey_content).
-    returned: changed or success
-    type: str
-    sample: /etc/ssl/private/ansible.com.pem
+  returned: changed or success
+  type: str
+  sample: /etc/ssl/private/ansible.com.pem
 format:
-    description: The format of the public key (PEM, OpenSSH, ...).
-    returned: changed or success
-    type: str
-    sample: PEM
+  description: The format of the public key (PEM, OpenSSH, ...).
+  returned: changed or success
+  type: str
+  sample: PEM
 filename:
-    description: Path to the generated TLS/SSL public key file.
-    returned: changed or success
-    type: str
-    sample: /etc/ssl/public/ansible.com.pem
+  description: Path to the generated TLS/SSL public key file.
+  returned: changed or success
+  type: str
+  sample: /etc/ssl/public/ansible.com.pem
 fingerprint:
-    description:
+  description:
     - The fingerprint of the public key. Fingerprint will be generated for each hashlib.algorithms available.
-    returned: changed or success
-    type: dict
-    sample:
-      md5: "84:75:71:72:8d:04:b5:6c:4d:37:6d:66:83:f5:4c:29"
-      sha1: "51:cc:7c:68:5d:eb:41:43:88:7e:1a:ae:c7:f8:24:72:ee:71:f6:10"
-      sha224: "b1:19:a6:6c:14:ac:33:1d:ed:18:50:d3:06:5c:b2:32:91:f1:f1:52:8c:cb:d5:75:e9:f5:9b:46"
-      sha256: "41:ab:c7:cb:d5:5f:30:60:46:99:ac:d4:00:70:cf:a1:76:4f:24:5d:10:24:57:5d:51:6e:09:97:df:2f:de:c7"
-      sha384: "85:39:50:4e:de:d9:19:33:40:70:ae:10:ab:59:24:19:51:c3:a2:e4:0b:1c:b1:6e:dd:b3:0c:d9:9e:6a:46:af:da:18:f8:ef:ae:2e:c0:9a:75:2c:9b:b3:0f:3a:5f:3d"
-      sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
+  returned: changed or success
+  type: dict
+  sample:
+    md5: "84:75:71:72:8d:04:b5:6c:4d:37:6d:66:83:f5:4c:29"
+    sha1: "51:cc:7c:68:5d:eb:41:43:88:7e:1a:ae:c7:f8:24:72:ee:71:f6:10"
+    sha224: "b1:19:a6:6c:14:ac:33:1d:ed:18:50:d3:06:5c:b2:32:91:f1:f1:52:8c:cb:d5:75:e9:f5:9b:46"
+    sha256: "41:ab:c7:cb:d5:5f:30:60:46:99:ac:d4:00:70:cf:a1:76:4f:24:5d:10:24:57:5d:51:6e:09:97:df:2f:de:c7"
+    sha384: "85:39:50:4e:de:d9:19:33:40:70:ae:10:ab:59:24:19:51:c3:a2:e4:0b:1c:b1:6e:dd:b3:0c:d9:9e:6a:46:af:da:18:f8:ef:ae:2e:c0:9a:75:2c:9b:b3:0f:3a:5f:3d"
+    sha512: "fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b"
 backup_file:
-    description: Name of backup file created.
-    returned: changed and if O(backup) is V(true)
-    type: str
-    sample: /path/to/publickey.pem.2019-03-09@11:22~
+  description: Name of backup file created.
+  returned: changed and if O(backup) is V(true)
+  type: str
+  sample: /path/to/publickey.pem.2019-03-09@11:22~
 publickey:
-    description: The (current or generated) public key's content.
-    returned: if O(state) is V(present) and O(return_content) is V(true)
-    type: str
-    version_added: '1.0.0'
-'''
+  description: The (current or generated) public key's content.
+  returned: if O(state) is V(present) and O(return_content) is V(true)
+  type: str
+  version_added: '1.0.0'
+"""
 
 import os
 import traceback

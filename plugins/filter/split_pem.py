@@ -7,37 +7,37 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: split_pem
 short_description: Split PEM file contents into multiple objects
 version_added: 2.10.0
 author:
-    - Felix Fontein (@felixfontein)
+  - Felix Fontein (@felixfontein)
 description:
-    - Split PEM file contents into multiple PEM objects. Comments or invalid parts are ignored.
+  - Split PEM file contents into multiple PEM objects. Comments or invalid parts are ignored.
 options:
-    _input:
-        description:
-            - The PEM contents to split.
-        type: string
-        required: true
-'''
+  _input:
+    description:
+      - The PEM contents to split.
+    type: string
+    required: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Print all CA certificates
   ansible.builtin.debug:
     msg: '{{ item }}'
   loop: >-
     {{ lookup('ansible.builtin.file', '/path/to/ca-bundle.pem') | community.crypto.split_pem }}
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 _value:
-    description:
-        - A list of PEM file contents.
-    type: list
-    elements: string
-'''
+  description:
+    - A list of PEM file contents.
+  type: list
+  elements: string
+"""
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types

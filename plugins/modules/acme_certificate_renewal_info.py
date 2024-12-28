@@ -9,16 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_certificate_renewal_info
 author: "Felix Fontein (@felixfontein)"
 version_added: 2.20.0
 short_description: Determine whether a certificate should be renewed or not
 description:
   - Uses various information to determine whether a certificate should be renewed or not.
-  - If available, the ARI extension (ACME Renewal Information, U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/))
-    is used. This module implements version 3 of the ARI draft."
+  - If available, the ARI extension (ACME Renewal Information, U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)) is
+    used. This module implements version 3 of the ARI draft.".
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.no_account
@@ -45,8 +44,7 @@ options:
   ari_algorithm:
     description:
       - If ARI information is used, selects which algorithm is used to determine whether to renew now.
-      - V(standard) selects the L(algorithm provided in the the ARI specification,
-        https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#name-renewalinfo-objects).
+      - V(standard) selects the L(algorithm provided in the the ARI specification, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#name-renewalinfo-objects).
       - V(start) returns RV(should_renew=true) once the start of the renewal interval has been reached.
     type: str
     choices:
@@ -56,14 +54,14 @@ options:
   remaining_days:
     description:
       - The number of days the certificate must have left being valid.
-      - For example, if O(remaining_days=20), this check causes RV(should_renew=true) if the
-        certificate is valid for less than 20 days.
+      - For example, if O(remaining_days=20), this check causes RV(should_renew=true) if the certificate is valid for less
+        than 20 days.
     type: int
   remaining_percentage:
     description:
       - The percentage of the certificate's validity period that should be left.
-      - For example, if O(remaining_percentage=0.1), and the certificate's validity period is 90 days,
-        this check causes RV(should_renew=true) if the certificate is valid for less than 9 days.
+      - For example, if O(remaining_percentage=0.1), and the certificate's validity period is 90 days, this check causes RV(should_renew=true)
+        if the certificate is valid for less than 9 days.
       - Must be a value between 0 and 1.
     type: float
   now:
@@ -71,17 +69,17 @@ options:
       - Use this timestamp instead of the current timestamp to determine whether a certificate should be renewed.
       - Time can be specified either as relative time or as absolute timestamp.
       - Time will always be interpreted as UTC.
-      - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer
-        + C([w | d | h | m | s]) (for example V(+32w1d2h)).
+      - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer + C([w | d | h | m | s]) (for example
+        V(+32w1d2h)).
     type: str
 seealso:
   - module: community.crypto.acme_certificate
-    description: Allows to obtain a certificate using the ACME protocol
+    description: Allows to obtain a certificate using the ACME protocol.
   - module: community.crypto.acme_ari_info
-    description: Obtain renewal information for a certificate
-'''
+    description: Obtain renewal information for a certificate.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Retrieve renewal information for a certificate
   community.crypto.acme_certificate_renewal_info:
     certificate_path: /etc/httpd/ssl/sample.com.crt
@@ -90,9 +88,9 @@ EXAMPLES = '''
 - name: Should the certificate be renewed?
   ansible.builtin.debug:
     var: cert_data.should_renew
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 should_renew:
   description:
     - Whether the certificate should be renewed.
@@ -104,16 +102,15 @@ should_renew:
 msg:
   description:
     - Information on the reason for renewal.
-    - Should be shown to the user, as in case of ARI triggered renewal it can contain important
-      information, for example on forced revocations for misissued certificates.
+    - Should be shown to the user, as in case of ARI triggered renewal it can contain important information, for example on
+      forced revocations for misissued certificates.
   type: str
   returned: success
   sample: The certificate does not exist.
 
 supports_ari:
   description:
-    - Whether ARI information was used to determine renewal. This can be used to determine whether to
-      specify O(community.crypto.acme_certificate#module:include_renewal_cert_id=when_ari_supported)
+    - Whether ARI information was used to determine renewal. This can be used to determine whether to specify O(community.crypto.acme_certificate#module:include_renewal_cert_id=when_ari_supported)
       for the M(community.crypto.acme_certificate) module.
     - If O(use_ari=false), this will always be V(false).
   returned: success
@@ -126,7 +123,7 @@ cert_id:
   returned: success, the certificate exists, and has an Authority Key Identifier X.509 extension
   type: str
   sample: aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
-'''
+"""
 
 import os
 import random

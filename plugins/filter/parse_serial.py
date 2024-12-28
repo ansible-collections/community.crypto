@@ -6,19 +6,19 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: parse_serial
 short_description: Convert a serial number as a colon-separated list of hex numbers to an integer
 author: Felix Fontein (@felixfontein)
 version_added: 2.18.0
 description:
-  - "Parses a colon-separated list of hex numbers of the form C(00:11:22:33) and returns the corresponding integer."
+  - Parses a colon-separated list of hex numbers of the form C(00:11:22:33) and returns the corresponding integer.
 options:
   _input:
     description:
       - A serial number represented as a colon-separated list of hex numbers between 0 and 255.
-      - These numbers are interpreted as the byte presentation of an unsigned integer in network byte order.
-        That is, C(01:00) is interpreted as the integer 256.
+      - These numbers are interpreted as the byte presentation of an unsigned integer in network byte order. That is, C(01:00)
+        is interpreted as the integer 256.
     type: string
     required: true
 seealso:
@@ -26,17 +26,17 @@ seealso:
     plugin_type: filter
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Parse serial number
   ansible.builtin.debug:
     msg: "{{ '11:22:33' | community.crypto.parse_serial }}"
 """
 
-RETURN = """
-  _value:
-    description:
-      - The serial number as an integer.
-    type: int
+RETURN = r"""
+_value:
+  description:
+    - The serial number as an integer.
+  type: int
 """
 
 from ansible.errors import AnsibleFilterError

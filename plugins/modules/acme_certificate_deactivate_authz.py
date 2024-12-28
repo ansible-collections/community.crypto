@@ -9,21 +9,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_certificate_deactivate_authz
 author: "Felix Fontein (@felixfontein)"
 version_added: 2.20.0
 short_description: Deactivate all authz for an ACME v2 order
 description:
-  - "Deactivate all authentication objects (authz) for an ACME v2 order,
-     which effectively deactivates (invalidates) the order itself."
-  - "Authentication objects are bound to an account key and remain valid
-     for a certain amount of time, and can be used to issue certificates
-     without having to re-authenticate the domain. This can be a security
-     concern."
-  - "Another reason to use this module is to deactivate an order whose
-     processing failed when using O(community.crypto.acme_certificate#module:include_renewal_cert_id)."
+  - Deactivate all authentication objects (authz) for an ACME v2 order, which effectively deactivates (invalidates) the order
+    itself.
+  - Authentication objects are bound to an account key and remain valid for a certain amount of time, and can be used to issue
+    certificates without having to re-authenticate the domain. This can be a security concern.
+  - Another reason to use this module is to deactivate an order whose processing failed when using O(community.crypto.acme_certificate#module:include_renewal_cert_id).
 seealso:
   - module: community.crypto.acme_certificate
 extends_documentation_fragment:
@@ -43,16 +39,16 @@ options:
       - Can be obtained from RV(community.crypto.acme_certificate#module:order_uri).
     type: str
     required: true
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Deactivate all authzs for an order
   community.crypto.acme_certificate_deactivate_authz:
     account_key_content: "{{ account_private_key }}"
     order_uri: "{{ certificate_result.order_uri }}"
-'''
+"""
 
-RETURN = '''#'''
+RETURN = """#"""
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,

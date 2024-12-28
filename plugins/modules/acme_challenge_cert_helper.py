@@ -9,16 +9,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_challenge_cert_helper
 author: "Felix Fontein (@felixfontein)"
 short_description: Prepare certificates required for ACME challenges such as C(tls-alpn-01)
 description:
-  - "Prepares certificates for ACME challenges such as C(tls-alpn-01)."
-  - "The raw data is provided by the M(community.crypto.acme_certificate) module, and needs to be
-     converted to a certificate to be used for challenge validation. This module
-     provides a simple way to generate the required certificates."
+  - Prepares certificates for ACME challenges such as C(tls-alpn-01).
+  - The raw data is provided by the M(community.crypto.acme_certificate) module, and needs to be converted to a certificate
+    to be used for challenge validation. This module provides a simple way to generate the required certificates.
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -42,36 +40,35 @@ attributes:
 options:
   challenge:
     description:
-      - "The challenge type."
+      - The challenge type.
     type: str
     required: true
     choices:
-    - tls-alpn-01
+      - tls-alpn-01
   challenge_data:
     description:
-      - "The RV(community.crypto.acme_certificate#module:challenge_data) entry provided by M(community.crypto.acme_certificate) for the
-         challenge."
+      - The RV(community.crypto.acme_certificate#module:challenge_data) entry provided by M(community.crypto.acme_certificate)
+        for the challenge.
     type: dict
     required: true
   private_key_src:
     description:
-      - "Path to a file containing the private key file to use for this challenge
-         certificate."
-      - "Mutually exclusive with O(private_key_content)."
+      - Path to a file containing the private key file to use for this challenge certificate.
+      - Mutually exclusive with O(private_key_content).
     type: path
   private_key_content:
     description:
-      - "Content of the private key to use for this challenge certificate."
-      - "Mutually exclusive with O(private_key_src)."
+      - Content of the private key to use for this challenge certificate.
+      - Mutually exclusive with O(private_key_src).
     type: str
   private_key_passphrase:
     description:
       - Phassphrase to use to decode the private key.
     type: str
     version_added: 1.6.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create challenges for a given CRT for sample.com
   community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key
@@ -89,15 +86,15 @@ EXAMPLES = '''
   register: sample_com_challenge_certs
 
 - name: Install challenge certificates
-  # We need to set up HTTPS such that for the domain,
-  # regular_certificate is delivered for regular connections,
-  # except if ALPN selects the "acme-tls/1"; then, the
-  # challenge_certificate must be delivered.
-  # This can for example be achieved with very new versions
-  # of NGINX; search for ssl_preread and
-  # ssl_preread_alpn_protocols for information on how to
-  # route by ALPN protocol.
-  ...:
+# We need to set up HTTPS such that for the domain,
+# regular_certificate is delivered for regular connections,
+# except if ALPN selects the "acme-tls/1"; then, the
+# challenge_certificate must be delivered.
+# This can for example be achieved with very new versions
+# of NGINX; search for ssl_preread and
+# ssl_preread_alpn_protocols for information on how to
+# route by ALPN protocol.
+  '...':
     domain: "{{ item.domain }}"
     challenge_certificate: "{{ item.challenge_certificate }}"
     regular_certificate: "{{ item.regular_certificate }}"
@@ -111,18 +108,18 @@ EXAMPLES = '''
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
     data: "{{ sample_com_challenge }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 domain:
   description:
-    - "The domain the challenge is for. The certificate should be provided if
-       this is specified in the request's the C(Host) header."
+    - The domain the challenge is for. The certificate should be provided if this is specified in the request's the C(Host)
+      header.
   returned: always
   type: str
 identifier_type:
   description:
-    - "The identifier type for the actual resource identifier."
+    - The identifier type for the actual resource identifier.
   returned: always
   type: str
   choices:
@@ -130,24 +127,22 @@ identifier_type:
     - ip
 identifier:
   description:
-    - "The identifier for the actual resource. Will be a domain name if
-       RV(identifier_type=dns), or an IP address if RV(identifier_type=ip)."
+    - The identifier for the actual resource. Will be a domain name if RV(identifier_type=dns), or an IP address if RV(identifier_type=ip).
   returned: always
   type: str
 challenge_certificate:
   description:
-    - "The challenge certificate in PEM format."
+    - The challenge certificate in PEM format.
   returned: always
   type: str
 regular_certificate:
   description:
-    - "A self-signed certificate for the challenge domain."
-    - "If no existing certificate exists, can be used to set-up
-       https in the first place if that is needed for providing
-       the challenge."
+    - A self-signed certificate for the challenge domain.
+    - If no existing certificate exists, can be used to set-up https in the first place if that is needed for providing the
+      challenge.
   returned: always
   type: str
-'''
+"""
 
 import base64
 import datetime

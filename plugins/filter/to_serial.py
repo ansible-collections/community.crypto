@@ -6,13 +6,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: to_serial
 short_description: Convert an integer to a colon-separated list of hex numbers
 author: Felix Fontein (@felixfontein)
 version_added: 2.18.0
 description:
-  - "Converts an integer to a colon-separated list of hex numbers of the form C(00:11:22:33)."
+  - Converts an integer to a colon-separated list of hex numbers of the form C(00:11:22:33).
 options:
   _input:
     description:
@@ -24,19 +24,19 @@ seealso:
     plugin_type: filter
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Convert integer to serial number
   ansible.builtin.debug:
     msg: "{{ 1234567 | community.crypto.to_serial }}"
 """
 
-RETURN = """
-  _value:
-    description:
-      - A colon-separated list of hexadecimal numbers.
-      - Letters are upper-case, and all numbers have exactly two digits.
-      - The string is never empty. The representation of C(0) is C("00").
-    type: string
+RETURN = r"""
+_value:
+  description:
+    - A colon-separated list of hexadecimal numbers.
+    - Letters are upper-case, and all numbers have exactly two digits.
+    - The string is never empty. The representation of C(0) is C("00").
+  type: string
 """
 
 from ansible.errors import AnsibleFilterError

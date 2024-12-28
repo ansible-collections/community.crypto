@@ -9,21 +9,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: acme_account
 author: "Felix Fontein (@felixfontein)"
 short_description: Create, modify or delete ACME accounts
 description:
-  - "Allows to create, modify or delete accounts with a CA supporting the
-     L(ACME protocol,https://tools.ietf.org/html/rfc8555),
-     such as L(Let's Encrypt,https://letsencrypt.org/)."
-  - "This module only works with the ACME v2 protocol."
+  - Allows to create, modify or delete accounts with a CA supporting the L(ACME protocol,https://tools.ietf.org/html/rfc8555),
+    such as L(Let's Encrypt,https://letsencrypt.org/).
+  - This module only works with the ACME v2 protocol.
 notes:
-  - "The M(community.crypto.acme_certificate) module also allows to do basic account management.
-     When using both modules, it is recommended to disable account management
-     for M(community.crypto.acme_certificate). For that, use the O(community.crypto.acme_certificate#module:modify_account) option of
-     M(community.crypto.acme_certificate)."
+  - The M(community.crypto.acme_certificate) module also allows to do basic account management. When using both modules, it
+    is recommended to disable account management for M(community.crypto.acme_certificate). For that, use the O(community.crypto.acme_certificate#module:modify_account)
+    option of M(community.crypto.acme_certificate).
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
@@ -49,64 +46,61 @@ attributes:
 options:
   state:
     description:
-      - "The state of the account, to be identified by its account key."
-      - "If the state is V(absent), the account will either not exist or be
-         deactivated."
-      - "If the state is V(changed_key), the account must exist. The account
-         key will be changed; no other information will be touched."
+      - The state of the account, to be identified by its account key.
+      - If the state is V(absent), the account will either not exist or be deactivated.
+      - If the state is V(changed_key), the account must exist. The account key will be changed; no other information will
+        be touched.
     type: str
     required: true
     choices:
-    - present
-    - absent
-    - changed_key
+      - present
+      - absent
+      - changed_key
   allow_creation:
     description:
-      - "Whether account creation is allowed (when state is V(present))."
+      - Whether account creation is allowed (when state is V(present)).
     type: bool
     default: true
   contact:
     description:
-      - "A list of contact URLs."
-      - "Email addresses must be prefixed with C(mailto:)."
-      - "See U(https://tools.ietf.org/html/rfc8555#section-7.3)
-         for what is allowed."
-      - "Must be specified when state is V(present). Will be ignored
-         if state is V(absent) or V(changed_key)."
+      - A list of contact URLs.
+      - Email addresses must be prefixed with C(mailto:).
+      - See U(https://tools.ietf.org/html/rfc8555#section-7.3) for what is allowed.
+      - Must be specified when state is V(present). Will be ignored if state is V(absent) or V(changed_key).
     type: list
     elements: str
     default: []
   terms_agreed:
     description:
-      - "Boolean indicating whether you agree to the terms of service document."
-      - "ACME servers can require this to be V(true)."
+      - Boolean indicating whether you agree to the terms of service document.
+      - ACME servers can require this to be V(true).
     type: bool
     default: false
   new_account_key_src:
     description:
-      - "Path to a file containing the ACME account RSA or Elliptic Curve key to change to."
-      - "Same restrictions apply as to O(account_key_src)."
-      - "Mutually exclusive with O(new_account_key_content)."
-      - "Required if O(new_account_key_content) is not used and O(state) is V(changed_key)."
+      - Path to a file containing the ACME account RSA or Elliptic Curve key to change to.
+      - Same restrictions apply as to O(account_key_src).
+      - Mutually exclusive with O(new_account_key_content).
+      - Required if O(new_account_key_content) is not used and O(state) is V(changed_key).
     type: path
   new_account_key_content:
     description:
-      - "Content of the ACME account RSA or Elliptic Curve key to change to."
-      - "Same restrictions apply as to O(account_key_content)."
-      - "Mutually exclusive with O(new_account_key_src)."
-      - "Required if O(new_account_key_src) is not used and O(state) is V(changed_key)."
+      - Content of the ACME account RSA or Elliptic Curve key to change to.
+      - Same restrictions apply as to O(account_key_content).
+      - Mutually exclusive with O(new_account_key_src).
+      - Required if O(new_account_key_src) is not used and O(state) is V(changed_key).
     type: str
   new_account_key_passphrase:
     description:
       - Phassphrase to use to decode the new account key.
-      - "B(Note:) this is not supported by the C(openssl) backend, only by the C(cryptography) backend."
+      - B(Note:) this is not supported by the C(openssl) backend, only by the C(cryptography) backend.
     type: str
     version_added: 1.6.0
   external_account_binding:
     description:
       - Allows to provide external account binding data during account creation.
-      - This is used by CAs like Sectigo to bind a new ACME account to an existing CA-specific
-        account, to be able to properly identify a customer.
+      - This is used by CAs like Sectigo to bind a new ACME account to an existing CA-specific account, to be able to properly
+        identify a customer.
       - Only used when creating a new account. Can not be specified for ACME v1.
     type: dict
     suboptions:
@@ -121,7 +115,7 @@ options:
           - If not specified by the CA, this is probably V(HS256).
         type: str
         required: true
-        choices: [ HS256, HS384, HS512 ]
+        choices: [HS256, HS384, HS512]
       key:
         description:
           - Base64 URL encoded value of the MAC key provided by the CA.
@@ -129,17 +123,17 @@ options:
         type: str
         required: true
     version_added: 1.1.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Make sure account exists and has given contacts. We agree to TOS.
   community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key
     state: present
     terms_agreed: true
     contact:
-    - mailto:me@example.com
-    - mailto:myself@example.org
+      - mailto:me@example.com
+      - mailto:myself@example.org
 
 - name: Make sure account has given email address. Do not create account if it does not exist
   community.crypto.acme_account:
@@ -147,7 +141,7 @@ EXAMPLES = '''
     state: present
     allow_creation: false
     contact:
-    - mailto:me@example.com
+      - mailto:me@example.com
 
 - name: Change account's key to the one stored in the variable new_account_key
   community.crypto.acme_account:
@@ -159,14 +153,14 @@ EXAMPLES = '''
   community.crypto.acme_account:
     account_key_content: '{{ new_account_key }}'
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 account_uri:
   description: ACME account URI, or None if account does not exist.
   returned: always
   type: str
-'''
+"""
 
 import base64
 

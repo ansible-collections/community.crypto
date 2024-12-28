@@ -9,60 +9,59 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: openssl_privatekey_convert
 short_description: Convert OpenSSL private keys
 version_added: 2.1.0
 description:
-    - This module allows one to convert OpenSSL private keys.
-    - The default mode for the private key file will be V(0600) if O(mode) is not explicitly set.
+  - This module allows one to convert OpenSSL private keys.
+  - The default mode for the private key file will be V(0600) if O(mode) is not explicitly set.
 author:
-    - Felix Fontein (@felixfontein)
+  - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.crypto.attributes
-    - community.crypto.attributes.files
-    - community.crypto.module_privatekey_convert
+  - ansible.builtin.files
+  - community.crypto.attributes
+  - community.crypto.attributes.files
+  - community.crypto.module_privatekey_convert
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
-    safe_file_operations:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  safe_file_operations:
+    support: full
 options:
-    dest_path:
-        description:
-            - Name of the file in which the generated TLS/SSL private key will be written. It will have V(0600) mode
-              if O(mode) is not explicitly set.
-        type: path
-        required: true
-    backup:
-        description:
-            - Create a backup file including a timestamp so you can get
-              the original private key back if you overwrote it with a new one by accident.
-        type: bool
-        default: false
+  dest_path:
+    description:
+      - Name of the file in which the generated TLS/SSL private key will be written. It will have V(0600) mode if O(mode)
+        is not explicitly set.
+    type: path
+    required: true
+  backup:
+    description:
+      - Create a backup file including a timestamp so you can get the original private key back if you overwrote it with a
+        new one by accident.
+    type: bool
+    default: false
 seealso: []
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Convert private key to PKCS8 format with passphrase
   community.crypto.openssl_privatekey_convert:
     src_path: /etc/ssl/private/ansible.com.pem
     dest_path: /etc/ssl/private/ansible.com.key
     dest_passphrase: '{{ private_key_passphrase }}'
     format: pkcs8
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 backup_file:
-    description: Name of backup file created.
-    returned: changed and if O(backup) is V(true)
-    type: str
-    sample: /path/to/privatekey.pem.2019-03-09@11:22~
-'''
+  description: Name of backup file created.
+  returned: changed and if O(backup) is V(true)
+  type: str
+  sample: /path/to/privatekey.pem.2019-03-09@11:22~
+"""
 
 import os
 
