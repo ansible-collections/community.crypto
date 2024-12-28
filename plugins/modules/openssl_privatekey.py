@@ -66,7 +66,8 @@ options:
       - If set to V(true), will return the (current or generated) private key's content as RV(privatekey).
       - Note that especially if the private key is not encrypted, you have to make sure that the returned value is treated
         appropriately and not accidentally written to logs etc.! Use with care!
-      - Use Ansible's C(no_log) task option to avoid the output being shown. See also U(https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook).
+      - Use Ansible's C(no_log) task option to avoid the output being shown. See also
+        U(https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook).
     type: bool
     default: false
     version_added: '1.0.0'

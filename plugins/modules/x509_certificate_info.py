@@ -19,7 +19,8 @@ description:
   - Note that this module was called C(openssl_certificate_info) when included directly in Ansible up to version 2.9. When
     moved to the collection C(community.crypto), it was renamed to M(community.crypto.x509_certificate_info). From Ansible
     2.10 on, it can still be used by the old short name (or by C(ansible.builtin.openssl_certificate_info)), which redirects
-    to M(community.crypto.x509_certificate_info). When using FQCNs or when using the L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
+    to M(community.crypto.x509_certificate_info). When using FQCNs or when using the
+    L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
     keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid a deprecation warning.
 requirements:
   - cryptography >= 1.6

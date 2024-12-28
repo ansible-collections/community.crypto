@@ -44,7 +44,8 @@ options:
   ari_algorithm:
     description:
       - If ARI information is used, selects which algorithm is used to determine whether to renew now.
-      - V(standard) selects the L(algorithm provided in the the ARI specification, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#name-renewalinfo-objects).
+      - V(standard) selects the L(algorithm provided in the the ARI specification,
+        https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#name-renewalinfo-objects).
       - V(start) returns RV(should_renew=true) once the start of the renewal interval has been reached.
     type: str
     choices:

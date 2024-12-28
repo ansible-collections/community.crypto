@@ -19,7 +19,8 @@ description:
     itself.
   - Authentication objects are bound to an account key and remain valid for a certain amount of time, and can be used to issue
     certificates without having to re-authenticate the domain. This can be a security concern.
-  - Another reason to use this module is to deactivate an order whose processing failed when using O(community.crypto.acme_certificate#module:include_renewal_cert_id).
+  - Another reason to use this module is to deactivate an order whose processing failed when using
+    O(community.crypto.acme_certificate#module:include_renewal_cert_id).
 seealso:
   - module: community.crypto.acme_certificate
 extends_documentation_fragment:

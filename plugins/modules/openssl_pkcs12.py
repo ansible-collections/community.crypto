@@ -100,7 +100,7 @@ options:
     description:
       - The PKCS#12 password.
       - B(Note:) PKCS12 encryption is typically not secure and should not be used as a security mechanism. If you need to
-        store or send a PKCS12 file safely, you should additionally encrypt it with something else. (L(Source, 
+        store or send a PKCS12 file safely, you should additionally encrypt it with something else. (L(Source,
         https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#cryptography.hazmat.primitives.serialization.pkcs12.serialize_key_and_certificates)).
     type: str
   path:

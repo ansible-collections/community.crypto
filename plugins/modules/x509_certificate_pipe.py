@@ -41,8 +41,8 @@ options:
   provider:
     description:
       - Name of the provider to use to generate/retrieve the OpenSSL certificate.
-      - The V(entrust) provider requires credentials for the L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates)
-        (ECS) API.
+      - The V(entrust) provider requires credentials for the L(Entrust Certificate Services,
+        https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API.
     type: str
     choices: [entrust, ownca, selfsigned]
     required: true
