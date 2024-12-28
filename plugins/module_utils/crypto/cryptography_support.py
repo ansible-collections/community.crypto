@@ -155,7 +155,7 @@ def cryptography_get_extensions_from_cert(cert):
 
     except Exception:
         # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use it's public_bytes() feature in that case. We will later switch this around
+        # Use its public_bytes() feature in that case. We will later switch this around
         # so that this code will be the default, but for now this will act as a fallback
         # since it will re-serialize de-serialized data, which can be different (if the
         # original data was not canonicalized) from what was contained in the certificate.
@@ -215,7 +215,7 @@ def cryptography_get_extensions_from_csr(csr):
 
     except Exception:
         # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use it's public_bytes() feature in that case. We will later switch this around
+        # Use its public_bytes() feature in that case. We will later switch this around
         # so that this code will be the default, but for now this will act as a fallback
         # since it will re-serialize de-serialized data, which can be different (if the
         # original data was not canonicalized) from what was contained in the CSR.

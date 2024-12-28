@@ -491,7 +491,7 @@ def create_backend(module, needs_acme_v2):
     # Create backend object
     if backend == 'cryptography':
         if CRYPTOGRAPHY_ERROR is not None:
-            # Either we couldn't import cryptography at all, or there was an unexpected error
+            # Either we could not import cryptography at all, or there was an unexpected error
             if CRYPTOGRAPHY_VERSION is None:
                 msg = missing_required_lib('cryptography')
             else:

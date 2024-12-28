@@ -167,7 +167,7 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
                 if passphrase is None and len(e.args) > 0 and len(e.args[0]) > 0:
                     if e.args[0][0][2] in ('bad decrypt', 'bad password read'):
                         # The key is obviously protected by the empty string.
-                        # Do not do this at home (if it's possible at all)...
+                        # Do not do this at home (if it is possible at all)...
                         raise OpenSSLBadPassphraseError('No passphrase provided, but private key is password-protected!')
     elif backend == 'cryptography':
         try:

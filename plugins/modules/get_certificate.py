@@ -502,7 +502,7 @@ def main():
             if get_certificate_chain:
                 if sys.version_info < (3, 13):
                     # The official way to access this has been added in https://github.com/python/cpython/pull/109113/files.
-                    # We're basically doing the same for older Python versions. The internal API needed for this was added
+                    # We are basically doing the same for older Python versions. The internal API needed for this was added
                     # in https://github.com/python/cpython/commit/666991fc598bc312d72aff0078ecb553f0a968f1, which was first
                     # released in Python 3.10.0.
                     def _convert_chain(chain):

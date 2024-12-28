@@ -704,7 +704,7 @@ class CRL(OpenSSLObject):
         if entry['issuer'] is not None:
             # Normalize to IDNA. If this is used-provided, it was already converted to
             # IDNA (by cryptography_get_name) and thus the `idna` library is present.
-            # If this is coming from cryptography and isn't already in IDNA (i.e. ascii),
+            # If this is coming from cryptography and is not already in IDNA (i.e. ascii),
             # cryptography < 2.1 must be in use, which depends on `idna`. So this should
             # not require `idna` except if it was already used by code earlier during
             # this invocation.

@@ -47,7 +47,7 @@ _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTY
 def _extract_date(out_text, name, cert_filename_suffix=""):
     try:
         date_str = re.search(r"\s+%s\s*:\s+(.*)" % name, out_text).group(1)
-        # For some reason Python's strptime() doesn't return any timezone information,
+        # For some reason Python's strptime() does not return any timezone information,
         # even though the information is there and a supported timezone for all supported
         # Python implementations (GMT). So we have to modify the datetime object by
         # replacing it by UTC.

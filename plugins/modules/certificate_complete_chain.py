@@ -356,7 +356,7 @@ def main():
     completed = []
     occured_certificates = set([cert.cert for cert in chain])
     if current.cert in roots.certificate_by_cert:
-        # Do not try to complete the chain when it's already ending with a root certificate
+        # Do not try to complete the chain when it is already ending with a root certificate
         current = None
     while current:
         root = roots.find_parent(current)

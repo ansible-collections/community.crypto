@@ -74,7 +74,7 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
     # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
     timestamp_str = _reduce_fractional_digits(timestamp_str)
     for format in ('%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%dT%H:%M:%S.%f%z'):
-        # Note that %z won't work with Python 2... https://stackoverflow.com/a/27829491
+        # Note that %z will not work with Python 2... https://stackoverflow.com/a/27829491
         try:
             result = datetime.datetime.strptime(timestamp_str, format)
         except ValueError:

@@ -419,7 +419,7 @@ EXAMPLES = r'''
     entrust_api_client_cert_key_path: /etc/ssl/entrust/ecs-client.key
 
 - name: Request a new certificate with an alternative client. Note that the
-        issued certificate will have it's Subject Distinguished Name use the
+        issued certificate will have its Subject Distinguished Name use the
         organization details associated with that client, rather than what is
         in the CSR.
   community.crypto.ecs_certificate:
