@@ -61,8 +61,8 @@ options:
       - Name of the provider to use to generate/retrieve the OpenSSL certificate. Please see the examples on how to emulate
         it with M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info), M(community.crypto.openssl_privatekey_info)
         and M(ansible.builtin.assert).
-      - The V(entrust) provider was added for Ansible 2.9 and requires credentials for the L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates)
-        (ECS) API.
+      - The V(entrust) provider was added for Ansible 2.9 and requires credentials for the
+        L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API.
       - Required if O(state) is V(present).
     type: str
     choices: [acme, entrust, ownca, selfsigned]
@@ -151,7 +151,7 @@ EXAMPLES = r"""
 - name: Get certificate information
   community.crypto.x509_certificate_info:
     path: /etc/ssl/crt/ansible.com.crt
-  # for valid_at, invalid_at and valid_in
+    # for valid_at, invalid_at and valid_in
     valid_at:
       one_day_ten_hours: "+1d10h"
       fixed_timestamp: 20200331202428Z
@@ -160,7 +160,7 @@ EXAMPLES = r"""
 
 - name: Get CSR information
   community.crypto.openssl_csr_info:
-  # Verifies that the CSR signature is valid; module will fail if not
+    # Verifies that the CSR signature is valid; module will fail if not
     path: /etc/ssl/csr/ansible.com.csr
   register: result_csr
 
@@ -172,37 +172,37 @@ EXAMPLES = r"""
 - name: Check conditions on certificate, CSR, and private key
   ansible.builtin.assert:
     that:
-    # When private key was specified for assertonly, this was checked:
+      # When private key was specified for assertonly, this was checked:
       - result.public_key == result_privatekey.public_key
-    # When CSR was specified for assertonly, this was checked:
+      # When CSR was specified for assertonly, this was checked:
       - result.public_key == result_csr.public_key
       - result.subject_ordered == result_csr.subject_ordered
       - result.extensions_by_oid == result_csr.extensions_by_oid
-    # signature_algorithms check
+      # signature_algorithms check
       - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha512WithRSAEncryption'"
-    # subject and subject_strict
+      # subject and subject_strict
       - "result.subject.commonName == 'ansible.com'"
       - "result.subject | length == 1" # the number must be the number of entries you check for
-    # issuer and issuer_strict
+      # issuer and issuer_strict
       - "result.issuer.commonName == 'ansible.com'"
       - "result.issuer | length == 1" # the number must be the number of entries you check for
-    # has_expired
+      # has_expired
       - not result.expired
-    # version
+      # version
       - result.version == 3
-    # key_usage and key_usage_strict
+      # key_usage and key_usage_strict
       - "'Data Encipherment' in result.key_usage"
       - "result.key_usage | length == 1" # the number must be the number of entries you check for
-    # extended_key_usage and extended_key_usage_strict
+      # extended_key_usage and extended_key_usage_strict
       - "'DVCS' in result.extended_key_usage"
       - "result.extended_key_usage | length == 1" # the number must be the number of entries you check for
-    # subject_alt_name and subject_alt_name_strict
+      # subject_alt_name and subject_alt_name_strict
       - "'dns:ansible.com' in result.subject_alt_name"
       - "result.subject_alt_name | length == 1" # the number must be the number of entries you check for
-    # not_before and not_after
+      # not_before and not_after
       - "result.not_before == '20190331202428Z'"
       - "result.not_after == '20190413202428Z'"
-    # valid_at, invalid_at and valid_in
+      # valid_at, invalid_at and valid_in
       - "result.valid_at.one_day_ten_hours" # for valid_at
       - "not result.valid_at.fixed_timestamp" # for invalid_at
       - "result.valid_at.ten_seconds" # for valid_in

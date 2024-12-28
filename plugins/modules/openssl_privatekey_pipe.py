@@ -95,7 +95,7 @@ EXAMPLES = r"""
 - name: Show generated key
   ansible.builtin.debug:
     msg: "{{ output.privatekey }}"
-# DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
+  # DO NOT OUTPUT KEY MATERIAL TO CONSOLE OR LOGS IN PRODUCTION!
 
 
 # The following example needs CNCF SOPS (https://github.com/getsops/sops) set up and

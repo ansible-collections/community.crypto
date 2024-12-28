@@ -91,8 +91,8 @@ EXAMPLES = r"""
     method: post
     content: '{"termsOfServiceAgreed":true}'
   register: account_creation
-# account_creation.headers.location contains the account URI
-# if creation was successful
+  # account_creation.headers.location contains the account URI
+  # if creation was successful
 
 - name: Get account information
   community.crypto.acme_inspect:
@@ -114,8 +114,8 @@ EXAMPLES = r"""
     content: '{{ account_info | to_json }}'
   vars:
     account_info:
-    # For valid values, see
-    # https://tools.ietf.org/html/rfc8555#section-7.3
+      # For valid values, see
+      # https://tools.ietf.org/html/rfc8555#section-7.3
       contact:
         - mailto:me@example.com
 
@@ -179,10 +179,14 @@ directory:
   description: The ACME directory's content.
   returned: always
   type: dict
-  sample: {"a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417", "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
+  sample: {"a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
+    "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
     "meta": {"caaIdentities": ["letsencrypt.org"], "termsOfService": "https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf",
-      "website": "https://letsencrypt.org"}, "newAccount": "https://acme-v02.api.letsencrypt.org/acme/new-acct", "newNonce": "https://acme-v02.api.letsencrypt.org/acme/new-nonce",
-    "newOrder": "https://acme-v02.api.letsencrypt.org/acme/new-order", "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"}
+      "website": "https://letsencrypt.org"},
+    "newAccount": "https://acme-v02.api.letsencrypt.org/acme/new-acct",
+    "newNonce": "https://acme-v02.api.letsencrypt.org/acme/new-nonce",
+    "newOrder": "https://acme-v02.api.letsencrypt.org/acme/new-order",
+    "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"}
 headers:
   description: The request's HTTP headers (with lowercase keys).
   returned: always

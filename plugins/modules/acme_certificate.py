@@ -234,7 +234,8 @@ options:
         type: str
   include_renewal_cert_id:
     description:
-      - Determines whether to request renewal of an existing certificate according to L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
+      - Determines whether to request renewal of an existing certificate according to L(the ACME ARI draft 3,
+        https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
       - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
       - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
       - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
@@ -247,8 +248,8 @@ options:
         cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries
         to create a new one on the next run, creating the new order might fail. For this reason, this option should only be
         set to a value different from V(never) if the role/playbook using it keeps track of order data accross restarts, or
-        if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the M(community.crypto.acme_certificate_deactivate_authz)
-        module.
+        if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the
+        M(community.crypto.acme_certificate_deactivate_authz) module.
     type: str
     choices:
       - never
@@ -323,7 +324,7 @@ EXAMPLES = r"""
     cert: /etc/httpd/ssl/sample.com.crt
     challenge: dns-01
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
-  # Renew if the certificate is at least 30 days old
+    # Renew if the certificate is at least 30 days old
     remaining_days: 60
   register: sample_com_challenge
 
@@ -384,14 +385,14 @@ EXAMPLES = r"""
     challenge: tls-alpn-01
     remaining_days: 60
     data: "{{ sample_com_challenge }}"
-  # We use Let's Encrypt's ACME v2 endpoint
+    # We use Let's Encrypt's ACME v2 endpoint
     acme_directory: https://acme-v02.api.letsencrypt.org/directory
     acme_version: 2
-  # The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided
-  # as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.
-  # As long as Let's Encrypt provides alternate chains with the cross-signed root(s) when
-  # switching to their own ISRG Root X1 root, this will use the chain ending with a cross-signed
-  # root. This chain is more compatible with older TLS clients.
+    # The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided
+    # as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.
+    # As long as Let's Encrypt provides alternate chains with the cross-signed root(s) when
+    # switching to their own ISRG Root X1 root, this will use the chain ending with a cross-signed
+    # root. This chain is more compatible with older TLS clients.
     select_chain:
       - test_certificates: last
         issuer:

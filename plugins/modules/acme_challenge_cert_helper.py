@@ -86,15 +86,15 @@ EXAMPLES = r"""
   register: sample_com_challenge_certs
 
 - name: Install challenge certificates
-# We need to set up HTTPS such that for the domain,
-# regular_certificate is delivered for regular connections,
-# except if ALPN selects the "acme-tls/1"; then, the
-# challenge_certificate must be delivered.
-# This can for example be achieved with very new versions
-# of NGINX; search for ssl_preread and
-# ssl_preread_alpn_protocols for information on how to
-# route by ALPN protocol.
-  '...':
+  # We need to set up HTTPS such that for the domain,
+  # regular_certificate is delivered for regular connections,
+  # except if ALPN selects the "acme-tls/1"; then, the
+  # challenge_certificate must be delivered.
+  # This can for example be achieved with very new versions
+  # of NGINX; search for ssl_preread and
+  # ssl_preread_alpn_protocols for information on how to
+  # route by ALPN protocol.
+  ...:
     domain: "{{ item.domain }}"
     challenge_certificate: "{{ item.challenge_certificate }}"
     regular_certificate: "{{ item.regular_certificate }}"
