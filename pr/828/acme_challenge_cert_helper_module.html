@@ -327,15 +327,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge_certs</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install challenge certificates</span>
-<span class="c1"># We need to set up HTTPS such that for the domain,</span>
-<span class="c1"># regular_certificate is delivered for regular connections,</span>
-<span class="c1"># except if ALPN selects the &quot;acme-tls/1&quot;; then, the</span>
-<span class="c1"># challenge_certificate must be delivered.</span>
-<span class="c1"># This can for example be achieved with very new versions</span>
-<span class="c1"># of NGINX; search for ssl_preread and</span>
-<span class="c1"># ssl_preread_alpn_protocols for information on how to</span>
-<span class="c1"># route by ALPN protocol.</span>
-<span class="w">  </span><span class="s">&#39;...&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">  </span><span class="c1"># We need to set up HTTPS such that for the domain,</span>
+<span class="w">  </span><span class="c1"># regular_certificate is delivered for regular connections,</span>
+<span class="w">  </span><span class="c1"># except if ALPN selects the &quot;acme-tls/1&quot;; then, the</span>
+<span class="w">  </span><span class="c1"># challenge_certificate must be delivered.</span>
+<span class="w">  </span><span class="c1"># This can for example be achieved with very new versions</span>
+<span class="w">  </span><span class="c1"># of NGINX; search for ssl_preread and</span>
+<span class="w">  </span><span class="c1"># ssl_preread_alpn_protocols for information on how to</span>
+<span class="w">  </span><span class="c1"># route by ALPN protocol.</span>
+<span class="w">  </span><span class="nt">...</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">domain</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.domain</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">    </span><span class="nt">challenge_certificate</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.challenge_certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">    </span><span class="nt">regular_certificate</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.regular_certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>

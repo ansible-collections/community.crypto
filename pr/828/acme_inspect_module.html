@@ -457,8 +457,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post</span>
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{&quot;termsOfServiceAgreed&quot;:true}&#39;</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">account_creation</span>
-<span class="c1"># account_creation.headers.location contains the account URI</span>
-<span class="c1"># if creation was successful</span>
+<span class="w">  </span><span class="c1"># account_creation.headers.location contains the account URI</span>
+<span class="w">  </span><span class="c1"># if creation was successful</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get account information</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_inspect</span><span class="p">:</span>
@@ -480,8 +480,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">account_info</span> <span class="o">|</span> <span class="nf">to_json</span> <span class="cp">}}</span><span class="s">&#39;</span>
 <span class="w">  </span><span class="nt">vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_info</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># For valid values, see</span>
-<span class="w">    </span><span class="c1"># https://tools.ietf.org/html/rfc8555#section-7.3</span>
+<span class="w">      </span><span class="c1"># For valid values, see</span>
+<span class="w">      </span><span class="c1"># https://tools.ietf.org/html/rfc8555#section-7.3</span>
 <span class="w">      </span><span class="nt">contact</span><span class="p">:</span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mailto:me@example.com</span>
 

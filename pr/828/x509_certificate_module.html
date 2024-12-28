@@ -941,7 +941,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get certificate information</span>
 <span class="w">  </span><span class="nt">community.crypto.x509_certificate_info</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
-<span class="w">  </span><span class="c1"># for valid_at, invalid_at and valid_in</span>
+<span class="w">    </span><span class="c1"># for valid_at, invalid_at and valid_in</span>
 <span class="w">    </span><span class="nt">valid_at</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">one_day_ten_hours</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;+1d10h&quot;</span>
 <span class="w">      </span><span class="nt">fixed_timestamp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20200331202428Z</span>
@@ -950,7 +950,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get CSR information</span>
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr_info</span><span class="p">:</span>
-<span class="w">  </span><span class="c1"># Verifies that the CSR signature is valid; module will fail if not</span>
+<span class="w">    </span><span class="c1"># Verifies that the CSR signature is valid; module will fail if not</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result_csr</span>
 
@@ -962,37 +962,37 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check conditions on certificate, CSR, and private key</span>
 <span class="w">  </span><span class="nt">ansible.builtin.assert</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">that</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># When private key was specified for assertonly, this was checked:</span>
+<span class="w">      </span><span class="c1"># When private key was specified for assertonly, this was checked:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.public_key == result_privatekey.public_key</span>
-<span class="w">    </span><span class="c1"># When CSR was specified for assertonly, this was checked:</span>
+<span class="w">      </span><span class="c1"># When CSR was specified for assertonly, this was checked:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.public_key == result_csr.public_key</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.subject_ordered == result_csr.subject_ordered</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.extensions_by_oid == result_csr.extensions_by_oid</span>
-<span class="w">    </span><span class="c1"># signature_algorithms check</span>
+<span class="w">      </span><span class="c1"># signature_algorithms check</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.signature_algorithm</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;sha256WithRSAEncryption&#39;</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">result.signature_algorithm</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;sha512WithRSAEncryption&#39;&quot;</span>
-<span class="w">    </span><span class="c1"># subject and subject_strict</span>
+<span class="w">      </span><span class="c1"># subject and subject_strict</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.subject.commonName</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;ansible.com&#39;&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.subject</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">length</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1&quot;</span><span class="w"> </span><span class="c1"># the number must be the number of entries you check for</span>
-<span class="w">    </span><span class="c1"># issuer and issuer_strict</span>
+<span class="w">      </span><span class="c1"># issuer and issuer_strict</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.issuer.commonName</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;ansible.com&#39;&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.issuer</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">length</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1&quot;</span><span class="w"> </span><span class="c1"># the number must be the number of entries you check for</span>
-<span class="w">    </span><span class="c1"># has_expired</span>
+<span class="w">      </span><span class="c1"># has_expired</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">not result.expired</span>
-<span class="w">    </span><span class="c1"># version</span>
+<span class="w">      </span><span class="c1"># version</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.version == 3</span>
-<span class="w">    </span><span class="c1"># key_usage and key_usage_strict</span>
+<span class="w">      </span><span class="c1"># key_usage and key_usage_strict</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;&#39;Data</span><span class="nv"> </span><span class="s">Encipherment&#39;</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">result.key_usage&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.key_usage</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">length</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1&quot;</span><span class="w"> </span><span class="c1"># the number must be the number of entries you check for</span>
-<span class="w">    </span><span class="c1"># extended_key_usage and extended_key_usage_strict</span>
+<span class="w">      </span><span class="c1"># extended_key_usage and extended_key_usage_strict</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;&#39;DVCS&#39;</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">result.extended_key_usage&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.extended_key_usage</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">length</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1&quot;</span><span class="w"> </span><span class="c1"># the number must be the number of entries you check for</span>
-<span class="w">    </span><span class="c1"># subject_alt_name and subject_alt_name_strict</span>
+<span class="w">      </span><span class="c1"># subject_alt_name and subject_alt_name_strict</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;&#39;dns:ansible.com&#39;</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">result.subject_alt_name&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.subject_alt_name</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">length</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1&quot;</span><span class="w"> </span><span class="c1"># the number must be the number of entries you check for</span>
-<span class="w">    </span><span class="c1"># not_before and not_after</span>
+<span class="w">      </span><span class="c1"># not_before and not_after</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.not_before</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;20190331202428Z&#39;&quot;</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.not_after</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;20190413202428Z&#39;&quot;</span>
-<span class="w">    </span><span class="c1"># valid_at, invalid_at and valid_in</span>
+<span class="w">      </span><span class="c1"># valid_at, invalid_at and valid_in</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.valid_at.one_day_ten_hours&quot;</span><span class="w"> </span><span class="c1"># for valid_at</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;not</span><span class="nv"> </span><span class="s">result.valid_at.fixed_timestamp&quot;</span><span class="w"> </span><span class="c1"># for invalid_at</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;result.valid_at.ten_seconds&quot;</span><span class="w"> </span><span class="c1"># for valid_in</span>

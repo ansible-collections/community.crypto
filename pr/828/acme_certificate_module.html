@@ -749,7 +749,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">cert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dns-01</span>
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
-<span class="w">  </span><span class="c1"># Renew if the certificate is at least 30 days old</span>
+<span class="w">    </span><span class="c1"># Renew if the certificate is at least 30 days old</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
@@ -810,14 +810,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tls-alpn-01</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
 <span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
-<span class="w">  </span><span class="c1"># We use Let&#39;s Encrypt&#39;s ACME v2 endpoint</span>
+<span class="w">    </span><span class="c1"># We use Let&#39;s Encrypt&#39;s ACME v2 endpoint</span>
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v02.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="nt">acme_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="w">  </span><span class="c1"># The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided</span>
-<span class="w">  </span><span class="c1"># as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.</span>
-<span class="w">  </span><span class="c1"># As long as Let&#39;s Encrypt provides alternate chains with the cross-signed root(s) when</span>
-<span class="w">  </span><span class="c1"># switching to their own ISRG Root X1 root, this will use the chain ending with a cross-signed</span>
-<span class="w">  </span><span class="c1"># root. This chain is more compatible with older TLS clients.</span>
+<span class="w">    </span><span class="c1"># The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided</span>
+<span class="w">    </span><span class="c1"># as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.</span>
+<span class="w">    </span><span class="c1"># As long as Let&#39;s Encrypt provides alternate chains with the cross-signed root(s) when</span>
+<span class="w">    </span><span class="c1"># switching to their own ISRG Root X1 root, this will use the chain ending with a cross-signed</span>
+<span class="w">    </span><span class="c1"># root. This chain is more compatible with older TLS clients.</span>
 <span class="w">    </span><span class="nt">select_chain</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">test_certificates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">last</span>
 <span class="w">        </span><span class="nt">issuer</span><span class="p">:</span>
