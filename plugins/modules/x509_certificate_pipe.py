@@ -35,8 +35,6 @@ attributes:
         in community.crypto 3.0.0.
       - From community.crypto 3.0.0 on, the module will ignore check mode and always behave as if check mode is not active.
         If you think this breaks your use-case of this module, please create an issue in the community.crypto repository.
-  diff_mode:
-    support: full
 options:
   provider:
     description:

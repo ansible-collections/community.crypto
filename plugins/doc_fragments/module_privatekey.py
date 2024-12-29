@@ -17,6 +17,9 @@ description:
     L(ECC,https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) or L(EdDSA,https://en.wikipedia.org/wiki/EdDSA) private
     keys.
   - Keys are generated in PEM format.
+attributes:
+  diff_mode:
+    support: full
 requirements:
   - cryptography >= 1.2.3 (older versions might work as well)
 options:

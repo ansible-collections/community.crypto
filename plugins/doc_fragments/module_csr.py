@@ -15,6 +15,9 @@ class ModuleDocFragment(object):
 description:
   - This module allows one to (re)generate OpenSSL certificate signing requests.
   - This module supports the subjectAltName, keyUsage, extendedKeyUsage, basicConstraints and OCSP Must Staple extensions.
+attributes:
+  diff_mode:
+    support: full
 requirements:
   - cryptography >= 1.3
 options:

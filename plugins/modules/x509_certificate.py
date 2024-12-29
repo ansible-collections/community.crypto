@@ -38,8 +38,6 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-  diff_mode:
-    support: full
   safe_file_operations:
     support: full
 options:

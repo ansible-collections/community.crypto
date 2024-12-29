@@ -16,6 +16,9 @@ class ModuleDocFragment(object):
 description:
   - This module allows one to (re)generate OpenSSL certificates.
   - It uses the cryptography python library to interact with OpenSSL.
+attributes:
+  diff_mode:
+    support: full
 requirements:
   - cryptography >= 1.6 (if using V(selfsigned) or V(ownca) provider)
 options:

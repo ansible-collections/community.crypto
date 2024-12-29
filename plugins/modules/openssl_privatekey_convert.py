@@ -26,8 +26,6 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-  diff_mode:
-    support: none
   safe_file_operations:
     support: full
 options:

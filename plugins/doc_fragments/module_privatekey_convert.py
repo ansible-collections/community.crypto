@@ -14,6 +14,9 @@ class ModuleDocFragment(object):
     DOCUMENTATION = r"""
 requirements:
   - cryptography >= 1.2.3 (older versions might work as well)
+attributes:
+  diff_mode:
+    support: none
 options:
   src_path:
     description:
