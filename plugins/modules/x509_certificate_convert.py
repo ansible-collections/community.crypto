@@ -28,6 +28,8 @@ attributes:
     support: none
   safe_file_operations:
     support: full
+  idempotent:
+    support: full
 options:
   src_path:
     description:

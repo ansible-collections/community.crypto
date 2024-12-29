@@ -81,6 +81,12 @@ attributes:
     support: none
   safe_file_operations:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - If O(force=true), the module is not idempotent.
+        If O(force=false), it depends on the certificate's validity period and the value of O(remaining_days).
+      - The second phase invocation of the module is always idempotent, assuming no error occurs.
 options:
   account_email:
     description:

@@ -19,6 +19,11 @@ description:
 attributes:
   diff_mode:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - If relative timestamps are used and O(ignore_timestamps=false), the module is not idempotent.
+      - The option O(force=true) generally disables idempotency.
 requirements:
   - cryptography >= 1.6 (if using V(selfsigned) or V(ownca) provider)
 options:

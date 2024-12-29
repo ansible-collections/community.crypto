@@ -23,6 +23,7 @@ extends_documentation_fragment:
   - community.crypto.acme.no_account
   - community.crypto.attributes
   - community.crypto.attributes.info_module
+  - community.crypto.attributes.idempotent_not_modify_state
 options:
   certificate_path:
     description:

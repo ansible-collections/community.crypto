@@ -35,6 +35,10 @@ attributes:
     support: none
   safe_file_operations:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - The module is not idempotent if O(force=true).
 options:
   state:
     description:

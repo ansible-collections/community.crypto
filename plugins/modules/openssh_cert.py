@@ -28,6 +28,11 @@ attributes:
     support: full
   safe_file_operations:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - The module is not idempotent if O(force=true) or O(regenerate=always).
+      - If relative timestamps are used and O(ignore_timestamps=false) (default), the module is not idempotent.
 options:
   state:
     description:

@@ -31,6 +31,7 @@ author:
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
+  - community.crypto.attributes.idempotent_not_modify_state
   - community.crypto.name_encoding
 options:
   path:

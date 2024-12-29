@@ -41,6 +41,8 @@ attributes:
     support: none
   diff_mode:
     support: none
+  idempotent:
+    support: full
 options:
   certificate:
     description:

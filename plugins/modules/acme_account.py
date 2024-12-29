@@ -43,6 +43,10 @@ attributes:
     support: full
   diff_mode:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - If O(state=changed_key) is used, the module is not idempotent.
 options:
   state:
     description:

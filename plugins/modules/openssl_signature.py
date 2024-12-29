@@ -30,6 +30,11 @@ attributes:
       - This action does not modify state.
   diff_mode:
     support: none
+  idempotent:
+    support: partial
+    details:
+      - Signature algorithms are generally not deterministic. Thus the generated signature
+        can change from one invocation to the next.
 options:
   privatekey_path:
     description:

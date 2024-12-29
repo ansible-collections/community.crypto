@@ -20,6 +20,10 @@ description:
 attributes:
   diff_mode:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - The option O(regenerate=always) generally disables idempotency.
 requirements:
   - cryptography >= 1.2.3 (older versions might work as well)
 options:
