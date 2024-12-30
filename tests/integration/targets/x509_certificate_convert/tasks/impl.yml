@@ -210,3 +210,33 @@
       - result_8 is not changed
       - result_9 is not changed
       - result_10 is not changed
+
+- name: Create empty file
+  ansible.builtin.copy:
+    dest: '{{ remote_tmp_dir }}/empty'
+    content: ''
+
+- name: Convert empty file to PEM (w/o verify)
+  community.crypto.x509_certificate_convert:
+    src_path: '{{ remote_tmp_dir }}/empty'
+    dest_path: '{{ remote_tmp_dir }}/empty.pem'
+    format: pem
+    verify_cert_parsable: false
+  register: result_1
+
+- name: Convert empty file to PEM (w/ verify)
+  community.crypto.x509_certificate_convert:
+    src_path: '{{ remote_tmp_dir }}/empty'
+    dest_path: '{{ remote_tmp_dir }}/empty.pem'
+    format: pem
+    verify_cert_parsable: true
+  register: result_2
+  ignore_errors: true
+
+- name: Check conditions
+  assert:
+    that:
+      - result_1 is changed
+      - result_2 is failed
+      - >-
+        result_2.msg.startswith('Error while parsing certificate: ')
