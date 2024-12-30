@@ -1,4 +1,0 @@
-deprecated_features:
-  - "openssl_pkcs12 - the PyOpenSSL based backend is deprecated and will be removed from community.crypto 3.0.0.
-    From that point on you need cryptography 3.0 or newer to use this module
-    (https://github.com/ansible-collections/community.crypto/issues/667, https://github.com/ansible-collections/community.crypto/pull/831)."

@@ -1,3 +1,0 @@
-minor_changes:
-  - "acme_certificate - add compatibility for ACME CAs that are not fully RFC8555 compliant and do not provide ``challenges`` in authz objects
-    (https://github.com/ansible-collections/community.crypto/issues/824, https://github.com/ansible-collections/community.crypto/pull/832)."

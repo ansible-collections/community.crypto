@@ -1,3 +1,0 @@
-minor_changes:
-  - "luks_device - allow to provide passphrases base64-encoded
-    (https://github.com/ansible-collections/community.crypto/issues/827, https://github.com/ansible-collections/community.crypto/pull/829)."

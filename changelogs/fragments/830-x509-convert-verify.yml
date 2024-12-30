@@ -1,3 +1,0 @@
-minor_changes:
-  - "x509_certificate_convert - add new option ``verify_cert_parsable`` which allows to check whether the certificate can actually be parsed
-    (https://github.com/ansible-collections/community.crypto/issues/809, https://github.com/ansible-collections/community.crypto/pull/830)."

@@ -4,6 +4,26 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.23.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme_certificate - add compatibility for ACME CAs that are not fully RFC8555 compliant and do not provide ``challenges`` in authz objects (https://github.com/ansible-collections/community.crypto/issues/824, https://github.com/ansible-collections/community.crypto/pull/832).
+- luks_device - allow to provide passphrases base64-encoded (https://github.com/ansible-collections/community.crypto/issues/827, https://github.com/ansible-collections/community.crypto/pull/829).
+- x509_certificate_convert - add new option ``verify_cert_parsable`` which allows to check whether the certificate can actually be parsed (https://github.com/ansible-collections/community.crypto/issues/809, https://github.com/ansible-collections/community.crypto/pull/830).
+
+Deprecated Features
+-------------------
+
+- openssl_pkcs12 - the PyOpenSSL based backend is deprecated and will be removed from community.crypto 3.0.0. From that point on you need cryptography 3.0 or newer to use this module (https://github.com/ansible-collections/community.crypto/issues/667, https://github.com/ansible-collections/community.crypto/pull/831).
+
 v2.22.3
 =======
 

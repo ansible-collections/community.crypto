@@ -1529,3 +1529,27 @@ releases:
       - 810-time.yml
       - 811-openssl-timezone.yml
     release_date: '2024-10-27'
+  2.23.0:
+    changes:
+      deprecated_features:
+        - openssl_pkcs12 - the PyOpenSSL based backend is deprecated and will be removed
+          from community.crypto 3.0.0. From that point on you need cryptography 3.0
+          or newer to use this module (https://github.com/ansible-collections/community.crypto/issues/667,
+          https://github.com/ansible-collections/community.crypto/pull/831).
+      minor_changes:
+        - acme_certificate - add compatibility for ACME CAs that are not fully RFC8555
+          compliant and do not provide ``challenges`` in authz objects (https://github.com/ansible-collections/community.crypto/issues/824,
+          https://github.com/ansible-collections/community.crypto/pull/832).
+        - luks_device - allow to provide passphrases base64-encoded (https://github.com/ansible-collections/community.crypto/issues/827,
+          https://github.com/ansible-collections/community.crypto/pull/829).
+        - x509_certificate_convert - add new option ``verify_cert_parsable`` which
+          allows to check whether the certificate can actually be parsed (https://github.com/ansible-collections/community.crypto/issues/809,
+          https://github.com/ansible-collections/community.crypto/pull/830).
+      release_summary: Feature release.
+    fragments:
+      - 2.23.0.yml
+      - 829-luks_device-passphrase-base64.yml
+      - 830-x509-convert-verify.yml
+      - 831-openssl_pkcs12-deprecate-pyopenssl.yml
+      - 832-acme-challenges.yml
+    release_date: '2024-12-30'
