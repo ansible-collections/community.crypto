@@ -141,7 +141,12 @@ class Authorization(object):
     def _setup(self, client, data):
         data['uri'] = self.url
         self.data = data
-        self.challenges = [Challenge.from_json(client, challenge) for challenge in data['challenges']]
+        # While 'challenges' is a required field, apparently not every CA cares
+        # (https://github.com/ansible-collections/community.crypto/issues/824)
+        if data.get('challenges'):
+            self.challenges = [Challenge.from_json(client, challenge) for challenge in data['challenges']]
+        else:
+            self.challenges = []
         if client.version == 1 and 'status' not in data:
             # https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.1.2
             # "status (required, string): ...
