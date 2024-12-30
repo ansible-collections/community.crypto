@@ -25,6 +25,7 @@ class DummyModule(object):
 
 def test_generate_luks_name(monkeypatch):
     module = DummyModule()
+    module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(luks_device.Handler, "_run_command",
                         lambda x, y: [0, "UUID", ""])
     crypt = luks_device.CryptHandler(module)
@@ -33,6 +34,7 @@ def test_generate_luks_name(monkeypatch):
 
 def test_get_container_name_by_device(monkeypatch):
     module = DummyModule()
+    module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(luks_device.Handler, "_run_command",
                         lambda x, y: [0, "crypt container_name", ""])
     crypt = luks_device.CryptHandler(module)
@@ -41,6 +43,7 @@ def test_get_container_name_by_device(monkeypatch):
 
 def test_get_container_device_by_name(monkeypatch):
     module = DummyModule()
+    module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(luks_device.Handler, "_run_command",
                         lambda x, y: [0, "device:  /dev/luksdevice", ""])
     crypt = luks_device.CryptHandler(module)
@@ -54,6 +57,7 @@ def test_run_luks_remove(monkeypatch):
         return [0, "", ""]
 
     module = DummyModule()
+    module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(luks_device.CryptHandler,
                         "get_container_name_by_device",
                         lambda x, y: None)
@@ -171,6 +175,7 @@ def test_luks_create(device, keyfile, passphrase, state, is_luks, label, cipher,
     module.params["device"] = device
     module.params["keyfile"] = keyfile
     module.params["passphrase"] = passphrase
+    module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
     module.params["label"] = label
     module.params["cipher"] = cipher
@@ -196,6 +201,7 @@ def test_luks_remove(device, state, is_luks, expected, monkeypatch):
     module = DummyModule()
 
     module.params["device"] = device
+    module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
 
     monkeypatch.setattr(luks_device.CryptHandler, "is_luks",
@@ -218,6 +224,7 @@ def test_luks_open(device, keyfile, passphrase, state, name, name_by_dev,
     module.params["device"] = device
     module.params["keyfile"] = keyfile
     module.params["passphrase"] = passphrase
+    module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
     module.params["name"] = name
 
@@ -246,6 +253,7 @@ def test_luks_close(device, dev_by_name, name, name_by_dev, state,
     module = DummyModule()
     module.params["device"] = device
     module.params["name"] = name
+    module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
     module.params["label"] = label
 
@@ -273,6 +281,7 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
     module.params["device"] = device
     module.params["keyfile"] = keyfile
     module.params["passphrase"] = passphrase
+    module.params["passphrase_encoding"] = "text"
     module.params["new_keyfile"] = new_keyfile
     module.params["new_passphrase"] = new_passphrase
     module.params["new_keyslot"] = None
@@ -301,6 +310,7 @@ def test_luks_remove_key(device, remove_keyfile, remove_passphrase, remove_keysl
 
     module = DummyModule()
     module.params["device"] = device
+    module.params["passphrase_encoding"] = "text"
     module.params["remove_keyfile"] = remove_keyfile
     module.params["remove_passphrase"] = remove_passphrase
     module.params["remove_keyslot"] = remove_keyslot

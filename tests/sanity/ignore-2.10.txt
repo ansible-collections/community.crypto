@@ -9,6 +9,7 @@ plugins/modules/acme_account_info.py validate-modules:return-syntax-error
 plugins/modules/acme_challenge_cert_helper.py validate-modules:return-syntax-error
 plugins/modules/ecs_certificate.py validate-modules:invalid-documentation
 plugins/modules/get_certificate.py validate-modules:invalid-documentation
+plugins/modules/luks_device.py validate-modules:invalid-documentation
 plugins/modules/openssh_cert.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
