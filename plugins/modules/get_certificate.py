@@ -20,6 +20,7 @@ description:
     newer.
 extends_documentation_fragment:
   - community.crypto.attributes
+  - community.crypto.attributes.idempotent_not_modify_state
 attributes:
   check_mode:
     support: none

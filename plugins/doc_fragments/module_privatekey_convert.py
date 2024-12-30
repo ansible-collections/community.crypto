@@ -17,6 +17,8 @@ requirements:
 attributes:
   diff_mode:
     support: none
+  idempotent:
+    support: full
 options:
   src_path:
     description:

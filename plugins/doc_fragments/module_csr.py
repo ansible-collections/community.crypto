@@ -18,6 +18,8 @@ description:
 attributes:
   diff_mode:
     support: full
+  idempotent:
+    support: full
 requirements:
   - cryptography >= 1.3
 options:

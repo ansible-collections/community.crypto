@@ -44,6 +44,12 @@ attributes:
     support: none
   diff_mode:
     support: none
+  idempotent:
+    support: partial
+    details:
+      - Under which conditions the module is idempotent still needs to be determined.
+        If you are using this module and have more information, please contribute to
+        the documentation!
 options:
   client_id:
     description:

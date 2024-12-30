@@ -37,6 +37,11 @@ attributes:
     support: N/A
     details:
       - This action does not modify state.
+  idempotent:
+    support: none
+    details:
+      - The certificates returned are never the same, since the Not Before and Not After timestamps
+        depend on the invocation's timestamp.
 options:
   challenge:
     description:

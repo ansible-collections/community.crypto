@@ -37,6 +37,13 @@ attributes:
     support: none
   safe_file_operations:
     support: full
+  idempotent:
+    support: partial
+    details:
+      - The module is not idempotent if O(force=true).
+      - Under which conditions the module is idempotent still needs to be determined.
+        If you are using this module and have more information, please contribute to
+        the documentation!
 options:
   backup:
     description:
