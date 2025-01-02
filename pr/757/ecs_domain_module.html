@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API &mdash; Community.Crypto Collection  documentation</title>
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.get_certificate module – Get a certificate from a host:port" href="get_certificate_module.html" />
@@ -116,7 +114,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -127,7 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -185,7 +183,7 @@
 <h1>community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API<a class="headerlink" href="#community-crypto-ecs-domain-module-request-validation-of-a-domain-with-the-entrust-certificate-services-ecs-api" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -298,7 +296,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <p>If using the email values from the WHOIS data for the domain or its top level namespace, they must be exact matches.</p>
 <p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-verification-method"><span class="std std-ref"><span class="pre">verification_method=email</span></span></a></code> but <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-verification-email"><span class="std std-ref"><span class="pre">verification_email</span></span></a></strong></code> is not provided, the first email address found in WHOIS data for the domain will be used.</p>
 <p>To verify domain ownership, domain owner must follow the instructions in the email they receive.</p>
-<p>Only allowed if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-verification-method"><span class="std std-ref"><span class="pre">verification_method=email</span></span></a></code></p>
+<p>Only allowed if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-verification-method"><span class="std std-ref"><span class="pre">verification_method=email</span></span></a></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -348,6 +346,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
 </div></td>
 </tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-partial">partial</strong></p>
+<p>Under which conditions the module is idempotent still needs to be determined. If you are using this module and have more information, please contribute to the documentation!</p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -385,8 +393,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request domain validation using DNS. If domain is already valid,</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">request revalidation if expires within 90 days</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request domain validation using DNS. If domain is already valid, request revalidation if expires within 90 days</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_domain</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">domain_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible.com</span>
 <span class="w">    </span><span class="nt">verification_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dns</span>
@@ -395,8 +402,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request domain validation using web server validation, and revalidate</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">if fewer than 60 days remaining of EV eligibility.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request domain validation using web server validation, and revalidate if fewer than 60 days remaining of EV eligibility.</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_domain</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">domain_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible.com</span>
 <span class="w">    </span><span class="nt">verification_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web_server</span>
@@ -430,7 +436,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-client_id"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-client-id"><strong>client_id</strong></p>
 <a class="ansibleOptionLink" href="#return-client_id" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Client ID that the domain belongs to. If the input value <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-client-id"><span class="std std-ref"><span class="pre">client_id</span></span></a></strong></code> is specified, this will always be the same as <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-client-id"><span class="std std-ref"><span class="pre">client_id</span></span></a></strong></code></p>
+<td><div class="ansible-option-cell"><p>Client ID that the domain belongs to. If the input value <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-client-id"><span class="std std-ref"><span class="pre">client_id</span></span></a></strong></code> is specified, this will always be the same as <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-parameter-client-id"><span class="std std-ref"><span class="pre">client_id</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">1</span></code></p>
 </div></td>
@@ -466,7 +472,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-domain_status"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-domain-status"><strong>domain_status</strong></p>
 <a class="ansibleOptionLink" href="#return-domain_status" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Status of the current domain. Will be one of <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">CANCELLED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">INITIAL_VERIFICATION</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">CANCELLED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code></p>
+<td><div class="ansible-option-cell"><p>Status of the current domain. Will be one of <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">CANCELLED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">INITIAL_VERIFICATION</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">CANCELLED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;APPROVED&quot;</span></code></p>
 </div></td>
@@ -485,7 +491,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-ev_days_remaining"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-ev-days-remaining"><strong>ev_days_remaining</strong></p>
 <a class="ansibleOptionLink" href="#return-ev_days_remaining" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The number of days the domain remains eligible for submission of “EV” certificates. Will never be greater than the value of <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ov-days-remaining"><span class="std std-ref"><span class="pre">ov_days_remaining</span></span></a></code></p>
+<td><div class="ansible-option-cell"><p>The number of days the domain remains eligible for submission of “EV” certificates. Will never be greater than the value of <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ov-days-remaining"><span class="std std-ref"><span class="pre">ov_days_remaining</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ev-eligible"><span class="std std-ref"><span class="pre">ev_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-domain-status"><span class="std std-ref"><span class="pre">domain_status</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code>.</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">94</span></code></p>
 </div></td>
@@ -494,7 +500,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-ev_eligible"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-ev-eligible"><strong>ev_eligible</strong></p>
 <a class="ansibleOptionLink" href="#return-ev_eligible" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Whether the domain is eligible for submission of “EV” certificates. Will never be <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> if <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ov-eligible"><span class="std std-ref"><span class="pre">ov_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code></p>
+<td><div class="ansible-option-cell"><p>Whether the domain is eligible for submission of “EV” certificates. Will never be <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> if <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ov-eligible"><span class="std std-ref"><span class="pre">ov_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-domain-status"><span class="std std-ref"><span class="pre">domain_status</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>.</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
@@ -521,7 +527,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-ov_days_remaining"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-ov-days-remaining"><strong>ov_days_remaining</strong></p>
 <a class="ansibleOptionLink" href="#return-ov_days_remaining" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The number of days the domain remains eligible for submission of “OV” certificates. Will never be less than the value of <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ev-days-remaining"><span class="std std-ref"><span class="pre">ev_days_remaining</span></span></a></code></p>
+<td><div class="ansible-option-cell"><p>The number of days the domain remains eligible for submission of “OV” certificates. Will never be less than the value of <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ev-days-remaining"><span class="std std-ref"><span class="pre">ev_days_remaining</span></span></a></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ov-eligible"><span class="std std-ref"><span class="pre">ov_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-domain-status"><span class="std std-ref"><span class="pre">domain_status</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code>.</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">129</span></code></p>
 </div></td>
@@ -530,7 +536,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="return-ov_eligible"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-domain-module-return-ov-eligible"><strong>ov_eligible</strong></p>
 <a class="ansibleOptionLink" href="#return-ov_eligible" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Whether the domain is eligible for submission of “OV” certificates. Will never be <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> if <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ev-eligible"><span class="std std-ref"><span class="pre">ev_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
+<td><div class="ansible-option-cell"><p>Whether the domain is eligible for submission of “OV” certificates. Will never be <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> if <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-ev-eligible"><span class="std std-ref"><span class="pre">ev_eligible</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-domain-module-return-domain-status"><span class="std std-ref"><span class="pre">domain_status</span></span></a></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RE_VERIFICATION</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRING</span></code>, or <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>.</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
@@ -557,6 +563,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>

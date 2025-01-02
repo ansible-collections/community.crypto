@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.ecs_certificate module – Request SSL/TLS certificates with the Entrust Certificate Services (ECS) API &mdash; Community.Crypto Collection  documentation</title>
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API" href="ecs_domain_module.html" />
@@ -116,7 +114,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -127,7 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -185,7 +183,7 @@
 <h1>community.crypto.ecs_certificate module – Request SSL/TLS certificates with the Entrust Certificate Services (ECS) API<a class="headerlink" href="#community-crypto-ecs-certificate-module-request-ssl-tls-certificates-with-the-entrust-certificate-services-ecs-api" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -497,105 +495,105 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text1"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text1"><strong>text1</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text1" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text10"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text10"><strong>text10</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text10" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text11"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text11"><strong>text11</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text11" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text12"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text12"><strong>text12</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text12" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text13"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text13"><strong>text13</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text13" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text14"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text14"><strong>text14</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text14" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text15"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text15"><strong>text15</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text15" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text2"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text2"><strong>text2</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text2" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text3"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text3"><strong>text3</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text3" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text4"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text4"><strong>text4</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text4" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text5"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text5"><strong>text5</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text5" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text6"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text6"><strong>text6</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text6" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text7"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text7"><strong>text7</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text7" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text8"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text8"><strong>text8</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text8" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-custom_fields/text9"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-parameter-custom-fields-text9"><strong>text9</strong></p>
 <a class="ansibleOptionLink" href="#parameter-custom_fields/text9" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters)</p>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Custom text field (maximum 500 characters).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -696,7 +694,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 </div></td>
 <td><div class="ansible-option-cell"><p>Organizational unit “OU=” to include in the certificate.</p>
 <p><code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> behavior is dependent on whether organizational units are enabled for your account. If organizational unit support is disabled for your account, organizational units from the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> and the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> parameter are ignored.</p>
-<p>If both <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> are specified, the value in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> will override the OU fields present in the subject distinguished name in the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code></p>
+<p>If both <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> are specified, the value in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> will override the OU fields present in the subject distinguished name in the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code>.</p>
 <p>If neither <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> nor <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> are specified for a renew or reissue operation, the OU fields in the initial certificate are reused.</p>
 <p>An invalid OU from <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> is ignored, but any invalid organizational units in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> will result in an error indicating “Unapproved OU”. The <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-ou"><span class="std std-ref"><span class="pre">ou</span></span></a></strong></code> parameter can be used to force failure if an unapproved organizational unit is provided.</p>
 <p>A maximum of one OU may be specified for current products. Multiple OUs are reserved for future products.</p>
@@ -734,7 +732,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <p>Specifying <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-request-type"><span class="std std-ref"><span class="pre">request_type=reissue</span></span></a></code> means that an existing certificate (specified by <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-tracking-id"><span class="std std-ref"><span class="pre">tracking_id</span></span></a></strong></code> if present, otherwise <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-path"><span class="std std-ref"><span class="pre">path</span></span></a></strong></code>) will be reissued. If there is no certificate to reissue, a new certificate is requested.</p>
 <p>If a certificate was issued within the past 30 days, the <code class="ansible-value docutils literal notranslate"><span class="pre">renew</span></code> operation is not a valid operation and will fail.</p>
 <p>Note that <code class="ansible-value docutils literal notranslate"><span class="pre">reissue</span></code> is an operation that will result in the revocation of the certificate that is reissued, be cautious with its use.</p>
-<p><em>check_mode</em> is only supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-request-type"><span class="std std-ref"><span class="pre">request_type=new</span></span></a></code></p>
+<p><em>check_mode</em> is only supported if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-request-type"><span class="std std-ref"><span class="pre">request_type=new</span></span></a></code>.</p>
 <p>For example, setting <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-request-type"><span class="std std-ref"><span class="pre">request_type=renew</span></span></a></code> and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-remaining-days"><span class="std std-ref"><span class="pre">remaining_days=30</span></span></a></code> and pointing to the same certificate on multiple playbook runs means that on the first run new certificate will be requested. It will then be left along on future runs until it is within 30 days of expiry, then the ECS “renew” operation will be performed.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
@@ -826,6 +824,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-partial">partial</strong></p>
+<p>The module is not idempotent if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-ecs-certificate-module-parameter-force"><span class="std std-ref"><span class="pre">force=true</span></span></a></code>.</p>
+<p>Under which conditions the module is idempotent still needs to be determined. If you are using this module and have more information, please contribute to the documentation!</p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="attribute-safe_file_operations"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-ecs-certificate-module-attribute-safe-file-operations"><strong>safe_file_operations</strong></p>
 <a class="ansibleOptionLink" href="#attribute-safe_file_operations" title="Permalink to this attribute"></a></div></td>
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
@@ -861,9 +870,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate from Entrust with bare minimum parameters.</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">Will request a new certificate if current one is valid but within 30</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">days of expiry. If replacing an existing file in path, will back it up.</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate from Entrust with bare minimum parameters. Will request a new certificate if current one</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">is valid but within 30 days of expiry. If replacing an existing file in path, will back it up.</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">backup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
@@ -878,10 +886,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">If there is no certificate present in path, request a new certificate</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">of type EV_SSL. Otherwise, if there is an Entrust managed certificate</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">in path and it is within 63 days of expiration, request a renew of that</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">certificate.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">If there is no certificate present in path, request a new certificate of type EV_SSL. Otherwise, if there is an</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">Entrust managed certificate in path and it is within 63 days of expiration, request a renew of that certificate.</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
@@ -897,11 +903,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">If there is no certificate present in path, download certificate</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">specified by tracking_id if it is still valid. Otherwise, if the</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">certificate is within 79 days of expiration, request a renew of that</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">certificate and save it in path. This can be used to &quot;migrate&quot; a</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">certificate to be Ansible managed.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">If there is no certificate present in path, download certificate specified by tracking_id if it is still valid.</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">Otherwise, if the certificate is within 79 days of expiration, request a renew of that certificate and save it in path.</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">This can be used to &quot;migrate&quot; a certificate to be Ansible managed.</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
@@ -924,10 +928,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate with an alternative client. Note that the</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">issued certificate will have it&#39;s Subject Distinguished Name use the</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">organization details associated with that client, rather than what is</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">in the CSR.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate with an alternative client. Note that the issued certificate will have its Subject Distinguished</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">Name use the organization details associated with that client, rather than what is in the CSR.</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
@@ -940,8 +942,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
 <span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.key</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate with a number of CSR parameters overridden</span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">and tracking information</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Request a new certificate with a number of CSR parameters overridden and tracking information</span>
 <span class="w">  </span><span class="nt">community.crypto.ecs_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
 <span class="w">    </span><span class="nt">full_chain_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.chain.crt</span>
@@ -1027,7 +1028,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <a class="ansibleOptionLink" href="#return-cert_status" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The certificate status in ECS.</p>
-<p>Current possible values (which may be expanded in the future) are: <code class="ansible-value docutils literal notranslate"><span class="pre">ACTIVE</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DEACTIVATED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">NA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">PENDING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">PENDING_QUORUM</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">READY</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REISSUED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REISSUING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RENEWED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RENEWING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REVOKED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">SUSPENDED</span></code></p>
+<p>Current possible values (which may be expanded in the future) are: <code class="ansible-value docutils literal notranslate"><span class="pre">ACTIVE</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">APPROVED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DEACTIVATED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">DECLINED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">EXPIRED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">NA</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">PENDING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">PENDING_QUORUM</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">READY</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REISSUED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REISSUING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RENEWED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">RENEWING</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">REVOKED</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">SUSPENDED</span></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;ACTIVE&quot;</span></code></p>
 </div></td>
@@ -1073,6 +1074,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ec
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>

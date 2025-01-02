@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs) &mdash; Community.Crypto Collection  documentation</title>
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)" href="x509_crl_info_module.html" />
@@ -102,7 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -113,7 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -185,7 +183,7 @@
 <h1>community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)<a class="headerlink" href="#community-crypto-x509-crl-module-generate-certificate-revocation-lists-crls" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -237,8 +235,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
-<p>To get supported flags look at the man page for <em>chattr</em> on the target system.</p>
-<p>This string should contain the attributes in the same order as the one displayed by <em>lsattr</em>.</p>
+<p>To get supported flags look at the man page for <code class="docutils literal notranslate"><span class="pre">chattr</span></code> on the target system.</p>
+<p>This string should contain the attributes in the same order as the one displayed by <code class="docutils literal notranslate"><span class="pre">lsattr</span></code>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">=</span></code> operator is assumed as default, otherwise <code class="docutils literal notranslate"><span class="pre">+</span></code> or <code class="docutils literal notranslate"><span class="pre">-</span></code> operators need to be included in the string.</p>
 </div></td>
 </tr>
@@ -308,7 +306,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="parameter-group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-group"><strong>group</strong></p>
 <a class="ansibleOptionLink" href="#parameter-group" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <em>chown</em>.</p>
+<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
 <p>When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.</p>
 </div></td>
 </tr>
@@ -405,7 +403,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <div class="ansibleOptionAnchor" id="parameter-owner"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-owner"><strong>owner</strong></p>
 <a class="ansibleOptionLink" href="#parameter-owner" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <em>chown</em>.</p>
+<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
 <p>When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.</p>
 <p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
 </div></td>
@@ -498,7 +496,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-revoked_certificates/issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The certificate’s issuer.</p>
-<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code></p>
+<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
@@ -584,7 +582,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 <td><div class="ansible-option-cell"><p>The level part of the SELinux filesystem object context.</p>
 <p>This is the MLS/MCS attribute, sometimes known as the <code class="docutils literal notranslate"><span class="pre">range</span></code>.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -593,8 +591,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p><em class="ansible-option-versionadded">added in community.crypto 2.18.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>This option determines which values will be accepted for <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-revoked-certificates-serial-number"><span class="std std-ref"><span class="pre">revoked_certificates[].serial_number</span></span></a></strong></code>.</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">integer</span></code> (default), serial numbers are assumed to be integers, for example <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>. (This example value is equivalent to the hex octet string <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>.)</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">hex-octets</span></code>, serial numbers are assumed to be colon-separated hex octet strings, for example <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>. (This example value is equivalent to the integer <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>.)</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">integer</span></code> (default), serial numbers are assumed to be integers, for example <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>. (This example value is equivalent to the hex octet string <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>).</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">hex-octets</span></code>, serial numbers are assumed to be colon-separated hex octet strings, for example <code class="ansible-value docutils literal notranslate"><span class="pre">01:02:AF</span></code>. (This example value is equivalent to the integer <code class="ansible-value docutils literal notranslate"><span class="pre">66223</span></code>).</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;integer&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -607,7 +605,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The role part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -615,7 +613,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The type part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -623,8 +621,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The user part of the SELinux filesystem object context.</p>
-<p>By default it uses the <code class="docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
+<p>By default it uses the <code class="ansible-value docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -684,6 +682,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-partial">partial</strong></p>
+<p>The module is not idempotent if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-force"><span class="std std-ref"><span class="pre">force=true</span></span></a></code>.</p>
+<p>If relative timestamps and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-ignore-timestamps"><span class="std std-ref"><span class="pre">ignore_timestamps=false</span></span></a></code> (default), the module is not idempotent.</p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="attribute-safe_file_operations"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-attribute-safe-file-operations"><strong>safe_file_operations</strong></p>
 <a class="ansibleOptionLink" href="#attribute-safe_file_operations" title="Permalink to this attribute"></a></div></td>
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
@@ -956,6 +965,8 @@ or that the certificate otherwise became invalid as ASN.1 TIME.</p>
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>

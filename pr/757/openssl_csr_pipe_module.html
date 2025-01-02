@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR) &mdash; Community.Crypto Collection  documentation</title>
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters" href="openssl_dhparam_module.html" />
@@ -102,7 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -127,7 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -185,7 +183,7 @@
 <h1>community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)<a class="headerlink" href="#community-crypto-openssl-csr-pipe-module-generate-openssl-certificate-signing-request-csr" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -235,8 +233,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-authority_cert_issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Names that will be present in the authority cert issuer field of the certificate signing request.</p>
-<p>Values must be prefixed by their options. (That is, <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code>, and the ones specific to your CA)</p>
-<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code></p>
+<p>Values must be prefixed by their options. (That is, <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">URI</span></code>, <code class="docutils literal notranslate"><span class="pre">DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">RID</span></code>, <code class="docutils literal notranslate"><span class="pre">IP</span></code>, <code class="docutils literal notranslate"><span class="pre">dirName</span></code>, <code class="docutils literal notranslate"><span class="pre">otherName</span></code>, and the ones specific to your CA).</p>
+<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">DNS:ca.example.org</span></code>.</p>
 <p>If specified, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-serial-number"><span class="std std-ref"><span class="pre">authority_cert_serial_number</span></span></a></strong></code> must also be specified.</p>
 <p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
 <p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
@@ -260,7 +258,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-authority_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The authority key identifier as a hex string, where two bytes are separated by colons.</p>
-<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code></p>
+<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code>.</p>
 <p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
 <p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">AuthorityKeyIdentifier</span></code> extension will only be added if at least one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-key-identifier"><span class="std std-ref"><span class="pre">authority_key_identifier</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-issuer"><span class="std std-ref"><span class="pre">authority_cert_issuer</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-authority-cert-serial-number"><span class="std std-ref"><span class="pre">authority_cert_serial_number</span></span></a></strong></code> is specified.</p>
@@ -625,7 +623,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-subject_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The subject key identifier as a hex string, where two bytes are separated by colons.</p>
-<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code></p>
+<p>Example: <code class="ansible-value docutils literal notranslate"><span class="pre">00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33</span></code>.</p>
 <p>Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option is mostly useful for self-signed certificates or for own CAs.</p>
 <p>Note that this option can only be used if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-create-subject-key-identifier"><span class="std std-ref"><span class="pre">create_subject_key_identifier</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>.</p>
 <p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
@@ -697,6 +695,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
 </div></td>
 </tr>
 </tbody>
@@ -778,7 +785,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-basicConstraints"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-basicconstraints"><strong>basicConstraints</strong></p>
 <a class="ansibleOptionLink" href="#return-basicConstraints" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Indicates if the certificate belongs to a CA</p>
+<td><div class="ansible-option-cell"><p>Indicates if the certificate belongs to a CA.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;CA:TRUE&quot;,</span> <span class="pre">&quot;pathLenConstraint:0&quot;]</span></code></p>
 </div></td>
@@ -795,7 +802,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-extendedKeyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-extendedkeyusage"><strong>extendedKeyUsage</strong></p>
 <a class="ansibleOptionLink" href="#return-extendedKeyUsage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Additional restriction on the public key purposes</p>
+<td><div class="ansible-option-cell"><p>Additional restriction on the public key purposes.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;clientAuth&quot;]</span></code></p>
 </div></td>
@@ -804,7 +811,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-keyUsage"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-keyusage"><strong>keyUsage</strong></p>
 <a class="ansibleOptionLink" href="#return-keyUsage" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Purpose for which the public key may be used</p>
+<td><div class="ansible-option-cell"><p>Purpose for which the public key may be used.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;digitalSignature&quot;,</span> <span class="pre">&quot;keyAgreement&quot;]</span></code></p>
 </div></td>
@@ -831,7 +838,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-ocsp_must_staple"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-ocsp-must-staple"><strong>ocsp_must_staple</strong></p>
 <a class="ansibleOptionLink" href="#return-ocsp_must_staple" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Indicates whether the certificate has the OCSP Must Staple feature enabled</p>
+<td><div class="ansible-option-cell"><p>Indicates whether the certificate has the OCSP Must Staple feature enabled.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">false</span></code></p>
 </div></td>
@@ -840,7 +847,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-privatekey"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-privatekey"><strong>privatekey</strong></p>
 <a class="ansibleOptionLink" href="#return-privatekey" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Path to the TLS/SSL private key the CSR was generated for</p>
+<td><div class="ansible-option-cell"><p>Path to the TLS/SSL private key the CSR was generated for.</p>
 <p>Will be <code class="ansible-value docutils literal notranslate"><span class="pre">none</span></code> if the private key has been provided in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-pipe-module-parameter-privatekey-content"><span class="std std-ref"><span class="pre">privatekey_content</span></span></a></strong></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/etc/ssl/private/ansible.com.pem&quot;</span></code></p>
@@ -850,7 +857,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-subject"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-subject"><strong>subject</strong></p>
 <a class="ansibleOptionLink" href="#return-subject" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=list</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>A list of the subject tuples attached to the CSR</p>
+<td><div class="ansible-option-cell"><p>A list of the subject tuples attached to the CSR.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[[&quot;CN&quot;,</span> <span class="pre">&quot;www.ansible.com&quot;],</span> <span class="pre">[&quot;O&quot;,</span> <span class="pre">&quot;Ansible&quot;]]</span></code></p>
 </div></td>
@@ -859,7 +866,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-subjectAltName"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-csr-pipe-module-return-subjectaltname"><strong>subjectAltName</strong></p>
 <a class="ansibleOptionLink" href="#return-subjectAltName" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The alternative names this CSR is valid for</p>
+<td><div class="ansible-option-cell"><p>The alternative names this CSR is valid for.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[&quot;DNS:www.ansible.com&quot;,</span> <span class="pre">&quot;DNS:m.ansible.com&quot;]</span></code></p>
 </div></td>
@@ -878,6 +885,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>

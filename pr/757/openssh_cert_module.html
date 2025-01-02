@@ -1,11 +1,13 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates. &mdash; Community.Crypto Collection  documentation</title>
+  <title>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates &mdash; Community.Crypto Collection  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5707b69d" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.openssh_keypair module – Generate OpenSSH private and public keys" href="openssh_keypair_module.html" />
@@ -102,7 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
@@ -126,7 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -167,7 +165,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</li>
+      <li class="breadcrumb-item active">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
               <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/openssh_cert.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
@@ -181,10 +179,10 @@
            <div itemprop="articleBody">
              
   <span class="target" id="ansible-collections-community-crypto-openssh-cert-module"></span><section id="community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates">
-<h1>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.<a class="headerlink" href="#community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates" title="Link to this heading"></a></h1>
+<h1>community.crypto.openssh_cert module – Generate OpenSSH host or user certificates<a class="headerlink" href="#community-crypto-openssh-cert-module-generate-openssh-host-or-user-certificates" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -232,8 +230,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
-<p>To get supported flags look at the man page for <em>chattr</em> on the target system.</p>
-<p>This string should contain the attributes in the same order as the one displayed by <em>lsattr</em>.</p>
+<p>To get supported flags look at the man page for <code class="docutils literal notranslate"><span class="pre">chattr</span></code> on the target system.</p>
+<p>This string should contain the attributes in the same order as the one displayed by <code class="docutils literal notranslate"><span class="pre">lsattr</span></code>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">=</span></code> operator is assumed as default, otherwise <code class="docutils literal notranslate"><span class="pre">+</span></code> or <code class="docutils literal notranslate"><span class="pre">-</span></code> operators need to be included in the string.</p>
 </div></td>
 </tr>
@@ -254,7 +252,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-parameter-group"><strong>group</strong></p>
 <a class="ansibleOptionLink" href="#parameter-group" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <em>chown</em>.</p>
+<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
 <p>When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.</p>
 </div></td>
 </tr>
@@ -284,12 +282,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The permissions the resulting filesystem object should have.</p>
-<p>For those used to <em>/usr/bin/chmod</em> remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, <code class="docutils literal notranslate"><span class="pre">'644'</span></code> or <code class="docutils literal notranslate"><span class="pre">'1777'</span></code>) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, <code class="docutils literal notranslate"><span class="pre">0755</span></code>) works sometimes, but can fail in loops and some other circumstances.</p>
+<p>For those used to <code class="docutils literal notranslate"><span class="pre">/usr/bin/chmod</span></code> remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">'644'</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">'1777'</span></code>) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">0755</span></code>) works sometimes, but can fail in loops and some other circumstances.</p>
 <p>Giving Ansible a number without following either of these rules will end up with a decimal number which will have unexpected results.</p>
-<p>As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, <code class="docutils literal notranslate"><span class="pre">u+rwx</span></code> or <code class="docutils literal notranslate"><span class="pre">u=rw,g=r,o=r</span></code>).</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">mode</span></code> is not specified and the destination filesystem object <strong>does not</strong> exist, the default <code class="docutils literal notranslate"><span class="pre">umask</span></code> on the system will be used when setting the mode for the newly created filesystem object.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">mode</span></code> is not specified and the destination filesystem object <strong>does</strong> exist, the mode of the existing filesystem object will be used.</p>
-<p>Specifying <code class="docutils literal notranslate"><span class="pre">mode</span></code> is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details.</p>
+<p>As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">u+rwx</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">u=rw,g=r,o=r</span></code>).</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does not</strong> exist, the default <code class="docutils literal notranslate"><span class="pre">umask</span></code> on the system will be used when setting the mode for the newly created filesystem object.</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does</strong> exist, the mode of the existing filesystem object will be used.</p>
+<p>Specifying <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -297,13 +295,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-options" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Specify certificate options when signing a key. The option that are valid for user certificates are:</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">clear</span></code>: Clear all enabled permissions.  This is useful for clearing the default set of permissions so permissions may be added individually.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">clear</span></code>: Clear all enabled permissions. This is useful for clearing the default set of permissions so permissions may be added individually.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">force-command=command</span></code>: Forces the execution of command instead of any shell or command specified by the user when the certificate is used for authentication.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-agent-forwarding</span></code>: Disable ssh-agent forwarding (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-port-forwarding</span></code>: Disable port forwarding (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-pty</span></code>: Disable PTY allocation (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">no-user-rc</span></code>: Disable execution of <code class="docutils literal notranslate"><span class="pre">~/.ssh/rc</span></code> by sshd (permitted by default).</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">no-x11-forwarding</span></code>: Disable X11 forwarding (permitted by default)</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">no-x11-forwarding</span></code>: Disable X11 forwarding (permitted by default).</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-agent-forwarding</span></code>: Allows ssh-agent forwarding.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-port-forwarding</span></code>: Allows port forwarding.</p>
 <p><code class="ansible-value docutils literal notranslate"><span class="pre">permit-pty</span></code>: Allows PTY allocation.</p>
@@ -317,7 +315,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-owner"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-parameter-owner"><strong>owner</strong></p>
 <a class="ansibleOptionLink" href="#parameter-owner" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <em>chown</em>.</p>
+<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
 <p>When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.</p>
 <p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
 </div></td>
@@ -379,7 +377,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>The level part of the SELinux filesystem object context.</p>
 <p>This is the MLS/MCS attribute, sometimes known as the <code class="docutils literal notranslate"><span class="pre">range</span></code>.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -395,7 +393,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The role part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -403,7 +401,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The type part of the SELinux filesystem object context.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -411,8 +409,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The user part of the SELinux filesystem object context.</p>
-<p>By default it uses the <code class="docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
-<p>When set to <code class="docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
+<p>By default it uses the <code class="ansible-value docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -550,6 +548,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-partial">partial</strong></p>
+<p>The module is not idempotent if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-force"><span class="std std-ref"><span class="pre">force=true</span></span></a></code> or <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-regenerate"><span class="std std-ref"><span class="pre">regenerate=always</span></span></a></code>.</p>
+<p>If relative timestamps are used and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssh-cert-module-parameter-ignore-timestamps"><span class="std std-ref"><span class="pre">ignore_timestamps=false</span></span></a></code> (default), the module is not idempotent.</p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="attribute-safe_file_operations"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-attribute-safe-file-operations"><strong>safe_file_operations</strong></p>
 <a class="ansibleOptionLink" href="#attribute-safe_file_operations" title="Permalink to this attribute"></a></div></td>
 <td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
@@ -603,8 +612,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">valid_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
 <span class="w">    </span><span class="nt">valid_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forever</span>
 <span class="w">    </span><span class="nt">principals</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example.com</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">examplehost</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example.com</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">examplehost</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSH host Certificate that is valid from 21.1.2001 to 21.1.2019</span>
 <span class="w">  </span><span class="nt">community.crypto.openssh_cert</span><span class="p">:</span>
@@ -624,8 +633,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">valid_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
 <span class="w">    </span><span class="nt">valid_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forever</span>
 <span class="w">    </span><span class="nt">options</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;clear&quot;</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;force-command=/tmp/bla/foo&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;clear&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;force-command=/tmp/bla/foo&quot;</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSH user certificate using a PKCS#11 token</span>
 <span class="w">  </span><span class="nt">community.crypto.openssh_cert</span><span class="p">:</span>
@@ -653,7 +662,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-filename"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-return-filename"><strong>filename</strong></p>
 <a class="ansibleOptionLink" href="#return-filename" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>path to the certificate</p>
+<td><div class="ansible-option-cell"><p>Path to the certificate.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/tmp/certificate-cert.pub&quot;</span></code></p>
 </div></td>
@@ -670,7 +679,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="return-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-cert-module-return-type"><strong>type</strong></p>
 <a class="ansibleOptionLink" href="#return-type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>type of the certificate (host or user)</p>
+<td><div class="ansible-option-cell"><p>Type of the certificate (host or user).</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;host&quot;</span></code></p>
 </div></td>
@@ -688,6 +697,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>

@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.11.0" name="antsibull-docs" />
+<meta content="2.16.2" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.acme_inspect module – Send direct requests to an ACME server &mdash; Community.Crypto Collection  documentation</title>
@@ -13,15 +15,11 @@
 
   
     <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7f41d439"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates" href="certificate_complete_chain_module.html" />
@@ -116,7 +114,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
@@ -127,7 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
@@ -185,7 +183,7 @@
 <h1>community.crypto.acme_inspect module – Send direct requests to an ACME server<a class="headerlink" href="#community-crypto-acme-inspect-module-send-direct-requests-to-an-acme-server" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.21.0).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.24.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -275,7 +273,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 <td><div class="ansible-option-cell"><p>The ACME directory to use. This is the entry point URL to access the ACME CA server API.</p>
 <p>For safety reasons the default is set to the Let’s Encrypt staging server (for the ACME v1 protocol). This will create technically correct, but untrusted certificates.</p>
-<p>For Let’s Encrypt, all staging endpoints can be found here: <a class="reference external" href="https://letsencrypt.org/docs/staging-environment/">https://letsencrypt.org/docs/staging-environment/</a>. For Buypass, all endpoints can be found here: <a class="reference external" href="https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints">https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints</a></p>
+<p>For Let’s Encrypt, all staging endpoints can be found here: <a class="reference external" href="https://letsencrypt.org/docs/staging-environment/">https://letsencrypt.org/docs/staging-environment/</a>. For Buypass, all endpoints can be found here: <a class="reference external" href="https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints">https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints</a>.</p>
 <p>For <strong>Let’s Encrypt</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme-v02.api.letsencrypt.org/directory">https://acme-v02.api.letsencrypt.org/directory</a>.</p>
 <p>For <strong>Buypass</strong>, the production directory URL for ACME v2 and v1 is <a class="reference external" href="https://api.buypass.com/acme/directory">https://api.buypass.com/acme/directory</a>.</p>
 <p>For <strong>ZeroSSL</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme.zerossl.com/v2/DV90">https://acme.zerossl.com/v2/DV90</a>.</p>
@@ -417,6 +415,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
 </div></td>
 </tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -426,7 +433,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>The <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-uri"><span class="std std-ref"><span class="pre">account_uri</span></span></a></strong></code> option must be specified for properly authenticated ACME v2 requests (except a <code class="docutils literal notranslate"><span class="pre">new-account</span></code> request).</p></li>
-<li><p>Using the <code class="docutils literal notranslate"><span class="pre">ansible</span></code> tool, <a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a> can be used to directly execute ACME requests without the need of writing a playbook. For example, the following command retrieves the ACME account with ID 1 from Let’s Encrypt (assuming <code class="docutils literal notranslate"><span class="pre">/path/to/key</span></code> is the correct private account key): <code class="docutils literal notranslate"><span class="pre">ansible</span> <span class="pre">localhost</span> <span class="pre">-m</span> <span class="pre">acme_inspect</span> <span class="pre">-a</span> <span class="pre">&quot;account_key_src=/path/to/key</span> <span class="pre">acme_directory=https://acme-v02.api.letsencrypt.org/directory</span> <span class="pre">acme_version=2</span> <span class="pre">account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1</span> <span class="pre">method=get</span> <span class="pre">url=https://acme-v02.api.letsencrypt.org/acme/acct/1&quot;</span></code></p></li>
+<li><p>Using the <code class="docutils literal notranslate"><span class="pre">ansible</span></code> tool, <a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a> can be used to directly execute ACME requests without the need of writing a playbook. For example, the following command retrieves the ACME account with ID 1 from Let’s Encrypt (assuming <code class="docutils literal notranslate"><span class="pre">/path/to/key</span></code> is the correct private account key): <code class="docutils literal notranslate"><span class="pre">ansible</span> <span class="pre">localhost</span> <span class="pre">-m</span> <span class="pre">acme_inspect</span> <span class="pre">-a</span> <span class="pre">&quot;account_key_src=/path/to/key</span> <span class="pre">acme_directory=https://acme-v02.api.letsencrypt.org/directory</span> <span class="pre">acme_version=2</span> <span class="pre">account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1</span> <span class="pre">method=get</span> <span class="pre">url=https://acme-v02.api.letsencrypt.org/acme/acct/1&quot;</span></code>.</p></li>
 <li><p>Although the defaults are chosen so that the module can be used with the <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a> CA, the module can in principle be used with any CA providing an ACME endpoint, such as <a class="reference external" href="https://www.buypass.com/ssl/products/acme">Buypass Go SSL</a>.</p></li>
 <li><p>So far, the ACME modules have only been tested by the developers against Let’s Encrypt (staging and production), Buypass (staging and production), ZeroSSL (production), and <a class="reference external" href="https://github.com/letsencrypt/Pebble">Pebble testing server</a>. We have got community feedback that they also work with Sectigo ACME Service for InCommon. If you experience problems with another ACME server, please <a class="reference external" href="https://github.com/ansible-collections/community.crypto/issues/new/choose">create an issue</a> to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.</p></li>
 <li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower and less secure, as private key contents always have to be stored on disk (see <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-inspect-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>).</p></li>
@@ -489,7 +496,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">      </span><span class="c1"># For valid values, see</span>
 <span class="w">      </span><span class="c1"># https://tools.ietf.org/html/rfc8555#section-7.3</span>
 <span class="w">      </span><span class="nt">contact</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mailto:me@example.com</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mailto:me@example.com</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create certificate order</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate</span><span class="p">:</span>
@@ -561,7 +568,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-directory"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-return-directory"><strong>directory</strong></p>
 <a class="ansibleOptionLink" href="#return-directory" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The ACME directory’s content</p>
+<td><div class="ansible-option-cell"><p>The ACME directory’s content.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">{&quot;a85k3x9f91A4&quot;:</span> <span class="pre">&quot;https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417&quot;,</span> <span class="pre">&quot;keyChange&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/key-change&quot;,</span> <span class="pre">&quot;meta&quot;:</span> <span class="pre">{&quot;caaIdentities&quot;:</span> <span class="pre">[&quot;letsencrypt.org&quot;],</span> <span class="pre">&quot;termsOfService&quot;:</span> <span class="pre">&quot;https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf&quot;,</span> <span class="pre">&quot;website&quot;:</span> <span class="pre">&quot;https://letsencrypt.org&quot;},</span> <span class="pre">&quot;newAccount&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/new-acct&quot;,</span> <span class="pre">&quot;newNonce&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/new-nonce&quot;,</span> <span class="pre">&quot;newOrder&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/new-order&quot;,</span> <span class="pre">&quot;revokeCert&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/revoke-cert&quot;}</span></code></p>
 </div></td>
@@ -570,7 +577,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-headers"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-return-headers"><strong>headers</strong></p>
 <a class="ansibleOptionLink" href="#return-headers" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The request’s HTTP headers (with lowercase keys)</p>
+<td><div class="ansible-option-cell"><p>The request’s HTTP headers (with lowercase keys).</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">{&quot;boulder-requester&quot;:</span> <span class="pre">&quot;12345&quot;,</span> <span class="pre">&quot;cache-control&quot;:</span> <span class="pre">&quot;max-age=0,</span> <span class="pre">no-cache,</span> <span class="pre">no-store&quot;,</span> <span class="pre">&quot;connection&quot;:</span> <span class="pre">&quot;close&quot;,</span> <span class="pre">&quot;content-length&quot;:</span> <span class="pre">&quot;904&quot;,</span> <span class="pre">&quot;content-type&quot;:</span> <span class="pre">&quot;application/json&quot;,</span> <span class="pre">&quot;cookies&quot;:</span> <span class="pre">{},</span> <span class="pre">&quot;cookies_string&quot;:</span> <span class="pre">&quot;&quot;,</span> <span class="pre">&quot;date&quot;:</span> <span class="pre">&quot;Wed,</span> <span class="pre">07</span> <span class="pre">Nov</span> <span class="pre">2018</span> <span class="pre">12:34:56</span> <span class="pre">GMT&quot;,</span> <span class="pre">&quot;expires&quot;:</span> <span class="pre">&quot;Wed,</span> <span class="pre">07</span> <span class="pre">Nov</span> <span class="pre">2018</span> <span class="pre">12:44:56</span> <span class="pre">GMT&quot;,</span> <span class="pre">&quot;link&quot;:</span> <span class="pre">&quot;&lt;https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf&gt;;rel=\&quot;terms-of-service\&quot;&quot;,</span> <span class="pre">&quot;msg&quot;:</span> <span class="pre">&quot;OK</span> <span class="pre">(904</span> <span class="pre">bytes)&quot;,</span> <span class="pre">&quot;pragma&quot;:</span> <span class="pre">&quot;no-cache&quot;,</span> <span class="pre">&quot;replay-nonce&quot;:</span> <span class="pre">&quot;1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH&quot;,</span> <span class="pre">&quot;server&quot;:</span> <span class="pre">&quot;nginx&quot;,</span> <span class="pre">&quot;status&quot;:</span> <span class="pre">200,</span> <span class="pre">&quot;strict-transport-security&quot;:</span> <span class="pre">&quot;max-age=604800&quot;,</span> <span class="pre">&quot;url&quot;:</span> <span class="pre">&quot;https://acme-v02.api.letsencrypt.org/acme/acct/46161&quot;,</span> <span class="pre">&quot;x-frame-options&quot;:</span> <span class="pre">&quot;DENY&quot;}</span></code></p>
 </div></td>
@@ -579,7 +586,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-output_json"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-return-output-json"><strong>output_json</strong></p>
 <a class="ansibleOptionLink" href="#return-output_json" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The output parsed as JSON</p>
+<td><div class="ansible-option-cell"><p>The output parsed as JSON.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> if output can be parsed as JSON</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">[{&quot;id&quot;:</span> <span class="pre">12345},</span> <span class="pre">{&quot;key&quot;:</span> <span class="pre">[{&quot;kty&quot;:</span> <span class="pre">&quot;RSA&quot;},</span> <span class="pre">&quot;...&quot;]}]</span></code></p>
 </div></td>
@@ -588,9 +595,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="ansibleOptionAnchor" id="return-output_text"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-inspect-module-return-output-text"><strong>output_text</strong></p>
 <a class="ansibleOptionLink" href="#return-output_text" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The raw text output</p>
+<td><div class="ansible-option-cell"><p>The raw text output.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> always</p>
-<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;{\n</span>&#160; <span class="pre">\&quot;id\&quot;:</span> <span class="pre">12345,\n</span>&#160; <span class="pre">\&quot;key\&quot;:</span> <span class="pre">{\n</span>&#160;&#160;&#160; <span class="pre">\&quot;kty\&quot;:</span> <span class="pre">\&quot;RSA\&quot;,\n</span> <span class="pre">...&quot;</span></code></p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;{\\n</span>&#160; <span class="pre">\\\&quot;id\\\&quot;:</span> <span class="pre">12345,\\n</span>&#160; <span class="pre">\\\&quot;key\\\&quot;:</span> <span class="pre">{\\n</span>&#160;&#160;&#160; <span class="pre">\\\&quot;kty\\\&quot;:</span> <span class="pre">\\\&quot;RSA\\\&quot;,\\n</span> <span class="pre">...&quot;</span></code></p>
 </div></td>
 </tr>
 </tbody>
@@ -606,6 +613,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <ul class="ansible-links">
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
 <li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
 <li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>
