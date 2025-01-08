@@ -74,9 +74,11 @@
         assert:
           that:
             - second_signature_algorithm is changed
-      # RHEL9 disables SHA-1 algorithms by default making this test fail with a 'libcrypt' error. Other systems which
-      # impose a similar restriction may also need to skip this block in the future.
-      when: not (ansible_facts['distribution'] == "RedHat" and (ansible_facts['distribution_major_version'] | int) >= 9)
+      # RHEL9 and Fedora 41 disable the SHA-1 algorithms by default, making this test fail with a 'libcrypt' error.
+      # Other systems which impose a similar restriction may also need to skip this block in the future.
+      when:
+        - not (ansible_facts['distribution'] == "RedHat" and (ansible_facts['distribution_major_version'] | int) >= 9)
+        - not (ansible_facts['distribution'] == "Fedora" and (ansible_facts['distribution_major_version'] | int) >= 41)
 
     - name: Omit signature algorithm
       openssh_cert:

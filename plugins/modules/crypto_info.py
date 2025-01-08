@@ -177,8 +177,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 try:
     import cryptography
     from cryptography.exceptions import UnsupportedAlgorithm
+
+    try:
+        # While UnsupportedAlgorithm got added in cryptography 0.1, InternalError
+        # only got added in 0.2, so let's guard the import
+        from cryptography.exceptions import InternalError as CryptographyInternalError
+    except ImportError:
+        CryptographyInternalError = Exception
 except ImportError:
     UnsupportedAlgorithm = Exception
+    CryptographyInternalError = Exception
     CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
 else:
@@ -273,6 +281,11 @@ def add_crypto_information(module):
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(curve=ecclass(), backend=backend)
                     curves.append(curve_name)
                 except UnsupportedAlgorithm:
+                    pass
+                except CryptographyInternalError:  # pylint: disable=duplicate-except,bad-except-order
+                    # On Fedora 41, some curves result in InternalError. This is probably because
+                    # Fedora's cryptography is linked against the system libssl, which has the
+                    # curves removed.
                     pass
 
     info = {
