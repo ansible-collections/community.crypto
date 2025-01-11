@@ -263,6 +263,14 @@ options:
       - always
     default: never
     version_added: 2.20.0
+  profile:
+    description:
+      - Chose a specific profile for certificate selection. The available profiles depend on the CA.
+      - See L(a blog post by Let's Encrypt, https://letsencrypt.org/2025/01/09/acme-profiles/) and
+        L(draft-aaron-acme-profiles-00, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
+        for more information.
+    type: str
+    version_added: 2.24.0
 """
 
 EXAMPLES = r"""
@@ -604,6 +612,7 @@ class ACMECertificateClient(object):
         self.all_chains = None
         self.select_chain_matcher = []
         self.include_renewal_cert_id = module.params['include_renewal_cert_id']
+        self.profile = module.params['profile']
 
         if self.module.params['select_chain']:
             for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
@@ -613,6 +622,13 @@ class ACMECertificateClient(object):
                             Criterium(criterium, index=criterium_idx)))
                 except ValueError as exc:
                     self.module.warn('Error while parsing criterium: {error}. Ignoring criterium.'.format(error=exc))
+
+        if self.profile is not None:
+            meta_profiles = (self.directory.get('meta') or {}).get('profiles') or {}
+            if not meta_profiles:
+                raise ModuleFailException(msg='The ACME CA does not support profiles.')
+            if self.profile not in meta_profiles:
+                raise ModuleFailException(msg='The ACME CA does not support selected profile {0!r}.'.format(self.profile))
 
         # Make sure account exists
         modify_account = module.params['modify_account']
@@ -696,7 +712,7 @@ class ACMECertificateClient(object):
                         cert_info=cert_info,
                         none_if_required_information_is_missing=True,
                     )
-            self.order = Order.create(self.client, self.identifiers, replaces_cert_id)
+            self.order = Order.create(self.client, self.identifiers, replaces_cert_id, profile=self.profile)
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)
             self.authorizations.update(self.order.authorizations)
@@ -882,6 +898,7 @@ def main():
             authority_key_identifier=dict(type='str'),
         )),
         include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
+        profile=dict(type='str'),
     )
     argument_spec.update(
         required_one_of=[

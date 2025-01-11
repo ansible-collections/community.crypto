@@ -65,7 +65,7 @@ class Order(object):
         return result
 
     @classmethod
-    def create(cls, client, identifiers, replaces_cert_id=None):
+    def create(cls, client, identifiers, replaces_cert_id=None, profile=None):
         '''
         Start a new certificate order (ACME v2 protocol).
         https://tools.ietf.org/html/rfc8555#section-7.4
@@ -81,6 +81,8 @@ class Order(object):
         }
         if replaces_cert_id is not None:
             new_order["replaces"] = replaces_cert_id
+        if profile is not None:
+            new_order["profile"] = profile
         result, info = client.send_signed_request(
             client.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
         return cls.from_json(client, result, info['location'])
