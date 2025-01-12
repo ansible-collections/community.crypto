@@ -341,6 +341,22 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-treat_parsing_error_as_non_existing"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-treat-parsing-error-as-non-existing"><strong>treat_parsing_error_as_non_existing</strong></p>
+<a class="ansibleOptionLink" href="#parameter-treat_parsing_error_as_non_existing" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines the behavior when the certificate file exists or its contents are provided, but the certificate cannot be parsed.</p>
+<p>If <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, will exit successfully with <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-exists"><span class="std std-ref"><span class="pre">exists=true</span></span></a></code>, <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-parsable"><span class="std std-ref"><span class="pre">parsable=false</span></span></a></code>, and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-should-renew"><span class="std std-ref"><span class="pre">should_renew=true</span></span></a></code>.</p>
+<p>If <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>, the module will fail.</p>
+<p>If the file exists, but cannot be loaded due to I/O errors or permission errors, the module always fails.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-use_ari"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-use-ari"><strong>use_ari</strong></p>
 <a class="ansibleOptionLink" href="#parameter-use_ari" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -353,7 +369,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -466,6 +482,16 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-exists"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-exists"><strong>exists</strong></p>
+<a class="ansibleOptionLink" href="#return-exists" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Whether the certificate file exists, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-certificate-content"><span class="std std-ref"><span class="pre">certificate_content</span></span></a></strong></code> was provided.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">true</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="return-msg"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-msg"><strong>msg</strong></p>
 <a class="ansibleOptionLink" href="#return-msg" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -473,6 +499,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Should be shown to the user, as in case of ARI triggered renewal it can contain important information, for example on forced revocations for misissued certificates.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;The</span> <span class="pre">certificate</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist.&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-parsable"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-parsable"><strong>parsable</strong></p>
+<a class="ansibleOptionLink" href="#return-parsable" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Whether the certificate file exists, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-certificate-content"><span class="std std-ref"><span class="pre">certificate_content</span></span></a></strong></code> was provided, and the certificate can be parsed.</p>
+<p>Can only differ from <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-exists"><span class="std std-ref"><span class="pre">exists</span></span></a></code> if <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-renewal-info-module-parameter-treat-parsing-error-as-non-existing"><span class="std std-ref"><span class="pre">treat_parsing_error_as_non_existing=true</span></span></a></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
