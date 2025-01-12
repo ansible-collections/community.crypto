@@ -10,38 +10,67 @@
       - cert_1_renewal_1.msg == 'The certificate is still valid and no condition was reached'
       - cert_1_renewal_1.supports_ari == supports_ari
       - cert_1_renewal_1.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_1.exists == true
+      - cert_1_renewal_1.parsable == true
       - cert_1_renewal_2.should_renew == false
       - cert_1_renewal_2.msg == 'The certificate is still valid and no condition was reached'
       - cert_1_renewal_2.supports_ari == supports_ari
       - cert_1_renewal_2.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_2.exists == true
+      - cert_1_renewal_2.parsable == true
       - cert_1_renewal_3.should_renew == false
       - cert_1_renewal_3.msg == 'The certificate is still valid and no condition was reached'
       - cert_1_renewal_3.supports_ari == supports_ari
       - cert_1_renewal_3.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_3.exists == true
+      - cert_1_renewal_3.parsable == true
       - cert_1_renewal_4.should_renew == true
       - cert_1_renewal_4.msg == 'The certificate expires in 25 days'
       - cert_1_renewal_4.supports_ari == supports_ari
       - cert_1_renewal_4.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_4.exists == true
+      - cert_1_renewal_4.parsable == true
       - cert_1_renewal_5.should_renew == true
       - cert_1_renewal_5.msg == 'The certificate expires in 25 days'
       - cert_1_renewal_5.supports_ari == supports_ari
       - cert_1_renewal_5.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_5.exists == true
+      - cert_1_renewal_5.parsable == true
       - cert_1_renewal_6.should_renew == true
       - cert_1_renewal_6.msg.startswith("The remaining percentage 3.0% of the certificate's lifespan was reached on ")
       - cert_1_renewal_6.supports_ari == supports_ari
       - cert_1_renewal_6.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_6.exists == true
+      - cert_1_renewal_6.parsable == true
       - cert_1_renewal_7.should_renew == true
       - cert_1_renewal_7.msg == 'The certificate has already expired'
       - cert_1_renewal_7.supports_ari == false
       - cert_1_renewal_7.cert_id is string or not can_have_cert_id
+      - cert_1_renewal_7.exists == true
+      - cert_1_renewal_7.parsable == true
       - cert_1_renewal_8.should_renew == true
       - cert_1_renewal_8.msg == 'No certificate was specified'
       - cert_1_renewal_8.supports_ari == false
       - cert_1_renewal_8.cert_id is not defined
+      - cert_1_renewal_8.exists == false
+      - cert_1_renewal_8.parsable == false
       - cert_1_renewal_9.should_renew == true
       - cert_1_renewal_9.msg == 'The certificate file does not exist'
       - cert_1_renewal_9.supports_ari == false
       - cert_1_renewal_9.cert_id is not defined
+      - cert_1_renewal_9.exists == false
+      - cert_1_renewal_9.parsable == false
+      - cert_1_renewal_10 is failed
+      - cert_1_renewal_10.msg.startswith('Error while running ') or
+        cert_1_renewal_10.msg.startswith('Cannot parse certificate ')
+      - cert_1_renewal_11.should_renew == true
+      - >-
+        cert_1_renewal_11.msg.startswith('Certificate cannot be parsed: Error while running ') or
+        cert_1_renewal_11.msg.startswith('Certificate cannot be parsed: Cannot parse certificate ')
+      - cert_1_renewal_11.supports_ari == false
+      - cert_1_renewal_11.cert_id is not defined
+      - cert_1_renewal_11.exists == true
+      - cert_1_renewal_11.parsable == false
   vars:
     can_have_cert_id: cert_1_info.authority_key_identifier is string
     supports_ari: false

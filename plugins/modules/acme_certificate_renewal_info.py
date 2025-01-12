@@ -74,6 +74,15 @@ options:
       - Valid format is C([+-]timespec | ASN.1 TIME) where timespec can be an integer + C([w | d | h | m | s]) (for example
         V(+32w1d2h)).
     type: str
+  treat_parsing_error_as_non_existing:
+    description:
+      - Determines the behavior when the certificate file exists or its contents are provided, but the certificate cannot be parsed.
+      - If V(true), will exit successfully with RV(exists=true), RV(parsable=false), and RV(should_renew=true).
+      - If V(false), the module will fail.
+      - If the file exists, but cannot be loaded due to I/O errors or permission errors, the module always fails.
+    type: bool
+    default: false
+    version_added: 2.24.0
 seealso:
   - module: community.crypto.acme_certificate
     description: Allows to obtain a certificate using the ACME protocol.
@@ -100,6 +109,23 @@ should_renew:
   returned: success
   type: bool
   sample: true
+
+exists:
+  description:
+    - Whether the certificate file exists, or O(certificate_content) was provided.
+  returned: success
+  type: bool
+  sample: true
+  version_added: 2.24.0
+
+parsable:
+  description:
+    - Whether the certificate file exists, or O(certificate_content) was provided, and the certificate can be parsed.
+    - Can only differ from RV(exists) if O(treat_parsing_error_as_non_existing=true).
+  returned: success
+  type: bool
+  sample: true
+  version_added: 2.24.0
 
 msg:
   description:
@@ -139,6 +165,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
 
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import compute_cert_id
 
 
@@ -152,6 +180,7 @@ def main():
         remaining_days=dict(type='int'),
         remaining_percentage=dict(type='float'),
         now=dict(type='str'),
+        treat_parsing_error_as_non_existing=dict(type='bool', default=False),
     )
     argument_spec.update(
         mutually_exclusive=(
@@ -164,6 +193,8 @@ def main():
     result = dict(
         changed=False,
         msg='The certificate is still valid and no condition was reached',
+        exists=False,
+        parsable=False,
         supports_ari=False,
     )
 
@@ -175,14 +206,28 @@ def main():
     if not module.params['certificate_path'] and not module.params['certificate_content']:
         complete(True, msg='No certificate was specified')
 
-    if module.params['certificate_path'] is not None and not os.path.exists(module.params['certificate_path']):
-        complete(True, msg='The certificate file does not exist')
+    if module.params['certificate_path'] is not None:
+        if not os.path.exists(module.params['certificate_path']):
+            complete(True, msg='The certificate file does not exist')
+        if module.params['treat_parsing_error_as_non_existing']:
+            try:
+                read_file(module.params['certificate_path'])
+            except ModuleFailException as e:
+                e.do_fail(module)
 
+    result['exists'] = True
     try:
         cert_info = backend.get_cert_information(
             cert_filename=module.params['certificate_path'],
             cert_content=module.params['certificate_content'],
         )
+    except ModuleFailException as e:
+        if module.params['treat_parsing_error_as_non_existing']:
+            complete(True, msg='Certificate cannot be parsed: {0}'.format(e.msg))
+        e.do_fail(module)
+
+    result['parsable'] = True
+    try:
         cert_id = compute_cert_id(backend, cert_info=cert_info, none_if_required_information_is_missing=True)
         if cert_id is not None:
             result['cert_id'] = cert_id
