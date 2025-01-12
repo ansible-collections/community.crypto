@@ -122,8 +122,10 @@ class OpenSSLCLIBackend(CryptoBackend):
             raise KeyParsingError('unknown key type "%s"' % account_key_type)
 
         openssl_keydump_cmd = [self.openssl_binary, account_key_type, "-in", key_file, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(
-            openssl_keydump_cmd, check_rc=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        rc, out, err = self.module.run_command(
+            openssl_keydump_cmd, check_rc=False, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        if rc != 0:
+            raise BackendException('Error while running {cmd}: {stderr}'.format(cmd=' '.join(openssl_keydump_cmd), stderr=to_text(err)))
 
         out_text = to_text(out, errors='surrogate_or_strict')
 
@@ -205,8 +207,10 @@ class OpenSSLCLIBackend(CryptoBackend):
             cmd_postfix = ["-sign", key_data['key_file']]
         openssl_sign_cmd = [self.openssl_binary, "dgst", "-{0}".format(key_data['hash'])] + cmd_postfix
 
-        dummy, out, dummy = self.module.run_command(
-            openssl_sign_cmd, data=sign_payload, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        rc, out, err = self.module.run_command(
+            openssl_sign_cmd, data=sign_payload, check_rc=False, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        if rc != 0:
+            raise BackendException('Error while running {cmd}: {stderr}'.format(cmd=' '.join(openssl_sign_cmd), stderr=to_text(err)))
 
         if key_data['type'] == 'ec':
             dummy, der_out, dummy = self.module.run_command(
@@ -281,8 +285,10 @@ class OpenSSLCLIBackend(CryptoBackend):
             data = csr_content.encode('utf-8')
 
         openssl_csr_cmd = [self.openssl_binary, "req", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(
-            openssl_csr_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        rc, out, err = self.module.run_command(
+            openssl_csr_cmd, data=data, check_rc=False, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        if rc != 0:
+            raise BackendException('Error while running {cmd}: {stderr}'.format(cmd=' '.join(openssl_csr_cmd), stderr=to_text(err)))
 
         identifiers = set()
         result = []
@@ -341,8 +347,11 @@ class OpenSSLCLIBackend(CryptoBackend):
             return -1
 
         openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(
-            openssl_cert_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        rc, out, err = self.module.run_command(
+            openssl_cert_cmd, data=data, check_rc=False, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        if rc != 0:
+            raise BackendException('Error while running {cmd}: {stderr}'.format(cmd=' '.join(openssl_cert_cmd), stderr=to_text(err)))
+
         out_text = to_text(out, errors='surrogate_or_strict')
         not_after = _extract_date(out_text, 'Not After', cert_filename_suffix=cert_filename_suffix)
         if now is None:
@@ -371,8 +380,11 @@ class OpenSSLCLIBackend(CryptoBackend):
             cert_filename_suffix = ''
 
         openssl_cert_cmd = [self.openssl_binary, "x509", "-in", filename, "-noout", "-text"]
-        dummy, out, dummy = self.module.run_command(
-            openssl_cert_cmd, data=data, check_rc=True, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        rc, out, err = self.module.run_command(
+            openssl_cert_cmd, data=data, check_rc=False, binary_data=True, environ_update=_OPENSSL_ENVIRONMENT_UPDATE)
+        if rc != 0:
+            raise BackendException('Error while running {cmd}: {stderr}'.format(cmd=' '.join(openssl_cert_cmd), stderr=to_text(err)))
+
         out_text = to_text(out, errors='surrogate_or_strict')
 
         not_after = _extract_date(out_text, 'Not After', cert_filename_suffix=cert_filename_suffix)
