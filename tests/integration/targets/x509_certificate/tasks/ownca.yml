@@ -6,14 +6,14 @@
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey with passphrase
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/ca_privatekey_pw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA CSR
   openssl_csr:

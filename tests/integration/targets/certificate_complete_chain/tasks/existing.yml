@@ -120,7 +120,7 @@
 
 - name: Check failure when no intermediate certificate can be found
   certificate_complete_chain:
-    input_chain: '{{ lookup("file", "cert2.pem", rstrip=True) }}'
+    input_chain: '{{ lookup("file", "cert2.pem", rstrip=true) }}'
     intermediate_certificates:
     - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
     root_certificates:
@@ -135,7 +135,7 @@
 
 - name: Check failure when infinite loop is found
   certificate_complete_chain:
-    input_chain: '{{ lookup("file", "cert1-fullchain.pem", rstrip=True) }}'
+    input_chain: '{{ lookup("file", "cert1-fullchain.pem", rstrip=true) }}'
     intermediate_certificates:
     - '{{ remote_tmp_dir }}/files/roots.pem'
     root_certificates:

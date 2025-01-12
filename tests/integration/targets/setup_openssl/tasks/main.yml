@@ -121,4 +121,4 @@
 
 - name: Print default key sizes
   debug:
-    msg: "Default RSA key size: {{ default_rsa_key_size }} (for certificates: {{ default_rsa_key_size_certifiates }})"
+    msg: "Default RSA key size: {{ default_rsa_key_size }} (for certificates: {{ default_rsa_key_size_certificates }})"

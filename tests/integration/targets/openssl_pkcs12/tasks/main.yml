@@ -12,7 +12,7 @@
   - name: Generate private keys
     openssl_privatekey:
       path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
-      size: '{{ default_rsa_key_size_certifiates }}'
+      size: '{{ default_rsa_key_size_certificates }}'
     loop: "{{ range(1, 4) | list }}"
 
   - name: Generate privatekey with password

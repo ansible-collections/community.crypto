@@ -11,7 +11,7 @@
 - name: Prepare private key for backend autodetection test
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 - name: Run module with backend autodetection
   x509_certificate_pipe:
     provider: selfsigned

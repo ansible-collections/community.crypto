@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 default_rsa_key_size: 1024
-default_rsa_key_size_certifiates: >-
+default_rsa_key_size_certificates: >-
   {{
       2048 if
         (ansible_os_family == "RedHat" and ansible_facts.distribution_major_version | int >= 8) or
