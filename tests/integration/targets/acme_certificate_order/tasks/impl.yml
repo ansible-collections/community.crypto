@@ -1,0 +1,349 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Generate random domain name
+  set_fact:
+    domain_name: "host{{ '%0x' % ((2**32) | random) }}.example.com"
+
+- name: Generate account key
+  openssl_privatekey:
+    path: "{{ remote_tmp_dir }}/accountkey.pem"
+    type: ECC
+    curve: secp256r1
+    force: true
+
+- name: Parse account keys (to ease debugging some test failures)
+  openssl_privatekey_info:
+    path: "{{ remote_tmp_dir }}/accountkey.pem"
+    return_private_key_data: true
+
+- name: Create ACME account
+  acme_account:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    terms_agreed: true
+    state: present
+  register: account
+
+- name: Generate certificate key
+  openssl_privatekey:
+    path: "{{ remote_tmp_dir }}/cert.key"
+    type: ECC
+    curve: secp256r1
+    force: true
+
+- name: Generate certificate CSR
+  openssl_csr:
+    path: "{{ remote_tmp_dir }}/cert.csr"
+    privatekey_path: "{{ remote_tmp_dir }}/cert.key"
+    subject:
+      commonName: "{{ domain_name }}"
+    return_content: true
+  register: csr
+
+- name: Create certificate order
+  acme_certificate_order_create:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    csr: "{{ remote_tmp_dir }}/cert.csr"
+  register: order
+
+- name: Show order information
+  debug:
+    var: order
+
+- name: Check order
+  assert:
+    that:
+      - order is changed
+      - order.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
+      - order.challenge_data | length == 1
+      - order.challenge_data[0].identifier_type == 'dns'
+      - order.challenge_data[0].identifier == domain_name
+      - order.challenge_data[0].challenges | length >= 2
+      - "'http-01' in order.challenge_data[0].challenges"
+      - "'dns-01' in order.challenge_data[0].challenges"
+      - order.challenge_data[0].challenges['http-01'].resource.startswith('.well-known/acme-challenge/')
+      - order.challenge_data[0].challenges['http-01'].resource_value is string
+      - order.challenge_data[0].challenges['dns-01'].record == '_acme-challenge.' ~ domain_name
+      - order.challenge_data[0].challenges['dns-01'].resource == '_acme-challenge'
+      - order.challenge_data[0].challenges['dns-01'].resource_value is string
+      - order.challenge_data_dns | length == 1
+      - order.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
+      - order.account_uri == account.account_uri
+
+- name: Get order information
+  acme_certificate_order_info:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+  register: order_info_1
+
+- name: Show order information
+  debug:
+    var: order_info_1
+
+- name: Check order information
+  assert:
+    that:
+      - order_info_1 is not changed
+      - order_info_1.authorizations_by_identifier | length == 1
+      - order_info_1.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
+      - order_info_1.authorizations_by_identifier['dns:' ~ domain_name].identifier.value == domain_name
+      - order_info_1.authorizations_by_identifier['dns:' ~ domain_name].status == 'pending'
+      - (order_info_1.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'http-01') | first).status == 'pending'
+      - (order_info_1.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'dns-01') | first).status == 'pending'
+      - order_info_1.authorizations_by_status['deactivated'] | length == 0
+      - order_info_1.authorizations_by_status['expired'] | length == 0
+      - order_info_1.authorizations_by_status['invalid'] | length == 0
+      - order_info_1.authorizations_by_status['pending'] | length == 1
+      - order_info_1.authorizations_by_status['pending'][0] == 'dns:' ~ domain_name
+      - order_info_1.authorizations_by_status['revoked'] | length == 0
+      - order_info_1.authorizations_by_status['valid'] | length == 0
+      - order_info_1.order.authorizations | length == 1
+      - order_info_1.order.authorizations[0] == order_info_1.authorizations_by_identifier['dns:' ~ domain_name].uri
+      - "'certificate' not in order_info_1.order"
+      - order_info_1.order.status == 'pending'
+      - order_info_1.order_uri == order.order_uri
+      - order_info_1.account_uri == account.account_uri
+
+- name: Create HTTP challenges
+  uri:
+    url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
+    method: PUT
+    body_format: raw
+    body: "{{ item.challenges['http-01'].resource_value }}"
+    headers:
+      content-type: "application/octet-stream"
+  loop: "{{ order.challenge_data }}"
+  when: "'http-01' in item.challenges"
+
+- name: Let the challenge be validated
+  community.crypto.acme_certificate_order_validate:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+    challenge: http-01
+  register: validate_1
+
+- name: Check validation result
+  assert:
+    that:
+      - validate_1 is changed
+      - validate_1.account_uri == account.account_uri
+
+- name: Wait until we know that the challenges have been validated for ansible-core <= 2.11
+  pause:
+    seconds: 5
+  when: ansible_version.full is version('2.12', '<')
+
+- name: Get order information
+  acme_certificate_order_info:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+  register: order_info_2
+
+- name: Show order information
+  debug:
+    var: order_info_2
+
+- name: Check order information
+  assert:
+    that:
+      - order_info_2 is not changed
+      - order_info_2.authorizations_by_identifier | length == 1
+      - order_info_2.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
+      - order_info_2.authorizations_by_identifier['dns:' ~ domain_name].identifier.value == domain_name
+      - order_info_2.authorizations_by_identifier['dns:' ~ domain_name].status in ['pending', 'valid']
+      - (order_info_2.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'http-01') | map(attribute='status') | first | default('not there')) in ['processing', 'valid']
+      - (order_info_2.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'dns-01') | map(attribute='status') | first | default('not there')) in ['pending', 'not there']
+      - order_info_2.authorizations_by_status['deactivated'] | length == 0
+      - order_info_2.authorizations_by_status['expired'] | length == 0
+      - order_info_2.authorizations_by_status['invalid'] | length == 0
+      - order_info_2.authorizations_by_status['pending'] | length <= 1
+      - order_info_2.authorizations_by_status['revoked'] | length == 0
+      - order_info_2.authorizations_by_status['valid'] | length <= 1
+      - (order_info_2.authorizations_by_status['pending'] | length) + (order_info_2.authorizations_by_status['valid'] | length) == 1
+      - order_info_2.order.authorizations | length == 1
+      - order_info_2.order.authorizations[0] == order_info_2.authorizations_by_identifier['dns:' ~ domain_name].uri
+      - "'certificate' not in order_info_2.order"
+      - order_info_2.order.status in ['pending', 'ready']
+      - order_info_2.order_uri == order.order_uri
+      - order_info_2.account_uri == account.account_uri
+
+- name: Let the challenge be validated (idempotent)
+  community.crypto.acme_certificate_order_validate:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+    challenge: http-01
+  register: validate_2
+
+- name: Check validation result
+  assert:
+    that:
+      - validate_2 is not changed
+      - validate_2.account_uri == account.account_uri
+
+- name: Retrieve the cert and intermediate certificate
+  community.crypto.acme_certificate_order_finalize:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+    retrieve_all_alternates: true
+    csr: "{{ remote_tmp_dir }}/cert.csr"
+    cert_dest: "{{ remote_tmp_dir }}/cert.pem"
+    chain_dest: "{{ remote_tmp_dir }}/cert-chain.pem"
+    fullchain_dest: "{{ remote_tmp_dir }}/cert-fullchain.pem"
+  register: finalize_1
+
+- name: Check finalization result
+  assert:
+    that:
+      - finalize_1 is changed
+      - finalize_1.account_uri == account.account_uri
+      - finalize_1.all_chains | length >= 1
+      - finalize_1.selected_chain == finalize_1.all_chains[0]
+      - finalize_1.selected_chain.cert.startswith('-----BEGIN CERTIFICATE-----\nMII')
+      - finalize_1.selected_chain.chain.startswith('-----BEGIN CERTIFICATE-----\nMII')
+      - finalize_1.selected_chain.full_chain == finalize_1.selected_chain.cert + finalize_1.selected_chain.chain
+
+- name: Read files from disk
+  slurp:
+    src: "{{ remote_tmp_dir }}/{{ item }}.pem"
+  loop:
+    - cert
+    - cert-chain
+    - cert-fullchain
+  register: slurp
+
+- name: Compare finalization result with files on disk
+  assert:
+    that:
+      - finalize_1.selected_chain.cert == slurp.results[0].content | b64decode
+      - finalize_1.selected_chain.chain == slurp.results[1].content | b64decode
+      - finalize_1.selected_chain.full_chain == slurp.results[2].content | b64decode
+
+- name: Get order information
+  acme_certificate_order_info:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+  register: order_info_3
+
+- name: Show order information
+  debug:
+    var: order_info_3
+
+- name: Check order information
+  assert:
+    that:
+      - order_info_3 is not changed
+      - order_info_3.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
+      - order_info_3.authorizations_by_identifier['dns:' ~ domain_name].identifier.value == domain_name
+      - order_info_3.authorizations_by_identifier['dns:' ~ domain_name].status == 'valid'
+      - (order_info_3.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'http-01') | first).status == 'valid'
+      - order_info_3.authorizations_by_status['deactivated'] | length == 0
+      - order_info_3.authorizations_by_status['expired'] | length == 0
+      - order_info_3.authorizations_by_status['invalid'] | length == 0
+      - order_info_3.authorizations_by_status['pending'] | length == 0
+      - order_info_3.authorizations_by_status['revoked'] | length == 0
+      - order_info_3.authorizations_by_status['valid'] | length == 1
+      - order_info_3.authorizations_by_status['valid'][0] == 'dns:' ~ domain_name
+      - order_info_3.order.authorizations | length == 1
+      - order_info_3.order.authorizations[0] == order_info_3.authorizations_by_identifier['dns:' ~ domain_name].uri
+      - "'certificate' in order_info_3.order"
+      - order_info_3.order.status == 'valid'
+      - order_info_3.order_uri == order.order_uri
+      - order_info_3.account_uri == account.account_uri
+
+- name: Retrieve the cert and intermediate certificate (idempotent)
+  community.crypto.acme_certificate_order_finalize:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+    deactivate_authzs: on_success
+    retrieve_all_alternates: true
+    csr: "{{ remote_tmp_dir }}/cert.csr"
+    cert_dest: "{{ remote_tmp_dir }}/cert.pem"
+    chain_dest: "{{ remote_tmp_dir }}/cert-chain.pem"
+    fullchain_dest: "{{ remote_tmp_dir }}/cert-fullchain.pem"
+  register: finalize_2
+
+- name: Check finalization result
+  assert:
+    that:
+      - finalize_2 is not changed
+      - finalize_2.account_uri == account.account_uri
+      - finalize_2.all_chains | length >= 1
+      - finalize_2.selected_chain == finalize_2.all_chains[0]
+      - finalize_2.selected_chain.cert.startswith('-----BEGIN CERTIFICATE-----\nMII')
+      - finalize_2.selected_chain.chain.startswith('-----BEGIN CERTIFICATE-----\nMII')
+      - finalize_2.selected_chain.full_chain == finalize_2.selected_chain.cert + finalize_2.selected_chain.chain
+      - finalize_2.selected_chain == finalize_1.selected_chain
+
+- name: Get order information
+  acme_certificate_order_info:
+    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_version: 2
+    validate_certs: false
+    account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    order_uri: "{{ order.order_uri }}"
+  register: order_info_4
+
+- name: Show order information
+  debug:
+    var: order_info_4
+
+- name: Check order information
+  assert:
+    that:
+      - order_info_4 is not changed
+      - order_info_4.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
+      - order_info_4.authorizations_by_identifier['dns:' ~ domain_name].identifier.value == domain_name
+      - order_info_4.authorizations_by_identifier['dns:' ~ domain_name].status == 'deactivated'
+      - (order_info_4.authorizations_by_identifier['dns:' ~ domain_name].challenges | selectattr('type', 'equalto', 'http-01') | first).status == 'valid'
+      - order_info_4.authorizations_by_status['deactivated'] | length == 1
+      - order_info_4.authorizations_by_status['deactivated'][0] == 'dns:' ~ domain_name
+      - order_info_4.authorizations_by_status['expired'] | length == 0
+      - order_info_4.authorizations_by_status['invalid'] | length == 0
+      - order_info_4.authorizations_by_status['pending'] | length == 0
+      - order_info_4.authorizations_by_status['revoked'] | length == 0
+      - order_info_4.authorizations_by_status['valid'] | length == 0
+      - order_info_4.order.authorizations | length == 1
+      - order_info_4.order.authorizations[0] == order_info_4.authorizations_by_identifier['dns:' ~ domain_name].uri
+      - "'certificate' in order_info_4.order"
+      - order_info_4.order.status == 'deactivated'
+      - order_info_4.order_uri == order.order_uri
+      - order_info_4.account_uri == account.account_uri
