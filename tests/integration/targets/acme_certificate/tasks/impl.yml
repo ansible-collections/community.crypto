@@ -339,7 +339,7 @@
       certgen_title: Certificate 8
       certificate_name: cert-8
       key_type: rsa
-      rsa_bits: "{{ default_rsa_key_size }}"
+      rsa_bits: "{{ default_rsa_key_size_certificates }}"
       subject_alt_name:
       - "IP:127.0.0.1"
       # IPv4 only since our test validation server doesn't work
