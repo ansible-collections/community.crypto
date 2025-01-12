@@ -136,6 +136,12 @@ class ACMEDirectory(object):
     def __getitem__(self, key):
         return self.directory[key]
 
+    def __contains__(self, key):
+        return key in self.directory
+
+    def get(self, key, default_value=None):
+        return self.directory.get(key, default_value)
+
     def get_nonce(self, resource=None):
         url = self.directory_root if self.version == 1 else self.directory['newNonce']
         if resource is not None:
