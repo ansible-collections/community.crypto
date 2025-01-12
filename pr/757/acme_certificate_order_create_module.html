@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.acme_certificate_order_create module – Create an ACME v2 order &mdash; Community.Crypto Collection  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5707b69d" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
@@ -191,7 +191,7 @@ You need further requirements to be able to use this module,
 see <a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
 <p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.acme_certificate_order_create</span></code>.</p>
 </div>
-<p class="ansible-version-added">New in community.crypto 2.21.0</p>
+<p class="ansible-version-added">New in community.crypto 2.24.0</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -336,6 +336,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-profile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-profile"><strong>profile</strong></p>
+<a class="ansibleOptionLink" href="#parameter-profile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Chose a specific profile for certificate selection. The available profiles depend on the CA.</p>
+<p>See <a class="reference external" href="https://letsencrypt.org/2025/01/09/acme-profiles/">a blog post by Let’s Encrypt</a> and <a class="reference external" href="https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/">draft-aaron-acme-profiles-00</a> for more information.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-replace_cert_id"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-replace-cert-id"><strong>replace_cert_id</strong></p>
 <a class="ansibleOptionLink" href="#parameter-replace_cert_id" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -344,7 +352,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>ACME servers might refuse to create new orders that indicate to replace a certificate for which an active replacement order already exists. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. For this reason, this option should only be used if the role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-request-timeout"><strong>request_timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -354,7 +362,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -370,7 +378,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>

@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol &mdash; Community.Crypto Collection  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5707b69d" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
@@ -454,6 +454,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-profile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-profile"><strong>profile</strong></p>
+<a class="ansibleOptionLink" href="#parameter-profile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Chose a specific profile for certificate selection. The available profiles depend on the CA.</p>
+<p>See <a class="reference external" href="https://letsencrypt.org/2025/01/09/acme-profiles/">a blog post by Let’s Encrypt</a> and <a class="reference external" href="https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/">draft-aaron-acme-profiles-00</a> for more information.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-remaining_days"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-remaining-days"><strong>remaining_days</strong></p>
 <a class="ansibleOptionLink" href="#parameter-remaining_days" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -462,7 +471,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-request-timeout"><strong>request_timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -472,7 +481,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-retrieve_all_alternates"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-retrieve-all-alternates"><strong>retrieve_all_alternates</strong></p>
 <a class="ansibleOptionLink" href="#parameter-retrieve_all_alternates" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -484,7 +493,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain"><strong>select_chain</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
@@ -496,7 +505,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>This option can only be used with the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain/authority_key_identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain-authority-key-identifier"><strong>authority_key_identifier</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain/authority_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -504,7 +513,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>The identifier must be of the form <code class="ansible-value docutils literal notranslate"><span class="pre">C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain/issuer"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain-issuer"><strong>issuer</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain/issuer" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
@@ -513,7 +522,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>An example value would be <code class="ansible-value docutils literal notranslate"><span class="pre">{&quot;commonName&quot;:</span> <span class="pre">&quot;My</span> <span class="pre">Preferred</span> <span class="pre">CA</span> <span class="pre">Root&quot;}</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain/subject"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain-subject"><strong>subject</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain/subject" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
@@ -522,7 +531,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>An example value would be <code class="ansible-value docutils literal notranslate"><span class="pre">{&quot;CN&quot;:</span> <span class="pre">&quot;My</span> <span class="pre">Preferred</span> <span class="pre">CA</span> <span class="pre">Intermediate&quot;}</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain/subject_key_identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain-subject-key-identifier"><strong>subject_key_identifier</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain/subject_key_identifier" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -530,7 +539,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>The identifier must be of the form <code class="ansible-value docutils literal notranslate"><span class="pre">A8:4A:6A:63:04:7D:DD:BA:E6:D1:39:B7:A6:45:65:EF:F3:A8:EC:A1</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_chain/test_certificates"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-chain-test-certificates"><strong>test_certificates</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_chain/test_certificates" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -546,7 +555,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -562,7 +571,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-terms_agreed"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-terms-agreed"><strong>terms_agreed</strong></p>
 <a class="ansibleOptionLink" href="#parameter-terms_agreed" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -576,7 +585,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
