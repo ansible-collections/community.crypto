@@ -118,15 +118,15 @@
 - name: Check that certificate 5 was not recreated on the first try
   assert:
     that:
-      - cert_5_recreate_1 == False
+      - cert_5_recreate_1 == false
 - name: Check that certificate 5 was recreated on the second try
   assert:
     that:
-      - cert_5_recreate_2 == True
+      - cert_5_recreate_2 == true
 - name: Check that certificate 5 was recreated on the third try
   assert:
     that:
-      - cert_5_recreate_3 == True
+      - cert_5_recreate_3 == true
 
 - block:
   - name: Check that certificate 6 is valid
