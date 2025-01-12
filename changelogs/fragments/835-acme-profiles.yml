@@ -1,0 +1,4 @@
+minor_changes:
+  - "acme_certificate - allow to chose a profile for certificate generation, in case the CA supports this using
+     Internet-Draft `draft-aaron-acme-profiles <https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/>`__
+     (https://github.com/ansible-collections/community.crypto/pull/835)."
