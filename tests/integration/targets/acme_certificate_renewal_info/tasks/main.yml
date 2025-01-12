@@ -8,33 +8,43 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- block:
-  - name: Running tests with OpenSSL backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: openssl
+- vars:
+    # ARI and profiles have been added in https://github.com/ansible/ansible/pull/TODO
+    # See also https://github.com/ansible/acme-test-container/pull/25
+    supports_ari: "{{ ansible_version.full is version('2.19', '>=') }}"
+    supports_profile: "{{ ansible_version.full is version('2.19', '>=') }}"
 
-  - import_tasks: ../tests/validate.yml
+    acme_certificate_profile: "{{ 'default' if supports_profile else omit }}"
 
-  # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
-  when: openssl_version.stdout is version('1.0.0', '>=')
+  block:
 
-- name: Remove output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: absent
+    - block:
+      - name: Running tests with OpenSSL backend
+        include_tasks: impl.yml
+        vars:
+          select_crypto_backend: openssl
 
-- name: Re-create output directory
-  file:
-    path: "{{ remote_tmp_dir }}"
-    state: directory
+      - import_tasks: ../tests/validate.yml
 
-- block:
-  - name: Running tests with cryptography backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: cryptography
+      # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
+      when: openssl_version.stdout is version('1.0.0', '>=')
 
-  - import_tasks: ../tests/validate.yml
+    - name: Remove output directory
+      file:
+        path: "{{ remote_tmp_dir }}"
+        state: absent
 
-  when: cryptography_version.stdout is version('1.5', '>=')
+    - name: Re-create output directory
+      file:
+        path: "{{ remote_tmp_dir }}"
+        state: directory
+
+    - block:
+      - name: Running tests with cryptography backend
+        include_tasks: impl.yml
+        vars:
+          select_crypto_backend: cryptography
+
+      - import_tasks: ../tests/validate.yml
+
+      when: cryptography_version.stdout is version('1.5', '>=')
