@@ -6,14 +6,14 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey with password
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR
   x509_certificate:
@@ -138,7 +138,7 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey2
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey2.pem'
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR2
   openssl_csr:
@@ -200,7 +200,7 @@
 - name: (Selfsigned, {{select_crypto_backend}}) Create private key 3
   openssl_privatekey:
     path: "{{ remote_tmp_dir }}/privatekey3.pem"
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create CSR 3
   openssl_csr:

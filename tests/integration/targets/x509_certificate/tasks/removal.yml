@@ -6,7 +6,7 @@
 - name: (Removal, {{select_crypto_backend}}) Generate privatekey
   openssl_privatekey:
     path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
-    size: '{{ default_rsa_key_size_certifiates }}'
+    size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Removal, {{select_crypto_backend}}) Generate CSR
   openssl_csr:

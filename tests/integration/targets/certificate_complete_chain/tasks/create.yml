@@ -12,7 +12,7 @@
   - name: Create private keys
     openssl_privatekey:
       path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
-      size: '{{ default_rsa_key_size_certifiates }}'
+      size: '{{ default_rsa_key_size_certificates }}'
     loop: '{{ certificates }}'
 
   - name: Generate certificates
