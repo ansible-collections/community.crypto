@@ -22,7 +22,7 @@
       certgen_title: Certificate 1
       certificate_name: cert-1
       key_type: rsa
-      rsa_bits: "{{ default_rsa_key_size }}"
+      rsa_bits: "{{ default_rsa_key_size_certificates }}"
       subject_alt_name: "DNS:example.com"
       subject_alt_name_critical: false
       account_key: account-ec256
