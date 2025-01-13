@@ -49,6 +49,7 @@
     remaining_days: "{{ remaining_days }}"
     terms_agreed: "{{ terms_agreed }}"
     account_email: "{{ account_email }}"
+    profile: "{{ acme_certificate_profile | default(omit) }}"
   register: challenge_data
 - name: ({{ certgen_title }}) Print challenge data
   debug:
