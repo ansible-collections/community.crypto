@@ -21,7 +21,7 @@
 
 - name: Create ACME account
   acme_account:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -48,7 +48,7 @@
 
 - name: Create certificate order
   acme_certificate_order_create:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -82,7 +82,7 @@
 
 - name: Get order information
   acme_certificate_order_info:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -131,7 +131,7 @@
 
 - name: Let the challenge be validated
   community.crypto.acme_certificate_order_validate:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -153,7 +153,7 @@
 
 - name: Get order information
   acme_certificate_order_info:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -191,7 +191,7 @@
 
 - name: Let the challenge be validated (idempotent)
   community.crypto.acme_certificate_order_validate:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -208,7 +208,7 @@
 
 - name: Retrieve the cert and intermediate certificate
   community.crypto.acme_certificate_order_finalize:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -250,7 +250,7 @@
 
 - name: Get order information
   acme_certificate_order_info:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -286,7 +286,7 @@
 
 - name: Retrieve the cert and intermediate certificate (idempotent)
   community.crypto.acme_certificate_order_finalize:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -314,7 +314,7 @@
 
 - name: Get order information
   acme_certificate_order_info:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"

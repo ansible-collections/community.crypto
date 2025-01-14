@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## SET UP ACCOUNT KEYS ########################################################################
+- block:
+  - name: Generate account keys
+    openssl_privatekey:
+      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+      type: "{{ item.type }}"
+      size: "{{ item.size | default(omit) }}"
+      curve: "{{ item.curve | default(omit) }}"
+      force: true
+    loop: "{{ account_keys }}"
+
+  vars:
+    account_keys:
+      - name: account-ec256
+        type: ECC
+        curve: secp256r1
+## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
+- name: Obtain cert 1
+  include_tasks: obtain-cert.yml
+  vars:
+    certgen_title: Certificate 1 for renewal check
+    certificate_name: cert-1
+    key_type: rsa
+    rsa_bits: "{{ default_rsa_key_size }}"
+    subject_alt_name: "DNS:example.com"
+    subject_alt_name_critical: false
+    account_key: account-ec256
+    challenge: http-01
+    modify_account: true
+    deactivate_authzs: false
+    force: true
+    remaining_days: "{{ omit }}"
+    terms_agreed: true
+    account_email: "example@example.org"
+## OBTAIN CERTIFICATE INFOS ###################################################################
+- name: Dump OpenSSL x509 info
+  command:
+    cmd: openssl x509 -in {{ remote_tmp_dir }}/cert-1.pem -noout -text
+- name: Obtain certificate information
+  x509_certificate_info:
+    path: "{{ remote_tmp_dir }}/cert-1.pem"
+  register: cert_1_info
+- name: Read certificate
+  slurp:
+    src: '{{ remote_tmp_dir }}/cert-1.pem'
+  register: slurp_cert_1
+- name: Obtain certificate information
+  acme_ari_info:
+    select_crypto_backend: "{{ select_crypto_backend }}"
+    certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
+    acme_version: 2
+    acme_directory: "{{ acme_directory_url }}"
+    validate_certs: false
+  register: cert_1

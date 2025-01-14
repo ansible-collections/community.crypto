@@ -10,6 +10,7 @@
 
 - vars:
     acme_certificate_profile: "{{ 'default' if acme_supports_profiles else omit }}"
+  when: acme_supports_ari
   block:
     - block:
       - name: Running tests with OpenSSL backend

@@ -32,7 +32,7 @@
   acme_certificate:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"
@@ -50,6 +50,7 @@
     terms_agreed: "{{ terms_agreed }}"
     account_email: "{{ account_email }}"
     profile: "{{ acme_certificate_profile | default(omit) }}"
+    include_renewal_cert_id: "{{ acme_certificate_include_renewal_cert_id | default(omit) }}"
   register: challenge_data
 - name: ({{ certgen_title }}) Print challenge data
   debug:
@@ -111,7 +112,7 @@
   acme_certificate:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_key: "{{ (remote_tmp_dir ~ '/' ~ account_key ~ '.pem') if account_key_content is not defined else omit }}"
     account_key_content: "{{ account_key_content | default(omit) }}"

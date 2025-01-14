@@ -1,0 +1,17 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Validate results
+  assert:
+    that:
+      - cert_1 is not changed
+      - cert_1.renewal_info.explanationURL is string or cert_1.renewal_info.explanationURL is not defined
+      - cert_1.renewal_info.retryAfter is string or cert_1.renewal_info.retryAfter is not defined
+      - cert_1.renewal_info.suggestedWindow.start is string
+      - cert_1.renewal_info.suggestedWindow.end is string
+      - >-
+        (cert_1.renewal_info.suggestedWindow.start | ansible.builtin.to_datetime('%Y-%m-%dT%H:%M:%SZ'))
+        <
+        (cert_1.renewal_info.suggestedWindow.end | ansible.builtin.to_datetime('%Y-%m-%dT%H:%M:%SZ'))

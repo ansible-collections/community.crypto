@@ -30,7 +30,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     state: absent
@@ -42,7 +42,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_key_content: "{{ slurp.content | b64decode }}"
     state: present
@@ -55,7 +55,7 @@
   acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     state: present
@@ -170,6 +170,7 @@
     remaining_days: 1
     terms_agreed: false
     account_email: ""
+    acme_certificate_profile: "{{ 'default' if acme_supports_profiles else omit }}"
     acme_expected_root_number: 2
     select_chain:
       - test_certificates: last
@@ -239,6 +240,8 @@
     terms_agreed: false
     account_email: ""
     use_csr_content: true
+    acme_certificate_profile: "{{ '6days' if acme_supports_profiles else omit }}"
+    acme_certificate_include_renewal_cert_id: when_ari_supported
 - name: Store obtain results for cert 5c
   set_fact:
     cert_5_recreate_2: "{{ challenge_data is changed }}"
@@ -467,7 +470,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     retrieve_orders: ignore
   register: account_orders_not
@@ -476,7 +479,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     retrieve_orders: url_list
   register: account_orders_urls
@@ -485,7 +488,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     retrieve_orders: url_list
   register: account_orders_urls2
@@ -494,7 +497,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     retrieve_orders: object_list
   register: account_orders_full
@@ -503,7 +506,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     retrieve_orders: object_list
   register: account_orders_full2

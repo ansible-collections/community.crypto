@@ -24,7 +24,7 @@
 
 - name: Get directory
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     method: directory-only
@@ -34,7 +34,7 @@
 
 - name: Create an account
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -49,7 +49,7 @@
 
 - name: Get account information
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -62,7 +62,7 @@
 
 - name: Update account contacts
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -82,7 +82,7 @@
 
 - name: Create certificate order
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -106,7 +106,7 @@
 
 - name: Get order information
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -119,7 +119,7 @@
 
 - name: Get authzs for order
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -133,7 +133,7 @@
 
 - name: Get HTTP-01 challenge for authz
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -147,7 +147,7 @@
 
 - name: Activate HTTP-01 challenge manually
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
@@ -162,7 +162,7 @@
 
 - name: Get HTTP-01 challenge results
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
