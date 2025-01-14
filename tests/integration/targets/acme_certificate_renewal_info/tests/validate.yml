@@ -61,7 +61,7 @@
           - cert_1_renewal_11.cert_id is not defined
           - cert_1_renewal_11.exists == true
           - cert_1_renewal_11.parsable == false
-      when: not supports_ari
+      when: not acme_supports_ari
 
     - name: Validate results without ARI
       assert:
@@ -81,24 +81,24 @@
           - cert_1_renewal_6.msg.startswith("The remaining percentage 3.0% of the certificate's lifespan was reached on ")
           - cert_1_renewal_6.supports_ari == false
           - cert_1_renewal_7.supports_ari == false
-      when: not supports_ari
+      when: not acme_supports_ari
 
     - name: Validate results with ARI
       assert:
         that:
-          - cert_1_renewal_1.supports_ari == supports_ari
-          - cert_1_renewal_2.supports_ari == supports_ari
+          - cert_1_renewal_1.supports_ari == true
+          - cert_1_renewal_2.supports_ari == true
           - cert_1_renewal_3.should_renew == true
           - cert_1_renewal_3.msg == 'The suggested renewal interval provided by ARI is in the past'
-          - cert_1_renewal_3.supports_ari == supports_ari
+          - cert_1_renewal_3.supports_ari == true
           - cert_1_renewal_4.should_renew == true
           - cert_1_renewal_4.msg == 'The suggested renewal interval provided by ARI is in the past'
-          - cert_1_renewal_4.supports_ari == supports_ari
+          - cert_1_renewal_4.supports_ari == true
           - cert_1_renewal_5.should_renew == true
           - cert_1_renewal_5.msg == 'The suggested renewal interval provided by ARI is in the past'
-          - cert_1_renewal_5.supports_ari == supports_ari
+          - cert_1_renewal_5.supports_ari == true
           - cert_1_renewal_6.should_renew == true
           - cert_1_renewal_6.msg == 'The suggested renewal interval provided by ARI is in the past'
-          - cert_1_renewal_6.supports_ari == supports_ari
+          - cert_1_renewal_6.supports_ari == true
           - cert_1_renewal_7.supports_ari == false
-      when: supports_ari
+      when: acme_supports_ari

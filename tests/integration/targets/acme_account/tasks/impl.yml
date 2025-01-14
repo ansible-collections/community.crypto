@@ -34,7 +34,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: false
@@ -46,7 +46,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: true
@@ -62,7 +62,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: true
@@ -76,7 +76,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: true
@@ -95,7 +95,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -110,7 +110,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -124,7 +124,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -138,7 +138,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri ~ '12345thisdoesnotexist' }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     contact: []
@@ -150,7 +150,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -164,7 +164,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -176,7 +176,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     # allow_creation: false
@@ -188,7 +188,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -204,7 +204,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -219,7 +219,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: absent
   check_mode: true
@@ -232,7 +232,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: absent
   register: account_deactivate
@@ -243,7 +243,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: absent
   register: account_deactivate_idempotent
@@ -254,7 +254,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: false
@@ -266,7 +266,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: false
@@ -278,7 +278,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/{{ item.account }}.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: true

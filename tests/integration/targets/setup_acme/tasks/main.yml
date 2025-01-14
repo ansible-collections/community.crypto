@@ -8,5 +8,20 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- debug:
-    msg: "ACME test container IP is {{ acme_host }}; OpenSSL version is {{ openssl_version.stdout }}; cryptography version is {{ cryptography_version.stdout }}"
+- name: Set ACME server information
+  set_fact:
+    # ARI and profiles have been added in https://github.com/ansible/ansible/pull/84547
+    # See also https://github.com/ansible/acme-test-container/pull/25
+    acme_supports_ari: "{{ ansible_version.full is version('2.19', '>=') }}"
+    acme_supports_profiles: "{{ ansible_version.full is version('2.19', '>=') }}"
+    acme_directory_url: "https://{{ acme_host }}:14000/dir"
+
+- name: Print ACME server information
+  debug:
+    msg: |-
+      ACME test container IP is {{ acme_host }}
+      ACME directory: {{ acme_directory_url }}
+      ACME server supports ARI: {{ acme_supports_ari }}
+      ACME server supports profiles: {{ acme_supports_profiles }}
+      OpenSSL version is {{ openssl_version.stdout }}
+      cryptography version is {{ cryptography_version.stdout }}

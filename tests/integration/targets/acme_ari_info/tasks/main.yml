@@ -9,16 +9,9 @@
 ####################################################################
 
 - vars:
-    # ARI and profiles have been added in https://github.com/ansible/ansible/pull/TODO
-    # See also https://github.com/ansible/acme-test-container/pull/25
-    supports_ari: "{{ ansible_version.full is version('2.19', '>=') }}"
-    supports_profile: "{{ ansible_version.full is version('2.19', '>=') }}"
-
-    acme_certificate_profile: "{{ 'default' if supports_profile else omit }}"
-
-  when: supports_ari
+    acme_certificate_profile: "{{ 'default' if acme_supports_profiles else omit }}"
+  when: acme_supports_ari
   block:
-
     - block:
       - name: Running tests with OpenSSL backend
         include_tasks: impl.yml

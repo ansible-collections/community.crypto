@@ -87,7 +87,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     certificate: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   ignore_errors: true
   register: cert_1_revoke
@@ -98,7 +98,7 @@
     private_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     certificate: "{{ remote_tmp_dir }}/cert-2.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   ignore_errors: true
   register: cert_2_revoke
@@ -112,7 +112,7 @@
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   ignore_errors: true
   register: cert_3_revoke

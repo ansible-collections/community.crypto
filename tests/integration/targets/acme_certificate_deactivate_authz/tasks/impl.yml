@@ -29,7 +29,7 @@
       acme_certificate:
         select_crypto_backend: "{{ select_crypto_backend }}"
         acme_version: 2
-        acme_directory: https://{{ acme_host }}:14000/dir
+        acme_directory: "{{ acme_directory_url }}"
         validate_certs: false
         account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
         modify_account: true
@@ -43,7 +43,7 @@
 
 - name: Inspect order
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -57,7 +57,7 @@
 
 - name: Deactivate order (check mode)
   acme_certificate_deactivate_authz:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -68,7 +68,7 @@
 
 - name: Inspect order again
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -82,7 +82,7 @@
 
 - name: Deactivate order
   acme_certificate_deactivate_authz:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -92,7 +92,7 @@
 
 - name: Inspect order again
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -106,7 +106,7 @@
 
 - name: Deactivate order (check mode, idempotent)
   acme_certificate_deactivate_authz:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -117,7 +117,7 @@
 
 - name: Inspect order again
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -131,7 +131,7 @@
 
 - name: Deactivate order (idempotent)
   acme_certificate_deactivate_authz:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
@@ -141,7 +141,7 @@
 
 - name: Inspect order again
   acme_inspect:
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"

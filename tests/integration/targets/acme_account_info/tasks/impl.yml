@@ -28,7 +28,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   register: account_not_created
 
@@ -37,7 +37,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: true
@@ -50,7 +50,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   register: account_created
 
@@ -64,7 +64,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     state: present
     allow_creation: false
@@ -75,7 +75,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_uri: "{{ account_created.account_uri }}"
   register: account_modified
@@ -85,7 +85,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_uri: "{{ account_created.account_uri }}test1234doesnotexists"
   register: account_not_exist
@@ -95,7 +95,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
     account_uri: "{{ account_created.account_uri }}"
   ignore_errors: true

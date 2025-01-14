@@ -34,7 +34,7 @@
     csr_path: '{{ remote_tmp_dir }}/cert-1.csr'
     acme_accountkey_path: '{{ remote_tmp_dir }}/account.key'
     acme_challenge_path: '{{ remote_tmp_dir }}/challenges/'
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
   environment:
     PATH: '{{ lookup("env", "PATH") }}:{{ remote_tmp_dir }}'
 
@@ -56,7 +56,7 @@
     csr_path: '{{ remote_tmp_dir }}/cert-2.csr'
     acme_accountkey_path: '{{ remote_tmp_dir }}/account.key'
     acme_challenge_path: '{{ remote_tmp_dir }}/challenges/'
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
   environment:
     PATH: '{{ lookup("env", "PATH") }}:{{ remote_tmp_dir }}'
 

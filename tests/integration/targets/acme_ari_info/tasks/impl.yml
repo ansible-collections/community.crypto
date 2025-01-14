@@ -54,6 +54,6 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
-    acme_directory: https://{{ acme_host }}:14000/dir
+    acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
   register: cert_1
