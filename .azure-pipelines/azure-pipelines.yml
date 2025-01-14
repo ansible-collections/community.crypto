@@ -98,17 +98,6 @@ stages:
               test: '2.16/sanity/1'
             - name: Units
               test: '2.16/units/1'
-  - stage: Ansible_2_15
-    displayName: Sanity & Units 2.15
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.15/sanity/1'
-            - name: Units
-              test: '2.15/units/1'
 ### Docker
   - stage: Docker_devel
     displayName: Docker devel
@@ -175,21 +164,6 @@ stages:
               test: opensuse15
             - name: Alpine 3
               test: alpine3
-          groups:
-            - 1
-            - 2
-  - stage: Docker_2_15
-    displayName: Docker 2.15
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.15/linux/{0}
-          targets:
-            - name: Fedora 37
-              test: fedora37
-            - name: CentOS 7
-              test: centos7
           groups:
             - 1
             - 2
@@ -297,29 +271,10 @@ stages:
               test: rhel/9.2
             - name: RHEL 8.8
               test: rhel/8.8
-            # - name: FreeBSD 13.2
-            #   test: freebsd/13.2
-          groups:
-            - 1
-            - 2
-  - stage: Remote_2_15
-    displayName: Remote 2.15
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.15/{0}
-          targets:
-            - name: RHEL 9.1
-              test: rhel/9.1
-            - name: RHEL 8.7
-              test: rhel/8.7
             - name: RHEL 7.9
               test: rhel/7.9
-            # - name: FreeBSD 13.1
-            #   test: freebsd/13.1
-            # - name: FreeBSD 12.4
-            #   test: freebsd/12.4
+            # - name: FreeBSD 13.2
+            #   test: freebsd/13.2
           groups:
             - 1
             - 2
@@ -384,20 +339,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Generic_2_15
-    displayName: Generic 2.15
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.15/generic/{0}
-          targets:
-            - test: 3.5
-            - test: "3.10"
-          groups:
-            - 1
-            - 2
 
   ## Finally
 
@@ -408,23 +349,19 @@ stages:
       - Ansible_2_18
       - Ansible_2_17
       - Ansible_2_16
-      - Ansible_2_15
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
-      - Remote_2_15
       - Docker_devel
       - Docker_2_18
       - Docker_2_17
       - Docker_2_16
-      - Docker_2_15
       - Docker_community_devel
       - Generic_devel
       - Generic_2_18
       - Generic_2_17
       - Generic_2_16
-      - Generic_2_15
     jobs:
       - template: templates/coverage.yml
