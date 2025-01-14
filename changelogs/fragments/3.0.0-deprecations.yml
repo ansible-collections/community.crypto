@@ -1,0 +1,15 @@
+deprecated_features:
+  - "Support for ansible-core 2.11, 2.12, 2.13, 2.14, 2.15, and 2.16 is deprecated,
+     and will be removed in the next major release (community.crypto 3.0.0).
+     Some modules might still work with some of these versions afterwards,
+     but we will no longer keep compatibility code that was needed to support them.
+     Note that this means that support for all Python versions before 3.7 will be dropped,
+     also on the target side
+     (https://github.com/ansible-collections/community.crypto/issues/559,
+      https://github.com/ansible-collections/community.crypto/pull/839)."
+  - "Support for cryptography < 3.4 is deprecated,
+     and will be removed in the next major release (community.crypto 3.0.0).
+     Some modules might still work with older versions of cryptography,
+     but we will no longer keep compatibility code that was needed to support them
+     (https://github.com/ansible-collections/community.crypto/issues/559,
+      https://github.com/ansible-collections/community.crypto/pull/839)."
