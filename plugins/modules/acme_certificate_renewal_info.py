@@ -24,6 +24,12 @@ extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
   - community.crypto.attributes.idempotent_not_modify_state
+attributes:
+  idempotent:
+    support: partial
+    details:
+      - The module is not idempotent if O(now) is a relative timestamp, or is not specified.
+      - If O(use_ari=true), the module is not idempotent if O(ari_algorithm=standard).
 options:
   certificate_path:
     description:
