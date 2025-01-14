@@ -170,6 +170,7 @@
     remaining_days: 1
     terms_agreed: false
     account_email: ""
+    acme_certificate_profile: "{{ 'default' if acme_supports_profiles else omit }}"
     acme_expected_root_number: 2
     select_chain:
       - test_certificates: last
@@ -239,6 +240,8 @@
     terms_agreed: false
     account_email: ""
     use_csr_content: true
+    acme_certificate_profile: "{{ '6days' if acme_supports_profiles else omit }}"
+    acme_certificate_include_renewal_cert_id: when_ari_supported
 - name: Store obtain results for cert 5c
   set_fact:
     cert_5_recreate_2: "{{ challenge_data is changed }}"

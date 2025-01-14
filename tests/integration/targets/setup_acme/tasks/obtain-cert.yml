@@ -50,6 +50,7 @@
     terms_agreed: "{{ terms_agreed }}"
     account_email: "{{ account_email }}"
     profile: "{{ acme_certificate_profile | default(omit) }}"
+    include_renewal_cert_id: "{{ acme_certificate_include_renewal_cert_id | default(omit) }}"
   register: challenge_data
 - name: ({{ certgen_title }}) Print challenge data
   debug:
