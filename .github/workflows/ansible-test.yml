@@ -270,14 +270,6 @@ jobs:
             python: ''
             target: azp/posix/2/
           - ansible: '2.15'
-            docker: centos7
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.15'
-            docker: centos7
-            python: ''
-            target: azp/posix/2/
-          - ansible: '2.15'
             docker: default
             python: '3.5'
             target: azp/generic/1/
