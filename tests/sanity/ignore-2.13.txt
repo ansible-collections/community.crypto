@@ -1,5 +1,6 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/lookup/gpg_fingerprint.py validate-modules:invalid-documentation
+plugins/modules/acme_certificate.py validate-modules:invalid-documentation
 plugins/modules/ecs_certificate.py validate-modules:invalid-documentation
 plugins/modules/get_certificate.py validate-modules:invalid-documentation
 plugins/modules/luks_device.py validate-modules:invalid-documentation

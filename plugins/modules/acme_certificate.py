@@ -243,8 +243,6 @@ options:
       - Determines whether to request renewal of an existing certificate according to L(the ACME ARI draft 3,
         https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
       - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
-      - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
-      - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
       - Generally you should use V(when_ari_supported) if you know that the ACME service supports a compatible draft (or final
         version, once it is out) of the ARI extension. V(always) should never be necessary. If you are not sure, or if you
         receive strange errors on invalid C(replaces) values in order objects, use V(never), which also happens to be the
@@ -258,9 +256,9 @@ options:
         M(community.crypto.acme_certificate_deactivate_authz) module.
     type: str
     choices:
-      - never
-      - when_ari_supported
-      - always
+      never: Never send the certificate ID of the certificate to renew.
+      when_ari_supported: Only send the certificate ID if the ARI endpoint is found in the ACME directory.
+      always: Will always send the certificate ID of the certificate to renew.
     default: never
     version_added: 2.20.0
   profile:

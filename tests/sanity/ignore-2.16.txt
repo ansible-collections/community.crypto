@@ -1,3 +1,4 @@
+plugins/modules/acme_certificate.py validate-modules:invalid-documentation
 plugins/modules/luks_device.py validate-modules:invalid-documentation
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

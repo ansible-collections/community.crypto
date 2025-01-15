@@ -6,6 +6,7 @@
 .azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
 docs/docsite/rst/guide_selfsigned.rst rstcheck
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
+plugins/modules/acme_certificate.py validate-modules:invalid-documentation
 plugins/modules/acme_certificate_order_create.py validate-modules:return-syntax-error
 plugins/modules/acme_certificate_order_info.py validate-modules:return-syntax-error
 plugins/modules/acme_certificate_order_validate.py validate-modules:return-syntax-error

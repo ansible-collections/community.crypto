@@ -113,7 +113,7 @@ options:
         according to L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
       - This certificate ID must be computed as specified in
         L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1).
-        It is returned as RV(community.crypto.acme_certificate_renewal_info#module:cert_id) of the
+        It is returned as return value RV(community.crypto.acme_certificate_renewal_info#module:cert_id) of the
         M(community.crypto.acme_certificate_renewal_info) module.
       - ACME servers might refuse to create new orders that indicate to replace a certificate for which
         an active replacement order already exists. This can happen if this module is used to create an order,
