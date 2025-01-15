@@ -87,6 +87,39 @@ class Order(object):
             client.directory['newOrder'], new_order, error_msg='Failed to start new order', expected_status_codes=[201])
         return cls.from_json(client, result, info['location'])
 
+    @classmethod
+    def create_with_error_handling(cls, client, identifiers, error_strategy='auto', error_max_retries=3, replaces_cert_id=None, profile=None):
+        """
+        error_strategy can be one of the following strings:
+
+        * ``fail``: simply fail. (Same behavior as ``Order.create()``.)
+        * ``retry_without_replaces_cert_id``: if ``replaces_cert_id`` is not ``None``, set it to ``None`` and retry.
+          The only exception is an error of type ``urn:ietf:params:acme:error:alreadyReplaced``, that indicates that
+          the certificate was already replaced.
+        * ``auto``: try to be clever. Right now this is identical to ``retry_without_replaces_cert_id``, but that can
+          change at any time in the future.
+        * ``always``: always retry until ``error_max_retries`` has been reached.
+        """
+        tries = 0
+        while True:
+            tries += 1
+            try:
+                return cls.create(client, identifiers, replaces_cert_id=replaces_cert_id, profile=profile)
+            except ACMEProtocolException as exc:
+                if tries <= error_max_retries + 1 and error_strategy != 'fail':
+                    if error_strategy == 'always':
+                        continue
+
+                    if (
+                        error_strategy in ('auto', 'retry_without_replaces_cert_id') and
+                        replaces_cert_id is not None and
+                        not (exc.error_code == 409 and exc.error_type == 'urn:ietf:params:acme:error:alreadyReplaced')
+                    ):
+                        replaces_cert_id = None
+                        continue
+
+                raise
+
     def refresh(self, client):
         result, dummy = client.get_request(self.url)
         changed = self.data != result
