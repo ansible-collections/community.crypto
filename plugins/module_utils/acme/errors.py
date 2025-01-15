@@ -84,6 +84,8 @@ class ACMEProtocolException(ModuleFailException):
                 pass
 
         extras = extras or dict()
+        error_code = None
+        error_type = None
 
         if msg is None:
             msg = 'ACME request failed'
@@ -94,7 +96,9 @@ class ACMEProtocolException(ModuleFailException):
             code = info['status']
             extras['http_url'] = url
             extras['http_status'] = code
+            error_code = code
             if code is not None and code >= 400 and content_json is not None and 'type' in content_json:
+                error_type = content_json['type']
                 if 'status' in content_json and content_json['status'] != code:
                     code_msg = 'status {problem_code} (HTTP status: {http_code})'.format(
                         http_code=format_http_status(code), problem_code=content_json['status'])
@@ -134,6 +138,8 @@ class ACMEProtocolException(ModuleFailException):
         )
         self.problem = {}
         self.subproblems = []
+        self.error_code = error_code
+        self.error_type = error_type
         for k, v in extras.items():
             setattr(self, k, v)
 
