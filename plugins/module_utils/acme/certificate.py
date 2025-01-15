@@ -63,6 +63,8 @@ class ACMECertificateClient(object):
             account = ACMEAccount(self.client)
         self.account = account
         self.order_uri = module.params.get('order_uri')
+        self.order_creation_error_strategy = module.params.get('order_creation_error_strategy', 'auto')
+        self.order_creation_max_retries = module.params.get('order_creation_max_retries', 3)
 
         # Make sure account exists
         dummy, account_data = self.account.setup_account(allow_creation=False)
@@ -102,7 +104,14 @@ class ACMECertificateClient(object):
         '''
         if self.identifiers is None:
             raise ModuleFailException('No identifiers have been provided')
-        order = Order.create(self.client, self.identifiers, replaces_cert_id=replaces_cert_id, profile=profile)
+        order = Order.create_with_error_handling(
+            self.client,
+            self.identifiers,
+            error_strategy=self.order_creation_error_strategy,
+            error_max_retries=self.order_creation_max_retries,
+            replaces_cert_id=replaces_cert_id,
+            profile=profile,
+        )
         self.order_uri = order.url
         order.load_authorizations(self.client)
         return order

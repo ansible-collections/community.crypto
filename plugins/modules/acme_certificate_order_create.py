@@ -119,9 +119,12 @@ options:
         an active replacement order already exists. This can happen if this module is used to create an order,
         and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not
         record the order data to continue with the existing order, but tries to create a new one on the next run,
-        creating the new order might fail. For this reason, this option should only be used if the role/playbook
-        using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose
-        processing is aborted. Orders can be deactivated with the
+        creating the new order might fail. If O(order_creation_error_strategy=fail) this will make the module fail.
+        O(order_creation_error_strategy=auto) and O(order_creation_error_strategy=retry_without_replaces_cert_id)
+        will avoid this by leaving away C(replaces) on retries.
+      - If O(order_creation_error_strategy=fail), for the above reason, this option should only be used
+        if the role/playbook using it keeps track of order data accross restarts, or if it takes care to
+        deactivate orders whose processing is aborted. Orders can be deactivated with the
         M(community.crypto.acme_certificate_deactivate_authz) module.
     type: str
   profile:
@@ -131,6 +134,29 @@ options:
         L(draft-aaron-acme-profiles-00, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
         for more information.
     type: str
+  order_creation_error_strategy:
+    description:
+      - Selects the error handling strategy for ACME protocol errors if creating a new ACME order fails.
+    type: str
+    choices:
+      auto:
+        - An unspecified algorithm that tries to be clever.
+        - Right now identical to V(retry_without_replaces_cert_id).
+      always:
+        - Always retry, until the limit in O(order_creation_max_retries) has been reached.
+      fail:
+        - Simply fail in case of errors. Do not attempt to retry.
+      retry_without_replaces_cert_id:
+        - If O(replaces_cert_id) is present, creating the order will be tried again without C(replaces).
+        - The only exception is an error of type C(urn:ietf:params:acme:error:alreadyReplaced), that indicates that
+          the certificate was already replaced. This usually means something went wrong and the user should investigate.
+    default: auto
+  order_creation_max_retries:
+    description:
+      - Depending on the strategy selected in O(order_creation_error_strategy), will retry creating new orders
+        for at most the specified amount of times.
+    type: int
+    default: 3
 '''
 
 EXAMPLES = r'''
@@ -370,6 +396,8 @@ def main():
         deactivate_authzs=dict(type='bool', default=True),
         replaces_cert_id=dict(type='str'),
         profile=dict(type='str'),
+        order_creation_error_strategy=dict(type='str', default='auto', choices=['auto', 'always', 'fail', 'retry_without_replaces_cert_id']),
+        order_creation_max_retries=dict(type='int', default=3),
     )
     module = argument_spec.create_ansible_module()
     if module.params['acme_version'] == 1:
