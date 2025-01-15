@@ -175,6 +175,13 @@ order:
         - A URL for the certificate that has been issued in response to this order.
       type: str
       returned: when the certificate has been issued
+    replaces:
+      description:
+        - If the order was created to replace an existing certificate using the C(replaces) mechanism from
+          L(draft-ietf-acme-ari, https://datatracker.ietf.org/doc/draft-ietf-acme-ari/), this provides the
+          certificate ID of the certificate that will be replaced by this order.
+      type: str
+      returned: when the certificate order is replacing a certificate through draft-ietf-acme-ari
 authorizations_by_identifier:
   description:
     - A dictionary mapping identifiers to their authorization objects.
