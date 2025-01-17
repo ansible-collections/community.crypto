@@ -4,7 +4,7 @@
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.16.2" name="antsibull-docs" />
+<meta content="2.16.3" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol &mdash; Community.Crypto Collection  documentation</title>
@@ -464,7 +464,7 @@ Only send the certificate ID if the ARI endpoint is found in the ACME directory.
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code>:
-Always retry, until the limit in <code class="ansible-option docutils literal notranslate"><strong><span><span class="pre">order_creation_max_retries</span></span></strong></code> has been reached.</p></li>
+Always retry, until the limit in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-max-retries"><span class="std std-ref"><span class="pre">order_creation_max_retries</span></span></a></strong></code> has been reached.</p></li>
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">(default)</span>:
 An unspecified algorithm that tries to be clever.</p>
 <p>Right now identical to <code class="ansible-value docutils literal notranslate"><span class="pre">retry_without_replaces_cert_id</span></code>.</p>
@@ -474,7 +474,7 @@ Simply fail in case of errors. Do not attempt to retry.</p>
 <p>This has been the default before community.crypto 2.24.0.</p>
 </li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;retry_without_replaces_cert_id&quot;</span></code>:
-If <code class="ansible-option docutils literal notranslate"><strong><span><span class="pre">include_renewal_cert_id</span></span></strong></code> is present, creating the order will be tried again without <code class="docutils literal notranslate"><span class="pre">replaces</span></code>.</p>
+If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-include-renewal-cert-id"><span class="std std-ref"><span class="pre">include_renewal_cert_id</span></span></a></strong></code> is present, creating the order will be tried again without <code class="docutils literal notranslate"><span class="pre">replaces</span></code>.</p>
 <p>The only exception is an error of type <code class="docutils literal notranslate"><span class="pre">urn:ietf:params:acme:error:alreadyReplaced</span></code>, that indicates that the certificate was already replaced. This usually means something went wrong and the user should investigate.</p>
 </li>
 </ul>
