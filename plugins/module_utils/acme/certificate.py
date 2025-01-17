@@ -19,6 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    Authorization,
     wait_for_validation,
 )
 
@@ -257,11 +258,22 @@ class ACMECertificateClient(object):
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        for authz in order.authorizations.values():
-            try:
-                authz.deactivate(self.client)
-            except Exception:
-                # ignore errors
-                pass
-            if authz.status != 'deactivated':
-                self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
+        if len(order.authorization_uris) > len(order.authorizations):
+            for authz_uri in order.authorization_uris:
+                authz = None
+                try:
+                    authz = Authorization.deactivate_url(self.client, authz_uri)
+                except Exception:
+                    # ignore errors
+                    pass
+                if authz is None or authz.status != 'deactivated':
+                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz_uri))
+        else:
+            for authz in order.authorizations.values():
+                try:
+                    authz.deactivate(self.client)
+                except Exception:
+                    # ignore errors
+                    pass
+                if authz.status != 'deactivated':
+                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
