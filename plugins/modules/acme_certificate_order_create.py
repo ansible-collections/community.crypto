@@ -410,7 +410,7 @@ def main():
 
         profile = module.params['profile']
         if profile is not None:
-            meta_profiles = (client.directory.get('meta') or {}).get('profiles') or {}
+            meta_profiles = (client.client.directory.get('meta') or {}).get('profiles') or {}
             if not meta_profiles:
                 raise ModuleFailException(msg='The ACME CA does not support profiles. Please omit the "profile" option.')
             if profile not in meta_profiles:
