@@ -3,23 +3,23 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Generate random domain name
+- name: "({{ select_crypto_backend }}) Generate random domain name"
   set_fact:
     domain_name: "host{{ '%0x' % ((2**32) | random) }}.example.com"
 
-- name: Generate account key
+- name: "({{ select_crypto_backend }}) Generate account key"
   openssl_privatekey:
     path: "{{ remote_tmp_dir }}/accountkey.pem"
     type: ECC
     curve: secp256r1
     force: true
 
-- name: Parse account keys (to ease debugging some test failures)
+- name: "({{ select_crypto_backend }}) Parse account keys (to ease debugging some test failures)"
   openssl_privatekey_info:
     path: "{{ remote_tmp_dir }}/accountkey.pem"
     return_private_key_data: true
 
-- name: Create ACME account
+- name: "({{ select_crypto_backend }}) Create ACME account"
   acme_account:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -30,14 +30,14 @@
     state: present
   register: account
 
-- name: Generate certificate key
+- name: "({{ select_crypto_backend }}) Generate certificate key"
   openssl_privatekey:
     path: "{{ remote_tmp_dir }}/cert.key"
     type: ECC
     curve: secp256r1
     force: true
 
-- name: Generate certificate CSR
+- name: "({{ select_crypto_backend }}) Generate certificate CSR"
   openssl_csr:
     path: "{{ remote_tmp_dir }}/cert.csr"
     privatekey_path: "{{ remote_tmp_dir }}/cert.key"
@@ -46,7 +46,7 @@
     return_content: true
   register: csr
 
-- name: Create certificate order
+- name: "({{ select_crypto_backend }}) Create certificate order"
   acme_certificate_order_create:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -56,11 +56,11 @@
     csr: "{{ remote_tmp_dir }}/cert.csr"
   register: order
 
-- name: Show order information
+- name: "({{ select_crypto_backend }}) Show order information"
   debug:
     var: order
 
-- name: Check order
+- name: "({{ select_crypto_backend }}) Check order"
   assert:
     that:
       - order is changed
@@ -80,7 +80,7 @@
       - order.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
       - order.account_uri == account.account_uri
 
-- name: Get order information
+- name: "({{ select_crypto_backend }}) Get order information"
   acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -90,11 +90,11 @@
     order_uri: "{{ order.order_uri }}"
   register: order_info_1
 
-- name: Show order information
+- name: "({{ select_crypto_backend }}) Show order information"
   debug:
     var: order_info_1
 
-- name: Check order information
+- name: "({{ select_crypto_backend }}) Check order information"
   assert:
     that:
       - order_info_1 is not changed
@@ -115,10 +115,11 @@
       - order_info_1.order.authorizations[0] == order_info_1.authorizations_by_identifier['dns:' ~ domain_name].uri
       - "'certificate' not in order_info_1.order"
       - order_info_1.order.status == 'pending'
+      - order_info_1.order.replaces is not defined
       - order_info_1.order_uri == order.order_uri
       - order_info_1.account_uri == account.account_uri
 
-- name: Create HTTP challenges
+- name: "({{ select_crypto_backend }}) Create HTTP challenges"
   uri:
     url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
     method: PUT
@@ -129,7 +130,7 @@
   loop: "{{ order.challenge_data }}"
   when: "'http-01' in item.challenges"
 
-- name: Let the challenge be validated
+- name: "({{ select_crypto_backend }}) Let the challenge be validated"
   community.crypto.acme_certificate_order_validate:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -140,18 +141,18 @@
     challenge: http-01
   register: validate_1
 
-- name: Check validation result
+- name: "({{ select_crypto_backend }}) Check validation result"
   assert:
     that:
       - validate_1 is changed
       - validate_1.account_uri == account.account_uri
 
-- name: Wait until we know that the challenges have been validated for ansible-core <= 2.11
+- name: "({{ select_crypto_backend }}) Wait until we know that the challenges have been validated for ansible-core <= 2.11"
   pause:
     seconds: 5
   when: ansible_version.full is version('2.12', '<')
 
-- name: Get order information
+- name: "({{ select_crypto_backend }}) Get order information"
   acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -161,11 +162,11 @@
     order_uri: "{{ order.order_uri }}"
   register: order_info_2
 
-- name: Show order information
+- name: "({{ select_crypto_backend }}) Show order information"
   debug:
     var: order_info_2
 
-- name: Check order information
+- name: "({{ select_crypto_backend }}) Check order information"
   assert:
     that:
       - order_info_2 is not changed
@@ -186,10 +187,11 @@
       - order_info_2.order.authorizations[0] == order_info_2.authorizations_by_identifier['dns:' ~ domain_name].uri
       - "'certificate' not in order_info_2.order"
       - order_info_2.order.status in ['pending', 'ready']
+      - order_info_2.order.replaces is not defined
       - order_info_2.order_uri == order.order_uri
       - order_info_2.account_uri == account.account_uri
 
-- name: Let the challenge be validated (idempotent)
+- name: "({{ select_crypto_backend }}) Let the challenge be validated (idempotent)"
   community.crypto.acme_certificate_order_validate:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -200,13 +202,13 @@
     challenge: http-01
   register: validate_2
 
-- name: Check validation result
+- name: "({{ select_crypto_backend }}) Check validation result"
   assert:
     that:
       - validate_2 is not changed
       - validate_2.account_uri == account.account_uri
 
-- name: Retrieve the cert and intermediate certificate
+- name: "({{ select_crypto_backend }}) Retrieve the cert and intermediate certificate"
   community.crypto.acme_certificate_order_finalize:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -214,6 +216,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order.order_uri }}"
+    deactivate_authzs: never
     retrieve_all_alternates: true
     csr: "{{ remote_tmp_dir }}/cert.csr"
     cert_dest: "{{ remote_tmp_dir }}/cert.pem"
@@ -221,7 +224,7 @@
     fullchain_dest: "{{ remote_tmp_dir }}/cert-fullchain.pem"
   register: finalize_1
 
-- name: Check finalization result
+- name: "({{ select_crypto_backend }}) Check finalization result"
   assert:
     that:
       - finalize_1 is changed
@@ -232,7 +235,7 @@
       - finalize_1.selected_chain.chain.startswith('-----BEGIN CERTIFICATE-----\nMII')
       - finalize_1.selected_chain.full_chain == finalize_1.selected_chain.cert + finalize_1.selected_chain.chain
 
-- name: Read files from disk
+- name: "({{ select_crypto_backend }}) Read files from disk"
   slurp:
     src: "{{ remote_tmp_dir }}/{{ item }}.pem"
   loop:
@@ -241,14 +244,14 @@
     - cert-fullchain
   register: slurp
 
-- name: Compare finalization result with files on disk
+- name: "({{ select_crypto_backend }}) Compare finalization result with files on disk"
   assert:
     that:
       - finalize_1.selected_chain.cert == slurp.results[0].content | b64decode
       - finalize_1.selected_chain.chain == slurp.results[1].content | b64decode
       - finalize_1.selected_chain.full_chain == slurp.results[2].content | b64decode
 
-- name: Get order information
+- name: "({{ select_crypto_backend }}) Get order information"
   acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -258,11 +261,11 @@
     order_uri: "{{ order.order_uri }}"
   register: order_info_3
 
-- name: Show order information
+- name: "({{ select_crypto_backend }}) Show order information"
   debug:
     var: order_info_3
 
-- name: Check order information
+- name: "({{ select_crypto_backend }}) Check order information"
   assert:
     that:
       - order_info_3 is not changed
@@ -284,7 +287,7 @@
       - order_info_3.order_uri == order.order_uri
       - order_info_3.account_uri == account.account_uri
 
-- name: Retrieve the cert and intermediate certificate (idempotent)
+- name: "({{ select_crypto_backend }}) Retrieve the cert and intermediate certificate (idempotent, but deactivate authzs)"
   community.crypto.acme_certificate_order_finalize:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -300,7 +303,7 @@
     fullchain_dest: "{{ remote_tmp_dir }}/cert-fullchain.pem"
   register: finalize_2
 
-- name: Check finalization result
+- name: "({{ select_crypto_backend }}) Check finalization result"
   assert:
     that:
       - finalize_2 is not changed
@@ -312,7 +315,7 @@
       - finalize_2.selected_chain.full_chain == finalize_2.selected_chain.cert + finalize_2.selected_chain.chain
       - finalize_2.selected_chain == finalize_1.selected_chain
 
-- name: Get order information
+- name: "({{ select_crypto_backend }}) Get order information"
   acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
@@ -322,11 +325,11 @@
     order_uri: "{{ order.order_uri }}"
   register: order_info_4
 
-- name: Show order information
+- name: "({{ select_crypto_backend }}) Show order information"
   debug:
     var: order_info_4
 
-- name: Check order information
+- name: "({{ select_crypto_backend }}) Check order information"
   assert:
     that:
       - order_info_4 is not changed
