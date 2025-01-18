@@ -112,6 +112,7 @@ class ACMECertificateClient(object):
             error_max_retries=self.order_creation_max_retries,
             replaces_cert_id=replaces_cert_id,
             profile=profile,
+            message_callback=self.module.warn,
         )
         self.order_uri = order.url
         order.load_authorizations(self.client)

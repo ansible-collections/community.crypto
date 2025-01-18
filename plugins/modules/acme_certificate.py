@@ -749,6 +749,7 @@ class ACMECertificateClient(object):
                 error_max_retries=self.order_creation_max_retries,
                 replaces_cert_id=replaces_cert_id,
                 profile=self.profile,
+                message_callback=self.module.warn,
             )
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)

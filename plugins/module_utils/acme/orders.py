@@ -88,7 +88,16 @@ class Order(object):
         return cls.from_json(client, result, info['location'])
 
     @classmethod
-    def create_with_error_handling(cls, client, identifiers, error_strategy='auto', error_max_retries=3, replaces_cert_id=None, profile=None):
+    def create_with_error_handling(
+        cls,
+        client,
+        identifiers,
+        error_strategy='auto',
+        error_max_retries=3,
+        replaces_cert_id=None,
+        profile=None,
+        message_callback=None,
+    ):
         """
         error_strategy can be one of the following strings:
 
@@ -116,6 +125,13 @@ class Order(object):
                         not (exc.error_code == 409 and exc.error_type == 'urn:ietf:params:acme:error:alreadyReplaced')
                     ):
                         replaces_cert_id = None
+                        if message_callback:
+                            message_callback(
+                                'Stop passing `replaces` due to error {code} {type} when creating ACME order'.format(
+                                    code=exc.error_code,
+                                    type=exc.error_type,
+                                )
+                            )
                         continue
 
                 raise
