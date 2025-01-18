@@ -243,8 +243,6 @@ options:
       - Determines whether to request renewal of an existing certificate according to L(the ACME ARI draft 3,
         https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
       - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
-      - V(never) never sends the certificate ID of the certificate to renew. V(always) will always send it.
-      - V(when_ari_supported) only sends the certificate ID if the ARI endpoint is found in the ACME directory.
       - Generally you should use V(when_ari_supported) if you know that the ACME service supports a compatible draft (or final
         version, once it is out) of the ARI extension. V(always) should never be necessary. If you are not sure, or if you
         receive strange errors on invalid C(replaces) values in order objects, use V(never), which also happens to be the
@@ -252,15 +250,19 @@ options:
       - ACME servers might refuse to create new orders with C(replaces) for certificates that already have an existing order.
         This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges
         cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries
-        to create a new one on the next run, creating the new order might fail. For this reason, this option should only be
-        set to a value different from V(never) if the role/playbook using it keeps track of order data accross restarts, or
-        if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the
+        to create a new one on the next run, creating the new order might fail. If O(order_creation_error_strategy=fail)
+        this will make the module fail. O(order_creation_error_strategy=auto) and
+        O(order_creation_error_strategy=retry_without_replaces_cert_id) will avoid this by leaving away C(replaces)
+        on retries.
+      - If O(order_creation_error_strategy=fail), for the above reason, this option should only be set to a value different
+        from V(never) if the role/playbook using it keeps track of order data accross restarts, or if it takes care to
+        deactivate orders whose processing is aborted. Orders can be deactivated with the
         M(community.crypto.acme_certificate_deactivate_authz) module.
     type: str
     choices:
-      - never
-      - when_ari_supported
-      - always
+      never: Never send the certificate ID of the certificate to renew.
+      when_ari_supported: Only send the certificate ID if the ARI endpoint is found in the ACME directory.
+      always: Will always send the certificate ID of the certificate to renew.
     default: never
     version_added: 2.20.0
   profile:
@@ -270,6 +272,32 @@ options:
         L(draft-aaron-acme-profiles-00, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
         for more information.
     type: str
+    version_added: 2.24.0
+  order_creation_error_strategy:
+    description:
+      - Selects the error handling strategy for ACME protocol errors if creating a new ACME order fails.
+    type: str
+    choices:
+      auto:
+        - An unspecified algorithm that tries to be clever.
+        - Right now identical to V(retry_without_replaces_cert_id).
+      always:
+        - Always retry, until the limit in O(order_creation_max_retries) has been reached.
+      fail:
+        - Simply fail in case of errors. Do not attempt to retry.
+        - This has been the default before community.crypto 2.24.0.
+      retry_without_replaces_cert_id:
+        - If O(include_renewal_cert_id) is present, creating the order will be tried again without C(replaces).
+        - The only exception is an error of type C(urn:ietf:params:acme:error:alreadyReplaced), that indicates that
+          the certificate was already replaced. This usually means something went wrong and the user should investigate.
+    default: auto
+    version_added: 2.24.0
+  order_creation_max_retries:
+    description:
+      - Depending on the strategy selected in O(order_creation_error_strategy), will retry creating new orders
+        for at most the specified amount of times.
+    type: int
+    default: 3
     version_added: 2.24.0
 """
 
@@ -613,6 +641,8 @@ class ACMECertificateClient(object):
         self.select_chain_matcher = []
         self.include_renewal_cert_id = module.params['include_renewal_cert_id']
         self.profile = module.params['profile']
+        self.order_creation_error_strategy = module.params['order_creation_error_strategy']
+        self.order_creation_max_retries = module.params['order_creation_max_retries']
 
         if self.module.params['select_chain']:
             for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
@@ -712,7 +742,15 @@ class ACMECertificateClient(object):
                         cert_info=cert_info,
                         none_if_required_information_is_missing=True,
                     )
-            self.order = Order.create(self.client, self.identifiers, replaces_cert_id, profile=self.profile)
+            self.order = Order.create_with_error_handling(
+                self.client,
+                self.identifiers,
+                error_strategy=self.order_creation_error_strategy,
+                error_max_retries=self.order_creation_max_retries,
+                replaces_cert_id=replaces_cert_id,
+                profile=self.profile,
+                message_callback=self.module.warn,
+            )
             self.order_uri = self.order.url
             self.order.load_authorizations(self.client)
             self.authorizations.update(self.order.authorizations)
@@ -899,6 +937,8 @@ def main():
         )),
         include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
         profile=dict(type='str'),
+        order_creation_error_strategy=dict(type='str', default='auto', choices=['auto', 'always', 'fail', 'retry_without_replaces_cert_id']),
+        order_creation_max_retries=dict(type='int', default=3),
     )
     argument_spec.update(
         required_one_of=[

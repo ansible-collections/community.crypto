@@ -19,6 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 )
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    Authorization,
     wait_for_validation,
 )
 
@@ -63,6 +64,8 @@ class ACMECertificateClient(object):
             account = ACMEAccount(self.client)
         self.account = account
         self.order_uri = module.params.get('order_uri')
+        self.order_creation_error_strategy = module.params.get('order_creation_error_strategy', 'auto')
+        self.order_creation_max_retries = module.params.get('order_creation_max_retries', 3)
 
         # Make sure account exists
         dummy, account_data = self.account.setup_account(allow_creation=False)
@@ -102,7 +105,15 @@ class ACMECertificateClient(object):
         '''
         if self.identifiers is None:
             raise ModuleFailException('No identifiers have been provided')
-        order = Order.create(self.client, self.identifiers, replaces_cert_id=replaces_cert_id, profile=profile)
+        order = Order.create_with_error_handling(
+            self.client,
+            self.identifiers,
+            error_strategy=self.order_creation_error_strategy,
+            error_max_retries=self.order_creation_max_retries,
+            replaces_cert_id=replaces_cert_id,
+            profile=profile,
+            message_callback=self.module.warn,
+        )
         self.order_uri = order.url
         order.load_authorizations(self.client)
         return order
@@ -248,11 +259,22 @@ class ACMECertificateClient(object):
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         '''
-        for authz in order.authorizations.values():
-            try:
-                authz.deactivate(self.client)
-            except Exception:
-                # ignore errors
-                pass
-            if authz.status != 'deactivated':
-                self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
+        if len(order.authorization_uris) > len(order.authorizations):
+            for authz_uri in order.authorization_uris:
+                authz = None
+                try:
+                    authz = Authorization.deactivate_url(self.client, authz_uri)
+                except Exception:
+                    # ignore errors
+                    pass
+                if authz is None or authz.status != 'deactivated':
+                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz_uri))
+        else:
+            for authz in order.authorizations.values():
+                try:
+                    authz.deactivate(self.client)
+                except Exception:
+                    # ignore errors
+                    pass
+                if authz.status != 'deactivated':
+                    self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))

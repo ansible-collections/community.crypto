@@ -322,6 +322,23 @@ class Authorization(object):
             return True
         return False
 
+    @classmethod
+    def deactivate_url(cls, client, url):
+        '''
+        Deactivates this authorization.
+        https://community.letsencrypt.org/t/authorization-deactivation/19860/2
+        https://tools.ietf.org/html/rfc8555#section-7.5.2
+        '''
+        authz = cls(url)
+        authz_deactivate = {
+            'status': 'deactivated'
+        }
+        if client.version == 1:
+            authz_deactivate['resource'] = 'authz'
+        result, info = client.send_signed_request(url, authz_deactivate, fail_on_error=True)
+        authz._setup(client, result)
+        return authz
+
 
 def wait_for_validation(authzs, client):
     '''
