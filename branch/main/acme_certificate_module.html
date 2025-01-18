@@ -427,15 +427,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines whether to request renewal of an existing certificate according to <a class="reference external" href="https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5">the ACME ARI draft 3</a>.</p>
 <p>This is only used when the certificate specified in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-dest"><span class="std std-ref"><span class="pre">dest</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-fullchain-dest"><span class="std std-ref"><span class="pre">fullchain_dest</span></span></a></strong></code> already exists.</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> never sends the certificate ID of the certificate to renew. <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code> will always send it.</p>
-<p><code class="ansible-value docutils literal notranslate"><span class="pre">when_ari_supported</span></code> only sends the certificate ID if the ARI endpoint is found in the ACME directory.</p>
 <p>Generally you should use <code class="ansible-value docutils literal notranslate"><span class="pre">when_ari_supported</span></code> if you know that the ACME service supports a compatible draft (or final version, once it is out) of the ARI extension. <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code> should never be necessary. If you are not sure, or if you receive strange errors on invalid <code class="docutils literal notranslate"><span class="pre">replaces</span></code> values in order objects, use <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code>, which also happens to be the default.</p>
-<p>ACME servers might refuse to create new orders with <code class="docutils literal notranslate"><span class="pre">replaces</span></code> for certificates that already have an existing order. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. For this reason, this option should only be set to a value different from <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> if the role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module.</p>
+<p>ACME servers might refuse to create new orders with <code class="docutils literal notranslate"><span class="pre">replaces</span></code> for certificates that already have an existing order. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=fail</span></span></a></code> this will make the module fail. <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=auto</span></span></a></code> and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=retry_without_replaces_cert_id</span></span></a></code> will avoid this by leaving away <code class="docutils literal notranslate"><span class="pre">replaces</span></code> on retries.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=fail</span></span></a></code>, for the above reason, this option should only be set to a value different from <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code> if the role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;never&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;when_ari_supported&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code>:
+Will always send the certificate ID of the certificate to renew.</p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;never&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">(default)</span>:
+Never send the certificate ID of the certificate to renew.</p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;when_ari_supported&quot;</span></code>:
+Only send the certificate ID if the ARI endpoint is found in the ACME directory.</p></li>
 </ul>
 </div></td>
 </tr>
@@ -451,6 +453,40 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 </ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-order_creation_error_strategy"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><strong>order_creation_error_strategy</strong></p>
+<a class="ansibleOptionLink" href="#parameter-order_creation_error_strategy" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Selects the error handling strategy for ACME protocol errors if creating a new ACME order fails.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code>:
+Always retry, until the limit in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-max-retries"><span class="std std-ref"><span class="pre">order_creation_max_retries</span></span></a></strong></code> has been reached.</p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">(default)</span>:
+An unspecified algorithm that tries to be clever.</p>
+<p>Right now identical to <code class="ansible-value docutils literal notranslate"><span class="pre">retry_without_replaces_cert_id</span></code>.</p>
+</li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;fail&quot;</span></code>:
+Simply fail in case of errors. Do not attempt to retry.</p>
+<p>This has been the default before community.crypto 2.24.0.</p>
+</li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;retry_without_replaces_cert_id&quot;</span></code>:
+If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-include-renewal-cert-id"><span class="std std-ref"><span class="pre">include_renewal_cert_id</span></span></a></strong></code> is present, creating the order will be tried again without <code class="docutils literal notranslate"><span class="pre">replaces</span></code>.</p>
+<p>The only exception is an error of type <code class="docutils literal notranslate"><span class="pre">urn:ietf:params:acme:error:alreadyReplaced</span></code>, that indicates that the certificate was already replaced. This usually means something went wrong and the user should investigate.</p>
+</li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-order_creation_max_retries"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-max-retries"><strong>order_creation_max_retries</strong></p>
+<a class="ansibleOptionLink" href="#parameter-order_creation_max_retries" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.24.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Depending on the strategy selected in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy</span></span></a></strong></code>, will retry creating new orders for at most the specified amount of times.</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">3</span></code></p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
