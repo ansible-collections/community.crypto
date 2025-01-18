@@ -9,7 +9,7 @@ version: 2.24.0
 readme: README.md
 authors:
   - Ansible (github.com/ansible)
-description: null
+description: Provides modules and plugins for many cryptographic operations.
 license:
   - GPL-3.0-or-later
   - Apache-2.0
