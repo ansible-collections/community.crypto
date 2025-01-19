@@ -54,31 +54,31 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     csr: "{{ remote_tmp_dir }}/cert.csr"
-  register: order
+  register: order_1
 
 - name: "({{ select_crypto_backend }}) Show order information"
   debug:
-    var: order
+    var: order_1
 
 - name: "({{ select_crypto_backend }}) Check order"
   assert:
     that:
-      - order is changed
-      - order.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
-      - order.challenge_data | length == 1
-      - order.challenge_data[0].identifier_type == 'dns'
-      - order.challenge_data[0].identifier == domain_name
-      - order.challenge_data[0].challenges | length >= 2
-      - "'http-01' in order.challenge_data[0].challenges"
-      - "'dns-01' in order.challenge_data[0].challenges"
-      - order.challenge_data[0].challenges['http-01'].resource.startswith('.well-known/acme-challenge/')
-      - order.challenge_data[0].challenges['http-01'].resource_value is string
-      - order.challenge_data[0].challenges['dns-01'].record == '_acme-challenge.' ~ domain_name
-      - order.challenge_data[0].challenges['dns-01'].resource == '_acme-challenge'
-      - order.challenge_data[0].challenges['dns-01'].resource_value is string
-      - order.challenge_data_dns | length == 1
-      - order.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
-      - order.account_uri == account.account_uri
+      - order_1 is changed
+      - order_1.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
+      - order_1.challenge_data | length == 1
+      - order_1.challenge_data[0].identifier_type == 'dns'
+      - order_1.challenge_data[0].identifier == domain_name
+      - order_1.challenge_data[0].challenges | length >= 2
+      - "'http-01' in order_1.challenge_data[0].challenges"
+      - "'dns-01' in order_1.challenge_data[0].challenges"
+      - order_1.challenge_data[0].challenges['http-01'].resource.startswith('.well-known/acme-challenge/')
+      - order_1.challenge_data[0].challenges['http-01'].resource_value is string
+      - order_1.challenge_data[0].challenges['dns-01'].record == '_acme-challenge.' ~ domain_name
+      - order_1.challenge_data[0].challenges['dns-01'].resource == '_acme-challenge'
+      - order_1.challenge_data[0].challenges['dns-01'].resource_value is string
+      - order_1.challenge_data_dns | length == 1
+      - order_1.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
+      - order_1.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Get order information"
   acme_certificate_order_info:
@@ -87,7 +87,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
   register: order_info_1
 
 - name: "({{ select_crypto_backend }}) Show order information"
@@ -116,7 +116,7 @@
       - "'certificate' not in order_info_1.order"
       - order_info_1.order.status == 'pending'
       - order_info_1.order.replaces is not defined
-      - order_info_1.order_uri == order.order_uri
+      - order_info_1.order_uri == order_1.order_uri
       - order_info_1.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Create HTTP challenges"
@@ -127,7 +127,7 @@
     body: "{{ item.challenges['http-01'].resource_value }}"
     headers:
       content-type: "application/octet-stream"
-  loop: "{{ order.challenge_data }}"
+  loop: "{{ order_1.challenge_data }}"
   when: "'http-01' in item.challenges"
 
 - name: "({{ select_crypto_backend }}) Let the challenge be validated"
@@ -137,7 +137,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
     challenge: http-01
   register: validate_1
 
@@ -159,7 +159,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
   register: order_info_2
 
 - name: "({{ select_crypto_backend }}) Show order information"
@@ -188,7 +188,7 @@
       - "'certificate' not in order_info_2.order"
       - order_info_2.order.status in ['pending', 'ready']
       - order_info_2.order.replaces is not defined
-      - order_info_2.order_uri == order.order_uri
+      - order_info_2.order_uri == order_1.order_uri
       - order_info_2.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Let the challenge be validated (idempotent)"
@@ -198,7 +198,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
     challenge: http-01
   register: validate_2
 
@@ -215,7 +215,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
     deactivate_authzs: never
     retrieve_all_alternates: true
     csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -258,7 +258,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
   register: order_info_3
 
 - name: "({{ select_crypto_backend }}) Show order information"
@@ -284,7 +284,7 @@
       - order_info_3.order.authorizations[0] == order_info_3.authorizations_by_identifier['dns:' ~ domain_name].uri
       - "'certificate' in order_info_3.order"
       - order_info_3.order.status == 'valid'
-      - order_info_3.order_uri == order.order_uri
+      - order_info_3.order_uri == order_1.order_uri
       - order_info_3.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Retrieve the cert and intermediate certificate (idempotent, but deactivate authzs)"
@@ -294,7 +294,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
     deactivate_authzs: on_success
     retrieve_all_alternates: true
     csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -322,7 +322,7 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
-    order_uri: "{{ order.order_uri }}"
+    order_uri: "{{ order_1.order_uri }}"
   register: order_info_4
 
 - name: "({{ select_crypto_backend }}) Show order information"
@@ -348,7 +348,7 @@
       - order_info_4.order.authorizations[0] == order_info_4.authorizations_by_identifier['dns:' ~ domain_name].uri
       - "'certificate' in order_info_4.order"
       - order_info_4.order.status == 'deactivated'
-      - order_info_4.order_uri == order.order_uri
+      - order_info_4.order_uri == order_1.order_uri
       - order_info_4.account_uri == account.account_uri
 
 # Test ARI support
@@ -414,7 +414,7 @@
           - replacement_order_1.challenge_data_dns | length == 1
           - replacement_order_1.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
           - replacement_order_1.account_uri == account.account_uri
-          - replacement_order_1.order_uri not in [order.order_uri]
+          - replacement_order_1.order_uri not in [order_1.order_uri]
 
     - name: "({{ select_crypto_backend }}) Check replacement order 1 information"
       assert:
@@ -510,7 +510,7 @@
               - replacement_order_3.challenge_data_dns | length == 1
               - replacement_order_3.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
               - replacement_order_3.account_uri == account.account_uri
-              - replacement_order_3.order_uri not in [order.order_uri, replacement_order_1.order_uri]
+              - replacement_order_3.order_uri not in [order_1.order_uri, replacement_order_1.order_uri]
               - >-
                 ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_3.warnings
 
@@ -651,7 +651,7 @@
               - replacement_order_5.challenge_data_dns | length == 1
               - replacement_order_5.challenge_data_dns['_acme-challenge.' ~ domain_name] | length == 1
               - replacement_order_5.account_uri == account.account_uri
-              - replacement_order_5.order_uri not in [order.order_uri, replacement_order_1.order_uri]
+              - replacement_order_5.order_uri not in [order_1.order_uri, replacement_order_1.order_uri, replacement_order_3.order_uri | default('')]
               - >-
                 ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_5.warnings
 
