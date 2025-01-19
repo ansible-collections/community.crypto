@@ -124,14 +124,15 @@ class Order(object):
                         replaces_cert_id is not None and
                         not (exc.error_code == 409 and exc.error_type == 'urn:ietf:params:acme:error:alreadyReplaced')
                     ):
-                        replaces_cert_id = None
                         if message_callback:
                             message_callback(
-                                'Stop passing `replaces` due to error {code} {type} when creating ACME order'.format(
+                                'Stop passing `replaces={replaces}` due to error {code} {type} when creating ACME order'.format(
                                     code=exc.error_code,
                                     type=exc.error_type,
+                                    replaces=replaces_cert_id,
                                 )
                             )
+                        replaces_cert_id = None
                         continue
 
                 raise
