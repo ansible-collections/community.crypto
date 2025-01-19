@@ -511,7 +511,7 @@
               - replacement_order_3.account_uri == account.account_uri
               - replacement_order_3.order_uri not in [order.order_uri, replacement_order_1.order_uri]
               - >-
-                'Stop passing `replaces` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order' in replacement_order_3.warnings
+                ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_3.warnings
 
         - name: "({{ select_crypto_backend }}) Check replacement order 3 information"
           assert:
@@ -652,7 +652,7 @@
               - replacement_order_5.account_uri == account.account_uri
               - replacement_order_5.order_uri not in [order.order_uri, replacement_order_1.order_uri]
               - >-
-                'Stop passing `replaces` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order' in replacement_order_5.warnings
+                ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_5.warnings
 
         - name: "({{ select_crypto_backend }}) Check replacement order 5 information"
           assert:
