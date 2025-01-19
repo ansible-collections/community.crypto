@@ -382,6 +382,7 @@
         csr: "{{ remote_tmp_dir }}/cert.csr"
         replaces_cert_id: "{{ cert_info.cert_id }}"
         order_creation_error_strategy: fail
+        profile: "{{ '90days' if acme_supports_profiles else omit }}"
       register: replacement_order_1
 
     - name: "({{ select_crypto_backend }}) Get replacement order 1 information"

@@ -182,6 +182,13 @@ order:
           certificate ID of the certificate that will be replaced by this order.
       type: str
       returned: when the certificate order is replacing a certificate through draft-ietf-acme-ari
+    profile:
+      description:
+        - If the ACME CA supports profiles through the L(draft-aaron-acme-profiles,
+          https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/) mechanism and informs about the profile
+          selected for this order, this field will contain the name of the profile used.
+      type: str
+      returned: depending on the ACME CA
 authorizations_by_identifier:
   description:
     - A dictionary mapping identifiers to their authorization objects.
