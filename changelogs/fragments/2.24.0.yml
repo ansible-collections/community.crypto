@@ -1,3 +1,0 @@
-release_summary: >-
-  New feature and bugfix release with multiple new modules.
-  It also deprecates support for older ansible-core and Python versions.

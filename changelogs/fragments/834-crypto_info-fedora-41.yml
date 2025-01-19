@@ -1,5 +1,0 @@
-bugfixes:
-  - "crypto_info - when running the module on Fedora 41 with ``cryptography`` installed from the package repository,
-     the module crashed apparently due to some elliptic curves being removed from libssl against which cryptography
-     is running, which cryptography did not expect
-     (https://github.com/ansible-collections/community.crypto/pull/834)."

@@ -1553,3 +1553,57 @@ releases:
       - 831-openssl_pkcs12-deprecate-pyopenssl.yml
       - 832-acme-challenges.yml
     release_date: '2024-12-30'
+  2.24.0:
+    changes:
+      bugfixes:
+        - crypto_info - when running the module on Fedora 41 with ``cryptography``
+          installed from the package repository, the module crashed apparently due
+          to some elliptic curves being removed from libssl against which cryptography
+          is running, which cryptography did not expect (https://github.com/ansible-collections/community.crypto/pull/834).
+      deprecated_features:
+        - Support for ansible-core 2.11, 2.12, 2.13, 2.14, 2.15, and 2.16 is deprecated,
+          and will be removed in the next major release (community.crypto 3.0.0).
+          Some modules might still work with some of these versions afterwards, but
+          we will no longer keep compatibility code that was needed to support them.
+          Note that this means that support for all Python versions before 3.7 will
+          be dropped, also on the target side (https://github.com/ansible-collections/community.crypto/issues/559,
+          https://github.com/ansible-collections/community.crypto/pull/839).
+        - Support for cryptography < 3.4 is deprecated, and will be removed in the
+          next major release (community.crypto 3.0.0). Some modules might still work
+          with older versions of cryptography, but we will no longer keep compatibility
+          code that was needed to support them (https://github.com/ansible-collections/community.crypto/issues/559,
+          https://github.com/ansible-collections/community.crypto/pull/839).
+      minor_changes:
+        - acme_certificate - add options ``order_creation_error_strategy`` and ``order_creation_max_retries``
+          which allow to configure the error handling behavior if creating a new ACME
+          order fails. This is particularly important when using the ``include_renewal_cert_id``
+          option, and the default value ``auto`` for ``order_creation_error_strategy``
+          tries to gracefully handle related errors (https://github.com/ansible-collections/community.crypto/pull/842).
+        - acme_certificate - allow to chose a profile for certificate generation,
+          in case the CA supports this using Internet-Draft `draft-aaron-acme-profiles
+          <https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/>`__ (https://github.com/ansible-collections/community.crypto/pull/835).
+        - acme_certificate_renewal_info - add ``exists`` and ``parsable`` return values
+          and ``treat_parsing_error_as_non_existing`` option (https://github.com/ansible-collections/community.crypto/pull/838).
+      release_summary: New feature and bugfix release with multiple new modules. It
+        also deprecates support for older ansible-core and Python versions.
+    fragments:
+      - 2.24.0.yml
+      - 3.0.0-deprecations.yml
+      - 834-crypto_info-fedora-41.yml
+      - 835-acme-profiles.yml
+      - 838-acme_certificate_renewal_info.yml
+      - 842-acme-certificate-order-errors.yml
+    modules:
+      - description: Create an ACME v2 order.
+        name: acme_certificate_order_create
+        namespace: ''
+      - description: Finalize an ACME v2 order.
+        name: acme_certificate_order_finalize
+        namespace: ''
+      - description: Obtain information for an ACME v2 order.
+        name: acme_certificate_order_info
+        namespace: ''
+      - description: Validate authorizations of an ACME v2 order.
+        name: acme_certificate_order_validate
+        namespace: ''
+    release_date: '2025-01-19'

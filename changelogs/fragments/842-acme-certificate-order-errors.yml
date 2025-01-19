@@ -1,6 +1,0 @@
-minor_changes:
-  - "acme_certificate - add options ``order_creation_error_strategy`` and ``order_creation_max_retries``
-     which allow to configure the error handling behavior if creating a new ACME order fails. This is
-     particularly important when using the ``include_renewal_cert_id`` option, and the default value
-     ``auto`` for ``order_creation_error_strategy`` tries to gracefully handle related errors
-     (https://github.com/ansible-collections/community.crypto/pull/842)."
