@@ -35,7 +35,6 @@
   luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
-    # Encode passphrase with Base64 to test passphrase_encoding
     passphrase: "{{ keyfile3 }}"
     passphrase_encoding: base64
   become: true
@@ -62,13 +61,23 @@
     that:
     - open_try is failed
 
+- name: Give access to passphrase1
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+    new_passphrase: "{{ cryptfile_passphrase1 | b64encode }}"
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+
 - name: Remove access for keyfile3
   luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     remove_passphrase: "{{ keyfile3 }}"
     passphrase_encoding: base64
-    force_remove_last_key: true
   become: true
 
 - name: Try to open with keyfile3
@@ -82,3 +91,15 @@
 - assert:
     that:
     - open_try is failed
+
+- name: Open with passphrase1
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: opened
+    passphrase: "{{ cryptfile_passphrase1 }}"
+  become: true
+  ignore_errors: true
+  register: open_try
+- assert:
+    that:
+    - open_try is not failed

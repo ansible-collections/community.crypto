@@ -70,9 +70,6 @@ options:
   passphrase_encoding:
     description:
       - Determine how passphrases are provided to parameters such as O(passphrase), O(new_passphrase), and O(remove_passphrase).
-      - Please note that binary passphrases cannot always contain all possible binary octets. When adding a new key to an existing
-        container, a newline (0x0A) cannot be used since it indicates that the passphrase is over. If you want to use arbitrary
-        binary data, you must use keyfiles.
     type: str
     default: text
     choices:
@@ -708,14 +705,16 @@ class CryptHandler(Handler):
         if keyfile:
             args.extend(['--key-file', keyfile])
         else:
+            args.extend(['--key-file', '-', '--keyfile-size', str(len(passphrase))])
             data.append(passphrase)
 
         if new_keyfile:
             args.append(new_keyfile)
         else:
-            data.extend([new_passphrase, new_passphrase])
+            args.append('-')
+            data.append(new_passphrase)
 
-        result = self._run_command(args, data=b'\n'.join(data) or None)
+        result = self._run_command(args, data=b''.join(data) or None)
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while adding new LUKS keyslot to %s: %s'
                              % (device, result[STDERR]))
