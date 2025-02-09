@@ -1607,3 +1607,12 @@ releases:
         name: acme_certificate_order_validate
         namespace: ''
     release_date: '2025-01-19'
+  2.25.0:
+    changes:
+      minor_changes:
+        - luks_device - allow passphrases to contain newlines (https://github.com/ansible-collections/community.crypto/pull/844).
+      release_summary: Feature release.
+    fragments:
+      - 2.25.0.yml
+      - luks_device_passphrase_newlines.yml
+    release_date: '2025-02-09'

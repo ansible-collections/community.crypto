@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.25.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- luks_device - allow passphrases to contain newlines (https://github.com/ansible-collections/community.crypto/pull/844).
+
 v2.24.0
 =======
 
