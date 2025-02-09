@@ -70,9 +70,6 @@ options:
   passphrase_encoding:
     description:
       - Determine how passphrases are provided to parameters such as O(passphrase), O(new_passphrase), and O(remove_passphrase).
-      - Please note that binary passphrases cannot contain all possible binary octets. For example, a newline (0x0A)
-        cannot be used since it indicates that the passphrase is over. If you want to use arbitrary binary data, you must
-        use keyfiles.
     type: str
     default: text
     choices:
@@ -488,8 +485,6 @@ class Handler(object):
             self._module.fail_json("Error while base64-decoding '{parameter_name}': {exc}".format(parameter_name=parameter_name, exc=exc))
 
     def _run_command(self, command, data=None):
-        if data is not None:
-            data += b'\n'
         return self._module.run_command(command, data=data, binary_data=True)
 
     def get_device_by_uuid(self, uuid):
@@ -635,6 +630,8 @@ class CryptHandler(Handler):
         args.extend(['-q', device])
         if keyfile:
             args.append(keyfile)
+        else:
+            args.append('-')
 
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
@@ -646,6 +643,8 @@ class CryptHandler(Handler):
         args = [self._cryptsetup_bin]
         if keyfile:
             args.extend(['--key-file', keyfile])
+        else:
+            args.extend(['--key-file', '-'])
         if perf_same_cpu_crypt:
             args.extend(['--perf-same_cpu_crypt'])
         if perf_submit_from_crypt_cpus:
@@ -706,14 +705,16 @@ class CryptHandler(Handler):
         if keyfile:
             args.extend(['--key-file', keyfile])
         else:
+            args.extend(['--key-file', '-', '--keyfile-size', str(len(passphrase))])
             data.append(passphrase)
 
         if new_keyfile:
             args.append(new_keyfile)
         else:
-            data.extend([new_passphrase, new_passphrase])
+            args.append('-')
+            data.append(new_passphrase)
 
-        result = self._run_command(args, data=b'\n'.join(data) or None)
+        result = self._run_command(args, data=b''.join(data) or None)
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while adding new LUKS keyslot to %s: %s'
                              % (device, result[STDERR]))
@@ -759,6 +760,8 @@ class CryptHandler(Handler):
             args = [self._cryptsetup_bin, 'luksKillSlot', device, '-q', str(keyslot)]
         if keyfile:
             args.extend(['--key-file', keyfile])
+        else:
+            args.extend(['--key-file', '-'])
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while removing LUKS key from %s: %s'
@@ -774,6 +777,7 @@ class CryptHandler(Handler):
         if keyfile:
             args.extend(['--key-file', keyfile])
         else:
+            args.extend(['--key-file', '-'])
             data = passphrase
 
         if keyslot is not None:

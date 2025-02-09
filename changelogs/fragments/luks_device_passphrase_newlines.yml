@@ -1,0 +1,2 @@
+bugfixes:
+  - luks_device - allow passphrases to contain newlines (https://github.com/ansible-collections/community.crypto/pull/844).

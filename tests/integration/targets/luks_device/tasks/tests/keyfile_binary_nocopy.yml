@@ -1,0 +1,105 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create with keyfile3
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+    type: luks2
+    pbkdf:
+      iteration_time: 0.1
+      algorithm: argon2i
+      memory: 1000
+      parallel: 1
+    sector_size: 1024
+  become: true
+  ignore_errors: true
+  register: create_passphrase_1
+
+- name: Create with keyfile3 (without argon2i)
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+  when: create_passphrase_1 is failed
+
+- name: Open with keyfile3
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: opened
+    passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+  become: true
+  ignore_errors: true
+  register: open_try
+- assert:
+    that:
+    - open_try is not failed
+- name: Close
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+  become: true
+
+- name: Try to open with passphrase1
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: opened
+    passphrase: "{{ cryptfile_passphrase1 }}"
+  become: true
+  ignore_errors: true
+  register: open_try
+- assert:
+    that:
+    - open_try is failed
+
+- name: Give access to passphrase1
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+    new_passphrase: "{{ cryptfile_passphrase1 | b64encode }}"
+    pbkdf:
+      iteration_time: 0.1
+  become: true
+
+- name: Remove access for keyfile3
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: closed
+    remove_passphrase: "{{ keyfile3 }}"
+    passphrase_encoding: base64
+  become: true
+
+- name: Try to open with keyfile3
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: opened
+    passphrase: "{{ keyfile3 }}"
+  become: true
+  ignore_errors: true
+  register: open_try
+- assert:
+    that:
+    - open_try is failed
+
+- name: Open with passphrase1
+  luks_device:
+    device: "{{ cryptfile_device }}"
+    state: opened
+    passphrase: "{{ cryptfile_passphrase1 }}"
+  become: true
+  ignore_errors: true
+  register: open_try
+- assert:
+    that:
+    - open_try is not failed
