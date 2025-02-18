@@ -265,7 +265,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-certificate_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.26.0</em></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Content of the certificate file.</p>
+<td><div class="ansible-option-cell"><p>Content of the certificate file in PEM format.</p>
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-certificate-path"><span class="std std-ref"><span class="pre">certificate_path</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
@@ -275,6 +275,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>The path to read certificates and private keys from.</p>
 <p>Must be in PEM format.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-certificate-content"><span class="std std-ref"><span class="pre">certificate_content</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -362,6 +363,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>List of other certificates to include. Pre Ansible 2.8 this parameter was called <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-ca-certificates"><span class="std std-ref"><span class="pre">ca_certificates</span></span></a></strong></code>.</p>
 <p>Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates, set <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-parse-all"><span class="std std-ref"><span class="pre">other_certificates_parse_all</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-content"><span class="std std-ref"><span class="pre">other_certificates_content</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -370,6 +372,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><em class="ansible-option-versionadded">added in community.crypto 2.26.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>List of other certificates to include.</p>
+<p>Assumes there is one PEM-encoded certificate per item.</p>
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates"><span class="std std-ref"><span class="pre">other_certificates</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
