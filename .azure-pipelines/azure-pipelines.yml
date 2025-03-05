@@ -63,6 +63,19 @@ stages:
               test: 'devel/sanity/extra'
             - name: Units
               test: 'devel/units/1'
+  - stage: Ansible_datatagging
+    displayName: Sanity & Units datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Sanity
+              test: 'datatagging/sanity/1'
+            - name: Sanity Extra # Only on datatagging
+              test: 'datatagging/sanity/extra'
+            - name: Units
+              test: 'datatagging/units/1'
   - stage: Ansible_2_18
     displayName: Sanity & Units 2.18
     dependsOn: []
@@ -104,6 +117,23 @@ stages:
       - template: templates/matrix.yml
         parameters:
           testFormat: devel/linux/{0}
+          targets:
+            - name: Fedora 41
+              test: fedora41
+            - name: Ubuntu 24.04
+              test: ubuntu2404
+            - name: Alpine 3.21
+              test: alpine321
+          groups:
+            - 1
+            - 2
+  - stage: Docker_datatagging
+    displayName: Docker datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: datatagging/linux/{0}
           targets:
             - name: Fedora 41
               test: fedora41
@@ -223,6 +253,25 @@ stages:
           groups:
             - 1
             - 2
+  - stage: Remote_datatagging
+    displayName: Remote datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: datatagging/{0}
+          targets:
+            - name: macOS 15.3
+              test: macos/15.3
+            - name: RHEL 9.5
+              test: rhel/9.5
+            - name: FreeBSD 14.2
+              test: freebsd/14.2
+            - name: FreeBSD 13.5
+              test: freebsd/13.5
+          groups:
+            - 1
+            - 2
   - stage: Remote_2_18
     displayName: Remote 2.18
     dependsOn: []
@@ -296,6 +345,23 @@ stages:
           groups:
             - 1
             - 2
+  - stage: Generic_datatagging
+    displayName: Generic datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: datatagging/generic/{0}
+          targets:
+            - test: "3.8"
+            # - test: "3.9"
+            # - test: "3.10"
+            - test: "3.11"
+            - test: "3.13"
+          groups:
+            - 1
+            - 2
   - stage: Generic_2_18
     displayName: Generic 2.18
     dependsOn: []
@@ -345,20 +411,24 @@ stages:
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
+      - Ansible_datatagging
       - Ansible_devel
       - Ansible_2_18
       - Ansible_2_17
       - Ansible_2_16
       - Remote_devel_extra_vms
+      - Remote_datatagging
       - Remote_devel
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
+      - Docker_datatagging
       - Docker_devel
       - Docker_2_18
       - Docker_2_17
       - Docker_2_16
       - Docker_community_devel
+      - Generic_datatagging
       - Generic_devel
       - Generic_2_18
       - Generic_2_17
