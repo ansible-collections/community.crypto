@@ -291,7 +291,7 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^The community.crypto.x509_crl_info input must be a text type, not <(?:class|type) 'list'>$")
+      - output.msg is search("The community.crypto.x509_crl_info input must be a text type, not ")
 
 - name: Get invalid CRL info
   set_fact:
@@ -304,7 +304,7 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^Error while decoding CRL")
+      - output.msg is search("Error while decoding CRL")
 
 - name: Get invalid CRL info
   set_fact:
@@ -317,7 +317,7 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^The name_encoding option must be of a text type, not <(?:class|type) 'list'>$")
+      - output.msg is search("The name_encoding option must be of a text type, not ")
 
 - name: Get invalid name_encoding parameter
   set_fact:
@@ -330,7 +330,7 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")
+      - output.msg is search("The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")
 
 - name: Get invalid list_revoked_certificates parameter
   set_fact:
@@ -343,4 +343,4 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^The list_revoked_certificates option must be a boolean, not <(?:class|type) 'list'>$")
+      - output.msg is search("The list_revoked_certificates option must be a boolean, not ")

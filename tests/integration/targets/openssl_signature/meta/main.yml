@@ -6,3 +6,4 @@
 dependencies:
   - setup_openssl
   - setup_remote_tmp_dir
+  - prepare_jinja2_compat
