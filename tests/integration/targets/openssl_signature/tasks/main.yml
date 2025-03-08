@@ -52,17 +52,7 @@
 
 - name: Create all test combinations
   set_fact:
-    # Explanation: see https://serverfault.com/a/1004124
-    all_tests: >-
-      [
-      {% for b in backends %}
-      {%   for kt in key_types %}
-      {%     for kp in key_password %}
-      {{       b | combine (kt) | combine(kp) }},
-      {%     endfor %}
-      {%   endfor %}
-      {% endfor %}
-      ]
+    all_tests: "{{ [backends, key_types, key_password] | openssl_signatures_combiner }}"
 
 - name: Generate private keys
   openssl_privatekey:

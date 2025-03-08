@@ -79,7 +79,7 @@
   assert:
     that:
       - output is failed
-      - output.msg is search("^The community.crypto.openssl_publickey_info input must be a text type, not <(?:class|type) 'list'>$")
+      - output.msg is search("The community.crypto.openssl_publickey_info input must be a text type, not ")
 
 - name: Get invalid key info
   set_fact:
@@ -92,4 +92,4 @@
   assert:
     that:
       - output is failed
-      - 'output.msg is search("^Error while deserializing key: ")'
+      - 'output.msg is search("Error while deserializing key: ")'

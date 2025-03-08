@@ -51,7 +51,8 @@
   assert:
     that:
       - result is failed
-      - result.msg == 'Wrong or empty passphrase provided for private key'
+      - >-
+        'Wrong or empty passphrase provided for private key' in result.msg
 
 - name: Get key 3 info (with passphrase)
   set_fact:

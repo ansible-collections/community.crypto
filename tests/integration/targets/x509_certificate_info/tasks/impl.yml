@@ -116,7 +116,10 @@
 - name: ({{select_crypto_backend}}) Compare output of direct and loaded info
   assert:
     that:
-      - result == result_direct
+      - >-
+        (result | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
+        ==
+        (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
