@@ -372,7 +372,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><em class="ansible-option-versionadded">added in community.crypto 2.26.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>List of other certificates to include.</p>
-<p>Assumes there is one PEM-encoded certificate per item.</p>
+<p>Assumes there is one PEM-encoded certificate per item. If an item contains multiple PEM certificates, set <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-parse-all"><span class="std std-ref"><span class="pre">other_certificates_parse_all</span></span></a></strong></code></p>
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates"><span class="std std-ref"><span class="pre">other_certificates</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
@@ -381,7 +381,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-other_certificates_parse_all" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.4.0</em></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, assumes that the files mentioned in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates"><span class="std std-ref"><span class="pre">other_certificates</span></span></a></strong></code> can contain more than one certificate per file (or even none per file).</p>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, assumes that the files mentioned in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates"><span class="std std-ref"><span class="pre">other_certificates</span></span></a></strong></code>/<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-content"><span class="std std-ref"><span class="pre">other_certificates_content</span></span></a></strong></code> can contain more than one certificate per file/item (or even none per file/item).</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
