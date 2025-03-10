@@ -55,15 +55,15 @@ options:
   other_certificates_content:
     description:
       - List of other certificates to include.
-      - Assumes there is one PEM-encoded certificate per item.
+      - Assumes there is one PEM-encoded certificate per item. If an item contains multiple PEM certificates, set O(other_certificates_parse_all)
       - Mutually exclusive with O(other_certificates).
     type: list
     elements: str
     version_added: "2.26.0"
   other_certificates_parse_all:
     description:
-      - If set to V(true), assumes that the files mentioned in O(other_certificates) can contain more than one certificate
-        per file (or even none per file).
+      - If set to V(true), assumes that the files mentioned in O(other_certificates)/O(other_certificates_content) can contain more than one
+        certificate per file/item (or even none per file/item).
     type: bool
     default: false
     version_added: 1.4.0
@@ -280,6 +280,7 @@ pkcs12:
 
 import abc
 import base64
+import itertools
 import os
 import stat
 import traceback
@@ -430,8 +431,11 @@ class Pkcs(OpenSSLObject):
                     load_certificate(other_cert, backend=self.backend) for other_cert in self.other_certificates
                 ]
         elif self.other_certificates_content:
+            certs = self.other_certificates_content
+            if self.other_certificates_parse_all:
+                certs = list(itertools.chain.from_iterable(split_pem_list(content) for content in certs))
             self.other_certificates = [
-                load_certificate(None, content=to_bytes(other_cert), backend=self.backend) for other_cert in self.other_certificates_content
+                load_certificate(None, content=to_bytes(other_cert), backend=self.backend) for other_cert in certs
             ]
 
     @abc.abstractmethod

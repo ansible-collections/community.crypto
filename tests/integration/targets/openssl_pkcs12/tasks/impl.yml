@@ -4,51 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: "({{ select_crypto_backend }}) Generate PKCS#12 file from contents"
-    openssl_pkcs12:
-      select_crypto_backend: '{{ select_crypto_backend }}'
-      path: '{{ remote_tmp_dir }}/ansible.p12'
-      friendly_name: abracadabra
-      privatekey_content: |
-        -----BEGIN EC PRIVATE KEY-----
-        MHcCAQEEIGZbvmYh3e0f47GtZWUGXLZf+ctx/nhOQWSbwzPRmugvoAoGCCqGSM49
-        AwEHoUQDQgAE1SVz+4QH2r9NcLgvsKx20J4qj3Y3u0obR9PP2p14fLUKNSQJgq1N
-        VKTF8KnhiDWoN+Lpp3Vf0VBU8BL48Y3hKw==
-        -----END EC PRIVATE KEY-----
-      certificate_content: |
-        -----BEGIN CERTIFICATE-----
-        MIIB2TCCAX+gAwIBAgIUETs79X6vL7XE8kCbK9ozF4VxMeswCgYIKoZIzj0EAwIw
-        QjELMAkGA1UEBhMCWFgxFTATBgNVBAcMDERlZmF1bHQgQ2l0eTEcMBoGA1UECgwT
-        RGVmYXVsdCBDb21wYW55IEx0ZDAeFw0yNTAyMTcwNjQ1NDZaFw0zNTAyMTcwNjQ1
-        NDZaMEIxCzAJBgNVBAYTAlhYMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAaBgNV
-        BAoME0RlZmF1bHQgQ29tcGFueSBMdGQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
-        AATVJXP7hAfav01wuC+wrHbQniqPdje7ShtH08/anXh8tQo1JAmCrU1UpMXwqeGI
-        Nag34umndV/RUFTwEvjxjeEro1MwUTAdBgNVHQ4EFgQUejmbwQ90PfjwNDDjcUcA
-        SLsiBpYwHwYDVR0jBBgwFoAUejmbwQ90PfjwNDDjcUcASLsiBpYwDwYDVR0TAQH/
-        BAUwAwEB/zAKBggqhkjOPQQDAgNIADBFAiBfwQIYqPvlGLNBcBvwtzZFQPhQQy4B
-        3yRKrrczSSYzrgIhAIA/ZeJJ7RGaGYgV4mLP7nnT85T0Ldqku6HgdkuLMN3k
-        -----END CERTIFICATE-----
-      other_certificates_content: 
-        - |
-          -----BEGIN CERTIFICATE-----
-          MIICtjCCAjygAwIBAgIRAICpc0jvJ2ip4/a7Q8D5xikwCgYIKoZIzj0EAwMwTzEL
-          MAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2VhcmNo
-          IEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDIwHhcNMjQwMzEzMDAwMDAwWhcN
-          MjcwMzEyMjM1OTU5WjAyMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3MgRW5j
-          cnlwdDELMAkGA1UEAxMCRTYwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAATZ8Z5Gh/gh
-          cWCoJuuj+rnq2h25EqfUJtlRFLFhfHWWvyILOR/VvtEKRqotPEoJhC6+QJVV6RlA
-          N2Z17TJOdwRJ+HB7wxjnzvdxEP6sdNgA1O1tHHMWMxCcOrLqbGL0vbijgfgwgfUw
-          DgYDVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAS
-          BgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBSTJ0aYA6lRaI6Y1sRCSNsjv1iU
-          0jAfBgNVHSMEGDAWgBR8Qpau3ktIO/qS+J6Mz22LqXI3lTAyBggrBgEFBQcBAQQm
-          MCQwIgYIKwYBBQUHMAKGFmh0dHA6Ly94Mi5pLmxlbmNyLm9yZy8wEwYDVR0gBAww
-          CjAIBgZngQwBAgEwJwYDVR0fBCAwHjAcoBqgGIYWaHR0cDovL3gyLmMubGVuY3Iu
-          b3JnLzAKBggqhkjOPQQDAwNoADBlAjBgGMvAszhCd1BsRuMwGYCC0QCzf5d//MC5
-          ASqIyswj3hGcoZREOKDKdvJPHhgdZr8CMQCWq4Kjl/RmuF49LBq9eP7oGWAc55w4
-          G72FoKw5a9WywSwBzoJunrayTB8nDSjEhu8=
-          -----END CERTIFICATE-----
-      state: present
-
   - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (check mode)"
     openssl_pkcs12:
       select_crypto_backend: '{{ select_crypto_backend }}'
@@ -112,13 +67,18 @@
       src: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
     register: ansible_pkey_content
 
+  - name: "({{ select_crypto_backend }}) Read ansible1.crt"
+    slurp:
+      src: '{{ remote_tmp_dir }}/ansible1.crt'
+    register: ansible_crt_content
+
   - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (private key from file)"
     openssl_pkcs12:
       select_crypto_backend: '{{ select_crypto_backend }}'
       path: '{{ remote_tmp_dir }}/ansible.p12'
       friendly_name: abracadabra
       privatekey_content: '{{ ansible_pkey_content.content | b64decode }}'
-      certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+      certificate_content: '{{ ansible_crt_content.content | b64decode }}'
       state: present
       return_content: true
     register: p12_standard_idempotency_2
@@ -199,6 +159,14 @@
       state: present
     register: p12_multiple_certs
 
+  - name: "({{ select_crypto_backend }}) Read ansible2.crt / ansible3.crt.crt"
+    slurp:
+      src: "{{ item }}"
+    loop:
+      - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
+      - "{{ remote_tmp_dir ~ '/ansible3.crt' }}"
+    register: ansible_other_content
+
   - name: "({{ select_crypto_backend }}) Generate PKCS#12 file with multiple certs and passphrase, again (idempotency)"
     openssl_pkcs12:
       select_crypto_backend: '{{ select_crypto_backend }}'
@@ -207,9 +175,9 @@
       passphrase: hunter3
       privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
       certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
-      other_certificates:
-      - '{{ remote_tmp_dir }}/ansible2.crt'
-      - '{{ remote_tmp_dir }}/ansible3.crt'
+      other_certificates_content:
+      - "{{ ansible_other_content.results[0].content | b64decode }}"
+      - "{{ ansible_other_content.results[1].content | b64decode }}"
       state: present
     register: p12_multiple_certs_idempotency
 
@@ -367,6 +335,22 @@
       other_certificates_parse_all: true
       state: present
     register: p12_empty_concat_idem
+
+  - name: "({{ select_crypto_backend }}) Read ansible23.crt"
+    slurp:
+      src: "{{ remote_tmp_dir ~ '/ansible23.crt' }}"
+    register: ansible_other_content_concat
+
+  - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (idempotent, concatenated other certificates)"
+    openssl_pkcs12:
+      select_crypto_backend: '{{ select_crypto_backend }}'
+      path: '{{ remote_tmp_dir }}/ansible_empty.p12'
+      friendly_name: abracadabra
+      other_certificates_content:
+      - "{{ ansible_other_content_concat.content | b64decode }}"
+      other_certificates_parse_all: true
+      state: present
+    register: p12_empty_concat_content_idem
 
   - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (parse)"
     openssl_pkcs12:
