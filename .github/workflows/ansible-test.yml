@@ -45,6 +45,8 @@ jobs:
           ansible-core-version: stable-${{ matrix.ansible }}
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
+          pre-test-cmd: >-
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'
           testing-type: sanity
 
@@ -74,6 +76,8 @@ jobs:
           ansible-core-version: stable-${{ matrix.ansible }}
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
+          pre-test-cmd: >-
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'
           testing-type: units
 
