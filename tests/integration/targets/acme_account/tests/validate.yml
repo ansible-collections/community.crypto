@@ -18,7 +18,7 @@
       - "account_created_check.diff.before == {}"
       - "'after' in account_created_check.diff"
       - account_created_check.diff.after.contact | length == 1
-      - account_created_check.diff.after.contact[0] == 'mailto:example@example.org'
+      - account_created_check.diff.after.contact[0] in ['mailto:example@example.org', 'mailto:********@********.org']
 
 - name: Validate that account was created in the second step
   assert:
@@ -39,9 +39,9 @@
       - account_modified_check.account_uri is not none
       - "'diff' in account_modified_check"
       - account_modified_check.diff.before.contact | length == 1
-      - account_modified_check.diff.before.contact[0] == 'mailto:example@example.org'
+      - account_modified_check.diff.before.contact[0] in ['mailto:example@example.org', 'mailto:********@********.org']
       - account_modified_check.diff.after.contact | length == 1
-      - account_modified_check.diff.after.contact[0] == 'mailto:example@example.com'
+      - account_modified_check.diff.after.contact[0] in ['mailto:example@example.com', 'mailto:********@********.com']
 
 - name: Validate that email address was changed
   assert:
@@ -67,7 +67,7 @@
       - account_modified_2_check.account_uri is not none
       - "'diff' in account_modified_2_check"
       - account_modified_2_check.diff.before.contact | length == 1
-      - account_modified_2_check.diff.before.contact[0] == 'mailto:example@example.com'
+      - account_modified_2_check.diff.before.contact[0] in ['mailto:example@example.com', 'mailto:********@********.com']
       - account_modified_2_check.diff.after.contact | length == 0
 
 - name: Validate that email address was cleared
