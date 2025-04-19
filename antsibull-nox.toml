@@ -1,0 +1,40 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+[collection_sources]
+"community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
+
+[sessions]
+
+[sessions.docs_check]
+validate_collection_refs="all"
+
+[sessions.license_check]
+run_reuse = false
+license_check_extra_ignore_paths = [
+    "tests/integration/targets/*/files/*.pem",
+    "tests/integration/targets/*/files/roots/*.pem",
+]
+# Right now we need to run the following before 'reuse lint' passes:
+#   rm -f tests/integration/targets/*/files/*.pem
+#   rm -f tests/integration/targets/*/files/roots/*.pem
+
+[sessions.extra_checks]
+run_no_unwanted_files = true
+no_unwanted_files_module_extensions = [".py"]
+no_unwanted_files_yaml_extensions = [".yml"]
+run_action_groups = true
+
+[[sessions.extra_checks.action_groups_config]]
+name = "acme"
+pattern = "^acme_.*$"
+exclusions = [
+    "acme_ari_info",  # does not support ACME account
+    "acme_certificate_renewal_info",  # does not support ACME account
+    "acme_challenge_cert_helper",  # does not support (and need) any common parameters
+]
+doc_fragment = "community.crypto.attributes.actiongroup_acme"
+
+[sessions.build_import_check]
+run_galaxy_importer = true
