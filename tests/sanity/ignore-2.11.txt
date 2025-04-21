@@ -4,6 +4,8 @@
 .azure-pipelines/scripts/publish-codecov.py compile-3.5!skip # Uses Python 3.6+ syntax
 .azure-pipelines/scripts/publish-codecov.py future-import-boilerplate
 .azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
+noxfile.py compile-2.6!skip # Uses Python 3.6+ syntax
+noxfile.py compile-2.7!skip # Uses Python 3.6+ syntax
 noxfile.py future-import-boilerplate
 noxfile.py metaclass-boilerplate
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
@@ -28,5 +30,10 @@ plugins/modules/x509_crl.py validate-modules:invalid-documentation
 plugins/modules/x509_crl.py validate-modules:return-syntax-error
 plugins/modules/x509_crl_info.py validate-modules:invalid-documentation
 plugins/modules/x509_crl_info.py validate-modules:return-syntax-error
+tests/create-certificates.py compile-2.6!skip # Uses Python 3.6+ syntax
+tests/create-certificates.py compile-2.7!skip # Uses Python 3.6+ syntax
+tests/create-certificates.py compile-3.5!skip # Uses Python 3.6+ syntax
+tests/create-certificates.py future-import-boilerplate
+tests/create-certificates.py metaclass-boilerplate
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang
