@@ -123,16 +123,16 @@ def concat_files(destination: Path, sources: list[Path | str]) -> None:
 
 # Root certificates
 
-comodo_ca = create_self_signed(
+foobar = create_self_signed(
     key=rsa.generate_private_key(public_exponent=65537, key_size=2048),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "GB"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Greater Manchester"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, "Salford"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not COMODO CA Limited"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not COMODO Certification Authority"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Some Area"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Some City"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foobar CA Limited"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Foobar Certification Authority"),
     ]),
-    serial=decode_serial("4e:81:2d:8a:82:65:e0:0b:02:ee:3e:35:02:46:e5:3d"),
+    serial=decode_serial("9f0703517195373e68ce154665d6f407"),
     hash=hashes.SHA1(),
     not_before=datetime.datetime(year=2006, month=12, day=1, hour=0, minute=0, second=0, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2029, month=12, day=31, hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc),
@@ -152,7 +152,7 @@ comodo_ca = create_self_signed(
         (x509.BasicConstraints(ca=True, path_length=None), True),
         (x509.CRLDistributionPoints([
             x509.DistributionPoint(
-                full_name=[x509.UniformResourceIdentifier("http://crl.comodoca.com/COMODOCertificationAuthority.crl")],
+                full_name=[x509.UniformResourceIdentifier("http://crl.example.org/foobar-ca.crl")],
                 relative_name=None,
                 reasons=None,
                 crl_issuer=None,
@@ -160,20 +160,20 @@ comodo_ca = create_self_signed(
         ]), False),
     ],
     filenames=[
-        "tests/integration/targets/certificate_complete_chain/files/roots/COMODO_Certification_Authority.pem",
+        "tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar.pem",
     ]
 )
 
-comodo_ecc_ca = create_self_signed(
+foobar_ecc = create_self_signed(
     key=ec.generate_private_key(ec.SECP384R1()),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "GB"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Greater Manchester"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, "Salford"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not COMODO CA Limited"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not COMODO ECC Certification Authority"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Some Area"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Some City"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foobar CA Limited"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Foobar ECC Certification Authority"),
     ]),
-    serial=decode_serial("1f:47:af:aa:62:00:70:50:54:4c:01:9e:9b:63:99:2a"),
+    serial=decode_serial("89f62d74904db60b077a63c2165e7af3"),
     hash=hashes.SHA384(),
     not_before=datetime.datetime(year=2008, month=3, day=6, hour=0, minute=0, second=0, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2038, month=1, day=18, hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc),
@@ -193,21 +193,21 @@ comodo_ecc_ca = create_self_signed(
         (x509.BasicConstraints(ca=True, path_length=None), True),
     ],
     filenames=[
-        "tests/integration/targets/certificate_complete_chain/files/roots/COMODO_ECC_Certification_Authority.pem",
+        "tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar_ECC.pem",
         "tests/integration/targets/certificate_complete_chain/files/cert1-root.pem",
     ]
 )
 
-comodo_rsa_ca = create_self_signed(
+foobar_rsa = create_self_signed(
     key=rsa.generate_private_key(public_exponent=65537, key_size=4096),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "GB"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Greater Manchester"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, "Salford"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not COMODO CA Limited"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not COMODO RSA Certification Authority"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Some Area"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Some City"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foobar CA Limited"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Foobar RSA Certification Authority"),
     ]),
-    serial=decode_serial("4c:aa:f9:ca:db:63:6f:e0:1f:f7:4e:d8:5b:03:86:9d"),
+    serial=decode_serial("6506cf0ebbcbf304c90745c46c30dc14"),
     hash=hashes.SHA384(),
     not_before=datetime.datetime(year=2010, month=1, day=19, hour=0, minute=0, second=0, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2038, month=1, day=18, hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc),
@@ -227,17 +227,17 @@ comodo_rsa_ca = create_self_signed(
         (x509.BasicConstraints(ca=True, path_length=None), True),
     ],
     filenames=[
-        "tests/integration/targets/certificate_complete_chain/files/roots/COMODO_RSA_Certification_Authority.pem",
+        "tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar_RSA.pem",
     ]
 )
 
-dst_root = create_self_signed(
+bazbam_root = create_self_signed(
     key=rsa.generate_private_key(public_exponent=65537, key_size=2048),
     subject=x509.Name([
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not Digital Signature Trust Co."),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not DST Root CA X3"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Bazbam International"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Bazbam CA"),
     ]),
-    serial=decode_serial("44:af:b0:80:d6:a3:27:ba:89:30:39:86:2e:f8:40:6b"),
+    serial=decode_serial("c9a56c6a4896e371c5ffba04b41073bf"),
     hash=hashes.SHA1(),
     not_before=datetime.datetime(year=2000, month=9, day=30, hour=21, minute=12, second=19, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2021, month=9, day=30, hour=14, minute=1, second=15, tzinfo=datetime.timezone.utc),
@@ -257,19 +257,19 @@ dst_root = create_self_signed(
         "ski",
     ],
     filenames=[
-        "tests/integration/targets/certificate_complete_chain/files/roots/DST_Root_CA_X3.pem",
+        "tests/integration/targets/certificate_complete_chain/files/roots/CA_Bazbam.pem",
         "tests/integration/targets/certificate_complete_chain/files/cert2-root.pem",
     ]
 )
 
-isrg_x1 = create_self_signed(
+foobazbam_root = create_self_signed(
     key=rsa.generate_private_key(public_exponent=65537, key_size=4096),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not Internet Security Research Group"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not ISRG Root X1"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foo Baz Bam Incorporated"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Foobazbam Root"),
     ]),
-    serial=decode_serial("82:10:cf:b0:d2:40:e3:59:44:63:e0:bb:63:82:8b:00"),
+    serial=decode_serial("f8bd06c8bf6ef3a6ac85fd51c462f9a0"),
     hash=hashes.SHA256(),
     not_before=datetime.datetime(year=2015, month=6, day=4, hour=11, minute=4, second=38, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2035, month=6, day=4, hour=11, minute=4, second=38, tzinfo=datetime.timezone.utc),
@@ -289,24 +289,24 @@ isrg_x1 = create_self_signed(
         "ski",
     ],
     filenames=[
-        "tests/integration/targets/certificate_complete_chain/files/roots/ISRG_Root_X1.pem",
+        "tests/integration/targets/certificate_complete_chain/files/roots/foobazbam.pem",
         "tests/integration/targets/certificate_complete_chain/files/cert2-altroot.pem",
     ]
 )
 
 # Intermediate certificates
 
-comodo_ecc_inter = create_signed(
-    sign_cert=comodo_ecc_ca,
+foobar_ecc_inter = create_signed(
+    sign_cert=foobar_ecc,
     key=ec.generate_private_key(ec.SECP256R1()),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "GB"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Greater Manchester"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, "Salford"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not COMODO CA Limited"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not COMODO ECC Domain Validation Secure Server CA 2"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Some Area"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Some City"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foobar CA Limited"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "Foobar ECC Domain Validation Intermediate"),
     ]),
-    serial=decode_serial("5b:25:ce:69:07:c4:26:55:66:d3:39:0c:99:a9:54:ad"),
+    serial=decode_serial("c9aad9d1e05074e7eae62e0eb34175e1"),
     hash=hashes.SHA384(),
     not_before=datetime.datetime(year=2014, month=9, day=25, hour=0, minute=0, second=0, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2029, month=9, day=24, hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc),
@@ -332,7 +332,7 @@ comodo_ecc_inter = create_signed(
         ]), False),
         (x509.CRLDistributionPoints([
             x509.DistributionPoint(
-                full_name=[x509.UniformResourceIdentifier("http://crl.comodoca.com/COMODOECCCertificationAuthority.crl")],
+                full_name=[x509.UniformResourceIdentifier("http://crl.example.org/foobar-ecc-ca.crl")],
                 relative_name=None,
                 reasons=None,
                 crl_issuer=None,
@@ -341,11 +341,11 @@ comodo_ecc_inter = create_signed(
         (x509.AuthorityInformationAccess([
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.CA_ISSUERS,
-                access_location=x509.UniformResourceIdentifier("http://crt.comodoca.com/COMODOECCAddTrustCA.crt"),
+                access_location=x509.UniformResourceIdentifier("http://crl.example.org/foobar-ecc-ca.crl"),
             ),
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.OCSP,
-                access_location=x509.UniformResourceIdentifier("http://ocsp.comodoca4.com"),
+                access_location=x509.UniformResourceIdentifier("http://ocsp.example.org"),
             ),
         ]), False),
     ],
@@ -354,15 +354,15 @@ comodo_ecc_inter = create_signed(
     ],
 )
 
-lets_encrypt_x3_dst = create_signed(
-    sign_cert=dst_root,
+foobazbam_inter_bazbam = create_signed(
+    sign_cert=bazbam_root,
     key=rsa.generate_private_key(public_exponent=65537, key_size=2048),
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not Let's Encrypt"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not Let's Encrypt Authority X3"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foo Baz Bam Subsidiary"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "FooBazBam Inter"),
     ]),
-    serial=decode_serial("0a:01:41:42:00:00:01:53:85:73:6a:0b:85:ec:a7:08"),
+    serial=decode_serial("f137dc8857c76a7b82be401fd03dbd4e"),
     hash=hashes.SHA256(),
     not_before=datetime.datetime(year=2016, month=3, day=17, hour=16, minute=40, second=46, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2021, month=3, day=17, hour=16, minute=40, second=46, tzinfo=datetime.timezone.utc),
@@ -382,21 +382,21 @@ lets_encrypt_x3_dst = create_signed(
         (x509.AuthorityInformationAccess([
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.OCSP,
-                access_location=x509.UniformResourceIdentifier("http://isrg.trustid.ocsp.identrust.com"),
+                access_location=x509.UniformResourceIdentifier("http://ocsp.bazbam.example.org"),
             ),
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.CA_ISSUERS,
-                access_location=x509.UniformResourceIdentifier("http://apps.identrust.com/roots/dstrootcax3.p7c"),
+                access_location=x509.UniformResourceIdentifier("http://cert.bazbam.example.org/ca.pem"),
             ),
         ]), False),
         "aki",
         (x509.CertificatePolicies([
             x509.PolicyInformation(x509.ObjectIdentifier("2.23.140.1.2.1"), policy_qualifiers=[]),
-            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.44947.1.1.1"), policy_qualifiers=["http://cps.root-x1.letsencrypt.org"]),
+            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.44947.1.1.1"), policy_qualifiers=["http://foobarbaz.example.com/cps-policy"]),
         ]), False),
         (x509.CRLDistributionPoints([
             x509.DistributionPoint(
-                full_name=[x509.UniformResourceIdentifier("http://crl.identrust.com/DSTROOTCAX3CRL.crl")],
+                full_name=[x509.UniformResourceIdentifier("http://crl.bazbam.example.org/ca.crl")],
                 relative_name=None,
                 reasons=None,
                 crl_issuer=None,
@@ -409,15 +409,15 @@ lets_encrypt_x3_dst = create_signed(
     ],
 )
 
-lets_encrypt_x3_isrg = create_signed(
-    sign_cert=isrg_x1,
-    key=lets_encrypt_x3_dst.key,
+foobazbam_inter_own = create_signed(
+    sign_cert=foobazbam_root,
+    key=foobazbam_inter_bazbam.key,
     subject=x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Not Let's Encrypt"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Not Let's Encrypt Authority X3"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Foo Baz Bam Subsidiary"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "FooBazBam Inter"),
     ]),
-    serial=decode_serial("d3:b1:72:26:34:23:32:dc:f4:05:28:51:2a:ec:9c:6a"),
+    serial=decode_serial("72cdaba696be80905df01a12a90e4f37"),
     hash=hashes.SHA256(),
     not_before=datetime.datetime(year=2016, month=10, day=6, hour=15, minute=43, second=55, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2021, month=10, day=6, hour=15, minute=43, second=55, tzinfo=datetime.timezone.utc),
@@ -436,12 +436,12 @@ lets_encrypt_x3_isrg = create_signed(
         (x509.BasicConstraints(ca=True, path_length=0), True),
         (x509.CertificatePolicies([
             x509.PolicyInformation(x509.ObjectIdentifier("2.23.140.1.2.1"), policy_qualifiers=[]),
-            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.44947.1.1.1"), policy_qualifiers=["http://cps.root-x1.letsencrypt.org"]),
+            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.44947.1.1.1"), policy_qualifiers=["http://foobarbaz.example.com/cps-policy"]),
         ]), False),
         "ski",
         (x509.CRLDistributionPoints([
             x509.DistributionPoint(
-                full_name=[x509.UniformResourceIdentifier("http://crl.root-x1.letsencrypt.org")],
+                full_name=[x509.UniformResourceIdentifier("http://crl.foobarbaz.example.com/inter.crl")],
                 relative_name=None,
                 reasons=None,
                 crl_issuer=None,
@@ -450,11 +450,11 @@ lets_encrypt_x3_isrg = create_signed(
         (x509.AuthorityInformationAccess([
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.OCSP,
-                access_location=x509.UniformResourceIdentifier("http://ocsp.root-x1.letsencrypt.org/"),
+                access_location=x509.UniformResourceIdentifier("http://ocsp.foobarbaz.example.com"),
             ),
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.CA_ISSUERS,
-                access_location=x509.UniformResourceIdentifier("http://cert.root-x1.letsencrypt.org/"),
+                access_location=x509.UniformResourceIdentifier("http://cert.foobarbaz.example.com/inter.pem"),
             ),
         ]), False),
         "aki",
@@ -467,14 +467,14 @@ lets_encrypt_x3_isrg = create_signed(
 # Leaf certificates
 
 cert1 = create_signed(
-    sign_cert=comodo_ecc_inter,
+    sign_cert=foobar_ecc_inter,
     key=ec.generate_private_key(ec.SECP256R1()),
     subject=x509.Name([
-        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Domain Control Validated"),
-        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Not PositiveSSL Multi-Domain"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "ssl803025.cloudflaressl.com"),
+        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Something Validated"),
+        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "FooBarTLS Validated"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "test.example.com"),
     ]),
-    serial=decode_serial("2f:e7:3d:a1:05:e9:bd:d7:0e:0f:70:4a:02:77:1b:80"),
+    serial=decode_serial("3ecc834a0ff8bb5cc06a8910f0ef9f34"),
     hash=hashes.SHA256(),
     not_before=datetime.datetime(year=2018, month=7, day=11, hour=0, minute=0, second=0, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2019, month=1, day=17, hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc),
@@ -495,12 +495,12 @@ cert1 = create_signed(
         (x509.BasicConstraints(ca=False, path_length=None), True),
         (x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH, ExtendedKeyUsageOID.CLIENT_AUTH]), False),
         (x509.CertificatePolicies([
-            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.6449.1.2.2.7"), policy_qualifiers=["https://secure.comodo.com/CPS"]),
+            x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.6449.1.2.2.7"), policy_qualifiers=["https://something.exmaple.org/c-p-s"]),
             x509.PolicyInformation(x509.ObjectIdentifier("2.23.140.1.2.1"), policy_qualifiers=[]),
         ]), False),
         (x509.CRLDistributionPoints([
             x509.DistributionPoint(
-                full_name=[x509.UniformResourceIdentifier("http://crl.comodoca4.com/COMODOECCDomainValidationSecureServerCA2.crl")],
+                full_name=[x509.UniformResourceIdentifier("http://crl.example.org/foobar-ecc-inter.crl")],
                 relative_name=None,
                 reasons=None,
                 crl_issuer=None,
@@ -509,17 +509,17 @@ cert1 = create_signed(
         (x509.AuthorityInformationAccess([
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.CA_ISSUERS,
-                access_location=x509.UniformResourceIdentifier("http://crt.comodoca4.com/COMODOECCDomainValidationSecureServerCA2.crt"),
+                access_location=x509.UniformResourceIdentifier("http://cert.example.org/foobar-ecc-inter.pem"),
             ),
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.OCSP,
-                access_location=x509.UniformResourceIdentifier("http://ocsp.comodoca4.com"),
+                access_location=x509.UniformResourceIdentifier("http://ocsp.example.org"),
             ),
         ]), False),
         (x509.SubjectAlternativeName([
-            x509.DNSName("ssl803025.cloudflaressl.com"),
-            x509.DNSName("*.hscoscdn40.net"),
-            x509.DNSName("hscoscdn40.net"),
+            x509.DNSName("test.example.com"),
+            x509.DNSName("*.test.example.com"),
+            x509.DNSName("something.example.com"),
         ]), False),
         # binascii.hexlify(
         #   x509.load_pem_x509_certificate(
@@ -529,11 +529,12 @@ cert1 = create_signed(
         (x509.UnrecognizedExtension(
             ExtensionOID.PRECERT_SIGNED_CERTIFICATE_TIMESTAMPS,
             decode_bytes(
-                "0481f100ef007600ee4bbdb775ce60bae142691fabe19e66a30f7e5fb072d88300c47b897aa8fdcb0000016486d503cf000004"
-                "0300473045022100db4de3cf48cf2de2b2cfde17cad4c3f822afcaeac80dadde5a719dca3e27636502204192ee4c8860fcc215"
-                "b9ff7d5bc8f8f4ff2a5ed4c986d1062bab7a96bd8890dd007500747eda8331ad331091219cce254f4270c2bffd5e422008c637"
-                "3579e6107bcc560000016486d5041e000004030046304402204a370bec1e1c6e09b65c40faf46eff8853dedb39168719e48062"
-                "124b0b97c35802202cf03e67db8c47f00cd5c4b81b3b25790f45a4f5a62ee167d691e702494ca1fd"
+                "0481f200f00077000de1f2302bd30dc140621209ea552efc47747cb1d7e930ef0e421eb47e4eaa34000001960"
+                "be468ec0000040300483046022100b57abc31c137bc075eb2d05a402d13b65de2c668aa589395b1c8a87a2740"
+                "8caf022100a8833d74ec6f1d7a6cdff8446cf772cfcc4c3b61cb89baf7ed11bed00a44485a00750012f14e34b"
+                "d53724c840619c38f3f7a13f8e7b56287889c6d300584ebe586263a000001960be468e5000004030046304402"
+                "205a45d0b28451ef630bc563aa2845c59c138e83a12fef67ea217a62fe0cc65c9002206fadff98adb2857fafa"
+                "7683551f993e72cc3d632fcf06a461527d7debd1a5784"
             ),
         ), False),
         # This doesn't work in a nicer way, see https://github.com/pyca/cryptography/issues/7824
@@ -544,13 +545,13 @@ cert1 = create_signed(
 )
 
 cert2 = create_signed(
-    # sign_cert=lets_encrypt_x3_dst,
-    sign_cert=lets_encrypt_x3_isrg,
+    # sign_cert=foobazbam_inter_bazbam,
+    sign_cert=foobazbam_inter_own,
     key=rsa.generate_private_key(public_exponent=65537, key_size=2048),
     subject=x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, "www.letsencrypt.org"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "example.net"),
     ]),
-    serial=decode_serial("03:68:12:0a:6f:c1:b6:f0:91:d9:ed:9b:21:aa:79:61:b5:da"),
+    serial=decode_serial("2405bbfcf40fdc2b142b22ab985e3556"),
     hash=hashes.SHA256(),
     not_before=datetime.datetime(year=2018, month=7, day=27, hour=17, minute=31, second=27, tzinfo=datetime.timezone.utc),
     not_after=datetime.datetime(year=2018, month=10, day=25, hour=17, minute=31, second=27, tzinfo=datetime.timezone.utc),
@@ -573,42 +574,30 @@ cert2 = create_signed(
         (x509.AuthorityInformationAccess([
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.OCSP,
-                access_location=x509.UniformResourceIdentifier("http://ocsp.int-x3.letsencrypt.org"),
+                access_location=x509.UniformResourceIdentifier("http://ocsp.foobarbaz.example.com"),
             ),
             x509.AccessDescription(
                 access_method=AuthorityInformationAccessOID.CA_ISSUERS,
-                access_location=x509.UniformResourceIdentifier("http://cert.int-x3.letsencrypt.org/"),
+                access_location=x509.UniformResourceIdentifier("http://cert.foobarbaz.example.com/inter.pem"),
             ),
         ]), False),
         (x509.SubjectAlternativeName([
-            x509.DNSName("cert.int-x1.letsencrypt.org"),
-            x509.DNSName("cert.int-x2.letsencrypt.org"),
-            x509.DNSName("cert.int-x3.letsencrypt.org"),
-            x509.DNSName("cert.int-x4.letsencrypt.org"),
-            x509.DNSName("cert.root-x1.letsencrypt.org"),
-            x509.DNSName("cert.staging-x1.letsencrypt.org"),
-            x509.DNSName("cert.stg-int-x1.letsencrypt.org"),
-            x509.DNSName("cert.stg-root-x1.letsencrypt.org"),
-            x509.DNSName("cp.letsencrypt.org"),
-            x509.DNSName("cp.root-x1.letsencrypt.org"),
-            x509.DNSName("cps.letsencrypt.org"),
-            x509.DNSName("cps.root-x1.letsencrypt.org"),
-            x509.DNSName("crl.root-x1.letsencrypt.org"),
-            x509.DNSName("letsencrypt.org"),
-            x509.DNSName("origin.letsencrypt.org"),
-            x509.DNSName("origin2.letsencrypt.org"),
-            x509.DNSName("status.letsencrypt.org"),
-            x509.DNSName("www.letsencrypt.org"),
+            x509.DNSName("example.net"),
+            x509.DNSName("www.example.net"),
+            x509.DNSName("foo.example.net"),
+            x509.DNSName("bar.example.net"),
+            x509.DNSName("baz.example.net"),
+            x509.DNSName("bam.example.net"),
+            x509.DNSName("*.bam.example.net"),
         ]), False),
         (x509.CertificatePolicies([
             x509.PolicyInformation(x509.ObjectIdentifier("2.23.140.1.2.1"), policy_qualifiers=[]),
             x509.PolicyInformation(x509.ObjectIdentifier("1.3.6.1.4.1.44947.1.1.1"), policy_qualifiers=[
-                "http://cps.letsencrypt.org",
+                "http://cps.foobarbaz.example.com/something",
                 x509.UserNotice(
                     notice_reference=None,
                     explicit_text=(
-                        "This Certificate may only be relied upon by Relying Parties and only in accordance"
-                        " with the Certificate Policy found at https://letsencrypt.org/repository/"
+                        "Blabla whatever."
                     ),
                 )
             ]),
@@ -621,11 +610,11 @@ cert2 = create_signed(
         (x509.UnrecognizedExtension(
             ExtensionOID.PRECERT_SIGNED_CERTIFICATE_TIMESTAMPS,
             decode_bytes(
-                "0481f200f0007600c1164ae0a772d2d4392dc80ac10770d4f0c49bde991a4840c1fa075164f6336000000164dd02853a00000"
-                "4030047304502206e56a5f285e77e8a29af5f9d59586f071faca874f478b631247053691a778f54022100e1150a8c93a0c35d"
-                "481c535d8adfaccb545c094dd0092384418ac9d7fa0f96d0007600293c519654c83965baaa50fc5807d4b76fbf587a2972dca"
-                "4c30cf4e54547f47800000164dd02873e0000040300473045022100898e8ef92b8ad50d289641edd714b63a3221b7cdc1d0ac"
-                "a6f4621335eebd5428022019af2a328374dc32e9f919bd9d127d5cb6d3273d6f6eebbd3f25d463be353fc1"
+                "0481ef00ed007400dddcca3495d7e11605e79532fac79ff83d1c50dfdb003a1412760a2cacbbc82a000001960bed082d00000"
+                "40300453043022005e4bbf5b87cc6e4a0e90782e46df117f1572e9d830a62f40f080d34643a7d57021f60f518e206f30974cf"
+                "fe5104be58d5dac4ea80e49cd47ef0858db60b6c46790075000de1f2302bd30dc140621209ea552efc47747cb1d7e930ef0e4"
+                "21eb47e4eaa34000001960bed07d80000040300463044022076e85e46f183ee675d6001f117a80169564d3555c6ceb12eb0dd"
+                "d9f60897face0220784582a60f6db10f1d07bfe1535cce9a46689bad950d7be4f02b3ecac71b42ae"
             ),
         ), False),
         # This doesn't work in a nicer way, see https://github.com/pyca/cryptography/issues/7824
@@ -658,13 +647,13 @@ concat_files(
     Path("tests/integration/targets/certificate_complete_chain/files/roots.pem"),
     [
         "# Foo",
-        Path("tests/integration/targets/certificate_complete_chain/files/roots/COMODO_Certification_Authority.pem"),
+        Path("tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar.pem"),
         "\n# Bar",
-        Path("tests/integration/targets/certificate_complete_chain/files/roots/COMODO_ECC_Certification_Authority.pem"),
+        Path("tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar_ECC.pem"),
         "\n# Baz\n#Bam",
-        Path("tests/integration/targets/certificate_complete_chain/files/roots/COMODO_RSA_Certification_Authority.pem"),
-        Path("tests/integration/targets/certificate_complete_chain/files/roots/DST_Root_CA_X3.pem"),
+        Path("tests/integration/targets/certificate_complete_chain/files/roots/CA_Foobar_RSA.pem"),
+        Path("tests/integration/targets/certificate_complete_chain/files/roots/CA_Bazbam.pem"),
         "# Jar",
-        Path("tests/integration/targets/certificate_complete_chain/files/roots/ISRG_Root_X1.pem"),
+        Path("tests/integration/targets/certificate_complete_chain/files/roots/foobazbam.pem"),
     ]
 )
