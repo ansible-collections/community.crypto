@@ -11,6 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 [![EOL CI](https://github.com/ansible-collections/community.crypto/actions/workflows/ansible-test.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Nox CI](https://github.com/ansible-collections/community.crypto/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
+[![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.crypto)](https://api.reuse.software/info/github.com/ansible-collections/community.crypto)
 
 Provides modules for [Ansible](https://www.ansible.com/community) for various cryptographic operations.
 
@@ -169,4 +170,4 @@ See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/commu
 
 Parts of the collection are licensed under the [Apache 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/Apache-2.0.txt) (`plugins/module_utils/crypto/_obj2txt.py` and `plugins/module_utils/crypto/_objects_data.py`), the [BSD 2-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-2-Clause.txt) (`plugins/module_utils/ecs/api.py`), the [BSD 3-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-3-Clause.txt) (`plugins/module_utils/crypto/_obj2txt.py`, `tests/integration/targets/prepare_jinja2_compat/filter_plugins/jinja_compatibility.py`), and the [PSF 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/PSF-2.0.txt) (`plugins/module_utils/_version.py`). This only applies to vendored files in ``plugins/module_utils/`` and to the ECS module utils.
 
-All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `.reuse/dep5`. This conforms to the [REUSE specification](https://reuse.software/spec/).
+All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `REUSE.toml`. This conforms to the [REUSE specification](https://reuse.software/spec/).
