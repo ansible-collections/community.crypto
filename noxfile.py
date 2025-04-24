@@ -21,6 +21,19 @@ except ImportError:
 antsibull_nox.load_antsibull_nox_toml()
 
 
+@nox.session(name="create-certificates", default=False)
+def create_certificates(session: nox.Session) -> None:
+    """
+    Regenerate some vendored certificates.
+    """
+    session.install("cryptography<39.0.0")  # we want support for SHA1 signatures
+    session.run("python", "tests/create-certificates.py")
+    session.warn(
+        "Note that you need to modify some values in tests/integration/targets/x509_certificate_info/tasks/impl.yml"
+        " and tests/integration/targets/filter_x509_certificate_info/tasks/impl.yml!"
+    )
+
+
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
 # Requires nox >= 2025.02.09
 if __name__ == "__main__":
