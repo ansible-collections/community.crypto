@@ -990,7 +990,7 @@ def run_module():
         passphrase=dict(type='str', no_log=True),
         new_passphrase=dict(type='str', no_log=True),
         remove_passphrase=dict(type='str', no_log=True),
-        passphrase_encoding=dict(type='str', default='text', choices=['text', 'base64']),
+        passphrase_encoding=dict(type='str', default='text', choices=['text', 'base64'], no_log=False),
         keyslot=dict(type='int', no_log=False),
         new_keyslot=dict(type='int', no_log=False),
         remove_keyslot=dict(type='int', no_log=False),
