@@ -49,6 +49,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSL Certificate Signing Request
   community.crypto.openssl_csr_pipe:
     privatekey_path: /etc/ssl/private/ansible.com.pem

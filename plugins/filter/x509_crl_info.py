@@ -39,6 +39,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Show the Organization Name of the CRL's subject
   ansible.builtin.debug:
     msg: >-

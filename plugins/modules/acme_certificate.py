@@ -302,6 +302,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 ### Example with HTTP challenge ###
 
 - name: Create a challenge for sample.com using a account key from a variable.
@@ -356,6 +357,7 @@ EXAMPLES = r"""
     chain_dest: /etc/httpd/ssl/sample.com-intermediate.crt
     data: "{{ sample_com_challenge }}"
 
+---
 ### Example with DNS challenge against production ACME server ###
 
 - name: Create a challenge for sample.com using a account key file.

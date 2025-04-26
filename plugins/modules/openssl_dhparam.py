@@ -92,6 +92,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate Diffie-Hellman parameters with the default size (4096 bits)
   community.crypto.openssl_dhparam:
     path: /etc/ssl/dhparams.pem

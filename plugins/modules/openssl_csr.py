@@ -72,6 +72,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSL Certificate Signing Request
   community.crypto.openssl_csr:
     path: /etc/ssl/csr/www.ansible.com.csr

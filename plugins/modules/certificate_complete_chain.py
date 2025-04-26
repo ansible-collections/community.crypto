@@ -67,6 +67,7 @@ options:
 
 
 EXAMPLES = r"""
+---
 # Given a leaf certificate for www.ansible.com and one or more intermediate
 # certificates, finds the associated root certificate.
 - name: Find root certificate

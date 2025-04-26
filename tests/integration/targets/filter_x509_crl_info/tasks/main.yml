@@ -78,14 +78,14 @@
   x509_certificate_info:
     path: '{{ remote_tmp_dir }}/{{ item }}.pem'
   loop:
-  - cert-1
-  - cert-2
-  - cert-3
-  - cert-4
+    - cert-1
+    - cert-2
+    - cert-3
+    - cert-4
   register: certificate_infos
 
 - block:
-  - name: Running tests
-    include_tasks: impl.yml
+    - name: Running tests
+      include_tasks: impl.yml
 
   when: cryptography_version.stdout is version('1.2', '>=')

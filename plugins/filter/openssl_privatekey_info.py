@@ -40,6 +40,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Show the Subject Alt Names of the CSR
   ansible.builtin.debug:
     msg: >-

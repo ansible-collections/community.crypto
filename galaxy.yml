@@ -16,7 +16,7 @@ license:
   - BSD-2-Clause
   - BSD-3-Clause
   - PSF-2.0
-#license_file: COPYING
+# license_file: COPYING
 tags:
   - acme
   - certificate

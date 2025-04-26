@@ -44,6 +44,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Retrieve renewal information for a certificate
   community.crypto.acme_ari_info:
     certificate_path: /etc/httpd/ssl/sample.com.crt

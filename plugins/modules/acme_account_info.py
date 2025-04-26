@@ -47,6 +47,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Check whether an account with the given account key exists
   community.crypto.acme_account_info:
     account_key_src: /etc/pki/cert/private/account.key

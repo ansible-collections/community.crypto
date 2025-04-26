@@ -125,17 +125,17 @@
     selfsigned_not_after: "+10d"
     selfsigned_not_before: "-3d"
   loop:
-  - 1
-  - 2
-  - 3
+    - 1
+    - 2
+    - 3
 
 - name: Convert PEM files to DER
   command:
     cmd: openssl x509 -inform PEM -outform DER -in {{ remote_tmp_dir }}/cert_{{ item }}.pem -out {{ remote_tmp_dir }}/cert_{{ item }}.der
   loop:
-  - 1
-  - 2
-  - 3
+    - 1
+    - 2
+    - 3
 
 - name: Running tests
   include_tasks: impl.yml

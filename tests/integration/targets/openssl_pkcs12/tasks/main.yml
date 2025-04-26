@@ -9,77 +9,77 @@
 ####################################################################
 
 - block:
-  - name: Generate private keys
-    openssl_privatekey:
-      path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
-      size: '{{ default_rsa_key_size_certificates }}'
-    loop: "{{ range(1, 4) | list }}"
+    - name: Generate private keys
+      openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+        size: '{{ default_rsa_key_size_certificates }}'
+      loop: "{{ range(1, 4) | list }}"
 
-  - name: Generate privatekey with password
-    openssl_privatekey:
-      path: '{{ remote_tmp_dir }}/privatekeypw.pem'
-      passphrase: hunter2
-      size: '{{ default_rsa_key_size }}'
+    - name: Generate privatekey with password
+      openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/privatekeypw.pem'
+        passphrase: hunter2
+        size: '{{ default_rsa_key_size }}'
 
-  - name: Generate CSRs
-    openssl_csr:
-      path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
-      privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
-      commonName: www{{ item }}.ansible.com
-    loop: "{{ range(1, 4) | list }}"
+    - name: Generate CSRs
+      openssl_csr:
+        path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+        commonName: www{{ item }}.ansible.com
+      loop: "{{ range(1, 4) | list }}"
 
-  - name: Generate certificate
-    x509_certificate:
-      path: '{{ remote_tmp_dir }}/ansible{{ item }}.crt'
-      privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
-      csr_path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
-      provider: selfsigned
-    loop: "{{ range(1, 4) | list }}"
+    - name: Generate certificate
+      x509_certificate:
+        path: '{{ remote_tmp_dir }}/ansible{{ item }}.crt'
+        privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+        csr_path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
+        provider: selfsigned
+      loop: "{{ range(1, 4) | list }}"
 
-  - name: Read files
-    slurp:
-      src: '{{ item }}'
-    loop:
-      - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
-      - "{{ remote_tmp_dir ~ '/ansible3.crt' }}"
-    register: slurp
+    - name: Read files
+      slurp:
+        src: '{{ item }}'
+      loop:
+        - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
+        - "{{ remote_tmp_dir ~ '/ansible3.crt' }}"
+      register: slurp
 
-  - name: Generate concatenated PEM file
-    copy:
-      dest: '{{ remote_tmp_dir }}/ansible23.crt'
-      content: '{{ slurp.results[0].content | b64decode }}{{ slurp.results[1].content | b64decode }}'
+    - name: Generate concatenated PEM file
+      copy:
+        dest: '{{ remote_tmp_dir }}/ansible23.crt'
+        content: '{{ slurp.results[0].content | b64decode }}{{ slurp.results[1].content | b64decode }}'
 
-  - name: Generate PKCS#12 file with backend autodetection
-    openssl_pkcs12:
-      path: '{{ remote_tmp_dir }}/ansible.p12'
-      friendly_name: abracadabra
-      privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
-      certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
-      state: present
+    - name: Generate PKCS#12 file with backend autodetection
+      openssl_pkcs12:
+        path: '{{ remote_tmp_dir }}/ansible.p12'
+        friendly_name: abracadabra
+        privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
+        certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+        state: present
 
-  - name: Delete result
-    file:
-      path: '{{ remote_tmp_dir }}/ansible.p12'
-      state: absent
+    - name: Delete result
+      file:
+        path: '{{ remote_tmp_dir }}/ansible.p12'
+        state: absent
 
-  - block:
-    - name: Running tests with pyOpenSSL backend
-      include_tasks: impl.yml
-      vars:
-        select_crypto_backend: pyopenssl
+    - block:
+        - name: Running tests with pyOpenSSL backend
+          include_tasks: impl.yml
+          vars:
+            select_crypto_backend: pyopenssl
 
-    when: >-
-      (pyopenssl_version.stdout | default('0.0')) is version('0.15', '>=')
-      and
-      (pyopenssl_version.stdout | default('0.0')) is version('23.3.0', '<')
+      when: >-
+        (pyopenssl_version.stdout | default('0.0')) is version('0.15', '>=')
+        and
+        (pyopenssl_version.stdout | default('0.0')) is version('23.3.0', '<')
 
-  - block:
-    - name: Running tests with cryptography backend
-      include_tasks: impl.yml
-      vars:
-        select_crypto_backend: cryptography
+    - block:
+        - name: Running tests with cryptography backend
+          include_tasks: impl.yml
+          vars:
+            select_crypto_backend: cryptography
 
-    when: cryptography_version.stdout is version('3.0', '>=')
+      when: cryptography_version.stdout is version('3.0', '>=')
 
   when: >-
     (

@@ -22,7 +22,7 @@
     subject: '{{ item.subject }}'
     useCommonNameForSAN: false
     basic_constraints:
-    - 'CA:TRUE'
+      - 'CA:TRUE'
     basic_constraints_critical: true
   loop:
     - path: '{{ remote_tmp_dir }}/ca_csr.csr'
@@ -41,7 +41,7 @@
       commonName: Example CA
     useCommonNameForSAN: false
     basic_constraints:
-    - 'CA:TRUE'
+      - 'CA:TRUE'
     basic_constraints_critical: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (check mode)
@@ -603,11 +603,11 @@
               commonName: Example CA
             useCommonNameForSAN: false
             basic_constraints:
-            - 'CA:TRUE'
+              - 'CA:TRUE'
             basic_constraints_critical: true
             key_usage:
-            - cRLSign
-            - keyCertSign
+              - cRLSign
+              - keyCertSign
           loop:
             - Ed25519
             - Ed448

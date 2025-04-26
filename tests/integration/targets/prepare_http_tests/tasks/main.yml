@@ -29,4 +29,4 @@
           - "{{ ansible_os_family | lower }}.yml"
           - "default.yml"
   when:
-  - has_httptester|bool
+    - has_httptester|bool

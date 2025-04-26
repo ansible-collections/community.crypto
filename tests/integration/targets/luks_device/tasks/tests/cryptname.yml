@@ -54,9 +54,9 @@
   register: absent
 - assert:
     that:
-    - create is changed
-    - open is changed
-    - open_idem is not changed
-    - close is changed
-    - close_idem is not changed
-    - absent is changed
+      - create is changed
+      - open is changed
+      - open_idem is not changed
+      - close is changed
+      - close_idem is not changed
+      - absent is changed

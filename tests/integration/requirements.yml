@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 collections:
-- community.general
-- community.internal_test_tools
+  - community.general
+  - community.internal_test_tools

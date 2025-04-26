@@ -140,10 +140,10 @@
     selfsigned_not_after: "+10d"
     selfsigned_not_before: "-3d"
   loop:
-  - 1
-  - 2
-  - 3
-  - 4
+    - 1
+    - 2
+    - 3
+    - 4
 
 - name: Running tests
   include_tasks: impl.yml

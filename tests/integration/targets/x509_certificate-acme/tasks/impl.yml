@@ -19,13 +19,13 @@
     path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     subject_alt_name: '{{ item.sans }}'
   loop:
-  - name: cert-1
-    sans:
-      - DNS:example.com
-  - name: cert-2
-    sans:
-      - DNS:example.com
-      - DNS:example.org
+    - name: cert-1
+      sans:
+        - DNS:example.com
+    - name: cert-2
+      sans:
+        - DNS:example.com
+        - DNS:example.org
 
 - name: Retrieve certificate 1
   x509_certificate:

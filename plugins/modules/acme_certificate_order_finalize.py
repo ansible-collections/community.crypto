@@ -10,7 +10,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
----
 module: acme_certificate_order_finalize
 author: Felix Fontein (@felixfontein)
 version_added: 2.24.0
@@ -172,6 +171,7 @@ options:
 '''
 
 EXAMPLES = r'''
+---
 ### Example with HTTP-01 challenge ###
 
 - name: Create a challenge for sample.com using a account key from a variable
@@ -219,6 +219,7 @@ EXAMPLES = r'''
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
     chain_dest: /etc/httpd/ssl/sample.com-intermediate.crt
 
+---
 ### Example with DNS challenge against production ACME server ###
 
 - name: Create a challenge for sample.com using a account key file.

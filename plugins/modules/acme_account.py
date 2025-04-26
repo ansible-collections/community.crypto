@@ -130,6 +130,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Make sure account exists and has given contacts. We agree to TOS.
   community.crypto.acme_account:
     account_key_src: /etc/pki/cert/private/account.key

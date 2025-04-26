@@ -111,7 +111,7 @@
 - name: "({{ select_crypto_backend }}) Validate ECC generation"
   assert:
     that:
-    - item is changed
+      - item is changed
   loop: "{{ privatekey_ecc_generate.results }}"
   when: "'skip_reason' not in item"
   loop_control:
@@ -120,7 +120,7 @@
 - name: "({{ select_crypto_backend }}) Validate ECC generation (curve type)"
   assert:
     that:
-    - "'skip_reason' in item or item.item.item.openssl_name == item.stdout"
+      - "'skip_reason' in item or item.item.item.openssl_name == item.stdout"
   loop: "{{ privatekey_ecc_dump.results }}"
   when: "'skip_reason' not in item"
   loop_control:
@@ -129,7 +129,7 @@
 - name: "({{ select_crypto_backend }}) Validate ECC generation idempotency"
   assert:
     that:
-    - item is not changed
+      - item is not changed
   loop: "{{ privatekey_ecc_idempotency.results }}"
   when: "'skip_reason' not in item"
   loop_control:
@@ -138,8 +138,8 @@
 - name: "({{ select_crypto_backend }}) Validate other type generation (just check changed)"
   assert:
     that:
-    - (item is succeeded and item is changed) or
-      (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
+      - (item is succeeded and item is changed) or
+        (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
   loop: "{{ privatekey_t1_generate.results }}"
   when: "'skip_reason' not in item"
   loop_control:
@@ -148,8 +148,8 @@
 - name: "({{ select_crypto_backend }}) Validate other type generation idempotency"
   assert:
     that:
-    - (item is succeeded and item is not changed) or
-      (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
+      - (item is succeeded and item is not changed) or
+        (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
   loop: "{{ privatekey_t1_idempotency.results }}"
   when: "'skip_reason' not in item"
   loop_control:

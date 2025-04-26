@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: Generate account keys
-    openssl_privatekey:
-      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
-      type: ECC
-      curve: secp256r1
-      force: true
-    loop: "{{ account_keys }}"
+    - name: Generate account keys
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ item }}.pem"
+        type: ECC
+        curve: secp256r1
+        force: true
+      loop: "{{ account_keys }}"
 
-  - name: Parse account keys (to ease debugging some test failures)
-    openssl_privatekey_info:
-      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
-      return_private_key_data: true
-    loop: "{{ account_keys }}"
+    - name: Parse account keys (to ease debugging some test failures)
+      openssl_privatekey_info:
+        path: "{{ remote_tmp_dir }}/{{ item }}.pem"
+        return_private_key_data: true
+      loop: "{{ account_keys }}"
 
   vars:
     account_keys:
@@ -43,7 +43,7 @@
     allow_creation: true
     terms_agreed: true
     contact:
-    - mailto:example@example.org
+      - mailto:example@example.org
 
 - name: Check that account exists
   acme_account_info:

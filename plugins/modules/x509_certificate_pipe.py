@@ -55,6 +55,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate a Self Signed OpenSSL certificate
   community.crypto.x509_certificate_pipe:
     provider: selfsigned

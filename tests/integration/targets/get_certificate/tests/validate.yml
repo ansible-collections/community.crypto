@@ -76,7 +76,7 @@
         or 'unknown protocol' in result.msg
         or 'wrong version number' in result.msg
         or 'record layer failure' in result.msg
- 
+
 - name: Test timeout option
   get_certificate:
     host: "{{ httpbin_host }}"

@@ -26,6 +26,7 @@ options: {}
 """
 
 EXAMPLES = r"""
+---
 - name: Retrieve information
   community.crypto.crypto_info:
     account_key_src: /etc/pki/cert/private/account.key

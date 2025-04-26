@@ -290,6 +290,7 @@ author: Jan Pokorny (@japokorn)
 """
 
 EXAMPLES = r"""
+---
 - name: Create LUKS container (remains unchanged if it already exists)
   community.crypto.luks_device:
     device: "/dev/loop0"
