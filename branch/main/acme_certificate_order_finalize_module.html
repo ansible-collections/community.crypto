@@ -574,7 +574,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id7" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="c1">### Example with HTTP-01 challenge ###</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="c1">### Example with HTTP-01 challenge ###</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from a variable</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
@@ -621,6 +622,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
 
+<span class="nn">---</span>
 <span class="c1">### Example with DNS challenge against production ACME server ###</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key file.</span>
