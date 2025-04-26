@@ -93,6 +93,7 @@ requirements:
 """
 
 EXAMPLES = r"""
+---
 - name: Convert PEM X.509 certificate to DER format
   community.crypto.x509_certificate_convert:
     src_path: /etc/ssl/cert/ansible.com.pem

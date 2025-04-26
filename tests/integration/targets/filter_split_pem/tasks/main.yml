@@ -33,10 +33,7 @@
       Baz
       Bam
       -----END PRIVATE KEY-----
-    pem_3: |
-      -----BEGIN 
-      foo
-      -----END 
+    pem_3: "-----BEGIN \nfoo\n-----END \n"
     crap_1: |
       # Comment
     crap_2: |

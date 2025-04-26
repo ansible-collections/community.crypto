@@ -99,6 +99,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Revoke certificate with account key
   community.crypto.acme_certificate_revoke:
     account_key_src: /etc/pki/cert/private/account.key

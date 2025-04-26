@@ -142,6 +142,7 @@ notes:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSH keypair with the default values (4096 bits, rsa)
   community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa

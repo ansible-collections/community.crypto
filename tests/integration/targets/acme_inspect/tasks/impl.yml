@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: Generate account keys
-    openssl_privatekey:
-      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
-      type: ECC
-      curve: secp256r1
-      force: true
-    loop: "{{ account_keys }}"
+    - name: Generate account keys
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ item }}.pem"
+        type: ECC
+        curve: secp256r1
+        force: true
+      loop: "{{ account_keys }}"
 
-  - name: Parse account keys (to ease debugging some test failures)
-    openssl_privatekey_info:
-      path: "{{ remote_tmp_dir }}/{{ item }}.pem"
-      return_private_key_data: true
-    loop: "{{ account_keys }}"
+    - name: Parse account keys (to ease debugging some test failures)
+      openssl_privatekey_info:
+        path: "{{ remote_tmp_dir }}/{{ item }}.pem"
+        return_private_key_data: true
+      loop: "{{ account_keys }}"
 
   vars:
     account_keys:
@@ -76,7 +76,7 @@
       # For valid values, see
       # https://www.rfc-editor.org/rfc/rfc8555.html#section-7.3
       contact:
-      - mailto:me@example.com
+        - mailto:me@example.com
   register: account_update
 - debug: var=account_update
 
@@ -97,10 +97,10 @@
       # https://www.rfc-editor.org/rfc/rfc8555.html#section-7.4 and
       # https://www.rfc-editor.org/rfc/rfc8738.html
       identifiers:
-      - type: dns
-        value: example.com
-      - type: dns
-        value: example.org
+        - type: dns
+          value: example.com
+        - type: dns
+          value: example.org
   register: new_order
 - debug: var=new_order
 

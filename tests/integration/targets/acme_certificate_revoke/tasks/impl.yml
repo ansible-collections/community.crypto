@@ -5,14 +5,14 @@
 
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
-  - name: Generate account keys
-    openssl_privatekey:
-      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      type: "{{ item.type }}"
-      size: "{{ item.size | default(omit) }}"
-      curve: "{{ item.curve | default(omit) }}"
-      force: true
-    loop: "{{ account_keys }}"
+    - name: Generate account keys
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+        type: "{{ item.type }}"
+        size: "{{ item.size | default(omit) }}"
+        curve: "{{ item.curve | default(omit) }}"
+        force: true
+      loop: "{{ account_keys }}"
 
   vars:
     account_keys:
@@ -25,6 +25,7 @@
       - name: account-rsa
         type: RSA
         size: "{{ default_rsa_key_size }}"
+
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Read account key (EC256)
   slurp:
@@ -80,6 +81,7 @@
     remaining_days: 10
     terms_agreed: true
     account_email: "example@example.org"
+
 ## REVOKE CERTIFICATES ########################################################################
 - name: Revoke certificate 1 via account key
   acme_certificate_revoke:

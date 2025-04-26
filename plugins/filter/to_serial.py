@@ -25,6 +25,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Convert integer to serial number
   ansible.builtin.debug:
     msg: "{{ 1234567 | community.crypto.to_serial }}"

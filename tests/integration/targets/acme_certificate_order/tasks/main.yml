@@ -9,10 +9,10 @@
 ####################################################################
 
 - block:
-  - name: Running tests with OpenSSL backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: openssl
+    - name: Running tests with OpenSSL backend
+      include_tasks: impl.yml
+      vars:
+        select_crypto_backend: openssl
 
   # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
   when: openssl_version.stdout is version('1.0.0', '>=')
@@ -28,9 +28,9 @@
     state: directory
 
 - block:
-  - name: Running tests with cryptography backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: cryptography
+    - name: Running tests with cryptography backend
+      include_tasks: impl.yml
+      vars:
+        select_crypto_backend: cryptography
 
   when: cryptography_version.stdout is version('1.5', '>=')

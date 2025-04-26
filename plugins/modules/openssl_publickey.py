@@ -110,6 +110,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSL public key in PEM format
   community.crypto.openssl_publickey:
     path: /etc/ssl/public/ansible.com.pem

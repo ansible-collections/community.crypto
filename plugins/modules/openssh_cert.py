@@ -201,6 +201,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSH user certificate that is valid forever and for all users
   community.crypto.openssh_cert:
     type: user

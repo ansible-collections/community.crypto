@@ -42,7 +42,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed
 - name: Close
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -59,7 +59,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Give access to passphrase1
   luks_device:
@@ -90,7 +90,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Open with passphrase1
   luks_device:
@@ -102,4 +102,4 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed

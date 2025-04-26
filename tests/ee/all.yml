@@ -36,13 +36,13 @@
         state: directory
 
     - block:
-      - name: Include all roles
-        ansible.builtin.include_role:
-          name: "{{ item }}"
-        loop: "{{ result.files | map(attribute='path') | map('regex_replace', '.*/', '') | sort }}"
+        - name: Include all roles
+          ansible.builtin.include_role:
+            name: "{{ item }}"
+          loop: "{{ result.files | map(attribute='path') | map('regex_replace', '.*/', '') | sort }}"
 
       always:
-      - name: Remove output directory
-        ansible.builtin.file:
-          path: "{{ output_path }}"
-          state: absent
+        - name: Remove output directory
+          ansible.builtin.file:
+            path: "{{ output_path }}"
+            state: absent

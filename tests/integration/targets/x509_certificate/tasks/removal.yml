@@ -50,8 +50,8 @@
 - name: (Removal, {{select_crypto_backend}}) Ensure removal worked
   assert:
     that:
-    - removal_1_prestat.stat.exists
-    - removal_1 is changed
-    - not removal_1_poststat.stat.exists
-    - removal_2 is not changed
-    - removal_1.certificate is none
+      - removal_1_prestat.stat.exists
+      - removal_1 is changed
+      - not removal_1_poststat.stat.exists
+      - removal_2 is not changed
+      - removal_1.certificate is none

@@ -132,9 +132,9 @@
   register: result
 - assert:
     that:
-    - result.valid_at.today
-    - not result.valid_at.past
-    - not result.valid_at.twentydays
+      - result.valid_at.today
+      - not result.valid_at.past
+      - not result.valid_at.twentydays
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
@@ -188,7 +188,9 @@
       - result.extensions_by_oid | length == 9
       # Precert Signed Certificate Timestamps
       - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].critical == false
-      - result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].value == 'BIHvAO0AdADd3Mo0ldfhFgXnlTL6x5/4PRxQ39sAOhQSdgosrLvIKgAAAZYL7QgtAAAEAwBFMEMCIAXku/W4fMbkoOkHguRt8RfxVy6dgwpi9A8IDTRkOn1XAh9g9RjiBvMJdM/+UQS+WNXaxOqA5JzUfvCFjbYLbEZ5AHUADeHyMCvTDcFAYhIJ6lUu/Ed0fLHX6TDvDkIetH5OqjQAAAGWC+0H2AAABAMARjBEAiB26F5G8YPuZ11gAfEXqAFpVk01VcbOsS6w3dn2CJf6zgIgeEWCpg9tsQ8dB7/hU1zOmkZom62VDXvk8Cs+yscbQq4='
+      - >-
+        result.extensions_by_oid['1.3.6.1.4.1.11129.2.4.2'].value ==
+        'BIHvAO0AdADd3Mo0ldfhFgXnlTL6x5/4PRxQ39sAOhQSdgosrLvIKgAAAZYL7QgtAAAEAwBFMEMCIAXku/W4fMbkoOkHguRt8RfxVy6dgwpi9A8IDTRkOn1XAh9g9RjiBvMJdM/+UQS+WNXaxOqA5JzUfvCFjbYLbEZ5AHUADeHyMCvTDcFAYhIJ6lUu/Ed0fLHX6TDvDkIetH5OqjQAAAGWC+0H2AAABAMARjBEAiB26F5G8YPuZ11gAfEXqAFpVk01VcbOsS6w3dn2CJf6zgIgeEWCpg9tsQ8dB7/hU1zOmkZom62VDXvk8Cs+yscbQq4='
       # Authority Information Access
       - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].critical == false
       - result.extensions_by_oid['1.3.6.1.5.5.7.1.1'].value == 'MGgwLQYIKwYBBQUHMAGGIWh0dHA6Ly9vY3NwLmZvb2JhcmJhei5leGFtcGxlLmNvbTA3BggrBgEFBQcwAoYraHR0cDovL2NlcnQuZm9vYmFyYmF6LmV4YW1wbGUuY29tL2ludGVyLnBlbQ=='

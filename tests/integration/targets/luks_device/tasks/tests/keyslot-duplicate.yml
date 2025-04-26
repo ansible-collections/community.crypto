@@ -34,7 +34,7 @@
   register: keyslot_duplicate
 - assert:
     that:
-    - keyslot_duplicate_check is failed
-    - "'Trying to add key that is already present in another slot' in keyslot_duplicate_check.msg"
-    - keyslot_duplicate is failed
-    - "'Trying to add key that is already present in another slot' in keyslot_duplicate.msg"
+      - keyslot_duplicate_check is failed
+      - "'Trying to add key that is already present in another slot' in keyslot_duplicate_check.msg"
+      - keyslot_duplicate is failed
+      - "'Trying to add key that is already present in another slot' in keyslot_duplicate.msg"

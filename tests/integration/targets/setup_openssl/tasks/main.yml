@@ -88,32 +88,32 @@
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
 
-  - name: Install from system packages
-    when: ansible_os_family != "Darwin" and target_system_python
-    block:
+    - name: Install from system packages
+      when: ansible_os_family != "Darwin" and target_system_python
+      block:
 
-    - name: Install cryptography (Python 3 from system packages)
-      become: true
-      package:
-        name: '{{ cryptography_package_name_python3 }}'
-      when: ansible_python_version is version('3.0', '>=')
+        - name: Install cryptography (Python 3 from system packages)
+          become: true
+          package:
+            name: '{{ cryptography_package_name_python3 }}'
+          when: ansible_python_version is version('3.0', '>=')
 
-    - name: Install cryptography (Python 2 from system packages)
-      become: true
-      package:
-        name: '{{ cryptography_package_name }}'
-      when: ansible_python_version is version('3.0', '<')
+        - name: Install cryptography (Python 2 from system packages)
+          become: true
+          package:
+            name: '{{ cryptography_package_name }}'
+          when: ansible_python_version is version('3.0', '<')
 
-  - name: Install from PyPi
-    when: ansible_os_family == "Darwin" or not target_system_python
-    block:
+    - name: Install from PyPi
+      when: ansible_os_family == "Darwin" or not target_system_python
+      block:
 
-    - name: Install cryptography (PyPi)
-      become: true
-      pip:
-        name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
-        state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
-        extra_args: "-c {{ remote_constraints }}"
+        - name: Install cryptography (PyPi)
+          become: true
+          pip:
+            name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
+            state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
+            extra_args: "-c {{ remote_constraints }}"
 
 - name: Register cryptography version
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"

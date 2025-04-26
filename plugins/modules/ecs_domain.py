@@ -100,6 +100,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Request domain validation using email validation for client ID of 2.
   community.crypto.ecs_domain:
     domain_name: ansible.com

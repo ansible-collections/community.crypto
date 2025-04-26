@@ -47,7 +47,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed
 - name: Close
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -80,7 +80,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Give access to passphrase2
   luks_device:
@@ -117,7 +117,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed
 - name: Close
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -134,7 +134,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Give access to keyfile1 from passphrase1
   luks_device:
@@ -169,7 +169,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed
 - name: Close
   luks_device:
     device: "{{ cryptfile_device }}"
@@ -207,7 +207,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Try to open with passphrase3
   luks_device:
@@ -219,7 +219,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is failed
+      - open_try is failed
 
 - name: Give access to passphrase3 from keyfile1
   luks_device:
@@ -241,7 +241,7 @@
   register: open_try
 - assert:
     that:
-    - open_try is not failed
+      - open_try is not failed
 - name: Close
   luks_device:
     device: "{{ cryptfile_device }}"

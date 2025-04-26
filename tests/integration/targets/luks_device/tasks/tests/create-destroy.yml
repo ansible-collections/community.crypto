@@ -43,10 +43,10 @@
   register: create_idem_check
 - assert:
     that:
-    - create_check is changed
-    - create is changed
-    - create_idem is not changed
-    - create_idem_check is not changed
+      - create_check is changed
+      - create is changed
+      - create_idem is not changed
+      - create_idem_check is not changed
 
 - name: Open (check)
   luks_device:
@@ -80,10 +80,10 @@
   register: open_idem_check
 - assert:
     that:
-    - open_check is changed
-    - open is changed
-    - open_idem is not changed
-    - open_idem_check is not changed
+      - open_check is changed
+      - open is changed
+      - open_idem is not changed
+      - open_idem_check is not changed
 
 - name: Closed (via name, check)
   luks_device:
@@ -113,10 +113,10 @@
   register: close_idem_check
 - assert:
     that:
-    - close_check is changed
-    - close is changed
-    - close_idem is not changed
-    - close_idem_check is not changed
+      - close_check is changed
+      - close is changed
+      - close_idem is not changed
+      - close_idem_check is not changed
 
 - name: Re-open
   luks_device:
@@ -153,10 +153,10 @@
   register: close_idem_check
 - assert:
     that:
-    - close_check is changed
-    - close is changed
-    - close_idem is not changed
-    - close_idem_check is not changed
+      - close_check is changed
+      - close is changed
+      - close_idem is not changed
+      - close_idem_check is not changed
 
 - name: Re-opened
   luks_device:
@@ -193,7 +193,7 @@
   register: absent_idem_check
 - assert:
     that:
-    - absent_check is changed
-    - absent is changed
-    - absent_idem is not changed
-    - absent_idem_check is not changed
+      - absent_check is changed
+      - absent is changed
+      - absent_idem is not changed
+      - absent_idem_check is not changed

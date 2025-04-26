@@ -187,6 +187,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate PKCS#12 file
   community.crypto.openssl_pkcs12:
     action: export

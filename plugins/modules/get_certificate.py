@@ -220,6 +220,7 @@ unverified_chain:
 """
 
 EXAMPLES = r"""
+---
 - name: Get the cert from an RDP port
   community.crypto.get_certificate:
     host: "1.2.3.4"

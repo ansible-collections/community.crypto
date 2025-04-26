@@ -10,7 +10,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
----
 module: acme_certificate_order_info
 author: Felix Fontein (@felixfontein)
 version_added: 2.24.0
@@ -59,6 +58,7 @@ options:
 '''
 
 EXAMPLES = r'''
+---
 - name: Create a challenge for sample.com using a account key from a variable
   community.crypto.acme_certificate_order_create:
     account_key_content: "{{ account_private_key }}"

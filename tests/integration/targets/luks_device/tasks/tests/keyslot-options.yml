@@ -40,9 +40,9 @@
   register: create_luks_slot8
 - assert:
     that:
-    - create_luks1_slot8 is failed
-    - create_luks2_slot32 is failed
-    - create_luks_slot8 is failed
+      - create_luks1_slot8 is failed
+      - create_luks2_slot32 is failed
+      - create_luks_slot8 is failed
 
 - name: Check valid slot (luks2, 8)
   luks_device:
@@ -59,7 +59,7 @@
 - name: Make sure that the previous task only fails if LUKS2 is not supported
   assert:
     that:
-    - "'Unknown option --type' in create_luks2_slot8.msg"
+      - "'Unknown option --type' in create_luks2_slot8.msg"
   when: create_luks2_slot8 is failed
 - name: Check add valid slot (no luks type, 10)
   luks_device:
@@ -75,5 +75,5 @@
   when: create_luks2_slot8 is changed
 - assert:
     that:
-    - create_luks_slot10 is changed
+      - create_luks_slot10 is changed
   when: create_luks2_slot8 is changed

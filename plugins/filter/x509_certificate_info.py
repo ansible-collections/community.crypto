@@ -31,6 +31,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Show the Subject Alt Names of the certificate
   ansible.builtin.debug:
     msg: >-

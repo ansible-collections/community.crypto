@@ -45,6 +45,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Deactivate all authzs for an order
   community.crypto.acme_certificate_deactivate_authz:
     account_key_content: "{{ account_private_key }}"

@@ -57,6 +57,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Get information on CRL
   community.crypto.x509_crl_info:
     path: /etc/ssl/my-ca.crl

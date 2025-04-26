@@ -27,6 +27,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Parse serial number
   ansible.builtin.debug:
     msg: "{{ '11:22:33' | community.crypto.parse_serial }}"

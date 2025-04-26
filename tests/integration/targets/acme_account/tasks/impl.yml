@@ -4,21 +4,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: Generate account keys
-    openssl_privatekey:
-      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
-      type: ECC
-      curve: secp256r1
-      force: true
-    loop: "{{ account_keys }}"
+    - name: Generate account keys
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+        passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
+        type: ECC
+        curve: secp256r1
+        force: true
+      loop: "{{ account_keys }}"
 
-  - name: Parse account keys (to ease debugging some test failures)
-    openssl_privatekey_info:
-      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
-      return_private_key_data: true
-    loop: "{{ account_keys }}"
+    - name: Parse account keys (to ease debugging some test failures)
+      openssl_privatekey_info:
+        path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+        passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
+        return_private_key_data: true
+      loop: "{{ account_keys }}"
 
   vars:
     account_keys:
@@ -52,7 +52,7 @@
     allow_creation: true
     terms_agreed: true
     contact:
-    - mailto:example@example.org
+      - mailto:example@example.org
   check_mode: true
   diff: true
   register: account_created_check
@@ -68,7 +68,7 @@
     allow_creation: true
     terms_agreed: true
     contact:
-    - mailto:example@example.org
+      - mailto:example@example.org
   register: account_created
 
 - name: Create it now (idempotent)
@@ -82,7 +82,7 @@
     allow_creation: true
     terms_agreed: true
     contact:
-    - mailto:example@example.org
+      - mailto:example@example.org
   register: account_created_idempotent
 
 - name: Read account key
@@ -100,7 +100,7 @@
     state: present
     # allow_creation: false
     contact:
-    - mailto:example@example.com
+      - mailto:example@example.com
   check_mode: true
   diff: true
   register: account_modified_check
@@ -115,7 +115,7 @@
     state: present
     # allow_creation: false
     contact:
-    - mailto:example@example.com
+      - mailto:example@example.com
   register: account_modified
 
 - name: Change email address (idempotent)
@@ -129,7 +129,7 @@
     state: present
     # allow_creation: false
     contact:
-    - mailto:example@example.com
+      - mailto:example@example.com
   register: account_modified_idempotent
 
 - name: Cannot access account with wrong URI
@@ -194,7 +194,7 @@
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
-    - mailto:example@example.com
+      - mailto:example@example.com
   check_mode: true
   diff: true
   register: account_change_key_check
@@ -210,7 +210,7 @@
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
     contact:
-    - mailto:example@example.com
+      - mailto:example@example.com
   register: account_change_key
 
 - name: Deactivate account (check mode, diff)
@@ -284,7 +284,7 @@
     allow_creation: true
     terms_agreed: true
     contact:
-    - mailto:example@example.org
+      - mailto:example@example.org
     external_account_binding:
       kid: "{{ item.kid }}"
       alg: "{{ item.alg }}"

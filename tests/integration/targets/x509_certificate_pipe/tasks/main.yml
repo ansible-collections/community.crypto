@@ -18,9 +18,9 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_backend_selection.pem'
 
 - block:
-  - name: Running tests with cryptography backend
-    include_tasks: impl.yml
-    vars:
-      select_crypto_backend: cryptography
+    - name: Running tests with cryptography backend
+      include_tasks: impl.yml
+      vars:
+        select_crypto_backend: cryptography
 
   when: cryptography_version.stdout is version('1.6', '>=')

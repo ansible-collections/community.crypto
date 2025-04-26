@@ -17,10 +17,10 @@
     size: 512
 
 - block:
-  - name: Running tests with OpenSSL backend
-    include_tasks: impl.yml
+    - name: Running tests with OpenSSL backend
+      include_tasks: impl.yml
 
-  - include_tasks: ../tests/validate.yml
+    - include_tasks: ../tests/validate.yml
 
   vars:
     select_crypto_backend: openssl
@@ -37,10 +37,10 @@
     state: directory
 
 - block:
-  - name: Running tests with cryptography backend
-    include_tasks: impl.yml
+    - name: Running tests with cryptography backend
+      include_tasks: impl.yml
 
-  - include_tasks: ../tests/validate.yml
+    - include_tasks: ../tests/validate.yml
 
   vars:
     select_crypto_backend: cryptography

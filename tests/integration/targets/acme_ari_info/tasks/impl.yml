@@ -5,14 +5,14 @@
 
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
-  - name: Generate account keys
-    openssl_privatekey:
-      path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
-      type: "{{ item.type }}"
-      size: "{{ item.size | default(omit) }}"
-      curve: "{{ item.curve | default(omit) }}"
-      force: true
-    loop: "{{ account_keys }}"
+    - name: Generate account keys
+      openssl_privatekey:
+        path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
+        type: "{{ item.type }}"
+        size: "{{ item.size | default(omit) }}"
+        curve: "{{ item.curve | default(omit) }}"
+        force: true
+      loop: "{{ account_keys }}"
 
   vars:
     account_keys:

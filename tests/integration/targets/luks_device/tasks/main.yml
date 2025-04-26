@@ -21,13 +21,13 @@
   vars:
     search:
       files:
-      - '{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml'
-      - '{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}.yml'
-      - '{{ ansible_distribution | lower }}.yml'
-      - '{{ ansible_os_family | lower }}.yml'
-      - default.yml
+        - '{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution | lower }}.yml'
+        - '{{ ansible_os_family | lower }}.yml'
+        - default.yml
       paths:
-      - vars
+        - vars
 
 - name: Make sure cryptsetup is installed
   package:
@@ -71,21 +71,21 @@
     cryptfile_passphrase3: "qQJqsjabO9pItV792k90VvX84MM"
 
 - block:
-  - include_tasks: run-test.yml
-    with_fileglob:
-    - "tests/*.yml"
+    - include_tasks: run-test.yml
+      with_fileglob:
+        - "tests/*.yml"
 
   always:
-  - name: Make sure LUKS device is gone
-    luks_device:
-      device: "{{ cryptfile_device }}"
-      state: absent
-    become: true
-    ignore_errors: true
+    - name: Make sure LUKS device is gone
+      luks_device:
+        device: "{{ cryptfile_device }}"
+        state: absent
+      become: true
+      ignore_errors: true
 
-  - command: losetup -d "{{ cryptfile_device }}"
-    become: true
+    - command: losetup -d "{{ cryptfile_device }}"
+      become: true
 
-  - file:
-      dest: "{{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile"
-      state: absent
+    - file:
+        dest: "{{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile"
+        state: absent

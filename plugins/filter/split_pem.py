@@ -24,6 +24,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Print all CA certificates
   ansible.builtin.debug:
     msg: '{{ item }}'

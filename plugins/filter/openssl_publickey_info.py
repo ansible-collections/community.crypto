@@ -27,6 +27,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Show the type of a public key
   ansible.builtin.debug:
     msg: >-

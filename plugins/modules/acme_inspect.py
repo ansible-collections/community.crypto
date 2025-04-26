@@ -77,6 +77,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Get directory
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
@@ -181,24 +182,43 @@ directory:
   description: The ACME directory's content.
   returned: always
   type: dict
-  sample: {"a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
+  sample: {
+    "a85k3x9f91A4": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
     "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
-    "meta": {"caaIdentities": ["letsencrypt.org"], "termsOfService": "https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf",
-      "website": "https://letsencrypt.org"},
+    "meta": {
+      "caaIdentities": ["letsencrypt.org"],
+      "termsOfService": "https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf",
+      "website": "https://letsencrypt.org",
+    },
     "newAccount": "https://acme-v02.api.letsencrypt.org/acme/new-acct",
     "newNonce": "https://acme-v02.api.letsencrypt.org/acme/new-nonce",
     "newOrder": "https://acme-v02.api.letsencrypt.org/acme/new-order",
-    "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"}
+    "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"
+  }
 headers:
   description: The request's HTTP headers (with lowercase keys).
   returned: always
   type: dict
-  sample: {"boulder-requester": "12345", "cache-control": "max-age=0, no-cache, no-store", "connection": "close", "content-length": "904",
-    "content-type": "application/json", "cookies": {}, "cookies_string": "", "date": "Wed, 07 Nov 2018 12:34:56 GMT", "expires": "Wed,
-      07 Nov 2018 12:44:56 GMT", "link": '<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel="terms-of-service"',
-    "msg": "OK (904 bytes)", "pragma": "no-cache", "replay-nonce": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH", "server": "nginx",
-    "status": 200, "strict-transport-security": "max-age=604800", "url": "https://acme-v02.api.letsencrypt.org/acme/acct/46161",
-    "x-frame-options": "DENY"}
+  sample: {
+    "boulder-requester": "12345",
+    "cache-control": "max-age=0, no-cache, no-store",
+    "connection": "close",
+    "content-length": "904",
+    "content-type": "application/json",
+    "cookies": {},
+    "cookies_string": "",
+    "date": "Wed, 07 Nov 2018 12:34:56 GMT",
+    "expires": "Wed, 07 Nov 2018 12:44:56 GMT",
+    "link": '<https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf>;rel="terms-of-service"',
+    "msg": "OK (904 bytes)",
+    "pragma": "no-cache",
+    "replay-nonce": "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGH",
+    "server": "nginx",
+    "status": 200,
+    "strict-transport-security": "max-age=604800",
+    "url": "https://acme-v02.api.letsencrypt.org/acme/acct/46161",
+    "x-frame-options": "DENY",
+  }
 output_text:
   description: The raw text output.
   returned: always

@@ -140,8 +140,21 @@ options:
       - If a certificate is being reissued or renewed, this parameter is ignored, and the O(cert_type) of the initial certificate
         is used.
     type: str
-    choices: ['STANDARD_SSL', 'ADVANTAGE_SSL', 'UC_SSL', 'EV_SSL', 'WILDCARD_SSL', 'PRIVATE_SSL', 'PD_SSL', 'CODE_SIGNING',
-      'EV_CODE_SIGNING', 'CDS_INDIVIDUAL', 'CDS_GROUP', 'CDS_ENT_LITE', 'CDS_ENT_PRO', 'SMIME_ENT']
+    choices:
+      - STANDARD_SSL
+      - ADVANTAGE_SSL
+      - UC_SSL
+      - EV_SSL
+      - WILDCARD_SSL
+      - PRIVATE_SSL
+      - PD_SSL
+      - CODE_SIGNING
+      - EV_CODE_SIGNING
+      - CDS_INDIVIDUAL
+      - CDS_GROUP
+      - CDS_ENT_LITE
+      - CDS_ENT_PRO
+      - SMIME_ENT
   subject_alt_name:
     description:
       - The subject alternative name identifiers, as an array of values (applies to O(cert_type) with a value of V(STANDARD_SSL),
@@ -377,6 +390,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Request a new certificate from Entrust with bare minimum parameters. Will request a new certificate if current one
     is valid but within 30 days of expiry. If replacing an existing file in path, will back it up.
   community.crypto.ecs_certificate:

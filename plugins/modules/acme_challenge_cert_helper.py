@@ -74,6 +74,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Create challenges for a given CRT for sample.com
   community.crypto.acme_certificate:
     account_key_src: /etc/pki/cert/private/account.key

@@ -27,6 +27,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Show fingerprint of GPG public key
   ansible.builtin.debug:
     msg: "{{ lookup('file', '/path/to/public_key.gpg') | community.crypto.gpg_fingerprint }}"

@@ -81,6 +81,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
   community.crypto.openssl_privatekey:
     path: /etc/ssl/private/ansible.com.pem

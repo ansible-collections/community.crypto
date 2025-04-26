@@ -69,10 +69,10 @@
       register: create_open_idem_check
     - assert:
         that:
-        - create_open_check is changed
-        - create_open is changed
-        - create_open_idem is not changed
-        - create_open_idem_check is not changed
+          - create_open_check is changed
+          - create_open is changed
+          - create_open_idem is not changed
+          - create_open_idem_check is not changed
 
     - name: Dump LUKS Header
       command: "cryptsetup luksDump {{ cryptfile_device }}"

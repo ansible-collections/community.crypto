@@ -292,6 +292,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Generate a CRL
   community.crypto.x509_crl:
     path: /etc/ssl/my-ca.crl

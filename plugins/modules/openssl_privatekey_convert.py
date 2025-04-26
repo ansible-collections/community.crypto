@@ -45,6 +45,7 @@ seealso: []
 """
 
 EXAMPLES = r"""
+---
 - name: Convert private key to PKCS8 format with passphrase
   community.crypto.openssl_privatekey_convert:
     src_path: /etc/ssl/private/ansible.com.pem

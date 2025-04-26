@@ -19,18 +19,18 @@
       commonName: '{{ item.cn }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop:
-  - name: cert
-    key: privatekey
-    cn: www.ansible.com
-  - name: cert-2
-    key: privatekey
-    cn: ansible.com
-  - name: cert-3
-    key: privatekey2
-    cn: example.com
-  - name: cert-4
-    key: privatekey2
-    cn: example.org
+    - name: cert
+      key: privatekey
+      cn: www.ansible.com
+    - name: cert-2
+      key: privatekey
+      cn: ansible.com
+    - name: cert-3
+      key: privatekey2
+      cn: example.com
+    - name: cert-4
+      key: privatekey2
+      cn: example.org
 
 ## Self Signed
 

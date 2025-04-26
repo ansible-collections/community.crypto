@@ -51,11 +51,11 @@
   register: luks_header_slot4
 - assert:
     that:
-    - create_luks_slot4_check is changed
-    - create_luks_slot4 is changed
-    - create_luks_slot4_idem is not changed
-    - create_luks_slot4_idem_check is not changed
-    - "'Key Slot 4: ENABLED' in luks_header_slot4.stdout or '4: luks2' in luks_header_slot4.stdout"
+      - create_luks_slot4_check is changed
+      - create_luks_slot4 is changed
+      - create_luks_slot4_idem is not changed
+      - create_luks_slot4_idem_check is not changed
+      - "'Key Slot 4: ENABLED' in luks_header_slot4.stdout or '4: luks2' in luks_header_slot4.stdout"
 
 - name: Add key in slot 2 (check)
   luks_device:
@@ -109,11 +109,11 @@
   register: luks_header_slot2
 - assert:
     that:
-    - add_luks_slot2_check is changed
-    - add_luks_slot2 is changed
-    - add_luks_slot2_idem is not changed
-    - add_luks_slot2_idem_check is not changed
-    - "'Key Slot 2: ENABLED' in luks_header_slot2.stdout or '2: luks2' in luks_header_slot2.stdout"
+      - add_luks_slot2_check is changed
+      - add_luks_slot2 is changed
+      - add_luks_slot2_idem is not changed
+      - add_luks_slot2_idem_check is not changed
+      - "'Key Slot 2: ENABLED' in luks_header_slot2.stdout or '2: luks2' in luks_header_slot2.stdout"
 
 - name: Check remove slot 4 without key
   luks_device:
@@ -132,8 +132,8 @@
   register: kill_slot4_key_slot4
 - assert:
     that:
-    - kill_slot4_nokey is failed
-    - kill_slot4_key_slot4 is failed
+      - kill_slot4_nokey is failed
+      - kill_slot4_key_slot4 is failed
 
 - name: Remove key in slot 4 (check)
   luks_device:
@@ -171,11 +171,11 @@
   register: luks_header_slot4_removed
 - assert:
     that:
-    - kill_luks_slot4_check is changed
-    - kill_luks_slot4 is changed
-    - kill_luks_slot4_idem is not changed
-    - kill_luks_slot4_idem_check is not changed
-    - "'Key Slot 4: DISABLED' in luks_header_slot4_removed.stdout or not '4: luks' in luks_header_slot4_removed.stdout"
+      - kill_luks_slot4_check is changed
+      - kill_luks_slot4 is changed
+      - kill_luks_slot4_idem is not changed
+      - kill_luks_slot4_idem_check is not changed
+      - "'Key Slot 4: DISABLED' in luks_header_slot4_removed.stdout or not '4: luks' in luks_header_slot4_removed.stdout"
 
 - name: Add key in slot 0
   luks_device:
@@ -201,6 +201,6 @@
   register: luks_header_slot0_removed
 - assert:
     that:
-    - add_luks_slot0 is changed
-    - kill_luks_slot0 is changed
-    - "'Key Slot 0: DISABLED' in luks_header_slot0_removed.stdout or not '0: luks' in luks_header_slot0_removed.stdout"
+      - add_luks_slot0 is changed
+      - kill_luks_slot0 is changed
+      - "'Key Slot 0: DISABLED' in luks_header_slot0_removed.stdout or not '0: luks' in luks_header_slot0_removed.stdout"

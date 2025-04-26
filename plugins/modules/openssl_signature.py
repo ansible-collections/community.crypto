@@ -75,6 +75,7 @@ seealso:
 """
 
 EXAMPLES = r"""
+---
 - name: Sign example file
   community.crypto.openssl_signature:
     privatekey_path: private.key
