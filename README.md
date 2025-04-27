@@ -41,8 +41,6 @@ For more information about communication, see the [Ansible communication guide](
 
 Tested with the current ansible-core-2.17, ansible-core 2.18, and ansible-core 2.19 releases and the current development version of ansible-core. Ansible-core versions before 2.17 are not supported; please use community.crypto 2.x.y with these.
 
-This collection does not work with ansible-core before 2.12 (this includes ansible-base and Ansible 2.9) on Python 3.12+.
-
 ## External requirements
 
 The exact requirements for every module are listed in the module documentation. 
