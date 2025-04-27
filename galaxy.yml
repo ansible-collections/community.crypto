@@ -5,7 +5,7 @@
 
 namespace: community
 name: crypto
-version: 2.27.0
+version: 2.26.1
 readme: README.md
 authors:
   - Ansible (github.com/ansible)
