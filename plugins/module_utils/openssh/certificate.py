@@ -185,7 +185,7 @@ class OpensshCertificateTimeParameters(object):
                     result = datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
                 else:
                     result = datetime.utcfromtimestamp(timestamp)
-            except OverflowError as e:
+            except OverflowError:
                 raise ValueError
         return result
 

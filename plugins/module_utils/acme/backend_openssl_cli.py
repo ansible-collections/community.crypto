@@ -104,7 +104,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             except Exception as err:
                 try:
                     f.close()
-                except Exception as dummy:
+                except Exception:
                     pass
                 raise KeyParsingError("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
             f.close()

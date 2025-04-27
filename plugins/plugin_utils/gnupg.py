@@ -23,7 +23,7 @@ class PluginGPGRunner(GPGRunner):
         if executable is None:
             try:
                 executable = get_bin_path('gpg')
-            except ValueError as e:
+            except ValueError:
                 raise GPGError('Cannot find the `gpg` executable on the controller')
         self.executable = executable
         self.cwd = cwd

@@ -69,7 +69,7 @@ class AcmeCertificateBackend(CertificateBackend):
             except Exception as err:
                 try:
                     f.close()
-                except Exception as dummy:
+                except Exception:
                     pass
                 self.module.fail_json(
                     msg="failed to create temporary CSR file: %s" % to_native(err),

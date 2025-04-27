@@ -491,7 +491,7 @@ def main():
                     try:
                         # Add the int value of the item to ctx options
                         ctx.options |= tls_ctx_option_int
-                    except Exception as e:
+                    except Exception:
                         module.fail_json(msg="Failed to add {0} to CTX options".format(tls_ctx_option_str or tls_ctx_option_int))
 
             tls_sock = ctx.wrap_socket(sock, server_hostname=server_name or host)

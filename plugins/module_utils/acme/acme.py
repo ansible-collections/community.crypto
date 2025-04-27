@@ -76,7 +76,7 @@ def _decode_retry(module, response, info, retry_count):
     # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
-    except (TypeError, ValueError) as dummy:
+    except (TypeError, ValueError):
         retry_after = 10
     module.log('Retrieved a %s HTTP status on %s, retrying in %s seconds' % (format_http_status(info['status']), info['url'], retry_after))
 
@@ -288,7 +288,7 @@ class ACMEClient(object):
             if self.version == 1:
                 data["header"] = jws_header.copy()
                 for k, v in protected.items():
-                    dummy = data["header"].pop(k, None)
+                    data["header"].pop(k, None)
             self._log('signed request', data)
             data = self.module.jsonify(data)
 

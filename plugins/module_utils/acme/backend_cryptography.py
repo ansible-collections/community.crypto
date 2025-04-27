@@ -72,7 +72,7 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-except ImportError as dummy:
+except ImportError:
     HAS_CURRENT_CRYPTOGRAPHY = False
     CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_ERROR = traceback.format_exc()
@@ -82,7 +82,7 @@ else:
     try:
         if HAS_CURRENT_CRYPTOGRAPHY:
             _cryptography_backend = cryptography.hazmat.backends.default_backend()
-    except Exception as dummy:
+    except Exception:
         CRYPTOGRAPHY_ERROR = traceback.format_exc()
 
 

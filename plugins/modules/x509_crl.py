@@ -645,7 +645,7 @@ class CRL(OpenSSLObject):
                 self.crl = x509.load_der_x509_crl(data, default_backend())
                 if self.return_content:
                     self.crl_content = base64.b64encode(data)
-        except Exception as dummy:
+        except Exception:
             self.crl_content = None
             self.actual_format = self.format
             data = None
@@ -678,7 +678,7 @@ class CRL(OpenSSLObject):
             result = get_crl_info(self.module, data)
             result['can_parse_crl'] = True
             return result
-        except Exception as exc:
+        except Exception:
             return dict(can_parse_crl=False)
 
     def remove(self):

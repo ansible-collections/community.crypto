@@ -158,7 +158,7 @@ try:
     import cryptography.x509.oid
     HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.5'))
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
-except ImportError as dummy:
+except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
 
@@ -208,9 +208,9 @@ def is_parent(module, cert, potential_parent):
             module.warn('Unknown public key type "{0}"'.format(public_key))
             return False
         return True
-    except cryptography.exceptions.InvalidSignature as dummy:
+    except cryptography.exceptions.InvalidSignature:
         return False
-    except cryptography.exceptions.UnsupportedAlgorithm as dummy:
+    except cryptography.exceptions.UnsupportedAlgorithm:
         module.warn('Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm))
         return False
     except Exception as e:

@@ -320,7 +320,7 @@ class EcsDomain(object):
                 return False
 
             return True
-        except RestOperationException as dummy:
+        except RestOperationException:
             return False
 
     def request_domain(self, module):

@@ -177,7 +177,7 @@ class CertificateSigningRequestBackend(object):
                 self.module, self.backend, data, validate_signature=False, prefer_one_fingerprint=True)
             result['can_parse_csr'] = True
             return result
-        except Exception as exc:
+        except Exception:
             return dict(can_parse_csr=False)
 
     @abc.abstractmethod
@@ -224,7 +224,7 @@ class CertificateSigningRequestBackend(object):
             return True
         try:
             self.existing_csr = load_certificate_request(None, content=self.existing_csr_bytes, backend=self.backend)
-        except Exception as dummy:
+        except Exception:
             return True
         self._ensure_private_key_loaded()
         return not self._check_csr()
@@ -342,7 +342,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             try:
                 # This only works with cryptography >= 2.1
                 csr = csr.add_extension(cryptography.x509.TLSFeature([cryptography.x509.TLSFeatureType.status_request]), critical=self.ocspMustStaple_critical)
-            except AttributeError as dummy:
+            except AttributeError:
                 csr = csr.add_extension(
                     cryptography.x509.UnrecognizedExtension(CRYPTOGRAPHY_MUST_STAPLE_NAME, CRYPTOGRAPHY_MUST_STAPLE_VALUE),
                     critical=self.ocspMustStaple_critical
@@ -486,7 +486,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 # This only works with cryptography >= 2.1
                 tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
                 has_tlsfeature = True
-            except AttributeError as dummy:
+            except AttributeError:
                 tlsfeature_ext = next(
                     (ext for ext in extensions if ext.value.oid == CRYPTOGRAPHY_MUST_STAPLE_NAME),
                     None

@@ -647,7 +647,7 @@ class EcsCertificate(object):
         if self.path and os.path.exists(self.path):
             try:
                 self.cert = load_certificate(self.path, backend='cryptography')
-            except Exception as dummy:
+            except Exception:
                 self.cert = None
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
         try:
@@ -732,7 +732,7 @@ class EcsCertificate(object):
             cert_results = self.ecs_client.GetCertificates(serialNumber=serial_number).get('certificates', {})
             if len(cert_results) == 1:
                 self.tracking_id = cert_results[0].get('trackingId')
-        except RestOperationException as dummy:
+        except RestOperationException:
             # If we fail to find a cert by serial number, that's fine, we just do not set self.tracking_id
             return
 

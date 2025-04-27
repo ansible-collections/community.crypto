@@ -82,7 +82,7 @@ class ACMEProtocolException(ModuleFailException):
         if content_json is None and content is not None and module is not None:
             try:
                 content_json = module.from_json(to_text(content))
-            except Exception as e:
+            except Exception:
                 pass
 
         extras = extras or dict()

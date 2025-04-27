@@ -274,7 +274,7 @@ class PublicKey(OpenSSLObject):
             result['can_parse_key'] = True
         except PublicKeyParseError as exc:
             result.update(exc.result)
-        except Exception as exc:
+        except Exception:
             pass
         return result
 
@@ -363,7 +363,7 @@ class PublicKey(OpenSSLObject):
                             crypto_serialization.Encoding.PEM,
                             crypto_serialization.PublicFormat.SubjectPublicKeyInfo
                         )
-            except Exception as dummy:
+            except Exception:
                 return False
 
             try:

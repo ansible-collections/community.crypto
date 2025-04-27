@@ -137,7 +137,6 @@ def test_valid_seek():
 
 
 def test_invalid_seek():
-    result = False
     buffer = b'buffer'
     parser = OpensshParser(buffer)
 

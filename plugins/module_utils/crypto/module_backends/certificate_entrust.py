@@ -159,7 +159,7 @@ class EntrustCertificateBackend(CertificateBackend):
         cert_details = {}
         try:
             self._ensure_existing_certificate_loaded()
-        except Exception as dummy:
+        except Exception:
             return
         if self.existing_certificate:
             serial_number = None

@@ -215,7 +215,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                 ext = self.existing_certificate.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
                 if ext.value != expected_ext:
                     return True
-            except cryptography.x509.ExtensionNotFound as dummy:
+            except cryptography.x509.ExtensionNotFound:
                 return True
 
         return False

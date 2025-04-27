@@ -193,7 +193,7 @@ def x509_crl_info_filter(data, name_encoding='ignore', list_revoked_certificates
     if not identify_pem_format(data):
         try:
             data = base64.b64decode(to_native(data))
-        except (binascii.Error, TypeError, ValueError, UnicodeEncodeError) as e:
+        except (binascii.Error, TypeError, ValueError, UnicodeEncodeError):
             pass
 
     module = FilterModuleMock({'name_encoding': name_encoding})

@@ -110,7 +110,7 @@ class PrivateKeyBackend:
             result.update(exc.result)
         except PrivateKeyParseError as exc:
             result.update(exc.result)
-        except Exception as exc:
+        except Exception:
             pass
         return result
 
@@ -206,7 +206,7 @@ class PrivateKeyBackend:
             return get_fingerprint_of_privatekey(self.private_key, backend=self.backend)
         try:
             self._ensure_existing_private_key_loaded()
-        except Exception as dummy:
+        except Exception:
             # Ignore errors
             pass
         if self.existing_private_key:
@@ -218,7 +218,7 @@ class PrivateKeyBackend:
         if not self.private_key:
             try:
                 self._ensure_existing_private_key_loaded()
-            except Exception as dummy:
+            except Exception:
                 # Ignore errors
                 pass
         result = {
@@ -348,7 +348,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     curve=self.curves[self.curve]['create'](self.size),
                     backend=self.cryptography_backend
                 )
-        except cryptography.exceptions.UnsupportedAlgorithm as dummy:
+        except cryptography.exceptions.UnsupportedAlgorithm:
             self.module.fail_json(msg='Cryptography backend does not support the algorithm required for {0}'.format(self.type))
 
     def get_private_key_data(self):
@@ -383,11 +383,11 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 format=export_format,
                 encryption_algorithm=encryption_algorithm
             )
-        except ValueError as dummy:
+        except ValueError:
             self.module.fail_json(
                 msg='Cryptography backend cannot serialize the private key in the required format "{0}"'.format(self.format)
             )
-        except Exception as dummy:
+        except Exception:
             self.module.fail_json(
                 msg='Error while serializing the private key in the required format "{0}"'.format(self.format),
                 exception=traceback.format_exc()
@@ -443,7 +443,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     None if self.passphrase is None else to_bytes(self.passphrase),
                     backend=self.cryptography_backend
                 )
-        except Exception as dummy:
+        except Exception:
             return False
 
     def _check_size_and_type(self):
@@ -474,7 +474,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         try:
             format = identify_private_key_format(self.existing_private_key_bytes)
             return format == self._get_wanted_format()
-        except Exception as dummy:
+        except Exception:
             return False
 
 

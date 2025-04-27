@@ -485,7 +485,7 @@ class Pkcs(OpenSSLObject):
             return state_and_perms
 
         if os.path.exists(self.path) and module.params['action'] == 'export':
-            dummy = self.generate_bytes(module)
+            self.generate_bytes(module)  # ignore result
             self.src = self.path
             try:
                 pkcs12_privatekey, pkcs12_certificate, pkcs12_other_certificates, pkcs12_friendly_name = self.parse()

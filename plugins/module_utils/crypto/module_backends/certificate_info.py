@@ -372,7 +372,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 if desc.access_method == x509.oid.AuthorityInformationAccessOID.OCSP:
                     if isinstance(desc.access_location, x509.UniformResourceIdentifier):
                         return desc.access_location.value
-        except x509.ExtensionNotFound as dummy:
+        except x509.ExtensionNotFound:
             pass
         return None
 
@@ -383,7 +383,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 if desc.access_method == x509.oid.AuthorityInformationAccessOID.CA_ISSUERS:
                     if isinstance(desc.access_location, x509.UniformResourceIdentifier):
                         return desc.access_location.value
-        except x509.ExtensionNotFound as dummy:
+        except x509.ExtensionNotFound:
             pass
         return None
 

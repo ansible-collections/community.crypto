@@ -345,7 +345,7 @@ class DHParameterCryptography(DHParameterBase):
             with open(self.path, 'rb') as f:
                 data = f.read()
             params = cryptography.hazmat.primitives.serialization.load_pem_parameters(data, backend=self.crypto_backend)
-        except Exception as dummy:
+        except Exception:
             return False
         # Check parameters
         bits = count_bits(params.parameter_numbers().p)

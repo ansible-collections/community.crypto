@@ -755,7 +755,7 @@ class ActionModuleBase(ActionBase):
         except _ModuleExitException as mee:
             result.update(mee.result)
             return result
-        except Exception as dummy:
+        except Exception:
             result['failed'] = True
             result['msg'] = 'MODULE FAILURE'
             result['exception'] = traceback.format_exc()
