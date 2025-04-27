@@ -8,7 +8,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/crypto/)
 [![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
-[![EOL CI](https://github.com/ansible-collections/community.crypto/actions/workflows/ansible-test.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Nox CI](https://github.com/ansible-collections/community.crypto/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.crypto)](https://api.reuse.software/info/github.com/ansible-collections/community.crypto)
@@ -40,7 +39,7 @@ For more information about communication, see the [Ansible communication guide](
 
 ## Tested with Ansible
 
-Tested with the current Ansible 2.9, ansible-base 2.10, ansible-core 2.11, ansible-core 2.12, ansible-core 2.13, ansible-core 2.14, ansible-core 2.15, ansible-core 2.16, ansible-core-2.17, and ansible-core 2.18 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
+Tested with the current ansible-core-2.17, ansible-core 2.18, and ansible-core 2.19 releases and the current development version of ansible-core. Ansible-core versions before 2.17 are not supported; please use community.crypto 2.x.y with these.
 
 ## External requirements
 
