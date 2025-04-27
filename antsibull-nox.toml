@@ -11,7 +11,8 @@
 run_isort = true
 isort_config = "tests/nox-config-isort.cfg"
 run_black = false
-run_flake8 = false
+run_flake8 = true
+flake8_config = "tests/nox-config-flake8.ini"
 run_pylint = false
 run_yamllint = true
 yamllint_config = ".yamllint"
