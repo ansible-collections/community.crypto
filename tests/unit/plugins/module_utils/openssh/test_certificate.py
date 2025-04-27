@@ -5,16 +5,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateOption,
     OpensshCertificateTimeParameters,
-    parse_option_list
+    parse_option_list,
 )
+
 
 # Type: ssh-rsa-cert-v01@openssh.com user certificate
 # Public key: RSA-CERT SHA256:SvUwwUer4AwsdePYseJR3LcZS8lnKi6BqiL51Dop030

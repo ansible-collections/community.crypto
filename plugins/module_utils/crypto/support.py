@@ -4,7 +4,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -15,18 +17,18 @@ import os
 
 from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_bytes
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_pem_format,
 )
 
+# These imports are for backwards compatibility:
 from ansible_collections.community.crypto.plugins.module_utils.time import (  # noqa: F401, pylint: disable=unused-import
-    # These imports are for backwards compatibility
-    get_now_datetime,
-    ensure_utc_timezone,
     convert_relative_to_datetime,
+    ensure_utc_timezone,
+    get_now_datetime,
     get_relative_time_option,
 )
+
 
 try:
     from OpenSSL import crypto
@@ -38,17 +40,13 @@ except (ImportError, AttributeError):
 try:
     from cryptography import x509
     from cryptography.hazmat.backends import default_backend as cryptography_backend
+    from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives import serialization
 except ImportError:
     # Error handled in the calling module.
     pass
 
-from .basic import (
-    OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
-)
+from .basic import OpenSSLBadPassphraseError, OpenSSLObjectError
 
 
 # This list of preferred fingerprints is used when prefer_one=True is supplied to the

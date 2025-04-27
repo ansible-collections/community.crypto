@@ -6,23 +6,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import abc
 
 from ansible.module_utils import six
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     der_to_pem,
     nopad_b64,
     process_links,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )

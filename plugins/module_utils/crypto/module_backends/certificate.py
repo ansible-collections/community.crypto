@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -14,31 +16,30 @@ import traceback
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
     OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    load_certificate,
-    load_certificate_request,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_compare_public_keys,
     get_not_valid_after,
     get_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
     get_certificate_info,
 )
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate,
+    load_certificate_request,
+    load_privatekey,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 
@@ -101,7 +102,7 @@ class CertificateBackend(object):
             result = get_certificate_info(self.module, self.backend, data, prefer_one_fingerprint=True)
             result['can_parse_certificate'] = True
             return result
-        except Exception as exc:
+        except Exception:
             return dict(can_parse_certificate=False)
 
     @abc.abstractmethod
@@ -199,7 +200,7 @@ class CertificateBackend(object):
                     csr_ext = self.csr.extensions.get_extension_for_oid(cert_ext.oid)
                     if cert_ext != csr_ext:
                         return False
-                except cryptography.x509.ExtensionNotFound as dummy:
+                except cryptography.x509.ExtensionNotFound:
                     return False
             return True
 
@@ -208,14 +209,14 @@ class CertificateBackend(object):
         # Get hold of certificate's SKI
         try:
             ext = self.existing_certificate.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
-        except cryptography.x509.ExtensionNotFound as dummy:
+        except cryptography.x509.ExtensionNotFound:
             return False
         # Get hold of CSR's SKI for 'create_if_not_provided'
         csr_ext = None
         if self.create_subject_key_identifier == 'create_if_not_provided':
             try:
                 csr_ext = self.csr.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
-            except cryptography.x509.ExtensionNotFound as dummy:
+            except cryptography.x509.ExtensionNotFound:
                 pass
         if csr_ext is None:
             # If CSR had no SKI, or we chose to ignore it ('always_create'), compare with created SKI
@@ -234,7 +235,7 @@ class CertificateBackend(object):
 
         try:
             self._ensure_existing_certificate_loaded()
-        except Exception as dummy:
+        except Exception:
             return True
 
         # Check whether private key matches

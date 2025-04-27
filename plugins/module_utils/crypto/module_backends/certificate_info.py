@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -17,14 +19,6 @@ import traceback
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_certificate,
-    get_fingerprint_of_bytes,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
@@ -34,14 +28,20 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     get_not_valid_after,
     get_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     get_publickey_info,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_fingerprint_of_bytes,
+    load_certificate,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 
@@ -372,7 +372,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 if desc.access_method == x509.oid.AuthorityInformationAccessOID.OCSP:
                     if isinstance(desc.access_location, x509.UniformResourceIdentifier):
                         return desc.access_location.value
-        except x509.ExtensionNotFound as dummy:
+        except x509.ExtensionNotFound:
             pass
         return None
 
@@ -383,7 +383,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 if desc.access_method == x509.oid.AuthorityInformationAccessOID.CA_ISSUERS:
                     if isinstance(desc.access_location, x509.UniformResourceIdentifier):
                         return desc.access_location.value
-        except x509.ExtensionNotFound as dummy:
+        except x509.ExtensionNotFound:
             pass
         return None
 

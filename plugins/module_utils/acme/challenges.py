@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -16,16 +18,15 @@ import re
 import time
 
 from ansible.module_utils.common.text.converters import to_bytes
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+    ModuleFailException,
+    format_error_problem,
+)
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    format_error_problem,
-    ACMEProtocolException,
-    ModuleFailException,
-)
 
 try:
     import ipaddress

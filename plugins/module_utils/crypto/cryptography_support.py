@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -14,21 +16,28 @@ import re
 import sys
 import traceback
 
-from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
-from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse, ParseResult
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.six.moves.urllib.parse import (
+    ParseResult,
+    urlparse,
+    urlunparse,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
 
 from ._asn1 import serialize_asn1_string_as_der
 
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 try:
+    import ipaddress
+
     import cryptography
     from cryptography import x509
     from cryptography.exceptions import InvalidSignature
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import padding
-    import ipaddress
     _HAS_CRYPTOGRAPHY = True
 except ImportError:
     _HAS_CRYPTOGRAPHY = False
@@ -84,28 +93,21 @@ except ImportError:
 
 from ansible.module_utils.basic import missing_required_lib
 
+from ._obj2txt import obj2txt
+from ._objects import NORMALIZE_NAMES, NORMALIZE_NAMES_SHORT, OID_LOOKUP, OID_MAP
 from .basic import (
     CRYPTOGRAPHY_HAS_DSA_SIGN,
     CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
     CRYPTOGRAPHY_HAS_ED448,
     CRYPTOGRAPHY_HAS_ED448_SIGN,
+    CRYPTOGRAPHY_HAS_ED25519,
+    CRYPTOGRAPHY_HAS_ED25519_SIGN,
     CRYPTOGRAPHY_HAS_RSA_SIGN,
+    CRYPTOGRAPHY_HAS_X448,
     CRYPTOGRAPHY_HAS_X25519,
     CRYPTOGRAPHY_HAS_X25519_FULL,
-    CRYPTOGRAPHY_HAS_X448,
     OpenSSLObjectError,
 )
-
-from ._objects import (
-    OID_LOOKUP,
-    OID_MAP,
-    NORMALIZE_NAMES_SHORT,
-    NORMALIZE_NAMES,
-)
-
-from ._obj2txt import obj2txt
 
 
 CRYPTOGRAPHY_TIMEZONE = False

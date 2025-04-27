@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import base64
@@ -12,10 +14,9 @@ import re
 import subprocess
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto._asn1 import (
-    serialize_asn1_string_as_der,
     pack_asn1,
+    serialize_asn1_string_as_der,
 )
 
 

@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 # Protocol References
@@ -35,11 +37,14 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.utils imp
     OpensshParser,
     _OpensshWriter,
 )
+from ansible_collections.community.crypto.plugins.module_utils.time import UTC as _UTC
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     add_or_remove_timezone as _add_or_remove_timezone,
-    convert_relative_to_datetime,
-    UTC as _UTC,
 )
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    convert_relative_to_datetime,
+)
+
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
 _USER_TYPE = 1
@@ -180,7 +185,7 @@ class OpensshCertificateTimeParameters(object):
                     result = datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
                 else:
                     result = datetime.utcfromtimestamp(timestamp)
-            except OverflowError as e:
+            except OverflowError:
                 raise ValueError
         return result
 

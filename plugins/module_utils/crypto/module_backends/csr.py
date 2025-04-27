@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -16,39 +18,36 @@ import traceback
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    REVOCATION_REASON_MAP,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    cryptography_get_basic_constraints,
+    cryptography_get_name,
+    cryptography_key_needs_digest_for_signing,
+    cryptography_name_to_oid,
+    cryptography_parse_key_usage_params,
+    cryptography_parse_relative_distinguished_name,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
+    get_csr_info,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
     load_certificate_request,
+    load_privatekey,
     parse_name_field,
     parse_ordered_name_field,
     select_message_digest,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_get_basic_constraints,
-    cryptography_get_name,
-    cryptography_name_to_oid,
-    cryptography_key_needs_digest_for_signing,
-    cryptography_parse_key_usage_params,
-    cryptography_parse_relative_distinguished_name,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
-    REVOCATION_REASON_MAP,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
-    get_csr_info,
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
 
@@ -57,12 +56,12 @@ MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
-    import cryptography.x509
-    import cryptography.x509.oid
     import cryptography.exceptions
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.serialization
     import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.serialization
+    import cryptography.x509
+    import cryptography.x509.oid
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -178,7 +177,7 @@ class CertificateSigningRequestBackend(object):
                 self.module, self.backend, data, validate_signature=False, prefer_one_fingerprint=True)
             result['can_parse_csr'] = True
             return result
-        except Exception as exc:
+        except Exception:
             return dict(can_parse_csr=False)
 
     @abc.abstractmethod
@@ -225,7 +224,7 @@ class CertificateSigningRequestBackend(object):
             return True
         try:
             self.existing_csr = load_certificate_request(None, content=self.existing_csr_bytes, backend=self.backend)
-        except Exception as dummy:
+        except Exception:
             return True
         self._ensure_private_key_loaded()
         return not self._check_csr()
@@ -343,7 +342,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             try:
                 # This only works with cryptography >= 2.1
                 csr = csr.add_extension(cryptography.x509.TLSFeature([cryptography.x509.TLSFeatureType.status_request]), critical=self.ocspMustStaple_critical)
-            except AttributeError as dummy:
+            except AttributeError:
                 csr = csr.add_extension(
                     cryptography.x509.UnrecognizedExtension(CRYPTOGRAPHY_MUST_STAPLE_NAME, CRYPTOGRAPHY_MUST_STAPLE_VALUE),
                     critical=self.ocspMustStaple_critical
@@ -487,7 +486,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 # This only works with cryptography >= 2.1
                 tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
                 has_tlsfeature = True
-            except AttributeError as dummy:
+            except AttributeError:
                 tlsfeature_ext = next(
                     (ext for ext in extensions if ext.value.oid == CRYPTOGRAPHY_MUST_STAPLE_NAME),
                     None

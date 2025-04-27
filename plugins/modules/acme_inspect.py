@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -235,14 +237,12 @@ output_json:
         - '...'
 """
 
-from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    ACMEClient,
     create_backend,
     create_default_argspec,
-    ACMEClient,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
@@ -294,7 +294,7 @@ def main():
             # See if we can parse the result as JSON
             try:
                 result['output_json'] = module.from_json(to_text(data))
-            except Exception as dummy:
+            except Exception:
                 pass
             # Fail if error was returned
             if fail_on_acme_error and info['status'] >= 400:

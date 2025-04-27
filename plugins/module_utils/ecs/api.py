@@ -12,6 +12,7 @@
 
 from __future__ import absolute_import, division, print_function
 
+
 __metaclass__ = type
 
 import json
@@ -19,11 +20,12 @@ import os
 import re
 import traceback
 
-from ansible.module_utils.common.text.converters import to_text, to_native
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import Request
+
 
 YAML_IMP_ERR = None
 try:
@@ -146,11 +148,9 @@ class RestOperation(object):
                 response = self.session.request.open(method=self.method, url=url, data=body_parameters_json)
             else:
                 response = self.session.request.open(method=self.method, url=url)
-            request_error = False
         except HTTPError as e:
             # An HTTPError has the same methods available as a valid response from request.open
             response = e
-            request_error = True
 
         # Return the result if JSON and success ({} for empty responses)
         # Raise an exception if there was a failure.

@@ -5,12 +5,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 from ansible.module_utils.basic import AnsibleModule
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec as _ArgumentSpec
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec as _ArgumentSpec,
+)
 
 
 class ArgumentSpec(_ArgumentSpec):

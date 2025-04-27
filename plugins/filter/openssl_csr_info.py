@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
@@ -277,18 +279,17 @@ _value:
 """
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-
+from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
     get_csr_info,
 )
-
-from ansible_collections.community.crypto.plugins.plugin_utils.filter_module import FilterModuleMock
+from ansible_collections.community.crypto.plugins.plugin_utils.filter_module import (
+    FilterModuleMock,
+)
 
 
 def openssl_csr_info_filter(data, name_encoding='ignore'):

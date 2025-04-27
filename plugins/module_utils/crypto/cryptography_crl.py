@@ -5,10 +5,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion as _LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion as _LooseVersion,
+)
+
 
 try:
     import cryptography
@@ -17,18 +22,9 @@ except ImportError:
     # Error handled in the calling module.
     pass
 
-from .basic import (
-    HAS_CRYPTOGRAPHY,
-)
-
-from .cryptography_support import (
-    CRYPTOGRAPHY_TIMEZONE,
-    cryptography_decode_name,
-)
-
-from ._obj2txt import (
-    obj2txt,
-)
+from ._obj2txt import obj2txt
+from .basic import HAS_CRYPTOGRAPHY
+from .cryptography_support import CRYPTOGRAPHY_TIMEZONE, cryptography_decode_name
 
 
 # TODO: once cryptography has a _utc variant of InvalidityDate.invalidity_date, set this

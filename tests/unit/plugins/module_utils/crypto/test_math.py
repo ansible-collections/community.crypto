@@ -5,17 +5,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     binary_exp_mod,
-    simple_gcd,
-    quick_is_not_prime,
+    convert_bytes_to_int,
     convert_int_to_bytes,
     convert_int_to_hex,
-    convert_bytes_to_int,
+    quick_is_not_prime,
+    simple_gcd,
 )
 
 

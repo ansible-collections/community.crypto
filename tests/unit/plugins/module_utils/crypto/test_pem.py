@@ -5,15 +5,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    extract_first_pem,
     identify_pem_format,
     identify_private_key_format,
     split_pem_list,
-    extract_first_pem,
 )
 
 

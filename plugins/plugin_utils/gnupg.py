@@ -3,15 +3,19 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError, GPGRunner
+from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
+    GPGError,
+    GPGRunner,
+)
 
 
 class PluginGPGRunner(GPGRunner):
@@ -19,7 +23,7 @@ class PluginGPGRunner(GPGRunner):
         if executable is None:
             try:
                 executable = get_bin_path('gpg')
-            except ValueError as e:
+            except ValueError:
                 raise GPGError('Cannot find the `gpg` executable on the controller')
         self.executable = executable
         self.cwd = cwd

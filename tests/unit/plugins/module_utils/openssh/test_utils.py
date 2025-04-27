@@ -5,15 +5,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
-    parse_openssh_version,
     OpensshParser,
-    _OpensshWriter
+    _OpensshWriter,
+    parse_openssh_version,
 )
+
 
 SSH_VERSION_STRING = "OpenSSH_7.9p1, OpenSSL 1.1.0i-fips  14 Aug 2018"
 SSH_VERSION_NUMBER = "7.9"
@@ -135,7 +137,6 @@ def test_valid_seek():
 
 
 def test_invalid_seek():
-    result = False
     buffer = b'buffer'
     parser = OpensshParser(buffer)
 

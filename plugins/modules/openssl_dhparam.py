@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -139,17 +141,17 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    count_bits,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
-    count_bits,
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '2.0'
 
@@ -343,7 +345,7 @@ class DHParameterCryptography(DHParameterBase):
             with open(self.path, 'rb') as f:
                 data = f.read()
             params = cryptography.hazmat.primitives.serialization.load_pem_parameters(data, backend=self.crypto_backend)
-        except Exception as dummy:
+        except Exception:
             return False
         # Check parameters
         bits = count_bits(params.parameter_numbers().p)

@@ -3,7 +3,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
@@ -43,9 +45,13 @@ _value:
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils.six import string_types
-
-from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError, get_fingerprint_from_bytes
-from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import PluginGPGRunner
+from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
+    GPGError,
+    get_fingerprint_from_bytes,
+)
+from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
+    PluginGPGRunner,
+)
 
 
 def gpg_fingerprint(input):

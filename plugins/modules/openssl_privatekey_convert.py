@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -65,23 +67,19 @@ backup_file:
 import os
 
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.io import (
-    load_file_if_exists,
-    write_file,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_convert import (
+    get_privatekey_argument_spec,
+    select_backend,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_convert import (
-    select_backend,
-    get_privatekey_argument_spec,
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
 )
 
 

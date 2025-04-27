@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -18,36 +20,34 @@ import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six import PY3
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
-    OpenSSLCLIBackend,
-)
-
+from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
-    CryptographyBackend,
     CRYPTOGRAPHY_ERROR,
     CRYPTOGRAPHY_MINIMAL_VERSION,
     CRYPTOGRAPHY_VERSION,
     HAS_CURRENT_CRYPTOGRAPHY,
+    CryptographyBackend,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
+    OpenSSLCLIBackend,
+)
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
-    NetworkException,
-    ModuleFailException,
     KeyParsingError,
+    ModuleFailException,
+    NetworkException,
     format_http_status,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     compute_cert_id,
     nopad_b64,
     parse_retry_after,
 )
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
+)
+
 
 try:
     import ipaddress  # noqa: F401, pylint: disable=unused-import
@@ -76,7 +76,7 @@ def _decode_retry(module, response, info, retry_count):
     # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
         retry_after = min(max(1, int(info.get('retry-after'))), 60)
-    except (TypeError, ValueError) as dummy:
+    except (TypeError, ValueError):
         retry_after = 10
     module.log('Retrieved a %s HTTP status on %s, retrying in %s seconds' % (format_http_status(info['status']), info['url'], retry_after))
 
@@ -288,7 +288,7 @@ class ACMEClient(object):
             if self.version == 1:
                 data["header"] = jws_header.copy()
                 for k, v in protected.items():
-                    dummy = data["header"].pop(k, None)
+                    data["header"].pop(k, None)
             self._log('signed request', data)
             data = self.module.jsonify(data)
 

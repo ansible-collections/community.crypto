@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -13,11 +15,10 @@ import os
 import tempfile
 import traceback
 
-from ansible.module_utils.common.text.converters import to_native, to_bytes
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    CertificateError,
     CertificateBackend,
+    CertificateError,
     CertificateProvider,
 )
 
@@ -68,7 +69,7 @@ class AcmeCertificateBackend(CertificateBackend):
             except Exception as err:
                 try:
                     f.close()
-                except Exception as dummy:
+                except Exception:
                     pass
                 self.module.fail_json(
                     msg="failed to create temporary CSR file: %s" % to_native(err),

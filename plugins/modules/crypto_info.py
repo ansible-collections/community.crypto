@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -157,23 +159,23 @@ openssl:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_EC,
-    CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
     CRYPTOGRAPHY_HAS_DSA,
     CRYPTOGRAPHY_HAS_DSA_SIGN,
+    CRYPTOGRAPHY_HAS_EC,
+    CRYPTOGRAPHY_HAS_EC_SIGN,
+    CRYPTOGRAPHY_HAS_ED448,
+    CRYPTOGRAPHY_HAS_ED448_SIGN,
+    CRYPTOGRAPHY_HAS_ED25519,
+    CRYPTOGRAPHY_HAS_ED25519_SIGN,
     CRYPTOGRAPHY_HAS_RSA,
     CRYPTOGRAPHY_HAS_RSA_SIGN,
+    CRYPTOGRAPHY_HAS_X448,
     CRYPTOGRAPHY_HAS_X25519,
     CRYPTOGRAPHY_HAS_X25519_FULL,
-    CRYPTOGRAPHY_HAS_X448,
     HAS_CRYPTOGRAPHY,
 )
+
 
 try:
     import cryptography
@@ -228,7 +230,9 @@ def add_crypto_information(module):
     has_ed25519 = CRYPTOGRAPHY_HAS_ED25519
     if has_ed25519:
         try:
-            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+                Ed25519PrivateKey,
+            )
             Ed25519PrivateKey.from_private_bytes(b'')
         except ValueError:
             pass
@@ -248,7 +252,9 @@ def add_crypto_information(module):
     has_x25519 = CRYPTOGRAPHY_HAS_X25519
     if has_x25519:
         try:
-            from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+            from cryptography.hazmat.primitives.asymmetric.x25519 import (
+                X25519PrivateKey,
+            )
             if CRYPTOGRAPHY_HAS_X25519_FULL:
                 X25519PrivateKey.from_private_bytes(b'')
             else:

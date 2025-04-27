@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -113,22 +115,19 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
-    create_backend,
-    create_default_argspec,
-    ACMEClient,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    ACMEClient,
+    create_backend,
+    create_default_argspec,
+)
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
-    ModuleFailException,
     KeyParsingError,
+    ModuleFailException,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
     pem_to_der,

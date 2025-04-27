@@ -5,27 +5,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import re
 
 import cryptography
 import pytest
-
-from cryptography.x509 import NameAttribute, oid
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_get_name,
     _adjust_idn,
-    _parse_dn_component,
     _parse_dn,
+    _parse_dn_component,
+    cryptography_get_name,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+from cryptography.x509 import NameAttribute, oid
 
 
 @pytest.mark.parametrize('unicode, idna, cycled_unicode', [
@@ -71,7 +71,7 @@ def test_adjust_idn(unicode, idna, cycled_unicode):
 ])
 def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
     with pytest.raises(ValueError, match=message):
-        result = _adjust_idn(value, idn_rewrite)
+        _adjust_idn(value, idn_rewrite)
 
 
 @pytest.mark.parametrize('value, idn_rewrite, message', [
@@ -86,7 +86,7 @@ def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
 ])
 def test_adjust_idn_fail_user_error(value, idn_rewrite, message):
     with pytest.raises(OpenSSLObjectError, match=message):
-        result = _adjust_idn(value, idn_rewrite)
+        _adjust_idn(value, idn_rewrite)
 
 
 def test_cryptography_get_name_invalid_prefix():
@@ -149,7 +149,7 @@ if LooseVersion('2.9') <= LooseVersion(cryptography.__version__) < LooseVersion(
 ])
 def test_parse_dn_component_failure(name, options, message):
     with pytest.raises(OpenSSLObjectError, match=u'^%s$' % re.escape(message)):
-        result = _parse_dn_component(name, **options)
+        _parse_dn_component(name, **options)
 
 
 @pytest.mark.parametrize('name, expected', [
@@ -169,4 +169,4 @@ def test_parse_dn(name, expected):
 ])
 def test_parse_dn_failure(name, message):
     with pytest.raises(OpenSSLObjectError, match=u'^%s$' % re.escape(message)):
-        result = _parse_dn(name)
+        _parse_dn(name)

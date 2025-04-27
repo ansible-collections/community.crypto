@@ -5,9 +5,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 # This import is only to maintain backwards compatibility
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (  # noqa: F401, pylint: disable=unused-import
-    parse_openssh_version
+    parse_openssh_version,
 )

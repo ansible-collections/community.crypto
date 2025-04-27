@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -98,12 +100,13 @@ renewal_info:
 """
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    ACMEClient,
     create_backend,
     create_default_argspec,
-    ACMEClient,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ModuleFailException,
+)
 
 
 def main():
