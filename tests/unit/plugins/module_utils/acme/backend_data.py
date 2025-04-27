@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -15,12 +17,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.backends imp
     CertificateInformation,
     CryptoBackend,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
 )
 
-from ..test_time import cartesian_product, TIMEZONES
+from ..test_time import TIMEZONES, cartesian_product
 
 
 def load_fixture(name):

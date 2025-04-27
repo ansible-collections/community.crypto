@@ -6,22 +6,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import time
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
-    nopad_b64,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    ACMEProtocolException,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     Authorization,
     normalize_combined_identifier,
+)
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ACMEProtocolException,
+)
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    nopad_b64,
 )
 
 

@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import abc
@@ -13,7 +15,6 @@ import stat
 import traceback
 
 from ansible.module_utils import six
-
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,

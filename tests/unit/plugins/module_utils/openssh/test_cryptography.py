@@ -5,9 +5,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
-import pytest
+
+__metaclass__ = type
 
 import os.path
 from getpass import getuser
@@ -15,16 +15,18 @@ from os import remove, rmdir
 from socket import gethostname
 from tempfile import mkdtemp
 
+import pytest
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
-    InvalidPrivateKeyFileError,
-    InvalidPublicKeyFileError,
     InvalidKeySizeError,
     InvalidKeyTypeError,
     InvalidPassphraseError,
-    OpensshKeypair
+    InvalidPrivateKeyFileError,
+    InvalidPublicKeyFileError,
+    OpensshKeypair,
 )
+
 
 DEFAULT_KEY_PARAMS = [
     (

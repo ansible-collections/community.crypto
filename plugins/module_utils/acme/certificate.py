@@ -5,41 +5,32 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import os
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
-    ACMEClient,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
-    Authorization,
-    wait_for_validation,
+from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    ACMEClient,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
     CertificateChain,
     Criterium,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    Authorization,
+    wait_for_validation,
+)
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.orders import (
-    Order,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
-    write_file,
-)
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import write_file
+from ansible_collections.community.crypto.plugins.module_utils.acme.orders import Order
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     pem_to_der,
 )

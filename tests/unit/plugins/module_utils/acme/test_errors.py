@@ -3,17 +3,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import pytest
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
-
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
-    format_error_problem,
     ACMEProtocolException,
+    format_error_problem,
+)
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
 )
 
 

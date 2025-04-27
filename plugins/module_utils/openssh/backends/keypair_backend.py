@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import abc
@@ -13,19 +15,7 @@ import os
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_text, to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
-    HAS_OPENSSH_SUPPORT,
-    HAS_OPENSSH_PRIVATE_FORMAT,
-    InvalidCommentError,
-    InvalidPassphraseError,
-    InvalidPrivateKeyFileError,
-    OpenSSHError,
-    OpensshKeypair,
-)
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
@@ -33,10 +23,22 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.
     PublicKey,
     parse_private_key_format,
 )
+from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+    HAS_OPENSSH_PRIVATE_FORMAT,
+    HAS_OPENSSH_SUPPORT,
+    InvalidCommentError,
+    InvalidPassphraseError,
+    InvalidPrivateKeyFileError,
+    OpenSSHError,
+    OpensshKeypair,
+)
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     any_in,
     file_mode,
     secure_write,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
 

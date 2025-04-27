@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -229,43 +231,35 @@ certificate:
 import os
 
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    select_backend,
-    get_certificate_argument_spec,
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+    get_certificate_argument_spec,
+    select_backend,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_acme import (
     AcmeCertificateProvider,
     add_acme_provider_to_argument_spec,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_entrust import (
     EntrustCertificateProvider,
     add_entrust_provider_to_argument_spec,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_ownca import (
     OwnCACertificateProvider,
     add_ownca_provider_to_argument_spec,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_selfsigned import (
     SelfSignedCertificateProvider,
     add_selfsigned_provider_to_argument_spec,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
 )
 
 

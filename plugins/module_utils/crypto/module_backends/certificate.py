@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -14,31 +16,30 @@ import traceback
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
     OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    load_certificate,
-    load_certificate_request,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_compare_public_keys,
     get_not_valid_after,
     get_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
     get_certificate_info,
 )
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate,
+    load_certificate_request,
+    load_privatekey,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 

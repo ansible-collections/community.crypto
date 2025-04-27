@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -267,31 +269,30 @@ EXAMPLES = r"""
 
 import atexit
 import base64
-import traceback
 import ssl
 import sys
-
+import traceback
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
-from ssl import get_server_certificate, DER_cert_to_PEM_cert, CERT_NONE, CERT_REQUIRED
+from ssl import CERT_NONE, CERT_REQUIRED, DER_cert_to_PEM_cert, get_server_certificate
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils.six import string_types
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
-    cryptography_oid_to_name,
     cryptography_get_extensions_from_cert,
+    cryptography_oid_to_name,
     get_not_valid_after,
     get_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 

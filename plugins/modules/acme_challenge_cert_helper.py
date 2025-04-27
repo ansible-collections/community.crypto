@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -157,38 +159,37 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
-    read_file,
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ModuleFailException,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     set_not_valid_after,
     set_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
+    import ipaddress
+
     import cryptography
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.serialization
-    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
-    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-    import ipaddress
     HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.3'))
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError as dummy:

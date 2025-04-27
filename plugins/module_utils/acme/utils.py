@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -17,12 +19,15 @@ import traceback
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six.moves.urllib.parse import unquote
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import ModuleFailException
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.math import convert_int_to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.time import get_now_datetime
+from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+    ModuleFailException,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    convert_int_to_bytes,
+)
+from ansible_collections.community.crypto.plugins.module_utils.time import (
+    get_now_datetime,
+)
 
 
 def nopad_b64(data):

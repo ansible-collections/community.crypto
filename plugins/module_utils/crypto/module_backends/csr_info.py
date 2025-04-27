@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -17,22 +19,21 @@ import traceback
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_certificate_request,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_decode_name,
     cryptography_get_extensions_from_csr,
     cryptography_oid_to_name,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     get_publickey_info,
 )
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate_request,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.3'
 

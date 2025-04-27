@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -288,32 +290,29 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    parse_pkcs12,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    split_pem_list,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_certificate,
+    load_privatekey,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-    OpenSSLBadPassphraseError,
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    parse_pkcs12,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
-    load_privatekey,
-    load_certificate,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    split_pem_list,
-)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '3.0'
 MINIMAL_PYOPENSSL_VERSION = '0.15'
@@ -323,7 +322,9 @@ PYOPENSSL_IMP_ERR = None
 try:
     import OpenSSL
     from OpenSSL import crypto
-    from OpenSSL.crypto import load_pkcs12 as _load_pkcs12  # this got removed in pyOpenSSL 23.3.0
+    from OpenSSL.crypto import (
+        load_pkcs12 as _load_pkcs12,  # this got removed in pyOpenSSL 23.3.0
+    )
     PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
 except (ImportError, AttributeError):
     PYOPENSSL_IMP_ERR = traceback.format_exc()
@@ -335,7 +336,9 @@ CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
-    from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        serialize_key_and_certificates,
+    )
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -347,6 +350,7 @@ CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None
 try:
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.serialization.pkcs12 import PBES
+
     # Try to build encryption builder for compatibility2022
     serialization.PrivateFormat.PKCS12.encryption_builder().key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC).hmac_hash(hashes.SHA1())
 except Exception:

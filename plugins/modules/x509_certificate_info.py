@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -393,21 +395,17 @@ issuer_uri:
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
 from ansible.module_utils.common.text.converters import to_native
-
+from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_info import (
     select_backend,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
 )

@@ -3,28 +3,26 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import datetime
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    compute_cert_id,
     nopad_b64,
+    parse_retry_after,
     pem_to_der,
     process_links,
-    parse_retry_after,
-    compute_cert_id,
 )
 
-from .backend_data import (
-    TEST_PEM_DERS,
-)
+from .backend_data import TEST_PEM_DERS
 
 
 NOPAD_B64 = [

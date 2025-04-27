@@ -6,25 +6,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import os
-
 from random import randrange
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLBadPassphraseError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    load_certificate,
-    select_message_digest,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_compare_public_keys,
@@ -36,17 +28,24 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_not_valid_after,
     set_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
     CRYPTOGRAPHY_VERSION,
-    CertificateError,
     CertificateBackend,
+    CertificateError,
     CertificateProvider,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate,
+    load_privatekey,
+    select_message_digest,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 try:
     import cryptography

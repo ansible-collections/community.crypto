@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -442,28 +444,23 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.common.validation import check_type_int, check_type_str
-
-from ansible_collections.community.crypto.plugins.module_utils.serial import parse_serial
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.io import (
-    write_file,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
     OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
-    load_privatekey,
-    load_certificate,
-    parse_name_field,
-    parse_ordered_name_field,
-    select_message_digest,
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+    CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
+    REVOCATION_REASON_MAP,
+    TIMESTAMP_FORMAT,
+    cryptography_decode_revoked_certificate,
+    cryptography_dump_revoked,
+    cryptography_get_signature_algorithm_oid_from_crl,
+    get_last_update,
+    get_next_update,
+    set_last_update,
+    set_next_update,
+    set_revocation_date,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
@@ -473,32 +470,31 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_oid_to_name,
     cryptography_serial_number_of_cert,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
-    CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
-    REVOCATION_REASON_MAP,
-    TIMESTAMP_FORMAT,
-    cryptography_decode_revoked_certificate,
-    cryptography_dump_revoked,
-    cryptography_get_signature_algorithm_oid_from_crl,
-    get_next_update,
-    get_last_update,
-    set_next_update,
-    set_last_update,
-    set_revocation_date,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    identify_pem_format,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
     get_crl_info,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    identify_pem_format,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    load_certificate,
+    load_privatekey,
+    parse_name_field,
+    parse_ordered_name_field,
+    select_message_digest,
+)
+from ansible_collections.community.crypto.plugins.module_utils.io import write_file
+from ansible_collections.community.crypto.plugins.module_utils.serial import (
+    parse_serial,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2'
 
@@ -510,9 +506,9 @@ try:
     from cryptography.hazmat.primitives.serialization import Encoding
     from cryptography.x509 import (
         CertificateRevocationListBuilder,
-        RevokedCertificateBuilder,
-        NameAttribute,
         Name,
+        NameAttribute,
+        RevokedCertificateBuilder,
     )
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:

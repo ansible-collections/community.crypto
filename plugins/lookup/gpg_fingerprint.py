@@ -3,7 +3,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
@@ -43,12 +45,16 @@ _value:
   elements: string
 """
 
-from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import GPGError, get_fingerprint_from_file
-from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import PluginGPGRunner
+from ansible.plugins.lookup import LookupBase
+from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
+    GPGError,
+    get_fingerprint_from_file,
+)
+from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
+    PluginGPGRunner,
+)
 
 
 class LookupModule(LookupBase):

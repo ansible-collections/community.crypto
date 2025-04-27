@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -192,29 +194,27 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.io import (
-    load_file_if_exists,
-    write_file,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
     OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
-    load_privatekey,
-    get_fingerprint,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     PublicKeyParseError,
     get_publickey_info,
 )
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+    get_fingerprint,
+    load_privatekey,
+)
+from ansible_collections.community.crypto.plugins.module_utils.io import (
+    load_file_if_exists,
+    write_file,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
 MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = '1.4'

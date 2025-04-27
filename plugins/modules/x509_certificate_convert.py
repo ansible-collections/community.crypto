@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -114,37 +116,34 @@ import os
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    OpenSSLObjectError,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    PEM_END,
+    PEM_END_START,
+    PEM_START,
+    extract_pem,
+    identify_pem_format,
+    split_pem_list,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    OpenSSLObject,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
 )
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    OpenSSLObjectError,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    PEM_START,
-    PEM_END_START,
-    PEM_END,
-    identify_pem_format,
-    split_pem_list,
-    extract_pem,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    OpenSSLObject,
-)
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography  # noqa: F401, pylint: disable=unused-import
-    from cryptography.x509 import load_der_x509_certificate
     from cryptography.hazmat.backends import default_backend
+    from cryptography.x509 import load_der_x509_certificate
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False

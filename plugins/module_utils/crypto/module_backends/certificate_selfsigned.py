@@ -6,16 +6,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
 import os
-
 from random import randrange
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    select_message_digest,
-)
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
@@ -27,16 +24,18 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_not_valid_after,
     set_not_valid_before,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    CertificateError,
     CertificateBackend,
+    CertificateError,
     CertificateProvider,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    select_message_digest,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
 )
+
 
 try:
     import cryptography

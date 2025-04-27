@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -235,14 +237,12 @@ output_json:
         - '...'
 """
 
-from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+    ACMEClient,
     create_backend,
     create_default_argspec,
-    ACMEClient,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     ModuleFailException,

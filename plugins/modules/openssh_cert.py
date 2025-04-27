@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -290,19 +292,18 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
     PrivateKey,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateTimeParameters,
     parse_option_list,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
 

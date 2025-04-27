@@ -3,40 +3,39 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import datetime
 
 import pytest
-from freezegun import freeze_time
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     HAS_CURRENT_CRYPTOGRAPHY,
     CryptographyBackend,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
-    ensure_utc_timezone,
     UTC,
+    ensure_utc_timezone,
 )
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
+)
+from freezegun import freeze_time
 
+from ..test_time import TIMEZONES
 from .backend_data import (
-    TEST_KEYS,
-    TEST_CSRS,
     TEST_CERT,
     TEST_CERT_DAYS,
     TEST_CERT_INFO,
-    TEST_PARSE_ACME_TIMESTAMP,
+    TEST_CSRS,
     TEST_INTERPOLATE_TIMESTAMP,
+    TEST_KEYS,
+    TEST_PARSE_ACME_TIMESTAMP,
 )
-
-from ..test_time import TIMEZONES
 
 
 if not HAS_CURRENT_CRYPTOGRAPHY:

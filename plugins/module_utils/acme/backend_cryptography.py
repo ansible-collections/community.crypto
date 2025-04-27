@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -15,32 +17,21 @@ import os
 import traceback
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
     CryptoBackend,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
     ChainMatcher,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
     KeyParsingError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import nopad_b64
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
-    convert_int_to_bytes,
-    convert_int_to_hex,
+from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+    nopad_b64,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
@@ -48,18 +39,23 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     get_not_valid_after,
     get_not_valid_before,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+    convert_int_to_bytes,
+    convert_int_to_hex,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     extract_first_pem,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     parse_name_field,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     add_or_remove_timezone,
 )
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 CRYPTOGRAPHY_MINIMAL_VERSION = '1.5'
 
@@ -67,12 +63,12 @@ CRYPTOGRAPHY_ERROR = None
 try:
     import cryptography
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.hashes
-    import cryptography.hazmat.primitives.hmac
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.hmac
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid

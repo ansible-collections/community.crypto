@@ -13,6 +13,8 @@
 # NOTE: THIS IS ONLY FOR ACTION PLUGINS!
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -23,14 +25,15 @@ import traceback
 from ansible import constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
-from ansible.module_utils.basic import AnsibleFallbackNotFound, SEQUENCETYPE, remove_values
-from ansible.module_utils.common._collections_compat import (
-    Mapping
+from ansible.module_utils.basic import (
+    SEQUENCETYPE,
+    AnsibleFallbackNotFound,
+    remove_values,
 )
-from ansible.module_utils.common.parameters import (
-    PASS_VARS,
-    PASS_BOOLS,
-)
+from ansible.module_utils.common._collections_compat import Mapping
+from ansible.module_utils.common.parameters import PASS_BOOLS, PASS_VARS
+from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.formatters import lenient_lowercase
 from ansible.module_utils.common.validation import (
     check_mutually_exclusive,
     check_required_arguments,
@@ -38,30 +41,22 @@ from ansible.module_utils.common.validation import (
     check_required_if,
     check_required_one_of,
     check_required_together,
-    count_terms,
-    check_type_bool,
     check_type_bits,
+    check_type_bool,
     check_type_bytes,
+    check_type_dict,
     check_type_float,
     check_type_int,
     check_type_jsonarg,
     check_type_list,
-    check_type_dict,
     check_type_path,
     check_type_raw,
     check_type_str,
+    count_terms,
     safe_eval,
 )
-from ansible.module_utils.common.text.formatters import (
-    lenient_lowercase,
-)
 from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE, BOOLEANS_TRUE
-from ansible.module_utils.six import (
-    binary_type,
-    string_types,
-    text_type,
-)
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.six import binary_type, string_types, text_type
 from ansible.plugins.action import ActionBase
 
 
@@ -69,9 +64,11 @@ try:
     # For ansible-core 2.11, we can use the ArgumentSpecValidator. We also import
     # ModuleArgumentSpecValidator since that indicates that the 'classical' approach
     # will no longer work.
-    from ansible.module_utils.common.arg_spec import (  # noqa: F401, pylint: disable=unused-import
+    from ansible.module_utils.common.arg_spec import (
         ArgumentSpecValidator,
-        ModuleArgumentSpecValidator,  # ModuleArgumentSpecValidator is not used
+    )
+    from ansible.module_utils.common.arg_spec import (  # noqa: F401, pylint: disable=unused-import; ModuleArgumentSpecValidator is not used
+        ModuleArgumentSpecValidator as dummy,
     )
     from ansible.module_utils.errors import UnsupportedError
     HAS_ARGSPEC_VALIDATOR = True

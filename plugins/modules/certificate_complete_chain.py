@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -129,29 +131,29 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    split_pem_list,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     CRYPTOGRAPHY_HAS_ED448_SIGN,
     CRYPTOGRAPHY_HAS_ED25519_SIGN,
 )
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    split_pem_list,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.serialization
-    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
-    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.hashes
+    import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
     HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.5'))

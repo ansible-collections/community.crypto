@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -16,32 +18,30 @@ import traceback
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+    CRYPTOGRAPHY_HAS_ED448,
+    CRYPTOGRAPHY_HAS_ED25519,
+    CRYPTOGRAPHY_HAS_X448,
     CRYPTOGRAPHY_HAS_X25519,
     CRYPTOGRAPHY_HAS_X25519_FULL,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED448,
     OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    get_fingerprint_of_privatekey,
-)
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
-    identify_private_key_format,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_info import (
     PrivateKeyConsistencyError,
     PrivateKeyParseError,
     get_privatekey_info,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+    identify_private_key_format,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_fingerprint_of_privatekey,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
 
@@ -52,11 +52,11 @@ try:
     import cryptography
     import cryptography.exceptions
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.serialization
-    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.dsa
     import cryptography.hazmat.primitives.asymmetric.ec
+    import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.serialization
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()

@@ -5,27 +5,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import re
 
 import cryptography
 import pytest
-
-from cryptography.x509 import NameAttribute, oid
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
-    cryptography_get_name,
     _adjust_idn,
-    _parse_dn_component,
     _parse_dn,
+    _parse_dn_component,
+    cryptography_get_name,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+from cryptography.x509 import NameAttribute, oid
 
 
 @pytest.mark.parametrize('unicode, idna, cycled_unicode', [

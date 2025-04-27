@@ -5,22 +5,30 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 import os
-from base64 import b64encode, b64decode
+from base64 import b64decode, b64encode
 from getpass import getuser
 from socket import gethostname
 
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 try:
     from cryptography import __version__ as CRYPTOGRAPHY_VERSION
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import dsa, ec, rsa, padding
-    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+    from cryptography.hazmat.primitives.asymmetric import dsa, ec, padding, rsa
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+        Ed25519PrivateKey,
+        Ed25519PublicKey,
+    )
 
     if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.0"):
         HAS_OPENSSH_PRIVATE_FORMAT = True

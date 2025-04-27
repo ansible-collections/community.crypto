@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -18,36 +20,34 @@ import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six import PY3
-
-from ansible_collections.community.crypto.plugins.module_utils.argspec import ArgumentSpec
-
-from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
-    OpenSSLCLIBackend,
-)
-
+from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
-    CryptographyBackend,
     CRYPTOGRAPHY_ERROR,
     CRYPTOGRAPHY_MINIMAL_VERSION,
     CRYPTOGRAPHY_VERSION,
     HAS_CURRENT_CRYPTOGRAPHY,
+    CryptographyBackend,
 )
-
+from ansible_collections.community.crypto.plugins.module_utils.acme.backend_openssl_cli import (
+    OpenSSLCLIBackend,
+)
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
-    NetworkException,
-    ModuleFailException,
     KeyParsingError,
+    ModuleFailException,
+    NetworkException,
     format_http_status,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     compute_cert_id,
     nopad_b64,
     parse_retry_after,
 )
+from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    ArgumentSpec,
+)
+
 
 try:
     import ipaddress  # noqa: F401, pylint: disable=unused-import

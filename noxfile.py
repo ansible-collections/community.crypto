@@ -10,6 +10,7 @@ import sys
 
 import nox
 
+
 try:
     import antsibull_nox
 except ImportError:

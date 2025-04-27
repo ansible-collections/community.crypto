@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -10,21 +12,19 @@ import datetime
 import sys
 
 import pytest
-from freezegun import freeze_time
-
 from ansible.module_utils.common.collections import is_sequence
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
+    UTC,
     add_or_remove_timezone,
-    get_now_datetime,
     convert_relative_to_datetime,
     ensure_utc_timezone,
     from_epoch_seconds,
     get_epoch_seconds,
+    get_now_datetime,
     get_relative_time_option,
     remove_timezone,
-    UTC,
 )
+from freezegun import freeze_time
 
 
 TIMEZONES = [

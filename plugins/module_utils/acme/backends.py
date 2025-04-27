@@ -6,33 +6,32 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
-from collections import namedtuple
 import abc
 import datetime
 import re
+from collections import namedtuple
 
 from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_native
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
+    UTC,
     ensure_utc_timezone,
     from_epoch_seconds,
     get_epoch_seconds,
     get_now_datetime,
     get_relative_time_option,
     remove_timezone,
-    UTC,
 )
 
 

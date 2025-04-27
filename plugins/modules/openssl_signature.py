@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -102,11 +104,14 @@ signature:
   type: str
 """
 
+import base64
 import os
 import traceback
-import base64
 
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = '1.4'
 
@@ -122,22 +127,20 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     CRYPTOGRAPHY_HAS_DSA_SIGN,
     CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
     CRYPTOGRAPHY_HAS_ED448_SIGN,
+    CRYPTOGRAPHY_HAS_ED25519_SIGN,
     CRYPTOGRAPHY_HAS_RSA_SIGN,
     OpenSSLObjectError,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
     load_privatekey,
 )
-
-from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class SignatureBase(OpenSSLObject):

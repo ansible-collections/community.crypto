@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -550,13 +552,6 @@ cert_details:
   type: dict
 """
 
-from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
-    ecs_client_argument_spec,
-    ECSClient,
-    RestOperationException,
-    SessionConfigurationException,
-)
-
 import datetime
 import os
 import re
@@ -564,17 +559,21 @@ import time
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
-from ansible_collections.community.crypto.plugins.module_utils.io import (
-    write_file,
-)
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
 )
+from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
+    ECSClient,
+    RestOperationException,
+    SessionConfigurationException,
+    ecs_client_argument_spec,
+)
+from ansible_collections.community.crypto.plugins.module_utils.io import write_file
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
+)
+
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

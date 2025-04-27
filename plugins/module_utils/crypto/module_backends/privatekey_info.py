@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -15,28 +17,25 @@ import traceback
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_bytes
-
-from ansible_collections.community.crypto.plugins.module_utils.version import LooseVersion
-
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED25519,
     CRYPTOGRAPHY_HAS_ED448,
+    CRYPTOGRAPHY_HAS_ED25519,
     OpenSSLObjectError,
 )
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
-    load_privatekey,
-    get_fingerprint_of_bytes,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     binary_exp_mod,
     quick_is_not_prime,
 )
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
     _get_cryptography_public_key_info,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    get_fingerprint_of_bytes,
+    load_privatekey,
+)
+from ansible_collections.community.crypto.plugins.module_utils.version import (
+    LooseVersion,
 )
 
 

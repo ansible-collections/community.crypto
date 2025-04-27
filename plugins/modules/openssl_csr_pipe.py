@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
 
 
@@ -134,14 +136,12 @@ csr:
 """
 
 from ansible.module_utils.common.text.converters import to_native
-
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
-    select_backend,
-    get_csr_argument_spec,
-)
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
+)
+from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
+    get_csr_argument_spec,
+    select_backend,
 )
 
 
