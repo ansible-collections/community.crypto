@@ -759,12 +759,14 @@ class CryptHandler(Handler):
 
         if keyslot is None:
             args = [self._cryptsetup_bin, 'luksRemoveKey', device, '-q']
+            if keyfile:
+                args.extend(['--key-file', keyfile])
+            elif passphrase is not None:
+                args.extend(['--key-file', '-'])
         else:
+            # Since we supply -q no passphrase is needed
             args = [self._cryptsetup_bin, 'luksKillSlot', device, '-q', str(keyslot)]
-        if keyfile:
-            args.extend(['--key-file', keyfile])
-        else:
-            args.extend(['--key-file', '-'])
+            passphrase = None
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
             raise ValueError('Error while removing LUKS key from %s: %s'
