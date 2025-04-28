@@ -31,13 +31,13 @@ from cryptography.x509 import NameAttribute, oid
 @pytest.mark.parametrize(
     "unicode, idna, cycled_unicode",
     [
-        (u"..", u"..", None),
-        (u"foo.com", u"foo.com", None),
-        (u".foo.com.", u".foo.com.", None),
-        (u"*.foo.com", u"*.foo.com", None),
-        (u"straße", u"xn--strae-oqa", None),
-        (u"ﬀóò.ḃâŗ.çøṁ", u"xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n", u"ffóò.ḃâŗ.çøṁ"),
-        (u"*.☺.", u"*.xn--74h.", None),
+        ("..", "..", None),
+        ("foo.com", "foo.com", None),
+        (".foo.com.", ".foo.com.", None),
+        ("*.foo.com", "*.foo.com", None),
+        ("straße", "xn--strae-oqa", None),
+        ("ﬀóò.ḃâŗ.çøṁ", "xn--ff-3jad.xn--2ca8uh37e.xn--7ca8a981n", "ffóò.ḃâŗ.çøṁ"),
+        ("*.☺.", "*.xn--74h.", None),
     ],
 )
 def test_adjust_idn(unicode, idna, cycled_unicode):
@@ -72,7 +72,7 @@ def test_adjust_idn(unicode, idna, cycled_unicode):
 @pytest.mark.parametrize(
     "value, idn_rewrite, message",
     [
-        (u"bar", "foo", re.escape(u'Invalid value for idn_rewrite: "foo"')),
+        ("bar", "foo", re.escape('Invalid value for idn_rewrite: "foo"')),
     ],
 )
 def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
@@ -84,12 +84,12 @@ def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
     "value, idn_rewrite, message",
     [
         (
-            u"xn--a",
+            "xn--a",
             "unicode",
-            u"""^Error while transforming part u?"xn\\-\\-a" of IDNA DNS name u?"xn\\-\\-a" to Unicode\\."""
-            u""" IDNA2008 transformation resulted in "Codepoint U\\+0080 at position 1 of u?'\\\\x80' not allowed","""
-            u""" IDNA2003 transformation resulted in "(decoding with 'idna' codec failed"""
-            u""" \\(UnicodeError: |'idna' codec can't decode byte 0x78 in position 0: )?Invalid character u?'\\\\x80'\\)?"\\.$""",
+            """^Error while transforming part u?"xn\\-\\-a" of IDNA DNS name u?"xn\\-\\-a" to Unicode\\."""
+            """ IDNA2008 transformation resulted in "Codepoint U\\+0080 at position 1 of u?'\\\\x80' not allowed","""
+            """ IDNA2003 transformation resulted in "(decoding with 'idna' codec failed"""
+            """ \\(UnicodeError: |'idna' codec can't decode byte 0x78 in position 0: )?Invalid character u?'\\\\x80'\\)?"\\.$""",
         ),
     ],
 )
@@ -121,51 +121,51 @@ def test_cryptography_get_name_other_name_utfstring():
 @pytest.mark.parametrize(
     "name, options, expected",
     [
-        (b"CN=x ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"x "), b"")),
-        (b"CN=\\ ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u" "), b"")),
-        (b"CN=\\#", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"#"), b"")),
-        (b"CN=#402032", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"@ 2"), b"")),
-        (b"CN = x ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"x "), b"")),
-        (b"CN = x\\, ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"x, "), b"")),
-        (b"CN = x\\40 ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u"x@ "), b"")),
+        (b"CN=x ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "x "), b"")),
+        (b"CN=\\ ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, " "), b"")),
+        (b"CN=\\#", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "#"), b"")),
+        (b"CN=#402032", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "@ 2"), b"")),
+        (b"CN = x ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "x "), b"")),
+        (b"CN = x\\, ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "x, "), b"")),
+        (b"CN = x\\40 ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, "x@ "), b"")),
         (
             b"CN  =  \\  , / ",
             {},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u"  "), b", / "),
+            (NameAttribute(oid.NameOID.COMMON_NAME, "  "), b", / "),
         ),
         (
             b"CN  =  \\  , / ",
             {"sep": b"/"},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u"  , "), b"/ "),
+            (NameAttribute(oid.NameOID.COMMON_NAME, "  , "), b"/ "),
         ),
         (
             b"CN  =  \\  , / ",
             {"decode_remainder": False},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u"\\  , / "), b""),
+            (NameAttribute(oid.NameOID.COMMON_NAME, "\\  , / "), b""),
         ),
         # Some examples from https://datatracker.ietf.org/doc/html/rfc4514#section-4:
         (
             b'CN=James \\"Jim\\" Smith\\, III',
             {},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u'James "Jim" Smith, III'), b""),
+            (NameAttribute(oid.NameOID.COMMON_NAME, 'James "Jim" Smith, III'), b""),
         ),
         (
             b"CN=Before\\0dAfter",
             {},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u"Before\x0dAfter"), b""),
+            (NameAttribute(oid.NameOID.COMMON_NAME, "Before\x0dAfter"), b""),
         ),
         (
             b"1.3.6.1.4.1.1466.0=#04024869",
             {},
             (
-                NameAttribute(oid.ObjectIdentifier("1.3.6.1.4.1.1466.0"), u"\x04\x02Hi"),
+                NameAttribute(oid.ObjectIdentifier("1.3.6.1.4.1.1466.0"), "\x04\x02Hi"),
                 b"",
             ),
         ),
         (
             b"CN=Lu\\C4\\8Di\\C4\\87",
             {},
-            (NameAttribute(oid.NameOID.COMMON_NAME, u"Lučić"), b""),
+            (NameAttribute(oid.NameOID.COMMON_NAME, "Lučić"), b""),
         ),
     ],
 )
@@ -187,8 +187,8 @@ if (
     @pytest.mark.parametrize(
         "name, options, expected",
         [
-            (b"CN=", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u""), b"")),
-            (b"CN= ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, u""), b"")),
+            (b"CN=", {}, (NameAttribute(oid.NameOID.COMMON_NAME, ""), b"")),
+            (b"CN= ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, ""), b"")),
         ],
     )
     def test_parse_dn_component_not_py26(name, options, expected):
@@ -200,32 +200,32 @@ if (
 @pytest.mark.parametrize(
     "name, options, message",
     [
-        (b"CN=\\0", {}, u'Hex escape sequence "\\0" incomplete at end of string'),
-        (b"CN=\\0,", {}, u'Hex escape sequence "\\0," has invalid second letter'),
-        (b"CN=#0,", {}, u'Invalid hex sequence entry "0,"'),
+        (b"CN=\\0", {}, 'Hex escape sequence "\\0" incomplete at end of string'),
+        (b"CN=\\0,", {}, 'Hex escape sequence "\\0," has invalid second letter'),
+        (b"CN=#0,", {}, 'Invalid hex sequence entry "0,"'),
     ],
 )
 def test_parse_dn_component_failure(name, options, message):
-    with pytest.raises(OpenSSLObjectError, match=u"^%s$" % re.escape(message)):
+    with pytest.raises(OpenSSLObjectError, match="^%s$" % re.escape(message)):
         _parse_dn_component(name, **options)
 
 
 @pytest.mark.parametrize(
     "name, expected",
     [
-        (b"CN=foo", [NameAttribute(oid.NameOID.COMMON_NAME, u"foo")]),
+        (b"CN=foo", [NameAttribute(oid.NameOID.COMMON_NAME, "foo")]),
         (
             b"CN=foo,CN=bar",
             [
-                NameAttribute(oid.NameOID.COMMON_NAME, u"foo"),
-                NameAttribute(oid.NameOID.COMMON_NAME, u"bar"),
+                NameAttribute(oid.NameOID.COMMON_NAME, "foo"),
+                NameAttribute(oid.NameOID.COMMON_NAME, "bar"),
             ],
         ),
         (
             b"CN  =  foo ,  CN  =  bar",
             [
-                NameAttribute(oid.NameOID.COMMON_NAME, u"foo "),
-                NameAttribute(oid.NameOID.COMMON_NAME, u"bar"),
+                NameAttribute(oid.NameOID.COMMON_NAME, "foo "),
+                NameAttribute(oid.NameOID.COMMON_NAME, "bar"),
             ],
         ),
     ],
@@ -241,14 +241,14 @@ def test_parse_dn(name, expected):
     [
         (
             b"CN=\\0",
-            u'Error while parsing distinguished name "CN=\\0": Hex escape sequence "\\0" incomplete at end of string',
+            'Error while parsing distinguished name "CN=\\0": Hex escape sequence "\\0" incomplete at end of string',
         ),
         (
             b"CN=x,",
-            u'Error while parsing distinguished name "CN=x,": unexpected end of string',
+            'Error while parsing distinguished name "CN=x,": unexpected end of string',
         ),
     ],
 )
 def test_parse_dn_failure(name, message):
-    with pytest.raises(OpenSSLObjectError, match=u"^%s$" % re.escape(message)):
+    with pytest.raises(OpenSSLObjectError, match="^%s$" % re.escape(message)):
         _parse_dn(name)

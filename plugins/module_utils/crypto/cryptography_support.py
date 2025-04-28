@@ -303,7 +303,7 @@ else:
 def _parse_dn_component(name, sep=b",", decode_remainder=True):
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
-        raise OpenSSLObjectError(u'cannot start part in "{0}"'.format(to_text(name)))
+        raise OpenSSLObjectError('cannot start part in "{0}"'.format(to_text(name)))
     oid = cryptography_name_to_oid(to_text(m.group(1)))
     idx = len(m.group(0))
     decoded_name = []
@@ -320,7 +320,7 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
                 idx2 = DN_HEX_LETTER.find(ch2.lower())
                 if idx1 < 0 or idx2 < 0:
                     raise OpenSSLObjectError(
-                        u'Invalid hex sequence entry "{0}"'.format(to_text(ch1 + ch2))
+                        'Invalid hex sequence entry "{0}"'.format(to_text(ch1 + ch2))
                     )
                 idx += 2
                 decoded_name.append(_int_to_byte(idx1 * 16 + idx2))
@@ -339,7 +339,7 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
                     if idx1 >= 0:
                         if idx + 2 >= length:
                             raise OpenSSLObjectError(
-                                u'Hex escape sequence "\\{0}" incomplete at end of string'.format(
+                                'Hex escape sequence "\\{0}" incomplete at end of string'.format(
                                     to_text(ch)
                                 )
                             )
@@ -347,7 +347,7 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
                         idx2 = DN_HEX_LETTER.find(ch2.lower())
                         if idx2 < 0:
                             raise OpenSSLObjectError(
-                                u'Hex escape sequence "\\{0}" has invalid second letter'.format(
+                                'Hex escape sequence "\\{0}" has invalid second letter'.format(
                                     to_text(ch + ch2)
                                 )
                             )
@@ -381,7 +381,7 @@ def _parse_dn(name):
             attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                u'Error while parsing distinguished name "{0}": {1}'.format(
+                'Error while parsing distinguished name "{0}": {1}'.format(
                     to_text(original_name), e
                 )
             )
@@ -389,7 +389,7 @@ def _parse_dn(name):
         if name:
             if name[0:1] != sep or len(name) < 2:
                 raise OpenSSLObjectError(
-                    u'Error while parsing distinguished name "{0}": unexpected end of string'.format(
+                    'Error while parsing distinguished name "{0}": unexpected end of string'.format(
                         to_text(original_name)
                     )
                 )
@@ -404,7 +404,7 @@ def cryptography_parse_relative_distinguished_name(rdn):
             names.append(_parse_dn_component(to_bytes(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                u'Error while parsing relative distinguished name "{0}": {1}'.format(
+                'Error while parsing relative distinguished name "{0}": {1}'.format(
                     part, e
                 )
             )
@@ -440,25 +440,25 @@ def _adjust_idn(value, idn_rewrite):
         )
     # Since IDNA does not like '*' or empty labels (except one empty label at the end),
     # we split and let IDNA only handle labels that are neither empty or '*'.
-    parts = value.split(u".")
+    parts = value.split(".")
     for index, part in enumerate(parts):
-        if part in (u"", u"*"):
+        if part in ("", "*"):
             continue
         try:
             if idn_rewrite == "idna":
                 parts[index] = idna.encode(part).decode("ascii")
-            elif idn_rewrite == "unicode" and part.startswith(u"xn--"):
+            elif idn_rewrite == "unicode" and part.startswith("xn--"):
                 parts[index] = idna.decode(part)
         except idna.IDNAError as exc2008:
             try:
                 if idn_rewrite == "idna":
                     parts[index] = part.encode("idna").decode("ascii")
-                elif idn_rewrite == "unicode" and part.startswith(u"xn--"):
+                elif idn_rewrite == "unicode" and part.startswith("xn--"):
                     parts[index] = part.encode("ascii").decode("idna")
             except Exception as exc2003:
                 raise OpenSSLObjectError(
-                    u'Error while transforming part "{part}" of {what} DNS name "{name}" to {dest}.'
-                    u' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'.format(
+                    'Error while transforming part "{part}" of {what} DNS name "{name}" to {dest}.'
+                    ' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'.format(
                         part=part,
                         name=value,
                         what="IDNA" if idn_rewrite == "unicode" else "Unicode",
@@ -467,25 +467,25 @@ def _adjust_idn(value, idn_rewrite):
                         exc2008=exc2008,
                     )
                 )
-    return u".".join(parts)
+    return ".".join(parts)
 
 
 def _adjust_idn_email(value, idn_rewrite):
-    idx = value.find(u"@")
+    idx = value.find("@")
     if idx < 0:
         return value
-    return u"{0}@{1}".format(value[:idx], _adjust_idn(value[idx + 1 :], idn_rewrite))
+    return "{0}@{1}".format(value[:idx], _adjust_idn(value[idx + 1 :], idn_rewrite))
 
 
 def _adjust_idn_url(value, idn_rewrite):
     url = urlparse(value)
     host = _adjust_idn(url.hostname, idn_rewrite)
     if url.username is not None and url.password is not None:
-        host = u"{0}:{1}@{2}".format(url.username, url.password, host)
+        host = "{0}:{1}@{2}".format(url.username, url.password, host)
     elif url.username is not None:
-        host = u"{0}@{1}".format(url.username, host)
+        host = "{0}@{1}".format(url.username, host)
     if url.port is not None:
-        host = u"{0}:{1}".format(host, url.port)
+        host = "{0}:{1}".format(host, url.port)
     return urlunparse(
         ParseResult(
             scheme=url.scheme,
@@ -575,14 +575,14 @@ def _dn_escape_value(value):
     """
     Escape Distinguished Name's attribute value.
     """
-    value = value.replace(u"\\", u"\\\\")
-    for ch in [u",", u"+", u"<", u">", u";", u'"']:
-        value = value.replace(ch, u"\\%s" % ch)
-    value = value.replace(u"\0", u"\\00")
-    if value.startswith((u" ", u"#")):
-        value = u"\\%s" % value[0] + value[1:]
-    if value.endswith(u" "):
-        value = value[:-1] + u"\\ "
+    value = value.replace("\\", "\\\\")
+    for ch in [",", "+", "<", ">", ";", '"']:
+        value = value.replace(ch, "\\%s" % ch)
+    value = value.replace("\0", "\\00")
+    if value.startswith((" ", "#")):
+        value = "\\%s" % value[0] + value[1:]
+    if value.endswith(" "):
+        value = value[:-1] + "\\ "
     return value
 
 
@@ -596,23 +596,23 @@ def cryptography_decode_name(name, idn_rewrite="ignore"):
             'idn_rewrite must be one of "ignore", "idna", or "unicode"'
         )
     if isinstance(name, x509.DNSName):
-        return u"DNS:{0}".format(_adjust_idn(name.value, idn_rewrite))
+        return "DNS:{0}".format(_adjust_idn(name.value, idn_rewrite))
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
-            return u"IP:{0}/{1}".format(
+            return "IP:{0}/{1}".format(
                 name.value.network_address.compressed, name.value.prefixlen
             )
-        return u"IP:{0}".format(name.value.compressed)
+        return "IP:{0}".format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
-        return u"email:{0}".format(_adjust_idn_email(name.value, idn_rewrite))
+        return "email:{0}".format(_adjust_idn_email(name.value, idn_rewrite))
     if isinstance(name, x509.UniformResourceIdentifier):
-        return u"URI:{0}".format(_adjust_idn_url(name.value, idn_rewrite))
+        return "URI:{0}".format(_adjust_idn_url(name.value, idn_rewrite))
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas
-        return u"dirName:" + ",".join(
+        return "dirName:" + ",".join(
             [
-                u"{0}={1}".format(
+                "{0}={1}".format(
                     to_text(cryptography_oid_to_name(attribute.oid, short=True)),
                     _dn_escape_value(attribute.value),
                 )
@@ -620,9 +620,9 @@ def cryptography_decode_name(name, idn_rewrite="ignore"):
             ]
         )
     if isinstance(name, x509.RegisteredID):
-        return u"RID:{0}".format(name.value.dotted_string)
+        return "RID:{0}".format(name.value.dotted_string)
     if isinstance(name, x509.OtherName):
-        return u"otherName:{0};{1}".format(
+        return "otherName:{0};{1}".format(
             name.type_id.dotted_string, _get_hex(name.value)
         )
     raise OpenSSLObjectError('Cannot decode name "{0}"'.format(name))
@@ -964,7 +964,7 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
             signer_public_key.verify(signature, data)
             return True
         raise OpenSSLObjectError(
-            u"Unsupported public key type {0}".format(type(signer_public_key))
+            "Unsupported public key type {0}".format(type(signer_public_key))
         )
     except InvalidSignature:
         return False

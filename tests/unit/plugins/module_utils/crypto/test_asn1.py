@@ -76,7 +76,7 @@ TEST_CASES = [
     # data u"café" encoded as UTF-8 bytes b"caf\xc3\xa9", decodes that internally with latin-1 (or similar variant) as
     # u"cafÃ©" then encodes that to UTF-8 b"caf\xc3\x83\xc2\xa9" for the UTF8String. Ultimately openssl is wrong here
     # so we keep our assertion happening.
-    (u"UTF8:café", b"\x0c\x05\x63\x61\x66\xc3\xa9"),
+    ("UTF8:café", b"\x0c\x05\x63\x61\x66\xc3\xa9"),
 ]
 
 
@@ -132,5 +132,5 @@ def test_test_cases(value, expected, tmp_path):
     )
 
     # This is a know edge case where openssl asn1parse does not work properly.
-    if value != u"UTF8:café":
+    if value != "UTF8:café":
         assert b_data == expected
