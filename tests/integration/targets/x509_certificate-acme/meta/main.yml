@@ -5,6 +5,5 @@
 
 dependencies:
   - setup_acme
-  - setup_pyopenssl  # needed for Ubuntu 16.04
   - setup_remote_tmp_dir
   - prepare_jinja2_compat
