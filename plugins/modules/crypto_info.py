@@ -198,33 +198,33 @@ else:
 
 
 CURVES = (
-    ('secp224r1', 'SECP224R1'),
-    ('secp256k1', 'SECP256K1'),
-    ('secp256r1', 'SECP256R1'),
-    ('secp384r1', 'SECP384R1'),
-    ('secp521r1', 'SECP521R1'),
-    ('secp192r1', 'SECP192R1'),
-    ('sect163k1', 'SECT163K1'),
-    ('sect163r2', 'SECT163R2'),
-    ('sect233k1', 'SECT233K1'),
-    ('sect233r1', 'SECT233R1'),
-    ('sect283k1', 'SECT283K1'),
-    ('sect283r1', 'SECT283R1'),
-    ('sect409k1', 'SECT409K1'),
-    ('sect409r1', 'SECT409R1'),
-    ('sect571k1', 'SECT571K1'),
-    ('sect571r1', 'SECT571R1'),
-    ('brainpoolP256r1', 'BrainpoolP256R1'),
-    ('brainpoolP384r1', 'BrainpoolP384R1'),
-    ('brainpoolP512r1', 'BrainpoolP512R1'),
+    ("secp224r1", "SECP224R1"),
+    ("secp256k1", "SECP256K1"),
+    ("secp256r1", "SECP256R1"),
+    ("secp384r1", "SECP384R1"),
+    ("secp521r1", "SECP521R1"),
+    ("secp192r1", "SECP192R1"),
+    ("sect163k1", "SECT163K1"),
+    ("sect163r2", "SECT163R2"),
+    ("sect233k1", "SECT233K1"),
+    ("sect233r1", "SECT233R1"),
+    ("sect283k1", "SECT283K1"),
+    ("sect283r1", "SECT283R1"),
+    ("sect409k1", "SECT409K1"),
+    ("sect409r1", "SECT409R1"),
+    ("sect571k1", "SECT571K1"),
+    ("sect571r1", "SECT571R1"),
+    ("brainpoolP256r1", "BrainpoolP256R1"),
+    ("brainpoolP384r1", "BrainpoolP384R1"),
+    ("brainpoolP512r1", "BrainpoolP512R1"),
 )
 
 
 def add_crypto_information(module):
     result = {}
-    result['python_cryptography_installed'] = HAS_CRYPTOGRAPHY
+    result["python_cryptography_installed"] = HAS_CRYPTOGRAPHY
     if not HAS_CRYPTOGRAPHY:
-        result['python_cryptography_import_error'] = CRYPTOGRAPHY_IMP_ERR
+        result["python_cryptography_import_error"] = CRYPTOGRAPHY_IMP_ERR
         return result
 
     has_ed25519 = CRYPTOGRAPHY_HAS_ED25519
@@ -233,7 +233,8 @@ def add_crypto_information(module):
             from cryptography.hazmat.primitives.asymmetric.ed25519 import (
                 Ed25519PrivateKey,
             )
-            Ed25519PrivateKey.from_private_bytes(b'')
+
+            Ed25519PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
         except UnsupportedAlgorithm:
@@ -243,7 +244,8 @@ def add_crypto_information(module):
     if has_ed448:
         try:
             from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
-            Ed448PrivateKey.from_private_bytes(b'')
+
+            Ed448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
         except UnsupportedAlgorithm:
@@ -255,8 +257,9 @@ def add_crypto_information(module):
             from cryptography.hazmat.primitives.asymmetric.x25519 import (
                 X25519PrivateKey,
             )
+
             if CRYPTOGRAPHY_HAS_X25519_FULL:
-                X25519PrivateKey.from_private_bytes(b'')
+                X25519PrivateKey.from_private_bytes(b"")
             else:
                 # Some versions do not support serialization and deserialization - use generate() instead
                 X25519PrivateKey.generate()
@@ -269,7 +272,8 @@ def add_crypto_information(module):
     if has_x448:
         try:
             from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
-            X448PrivateKey.from_private_bytes(b'')
+
+            X448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
         except UnsupportedAlgorithm:
@@ -282,59 +286,65 @@ def add_crypto_information(module):
 
         backend = cryptography.hazmat.backends.default_backend()
         for curve_name, constructor_name in CURVES:
-            ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(constructor_name)
+            ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(
+                constructor_name
+            )
             if ecclass:
                 try:
-                    cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(curve=ecclass(), backend=backend)
+                    cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
+                        curve=ecclass(), backend=backend
+                    )
                     curves.append(curve_name)
                 except UnsupportedAlgorithm:
                     pass
-                except CryptographyInternalError:  # pylint: disable=duplicate-except,bad-except-order
+                except (  # pylint: disable=duplicate-except,bad-except-order
+                    CryptographyInternalError
+                ):
                     # On Fedora 41, some curves result in InternalError. This is probably because
                     # Fedora's cryptography is linked against the system libssl, which has the
                     # curves removed.
                     pass
 
     info = {
-        'version': CRYPTOGRAPHY_VERSION,
-        'curves': curves,
-        'has_ec': CRYPTOGRAPHY_HAS_EC,
-        'has_ec_sign': CRYPTOGRAPHY_HAS_EC_SIGN,
-        'has_ed25519': has_ed25519,
-        'has_ed25519_sign': has_ed25519 and CRYPTOGRAPHY_HAS_ED25519_SIGN,
-        'has_ed448': has_ed448,
-        'has_ed448_sign': has_ed448 and CRYPTOGRAPHY_HAS_ED448_SIGN,
-        'has_dsa': CRYPTOGRAPHY_HAS_DSA,
-        'has_dsa_sign': CRYPTOGRAPHY_HAS_DSA_SIGN,
-        'has_rsa': CRYPTOGRAPHY_HAS_RSA,
-        'has_rsa_sign': CRYPTOGRAPHY_HAS_RSA_SIGN,
-        'has_x25519': has_x25519,
-        'has_x25519_serialization': has_x25519 and CRYPTOGRAPHY_HAS_X25519_FULL,
-        'has_x448': has_x448,
+        "version": CRYPTOGRAPHY_VERSION,
+        "curves": curves,
+        "has_ec": CRYPTOGRAPHY_HAS_EC,
+        "has_ec_sign": CRYPTOGRAPHY_HAS_EC_SIGN,
+        "has_ed25519": has_ed25519,
+        "has_ed25519_sign": has_ed25519 and CRYPTOGRAPHY_HAS_ED25519_SIGN,
+        "has_ed448": has_ed448,
+        "has_ed448_sign": has_ed448 and CRYPTOGRAPHY_HAS_ED448_SIGN,
+        "has_dsa": CRYPTOGRAPHY_HAS_DSA,
+        "has_dsa_sign": CRYPTOGRAPHY_HAS_DSA_SIGN,
+        "has_rsa": CRYPTOGRAPHY_HAS_RSA,
+        "has_rsa_sign": CRYPTOGRAPHY_HAS_RSA_SIGN,
+        "has_x25519": has_x25519,
+        "has_x25519_serialization": has_x25519 and CRYPTOGRAPHY_HAS_X25519_FULL,
+        "has_x448": has_x448,
     }
-    result['python_cryptography_capabilities'] = info
+    result["python_cryptography_capabilities"] = info
     return result
 
 
 def add_openssl_information(module):
-    openssl_binary = module.get_bin_path('openssl')
+    openssl_binary = module.get_bin_path("openssl")
     result = {
-        'openssl_present': openssl_binary is not None,
+        "openssl_present": openssl_binary is not None,
     }
     if openssl_binary is None:
         return result
 
     openssl_result = {
-        'path': openssl_binary,
+        "path": openssl_binary,
     }
-    result['openssl'] = openssl_result
+    result["openssl"] = openssl_result
 
-    rc, out, err = module.run_command([openssl_binary, 'version'])
+    rc, out, err = module.run_command([openssl_binary, "version"])
     if rc == 0:
-        openssl_result['version_output'] = out
+        openssl_result["version_output"] = out
         parts = out.split(None, 2)
         if len(parts) > 1:
-            openssl_result['version'] = parts[1]
+            openssl_result["version"] = parts[1]
 
     return result
 
@@ -353,5 +363,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

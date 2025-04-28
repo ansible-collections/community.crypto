@@ -23,9 +23,9 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def read_file(fn, mode='b'):
+def read_file(fn, mode="b"):
     try:
-        with open(fn, 'r' + mode) as f:
+        with open(fn, "r" + mode) as f:
             return f.read()
     except Exception as e:
         raise ModuleFailException('Error while reading file "{0}": {1}'.format(fn, e))
@@ -33,14 +33,14 @@ def read_file(fn, mode='b'):
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
 def write_file(module, dest, content):
-    '''
+    """
     Write content to destination file dest, only if the content
     has changed.
-    '''
+    """
     changed = False
     # create a tempfile
     fd, tmpsrc = tempfile.mkstemp(text=False)
-    f = os.fdopen(fd, 'wb')
+    f = os.fdopen(fd, "wb")
     try:
         f.write(content)
     except Exception as err:
@@ -49,7 +49,10 @@ def write_file(module, dest, content):
         except Exception:
             pass
         os.remove(tmpsrc)
-        raise ModuleFailException("failed to create temporary content file: %s" % to_native(err), exception=traceback.format_exc())
+        raise ModuleFailException(
+            "failed to create temporary content file: %s" % to_native(err),
+            exception=traceback.format_exc(),
+        )
     f.close()
     checksum_src = None
     checksum_dest = None
@@ -75,7 +78,7 @@ def write_file(module, dest, content):
             raise ModuleFailException("Destination %s not readable" % (dest))
         checksum_dest = module.sha1(dest)
     else:
-        dirname = os.path.dirname(dest) or '.'
+        dirname = os.path.dirname(dest) or "."
         if not os.access(dirname, os.W_OK):
             os.remove(tmpsrc)
             raise ModuleFailException("Destination dir %s not writable" % (dirname))
@@ -85,6 +88,9 @@ def write_file(module, dest, content):
             changed = True
         except Exception as err:
             os.remove(tmpsrc)
-            raise ModuleFailException("failed to copy %s to %s: %s" % (tmpsrc, dest, to_native(err)), exception=traceback.format_exc())
+            raise ModuleFailException(
+                "failed to copy %s to %s: %s" % (tmpsrc, dest, to_native(err)),
+                exception=traceback.format_exc(),
+            )
     os.remove(tmpsrc)
     return changed

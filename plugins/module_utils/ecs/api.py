@@ -41,22 +41,25 @@ valid_file_format = re.compile(r".*(\.)(yml|yaml|json)$")
 
 def ecs_client_argument_spec():
     return dict(
-        entrust_api_user=dict(type='str', required=True),
-        entrust_api_key=dict(type='str', required=True, no_log=True),
-        entrust_api_client_cert_path=dict(type='path', required=True),
-        entrust_api_client_cert_key_path=dict(type='path', required=True, no_log=True),
-        entrust_api_specification_path=dict(type='path', default='https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml'),
+        entrust_api_user=dict(type="str", required=True),
+        entrust_api_key=dict(type="str", required=True, no_log=True),
+        entrust_api_client_cert_path=dict(type="path", required=True),
+        entrust_api_client_cert_key_path=dict(type="path", required=True, no_log=True),
+        entrust_api_specification_path=dict(
+            type="path",
+            default="https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml",
+        ),
     )
 
 
 class SessionConfigurationException(Exception):
-    """ Raised if we cannot configure a session with the API """
+    """Raised if we cannot configure a session with the API"""
 
     pass
 
 
 class RestOperationException(Exception):
-    """ Encapsulate a REST API error """
+    """Encapsulate a REST API error"""
 
     def __init__(self, error):
         self.status = to_native(error.get("status", None))
@@ -106,7 +109,12 @@ class RestOperation(object):
             self.parameters = {}
         else:
             self.parameters = parameters
-        self.url = "{scheme}://{host}{base_path}{uri}".format(scheme="https", host=session._spec.get("host"), base_path=session._spec.get("basePath"), uri=uri)
+        self.url = "{scheme}://{host}{base_path}{uri}".format(
+            scheme="https",
+            host=session._spec.get("host"),
+            base_path=session._spec.get("basePath"),
+            uri=uri,
+        )
 
     def restmethod(self, *args, **kwargs):
         """Do the hard work of making the request here"""
@@ -145,7 +153,9 @@ class RestOperation(object):
         try:
             if body_parameters:
                 body_parameters_json = json.dumps(body_parameters)
-                response = self.session.request.open(method=self.method, url=url, data=body_parameters_json)
+                response = self.session.request.open(
+                    method=self.method, url=url, data=body_parameters_json
+                )
             else:
                 response = self.session.request.open(method=self.method, url=url)
         except HTTPError as e:
@@ -167,11 +177,13 @@ class RestOperation(object):
                 raise RestOperationException(result)
 
         # Raise a generic RestOperationException if this fails
-        raise RestOperationException({"status": result_code, "errors": [{"message": "REST Operation Failed"}]})
+        raise RestOperationException(
+            {"status": result_code, "errors": [{"message": "REST Operation Failed"}]}
+        )
 
 
 class Resource(object):
-    """ Implement basic CRUD operations against a path. """
+    """Implement basic CRUD operations against a path."""
 
     def __init__(self, session):
         self.session = session
@@ -196,13 +208,20 @@ class Resource(object):
                     elif method.lower() == "patch":
                         operation_name = "Patch"
                     else:
-                        raise SessionConfigurationException(to_native("Invalid REST method type {0}".format(method)))
+                        raise SessionConfigurationException(
+                            to_native("Invalid REST method type {0}".format(method))
+                        )
 
                     # Get the non-parameter parts of the URL and append to the operation name
                     # e.g  /application/version -> GetApplicationVersion
                     # e.g. /application/{id}    -> GetApplication
                     # This may lead to duplicates, which we must prevent.
-                    operation_name += re.sub(r"{(.*)}", "", url).replace("/", " ").title().replace(" ", "")
+                    operation_name += (
+                        re.sub(r"{(.*)}", "", url)
+                        .replace("/", " ")
+                        .title()
+                        .replace(" ", "")
+                    )
                     operation_spec["operationId"] = operation_name
 
                 op = RestOperation(session, url, method, parameters)
@@ -244,7 +263,9 @@ class ECSSession(object):
             self.request.url_username = entrust_api_user
             self.request.url_password = entrust_api_key
         else:
-            raise SessionConfigurationException(to_native("User and key must be provided."))
+            raise SessionConfigurationException(
+                to_native("User and key must be provided.")
+            )
 
         # set up client certificate if passed (support all-in one or cert + key)
         entrust_api_cert = self.get_config("entrust_api_cert")
@@ -254,45 +275,78 @@ class ECSSession(object):
             if entrust_api_cert_key:
                 self.request.client_key = entrust_api_cert_key
         else:
-            raise SessionConfigurationException(to_native("Client certificate for authentication to the API must be provided."))
+            raise SessionConfigurationException(
+                to_native(
+                    "Client certificate for authentication to the API must be provided."
+                )
+            )
 
         # set up the spec
-        entrust_api_specification_path = self.get_config("entrust_api_specification_path")
+        entrust_api_specification_path = self.get_config(
+            "entrust_api_specification_path"
+        )
 
-        if not entrust_api_specification_path.startswith("http") and not os.path.isfile(entrust_api_specification_path):
-            raise SessionConfigurationException(to_native("OpenAPI specification was not found at location {0}.".format(entrust_api_specification_path)))
+        if not entrust_api_specification_path.startswith("http") and not os.path.isfile(
+            entrust_api_specification_path
+        ):
+            raise SessionConfigurationException(
+                to_native(
+                    "OpenAPI specification was not found at location {0}.".format(
+                        entrust_api_specification_path
+                    )
+                )
+            )
         if not valid_file_format.match(entrust_api_specification_path):
-            raise SessionConfigurationException(to_native("OpenAPI specification filename must end in .json, .yml or .yaml"))
+            raise SessionConfigurationException(
+                to_native(
+                    "OpenAPI specification filename must end in .json, .yml or .yaml"
+                )
+            )
 
         self.verify = True
 
         if entrust_api_specification_path.startswith("http"):
             try:
-                http_response = Request().open(method="GET", url=entrust_api_specification_path)
+                http_response = Request().open(
+                    method="GET", url=entrust_api_specification_path
+                )
                 http_response_contents = http_response.read()
                 if entrust_api_specification_path.endswith(".json"):
                     self._spec = json.load(http_response_contents)
-                elif entrust_api_specification_path.endswith(".yml") or entrust_api_specification_path.endswith(".yaml"):
+                elif entrust_api_specification_path.endswith(
+                    ".yml"
+                ) or entrust_api_specification_path.endswith(".yaml"):
                     self._spec = yaml.safe_load(http_response_contents)
             except HTTPError as e:
-                raise SessionConfigurationException(to_native("Error downloading specification from address '{0}', received error code '{1}'".format(
-                    entrust_api_specification_path, e.getcode())))
+                raise SessionConfigurationException(
+                    to_native(
+                        "Error downloading specification from address '{0}', received error code '{1}'".format(
+                            entrust_api_specification_path, e.getcode()
+                        )
+                    )
+                )
         else:
             with open(entrust_api_specification_path) as f:
                 if ".json" in entrust_api_specification_path:
                     self._spec = json.load(f)
-                elif ".yml" in entrust_api_specification_path or ".yaml" in entrust_api_specification_path:
+                elif (
+                    ".yml" in entrust_api_specification_path
+                    or ".yaml" in entrust_api_specification_path
+                ):
                     self._spec = yaml.safe_load(f)
 
     def get_config(self, item):
         return self._config.get(item, None)
 
     def _read_config_vars(self, name, **kwargs):
-        """ Read configuration from variables passed to the module. """
+        """Read configuration from variables passed to the module."""
         config = {}
 
         entrust_api_specification_path = kwargs.get("entrust_api_specification_path")
-        if not entrust_api_specification_path or (not entrust_api_specification_path.startswith("http") and not os.path.isfile(entrust_api_specification_path)):
+        if not entrust_api_specification_path or (
+            not entrust_api_specification_path.startswith("http")
+            and not os.path.isfile(entrust_api_specification_path)
+        ):
             raise SessionConfigurationException(
                 to_native(
                     "Parameter provided for entrust_api_specification_path of value '{0}' was not a valid file path or HTTPS address.".format(
@@ -305,30 +359,50 @@ class ECSSession(object):
             file_path = kwargs.get(required_file)
             if not file_path or not os.path.isfile(file_path):
                 raise SessionConfigurationException(
-                    to_native("Parameter provided for {0} of value '{1}' was not a valid file path.".format(required_file, file_path))
+                    to_native(
+                        "Parameter provided for {0} of value '{1}' was not a valid file path.".format(
+                            required_file, file_path
+                        )
+                    )
                 )
 
         for required_var in ["entrust_api_user", "entrust_api_key"]:
             if not kwargs.get(required_var):
-                raise SessionConfigurationException(to_native("Parameter provided for {0} was missing.".format(required_var)))
+                raise SessionConfigurationException(
+                    to_native(
+                        "Parameter provided for {0} was missing.".format(required_var)
+                    )
+                )
 
         config["entrust_api_cert"] = kwargs.get("entrust_api_cert")
         config["entrust_api_cert_key"] = kwargs.get("entrust_api_cert_key")
-        config["entrust_api_specification_path"] = kwargs.get("entrust_api_specification_path")
+        config["entrust_api_specification_path"] = kwargs.get(
+            "entrust_api_specification_path"
+        )
         config["entrust_api_user"] = kwargs.get("entrust_api_user")
         config["entrust_api_key"] = kwargs.get("entrust_api_key")
 
         return config
 
 
-def ECSClient(entrust_api_user=None, entrust_api_key=None, entrust_api_cert=None, entrust_api_cert_key=None, entrust_api_specification_path=None):
+def ECSClient(
+    entrust_api_user=None,
+    entrust_api_key=None,
+    entrust_api_cert=None,
+    entrust_api_cert_key=None,
+    entrust_api_specification_path=None,
+):
     """Create an ECS client"""
 
     if not YAML_FOUND:
-        raise SessionConfigurationException(missing_required_lib("PyYAML"), exception=YAML_IMP_ERR)
+        raise SessionConfigurationException(
+            missing_required_lib("PyYAML"), exception=YAML_IMP_ERR
+        )
 
     if entrust_api_specification_path is None:
-        entrust_api_specification_path = "https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml"
+        entrust_api_specification_path = (
+            "https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml"
+        )
 
     # Not functionally necessary with current uses of this module_util, but better to be explicit for future use cases
     entrust_api_user = to_text(entrust_api_user)

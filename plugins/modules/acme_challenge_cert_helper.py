@@ -190,7 +190,8 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-    HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.3'))
+
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.3")
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -199,121 +200,137 @@ except ImportError:
 
 # Convert byte string to ASN1 encoded octet string
 if sys.version_info[0] >= 3:
+
     def encode_octet_string(octet_string):
         if len(octet_string) >= 128:
-            raise ModuleFailException('Cannot handle octet strings with more than 128 bytes')
+            raise ModuleFailException(
+                "Cannot handle octet strings with more than 128 bytes"
+            )
         return bytes([0x4, len(octet_string)]) + octet_string
+
 else:
+
     def encode_octet_string(octet_string):
         if len(octet_string) >= 128:
-            raise ModuleFailException('Cannot handle octet strings with more than 128 bytes')
-        return b'\x04' + chr(len(octet_string)) + octet_string
+            raise ModuleFailException(
+                "Cannot handle octet strings with more than 128 bytes"
+            )
+        return b"\x04" + chr(len(octet_string)) + octet_string
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            challenge=dict(type='str', required=True, choices=['tls-alpn-01']),
-            challenge_data=dict(type='dict', required=True),
-            private_key_src=dict(type='path'),
-            private_key_content=dict(type='str', no_log=True),
-            private_key_passphrase=dict(type='str', no_log=True),
+            challenge=dict(type="str", required=True, choices=["tls-alpn-01"]),
+            challenge_data=dict(type="dict", required=True),
+            private_key_src=dict(type="path"),
+            private_key_content=dict(type="str", no_log=True),
+            private_key_passphrase=dict(type="str", no_log=True),
         ),
-        required_one_of=(
-            ['private_key_src', 'private_key_content'],
-        ),
-        mutually_exclusive=(
-            ['private_key_src', 'private_key_content'],
-        ),
+        required_one_of=(["private_key_src", "private_key_content"],),
+        mutually_exclusive=(["private_key_src", "private_key_content"],),
     )
     if not HAS_CRYPTOGRAPHY:
         # Some callbacks die when exception is provided with value None
         if CRYPTOGRAPHY_IMP_ERR:
-            module.fail_json(msg=missing_required_lib('cryptography >= 1.3'), exception=CRYPTOGRAPHY_IMP_ERR)
-        module.fail_json(msg=missing_required_lib('cryptography >= 1.3'))
+            module.fail_json(
+                msg=missing_required_lib("cryptography >= 1.3"),
+                exception=CRYPTOGRAPHY_IMP_ERR,
+            )
+        module.fail_json(msg=missing_required_lib("cryptography >= 1.3"))
 
     try:
         # Get parameters
-        challenge = module.params['challenge']
-        challenge_data = module.params['challenge_data']
+        challenge = module.params["challenge"]
+        challenge_data = module.params["challenge_data"]
 
         # Get hold of private key
-        private_key_content = module.params.get('private_key_content')
-        private_key_passphrase = module.params.get('private_key_passphrase')
+        private_key_content = module.params.get("private_key_content")
+        private_key_passphrase = module.params.get("private_key_passphrase")
         if private_key_content is None:
-            private_key_content = read_file(module.params['private_key_src'])
+            private_key_content = read_file(module.params["private_key_src"])
         else:
             private_key_content = to_bytes(private_key_content)
         try:
-            private_key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                private_key_content,
-                password=to_bytes(private_key_passphrase) if private_key_passphrase is not None else None,
-                backend=_cryptography_backend)
+            private_key = (
+                cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    private_key_content,
+                    password=(
+                        to_bytes(private_key_passphrase)
+                        if private_key_passphrase is not None
+                        else None
+                    ),
+                    backend=_cryptography_backend,
+                )
+            )
         except Exception as e:
-            raise ModuleFailException('Error while loading private key: {0}'.format(e))
+            raise ModuleFailException("Error while loading private key: {0}".format(e))
 
         # Some common attributes
-        domain = to_text(challenge_data['resource'])
-        identifier_type, identifier = to_text(challenge_data.get('resource_original', 'dns:' + challenge_data['resource'])).split(':', 1)
+        domain = to_text(challenge_data["resource"])
+        identifier_type, identifier = to_text(
+            challenge_data.get("resource_original", "dns:" + challenge_data["resource"])
+        ).split(":", 1)
         subject = issuer = cryptography.x509.Name([])
         now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
         not_valid_before = now
         not_valid_after = now + datetime.timedelta(days=10)
-        if identifier_type == 'dns':
+        if identifier_type == "dns":
             san = cryptography.x509.DNSName(identifier)
-        elif identifier_type == 'ip':
+        elif identifier_type == "ip":
             san = cryptography.x509.IPAddress(ipaddress.ip_address(identifier))
         else:
-            raise ModuleFailException('Unsupported identifier type "{0}"'.format(identifier_type))
+            raise ModuleFailException(
+                'Unsupported identifier type "{0}"'.format(identifier_type)
+            )
 
         # Generate regular self-signed certificate
-        cert_builder = cryptography.x509.CertificateBuilder().subject_name(
-            subject
-        ).issuer_name(
-            issuer
-        ).public_key(
-            private_key.public_key()
-        ).serial_number(
-            cryptography.x509.random_serial_number()
-        ).add_extension(
-            cryptography.x509.SubjectAlternativeName([san]),
-            critical=False,
+        cert_builder = (
+            cryptography.x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(issuer)
+            .public_key(private_key.public_key())
+            .serial_number(cryptography.x509.random_serial_number())
+            .add_extension(
+                cryptography.x509.SubjectAlternativeName([san]),
+                critical=False,
+            )
         )
         cert_builder = set_not_valid_before(cert_builder, not_valid_before)
         cert_builder = set_not_valid_after(cert_builder, not_valid_after)
         regular_certificate = cert_builder.sign(
             private_key,
             cryptography.hazmat.primitives.hashes.SHA256(),
-            _cryptography_backend
+            _cryptography_backend,
         )
 
         # Process challenge
-        if challenge == 'tls-alpn-01':
-            value = base64.b64decode(challenge_data['resource_value'])
-            cert_builder = cryptography.x509.CertificateBuilder().subject_name(
-                subject
-            ).issuer_name(
-                issuer
-            ).public_key(
-                private_key.public_key()
-            ).serial_number(
-                cryptography.x509.random_serial_number()
-            ).add_extension(
-                cryptography.x509.SubjectAlternativeName([san]),
-                critical=False,
-            ).add_extension(
-                cryptography.x509.UnrecognizedExtension(
-                    cryptography.x509.ObjectIdentifier("1.3.6.1.5.5.7.1.31"),
-                    encode_octet_string(value),
-                ),
-                critical=True,
+        if challenge == "tls-alpn-01":
+            value = base64.b64decode(challenge_data["resource_value"])
+            cert_builder = (
+                cryptography.x509.CertificateBuilder()
+                .subject_name(subject)
+                .issuer_name(issuer)
+                .public_key(private_key.public_key())
+                .serial_number(cryptography.x509.random_serial_number())
+                .add_extension(
+                    cryptography.x509.SubjectAlternativeName([san]),
+                    critical=False,
+                )
+                .add_extension(
+                    cryptography.x509.UnrecognizedExtension(
+                        cryptography.x509.ObjectIdentifier("1.3.6.1.5.5.7.1.31"),
+                        encode_octet_string(value),
+                    ),
+                    critical=True,
+                )
             )
             cert_builder = set_not_valid_before(cert_builder, not_valid_before)
             cert_builder = set_not_valid_after(cert_builder, not_valid_after)
             challenge_certificate = cert_builder.sign(
                 private_key,
                 cryptography.hazmat.primitives.hashes.SHA256(),
-                _cryptography_backend
+                _cryptography_backend,
             )
 
         module.exit_json(
@@ -321,12 +338,16 @@ def main():
             domain=domain,
             identifier_type=identifier_type,
             identifier=identifier,
-            challenge_certificate=challenge_certificate.public_bytes(cryptography.hazmat.primitives.serialization.Encoding.PEM),
-            regular_certificate=regular_certificate.public_bytes(cryptography.hazmat.primitives.serialization.Encoding.PEM)
+            challenge_certificate=challenge_certificate.public_bytes(
+                cryptography.hazmat.primitives.serialization.Encoding.PEM
+            ),
+            regular_certificate=regular_certificate.public_bytes(
+                cryptography.hazmat.primitives.serialization.Encoding.PEM
+            ),
         )
     except ModuleFailException as e:
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

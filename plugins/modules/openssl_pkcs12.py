@@ -314,9 +314,9 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = '3.0'
-MINIMAL_PYOPENSSL_VERSION = '0.15'
-MAXIMAL_PYOPENSSL_VERSION = '23.3.0'
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.0"
+MINIMAL_PYOPENSSL_VERSION = "0.15"
+MAXIMAL_PYOPENSSL_VERSION = "23.3.0"
 
 PYOPENSSL_IMP_ERR = None
 try:
@@ -325,6 +325,7 @@ try:
     from OpenSSL.crypto import (
         load_pkcs12 as _load_pkcs12,  # this got removed in pyOpenSSL 23.3.0
     )
+
     PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
 except (ImportError, AttributeError):
     PYOPENSSL_IMP_ERR = traceback.format_exc()
@@ -339,6 +340,7 @@ try:
     from cryptography.hazmat.primitives.serialization.pkcs12 import (
         serialize_key_and_certificates,
     )
+
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -352,7 +354,9 @@ try:
     from cryptography.hazmat.primitives.serialization.pkcs12 import PBES
 
     # Try to build encryption builder for compatibility2022
-    serialization.PrivateFormat.PKCS12.encryption_builder().key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC).hmac_hash(hashes.SHA1())
+    serialization.PrivateFormat.PKCS12.encryption_builder().key_cert_algorithm(
+        PBES.PBESv1SHA1And3KeyTripleDESCBC
+    ).hmac_hash(hashes.SHA1())
 except Exception:
     CRYPTOGRAPHY_COMPATIBILITY2022_ERR = traceback.format_exc()
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = False
@@ -361,12 +365,15 @@ else:
 
 
 def load_certificate_set(filename, backend):
-    '''
+    """
     Load list of concatenated PEM files, and return a list of parsed certificates.
-    '''
-    with open(filename, 'rb') as f:
-        data = f.read().decode('utf-8')
-    return [load_certificate(None, content=cert.encode('utf-8'), backend=backend) for cert in split_pem_list(data)]
+    """
+    with open(filename, "rb") as f:
+        data = f.read().decode("utf-8")
+    return [
+        load_certificate(None, content=cert.encode("utf-8"), backend=backend)
+        for cert in split_pem_list(data)
+    ]
 
 
 class PkcsError(OpenSSLObjectError):
@@ -376,40 +383,42 @@ class PkcsError(OpenSSLObjectError):
 class Pkcs(OpenSSLObject):
     def __init__(self, module, backend, iter_size_default=2048):
         super(Pkcs, self).__init__(
-            module.params['path'],
-            module.params['state'],
-            module.params['force'],
-            module.check_mode
+            module.params["path"],
+            module.params["state"],
+            module.params["force"],
+            module.check_mode,
         )
         self.backend = backend
-        self.action = module.params['action']
-        self.other_certificates = module.params['other_certificates']
-        self.other_certificates_parse_all = module.params['other_certificates_parse_all']
-        self.other_certificates_content = module.params['other_certificates_content']
-        self.certificate_path = module.params['certificate_path']
-        self.certificate_content = module.params['certificate_content']
-        self.friendly_name = module.params['friendly_name']
-        self.iter_size = module.params['iter_size'] or iter_size_default
-        self.maciter_size = module.params['maciter_size'] or 1
-        self.encryption_level = module.params['encryption_level']
-        self.passphrase = module.params['passphrase']
+        self.action = module.params["action"]
+        self.other_certificates = module.params["other_certificates"]
+        self.other_certificates_parse_all = module.params[
+            "other_certificates_parse_all"
+        ]
+        self.other_certificates_content = module.params["other_certificates_content"]
+        self.certificate_path = module.params["certificate_path"]
+        self.certificate_content = module.params["certificate_content"]
+        self.friendly_name = module.params["friendly_name"]
+        self.iter_size = module.params["iter_size"] or iter_size_default
+        self.maciter_size = module.params["maciter_size"] or 1
+        self.encryption_level = module.params["encryption_level"]
+        self.passphrase = module.params["passphrase"]
         self.pkcs12 = None
-        self.privatekey_passphrase = module.params['privatekey_passphrase']
-        self.privatekey_path = module.params['privatekey_path']
-        self.privatekey_content = module.params['privatekey_content']
+        self.privatekey_passphrase = module.params["privatekey_passphrase"]
+        self.privatekey_path = module.params["privatekey_path"]
+        self.privatekey_content = module.params["privatekey_content"]
         self.pkcs12_bytes = None
-        self.return_content = module.params['return_content']
-        self.src = module.params['src']
+        self.return_content = module.params["return_content"]
+        self.src = module.params["src"]
 
-        if module.params['mode'] is None:
-            module.params['mode'] = '0400'
+        if module.params["mode"] is None:
+            module.params["mode"] = "0400"
 
-        self.backup = module.params['backup']
+        self.backup = module.params["backup"]
         self.backup_file = None
 
         if self.certificate_path is not None:
             try:
-                with open(self.certificate_path, 'rb') as fh:
+                with open(self.certificate_path, "rb") as fh:
                     self.certificate_content = fh.read()
             except (IOError, OSError) as exc:
                 raise PkcsError(exc)
@@ -418,7 +427,7 @@ class Pkcs(OpenSSLObject):
 
         if self.privatekey_path is not None:
             try:
-                with open(self.privatekey_path, 'rb') as fh:
+                with open(self.privatekey_path, "rb") as fh:
                     self.privatekey_content = fh.read()
             except (IOError, OSError) as exc:
                 raise PkcsError(exc)
@@ -430,17 +439,27 @@ class Pkcs(OpenSSLObject):
                 filenames = list(self.other_certificates)
                 self.other_certificates = []
                 for other_cert_bundle in filenames:
-                    self.other_certificates.extend(load_certificate_set(other_cert_bundle, self.backend))
+                    self.other_certificates.extend(
+                        load_certificate_set(other_cert_bundle, self.backend)
+                    )
             else:
                 self.other_certificates = [
-                    load_certificate(other_cert, backend=self.backend) for other_cert in self.other_certificates
+                    load_certificate(other_cert, backend=self.backend)
+                    for other_cert in self.other_certificates
                 ]
         elif self.other_certificates_content:
             certs = self.other_certificates_content
             if self.other_certificates_parse_all:
-                certs = list(itertools.chain.from_iterable(split_pem_list(content) for content in certs))
+                certs = list(
+                    itertools.chain.from_iterable(
+                        split_pem_list(content) for content in certs
+                    )
+                )
             self.other_certificates = [
-                load_certificate(None, content=to_bytes(other_cert), backend=self.backend) for other_cert in certs
+                load_certificate(
+                    None, content=to_bytes(other_cert), backend=self.backend
+                )
+                for other_cert in certs
             ]
 
     @abc.abstractmethod
@@ -476,7 +495,12 @@ class Pkcs(OpenSSLObject):
         def _check_pkey_passphrase():
             if self.privatekey_passphrase:
                 try:
-                    load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend)
+                    load_privatekey(
+                        None,
+                        content=self.privatekey_content,
+                        passphrase=self.privatekey_passphrase,
+                        backend=self.backend,
+                    )
                 except OpenSSLObjectError:
                     return False
             return True
@@ -484,28 +508,39 @@ class Pkcs(OpenSSLObject):
         if not state_and_perms:
             return state_and_perms
 
-        if os.path.exists(self.path) and module.params['action'] == 'export':
+        if os.path.exists(self.path) and module.params["action"] == "export":
             self.generate_bytes(module)  # ignore result
             self.src = self.path
             try:
-                pkcs12_privatekey, pkcs12_certificate, pkcs12_other_certificates, pkcs12_friendly_name = self.parse()
+                (
+                    pkcs12_privatekey,
+                    pkcs12_certificate,
+                    pkcs12_other_certificates,
+                    pkcs12_friendly_name,
+                ) = self.parse()
             except OpenSSLObjectError:
                 return False
-            if (pkcs12_privatekey is not None) and (self.privatekey_content is not None):
+            if (pkcs12_privatekey is not None) and (
+                self.privatekey_content is not None
+            ):
                 expected_pkey = self._dump_privatekey(self.pkcs12)
                 if pkcs12_privatekey != expected_pkey:
                     return False
             elif bool(pkcs12_privatekey) != bool(self.privatekey_content):
                 return False
 
-            if (pkcs12_certificate is not None) and (self.certificate_content is not None):
+            if (pkcs12_certificate is not None) and (
+                self.certificate_content is not None
+            ):
                 expected_cert = self._dump_certificate(self.pkcs12)
                 if pkcs12_certificate != expected_cert:
                     return False
             elif bool(pkcs12_certificate) != bool(self.certificate_content):
                 return False
 
-            if (pkcs12_other_certificates is not None) and (self.other_certificates is not None):
+            if (pkcs12_other_certificates is not None) and (
+                self.other_certificates is not None
+            ):
                 expected_other_certs = self._dump_other_certificates(self.pkcs12)
                 if set(pkcs12_other_certificates) != set(expected_other_certs):
                     return False
@@ -516,18 +551,28 @@ class Pkcs(OpenSSLObject):
                 # This check is required because pyOpenSSL will not return a friendly name
                 # if the private key is not set in the file
                 friendly_name = self._get_friendly_name(self.pkcs12)
-                if ((friendly_name is not None) and (pkcs12_friendly_name is not None)):
+                if (friendly_name is not None) and (pkcs12_friendly_name is not None):
                     if friendly_name != pkcs12_friendly_name:
                         return False
                 elif bool(friendly_name) != bool(pkcs12_friendly_name):
                     return False
-        elif module.params['action'] == 'parse' and os.path.exists(self.src) and os.path.exists(self.path):
+        elif (
+            module.params["action"] == "parse"
+            and os.path.exists(self.src)
+            and os.path.exists(self.path)
+        ):
             try:
                 pkey, cert, other_certs, friendly_name = self.parse()
             except OpenSSLObjectError:
                 return False
             expected_content = to_bytes(
-                ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
+                "".join(
+                    [
+                        to_native(pem)
+                        for pem in [pkey, cert] + other_certs
+                        if pem is not None
+                    ]
+                )
             )
             dumped_content = load_file_if_exists(self.path, ignore_errors=True)
             if expected_content != dumped_content:
@@ -541,16 +586,18 @@ class Pkcs(OpenSSLObject):
         """Serialize the object into a dictionary."""
 
         result = {
-            'filename': self.path,
+            "filename": self.path,
         }
         if self.privatekey_path:
-            result['privatekey_path'] = self.privatekey_path
+            result["privatekey_path"] = self.privatekey_path
         if self.backup_file:
-            result['backup_file'] = self.backup_file
+            result["backup_file"] = self.backup_file
         if self.return_content:
             if self.pkcs12_bytes is None:
                 self.pkcs12_bytes = load_file_if_exists(self.path, ignore_errors=True)
-            result['pkcs12'] = base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
+            result["pkcs12"] = (
+                base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
+            )
 
         return result
 
@@ -563,7 +610,7 @@ class Pkcs(OpenSSLObject):
         """Read PKCS#12 file."""
 
         try:
-            with open(self.src, 'rb') as pkcs12_fh:
+            with open(self.src, "rb") as pkcs12_fh:
                 pkcs12_content = pkcs12_fh.read()
             return self.parse_bytes(pkcs12_content)
         except IOError as exc:
@@ -583,9 +630,11 @@ class Pkcs(OpenSSLObject):
 
 class PkcsPyOpenSSL(Pkcs):
     def __init__(self, module):
-        super(PkcsPyOpenSSL, self).__init__(module, 'pyopenssl')
-        if self.encryption_level != 'auto':
-            module.fail_json(msg='The PyOpenSSL backend only supports encryption_level = auto')
+        super(PkcsPyOpenSSL, self).__init__(module, "pyopenssl")
+        if self.encryption_level != "auto":
+            module.fail_json(
+                msg="The PyOpenSSL backend only supports encryption_level = auto"
+            )
 
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
@@ -595,7 +644,11 @@ class PkcsPyOpenSSL(Pkcs):
             self.pkcs12.set_ca_certificates(self.other_certificates)
 
         if self.certificate_content:
-            self.pkcs12.set_certificate(load_certificate(None, content=self.certificate_content, backend=self.backend))
+            self.pkcs12.set_certificate(
+                load_certificate(
+                    None, content=self.certificate_content, backend=self.backend
+                )
+            )
 
         if self.friendly_name:
             self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
@@ -603,7 +656,13 @@ class PkcsPyOpenSSL(Pkcs):
         if self.privatekey_content:
             try:
                 self.pkcs12.set_privatekey(
-                    load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend))
+                    load_privatekey(
+                        None,
+                        content=self.privatekey_content,
+                        passphrase=self.privatekey_passphrase,
+                        backend=self.backend,
+                    )
+                )
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
@@ -620,8 +679,10 @@ class PkcsPyOpenSSL(Pkcs):
                 crt = crypto.dump_certificate(crypto.FILETYPE_PEM, crt)
             other_certs = []
             if p12.get_ca_certificates() is not None:
-                other_certs = [crypto.dump_certificate(crypto.FILETYPE_PEM,
-                                                       other_cert) for other_cert in p12.get_ca_certificates()]
+                other_certs = [
+                    crypto.dump_certificate(crypto.FILETYPE_PEM, other_cert)
+                    for other_cert in p12.get_ca_certificates()
+                ]
 
             friendly_name = p12.get_friendlyname()
 
@@ -651,43 +712,60 @@ class PkcsPyOpenSSL(Pkcs):
 
 class PkcsCryptography(Pkcs):
     def __init__(self, module):
-        super(PkcsCryptography, self).__init__(module, 'cryptography', iter_size_default=50000)
-        if self.encryption_level == 'compatibility2022' and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022:
+        super(PkcsCryptography, self).__init__(
+            module, "cryptography", iter_size_default=50000
+        )
+        if (
+            self.encryption_level == "compatibility2022"
+            and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022
+        ):
             module.fail_json(
-                msg='The installed cryptography version does not support encryption_level = compatibility2022.'
-                ' You need cryptography >= 38.0.0 and support for SHA1',
-                exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR)
+                msg="The installed cryptography version does not support encryption_level = compatibility2022."
+                " You need cryptography >= 38.0.0 and support for SHA1",
+                exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR,
+            )
 
     def generate_bytes(self, module):
         """Generate PKCS#12 file archive."""
         pkey = None
         if self.privatekey_content:
             try:
-                pkey = load_privatekey(None, content=self.privatekey_content, passphrase=self.privatekey_passphrase, backend=self.backend)
+                pkey = load_privatekey(
+                    None,
+                    content=self.privatekey_content,
+                    passphrase=self.privatekey_passphrase,
+                    backend=self.backend,
+                )
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
         cert = None
         if self.certificate_content:
-            cert = load_certificate(None, content=self.certificate_content, backend=self.backend)
+            cert = load_certificate(
+                None, content=self.certificate_content, backend=self.backend
+            )
 
-        friendly_name = to_bytes(self.friendly_name) if self.friendly_name is not None else None
+        friendly_name = (
+            to_bytes(self.friendly_name) if self.friendly_name is not None else None
+        )
 
         # Store fake object which can be used to retrieve the components back
         self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
 
         if not self.passphrase:
             encryption = serialization.NoEncryption()
-        elif self.encryption_level == 'compatibility2022':
+        elif self.encryption_level == "compatibility2022":
             encryption = (
-                serialization.PrivateFormat.PKCS12.encryption_builder().
-                kdf_rounds(self.iter_size).
-                key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC).
-                hmac_hash(hashes.SHA1()).
-                build(to_bytes(self.passphrase))
+                serialization.PrivateFormat.PKCS12.encryption_builder()
+                .kdf_rounds(self.iter_size)
+                .key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC)
+                .hmac_hash(hashes.SHA1())
+                .build(to_bytes(self.passphrase))
             )
         else:
-            encryption = serialization.BestAvailableEncryption(to_bytes(self.passphrase))
+            encryption = serialization.BestAvailableEncryption(
+                to_bytes(self.passphrase)
+            )
 
         return serialize_key_and_certificates(
             friendly_name,
@@ -699,8 +777,9 @@ class PkcsCryptography(Pkcs):
 
     def parse_bytes(self, pkcs12_content):
         try:
-            private_key, certificate, additional_certificates, friendly_name = parse_pkcs12(
-                pkcs12_content, self.passphrase)
+            private_key, certificate, additional_certificates, friendly_name = (
+                parse_pkcs12(pkcs12_content, self.passphrase)
+            )
 
             pkey = None
             if private_key is not None:
@@ -730,103 +809,133 @@ class PkcsCryptography(Pkcs):
     #     self.pkcs12 = (pkey, cert, self.other_certificates, self.friendly_name)
 
     def _dump_privatekey(self, pkcs12):
-        return pkcs12[0].private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        ) if pkcs12[0] else None
+        return (
+            pkcs12[0].private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+            if pkcs12[0]
+            else None
+        )
 
     def _dump_certificate(self, pkcs12):
         return pkcs12[1].public_bytes(serialization.Encoding.PEM) if pkcs12[1] else None
 
     def _dump_other_certificates(self, pkcs12):
-        return [other_cert.public_bytes(serialization.Encoding.PEM) for other_cert in pkcs12[2]]
+        return [
+            other_cert.public_bytes(serialization.Encoding.PEM)
+            for other_cert in pkcs12[2]
+        ]
 
     def _get_friendly_name(self, pkcs12):
         return pkcs12[3]
 
 
 def select_backend(module, backend):
-    if backend == 'auto':
+    if backend == "auto":
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = (
+            CRYPTOGRAPHY_FOUND
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        )
         can_use_pyopenssl = (
-            PYOPENSSL_FOUND and
-            PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION) and
-            PYOPENSSL_VERSION < LooseVersion(MAXIMAL_PYOPENSSL_VERSION)
+            PYOPENSSL_FOUND
+            and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
+            and PYOPENSSL_VERSION < LooseVersion(MAXIMAL_PYOPENSSL_VERSION)
         )
 
         # If no restrictions are provided, first try cryptography, then pyOpenSSL
         if (
-            (module.params['iter_size'] is not None and module.params['encryption_level'] != 'compatibility2022')
-            or module.params['maciter_size'] is not None
-        ):
+            module.params["iter_size"] is not None
+            and module.params["encryption_level"] != "compatibility2022"
+        ) or module.params["maciter_size"] is not None:
             # If iter_size (for encryption_level != compatibility2022) or maciter_size is specified, use pyOpenSSL backend
-            backend = 'pyopenssl'
+            backend = "pyopenssl"
         elif can_use_cryptography:
-            backend = 'cryptography'
+            backend = "cryptography"
         elif can_use_pyopenssl:
-            backend = 'pyopenssl'
+            backend = "pyopenssl"
 
         # Success?
-        if backend == 'auto':
-            module.fail_json(msg=("Cannot detect any of the required Python libraries "
-                                  "cryptography (>= {0}) or PyOpenSSL (>= {1}, < {2})").format(
-                                      MINIMAL_CRYPTOGRAPHY_VERSION,
-                                      MINIMAL_PYOPENSSL_VERSION,
-                                      MAXIMAL_PYOPENSSL_VERSION))
+        if backend == "auto":
+            module.fail_json(
+                msg=(
+                    "Cannot detect any of the required Python libraries "
+                    "cryptography (>= {0}) or PyOpenSSL (>= {1}, < {2})"
+                ).format(
+                    MINIMAL_CRYPTOGRAPHY_VERSION,
+                    MINIMAL_PYOPENSSL_VERSION,
+                    MAXIMAL_PYOPENSSL_VERSION,
+                )
+            )
 
-    if backend == 'pyopenssl':
+    if backend == "pyopenssl":
         if not PYOPENSSL_FOUND:
             msg = missing_required_lib(
-                'pyOpenSSL >= {0}, < {1}'.format(MINIMAL_PYOPENSSL_VERSION, MAXIMAL_PYOPENSSL_VERSION)
+                "pyOpenSSL >= {0}, < {1}".format(
+                    MINIMAL_PYOPENSSL_VERSION, MAXIMAL_PYOPENSSL_VERSION
+                )
             )
             module.fail_json(msg=msg, exception=PYOPENSSL_IMP_ERR)
-        module.deprecate('The module is using the PyOpenSSL backend. This backend has been deprecated',
-                         version='3.0.0', collection_name='community.crypto')
+        module.deprecate(
+            "The module is using the PyOpenSSL backend. This backend has been deprecated",
+            version="3.0.0",
+            collection_name="community.crypto",
+        )
         return backend, PkcsPyOpenSSL(module)
-    elif backend == 'cryptography':
+    elif backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
-                             exception=CRYPTOGRAPHY_IMP_ERR)
+            module.fail_json(
+                msg=missing_required_lib(
+                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                ),
+                exception=CRYPTOGRAPHY_IMP_ERR,
+            )
         return backend, PkcsCryptography(module)
     else:
-        raise ValueError('Unsupported value for backend: {0}'.format(backend))
+        raise ValueError("Unsupported value for backend: {0}".format(backend))
 
 
 def main():
     argument_spec = dict(
-        action=dict(type='str', default='export', choices=['export', 'parse']),
-        other_certificates=dict(type='list', elements='path', aliases=['ca_certificates']),
-        other_certificates_parse_all=dict(type='bool', default=False),
-        other_certificates_content=dict(type='list', elements='str'),
-        certificate_path=dict(type='path'),
-        certificate_content=dict(type='str'),
-        force=dict(type='bool', default=False),
-        friendly_name=dict(type='str', aliases=['name']),
-        encryption_level=dict(type='str', choices=['auto', 'compatibility2022'], default='auto'),
-        iter_size=dict(type='int'),
-        maciter_size=dict(type='int'),
-        passphrase=dict(type='str', no_log=True),
-        path=dict(type='path', required=True),
-        privatekey_passphrase=dict(type='str', no_log=True),
-        privatekey_path=dict(type='path'),
-        privatekey_content=dict(type='str', no_log=True),
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        src=dict(type='path'),
-        backup=dict(type='bool', default=False),
-        return_content=dict(type='bool', default=False),
-        select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'pyopenssl']),
+        action=dict(type="str", default="export", choices=["export", "parse"]),
+        other_certificates=dict(
+            type="list", elements="path", aliases=["ca_certificates"]
+        ),
+        other_certificates_parse_all=dict(type="bool", default=False),
+        other_certificates_content=dict(type="list", elements="str"),
+        certificate_path=dict(type="path"),
+        certificate_content=dict(type="str"),
+        force=dict(type="bool", default=False),
+        friendly_name=dict(type="str", aliases=["name"]),
+        encryption_level=dict(
+            type="str", choices=["auto", "compatibility2022"], default="auto"
+        ),
+        iter_size=dict(type="int"),
+        maciter_size=dict(type="int"),
+        passphrase=dict(type="str", no_log=True),
+        path=dict(type="path", required=True),
+        privatekey_passphrase=dict(type="str", no_log=True),
+        privatekey_path=dict(type="path"),
+        privatekey_content=dict(type="str", no_log=True),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
+        src=dict(type="path"),
+        backup=dict(type="bool", default=False),
+        return_content=dict(type="bool", default=False),
+        select_crypto_backend=dict(
+            type="str", default="auto", choices=["auto", "cryptography", "pyopenssl"]
+        ),
     )
 
     required_if = [
-        ['action', 'parse', ['src']],
+        ["action", "parse", ["src"]],
     ]
 
     mutually_exclusive = [
-        ['privatekey_path', 'privatekey_content'],
-        ['certificate_path', 'certificate_content'],
-        ['other_certificates', 'other_certificates_content'],
+        ["privatekey_path", "privatekey_content"],
+        ["certificate_path", "certificate_content"],
+        ["other_certificates", "other_certificates_content"],
     ]
 
     module = AnsibleModule(
@@ -837,62 +946,69 @@ def main():
         supports_check_mode=True,
     )
 
-    backend, pkcs12 = select_backend(module, module.params['select_crypto_backend'])
+    backend, pkcs12 = select_backend(module, module.params["select_crypto_backend"])
 
-    base_dir = os.path.dirname(module.params['path']) or '.'
+    base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory '%s' does not exist or the path is not a directory" % base_dir
+            msg="The directory '%s' does not exist or the path is not a directory"
+            % base_dir,
         )
 
     try:
         changed = False
 
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if module.check_mode:
                 result = pkcs12.dump()
-                result['changed'] = module.params['force'] or not pkcs12.check(module)
+                result["changed"] = module.params["force"] or not pkcs12.check(module)
                 module.exit_json(**result)
 
-            if not pkcs12.check(module, perms_required=False) or module.params['force']:
-                if module.params['action'] == 'export':
-                    if not module.params['friendly_name']:
-                        module.fail_json(msg='Friendly_name is required')
+            if not pkcs12.check(module, perms_required=False) or module.params["force"]:
+                if module.params["action"] == "export":
+                    if not module.params["friendly_name"]:
+                        module.fail_json(msg="Friendly_name is required")
                     pkcs12_content = pkcs12.generate_bytes(module)
                     pkcs12.write(module, pkcs12_content, 0o600)
                     changed = True
                 else:
                     pkey, cert, other_certs, friendly_name = pkcs12.parse()
-                    dump_content = ''.join([to_native(pem) for pem in [pkey, cert] + other_certs if pem is not None])
+                    dump_content = "".join(
+                        [
+                            to_native(pem)
+                            for pem in [pkey, cert] + other_certs
+                            if pem is not None
+                        ]
+                    )
                     pkcs12.write(module, to_bytes(dump_content))
                     changed = True
 
             file_args = module.load_file_common_arguments(module.params)
-            if module.check_file_absent_if_check_mode(file_args['path']):
+            if module.check_file_absent_if_check_mode(file_args["path"]):
                 changed = True
             elif module.set_fs_attributes_if_different(file_args, changed):
                 changed = True
         else:
             if module.check_mode:
                 result = pkcs12.dump()
-                result['changed'] = os.path.exists(module.params['path'])
+                result["changed"] = os.path.exists(module.params["path"])
                 module.exit_json(**result)
 
-            if os.path.exists(module.params['path']):
+            if os.path.exists(module.params["path"]):
                 pkcs12.remove(module)
                 changed = True
 
         result = pkcs12.dump()
-        result['changed'] = changed
-        if os.path.exists(module.params['path']):
-            file_mode = "%04o" % stat.S_IMODE(os.stat(module.params['path']).st_mode)
-            result['mode'] = file_mode
+        result["changed"] = changed
+        if os.path.exists(module.params["path"]):
+            file_mode = "%04o" % stat.S_IMODE(os.stat(module.params["path"]).st_mode)
+            result["mode"] = file_mode
 
         module.exit_json(**result)
     except OpenSSLObjectError as exc:
         module.fail_json(msg=to_native(exc))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

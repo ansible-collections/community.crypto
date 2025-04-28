@@ -113,13 +113,14 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = '1.4'
+MINIMAL_CRYPTOGRAPHY_VERSION = "1.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.hashes
+
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -147,19 +148,19 @@ class SignatureBase(OpenSSLObject):
 
     def __init__(self, module, backend):
         super(SignatureBase, self).__init__(
-            path=module.params['path'],
-            state='present',
+            path=module.params["path"],
+            state="present",
             force=False,
-            check_mode=module.check_mode
+            check_mode=module.check_mode,
         )
 
         self.backend = backend
 
-        self.privatekey_path = module.params['privatekey_path']
-        self.privatekey_content = module.params['privatekey_content']
+        self.privatekey_path = module.params["privatekey_path"]
+        self.privatekey_content = module.params["privatekey_content"]
         if self.privatekey_content is not None:
-            self.privatekey_content = self.privatekey_content.encode('utf-8')
-        self.privatekey_passphrase = module.params['privatekey_passphrase']
+            self.privatekey_content = self.privatekey_content.encode("utf-8")
+        self.privatekey_passphrase = module.params["privatekey_passphrase"]
 
     def generate(self):
         # Empty method because OpenSSLObject wants this
@@ -196,31 +197,50 @@ class SignatureCryptography(SignatureBase):
             signature = None
 
             if CRYPTOGRAPHY_HAS_DSA_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
+                if isinstance(
+                    private_key,
+                    cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey,
+                ):
                     signature = private_key.sign(_in, _hash)
 
             if CRYPTOGRAPHY_HAS_EC_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
-                    signature = private_key.sign(_in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash))
+                if isinstance(
+                    private_key,
+                    cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
+                ):
+                    signature = private_key.sign(
+                        _in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash)
+                    )
 
             if CRYPTOGRAPHY_HAS_ED25519_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey):
+                if isinstance(
+                    private_key,
+                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+                ):
                     signature = private_key.sign(_in)
 
             if CRYPTOGRAPHY_HAS_ED448_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
+                if isinstance(
+                    private_key,
+                    cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+                ):
                     signature = private_key.sign(_in)
 
             if CRYPTOGRAPHY_HAS_RSA_SIGN:
-                if isinstance(private_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
+                if isinstance(
+                    private_key,
+                    cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey,
+                ):
                     signature = private_key.sign(_in, _padding, _hash)
 
             if signature is None:
                 self.module.fail_json(
-                    msg="Unsupported key type. Your cryptography version is {0}".format(CRYPTOGRAPHY_VERSION)
+                    msg="Unsupported key type. Your cryptography version is {0}".format(
+                        CRYPTOGRAPHY_VERSION
+                    )
                 )
 
-            result['signature'] = base64.b64encode(signature)
+            result["signature"] = base64.b64encode(signature)
             return result
 
         except Exception as e:
@@ -230,45 +250,53 @@ class SignatureCryptography(SignatureBase):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            privatekey_path=dict(type='path'),
-            privatekey_content=dict(type='str', no_log=True),
-            privatekey_passphrase=dict(type='str', no_log=True),
-            path=dict(type='path', required=True),
-            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
+            privatekey_path=dict(type="path"),
+            privatekey_content=dict(type="str", no_log=True),
+            privatekey_passphrase=dict(type="str", no_log=True),
+            path=dict(type="path", required=True),
+            select_crypto_backend=dict(
+                type="str", choices=["auto", "cryptography"], default="auto"
+            ),
         ),
-        mutually_exclusive=(
-            ['privatekey_path', 'privatekey_content'],
-        ),
-        required_one_of=(
-            ['privatekey_path', 'privatekey_content'],
-        ),
+        mutually_exclusive=(["privatekey_path", "privatekey_content"],),
+        required_one_of=(["privatekey_path", "privatekey_content"],),
         supports_check_mode=True,
     )
 
-    if not os.path.isfile(module.params['path']):
+    if not os.path.isfile(module.params["path"]):
         module.fail_json(
-            name=module.params['path'],
-            msg='The file {0} does not exist'.format(module.params['path'])
+            name=module.params["path"],
+            msg="The file {0} does not exist".format(module.params["path"]),
         )
 
-    backend = module.params['select_crypto_backend']
-    if backend == 'auto':
+    backend = module.params["select_crypto_backend"]
+    if backend == "auto":
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = (
+            CRYPTOGRAPHY_FOUND
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        )
 
         # Decision
         if can_use_cryptography:
-            backend = 'cryptography'
+            backend = "cryptography"
 
         # Success?
-        if backend == 'auto':
-            module.fail_json(msg=("Cannot detect the required Python library "
-                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
+        if backend == "auto":
+            module.fail_json(
+                msg=(
+                    "Cannot detect the required Python library " "cryptography (>= {0})"
+                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+            )
     try:
-        if backend == 'cryptography':
+        if backend == "cryptography":
             if not CRYPTOGRAPHY_FOUND:
-                module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
-                                 exception=CRYPTOGRAPHY_IMP_ERR)
+                module.fail_json(
+                    msg=missing_required_lib(
+                        "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    ),
+                    exception=CRYPTOGRAPHY_IMP_ERR,
+                )
             _sign = SignatureCryptography(module, backend)
 
         result = _sign.run()
@@ -278,5 +306,5 @@ def main():
         module.fail_json(msg=to_native(exc))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

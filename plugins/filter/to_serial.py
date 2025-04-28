@@ -51,10 +51,14 @@ from ansible_collections.community.crypto.plugins.module_utils.serial import to_
 def to_serial_filter(input):
     if not isinstance(input, integer_types):
         raise AnsibleFilterError(
-            'The input for the community.crypto.to_serial filter must be an integer; got {type} instead'.format(type=type(input))
+            "The input for the community.crypto.to_serial filter must be an integer; got {type} instead".format(
+                type=type(input)
+            )
         )
     if input < 0:
-        raise AnsibleFilterError('The input for the community.crypto.to_serial filter must not be negative')
+        raise AnsibleFilterError(
+            "The input for the community.crypto.to_serial filter must not be negative"
+        )
     try:
         return to_serial(input)
     except ValueError as exc:
@@ -62,9 +66,9 @@ def to_serial_filter(input):
 
 
 class FilterModule(object):
-    '''Ansible jinja2 filters'''
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'to_serial': to_serial_filter,
+            "to_serial": to_serial_filter,
         }

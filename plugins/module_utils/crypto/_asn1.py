@@ -31,8 +31,10 @@ type:
 value:
     The value to encode, the format of this value depends on the <type> specified.
 """
-ASN1_STRING_REGEX = re.compile(r'^((?P<tag_type>IMPLICIT|EXPLICIT):(?P<tag_number>\d+)(?P<tag_class>U|A|P|C)?,)?'
-                               r'(?P<value_type>[\w\d]+):(?P<value>.*)')
+ASN1_STRING_REGEX = re.compile(
+    r"^((?P<tag_type>IMPLICIT|EXPLICIT):(?P<tag_number>\d+)(?P<tag_class>U|A|P|C)?,)?"
+    r"(?P<value_type>[\w\d]+):(?P<value>.*)"
+)
 
 
 class TagClass:
@@ -48,7 +50,7 @@ class TagNumber:
 
 
 def _pack_octet_integer(value):
-    """ Packs an integer value into 1 or multiple octets. """
+    """Packs an integer value into 1 or multiple octets."""
     # NOTE: This is *NOT* the same as packing an ASN.1 INTEGER like value.
     octets = bytearray()
 
@@ -70,37 +72,41 @@ def _pack_octet_integer(value):
 
 
 def serialize_asn1_string_as_der(value):
-    """ Deserializes an ASN.1 string to a DER encoded byte string. """
+    """Deserializes an ASN.1 string to a DER encoded byte string."""
     asn1_match = ASN1_STRING_REGEX.match(value)
     if not asn1_match:
-        raise ValueError("The ASN.1 serialized string must be in the format [modifier,]type[:value]")
+        raise ValueError(
+            "The ASN.1 serialized string must be in the format [modifier,]type[:value]"
+        )
 
-    tag_type = asn1_match.group('tag_type')
-    tag_number = asn1_match.group('tag_number')
-    tag_class = asn1_match.group('tag_class') or 'C'
-    value_type = asn1_match.group('value_type')
-    asn1_value = asn1_match.group('value')
+    tag_type = asn1_match.group("tag_type")
+    tag_number = asn1_match.group("tag_number")
+    tag_class = asn1_match.group("tag_class") or "C"
+    value_type = asn1_match.group("value_type")
+    asn1_value = asn1_match.group("value")
 
-    if value_type != 'UTF8':
-        raise ValueError('The ASN.1 serialized string is not a known type "{0}", only UTF8 types are '
-                         'supported'.format(value_type))
+    if value_type != "UTF8":
+        raise ValueError(
+            'The ASN.1 serialized string is not a known type "{0}", only UTF8 types are '
+            "supported".format(value_type)
+        )
 
-    b_value = to_bytes(asn1_value, encoding='utf-8', errors='surrogate_or_strict')
+    b_value = to_bytes(asn1_value, encoding="utf-8", errors="surrogate_or_strict")
 
     # We should only do a universal type tag if not IMPLICITLY tagged or the tag class is not universal.
-    if not tag_type or (tag_type == 'EXPLICIT' and tag_class != 'U'):
+    if not tag_type or (tag_type == "EXPLICIT" and tag_class != "U"):
         b_value = pack_asn1(TagClass.universal, False, TagNumber.utf8_string, b_value)
 
     if tag_type:
         tag_class = {
-            'U': TagClass.universal,
-            'A': TagClass.application,
-            'P': TagClass.private,
-            'C': TagClass.context_specific,
+            "U": TagClass.universal,
+            "A": TagClass.application,
+            "P": TagClass.private,
+            "C": TagClass.context_specific,
         }[tag_class]
 
         # When adding support for more types this should be looked into further. For now it works with UTF8Strings.
-        constructed = tag_type == 'EXPLICIT' and tag_class != TagClass.universal
+        constructed = tag_type == "EXPLICIT" and tag_class != TagClass.universal
         b_value = pack_asn1(tag_class, constructed, int(tag_number), b_value)
 
     return b_value
@@ -121,7 +127,7 @@ def pack_asn1(tag_class, constructed, tag_number, b_data):
     # Bit 8 and 7 denotes the class.
     identifier_octets = tag_class << 6
     # Bit 6 denotes whether the value is primitive or constructed.
-    identifier_octets |= ((1 if constructed else 0) << 5)
+    identifier_octets |= (1 if constructed else 0) << 5
 
     # Bits 5-1 contain the tag number, if it cannot be encoded in these 5 bits
     # then they are set and another octet(s) is used to denote the tag number.

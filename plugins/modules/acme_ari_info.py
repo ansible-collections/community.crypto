@@ -112,16 +112,12 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 def main():
     argument_spec = create_default_argspec(with_account=False)
     argument_spec.update_argspec(
-        certificate_path=dict(type='path'),
-        certificate_content=dict(type='str'),
+        certificate_path=dict(type="path"),
+        certificate_content=dict(type="str"),
     )
     argument_spec.update(
-        required_one_of=(
-            ['certificate_path', 'certificate_content'],
-        ),
-        mutually_exclusive=(
-            ['certificate_path', 'certificate_content'],
-        ),
+        required_one_of=(["certificate_path", "certificate_content"],),
+        mutually_exclusive=(["certificate_path", "certificate_content"],),
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
@@ -129,10 +125,12 @@ def main():
     try:
         client = ACMEClient(module, backend)
         if not client.directory.has_renewal_info_endpoint():
-            module.fail_json(msg='The ACME endpoint does not support ACME Renewal Information retrieval')
+            module.fail_json(
+                msg="The ACME endpoint does not support ACME Renewal Information retrieval"
+            )
         renewal_info = client.get_renewal_info(
-            cert_filename=module.params['certificate_path'],
-            cert_content=module.params['certificate_content'],
+            cert_filename=module.params["certificate_path"],
+            cert_content=module.params["certificate_content"],
             include_retry_after=True,
         )
         module.exit_json(renewal_info=renewal_info)
@@ -140,5 +138,5 @@ def main():
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

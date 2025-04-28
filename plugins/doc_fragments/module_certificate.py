@@ -96,7 +96,7 @@ seealso:
   - module: community.crypto.openssl_publickey
 """
 
-    BACKEND_ACME_DOCUMENTATION = r'''
+    BACKEND_ACME_DOCUMENTATION = r"""
 description:
   - This module allows one to (re)generate OpenSSL certificates.
 requirements:
@@ -129,9 +129,9 @@ options:
       - "Let's Encrypt recommends using their staging server while developing jobs. U(https://letsencrypt.org/docs/staging-environment/)."
     type: str
     default: https://acme-v02.api.letsencrypt.org/directory
-'''
+"""
 
-    BACKEND_ENTRUST_DOCUMENTATION = r'''
+    BACKEND_ENTRUST_DOCUMENTATION = r"""
 options:
   entrust_cert_type:
     description:
@@ -214,9 +214,9 @@ options:
       - This is only used by the V(entrust) provider.
     type: path
     default: https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml
-'''
+"""
 
-    BACKEND_OWNCA_DOCUMENTATION = r'''
+    BACKEND_OWNCA_DOCUMENTATION = r"""
 description:
   - The V(ownca) provider is intended for generating an OpenSSL certificate signed with your own
     CA (Certificate Authority) certificate (self-signed certificate).
@@ -324,9 +324,9 @@ options:
       - Note that this is only supported if the C(cryptography) backend is used!
     type: bool
     default: true
-'''
+"""
 
-    BACKEND_SELFSIGNED_DOCUMENTATION = r'''
+    BACKEND_SELFSIGNED_DOCUMENTATION = r"""
 notes:
   - For the V(selfsigned) provider, O(csr_path) and O(csr_content) are optional. If not provided, a
     certificate without any information (Subject, Subject Alternative Names, Key Usage, etc.) is created.
@@ -410,4 +410,4 @@ options:
     type: str
     choices: [create_if_not_provided, always_create, never_create]
     default: create_if_not_provided
-'''
+"""

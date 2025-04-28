@@ -20,7 +20,15 @@ def _ensure_list(value):
 
 
 class ArgumentSpec:
-    def __init__(self, argument_spec=None, mutually_exclusive=None, required_together=None, required_one_of=None, required_if=None, required_by=None):
+    def __init__(
+        self,
+        argument_spec=None,
+        mutually_exclusive=None,
+        required_together=None,
+        required_one_of=None,
+        required_if=None,
+        required_by=None,
+    ):
         self.argument_spec = argument_spec or {}
         self.mutually_exclusive = _ensure_list(mutually_exclusive)
         self.required_together = _ensure_list(required_together)
@@ -32,7 +40,14 @@ class ArgumentSpec:
         self.argument_spec.update(kwargs)
         return self
 
-    def update(self, mutually_exclusive=None, required_together=None, required_one_of=None, required_if=None, required_by=None):
+    def update(
+        self,
+        mutually_exclusive=None,
+        required_together=None,
+        required_one_of=None,
+        required_if=None,
+        required_by=None,
+    ):
         if mutually_exclusive:
             self.mutually_exclusive.extend(mutually_exclusive)
         if required_together:
@@ -68,10 +83,11 @@ class ArgumentSpec:
             required_one_of=self.required_one_of,
             required_if=self.required_if,
             required_by=self.required_by,
-            **kwargs)
+            **kwargs
+        )
 
     def create_ansible_module(self, **kwargs):
         return self.create_ansible_module_helper(AnsibleModule, (), **kwargs)
 
 
-__all__ = ('ArgumentSpec', )
+__all__ = ("ArgumentSpec",)

@@ -414,51 +414,61 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path'),
-            content=dict(type='str'),
-            valid_at=dict(type='dict'),
-            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
+            path=dict(type="path"),
+            content=dict(type="str"),
+            valid_at=dict(type="dict"),
+            name_encoding=dict(
+                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
+            ),
+            select_crypto_backend=dict(
+                type="str", default="auto", choices=["auto", "cryptography"]
+            ),
         ),
-        required_one_of=(
-            ['path', 'content'],
-        ),
-        mutually_exclusive=(
-            ['path', 'content'],
-        ),
+        required_one_of=(["path", "content"],),
+        mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
     )
 
-    if module.params['content'] is not None:
-        data = module.params['content'].encode('utf-8')
+    if module.params["content"] is not None:
+        data = module.params["content"].encode("utf-8")
     else:
         try:
-            with open(module.params['path'], 'rb') as f:
+            with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(msg='Error while reading certificate file from disk: {0}'.format(e))
+            module.fail_json(
+                msg="Error while reading certificate file from disk: {0}".format(e)
+            )
 
-    backend, module_backend = select_backend(module, module.params['select_crypto_backend'], data)
+    backend, module_backend = select_backend(
+        module, module.params["select_crypto_backend"], data
+    )
 
-    valid_at = module.params['valid_at']
+    valid_at = module.params["valid_at"]
     if valid_at:
         for k, v in valid_at.items():
             if not isinstance(v, string_types):
                 module.fail_json(
-                    msg='The value for valid_at.{0} must be of type string (got {1})'.format(k, type(v))
+                    msg="The value for valid_at.{0} must be of type string (got {1})".format(
+                        k, type(v)
+                    )
                 )
-            valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k), with_timezone=CRYPTOGRAPHY_TIMEZONE)
+            valid_at[k] = get_relative_time_option(
+                v, "valid_at.{0}".format(k), with_timezone=CRYPTOGRAPHY_TIMEZONE
+            )
 
     try:
-        result = module_backend.get_info(der_support_enabled=module.params['content'] is None)
+        result = module_backend.get_info(
+            der_support_enabled=module.params["content"] is None
+        )
 
         not_before = module_backend.get_not_before()
         not_after = module_backend.get_not_after()
 
-        result['valid_at'] = dict()
+        result["valid_at"] = dict()
         if valid_at:
             for k, v in valid_at.items():
-                result['valid_at'][k] = not_before <= v <= not_after
+                result["valid_at"][k] = not_before <= v <= not_after
 
         module.exit_json(**result)
     except OpenSSLObjectError as exc:

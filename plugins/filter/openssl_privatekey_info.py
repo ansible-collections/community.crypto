@@ -165,20 +165,36 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 )
 
 
-def openssl_privatekey_info_filter(data, passphrase=None, return_private_key_data=False):
-    '''Extract information from X.509 PEM certificate.'''
+def openssl_privatekey_info_filter(
+    data, passphrase=None, return_private_key_data=False
+):
+    """Extract information from X.509 PEM certificate."""
     if not isinstance(data, string_types):
-        raise AnsibleFilterError('The community.crypto.openssl_privatekey_info input must be a text type, not %s' % type(data))
+        raise AnsibleFilterError(
+            "The community.crypto.openssl_privatekey_info input must be a text type, not %s"
+            % type(data)
+        )
     if passphrase is not None and not isinstance(passphrase, string_types):
-        raise AnsibleFilterError('The passphrase option must be a text type, not %s' % type(passphrase))
+        raise AnsibleFilterError(
+            "The passphrase option must be a text type, not %s" % type(passphrase)
+        )
     if not isinstance(return_private_key_data, bool):
-        raise AnsibleFilterError('The return_private_key_data option must be a boolean, not %s' % type(return_private_key_data))
+        raise AnsibleFilterError(
+            "The return_private_key_data option must be a boolean, not %s"
+            % type(return_private_key_data)
+        )
 
     module = FilterModuleMock({})
     try:
-        result = get_privatekey_info(module, 'cryptography', content=to_bytes(data), passphrase=passphrase, return_private_key_data=return_private_key_data)
-        result.pop('can_parse_key', None)
-        result.pop('key_is_consistent', None)
+        result = get_privatekey_info(
+            module,
+            "cryptography",
+            content=to_bytes(data),
+            passphrase=passphrase,
+            return_private_key_data=return_private_key_data,
+        )
+        result.pop("can_parse_key", None)
+        result.pop("key_is_consistent", None)
         return result
     except PrivateKeyParseError as exc:
         raise AnsibleFilterError(exc.error_message)
@@ -187,9 +203,9 @@ def openssl_privatekey_info_filter(data, passphrase=None, return_private_key_dat
 
 
 class FilterModule(object):
-    '''Ansible jinja2 filters'''
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'openssl_privatekey_info': openssl_privatekey_info_filter,
+            "openssl_privatekey_info": openssl_privatekey_info_filter,
         }

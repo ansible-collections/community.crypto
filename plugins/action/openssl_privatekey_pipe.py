@@ -31,16 +31,18 @@ class PrivateKeyModule(object):
         self.module_backend = module_backend
         self.check_mode = module.check_mode
         self.changed = False
-        self.return_current_key = module.params['return_current_key']
+        self.return_current_key = module.params["return_current_key"]
 
-        if module.params['content'] is not None:
-            if module.params['content_base64']:
+        if module.params["content"] is not None:
+            if module.params["content_base64"]:
                 try:
-                    data = base64.b64decode(module.params['content'])
+                    data = base64.b64decode(module.params["content"])
                 except Exception as e:
-                    module.fail_json(msg='Cannot decode Base64 encoded data: {0}'.format(e))
+                    module.fail_json(
+                        msg="Cannot decode Base64 encoded data: {0}".format(e)
+                    )
             else:
-                data = to_bytes(module.params['content'])
+                data = to_bytes(module.params["content"])
             module_backend.set_existing(data)
 
     def generate(self, module):
@@ -54,13 +56,13 @@ class PrivateKeyModule(object):
                 self.privatekey_bytes = privatekey_data
             else:
                 self.module.deprecate(
-                    'Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0'
-                    ' to behave the same as without check mode. You can get that behavior right now'
-                    ' by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this'
-                    ' breaks your use-case of this module, please create an issue in the'
-                    ' community.crypto repository',
-                    version='3.0.0',
-                    collection_name='community.crypto',
+                    "Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0"
+                    " to behave the same as without check mode. You can get that behavior right now"
+                    " by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this"
+                    " breaks your use-case of this module, please create an issue in the"
+                    " community.crypto repository",
+                    version="3.0.0",
+                    collection_name="community.crypto",
                 )
             self.changed = True
         elif self.module_backend.needs_conversion():
@@ -71,20 +73,22 @@ class PrivateKeyModule(object):
                 self.privatekey_bytes = privatekey_data
             else:
                 self.module.deprecate(
-                    'Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0'
-                    ' to behave the same as without check mode. You can get that behavior right now'
-                    ' by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this'
-                    ' breaks your use-case of this module, please create an issue in the'
-                    ' community.crypto repository',
-                    version='3.0.0',
-                    collection_name='community.crypto',
+                    "Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0"
+                    " to behave the same as without check mode. You can get that behavior right now"
+                    " by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this"
+                    " breaks your use-case of this module, please create an issue in the"
+                    " community.crypto repository",
+                    version="3.0.0",
+                    collection_name="community.crypto",
                 )
             self.changed = True
 
     def dump(self):
         """Serialize the object into a dictionary."""
-        result = self.module_backend.dump(include_key=self.changed or self.return_current_key)
-        result['changed'] = self.changed
+        result = self.module_backend.dump(
+            include_key=self.changed or self.return_current_key
+        )
+        result["changed"] = self.changed
         return result
 
 
@@ -92,11 +96,13 @@ class ActionModule(ActionModuleBase):
     @staticmethod
     def setup_module():
         argument_spec = get_privatekey_argument_spec()
-        argument_spec.argument_spec.update(dict(
-            content=dict(type='str', no_log=True),
-            content_base64=dict(type='bool', default=False),
-            return_current_key=dict(type='bool', default=False),
-        ))
+        argument_spec.argument_spec.update(
+            dict(
+                content=dict(type="str", no_log=True),
+                content_base64=dict(type="bool", default=False),
+                return_current_key=dict(type="bool", default=False),
+            )
+        )
         return argument_spec, dict(
             supports_check_mode=True,
         )
@@ -105,7 +111,7 @@ class ActionModule(ActionModuleBase):
     def run_module(module):
         backend, module_backend = select_backend(
             module=module,
-            backend=module.params['select_crypto_backend'],
+            backend=module.params["select_crypto_backend"],
         )
 
         try:
@@ -120,10 +126,10 @@ class ActionModule(ActionModuleBase):
                 # `module.no_log = True`, this should be safe.
                 module.no_log = True
                 try:
-                    module.no_log_values.remove(module.params['content'])
+                    module.no_log_values.remove(module.params["content"])
                 except KeyError:
                     pass
-                module.params['content'] = 'ANSIBLE_NO_LOG_VALUE'
+                module.params["content"] = "ANSIBLE_NO_LOG_VALUE"
             module.exit_json(**result)
         except OpenSSLObjectError as exc:
             module.fail_json(msg=to_native(exc))

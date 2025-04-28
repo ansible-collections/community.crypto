@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: acme_certificate_order_finalize
 author: Felix Fontein (@felixfontein)
 version_added: 2.24.0
@@ -170,9 +170,9 @@ options:
           - "The identifier must be of the form
              V(C4:A7:B1:A4:7B:2C:71:FA:DB:E1:4B:90:75:FF:C4:15:60:85:89:10)."
         type: str
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 ### Example with HTTP-01 challenge ###
 
@@ -265,9 +265,9 @@ EXAMPLES = r'''
     cert_dest: /etc/httpd/ssl/sample.com.crt
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
     chain_dest: /etc/httpd/ssl/sample.com-intermediate.crt
-'''
+"""
 
-RETURN = '''
+RETURN = """
 account_uri:
   description: ACME account URI.
   returned: success
@@ -323,7 +323,7 @@ selected_chain:
           as concatenated PEM certificates.
       type: str
       returned: always
-'''
+"""
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
@@ -340,29 +340,39 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 def main():
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
-        order_uri=dict(type='str', required=True),
-        cert_dest=dict(type='path'),
-        fullchain_dest=dict(type='path'),
-        chain_dest=dict(type='path'),
-        deactivate_authzs=dict(type='str', default='always', choices=['never', 'always', 'on_error', 'on_success']),
-        retrieve_all_alternates=dict(type='bool', default=False),
-        select_chain=dict(type='list', elements='dict', options=dict(
-            test_certificates=dict(type='str', default='all', choices=['first', 'last', 'all']),
-            issuer=dict(type='dict'),
-            subject=dict(type='dict'),
-            subject_key_identifier=dict(type='str'),
-            authority_key_identifier=dict(type='str'),
-        )),
+        order_uri=dict(type="str", required=True),
+        cert_dest=dict(type="path"),
+        fullchain_dest=dict(type="path"),
+        chain_dest=dict(type="path"),
+        deactivate_authzs=dict(
+            type="str",
+            default="always",
+            choices=["never", "always", "on_error", "on_success"],
+        ),
+        retrieve_all_alternates=dict(type="bool", default=False),
+        select_chain=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                test_certificates=dict(
+                    type="str", default="all", choices=["first", "last", "all"]
+                ),
+                issuer=dict(type="dict"),
+                subject=dict(type="dict"),
+                subject_key_identifier=dict(type="str"),
+                authority_key_identifier=dict(type="str"),
+            ),
+        ),
     )
     module = argument_spec.create_ansible_module()
-    if module.params['acme_version'] == 1:
-        module.fail_json('The module does not support acme_version=1')
+    if module.params["acme_version"] == 1:
+        module.fail_json("The module does not support acme_version=1")
 
     backend = create_backend(module, False)
 
     try:
         client = ACMECertificateClient(module, backend)
-        select_chain_matcher = client.parse_select_chain(module.params['select_chain'])
+        select_chain_matcher = client.parse_select_chain(module.params["select_chain"])
         other = dict()
         done = False
         order = None
@@ -370,9 +380,12 @@ def main():
             # Step 1: load order
             order = client.load_order()
 
-            download_all_chains = len(select_chain_matcher) > 0 or module.params['retrieve_all_alternates']
+            download_all_chains = (
+                len(select_chain_matcher) > 0
+                or module.params["retrieve_all_alternates"]
+            )
             changed = False
-            if order.status == 'valid':
+            if order.status == "valid":
                 # Step 2 and 3: download certificate(s) and chain(s)
                 cert, alternate_chains = client.download_certificate(
                     order,
@@ -395,34 +408,36 @@ def main():
             # Step 4: pick chain, write certificates, and provide return values
             if alternate_chains is not None:
                 # Prepare return value for all alternate chains
-                if module.params['retrieve_all_alternates']:
+                if module.params["retrieve_all_alternates"]:
                     all_chains = [cert.to_json()]
                     for alt_chain in alternate_chains:
                         all_chains.append(alt_chain.to_json())
-                    other['all_chains'] = all_chains
+                    other["all_chains"] = all_chains
 
                 # Try to select alternate chain depending on criteria
                 if select_chain_matcher:
-                    matching_chain = client.find_matching_chain([cert] + alternate_chains, select_chain_matcher)
+                    matching_chain = client.find_matching_chain(
+                        [cert] + alternate_chains, select_chain_matcher
+                    )
                     if matching_chain:
                         cert = matching_chain
                     else:
-                        module.debug('Found no matching alternative chain')
+                        module.debug("Found no matching alternative chain")
 
             if client.write_cert_chain(
                 cert,
-                cert_dest=module.params['cert_dest'],
-                fullchain_dest=module.params['fullchain_dest'],
-                chain_dest=module.params['chain_dest'],
+                cert_dest=module.params["cert_dest"],
+                fullchain_dest=module.params["fullchain_dest"],
+                chain_dest=module.params["chain_dest"],
             ):
                 changed = True
 
             done = True
         finally:
             if (
-                module.params['deactivate_authzs'] == 'always' or
-                (module.params['deactivate_authzs'] == 'on_success' and done) or
-                (module.params['deactivate_authzs'] == 'on_error' and not done)
+                module.params["deactivate_authzs"] == "always"
+                or (module.params["deactivate_authzs"] == "on_success" and done)
+                or (module.params["deactivate_authzs"] == "on_error" and not done)
             ):
                 if order:
                     client.deactivate_authzs(order)
@@ -436,5 +451,5 @@ def main():
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

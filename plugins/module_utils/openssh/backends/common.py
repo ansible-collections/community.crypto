@@ -44,17 +44,24 @@ def safe_atomic_move(module, path, destination):
 
 def _restore_all_on_failure(f):
     def backup_and_restore(self, sources_and_destinations, *args, **kwargs):
-        backups = [(d, self.module.backup_local(d)) for s, d in sources_and_destinations if os.path.exists(d)]
+        backups = [
+            (d, self.module.backup_local(d))
+            for s, d in sources_and_destinations
+            if os.path.exists(d)
+        ]
 
         try:
             f(self, sources_and_destinations, *args, **kwargs)
         except Exception:
             for destination, backup in backups:
-                self.module.atomic_move(os.path.abspath(backup), os.path.abspath(destination))
+                self.module.atomic_move(
+                    os.path.abspath(backup), os.path.abspath(destination)
+                )
             raise
         else:
             for destination, backup in backups:
                 self.module.add_cleanup_file(backup)
+
     return backup_and_restore
 
 
@@ -85,10 +92,10 @@ class OpensshModule(object):
     def result(self):
         result = self._result
 
-        result['changed'] = self.changed
+        result["changed"] = self.changed
 
         if self.module._diff:
-            result['diff'] = self.diff
+            result["diff"] = self.diff
 
         return result
 
@@ -107,6 +114,7 @@ class OpensshModule(object):
         def wrapper(self, *args, **kwargs):
             if not self.check_mode:
                 f(self, *args, **kwargs)
+
         return wrapper
 
     @staticmethod
@@ -114,72 +122,92 @@ class OpensshModule(object):
         def wrapper(self, *args, **kwargs):
             f(self, *args, **kwargs)
             self.changed = True
+
         return wrapper
 
     def _check_if_base_dir(self, path):
-        base_dir = os.path.dirname(path) or '.'
+        base_dir = os.path.dirname(path) or "."
         if not os.path.isdir(base_dir):
             self.module.fail_json(
                 name=base_dir,
-                msg='The directory %s does not exist or the file is not a directory' % base_dir
+                msg="The directory %s does not exist or the file is not a directory"
+                % base_dir,
             )
 
     def _get_ssh_version(self):
-        ssh_bin = self.module.get_bin_path('ssh')
+        ssh_bin = self.module.get_bin_path("ssh")
         if not ssh_bin:
             return ""
-        return parse_openssh_version(self.module.run_command([ssh_bin, '-V', '-q'], check_rc=True)[2].strip())
+        return parse_openssh_version(
+            self.module.run_command([ssh_bin, "-V", "-q"], check_rc=True)[2].strip()
+        )
 
     @_restore_all_on_failure
     def _safe_secure_move(self, sources_and_destinations):
         """Moves a list of files from 'source' to 'destination' and restores 'destination' from backup upon failure.
-           If 'destination' does not already exist, then 'source' permissions are preserved to prevent
-           exposing protected data ('atomic_move' uses the 'destination' base directory mask for
-           permissions if 'destination' does not already exists).
+        If 'destination' does not already exist, then 'source' permissions are preserved to prevent
+        exposing protected data ('atomic_move' uses the 'destination' base directory mask for
+        permissions if 'destination' does not already exists).
         """
         for source, destination in sources_and_destinations:
             if os.path.exists(destination):
-                self.module.atomic_move(os.path.abspath(source), os.path.abspath(destination))
+                self.module.atomic_move(
+                    os.path.abspath(source), os.path.abspath(destination)
+                )
             else:
                 self.module.preserved_copy(source, destination)
 
     def _update_permissions(self, path):
         file_args = self.module.load_file_common_arguments(self.module.params)
-        file_args['path'] = path
+        file_args["path"] = path
 
         if not self.module.check_file_absent_if_check_mode(path):
-            self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
+            self.changed = self.module.set_fs_attributes_if_different(
+                file_args, self.changed
+            )
         else:
             self.changed = True
 
 
 class KeygenCommand(object):
     def __init__(self, module):
-        self._bin_path = module.get_bin_path('ssh-keygen', True)
+        self._bin_path = module.get_bin_path("ssh-keygen", True)
         self._run_command = module.run_command
 
-    def generate_certificate(self, certificate_path, identifier, options, pkcs11_provider, principals,
-                             serial_number, signature_algorithm, signing_key_path, type,
-                             time_parameters, use_agent, **kwargs):
-        args = [self._bin_path, '-s', signing_key_path, '-P', '', '-I', identifier]
+    def generate_certificate(
+        self,
+        certificate_path,
+        identifier,
+        options,
+        pkcs11_provider,
+        principals,
+        serial_number,
+        signature_algorithm,
+        signing_key_path,
+        type,
+        time_parameters,
+        use_agent,
+        **kwargs
+    ):
+        args = [self._bin_path, "-s", signing_key_path, "-P", "", "-I", identifier]
 
         if options:
             for option in options:
-                args.extend(['-O', option])
+                args.extend(["-O", option])
         if pkcs11_provider:
-            args.extend(['-D', pkcs11_provider])
+            args.extend(["-D", pkcs11_provider])
         if principals:
-            args.extend(['-n', ','.join(principals)])
+            args.extend(["-n", ",".join(principals)])
         if serial_number is not None:
-            args.extend(['-z', str(serial_number)])
-        if type == 'host':
-            args.extend(['-h'])
+            args.extend(["-z", str(serial_number)])
+        if type == "host":
+            args.extend(["-h"])
         if use_agent:
-            args.extend(['-U'])
+            args.extend(["-U"])
         if time_parameters.validity_string:
-            args.extend(['-V', time_parameters.validity_string])
+            args.extend(["-V", time_parameters.validity_string])
         if signature_algorithm:
-            args.extend(['-t', signature_algorithm])
+            args.extend(["-t", signature_algorithm])
         args.append(certificate_path)
 
         return self._run_command(args, **kwargs)
@@ -187,44 +215,62 @@ class KeygenCommand(object):
     def generate_keypair(self, private_key_path, size, type, comment, **kwargs):
         args = [
             self._bin_path,
-            '-q',
-            '-N', '',
-            '-b', str(size),
-            '-t', type,
-            '-f', private_key_path,
-            '-C', comment or ''
+            "-q",
+            "-N",
+            "",
+            "-b",
+            str(size),
+            "-t",
+            type,
+            "-f",
+            private_key_path,
+            "-C",
+            comment or "",
         ]
 
         # "y" must be entered in response to the "overwrite" prompt
-        data = 'y' if os.path.exists(private_key_path) else None
+        data = "y" if os.path.exists(private_key_path) else None
 
         return self._run_command(args, data=data, **kwargs)
 
     def get_certificate_info(self, certificate_path, **kwargs):
-        return self._run_command([self._bin_path, '-L', '-f', certificate_path], **kwargs)
+        return self._run_command(
+            [self._bin_path, "-L", "-f", certificate_path], **kwargs
+        )
 
     def get_matching_public_key(self, private_key_path, **kwargs):
-        return self._run_command([self._bin_path, '-P', '', '-y', '-f', private_key_path], **kwargs)
+        return self._run_command(
+            [self._bin_path, "-P", "", "-y", "-f", private_key_path], **kwargs
+        )
 
     def get_private_key(self, private_key_path, **kwargs):
-        return self._run_command([self._bin_path, '-l', '-f', private_key_path], **kwargs)
+        return self._run_command(
+            [self._bin_path, "-l", "-f", private_key_path], **kwargs
+        )
 
-    def update_comment(self, private_key_path, comment, force_new_format=True, **kwargs):
-        if os.path.exists(private_key_path) and not os.access(private_key_path, os.W_OK):
+    def update_comment(
+        self, private_key_path, comment, force_new_format=True, **kwargs
+    ):
+        if os.path.exists(private_key_path) and not os.access(
+            private_key_path, os.W_OK
+        ):
             try:
                 os.chmod(private_key_path, stat.S_IWUSR + stat.S_IRUSR)
             except (IOError, OSError) as e:
-                raise e("The private key at %s is not writeable preventing a comment update" % private_key_path)
+                raise e(
+                    "The private key at %s is not writeable preventing a comment update"
+                    % private_key_path
+                )
 
-        command = [self._bin_path, '-q']
+        command = [self._bin_path, "-q"]
         if force_new_format:
-            command.append('-o')
-        command.extend(['-c', '-C', comment, '-f', private_key_path])
+            command.append("-o")
+        command.extend(["-c", "-C", comment, "-f", private_key_path])
         return self._run_command(command, **kwargs)
 
 
 class PrivateKey(object):
-    def __init__(self, size, key_type, fingerprint, format=''):
+    def __init__(self, size, key_type, fingerprint, format=""):
         self._size = size
         self._type = key_type
         self._fingerprint = fingerprint
@@ -258,10 +304,10 @@ class PrivateKey(object):
 
     def to_dict(self):
         return {
-            'size': self._size,
-            'type': self._type,
-            'fingerprint': self._fingerprint,
-            'format': self._format,
+            "size": self._size,
+            "type": self._type,
+            "fingerprint": self._fingerprint,
+            "format": self._format,
         }
 
 
@@ -275,11 +321,17 @@ class PublicKey(object):
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        return all([
-            self._type_string == other._type_string,
-            self._data == other._data,
-            (self._comment == other._comment) if self._comment is not None and other._comment is not None else True
-        ])
+        return all(
+            [
+                self._type_string == other._type_string,
+                self._data == other._data,
+                (
+                    (self._comment == other._comment)
+                    if self._comment is not None and other._comment is not None
+                    else True
+                ),
+            ]
+        )
 
     def __ne__(self, other):
         return not self == other
@@ -305,19 +357,19 @@ class PublicKey(object):
 
     @classmethod
     def from_string(cls, string):
-        properties = string.strip('\n').split(' ', 2)
+        properties = string.strip("\n").split(" ", 2)
 
         return cls(
             type_string=properties[0],
             data=properties[1],
-            comment=properties[2] if len(properties) > 2 else ""
+            comment=properties[2] if len(properties) > 2 else "",
         )
 
     @classmethod
     def load(cls, path):
         try:
-            with open(path, 'r') as f:
-                properties = f.read().strip(' \n').split(' ', 2)
+            with open(path, "r") as f:
+                properties = f.read().strip(" \n").split(" ", 2)
         except (IOError, OSError):
             raise
 
@@ -327,25 +379,25 @@ class PublicKey(object):
         return cls(
             type_string=properties[0],
             data=properties[1],
-            comment='' if len(properties) <= 2 else properties[2],
+            comment="" if len(properties) <= 2 else properties[2],
         )
 
     def to_dict(self):
         return {
-            'comment': self._comment,
-            'public_key': self._data,
+            "comment": self._comment,
+            "public_key": self._data,
         }
 
 
 def parse_private_key_format(path):
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         header = file.readline().strip()
 
-    if header == '-----BEGIN OPENSSH PRIVATE KEY-----':
-        return 'SSH'
-    elif header == '-----BEGIN PRIVATE KEY-----':
-        return 'PKCS8'
-    elif header == '-----BEGIN RSA PRIVATE KEY-----':
-        return 'PKCS1'
+    if header == "-----BEGIN OPENSSH PRIVATE KEY-----":
+        return "SSH"
+    elif header == "-----BEGIN PRIVATE KEY-----":
+        return "PKCS8"
+    elif header == "-----BEGIN RSA PRIVATE KEY-----":
+        return "PKCS1"
 
-    return ''
+    return ""

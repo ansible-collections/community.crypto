@@ -294,7 +294,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = '1.6'
+MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
 
 CREATE_DEFAULT_CONTEXT_IMP_ERR = None
 try:
@@ -311,6 +311,7 @@ try:
     import cryptography.exceptions
     import cryptography.x509
     from cryptography.hazmat.backends import default_backend as cryptography_backend
+
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -320,85 +321,100 @@ else:
 
 
 def send_starttls_packet(sock, server_type):
-    if server_type == 'mysql':
+    if server_type == "mysql":
         ssl_request_packet = (
-            b'\x20\x00\x00\x01\x85\xae\x7f\x00' +
-            b'\x00\x00\x00\x01\x21\x00\x00\x00' +
-            b'\x00\x00\x00\x00\x00\x00\x00\x00' +
-            b'\x00\x00\x00\x00\x00\x00\x00\x00' +
-            b'\x00\x00\x00\x00'
+            b"\x20\x00\x00\x01\x85\xae\x7f\x00"
+            + b"\x00\x00\x00\x01\x21\x00\x00\x00"
+            + b"\x00\x00\x00\x00\x00\x00\x00\x00"
+            + b"\x00\x00\x00\x00\x00\x00\x00\x00"
+            + b"\x00\x00\x00\x00"
         )
 
-        sock.recv(8192)  # discard initial handshake from server for this naive implementation
+        sock.recv(
+            8192
+        )  # discard initial handshake from server for this naive implementation
         sock.send(ssl_request_packet)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            ca_cert=dict(type='path'),
-            host=dict(type='str', required=True),
-            port=dict(type='int', required=True),
-            proxy_host=dict(type='str'),
-            proxy_port=dict(type='int', default=8080),
-            server_name=dict(type='str'),
-            timeout=dict(type='int', default=10),
-            select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
-            starttls=dict(type='str', choices=['mysql']),
-            ciphers=dict(type='list', elements='str'),
-            asn1_base64=dict(type='bool'),
-            tls_ctx_options=dict(type='list', elements='raw'),
-            get_certificate_chain=dict(type='bool', default=False),
+            ca_cert=dict(type="path"),
+            host=dict(type="str", required=True),
+            port=dict(type="int", required=True),
+            proxy_host=dict(type="str"),
+            proxy_port=dict(type="int", default=8080),
+            server_name=dict(type="str"),
+            timeout=dict(type="int", default=10),
+            select_crypto_backend=dict(
+                type="str", choices=["auto", "cryptography"], default="auto"
+            ),
+            starttls=dict(type="str", choices=["mysql"]),
+            ciphers=dict(type="list", elements="str"),
+            asn1_base64=dict(type="bool"),
+            tls_ctx_options=dict(type="list", elements="raw"),
+            get_certificate_chain=dict(type="bool", default=False),
         ),
     )
 
-    ca_cert = module.params.get('ca_cert')
-    host = module.params.get('host')
-    port = module.params.get('port')
-    proxy_host = module.params.get('proxy_host')
-    proxy_port = module.params.get('proxy_port')
-    timeout = module.params.get('timeout')
-    server_name = module.params.get('server_name')
-    start_tls_server_type = module.params.get('starttls')
-    ciphers = module.params.get('ciphers')
-    asn1_base64 = module.params['asn1_base64']
-    tls_ctx_options = module.params['tls_ctx_options']
-    get_certificate_chain = module.params['get_certificate_chain']
+    ca_cert = module.params.get("ca_cert")
+    host = module.params.get("host")
+    port = module.params.get("port")
+    proxy_host = module.params.get("proxy_host")
+    proxy_port = module.params.get("proxy_port")
+    timeout = module.params.get("timeout")
+    server_name = module.params.get("server_name")
+    start_tls_server_type = module.params.get("starttls")
+    ciphers = module.params.get("ciphers")
+    asn1_base64 = module.params["asn1_base64"]
+    tls_ctx_options = module.params["tls_ctx_options"]
+    get_certificate_chain = module.params["get_certificate_chain"]
 
     if asn1_base64 is None:
         module.deprecate(
-            'The default value `false` for asn1_base64 is deprecated and will change to `true` in '
-            'community.crypto 3.0.0. If you need this value, it is best to set the value explicitly '
-            'and adjust your roles/playbooks to use `asn1_base64=true` as soon as possible',
-            version='3.0.0',
-            collection_name='community.crypto',
+            "The default value `false` for asn1_base64 is deprecated and will change to `true` in "
+            "community.crypto 3.0.0. If you need this value, it is best to set the value explicitly "
+            "and adjust your roles/playbooks to use `asn1_base64=true` as soon as possible",
+            version="3.0.0",
+            collection_name="community.crypto",
         )
         asn1_base64 = False
 
     if get_certificate_chain and sys.version_info < (3, 10):
         module.fail_json(
-            msg='get_certificate_chain=true can only be used with Python 3.10 (Python 3.13+ officially supports this). '
-            'The Python version used to run the get_certificate module is %s' % sys.version
+            msg="get_certificate_chain=true can only be used with Python 3.10 (Python 3.13+ officially supports this). "
+            "The Python version used to run the get_certificate module is %s"
+            % sys.version
         )
 
-    backend = module.params.get('select_crypto_backend')
-    if backend == 'auto':
+    backend = module.params.get("select_crypto_backend")
+    if backend == "auto":
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = (
+            CRYPTOGRAPHY_FOUND
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        )
 
         # Try cryptography
         if can_use_cryptography:
-            backend = 'cryptography'
+            backend = "cryptography"
 
         # Success?
-        if backend == 'auto':
-            module.fail_json(msg=("Cannot detect the required Python library "
-                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
+        if backend == "auto":
+            module.fail_json(
+                msg=(
+                    "Cannot detect the required Python library " "cryptography (>= {0})"
+                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+            )
 
-    if backend == 'cryptography':
+    if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
-                             exception=CRYPTOGRAPHY_IMP_ERR)
+            module.fail_json(
+                msg=missing_required_lib(
+                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                ),
+                exception=CRYPTOGRAPHY_IMP_ERR,
+            )
 
     result = dict(
         changed=False,
@@ -417,19 +433,27 @@ def main():
     if not HAS_CREATE_DEFAULT_CONTEXT:
         # Python < 2.7.9
         if proxy_host:
-            module.fail_json(msg='To use proxy_host, you must run the get_certificate module with Python 2.7 or newer.',
-                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+            module.fail_json(
+                msg="To use proxy_host, you must run the get_certificate module with Python 2.7 or newer.",
+                exception=CREATE_DEFAULT_CONTEXT_IMP_ERR,
+            )
         if ciphers is not None:
-            module.fail_json(msg='To use ciphers, you must run the get_certificate module with Python 2.7 or newer.',
-                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+            module.fail_json(
+                msg="To use ciphers, you must run the get_certificate module with Python 2.7 or newer.",
+                exception=CREATE_DEFAULT_CONTEXT_IMP_ERR,
+            )
         if tls_ctx_options is not None:
-            module.fail_json(msg='To use tls_ctx_options, you must run the get_certificate module with Python 2.7 or newer.',
-                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+            module.fail_json(
+                msg="To use tls_ctx_options, you must run the get_certificate module with Python 2.7 or newer.",
+                exception=CREATE_DEFAULT_CONTEXT_IMP_ERR,
+            )
         try:
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
         except Exception as e:
-            module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
+            module.fail_json(
+                msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e)
+            )
     else:
         # Python >= 2.7.9
         try:
@@ -478,21 +502,35 @@ def main():
                             tls_ctx_option_int = tls_ctx_option_attr
                         # If tls_ctx_option_attr is not an integer
                         else:
-                            module.fail_json(msg="Failed to determine the numeric value for {0}".format(tls_ctx_option_str))
+                            module.fail_json(
+                                msg="Failed to determine the numeric value for {0}".format(
+                                    tls_ctx_option_str
+                                )
+                            )
                     # If the item is an integer
                     elif isinstance(tls_ctx_option, int):
                         # Set tls_ctx_option_int to the item value
                         tls_ctx_option_int = tls_ctx_option
                     # If the item is not a string nor integer
                     else:
-                        module.fail_json(msg="tls_ctx_options must be a string or integer, got {0!r}".format(tls_ctx_option))
-                        tls_ctx_option_int = 0  # make pylint happy; this code is actually unreachable
+                        module.fail_json(
+                            msg="tls_ctx_options must be a string or integer, got {0!r}".format(
+                                tls_ctx_option
+                            )
+                        )
+                        tls_ctx_option_int = (
+                            0  # make pylint happy; this code is actually unreachable
+                        )
 
                     try:
                         # Add the int value of the item to ctx options
                         ctx.options |= tls_ctx_option_int
                     except Exception:
-                        module.fail_json(msg="Failed to add {0} to CTX options".format(tls_ctx_option_str or tls_ctx_option_int))
+                        module.fail_json(
+                            msg="Failed to add {0} to CTX options".format(
+                                tls_ctx_option_str or tls_ctx_option_int
+                            )
+                        )
 
             tls_sock = ctx.wrap_socket(sock, server_hostname=server_name or host)
             cert = tls_sock.getpeercert(True)
@@ -511,7 +549,9 @@ def main():
 
                     ssl_obj = tls_sock._sslobj  # This is of type ssl._ssl._SSLSocket
                     verified_der_chain = _convert_chain(ssl_obj.get_verified_chain())
-                    unverified_der_chain = _convert_chain(ssl_obj.get_unverified_chain())
+                    unverified_der_chain = _convert_chain(
+                        ssl_obj.get_unverified_chain()
+                    )
                 else:
                     # This works with Python 3.13+
 
@@ -521,70 +561,95 @@ def main():
                     # if they are not byte strings to work around this.
                     def _convert_chain(chain):
                         return [
-                            c if isinstance(c, bytes) else c.public_bytes(ssl._ssl.ENCODING_DER)
+                            (
+                                c
+                                if isinstance(c, bytes)
+                                else c.public_bytes(ssl._ssl.ENCODING_DER)
+                            )
                             for c in chain
                         ]
 
                     verified_der_chain = _convert_chain(tls_sock.get_verified_chain())
-                    unverified_der_chain = _convert_chain(tls_sock.get_unverified_chain())
+                    unverified_der_chain = _convert_chain(
+                        tls_sock.get_unverified_chain()
+                    )
 
                 verified_chain = [DER_cert_to_PEM_cert(c) for c in verified_der_chain]
-                unverified_chain = [DER_cert_to_PEM_cert(c) for c in unverified_der_chain]
+                unverified_chain = [
+                    DER_cert_to_PEM_cert(c) for c in unverified_der_chain
+                ]
 
         except Exception as e:
             if proxy_host:
-                module.fail_json(msg="Failed to get cert via proxy {0}:{1} from {2}:{3}, error: {4}".format(
-                    proxy_host, proxy_port, host, port, e))
+                module.fail_json(
+                    msg="Failed to get cert via proxy {0}:{1} from {2}:{3}, error: {4}".format(
+                        proxy_host, proxy_port, host, port, e
+                    )
+                )
             else:
-                module.fail_json(msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e))
+                module.fail_json(
+                    msg="Failed to get cert from {0}:{1}, error: {2}".format(
+                        host, port, e
+                    )
+                )
 
-    result['cert'] = cert
+    result["cert"] = cert
 
-    if backend == 'cryptography':
-        x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert), cryptography_backend())
-        result['subject'] = {}
+    if backend == "cryptography":
+        x509 = cryptography.x509.load_pem_x509_certificate(
+            to_bytes(cert), cryptography_backend()
+        )
+        result["subject"] = {}
         for attribute in x509.subject:
-            result['subject'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
+            result["subject"][cryptography_oid_to_name(attribute.oid, short=True)] = (
+                attribute.value
+            )
 
-        result['expired'] = get_not_valid_after(x509) < get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
+        result["expired"] = get_not_valid_after(x509) < get_now_datetime(
+            with_timezone=CRYPTOGRAPHY_TIMEZONE
+        )
 
-        result['extensions'] = []
+        result["extensions"] = []
         for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
             oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
             ext = {
-                'critical': entry['critical'],
-                'asn1_data': entry['value'],
-                'name': cryptography_oid_to_name(oid, short=True),
+                "critical": entry["critical"],
+                "asn1_data": entry["value"],
+                "name": cryptography_oid_to_name(oid, short=True),
             }
             if not asn1_base64:
-                ext['asn1_data'] = base64.b64decode(ext['asn1_data'])
-            result['extensions'].append(ext)
+                ext["asn1_data"] = base64.b64decode(ext["asn1_data"])
+            result["extensions"].append(ext)
 
-        result['issuer'] = {}
+        result["issuer"] = {}
         for attribute in x509.issuer:
-            result['issuer'][cryptography_oid_to_name(attribute.oid, short=True)] = attribute.value
+            result["issuer"][cryptography_oid_to_name(attribute.oid, short=True)] = (
+                attribute.value
+            )
 
-        result['not_after'] = get_not_valid_after(x509).strftime('%Y%m%d%H%M%SZ')
-        result['not_before'] = get_not_valid_before(x509).strftime('%Y%m%d%H%M%SZ')
+        result["not_after"] = get_not_valid_after(x509).strftime("%Y%m%d%H%M%SZ")
+        result["not_before"] = get_not_valid_before(x509).strftime("%Y%m%d%H%M%SZ")
 
-        result['serial_number'] = x509.serial_number
-        result['signature_algorithm'] = cryptography_oid_to_name(x509.signature_algorithm_oid)
+        result["serial_number"] = x509.serial_number
+        result["signature_algorithm"] = cryptography_oid_to_name(
+            x509.signature_algorithm_oid
+        )
 
         # We need the -1 offset to get the same values as pyOpenSSL
         if x509.version == cryptography.x509.Version.v1:
-            result['version'] = 1 - 1
+            result["version"] = 1 - 1
         elif x509.version == cryptography.x509.Version.v3:
-            result['version'] = 3 - 1
+            result["version"] = 3 - 1
         else:
-            result['version'] = "unknown"
+            result["version"] = "unknown"
 
         if verified_chain is not None:
-            result['verified_chain'] = verified_chain
+            result["verified_chain"] = verified_chain
         if unverified_chain is not None:
-            result['unverified_chain'] = unverified_chain
+            result["unverified_chain"] = unverified_chain
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

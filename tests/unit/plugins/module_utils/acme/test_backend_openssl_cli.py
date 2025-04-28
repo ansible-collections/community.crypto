@@ -51,23 +51,23 @@ TEST_IPS = [
 
 @pytest.mark.parametrize("pem, result, openssl_output", TEST_KEYS)
 def test_eckeyparse_openssl(pem, result, openssl_output, tmpdir):
-    fn = tmpdir / 'test.key'
+    fn = tmpdir / "test.key"
     fn.write(pem)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
     key = backend.parse_key(key_file=str(fn))
-    key.pop('key_file')
+    key.pop("key_file")
     assert key == result
 
 
 @pytest.mark.parametrize("csr, result, openssl_output", TEST_CSRS)
 def test_csridentifiers_openssl(csr, result, openssl_output, tmpdir):
-    fn = tmpdir / 'test.csr'
+    fn = tmpdir / "test.csr"
     fn.write(csr)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
     identifiers = backend.get_csr_identifiers(str(fn))
     assert identifiers == result
 
@@ -75,31 +75,33 @@ def test_csridentifiers_openssl(csr, result, openssl_output, tmpdir):
 @pytest.mark.parametrize("ip, result", TEST_IPS)
 def test_normalize_ip(ip, result):
     module = MagicMock()
-    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
     assert backend._normalize_ip(ip) == result
 
 
 @pytest.mark.parametrize("timezone, now, expected_days", TEST_CERT_DAYS)
 def test_certdays_cryptography(timezone, now, expected_days, tmpdir):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        fn = tmpdir / 'test-cert.pem'
+        fn = tmpdir / "test-cert.pem"
         fn.write(TEST_CERT)
         module = MagicMock()
         module.run_command = MagicMock(return_value=(0, TEST_CERT_OPENSSL_OUTPUT, 0))
-        backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
         days = backend.get_cert_days(cert_filename=str(fn), now=now)
         assert days == expected_days
         days = backend.get_cert_days(cert_content=TEST_CERT, now=now)
         assert days == expected_days
 
 
-@pytest.mark.parametrize("cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO)
+@pytest.mark.parametrize(
+    "cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO
+)
 def test_get_cert_information(cert_content, expected_cert_info, openssl_output, tmpdir):
-    fn = tmpdir / 'test-cert.pem'
+    fn = tmpdir / "test-cert.pem"
     fn.write(cert_content)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
 
     expected_cert_info = expected_cert_info._replace(
         not_valid_after=ensure_utc_timezone(expected_cert_info.not_valid_after),
@@ -119,7 +121,7 @@ def test_get_cert_information(cert_content, expected_cert_info, openssl_output, 
 def test_now(timezone):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
         now = backend.get_now()
         assert now.tzinfo is not None
         assert now == datetime.datetime(2024, 2, 3, 4, 5, 6, tzinfo=UTC)
@@ -129,17 +131,19 @@ def test_now(timezone):
 def test_parse_acme_timestamp(timezone, input, expected):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
         ts_expected = backend.get_utc_datetime(**expected)
         timestamp = backend.parse_acme_timestamp(input)
         assert ts_expected == timestamp
 
 
-@pytest.mark.parametrize("timezone, start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP)
+@pytest.mark.parametrize(
+    "timezone, start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP
+)
 def test_interpolate_timestamp(timezone, start, end, percentage, expected):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary='openssl')
+        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
         ts_start = backend.get_utc_datetime(**start)
         ts_end = backend.get_utc_datetime(**end)
         ts_expected = backend.get_utc_datetime(**expected)

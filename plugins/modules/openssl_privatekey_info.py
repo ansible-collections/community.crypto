@@ -219,19 +219,17 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path'),
-            content=dict(type='str', no_log=True),
-            passphrase=dict(type='str', no_log=True),
-            return_private_key_data=dict(type='bool', default=False),
-            check_consistency=dict(type='bool', default=False),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
+            path=dict(type="path"),
+            content=dict(type="str", no_log=True),
+            passphrase=dict(type="str", no_log=True),
+            return_private_key_data=dict(type="bool", default=False),
+            check_consistency=dict(type="bool", default=False),
+            select_crypto_backend=dict(
+                type="str", default="auto", choices=["auto", "cryptography"]
+            ),
         ),
-        required_one_of=(
-            ['path', 'content'],
-        ),
-        mutually_exclusive=(
-            ['path', 'content'],
-        ),
+        required_one_of=(["path", "content"],),
+        mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
     )
 
@@ -241,24 +239,28 @@ def main():
         key_is_consistent=None,
     )
 
-    if module.params['content'] is not None:
-        data = module.params['content'].encode('utf-8')
+    if module.params["content"] is not None:
+        data = module.params["content"].encode("utf-8")
     else:
         try:
-            with open(module.params['path'], 'rb') as f:
+            with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(msg='Error while reading private key file from disk: {0}'.format(e), **result)
+            module.fail_json(
+                msg="Error while reading private key file from disk: {0}".format(e),
+                **result
+            )
 
-    result['can_load_key'] = True
+    result["can_load_key"] = True
 
     backend, module_backend = select_backend(
         module,
-        module.params['select_crypto_backend'],
+        module.params["select_crypto_backend"],
         data,
-        passphrase=module.params['passphrase'],
-        return_private_key_data=module.params['return_private_key_data'],
-        check_consistency=module.params['check_consistency'])
+        passphrase=module.params["passphrase"],
+        return_private_key_data=module.params["return_private_key_data"],
+        check_consistency=module.params["check_consistency"],
+    )
 
     try:
         result.update(module_backend.get_info())

@@ -25,11 +25,13 @@ class DummyModule(object):
 
 # ===== Handler & CryptHandler methods tests =====
 
+
 def test_generate_luks_name(monkeypatch):
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
-    monkeypatch.setattr(luks_device.Handler, "_run_command",
-                        lambda x, y: [0, "UUID", ""])
+    monkeypatch.setattr(
+        luks_device.Handler, "_run_command", lambda x, y: [0, "UUID", ""]
+    )
     crypt = luks_device.CryptHandler(module)
     assert crypt.generate_luks_name("/dev/dummy") == "luks-UUID"
 
@@ -37,8 +39,11 @@ def test_generate_luks_name(monkeypatch):
 def test_get_container_name_by_device(monkeypatch):
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
-    monkeypatch.setattr(luks_device.Handler, "_run_command",
-                        lambda x, y: [0, "crypt container_name", ""])
+    monkeypatch.setattr(
+        luks_device.Handler,
+        "_run_command",
+        lambda x, y: [0, "crypt container_name", ""],
+    )
     crypt = luks_device.CryptHandler(module)
     assert crypt.get_container_name_by_device("/dev/dummy") == "container_name"
 
@@ -46,8 +51,11 @@ def test_get_container_name_by_device(monkeypatch):
 def test_get_container_device_by_name(monkeypatch):
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
-    monkeypatch.setattr(luks_device.Handler, "_run_command",
-                        lambda x, y: [0, "device:  /dev/luksdevice", ""])
+    monkeypatch.setattr(
+        luks_device.Handler,
+        "_run_command",
+        lambda x, y: [0, "device:  /dev/luksdevice", ""],
+    )
     crypt = luks_device.CryptHandler(module)
     assert crypt.get_container_device_by_name("dummy") == "/dev/luksdevice"
 
@@ -60,15 +68,11 @@ def test_run_luks_remove(monkeypatch):
 
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
-    monkeypatch.setattr(luks_device.CryptHandler,
-                        "get_container_name_by_device",
-                        lambda x, y: None)
-    monkeypatch.setattr(luks_device.Handler,
-                        "_run_command",
-                        run_command_check)
-    monkeypatch.setattr(luks_device,
-                        "wipe_luks_headers",
-                        lambda device: True)
+    monkeypatch.setattr(
+        luks_device.CryptHandler, "get_container_name_by_device", lambda x, y: None
+    )
+    monkeypatch.setattr(luks_device.Handler, "_run_command", run_command_check)
+    monkeypatch.setattr(luks_device, "wipe_luks_headers", lambda device: True)
     crypt = luks_device.CryptHandler(module)
     crypt.run_luks_remove("dummy")
 
@@ -95,14 +99,16 @@ LUKS_CREATE_DATA = (
     ("dummy", None, "corge", "present", True, None, "dummy", "dummy", False),
     ("dummy", "key", None, "present", False, None, None, None, True),
     ("dummy", "key", None, "present", False, None, None, "dummy", True),
-    ("dummy", "key", None, "present", False, None, "dummy", None, True))
+    ("dummy", "key", None, "present", False, None, "dummy", None, True),
+)
 
 # device, state, is_luks, expected
 LUKS_REMOVE_DATA = (
     ("dummy", "absent", True, True),
     (None, "absent", True, False),
     ("dummy", "present", True, False),
-    ("dummy", "absent", False, False))
+    ("dummy", "absent", False, False),
+)
 
 # device, key, passphrase, state, name, name_by_dev, expected
 LUKS_OPEN_DATA = (
@@ -121,7 +127,8 @@ LUKS_OPEN_DATA = (
     (None, None, "quux", "opened", "name", None, False),
     ("dummy", None, None, "opened", "name", None, False),
     ("dummy", None, "quuz", "opened", "name", "name", False),
-    ("dummy", None, "corge", "opened", "beer", "name", "exception"))
+    ("dummy", None, "corge", "opened", "beer", "name", "exception"),
+)
 
 # device, dev_by_name, name, name_by_dev, state, label, expected
 LUKS_CLOSE_DATA = (
@@ -131,7 +138,8 @@ LUKS_CLOSE_DATA = (
     ("dummy", "dummy", "name", "name", "closed", None, True),
     (None, "dummy", "name", "name", "closed", None, True),
     ("dummy", "dummy", None, "name", "closed", None, True),
-    (None, "dummy", None, "name", "closed", None, False))
+    (None, "dummy", None, "name", "closed", None, False),
+)
 
 # device, key, passphrase, new_key, new_passphrase, state, label, expected
 LUKS_ADD_KEY_DATA = (
@@ -150,7 +158,8 @@ LUKS_ADD_KEY_DATA = (
     ("dummy", "key", None, None, None, "present", None, False),
     ("dummy", "key", None, None, "new_pass", "absent", None, "exception"),
     ("dummy", None, "pass", None, "new_pass", "present", None, True),
-    (None, None, "pass", None, "new_pass", "present", "labelName", True))
+    (None, None, "pass", None, "new_pass", "present", "labelName", True),
+)
 
 # device, remove_key, remove_passphrase, state, label, expected
 LUKS_REMOVE_KEY_DATA = (
@@ -163,15 +172,26 @@ LUKS_REMOVE_KEY_DATA = (
     (None, None, "foo", None, "present", None, False),
     (None, None, "foo", None, "present", "labelName", True),
     ("dummy", None, None, None, "present", None, False),
-    ("dummy", None, "foo", None, "absent", None, "exception"))
+    ("dummy", None, "foo", None, "absent", None, "exception"),
+)
 
 
-@pytest.mark.parametrize("device, keyfile, passphrase, state, is_luks, " +
-                         "label, cipher, hash_, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
-                          for d in LUKS_CREATE_DATA))
-def test_luks_create(device, keyfile, passphrase, state, is_luks, label, cipher, hash_,
-                     expected, monkeypatch):
+@pytest.mark.parametrize(
+    "device, keyfile, passphrase, state, is_luks, " + "label, cipher, hash_, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8]) for d in LUKS_CREATE_DATA),
+)
+def test_luks_create(
+    device,
+    keyfile,
+    passphrase,
+    state,
+    is_luks,
+    label,
+    cipher,
+    hash_,
+    expected,
+    monkeypatch,
+):
     module = DummyModule()
 
     module.params["device"] = device
@@ -183,12 +203,14 @@ def test_luks_create(device, keyfile, passphrase, state, is_luks, label, cipher,
     module.params["cipher"] = cipher
     module.params["hash"] = hash_
 
-    monkeypatch.setattr(luks_device.CryptHandler, "is_luks",
-                        lambda x, y: is_luks)
+    monkeypatch.setattr(luks_device.CryptHandler, "is_luks", lambda x, y: is_luks)
     crypt = luks_device.CryptHandler(module)
     if device is None:
-        monkeypatch.setattr(luks_device.Handler, "get_device_by_label",
-                            lambda x, y: [0, "/dev/dummy", ""])
+        monkeypatch.setattr(
+            luks_device.Handler,
+            "get_device_by_label",
+            lambda x, y: [0, "/dev/dummy", ""],
+        )
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)
         assert conditions.luks_create() == expected
@@ -196,9 +218,10 @@ def test_luks_create(device, keyfile, passphrase, state, is_luks, label, cipher,
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, state, is_luks, expected",
-                         ((d[0], d[1], d[2], d[3])
-                          for d in LUKS_REMOVE_DATA))
+@pytest.mark.parametrize(
+    "device, state, is_luks, expected",
+    ((d[0], d[1], d[2], d[3]) for d in LUKS_REMOVE_DATA),
+)
 def test_luks_remove(device, state, is_luks, expected, monkeypatch):
     module = DummyModule()
 
@@ -206,8 +229,7 @@ def test_luks_remove(device, state, is_luks, expected, monkeypatch):
     module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
 
-    monkeypatch.setattr(luks_device.CryptHandler, "is_luks",
-                        lambda x, y: is_luks)
+    monkeypatch.setattr(luks_device.CryptHandler, "is_luks", lambda x, y: is_luks)
     crypt = luks_device.CryptHandler(module)
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)
@@ -216,12 +238,13 @@ def test_luks_remove(device, state, is_luks, expected, monkeypatch):
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, keyfile, passphrase, state, name, "
-                         "name_by_dev, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6])
-                          for d in LUKS_OPEN_DATA))
-def test_luks_open(device, keyfile, passphrase, state, name, name_by_dev,
-                   expected, monkeypatch):
+@pytest.mark.parametrize(
+    "device, keyfile, passphrase, state, name, name_by_dev, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_OPEN_DATA),
+)
+def test_luks_open(
+    device, keyfile, passphrase, state, name, name_by_dev, expected, monkeypatch
+):
     module = DummyModule()
     module.params["device"] = device
     module.params["keyfile"] = keyfile
@@ -230,14 +253,17 @@ def test_luks_open(device, keyfile, passphrase, state, name, name_by_dev,
     module.params["state"] = state
     module.params["name"] = name
 
-    monkeypatch.setattr(luks_device.CryptHandler,
-                        "get_container_name_by_device",
-                        lambda x, y: name_by_dev)
-    monkeypatch.setattr(luks_device.CryptHandler,
-                        "get_container_device_by_name",
-                        lambda x, y: device)
-    monkeypatch.setattr(luks_device.Handler, "_run_command",
-                        lambda x, y: [0, device, ""])
+    monkeypatch.setattr(
+        luks_device.CryptHandler,
+        "get_container_name_by_device",
+        lambda x, y: name_by_dev,
+    )
+    monkeypatch.setattr(
+        luks_device.CryptHandler, "get_container_device_by_name", lambda x, y: device
+    )
+    monkeypatch.setattr(
+        luks_device.Handler, "_run_command", lambda x, y: [0, device, ""]
+    )
     crypt = luks_device.CryptHandler(module)
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)
@@ -246,12 +272,13 @@ def test_luks_open(device, keyfile, passphrase, state, name, name_by_dev,
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, dev_by_name, name, name_by_dev, "
-                         "state, label, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6])
-                          for d in LUKS_CLOSE_DATA))
-def test_luks_close(device, dev_by_name, name, name_by_dev, state,
-                    label, expected, monkeypatch):
+@pytest.mark.parametrize(
+    "device, dev_by_name, name, name_by_dev, state, label, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_CLOSE_DATA),
+)
+def test_luks_close(
+    device, dev_by_name, name, name_by_dev, state, label, expected, monkeypatch
+):
     module = DummyModule()
     module.params["device"] = device
     module.params["name"] = name
@@ -259,12 +286,16 @@ def test_luks_close(device, dev_by_name, name, name_by_dev, state,
     module.params["state"] = state
     module.params["label"] = label
 
-    monkeypatch.setattr(luks_device.CryptHandler,
-                        "get_container_name_by_device",
-                        lambda x, y: name_by_dev)
-    monkeypatch.setattr(luks_device.CryptHandler,
-                        "get_container_device_by_name",
-                        lambda x, y: dev_by_name)
+    monkeypatch.setattr(
+        luks_device.CryptHandler,
+        "get_container_name_by_device",
+        lambda x, y: name_by_dev,
+    )
+    monkeypatch.setattr(
+        luks_device.CryptHandler,
+        "get_container_device_by_name",
+        lambda x, y: dev_by_name,
+    )
     crypt = luks_device.CryptHandler(module)
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)
@@ -273,12 +304,22 @@ def test_luks_close(device, dev_by_name, name, name_by_dev, state,
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, keyfile, passphrase, new_keyfile, " +
-                         "new_passphrase, state, label, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7])
-                          for d in LUKS_ADD_KEY_DATA))
-def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
-                      state, label, expected, monkeypatch):
+@pytest.mark.parametrize(
+    "device, keyfile, passphrase, new_keyfile, "
+    + "new_passphrase, state, label, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]) for d in LUKS_ADD_KEY_DATA),
+)
+def test_luks_add_key(
+    device,
+    keyfile,
+    passphrase,
+    new_keyfile,
+    new_passphrase,
+    state,
+    label,
+    expected,
+    monkeypatch,
+):
     module = DummyModule()
     module.params["device"] = device
     module.params["keyfile"] = keyfile
@@ -290,10 +331,12 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
     module.params["state"] = state
     module.params["label"] = label
 
-    monkeypatch.setattr(luks_device.Handler, "get_device_by_label",
-                        lambda x, y: [0, "/dev/dummy", ""])
-    monkeypatch.setattr(luks_device.CryptHandler, "luks_test_key",
-                        lambda x, y, z, w: False)
+    monkeypatch.setattr(
+        luks_device.Handler, "get_device_by_label", lambda x, y: [0, "/dev/dummy", ""]
+    )
+    monkeypatch.setattr(
+        luks_device.CryptHandler, "luks_test_key", lambda x, y, z, w: False
+    )
 
     crypt = luks_device.CryptHandler(module)
     try:
@@ -303,12 +346,21 @@ def test_luks_add_key(device, keyfile, passphrase, new_keyfile, new_passphrase,
         assert expected == "exception"
 
 
-@pytest.mark.parametrize("device, remove_keyfile, remove_passphrase, remove_keyslot, " +
-                         "state, label, expected",
-                         ((d[0], d[1], d[2], d[3], d[4], d[5], d[6])
-                          for d in LUKS_REMOVE_KEY_DATA))
-def test_luks_remove_key(device, remove_keyfile, remove_passphrase, remove_keyslot, state,
-                         label, expected, monkeypatch):
+@pytest.mark.parametrize(
+    "device, remove_keyfile, remove_passphrase, remove_keyslot, "
+    + "state, label, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_REMOVE_KEY_DATA),
+)
+def test_luks_remove_key(
+    device,
+    remove_keyfile,
+    remove_passphrase,
+    remove_keyslot,
+    state,
+    label,
+    expected,
+    monkeypatch,
+):
 
     module = DummyModule()
     module.params["device"] = device
@@ -319,12 +371,15 @@ def test_luks_remove_key(device, remove_keyfile, remove_passphrase, remove_keysl
     module.params["state"] = state
     module.params["label"] = label
 
-    monkeypatch.setattr(luks_device.Handler, "get_device_by_label",
-                        lambda x, y: [0, "/dev/dummy", ""])
-    monkeypatch.setattr(luks_device.Handler, "_run_command",
-                        lambda x, y: [0, device, ""])
-    monkeypatch.setattr(luks_device.CryptHandler, "luks_test_key",
-                        lambda x, y, z, w: True)
+    monkeypatch.setattr(
+        luks_device.Handler, "get_device_by_label", lambda x, y: [0, "/dev/dummy", ""]
+    )
+    monkeypatch.setattr(
+        luks_device.Handler, "_run_command", lambda x, y: [0, device, ""]
+    )
+    monkeypatch.setattr(
+        luks_device.CryptHandler, "luks_test_key", lambda x, y, z, w: True
+    )
 
     crypt = luks_device.CryptHandler(module)
     try:

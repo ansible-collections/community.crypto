@@ -57,7 +57,9 @@ from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
 def gpg_fingerprint(input):
     if not isinstance(input, string_types):
         raise AnsibleFilterError(
-            'The input for the community.crypto.gpg_fingerprint filter must be a string; got {type} instead'.format(type=type(input))
+            "The input for the community.crypto.gpg_fingerprint filter must be a string; got {type} instead".format(
+                type=type(input)
+            )
         )
     try:
         gpg = PluginGPGRunner()
@@ -67,9 +69,9 @@ def gpg_fingerprint(input):
 
 
 class FilterModule(object):
-    '''Ansible jinja2 filters'''
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'gpg_fingerprint': gpg_fingerprint,
+            "gpg_fingerprint": gpg_fingerprint,
         }

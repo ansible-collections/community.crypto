@@ -143,13 +143,16 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 
 
 def openssl_publickey_info_filter(data):
-    '''Extract information from OpenSSL PEM public key.'''
+    """Extract information from OpenSSL PEM public key."""
     if not isinstance(data, string_types):
-        raise AnsibleFilterError('The community.crypto.openssl_publickey_info input must be a text type, not %s' % type(data))
+        raise AnsibleFilterError(
+            "The community.crypto.openssl_publickey_info input must be a text type, not %s"
+            % type(data)
+        )
 
     module = FilterModuleMock({})
     try:
-        return get_publickey_info(module, 'cryptography', content=to_bytes(data))
+        return get_publickey_info(module, "cryptography", content=to_bytes(data))
     except PublicKeyParseError as exc:
         raise AnsibleFilterError(exc.error_message)
     except OpenSSLObjectError as exc:
@@ -157,9 +160,9 @@ def openssl_publickey_info_filter(data):
 
 
 class FilterModule(object):
-    '''Ansible jinja2 filters'''
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'openssl_publickey_info': openssl_publickey_info_filter,
+            "openssl_publickey_info": openssl_publickey_info_filter,
         }

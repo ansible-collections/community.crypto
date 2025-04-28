@@ -34,17 +34,17 @@ if PY3:
     long = int
 
 # 0 (False) or 1 (True) encoded as a single byte
-_BOOLEAN = Struct(b'?')
+_BOOLEAN = Struct(b"?")
 # Unsigned 8-bit integer in network-byte-order
-_UBYTE = Struct(b'!B')
+_UBYTE = Struct(b"!B")
 _UBYTE_MAX = 0xFF
 # Unsigned 32-bit integer in network-byte-order
-_UINT32 = Struct(b'!I')
+_UINT32 = Struct(b"!I")
 # Unsigned 32-bit little endian integer
-_UINT32_LE = Struct(b'<I')
+_UINT32_LE = Struct(b"<I")
 _UINT32_MAX = 0xFFFFFFFF
 # Unsigned 64-bit integer in network-byte-order
-_UINT64 = Struct(b'!Q')
+_UINT64 = Struct(b"!Q")
 _UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 
 
@@ -89,6 +89,7 @@ def secure_write(path, mode, content):
 # See https://datatracker.ietf.org/doc/html/rfc4251#section-5 for SSH data types
 class OpensshParser(object):
     """Parser for OpenSSH encoded objects"""
+
     BOOLEAN_OFFSET = 1
     UINT32_OFFSET = 4
     UINT64_OFFSET = 8
@@ -103,21 +104,21 @@ class OpensshParser(object):
     def boolean(self):
         next_pos = self._check_position(self.BOOLEAN_OFFSET)
 
-        value = _BOOLEAN.unpack(self._data[self._pos:next_pos])[0]
+        value = _BOOLEAN.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint32(self):
         next_pos = self._check_position(self.UINT32_OFFSET)
 
-        value = _UINT32.unpack(self._data[self._pos:next_pos])[0]
+        value = _UINT32.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint64(self):
         next_pos = self._check_position(self.UINT64_OFFSET)
 
-        value = _UINT64.unpack(self._data[self._pos:next_pos])[0]
+        value = _UINT64.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
@@ -126,7 +127,7 @@ class OpensshParser(object):
 
         next_pos = self._check_position(length)
 
-        value = self._data[self._pos:next_pos]
+        value = self._data[self._pos : next_pos]
         self._pos = next_pos
         # Cast to bytes is required as a memoryview slice is itself a memoryview
         return value if not PY3 else bytes(value)
@@ -136,7 +137,7 @@ class OpensshParser(object):
 
     def name_list(self):
         raw_string = self.string()
-        return raw_string.decode('ASCII').split(',')
+        return raw_string.decode("ASCII").split(",")
 
     # Convenience function, but not an official data type from SSH
     def string_list(self):
@@ -193,33 +194,39 @@ class OpensshParser(object):
         signature_blob = parser.string()
 
         blob_parser = cls(signature_blob)
-        if signature_type in (b'ssh-rsa', b'rsa-sha2-256', b'rsa-sha2-512'):
+        if signature_type in (b"ssh-rsa", b"rsa-sha2-256", b"rsa-sha2-512"):
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
             # https://datatracker.ietf.org/doc/html/rfc8332#section-3
-            signature_data['s'] = cls._big_int(signature_blob, "big")
-        elif signature_type == b'ssh-dss':
+            signature_data["s"] = cls._big_int(signature_blob, "big")
+        elif signature_type == b"ssh-dss":
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
-            signature_data['r'] = cls._big_int(signature_blob[:20], "big")
-            signature_data['s'] = cls._big_int(signature_blob[20:], "big")
-        elif signature_type in (b'ecdsa-sha2-nistp256', b'ecdsa-sha2-nistp384', b'ecdsa-sha2-nistp521'):
+            signature_data["r"] = cls._big_int(signature_blob[:20], "big")
+            signature_data["s"] = cls._big_int(signature_blob[20:], "big")
+        elif signature_type in (
+            b"ecdsa-sha2-nistp256",
+            b"ecdsa-sha2-nistp384",
+            b"ecdsa-sha2-nistp521",
+        ):
             # https://datatracker.ietf.org/doc/html/rfc5656#section-3.1.2
-            signature_data['r'] = blob_parser.mpint()
-            signature_data['s'] = blob_parser.mpint()
-        elif signature_type == b'ssh-ed25519':
+            signature_data["r"] = blob_parser.mpint()
+            signature_data["s"] = blob_parser.mpint()
+        elif signature_type == b"ssh-ed25519":
             # https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.2
-            signature_data['R'] = cls._big_int(signature_blob[:32], "little")
-            signature_data['S'] = cls._big_int(signature_blob[32:], "little")
+            signature_data["R"] = cls._big_int(signature_blob[:32], "little")
+            signature_data["S"] = cls._big_int(signature_blob[32:], "little")
         else:
             raise ValueError("%s is not a valid signature type" % signature_type)
 
-        signature_data['signature_type'] = signature_type
+        signature_data["signature_type"] = signature_type
 
         return signature_data
 
     @classmethod
     def _big_int(cls, raw_string, byte_order, signed=False):
         if byte_order not in ("big", "little"):
-            raise ValueError("Byte_order must be one of (big, little) not %s" % byte_order)
+            raise ValueError(
+                "Byte_order must be one of (big, little) not %s" % byte_order
+            )
 
         if PY3:
             return int.from_bytes(raw_string, byte_order, signed=signed)
@@ -232,21 +239,31 @@ class OpensshParser(object):
             msb = raw_string[0] if byte_order == "big" else raw_string[-1]
             negative = bool(ord(msb) & 0x80)
             # Match pad value for two's complement
-            pad = b'\xFF' if signed and negative else b'\x00'
+            pad = b"\xff" if signed and negative else b"\x00"
             # The definition of ``mpint`` enforces that unnecessary bytes are not encoded so they are added back
-            pad_length = (4 - byte_length % 4)
+            pad_length = 4 - byte_length % 4
             if pad_length < 4:
-                raw_string = pad * pad_length + raw_string if byte_order == "big" else raw_string + pad * pad_length
+                raw_string = (
+                    pad * pad_length + raw_string
+                    if byte_order == "big"
+                    else raw_string + pad * pad_length
+                )
                 byte_length += pad_length
             # Accumulate arbitrary precision integer bytes in the appropriate order
             if byte_order == "big":
                 for i in range(0, byte_length, cls.UINT32_OFFSET):
                     left_shift = result << cls.UINT32_OFFSET * 8
-                    result = left_shift + _UINT32.unpack(raw_string[i:i + cls.UINT32_OFFSET])[0]
+                    result = (
+                        left_shift
+                        + _UINT32.unpack(raw_string[i : i + cls.UINT32_OFFSET])[0]
+                    )
             else:
                 for i in range(byte_length, 0, -cls.UINT32_OFFSET):
                     left_shift = result << cls.UINT32_OFFSET * 8
-                    result = left_shift + _UINT32_LE.unpack(raw_string[i - cls.UINT32_OFFSET:i])[0]
+                    result = (
+                        left_shift
+                        + _UINT32_LE.unpack(raw_string[i - cls.UINT32_OFFSET : i])[0]
+                    )
             # Adjust for two's complement
             if signed and negative:
                 result -= 1 << (8 * byte_length)
@@ -262,10 +279,13 @@ class _OpensshWriter(object):
         It is not to be used to construct Openssh objects, but rather as a utility to assist
         in validating parsed material.
     """
+
     def __init__(self, buffer=None):
         if buffer is not None:
             if not isinstance(buffer, (bytes, bytearray)):
-                raise TypeError("Buffer must be a bytes-like object not %s" % type(buffer))
+                raise TypeError(
+                    "Buffer must be a bytes-like object not %s" % type(buffer)
+                )
         else:
             buffer = bytearray()
 
@@ -283,7 +303,9 @@ class _OpensshWriter(object):
         if not isinstance(value, int):
             raise TypeError("Value must be of type int not %s" % type(value))
         if value < 0 or value > _UINT32_MAX:
-            raise ValueError("Value must be a positive integer less than %s" % _UINT32_MAX)
+            raise ValueError(
+                "Value must be a positive integer less than %s" % _UINT32_MAX
+            )
 
         self._buff.extend(_UINT32.pack(value))
 
@@ -293,7 +315,9 @@ class _OpensshWriter(object):
         if not isinstance(value, (long, int)):
             raise TypeError("Value must be of type (long, int) not %s" % type(value))
         if value < 0 or value > _UINT64_MAX:
-            raise ValueError("Value must be a positive integer less than %s" % _UINT64_MAX)
+            raise ValueError(
+                "Value must be a positive integer less than %s" % _UINT64_MAX
+            )
 
         self._buff.extend(_UINT64.pack(value))
 
@@ -320,7 +344,7 @@ class _OpensshWriter(object):
             raise TypeError("Value must be a list of byte strings not %s" % type(value))
 
         try:
-            self.string(','.join(value).encode('ASCII'))
+            self.string(",".join(value).encode("ASCII"))
         except UnicodeEncodeError as e:
             raise ValueError("Name-list's must consist of US-ASCII characters: %s" % e)
 
@@ -365,9 +389,9 @@ class _OpensshWriter(object):
             result = bytes()
             # 0 and -1 are treated as special cases since they are used as sentinels for all other values
             if num == 0:
-                result += b'\x00'
+                result += b"\x00"
             elif num == -1:
-                result += b'\xFF'
+                result += b"\xff"
             elif num > 0:
                 while num >> 32:
                     result = _UINT32.pack(num & _UINT32_MAX) + result
@@ -378,7 +402,7 @@ class _OpensshWriter(object):
                     num = num >> 8
                 # Zero pad final byte if most-significant bit is 1 as per mpint definition
                 if ord(result[0]) & 0x80:
-                    result = b'\x00' + result
+                    result = b"\x00" + result
             else:
                 while (num >> 32) < -1:
                     result = _UINT32.pack(num & _UINT32_MAX) + result
@@ -387,7 +411,7 @@ class _OpensshWriter(object):
                     result = _UBYTE.pack(num & _UBYTE_MAX) + result
                     num = num >> 8
                 if not ord(result[0]) & 0x80:
-                    result = b'\xFF' + result
+                    result = b"\xff" + result
 
         return result
 

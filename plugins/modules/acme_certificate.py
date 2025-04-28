@@ -600,76 +600,94 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-NO_CHALLENGE = 'no challenge'
+NO_CHALLENGE = "no challenge"
 
 
 class ACMECertificateClient(object):
-    '''
+    """
     ACME client class. Uses an ACME account object and a CSR to
     start and validate ACME challenges and download the respective
     certificates.
-    '''
+    """
 
     def __init__(self, module, backend):
         self.module = module
-        self.version = module.params['acme_version']
-        self.challenge = module.params['challenge']
+        self.version = module.params["acme_version"]
+        self.challenge = module.params["challenge"]
         # We use None instead of a magic string for 'no challenge'
         if self.challenge == NO_CHALLENGE:
             self.challenge = None
-        self.csr = module.params['csr']
-        self.csr_content = module.params['csr_content']
-        self.dest = module.params.get('dest')
-        self.fullchain_dest = module.params.get('fullchain_dest')
-        self.chain_dest = module.params.get('chain_dest')
+        self.csr = module.params["csr"]
+        self.csr_content = module.params["csr_content"]
+        self.dest = module.params.get("dest")
+        self.fullchain_dest = module.params.get("fullchain_dest")
+        self.chain_dest = module.params.get("chain_dest")
         self.client = ACMEClient(module, backend)
         self.account = ACMEAccount(self.client)
         self.directory = self.client.directory
-        self.data = module.params['data']
+        self.data = module.params["data"]
         self.authorizations = None
         self.cert_days = -1
         self.order = None
-        self.order_uri = self.data.get('order_uri') if self.data else None
+        self.order_uri = self.data.get("order_uri") if self.data else None
         self.all_chains = None
         self.select_chain_matcher = []
-        self.include_renewal_cert_id = module.params['include_renewal_cert_id']
-        self.profile = module.params['profile']
-        self.order_creation_error_strategy = module.params['order_creation_error_strategy']
-        self.order_creation_max_retries = module.params['order_creation_max_retries']
+        self.include_renewal_cert_id = module.params["include_renewal_cert_id"]
+        self.profile = module.params["profile"]
+        self.order_creation_error_strategy = module.params[
+            "order_creation_error_strategy"
+        ]
+        self.order_creation_max_retries = module.params["order_creation_max_retries"]
 
-        if self.module.params['select_chain']:
-            for criterium_idx, criterium in enumerate(self.module.params['select_chain']):
+        if self.module.params["select_chain"]:
+            for criterium_idx, criterium in enumerate(
+                self.module.params["select_chain"]
+            ):
                 try:
                     self.select_chain_matcher.append(
                         self.client.backend.create_chain_matcher(
-                            Criterium(criterium, index=criterium_idx)))
+                            Criterium(criterium, index=criterium_idx)
+                        )
+                    )
                 except ValueError as exc:
-                    self.module.warn('Error while parsing criterium: {error}. Ignoring criterium.'.format(error=exc))
+                    self.module.warn(
+                        "Error while parsing criterium: {error}. Ignoring criterium.".format(
+                            error=exc
+                        )
+                    )
 
         if self.profile is not None:
-            meta_profiles = (self.directory.get('meta') or {}).get('profiles') or {}
+            meta_profiles = (self.directory.get("meta") or {}).get("profiles") or {}
             if not meta_profiles:
-                raise ModuleFailException(msg='The ACME CA does not support profiles.')
+                raise ModuleFailException(msg="The ACME CA does not support profiles.")
             if self.profile not in meta_profiles:
-                raise ModuleFailException(msg='The ACME CA does not support selected profile {0!r}.'.format(self.profile))
+                raise ModuleFailException(
+                    msg="The ACME CA does not support selected profile {0!r}.".format(
+                        self.profile
+                    )
+                )
 
         # Make sure account exists
-        modify_account = module.params['modify_account']
+        modify_account = module.params["modify_account"]
         if modify_account or self.version > 1:
             contact = []
-            if module.params['account_email']:
-                contact.append('mailto:' + module.params['account_email'])
+            if module.params["account_email"]:
+                contact.append("mailto:" + module.params["account_email"])
             created, account_data = self.account.setup_account(
                 contact,
-                agreement=module.params.get('agreement'),
-                terms_agreed=module.params.get('terms_agreed'),
+                agreement=module.params.get("agreement"),
+                terms_agreed=module.params.get("terms_agreed"),
                 allow_creation=modify_account,
             )
             if account_data is None:
-                raise ModuleFailException(msg='Account does not exist or is deactivated.')
+                raise ModuleFailException(
+                    msg="Account does not exist or is deactivated."
+                )
             updated = False
             if not created and account_data and modify_account:
-                updated, account_data = self.account.update_account(account_data, contact)
+                updated, account_data = self.account.update_account(
+                    account_data, contact
+                )
             self.changed = created or updated
         else:
             # This happens if modify_account is False and the ACME v1
@@ -683,13 +701,15 @@ class ACMECertificateClient(object):
             raise ModuleFailException("CSR %s not found" % (self.csr))
 
         # Extract list of identifiers from CSR
-        self.identifiers = self.client.backend.get_ordered_csr_identifiers(csr_filename=self.csr, csr_content=self.csr_content)
+        self.identifiers = self.client.backend.get_ordered_csr_identifiers(
+            csr_filename=self.csr, csr_content=self.csr_content
+        )
 
     def is_first_step(self):
-        '''
+        """
         Return True if this is the first execution of this module, i.e. if a
         sufficient data object from a first run has not been provided.
-        '''
+        """
         if self.data is None:
             return True
         if self.version == 1:
@@ -701,32 +721,34 @@ class ACMECertificateClient(object):
             return self.order_uri is None
 
     def _get_cert_info_or_none(self):
-        if self.module.params.get('dest'):
-            filename = self.module.params['dest']
+        if self.module.params.get("dest"):
+            filename = self.module.params["dest"]
         else:
-            filename = self.module.params['fullchain_dest']
+            filename = self.module.params["fullchain_dest"]
         if not os.path.exists(filename):
             return None
         return self.client.backend.get_cert_information(cert_filename=filename)
 
     def start_challenges(self):
-        '''
+        """
         Create new authorizations for all identifiers of the CSR,
         respectively start a new order for ACME v2.
-        '''
+        """
         self.authorizations = {}
         if self.version == 1:
             for identifier_type, identifier in self.identifiers:
-                if identifier_type != 'dns':
-                    raise ModuleFailException('ACME v1 only supports DNS identifiers!')
+                if identifier_type != "dns":
+                    raise ModuleFailException("ACME v1 only supports DNS identifiers!")
             for identifier_type, identifier in self.identifiers:
                 authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[normalize_combined_identifier(authz.combined_identifier)] = authz
+                self.authorizations[
+                    normalize_combined_identifier(authz.combined_identifier)
+                ] = authz
         else:
             replaces_cert_id = None
-            if (
-                self.include_renewal_cert_id == 'always' or
-                (self.include_renewal_cert_id == 'when_ari_supported' and self.client.directory.has_renewal_info_endpoint())
+            if self.include_renewal_cert_id == "always" or (
+                self.include_renewal_cert_id == "when_ari_supported"
+                and self.client.directory.has_renewal_info_endpoint()
             ):
                 cert_info = self._get_cert_info_or_none()
                 if cert_info is not None:
@@ -750,39 +772,46 @@ class ACMECertificateClient(object):
         self.changed = True
 
     def get_challenges_data(self, first_step):
-        '''
+        """
         Get challenge details for the chosen challenge type.
         Return a tuple of generic challenge details, and specialized DNS challenge details.
-        '''
+        """
         # Get general challenge data
         data = {}
         for type_identifier, authz in self.authorizations.items():
             identifier_type, identifier = split_identifier(type_identifier)
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
-            if authz.status == 'valid':
+            if authz.status == "valid":
                 continue
             # We drop the type from the key to preserve backwards compatibility
             data[authz.identifier] = authz.get_challenge_data(self.client)
-            if first_step and self.challenge is not None and self.challenge not in data[authz.identifier]:
-                raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
-                    self.challenge, type_identifier))
+            if (
+                first_step
+                and self.challenge is not None
+                and self.challenge not in data[authz.identifier]
+            ):
+                raise ModuleFailException(
+                    "Found no challenge of type '{0}' for identifier {1}!".format(
+                        self.challenge, type_identifier
+                    )
+                )
         # Get DNS challenge data
         data_dns = {}
-        if self.challenge == 'dns-01':
+        if self.challenge == "dns-01":
             for identifier, challenges in data.items():
                 if self.challenge in challenges:
-                    values = data_dns.get(challenges[self.challenge]['record'])
+                    values = data_dns.get(challenges[self.challenge]["record"])
                     if values is None:
                         values = []
-                        data_dns[challenges[self.challenge]['record']] = values
-                    values.append(challenges[self.challenge]['resource_value'])
+                        data_dns[challenges[self.challenge]["record"]] = values
+                    values.append(challenges[self.challenge]["resource_value"])
         return data, data_dns
 
     def finish_challenges(self):
-        '''
+        """
         Verify challenges for all identifiers of the CSR.
-        '''
+        """
         self.authorizations = {}
 
         # Step 1: obtain challenge information
@@ -791,7 +820,9 @@ class ACMECertificateClient(object):
             # will be returned instead.
             for identifier_type, identifier in self.identifiers:
                 authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[combine_identifier(identifier_type, identifier)] = authz
+                self.authorizations[combine_identifier(identifier_type, identifier)] = (
+                    authz
+                )
         else:
             # For ACME v2, we obtain the order object by fetching the
             # order URI, and extract the information from there.
@@ -802,12 +833,12 @@ class ACMECertificateClient(object):
         # Step 2: validate pending challenges
         authzs_to_wait_for = []
         for type_identifier, authz in self.authorizations.items():
-            if authz.status == 'pending':
+            if authz.status == "pending":
                 if self.challenge is not None:
                     authz.call_validate(self.client, self.challenge, wait=False)
                     authzs_to_wait_for.append(authz)
                 # If there is no challenge, we must check whether the authz is valid
-                elif authz.status != 'valid':
+                elif authz.status != "valid":
                     authz.raise_error(
                         'Status is not "valid", even though no challenge should be necessary',
                         module=self.client.module,
@@ -823,7 +854,11 @@ class ACMECertificateClient(object):
             try:
                 alt_cert = CertificateChain.download(self.client, alternate)
             except ModuleFailException as e:
-                self.module.warn('Error while downloading alternative certificate {0}: {1}'.format(alternate, e))
+                self.module.warn(
+                    "Error while downloading alternative certificate {0}: {1}".format(
+                        alternate, e
+                    )
+                )
                 continue
             alternate_chains.append(alt_cert)
         return alternate_chains
@@ -832,35 +867,52 @@ class ACMECertificateClient(object):
         for criterium_idx, matcher in enumerate(self.select_chain_matcher):
             for chain in chains:
                 if matcher.match(chain):
-                    self.module.debug('Found matching chain for criterium {0}'.format(criterium_idx))
+                    self.module.debug(
+                        "Found matching chain for criterium {0}".format(criterium_idx)
+                    )
                     return chain
         return None
 
     def get_certificate(self):
-        '''
+        """
         Request a new certificate and write it to the destination file.
         First verifies whether all authorizations are valid; if not, aborts
         with an error.
-        '''
+        """
         for identifier_type, identifier in self.identifiers:
-            authz = self.authorizations.get(normalize_combined_identifier(combine_identifier(identifier_type, identifier)))
+            authz = self.authorizations.get(
+                normalize_combined_identifier(
+                    combine_identifier(identifier_type, identifier)
+                )
+            )
             if authz is None:
-                raise ModuleFailException('Found no authorization information for "{identifier}"!'.format(
-                    identifier=combine_identifier(identifier_type, identifier)))
-            if authz.status != 'valid':
-                authz.raise_error('Status is "{status}" and not "valid"'.format(status=authz.status), module=self.module)
+                raise ModuleFailException(
+                    'Found no authorization information for "{identifier}"!'.format(
+                        identifier=combine_identifier(identifier_type, identifier)
+                    )
+                )
+            if authz.status != "valid":
+                authz.raise_error(
+                    'Status is "{status}" and not "valid"'.format(status=authz.status),
+                    module=self.module,
+                )
 
         if self.version == 1:
-            cert = retrieve_acme_v1_certificate(self.client, pem_to_der(self.csr, self.csr_content))
+            cert = retrieve_acme_v1_certificate(
+                self.client, pem_to_der(self.csr, self.csr_content)
+            )
         else:
             self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
             cert = CertificateChain.download(self.client, self.order.certificate_uri)
-            if self.module.params['retrieve_all_alternates'] or self.select_chain_matcher:
+            if (
+                self.module.params["retrieve_all_alternates"]
+                or self.select_chain_matcher
+            ):
                 # Retrieve alternate chains
                 alternate_chains = self.download_alternate_chains(cert)
 
                 # Prepare return value for all alternate chains
-                if self.module.params['retrieve_all_alternates']:
+                if self.module.params["retrieve_all_alternates"]:
                     self.all_chains = [cert.to_json()]
                     for alt_chain in alternate_chains:
                         self.all_chains.append(alt_chain.to_json())
@@ -871,89 +923,122 @@ class ACMECertificateClient(object):
                     if matching_chain:
                         cert = matching_chain
                     else:
-                        self.module.debug('Found no matching alternative chain')
+                        self.module.debug("Found no matching alternative chain")
 
         if cert.cert is not None:
             pem_cert = cert.cert
             chain = cert.chain
 
-            if self.dest and write_file(self.module, self.dest, pem_cert.encode('utf8')):
+            if self.dest and write_file(
+                self.module, self.dest, pem_cert.encode("utf8")
+            ):
                 self.cert_days = self.client.backend.get_cert_days(self.dest)
                 self.changed = True
 
-            if self.fullchain_dest and write_file(self.module, self.fullchain_dest, (pem_cert + "\n".join(chain)).encode('utf8')):
+            if self.fullchain_dest and write_file(
+                self.module,
+                self.fullchain_dest,
+                (pem_cert + "\n".join(chain)).encode("utf8"),
+            ):
                 self.cert_days = self.client.backend.get_cert_days(self.fullchain_dest)
                 self.changed = True
 
-            if self.chain_dest and write_file(self.module, self.chain_dest, ("\n".join(chain)).encode('utf8')):
+            if self.chain_dest and write_file(
+                self.module, self.chain_dest, ("\n".join(chain)).encode("utf8")
+            ):
                 self.changed = True
 
     def deactivate_authzs(self):
-        '''
+        """
         Deactivates all valid authz's. Does not raise exceptions.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
-        '''
+        """
         for authz in self.authorizations.values():
             try:
                 authz.deactivate(self.client)
             except Exception:
                 # ignore errors
                 pass
-            if authz.status != 'deactivated':
-                self.module.warn(warning='Could not deactivate authz object {0}.'.format(authz.url))
+            if authz.status != "deactivated":
+                self.module.warn(
+                    warning="Could not deactivate authz object {0}.".format(authz.url)
+                )
 
 
 def main():
     argument_spec = create_default_argspec(with_certificate=True)
-    argument_spec.argument_spec['csr']['aliases'] = ['src']
+    argument_spec.argument_spec["csr"]["aliases"] = ["src"]
     argument_spec.update_argspec(
-        modify_account=dict(type='bool', default=True),
-        account_email=dict(type='str'),
-        agreement=dict(type='str'),
-        terms_agreed=dict(type='bool', default=False),
-        challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01', NO_CHALLENGE]),
-        data=dict(type='dict'),
-        dest=dict(type='path', aliases=['cert']),
-        fullchain_dest=dict(type='path', aliases=['fullchain']),
-        chain_dest=dict(type='path', aliases=['chain']),
-        remaining_days=dict(type='int', default=10),
-        deactivate_authzs=dict(type='bool', default=False),
-        force=dict(type='bool', default=False),
-        retrieve_all_alternates=dict(type='bool', default=False),
-        select_chain=dict(type='list', elements='dict', options=dict(
-            test_certificates=dict(type='str', default='all', choices=['first', 'last', 'all']),
-            issuer=dict(type='dict'),
-            subject=dict(type='dict'),
-            subject_key_identifier=dict(type='str'),
-            authority_key_identifier=dict(type='str'),
-        )),
-        include_renewal_cert_id=dict(type='str', choices=['never', 'when_ari_supported', 'always'], default='never'),
-        profile=dict(type='str'),
-        order_creation_error_strategy=dict(type='str', default='auto', choices=['auto', 'always', 'fail', 'retry_without_replaces_cert_id']),
-        order_creation_max_retries=dict(type='int', default=3),
+        modify_account=dict(type="bool", default=True),
+        account_email=dict(type="str"),
+        agreement=dict(type="str"),
+        terms_agreed=dict(type="bool", default=False),
+        challenge=dict(
+            type="str",
+            default="http-01",
+            choices=["http-01", "dns-01", "tls-alpn-01", NO_CHALLENGE],
+        ),
+        data=dict(type="dict"),
+        dest=dict(type="path", aliases=["cert"]),
+        fullchain_dest=dict(type="path", aliases=["fullchain"]),
+        chain_dest=dict(type="path", aliases=["chain"]),
+        remaining_days=dict(type="int", default=10),
+        deactivate_authzs=dict(type="bool", default=False),
+        force=dict(type="bool", default=False),
+        retrieve_all_alternates=dict(type="bool", default=False),
+        select_chain=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                test_certificates=dict(
+                    type="str", default="all", choices=["first", "last", "all"]
+                ),
+                issuer=dict(type="dict"),
+                subject=dict(type="dict"),
+                subject_key_identifier=dict(type="str"),
+                authority_key_identifier=dict(type="str"),
+            ),
+        ),
+        include_renewal_cert_id=dict(
+            type="str",
+            choices=["never", "when_ari_supported", "always"],
+            default="never",
+        ),
+        profile=dict(type="str"),
+        order_creation_error_strategy=dict(
+            type="str",
+            default="auto",
+            choices=["auto", "always", "fail", "retry_without_replaces_cert_id"],
+        ),
+        order_creation_max_retries=dict(type="int", default=3),
     )
     argument_spec.update(
         required_one_of=[
-            ['dest', 'fullchain_dest'],
+            ["dest", "fullchain_dest"],
         ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, False)
 
     try:
-        if module.params.get('dest'):
-            cert_days = backend.get_cert_days(module.params['dest'])
+        if module.params.get("dest"):
+            cert_days = backend.get_cert_days(module.params["dest"])
         else:
-            cert_days = backend.get_cert_days(module.params['fullchain_dest'])
+            cert_days = backend.get_cert_days(module.params["fullchain_dest"])
 
-        if module.params['force'] or cert_days < module.params['remaining_days']:
+        if module.params["force"] or cert_days < module.params["remaining_days"]:
             # If checkmode is active, base the changed state solely on the status
             # of the certificate file as all other actions (accessing an account, checking
             # the authorization status...) would lead to potential changes of the current
             # state
             if module.check_mode:
-                module.exit_json(changed=True, authorizations={}, challenge_data={}, cert_days=cert_days)
+                module.exit_json(
+                    changed=True,
+                    authorizations={},
+                    challenge_data={},
+                    cert_days=cert_days,
+                )
             else:
                 client = ACMECertificateClient(module, backend)
                 client.cert_days = cert_days
@@ -968,9 +1053,9 @@ def main():
                         client.finish_challenges()
                         client.get_certificate()
                         if client.all_chains is not None:
-                            other['all_chains'] = client.all_chains
+                            other["all_chains"] = client.all_chains
                     finally:
-                        if module.params['deactivate_authzs']:
+                        if module.params["deactivate_authzs"]:
                             client.deactivate_authzs()
                 data, data_dns = client.get_challenges_data(first_step=is_first_step)
                 auths = dict()
@@ -994,5 +1079,5 @@ def main():
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
