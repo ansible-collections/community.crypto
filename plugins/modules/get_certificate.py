@@ -100,8 +100,9 @@ options:
       - Whether to encode the ASN.1 values in the RV(extensions) return value with Base64 or not.
       - The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility
         this option is set to V(false).
-      - The default value V(false) is B(deprecated) and will change to V(true) in community.crypto 3.0.0.
+      - The default value was changed from V(false) to V(true) incommunity.crypto 3.0.0.
     type: bool
+    default: true
     version_added: 2.12.0
   tls_ctx_options:
     description:
@@ -351,7 +352,7 @@ def main():
             ),
             starttls=dict(type="str", choices=["mysql"]),
             ciphers=dict(type="list", elements="str"),
-            asn1_base64=dict(type="bool"),
+            asn1_base64=dict(type="bool", default=True),
             tls_ctx_options=dict(type="list", elements="raw"),
             get_certificate_chain=dict(type="bool", default=False),
         ),
@@ -369,16 +370,6 @@ def main():
     asn1_base64 = module.params["asn1_base64"]
     tls_ctx_options = module.params["tls_ctx_options"]
     get_certificate_chain = module.params["get_certificate_chain"]
-
-    if asn1_base64 is None:
-        module.deprecate(
-            "The default value `false` for asn1_base64 is deprecated and will change to `true` in "
-            "community.crypto 3.0.0. If you need this value, it is best to set the value explicitly "
-            "and adjust your roles/playbooks to use `asn1_base64=true` as soon as possible",
-            version="3.0.0",
-            collection_name="community.crypto",
-        )
-        asn1_base64 = False
 
     if get_certificate_chain and sys.version_info < (3, 10):
         module.fail_json(
