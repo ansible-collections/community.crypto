@@ -9,3 +9,4 @@ removed_features:
   - "acme_* modules - support for ACME v1 has been removed (https://github.com/ansible-collections/community.crypto/pull/873)."
 breaking_changes:
   - "get_certificate - the default for ``asn1_base64`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.crypto/pull/873)."
+  - "acme.certificates module utils - the ``retrieve_acme_v1_certificate()`` helper function has been removed (https://github.com/ansible-collections/community.crypto/pull/873)."
