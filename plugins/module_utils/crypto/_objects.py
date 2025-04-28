@@ -21,17 +21,19 @@ for dotted, names in OID_MAP.items():
     for name in names:
         if name in NORMALIZE_NAMES and OID_LOOKUP[name] != dotted:
             raise AssertionError(
-                'Name collision during setup: "{0}" for OIDs {1} and {2}'
-                .format(name, dotted, OID_LOOKUP[name])
+                'Name collision during setup: "{0}" for OIDs {1} and {2}'.format(
+                    name, dotted, OID_LOOKUP[name]
+                )
             )
         NORMALIZE_NAMES[name] = names[0]
         NORMALIZE_NAMES_SHORT[name] = names[-1]
         OID_LOOKUP[name] = dotted
-for alias, original in [('userID', 'userId')]:
+for alias, original in [("userID", "userId")]:
     if alias in NORMALIZE_NAMES:
         raise AssertionError(
-            'Name collision during adding aliases: "{0}" (alias for "{1}") is already mapped to OID {2}'
-            .format(alias, original, OID_LOOKUP[alias])
+            'Name collision during adding aliases: "{0}" (alias for "{1}") is already mapped to OID {2}'.format(
+                alias, original, OID_LOOKUP[alias]
+            )
         )
     NORMALIZE_NAMES[alias] = original
     NORMALIZE_NAMES_SHORT[alias] = NORMALIZE_NAMES_SHORT[original]

@@ -39,12 +39,13 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = '1.2.3'
+MINIMAL_CRYPTOGRAPHY_VERSION = "1.2.3"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
+
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -52,7 +53,7 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
-SIGNATURE_TEST_DATA = b'1234'
+SIGNATURE_TEST_DATA = b"1234"
 
 
 def _get_cryptography_private_key_info(key, need_private_key_data=False):
@@ -61,25 +62,29 @@ def _get_cryptography_private_key_info(key, need_private_key_data=False):
     if need_private_key_data:
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
             private_numbers = key.private_numbers()
-            key_private_data['p'] = private_numbers.p
-            key_private_data['q'] = private_numbers.q
-            key_private_data['exponent'] = private_numbers.d
-        elif isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
+            key_private_data["p"] = private_numbers.p
+            key_private_data["q"] = private_numbers.q
+            key_private_data["exponent"] = private_numbers.d
+        elif isinstance(
+            key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey
+        ):
             private_numbers = key.private_numbers()
-            key_private_data['x'] = private_numbers.x
-        elif isinstance(key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
+            key_private_data["x"] = private_numbers.x
+        elif isinstance(
+            key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
+        ):
             private_numbers = key.private_numbers()
-            key_private_data['multiplier'] = private_numbers.private_value
+            key_private_data["multiplier"] = private_numbers.private_value
     return key_type, key_public_data, key_private_data
 
 
 def _check_dsa_consistency(key_public_data, key_private_data):
     # Get parameters
-    p = key_public_data.get('p')
-    q = key_public_data.get('q')
-    g = key_public_data.get('g')
-    y = key_public_data.get('y')
-    x = key_private_data.get('x')
+    p = key_public_data.get("p")
+    q = key_public_data.get("q")
+    g = key_public_data.get("g")
+    y = key_public_data.get("y")
+    x = key_private_data.get("x")
     for v in (p, q, g, y, x):
         if v is None:
             return None
@@ -104,10 +109,12 @@ def _check_dsa_consistency(key_public_data, key_private_data):
     return True
 
 
-def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn_func=None):
+def _is_cryptography_key_consistent(
+    key, key_public_data, key_private_data, warn_func=None
+):
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
         # key._backend was removed in cryptography 42.0.0
-        backend = getattr(key, '_backend', None)
+        backend = getattr(key, "_backend", None)
         if backend is not None:
             return bool(backend._lib.RSA_check_key(key._rsa_cdata))
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
@@ -115,7 +122,9 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn
         if result is not None:
             return result
         try:
-            signature = key.sign(SIGNATURE_TEST_DATA, cryptography.hazmat.primitives.hashes.SHA256())
+            signature = key.sign(
+                SIGNATURE_TEST_DATA, cryptography.hazmat.primitives.hashes.SHA256()
+            )
         except AttributeError:
             # sign() was added in cryptography 1.5, but we support older versions
             return None
@@ -123,16 +132,20 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn
             key.public_key().verify(
                 signature,
                 SIGNATURE_TEST_DATA,
-                cryptography.hazmat.primitives.hashes.SHA256()
+                cryptography.hazmat.primitives.hashes.SHA256(),
             )
             return True
         except cryptography.exceptions.InvalidSignature:
             return False
-    if isinstance(key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey):
+    if isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
+    ):
         try:
             signature = key.sign(
                 SIGNATURE_TEST_DATA,
-                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(cryptography.hazmat.primitives.hashes.SHA256())
+                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(
+                    cryptography.hazmat.primitives.hashes.SHA256()
+                ),
             )
         except AttributeError:
             # sign() was added in cryptography 1.5, but we support older versions
@@ -141,15 +154,21 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn
             key.public_key().verify(
                 signature,
                 SIGNATURE_TEST_DATA,
-                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(cryptography.hazmat.primitives.hashes.SHA256())
+                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(
+                    cryptography.hazmat.primitives.hashes.SHA256()
+                ),
             )
             return True
         except cryptography.exceptions.InvalidSignature:
             return False
     has_simple_sign_function = False
-    if CRYPTOGRAPHY_HAS_ED25519 and isinstance(key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey):
+    if CRYPTOGRAPHY_HAS_ED25519 and isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey
+    ):
         has_simple_sign_function = True
-    if CRYPTOGRAPHY_HAS_ED448 and isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
+    if CRYPTOGRAPHY_HAS_ED448 and isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
+    ):
         has_simple_sign_function = True
     if has_simple_sign_function:
         signature = key.sign(SIGNATURE_TEST_DATA)
@@ -160,7 +179,7 @@ def _is_cryptography_key_consistent(key, key_public_data, key_private_data, warn
             return False
     # For X25519 and X448, there's no test yet.
     if warn_func is not None:
-        warn_func('Cannot determine consistency for key of type %s' % type(key))
+        warn_func("Cannot determine consistency for key of type %s" % type(key))
     return None
 
 
@@ -180,7 +199,15 @@ class PrivateKeyParseError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyInfoRetrieval(object):
-    def __init__(self, module, backend, content, passphrase=None, return_private_key_data=False, check_consistency=False):
+    def __init__(
+        self,
+        module,
+        backend,
+        content,
+        passphrase=None,
+        return_private_key_data=False,
+        check_consistency=False,
+    ):
         # content must be a bytes string
         self.module = module
         self.backend = backend
@@ -211,28 +238,38 @@ class PrivateKeyInfoRetrieval(object):
             self.key = load_privatekey(
                 path=None,
                 content=priv_key_detail,
-                passphrase=to_bytes(self.passphrase) if self.passphrase is not None else self.passphrase,
-                backend=self.backend
+                passphrase=(
+                    to_bytes(self.passphrase)
+                    if self.passphrase is not None
+                    else self.passphrase
+                ),
+                backend=self.backend,
             )
-            result['can_parse_key'] = True
+            result["can_parse_key"] = True
         except OpenSSLObjectError as exc:
             raise PrivateKeyParseError(to_native(exc), result)
 
-        result['public_key'] = to_native(self._get_public_key(binary=False))
+        result["public_key"] = to_native(self._get_public_key(binary=False))
         pk = self._get_public_key(binary=True)
-        result['public_key_fingerprints'] = get_fingerprint_of_bytes(
-            pk, prefer_one=prefer_one_fingerprint) if pk is not None else dict()
+        result["public_key_fingerprints"] = (
+            get_fingerprint_of_bytes(pk, prefer_one=prefer_one_fingerprint)
+            if pk is not None
+            else dict()
+        )
 
         key_type, key_public_data, key_private_data = self._get_key_info(
-            need_private_key_data=self.return_private_key_data or self.check_consistency)
-        result['type'] = key_type
-        result['public_data'] = key_public_data
+            need_private_key_data=self.return_private_key_data or self.check_consistency
+        )
+        result["type"] = key_type
+        result["public_data"] = key_public_data
         if self.return_private_key_data:
-            result['private_data'] = key_private_data
+            result["private_data"] = key_private_data
 
         if self.check_consistency:
-            result['key_is_consistent'] = self._is_key_consistent(key_public_data, key_private_data)
-            if result['key_is_consistent'] is False:
+            result["key_is_consistent"] = self._is_key_consistent(
+                key_public_data, key_private_data
+            )
+            if result["key_is_consistent"] is False:
                 # Only fail when it is False, to avoid to fail on None (which means "we do not know")
                 msg = (
                     "Private key is not consistent! (See "
@@ -244,48 +281,88 @@ class PrivateKeyInfoRetrieval(object):
 
 class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
     """Validate the supplied private key, using the cryptography backend"""
+
     def __init__(self, module, content, **kwargs):
-        super(PrivateKeyInfoRetrievalCryptography, self).__init__(module, 'cryptography', content, **kwargs)
+        super(PrivateKeyInfoRetrievalCryptography, self).__init__(
+            module, "cryptography", content, **kwargs
+        )
 
     def _get_public_key(self, binary):
         return self.key.public_key().public_bytes(
             serialization.Encoding.DER if binary else serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo
+            serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
     def _get_key_info(self, need_private_key_data=False):
-        return _get_cryptography_private_key_info(self.key, need_private_key_data=need_private_key_data)
+        return _get_cryptography_private_key_info(
+            self.key, need_private_key_data=need_private_key_data
+        )
 
     def _is_key_consistent(self, key_public_data, key_private_data):
-        return _is_cryptography_key_consistent(self.key, key_public_data, key_private_data, warn_func=self.module.warn)
+        return _is_cryptography_key_consistent(
+            self.key, key_public_data, key_private_data, warn_func=self.module.warn
+        )
 
 
-def get_privatekey_info(module, backend, content, passphrase=None, return_private_key_data=False, prefer_one_fingerprint=False):
-    if backend == 'cryptography':
+def get_privatekey_info(
+    module,
+    backend,
+    content,
+    passphrase=None,
+    return_private_key_data=False,
+    prefer_one_fingerprint=False,
+):
+    if backend == "cryptography":
         info = PrivateKeyInfoRetrievalCryptography(
-            module, content, passphrase=passphrase, return_private_key_data=return_private_key_data)
+            module,
+            content,
+            passphrase=passphrase,
+            return_private_key_data=return_private_key_data,
+        )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, backend, content, passphrase=None, return_private_key_data=False, check_consistency=False):
-    if backend == 'auto':
+def select_backend(
+    module,
+    backend,
+    content,
+    passphrase=None,
+    return_private_key_data=False,
+    check_consistency=False,
+):
+    if backend == "auto":
         # Detection what is possible
-        can_use_cryptography = CRYPTOGRAPHY_FOUND and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        can_use_cryptography = (
+            CRYPTOGRAPHY_FOUND
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+        )
 
         # Try cryptography
         if can_use_cryptography:
-            backend = 'cryptography'
+            backend = "cryptography"
 
         # Success?
-        if backend == 'auto':
-            module.fail_json(msg=("Cannot detect the required Python library "
-                                  "cryptography (>= {0})").format(MINIMAL_CRYPTOGRAPHY_VERSION))
+        if backend == "auto":
+            module.fail_json(
+                msg=(
+                    "Cannot detect the required Python library " "cryptography (>= {0})"
+                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+            )
 
-    if backend == 'cryptography':
+    if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(msg=missing_required_lib('cryptography >= {0}'.format(MINIMAL_CRYPTOGRAPHY_VERSION)),
-                             exception=CRYPTOGRAPHY_IMP_ERR)
+            module.fail_json(
+                msg=missing_required_lib(
+                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                ),
+                exception=CRYPTOGRAPHY_IMP_ERR,
+            )
         return backend, PrivateKeyInfoRetrievalCryptography(
-            module, content, passphrase=passphrase, return_private_key_data=return_private_key_data, check_consistency=check_consistency)
+            module,
+            content,
+            passphrase=passphrase,
+            return_private_key_data=return_private_key_data,
+            check_consistency=check_consistency,
+        )
     else:
-        raise ValueError('Unsupported value for backend: {0}'.format(backend))
+        raise ValueError("Unsupported value for backend: {0}".format(backend))

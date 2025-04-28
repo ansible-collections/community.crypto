@@ -312,25 +312,29 @@ class Certificate(OpensshModule):
         super(Certificate, self).__init__(module)
         self.ssh_keygen = KeygenCommand(self.module)
 
-        self.identifier = self.module.params['identifier'] or ""
-        self.options = self.module.params['options'] or []
-        self.path = self.module.params['path']
-        self.pkcs11_provider = self.module.params['pkcs11_provider']
-        self.principals = self.module.params['principals'] or []
-        self.public_key = self.module.params['public_key']
-        self.regenerate = self.module.params['regenerate'] if not self.module.params['force'] else 'always'
-        self.serial_number = self.module.params['serial_number']
-        self.signature_algorithm = self.module.params['signature_algorithm']
-        self.signing_key = self.module.params['signing_key']
-        self.state = self.module.params['state']
-        self.type = self.module.params['type']
-        self.use_agent = self.module.params['use_agent']
-        self.valid_at = self.module.params['valid_at']
-        self.ignore_timestamps = self.module.params['ignore_timestamps']
+        self.identifier = self.module.params["identifier"] or ""
+        self.options = self.module.params["options"] or []
+        self.path = self.module.params["path"]
+        self.pkcs11_provider = self.module.params["pkcs11_provider"]
+        self.principals = self.module.params["principals"] or []
+        self.public_key = self.module.params["public_key"]
+        self.regenerate = (
+            self.module.params["regenerate"]
+            if not self.module.params["force"]
+            else "always"
+        )
+        self.serial_number = self.module.params["serial_number"]
+        self.signature_algorithm = self.module.params["signature_algorithm"]
+        self.signing_key = self.module.params["signing_key"]
+        self.state = self.module.params["state"]
+        self.type = self.module.params["type"]
+        self.use_agent = self.module.params["use_agent"]
+        self.valid_at = self.module.params["valid_at"]
+        self.ignore_timestamps = self.module.params["ignore_timestamps"]
 
         self._check_if_base_dir(self.path)
 
-        if self.state == 'present':
+        if self.state == "present":
             self._validate_parameters()
 
         self.data = None
@@ -339,7 +343,7 @@ class Certificate(OpensshModule):
             self._load_certificate()
 
         self.time_parameters = None
-        if self.state == 'present':
+        if self.state == "present":
             self._set_time_parameters()
 
     def _validate_parameters(self):
@@ -347,7 +351,9 @@ class Certificate(OpensshModule):
             self._check_if_base_dir(path)
 
         if self.options and self.type == "host":
-            self.module.fail_json(msg="Options can only be used with user certificates.")
+            self.module.fail_json(
+                msg="Options can only be used with user certificates."
+            )
 
         if self.use_agent:
             self._use_agent_available()
@@ -358,8 +364,8 @@ class Certificate(OpensshModule):
             self.module.fail_json(msg="Failed to determine ssh version")
         elif LooseVersion(ssh_version) < LooseVersion("7.6"):
             self.module.fail_json(
-                msg="Signing with CA key in ssh agent requires ssh 7.6 or newer." +
-                    " Your version is: %s" % ssh_version
+                msg="Signing with CA key in ssh agent requires ssh 7.6 or newer."
+                + " Your version is: %s" % ssh_version
             )
 
     def _exists(self):
@@ -369,21 +375,23 @@ class Certificate(OpensshModule):
         try:
             self.original_data = OpensshCertificate.load(self.path)
         except (TypeError, ValueError) as e:
-            if self.regenerate in ('never', 'fail'):
-                self.module.fail_json(msg="Unable to read existing certificate: %s" % to_native(e))
+            if self.regenerate in ("never", "fail"):
+                self.module.fail_json(
+                    msg="Unable to read existing certificate: %s" % to_native(e)
+                )
             self.module.warn("Unable to read existing certificate: %s" % to_native(e))
 
     def _set_time_parameters(self):
         try:
             self.time_parameters = OpensshCertificateTimeParameters(
-                valid_from=self.module.params['valid_from'],
-                valid_to=self.module.params['valid_to'],
+                valid_from=self.module.params["valid_from"],
+                valid_to=self.module.params["valid_to"],
             )
         except ValueError as e:
             self.module.fail_json(msg=to_native(e))
 
     def _execute(self):
-        if self.state == 'present':
+        if self.state == "present":
             if self._should_generate():
                 self._generate()
                 self._update_permissions(self.path)
@@ -392,44 +400,58 @@ class Certificate(OpensshModule):
                 self._remove()
 
     def _should_generate(self):
-        if self.regenerate == 'never':
+        if self.regenerate == "never":
             return self.original_data is None
-        elif self.regenerate == 'fail':
+        elif self.regenerate == "fail":
             if self.original_data and not self._is_fully_valid():
                 self.module.fail_json(
                     msg="Certificate does not match the provided options.",
-                    cert=get_cert_dict(self.original_data)
+                    cert=get_cert_dict(self.original_data),
                 )
             return self.original_data is None
-        elif self.regenerate == 'partial_idempotence':
+        elif self.regenerate == "partial_idempotence":
             return self.original_data is None or not self._is_partially_valid()
-        elif self.regenerate == 'full_idempotence':
+        elif self.regenerate == "full_idempotence":
             return self.original_data is None or not self._is_fully_valid()
         else:
             return True
 
     def _is_fully_valid(self):
-        return self._is_partially_valid() and all([
-            self._compare_options() if self.original_data.type == 'user' else True,
-            self.original_data.key_id == self.identifier,
-            self.original_data.public_key == self._get_key_fingerprint(self.public_key),
-            self.original_data.signing_key == self._get_key_fingerprint(self.signing_key),
-        ])
+        return self._is_partially_valid() and all(
+            [
+                self._compare_options() if self.original_data.type == "user" else True,
+                self.original_data.key_id == self.identifier,
+                self.original_data.public_key
+                == self._get_key_fingerprint(self.public_key),
+                self.original_data.signing_key
+                == self._get_key_fingerprint(self.signing_key),
+            ]
+        )
 
     def _is_partially_valid(self):
-        return all([
-            set(self.original_data.principals) == set(self.principals),
-            self.original_data.signature_type == self.signature_algorithm if self.signature_algorithm else True,
-            self.original_data.serial == self.serial_number if self.serial_number is not None else True,
-            self.original_data.type == self.type,
-            self._compare_time_parameters(),
-        ])
+        return all(
+            [
+                set(self.original_data.principals) == set(self.principals),
+                (
+                    self.original_data.signature_type == self.signature_algorithm
+                    if self.signature_algorithm
+                    else True
+                ),
+                (
+                    self.original_data.serial == self.serial_number
+                    if self.serial_number is not None
+                    else True
+                ),
+                self.original_data.type == self.type,
+                self._compare_time_parameters(),
+            ]
+        )
 
     def _compare_time_parameters(self):
         try:
             original_time_parameters = OpensshCertificateTimeParameters(
                 valid_from=self.original_data.valid_after,
-                valid_to=self.original_data.valid_before
+                valid_to=self.original_data.valid_before,
             )
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
@@ -437,10 +459,12 @@ class Certificate(OpensshModule):
         if self.ignore_timestamps:
             return original_time_parameters.within_range(self.valid_at)
 
-        return all([
-            original_time_parameters == self.time_parameters,
-            original_time_parameters.within_range(self.valid_at)
-        ])
+        return all(
+            [
+                original_time_parameters == self.time_parameters,
+                original_time_parameters.within_range(self.valid_at),
+            ]
+        )
 
     def _compare_options(self):
         try:
@@ -448,10 +472,12 @@ class Certificate(OpensshModule):
         except ValueError as e:
             return self.module.fail_json(msg=to_native(e))
 
-        return all([
-            set(self.original_data.critical_options) == set(critical_options),
-            set(self.original_data.extensions) == set(extensions)
-        ])
+        return all(
+            [
+                set(self.original_data.critical_options) == set(critical_options),
+                set(self.original_data.extensions) == set(extensions),
+            ]
+        )
 
     def _get_key_fingerprint(self, path):
         private_key_content = self.ssh_keygen.get_private_key(path, check_rc=True)[1]
@@ -464,12 +490,16 @@ class Certificate(OpensshModule):
             temp_certificate = self._generate_temp_certificate()
             self._safe_secure_move([(temp_certificate, self.path)])
         except OSError as e:
-            self.module.fail_json(msg="Unable to write certificate to %s: %s" % (self.path, to_native(e)))
+            self.module.fail_json(
+                msg="Unable to write certificate to %s: %s" % (self.path, to_native(e))
+            )
 
         try:
             self.data = OpensshCertificate.load(self.path)
         except (TypeError, ValueError) as e:
-            self.module.fail_json(msg="Unable to read new certificate: %s" % to_native(e))
+            self.module.fail_json(
+                msg="Unable to read new certificate: %s" % to_native(e)
+            )
 
     def _generate_temp_certificate(self):
         key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
@@ -477,16 +507,28 @@ class Certificate(OpensshModule):
         try:
             self.module.preserved_copy(self.public_key, key_copy)
         except OSError as e:
-            self.module.fail_json(msg="Unable to stage temporary key: %s" % to_native(e))
+            self.module.fail_json(
+                msg="Unable to stage temporary key: %s" % to_native(e)
+            )
         self.module.add_cleanup_file(key_copy)
 
         self.ssh_keygen.generate_certificate(
-            key_copy, self.identifier, self.options, self.pkcs11_provider, self.principals, self.serial_number,
-            self.signature_algorithm, self.signing_key, self.type, self.time_parameters, self.use_agent,
-            environ_update=dict(TZ="UTC"), check_rc=True
+            key_copy,
+            self.identifier,
+            self.options,
+            self.pkcs11_provider,
+            self.principals,
+            self.serial_number,
+            self.signature_algorithm,
+            self.signing_key,
+            self.type,
+            self.time_parameters,
+            self.use_agent,
+            environ_update=dict(TZ="UTC"),
+            check_rc=True,
         )
 
-        temp_cert = os.path.splitext(key_copy)[0] + '-cert.pub'
+        temp_cert = os.path.splitext(key_copy)[0] + "-cert.pub"
         self.module.add_cleanup_file(temp_cert)
 
         return temp_cert
@@ -497,29 +539,31 @@ class Certificate(OpensshModule):
         try:
             os.remove(self.path)
         except OSError as e:
-            self.module.fail_json(msg="Unable to remove existing certificate: %s" % to_native(e))
+            self.module.fail_json(
+                msg="Unable to remove existing certificate: %s" % to_native(e)
+            )
 
     @property
     def _result(self):
-        if self.state != 'present':
+        if self.state != "present":
             return {}
 
         certificate_info = self.ssh_keygen.get_certificate_info(
             self.path,
-            check_rc=self.state == 'present' and not self.module.check_mode,
+            check_rc=self.state == "present" and not self.module.check_mode,
         )[1]
 
         return {
-            'type': self.type,
-            'filename': self.path,
-            'info': format_cert_info(certificate_info),
+            "type": self.type,
+            "filename": self.path,
+            "info": format_cert_info(certificate_info),
         }
 
     @property
     def diff(self):
         return {
-            'before': get_cert_dict(self.original_data),
-            'after': get_cert_dict(self.data)
+            "before": get_cert_dict(self.original_data),
+            "after": get_cert_dict(self.data),
         }
 
 
@@ -528,7 +572,17 @@ def format_cert_info(cert_info):
     string = ""
 
     for word in cert_info.split():
-        if word in ("Type:", "Public", "Signing", "Key", "Serial:", "Valid:", "Principals:", "Critical", "Extensions:"):
+        if word in (
+            "Type:",
+            "Public",
+            "Signing",
+            "Key",
+            "Serial:",
+            "Valid:",
+            "Principals:",
+            "Critical",
+            "Extensions:",
+        ):
             result.append(string)
             string = word
         else:
@@ -544,8 +598,8 @@ def get_cert_dict(data):
         return {}
 
     result = data.to_dict()
-    result.pop('nonce')
-    result['signature_algorithm'] = data.signature_type
+    result.pop("nonce")
+    result["signature_algorithm"] = data.signature_type
 
     return result
 
@@ -553,36 +607,50 @@ def get_cert_dict(data):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            force=dict(type='bool', default=False),
-            identifier=dict(type='str'),
-            options=dict(type='list', elements='str'),
-            path=dict(type='path', required=True),
-            pkcs11_provider=dict(type='str'),
-            principals=dict(type='list', elements='str'),
-            public_key=dict(type='path'),
+            force=dict(type="bool", default=False),
+            identifier=dict(type="str"),
+            options=dict(type="list", elements="str"),
+            path=dict(type="path", required=True),
+            pkcs11_provider=dict(type="str"),
+            principals=dict(type="list", elements="str"),
+            public_key=dict(type="path"),
             regenerate=dict(
-                type='str',
-                default='partial_idempotence',
-                choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
+                type="str",
+                default="partial_idempotence",
+                choices=[
+                    "never",
+                    "fail",
+                    "partial_idempotence",
+                    "full_idempotence",
+                    "always",
+                ],
             ),
-            signature_algorithm=dict(type='str', choices=['ssh-rsa', 'rsa-sha2-256', 'rsa-sha2-512']),
-            signing_key=dict(type='path'),
-            serial_number=dict(type='int'),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            type=dict(type='str', choices=['host', 'user']),
-            use_agent=dict(type='bool', default=False),
-            valid_at=dict(type='str'),
-            valid_from=dict(type='str'),
-            valid_to=dict(type='str'),
-            ignore_timestamps=dict(type='bool', default=False),
+            signature_algorithm=dict(
+                type="str", choices=["ssh-rsa", "rsa-sha2-256", "rsa-sha2-512"]
+            ),
+            signing_key=dict(type="path"),
+            serial_number=dict(type="int"),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            type=dict(type="str", choices=["host", "user"]),
+            use_agent=dict(type="bool", default=False),
+            valid_at=dict(type="str"),
+            valid_from=dict(type="str"),
+            valid_to=dict(type="str"),
+            ignore_timestamps=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
-        required_if=[('state', 'present', ['type', 'signing_key', 'public_key', 'valid_from', 'valid_to'])],
+        required_if=[
+            (
+                "state",
+                "present",
+                ["type", "signing_key", "public_key", "valid_from", "valid_to"],
+            )
+        ],
     )
 
     Certificate(module).execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

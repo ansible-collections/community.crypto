@@ -19,37 +19,42 @@ def format_http_status(status_code):
     expl = http_responses.get(status_code)
     if not expl:
         return str(status_code)
-    return '%d %s' % (status_code, expl)
+    return "%d %s" % (status_code, expl)
 
 
-def format_error_problem(problem, subproblem_prefix=''):
-    error_type = problem.get('type', 'about:blank')  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
-    if 'title' in problem:
+def format_error_problem(problem, subproblem_prefix=""):
+    error_type = problem.get(
+        "type", "about:blank"
+    )  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
+    if "title" in problem:
         msg = 'Error "{title}" ({type})'.format(
             type=error_type,
-            title=problem['title'],
+            title=problem["title"],
         )
     else:
-        msg = 'Error {type}'.format(type=error_type)
-    if 'detail' in problem:
-        msg += ': "{detail}"'.format(detail=problem['detail'])
-    subproblems = problem.get('subproblems')
+        msg = "Error {type}".format(type=error_type)
+    if "detail" in problem:
+        msg += ': "{detail}"'.format(detail=problem["detail"])
+    subproblems = problem.get("subproblems")
     if subproblems is not None:
-        msg = '{msg} Subproblems:'.format(msg=msg)
+        msg = "{msg} Subproblems:".format(msg=msg)
         for index, problem in enumerate(subproblems):
-            index_str = '{prefix}{index}'.format(prefix=subproblem_prefix, index=index)
-            msg = '{msg}\n({index}) {problem}'.format(
+            index_str = "{prefix}{index}".format(prefix=subproblem_prefix, index=index)
+            msg = "{msg}\n({index}) {problem}".format(
                 msg=msg,
                 index=index_str,
-                problem=format_error_problem(problem, subproblem_prefix='{0}.'.format(index_str)),
+                problem=format_error_problem(
+                    problem, subproblem_prefix="{0}.".format(index_str)
+                ),
             )
     return msg
 
 
 class ModuleFailException(Exception):
-    '''
+    """
     If raised, module.fail_json() will be called with the given parameters after cleanup.
-    '''
+    """
+
     def __init__(self, msg, **args):
         super(ModuleFailException, self).__init__(self, msg)
         self.msg = msg
@@ -60,7 +65,16 @@ class ModuleFailException(Exception):
 
 
 class ACMEProtocolException(ModuleFailException):
-    def __init__(self, module, msg=None, info=None, response=None, content=None, content_json=None, extras=None):
+    def __init__(
+        self,
+        module,
+        msg=None,
+        info=None,
+        response=None,
+        content=None,
+        content_json=None,
+        extras=None,
+    ):
         # Try to get hold of content, if response is given and content is not provided
         if content is None and content_json is None and response is not None:
             try:
@@ -70,7 +84,7 @@ class ACMEProtocolException(ModuleFailException):
                     raise TypeError
                 content = response.read()
             except (AttributeError, TypeError):
-                content = info.pop('body', None)
+                content = info.pop("body", None)
 
         # Make sure that content_json is None or a dictionary
         if content_json is not None and not isinstance(content_json, dict):
@@ -90,53 +104,71 @@ class ACMEProtocolException(ModuleFailException):
         error_type = None
 
         if msg is None:
-            msg = 'ACME request failed'
-        add_msg = ''
+            msg = "ACME request failed"
+        add_msg = ""
 
         if info is not None:
-            url = info['url']
-            code = info['status']
-            extras['http_url'] = url
-            extras['http_status'] = code
+            url = info["url"]
+            code = info["status"]
+            extras["http_url"] = url
+            extras["http_status"] = code
             error_code = code
-            if code is not None and code >= 400 and content_json is not None and 'type' in content_json:
-                error_type = content_json['type']
-                if 'status' in content_json and content_json['status'] != code:
-                    code_msg = 'status {problem_code} (HTTP status: {http_code})'.format(
-                        http_code=format_http_status(code), problem_code=content_json['status'])
+            if (
+                code is not None
+                and code >= 400
+                and content_json is not None
+                and "type" in content_json
+            ):
+                error_type = content_json["type"]
+                if "status" in content_json and content_json["status"] != code:
+                    code_msg = (
+                        "status {problem_code} (HTTP status: {http_code})".format(
+                            http_code=format_http_status(code),
+                            problem_code=content_json["status"],
+                        )
+                    )
                 else:
-                    code_msg = 'status {problem_code}'.format(problem_code=format_http_status(code))
-                    if code == -1 and info.get('msg'):
-                        code_msg = 'error: {msg}'.format(msg=info['msg'])
-                subproblems = content_json.pop('subproblems', None)
-                add_msg = ' {problem}.'.format(problem=format_error_problem(content_json))
-                extras['problem'] = content_json
-                extras['subproblems'] = subproblems or []
+                    code_msg = "status {problem_code}".format(
+                        problem_code=format_http_status(code)
+                    )
+                    if code == -1 and info.get("msg"):
+                        code_msg = "error: {msg}".format(msg=info["msg"])
+                subproblems = content_json.pop("subproblems", None)
+                add_msg = " {problem}.".format(
+                    problem=format_error_problem(content_json)
+                )
+                extras["problem"] = content_json
+                extras["subproblems"] = subproblems or []
                 if subproblems is not None:
-                    add_msg = '{add_msg} Subproblems:'.format(add_msg=add_msg)
+                    add_msg = "{add_msg} Subproblems:".format(add_msg=add_msg)
                     for index, problem in enumerate(subproblems):
-                        add_msg = '{add_msg}\n({index}) {problem}.'.format(
+                        add_msg = "{add_msg}\n({index}) {problem}.".format(
                             add_msg=add_msg,
                             index=index,
-                            problem=format_error_problem(problem, subproblem_prefix='{0}.'.format(index)),
+                            problem=format_error_problem(
+                                problem, subproblem_prefix="{0}.".format(index)
+                            ),
                         )
             else:
-                code_msg = 'HTTP status {code}'.format(code=format_http_status(code))
-                if code == -1 and info.get('msg'):
-                    code_msg = 'error: {msg}'.format(msg=info['msg'])
+                code_msg = "HTTP status {code}".format(code=format_http_status(code))
+                if code == -1 and info.get("msg"):
+                    code_msg = "error: {msg}".format(msg=info["msg"])
                 if content_json is not None:
-                    add_msg = ' The JSON error result: {content}'.format(content=content_json)
+                    add_msg = " The JSON error result: {content}".format(
+                        content=content_json
+                    )
                 elif content is not None:
-                    add_msg = ' The raw error result: {content}'.format(content=to_text(content))
-            msg = '{msg} for {url} with {code}'.format(msg=msg, url=url, code=code_msg)
+                    add_msg = " The raw error result: {content}".format(
+                        content=to_text(content)
+                    )
+            msg = "{msg} for {url} with {code}".format(msg=msg, url=url, code=code_msg)
         elif content_json is not None:
-            add_msg = ' The JSON result: {content}'.format(content=content_json)
+            add_msg = " The JSON result: {content}".format(content=content_json)
         elif content is not None:
-            add_msg = ' The raw result: {content}'.format(content=to_text(content))
+            add_msg = " The raw result: {content}".format(content=to_text(content))
 
         super(ACMEProtocolException, self).__init__(
-            '{msg}.{add_msg}'.format(msg=msg, add_msg=add_msg),
-            **extras
+            "{msg}.{add_msg}".format(msg=msg, add_msg=add_msg), **extras
         )
         self.problem = {}
         self.subproblems = []

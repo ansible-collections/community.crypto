@@ -325,30 +325,34 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path'),
-            content=dict(type='str'),
-            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
-            select_crypto_backend=dict(type='str', default='auto', choices=['auto', 'cryptography']),
+            path=dict(type="path"),
+            content=dict(type="str"),
+            name_encoding=dict(
+                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
+            ),
+            select_crypto_backend=dict(
+                type="str", default="auto", choices=["auto", "cryptography"]
+            ),
         ),
-        required_one_of=(
-            ['path', 'content'],
-        ),
-        mutually_exclusive=(
-            ['path', 'content'],
-        ),
+        required_one_of=(["path", "content"],),
+        mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
     )
 
-    if module.params['content'] is not None:
-        data = module.params['content'].encode('utf-8')
+    if module.params["content"] is not None:
+        data = module.params["content"].encode("utf-8")
     else:
         try:
-            with open(module.params['path'], 'rb') as f:
+            with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(msg='Error while reading CSR file from disk: {0}'.format(e))
+            module.fail_json(
+                msg="Error while reading CSR file from disk: {0}".format(e)
+            )
 
-    backend, module_backend = select_backend(module, module.params['select_crypto_backend'], data, validate_signature=True)
+    backend, module_backend = select_backend(
+        module, module.params["select_crypto_backend"], data, validate_signature=True
+    )
 
     try:
         result = module_backend.get_info()

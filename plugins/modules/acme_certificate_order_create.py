@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: acme_certificate_order_create
 author: Felix Fontein (@felixfontein)
 version_added: 2.24.0
@@ -158,9 +158,9 @@ options:
         for at most the specified amount of times.
     type: int
     default: 3
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 ### Example with HTTP-01 challenge ###
 
@@ -253,9 +253,9 @@ EXAMPLES = r'''
     cert_dest: /etc/httpd/ssl/sample.com.crt
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
     chain_dest: /etc/httpd/ssl/sample.com-intermediate.crt
-'''
+"""
 
-RETURN = '''
+RETURN = """
 challenge_data:
   description:
     - For every identifier, provides the challenge information.
@@ -377,7 +377,7 @@ account_uri:
   description: ACME account URI.
   returned: success
   type: str
-'''
+"""
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
@@ -394,37 +394,51 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 def main():
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
-        deactivate_authzs=dict(type='bool', default=True),
-        replaces_cert_id=dict(type='str'),
-        profile=dict(type='str'),
-        order_creation_error_strategy=dict(type='str', default='auto', choices=['auto', 'always', 'fail', 'retry_without_replaces_cert_id']),
-        order_creation_max_retries=dict(type='int', default=3),
+        deactivate_authzs=dict(type="bool", default=True),
+        replaces_cert_id=dict(type="str"),
+        profile=dict(type="str"),
+        order_creation_error_strategy=dict(
+            type="str",
+            default="auto",
+            choices=["auto", "always", "fail", "retry_without_replaces_cert_id"],
+        ),
+        order_creation_max_retries=dict(type="int", default=3),
     )
     module = argument_spec.create_ansible_module()
-    if module.params['acme_version'] == 1:
-        module.fail_json('The module does not support acme_version=1')
+    if module.params["acme_version"] == 1:
+        module.fail_json("The module does not support acme_version=1")
 
     backend = create_backend(module, False)
 
     try:
         client = ACMECertificateClient(module, backend)
 
-        profile = module.params['profile']
+        profile = module.params["profile"]
         if profile is not None:
-            meta_profiles = (client.client.directory.get('meta') or {}).get('profiles') or {}
+            meta_profiles = (client.client.directory.get("meta") or {}).get(
+                "profiles"
+            ) or {}
             if not meta_profiles:
-                raise ModuleFailException(msg='The ACME CA does not support profiles. Please omit the "profile" option.')
+                raise ModuleFailException(
+                    msg='The ACME CA does not support profiles. Please omit the "profile" option.'
+                )
             if profile not in meta_profiles:
-                raise ModuleFailException(msg='The ACME CA does not support selected profile {0!r}.'.format(profile))
+                raise ModuleFailException(
+                    msg="The ACME CA does not support selected profile {0!r}.".format(
+                        profile
+                    )
+                )
 
         order = None
         done = False
         try:
-            order = client.create_order(replaces_cert_id=module.params['replaces_cert_id'], profile=profile)
+            order = client.create_order(
+                replaces_cert_id=module.params["replaces_cert_id"], profile=profile
+            )
             client.check_that_authorizations_can_be_used(order)
             done = True
         finally:
-            if module.params['deactivate_authzs'] and order and not done:
+            if module.params["deactivate_authzs"] and order and not done:
                 client.deactivate_authzs(order)
         data, data_dns = client.get_challenges_data(order)
         module.exit_json(
@@ -438,5 +452,5 @@ def main():
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

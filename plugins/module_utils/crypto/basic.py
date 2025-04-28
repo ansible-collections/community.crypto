@@ -27,7 +27,7 @@ try:
     # actually doing that in x509_certificate, and potentially in other code,
     # we need to monkey-patch __hash__ for these classes to make sure our code
     # works fine.
-    if LooseVersion(cryptography.__version__) < LooseVersion('2.1'):
+    if LooseVersion(cryptography.__version__) < LooseVersion("2.1"):
         # A very simply hash function which relies on the representation
         # of an object to be implemented. This is the case since at least
         # cryptography 1.0, see
@@ -44,7 +44,7 @@ try:
         x509.OtherName.__hash__ = simple_hash
         x509.RegisteredID.__hash__ = simple_hash
 
-        if LooseVersion(cryptography.__version__) < LooseVersion('1.2'):
+        if LooseVersion(cryptography.__version__) < LooseVersion("1.2"):
             # The hash functions for the following types were added for cryptography 1.2:
             # https://github.com/pyca/cryptography/commit/b642deed88a8696e5f01ce6855ccf89985fc35d0
             # https://github.com/pyca/cryptography/commit/d1b5681f6db2bde7a14625538bd7907b08dfb486
@@ -55,6 +55,7 @@ try:
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/dsa/
         import cryptography.hazmat.primitives.asymmetric.dsa
+
         CRYPTOGRAPHY_HAS_DSA = True
         try:
             # added later in 1.5
@@ -68,6 +69,7 @@ try:
     try:
         # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/
         import cryptography.hazmat.primitives.asymmetric.ed25519
+
         CRYPTOGRAPHY_HAS_ED25519 = True
         try:
             # added with the primitive in 2.6
@@ -81,6 +83,7 @@ try:
     try:
         # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed448/
         import cryptography.hazmat.primitives.asymmetric.ed448
+
         CRYPTOGRAPHY_HAS_ED448 = True
         try:
             # added with the primitive in 2.6
@@ -94,6 +97,7 @@ try:
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ec/
         import cryptography.hazmat.primitives.asymmetric.ec
+
         CRYPTOGRAPHY_HAS_EC = True
         try:
             # added later in 1.5
@@ -107,6 +111,7 @@ try:
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
         import cryptography.hazmat.primitives.asymmetric.rsa
+
         CRYPTOGRAPHY_HAS_RSA = True
         try:
             # added later in 1.4
@@ -120,6 +125,7 @@ try:
     try:
         # added in 2.0 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/
         import cryptography.hazmat.primitives.asymmetric.x25519
+
         CRYPTOGRAPHY_HAS_X25519 = True
         try:
             # added later in 2.5
@@ -133,6 +139,7 @@ try:
     try:
         # added in 2.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x448/
         import cryptography.hazmat.primitives.asymmetric.x448
+
         CRYPTOGRAPHY_HAS_X448 = True
     except ImportError:
         CRYPTOGRAPHY_HAS_X448 = False

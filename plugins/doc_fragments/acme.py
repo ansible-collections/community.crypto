@@ -218,7 +218,7 @@ options:
 """
 
     # No account data documentation fragment
-    NO_ACCOUNT = r'''
+    NO_ACCOUNT = r"""
 notes:
   - "If a new enough version of the C(cryptography) library
      is available (see Requirements for details), it will be used
@@ -226,7 +226,7 @@ notes:
      or enabled with the O(select_crypto_backend) option. Note that using
      the C(openssl) binary will be slower."
 options: {}
-'''
+"""
 
     CERTIFICATE = r"""
 options:

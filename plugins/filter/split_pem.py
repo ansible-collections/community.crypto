@@ -51,18 +51,21 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 
 def split_pem_filter(data):
-    '''Split PEM file.'''
+    """Split PEM file."""
     if not isinstance(data, string_types):
-        raise AnsibleFilterError('The community.crypto.split_pem input must be a text type, not %s' % type(data))
+        raise AnsibleFilterError(
+            "The community.crypto.split_pem input must be a text type, not %s"
+            % type(data)
+        )
 
     data = to_text(data)
     return split_pem_list(data)
 
 
 class FilterModule(object):
-    '''Ansible jinja2 filters'''
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'split_pem': split_pem_filter,
+            "split_pem": split_pem_filter,
         }

@@ -58,75 +58,90 @@ except ImportError:
 
 class OwnCACertificateBackendCryptography(CertificateBackend):
     def __init__(self, module):
-        super(OwnCACertificateBackendCryptography, self).__init__(module, 'cryptography')
+        super(OwnCACertificateBackendCryptography, self).__init__(
+            module, "cryptography"
+        )
 
-        self.create_subject_key_identifier = module.params['ownca_create_subject_key_identifier']
-        self.create_authority_key_identifier = module.params['ownca_create_authority_key_identifier']
+        self.create_subject_key_identifier = module.params[
+            "ownca_create_subject_key_identifier"
+        ]
+        self.create_authority_key_identifier = module.params[
+            "ownca_create_authority_key_identifier"
+        ]
         self.notBefore = get_relative_time_option(
-            module.params['ownca_not_before'],
-            'ownca_not_before',
+            module.params["ownca_not_before"],
+            "ownca_not_before",
             backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.notAfter = get_relative_time_option(
-            module.params['ownca_not_after'],
-            'ownca_not_after',
+            module.params["ownca_not_after"],
+            "ownca_not_after",
             backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
-        self.digest = select_message_digest(module.params['ownca_digest'])
-        self.version = module.params['ownca_version']
+        self.digest = select_message_digest(module.params["ownca_digest"])
+        self.version = module.params["ownca_version"]
         self.serial_number = x509.random_serial_number()
-        self.ca_cert_path = module.params['ownca_path']
-        self.ca_cert_content = module.params['ownca_content']
+        self.ca_cert_path = module.params["ownca_path"]
+        self.ca_cert_content = module.params["ownca_content"]
         if self.ca_cert_content is not None:
-            self.ca_cert_content = self.ca_cert_content.encode('utf-8')
-        self.ca_privatekey_path = module.params['ownca_privatekey_path']
-        self.ca_privatekey_content = module.params['ownca_privatekey_content']
+            self.ca_cert_content = self.ca_cert_content.encode("utf-8")
+        self.ca_privatekey_path = module.params["ownca_privatekey_path"]
+        self.ca_privatekey_content = module.params["ownca_privatekey_content"]
         if self.ca_privatekey_content is not None:
-            self.ca_privatekey_content = self.ca_privatekey_content.encode('utf-8')
-        self.ca_privatekey_passphrase = module.params['ownca_privatekey_passphrase']
+            self.ca_privatekey_content = self.ca_privatekey_content.encode("utf-8")
+        self.ca_privatekey_passphrase = module.params["ownca_privatekey_passphrase"]
 
         if self.csr_content is None and self.csr_path is None:
             raise CertificateError(
-                'csr_path or csr_content is required for ownca provider'
+                "csr_path or csr_content is required for ownca provider"
             )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
-                'The certificate signing request file {0} does not exist'.format(self.csr_path)
+                "The certificate signing request file {0} does not exist".format(
+                    self.csr_path
+                )
             )
         if self.ca_cert_content is None and not os.path.exists(self.ca_cert_path):
             raise CertificateError(
-                'The CA certificate file {0} does not exist'.format(self.ca_cert_path)
+                "The CA certificate file {0} does not exist".format(self.ca_cert_path)
             )
-        if self.ca_privatekey_content is None and not os.path.exists(self.ca_privatekey_path):
+        if self.ca_privatekey_content is None and not os.path.exists(
+            self.ca_privatekey_path
+        ):
             raise CertificateError(
-                'The CA private key file {0} does not exist'.format(self.ca_privatekey_path)
+                "The CA private key file {0} does not exist".format(
+                    self.ca_privatekey_path
+                )
             )
 
         self._ensure_csr_loaded()
         self.ca_cert = load_certificate(
-            path=self.ca_cert_path,
-            content=self.ca_cert_content,
-            backend=self.backend
+            path=self.ca_cert_path, content=self.ca_cert_content, backend=self.backend
         )
         try:
             self.ca_private_key = load_privatekey(
                 path=self.ca_privatekey_path,
                 content=self.ca_privatekey_content,
                 passphrase=self.ca_privatekey_passphrase,
-                backend=self.backend
+                backend=self.backend,
             )
         except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
 
-        if not cryptography_compare_public_keys(self.ca_cert.public_key(), self.ca_private_key.public_key()):
-            raise CertificateError('The CA private key does not belong to the CA certificate')
+        if not cryptography_compare_public_keys(
+            self.ca_cert.public_key(), self.ca_private_key.public_key()
+        ):
+            raise CertificateError(
+                "The CA private key does not belong to the CA certificate"
+            )
 
         if cryptography_key_needs_digest_for_signing(self.ca_private_key):
             if self.digest is None:
                 raise CertificateError(
-                    'The digest %s is not supported with the cryptography backend' % module.params['ownca_digest']
+                    "The digest %s is not supported with the cryptography backend"
+                    % module.params["ownca_digest"]
                 )
         else:
             self.digest = None
@@ -143,40 +158,60 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         has_ski = False
         for extension in self.csr.extensions:
             if isinstance(extension.value, x509.SubjectKeyIdentifier):
-                if self.create_subject_key_identifier == 'always_create':
+                if self.create_subject_key_identifier == "always_create":
                     continue
                 has_ski = True
-            if self.create_authority_key_identifier and isinstance(extension.value, x509.AuthorityKeyIdentifier):
+            if self.create_authority_key_identifier and isinstance(
+                extension.value, x509.AuthorityKeyIdentifier
+            ):
                 continue
-            cert_builder = cert_builder.add_extension(extension.value, critical=extension.critical)
-        if not has_ski and self.create_subject_key_identifier != 'never_create':
+            cert_builder = cert_builder.add_extension(
+                extension.value, critical=extension.critical
+            )
+        if not has_ski and self.create_subject_key_identifier != "never_create":
             cert_builder = cert_builder.add_extension(
                 x509.SubjectKeyIdentifier.from_public_key(self.csr.public_key()),
-                critical=False
+                critical=False,
             )
         if self.create_authority_key_identifier:
             try:
-                ext = self.ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
+                ext = self.ca_cert.extensions.get_extension_for_class(
+                    x509.SubjectKeyIdentifier
+                )
                 cert_builder = cert_builder.add_extension(
-                    x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext.value)
-                    if CRYPTOGRAPHY_VERSION >= LooseVersion('2.7') else
-                    x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext),
-                    critical=False
+                    (
+                        x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                            ext.value
+                        )
+                        if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
+                        else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                            ext
+                        )
+                    ),
+                    critical=False,
                 )
             except cryptography.x509.ExtensionNotFound:
                 cert_builder = cert_builder.add_extension(
-                    x509.AuthorityKeyIdentifier.from_issuer_public_key(self.ca_cert.public_key()),
-                    critical=False
+                    x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                        self.ca_cert.public_key()
+                    ),
+                    critical=False,
                 )
 
         try:
             certificate = cert_builder.sign(
-                private_key=self.ca_private_key, algorithm=self.digest,
-                backend=default_backend()
+                private_key=self.ca_private_key,
+                algorithm=self.digest,
+                backend=default_backend(),
             )
         except TypeError as e:
-            if str(e) == 'Algorithm must be a registered hash algorithm.' and self.digest is None:
-                self.module.fail_json(msg='Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer.')
+            if (
+                str(e) == "Algorithm must be a registered hash algorithm."
+                and self.digest is None
+            ):
+                self.module.fail_json(
+                    msg="Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer."
+                )
             raise
 
         self.cert = certificate
@@ -186,13 +221,17 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         return self.cert.public_bytes(Encoding.PEM)
 
     def needs_regeneration(self):
-        if super(OwnCACertificateBackendCryptography, self).needs_regeneration(not_before=self.notBefore, not_after=self.notAfter):
+        if super(OwnCACertificateBackendCryptography, self).needs_regeneration(
+            not_before=self.notBefore, not_after=self.notAfter
+        ):
             return True
 
         self._ensure_existing_certificate_loaded()
 
         # Check whether certificate is signed by CA certificate
-        if not cryptography_verify_certificate_signature(self.existing_certificate, self.ca_cert.public_key()):
+        if not cryptography_verify_certificate_signature(
+            self.existing_certificate, self.ca_cert.public_key()
+        ):
             return True
 
         # Check subject
@@ -202,17 +241,27 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         # Check AuthorityKeyIdentifier
         if self.create_authority_key_identifier:
             try:
-                ext = self.ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
+                ext = self.ca_cert.extensions.get_extension_for_class(
+                    x509.SubjectKeyIdentifier
+                )
                 expected_ext = (
-                    x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext.value)
-                    if CRYPTOGRAPHY_VERSION >= LooseVersion('2.7') else
-                    x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ext)
+                    x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                        ext.value
+                    )
+                    if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
+                    else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                        ext
+                    )
                 )
             except cryptography.x509.ExtensionNotFound:
-                expected_ext = x509.AuthorityKeyIdentifier.from_issuer_public_key(self.ca_cert.public_key())
+                expected_ext = x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                    self.ca_cert.public_key()
+                )
 
             try:
-                ext = self.existing_certificate.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
+                ext = self.existing_certificate.extensions.get_extension_for_class(
+                    x509.AuthorityKeyIdentifier
+                )
                 if ext.value != expected_ext:
                     return True
             except cryptography.x509.ExtensionNotFound:
@@ -221,26 +270,38 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         return False
 
     def dump(self, include_certificate):
-        result = super(OwnCACertificateBackendCryptography, self).dump(include_certificate)
-        result.update({
-            'ca_cert': self.ca_cert_path,
-            'ca_privatekey': self.ca_privatekey_path,
-        })
+        result = super(OwnCACertificateBackendCryptography, self).dump(
+            include_certificate
+        )
+        result.update(
+            {
+                "ca_cert": self.ca_cert_path,
+                "ca_privatekey": self.ca_privatekey_path,
+            }
+        )
 
         if self.module.check_mode:
-            result.update({
-                'notBefore': self.notBefore.strftime("%Y%m%d%H%M%SZ"),
-                'notAfter': self.notAfter.strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': self.serial_number,
-            })
+            result.update(
+                {
+                    "notBefore": self.notBefore.strftime("%Y%m%d%H%M%SZ"),
+                    "notAfter": self.notAfter.strftime("%Y%m%d%H%M%SZ"),
+                    "serial_number": self.serial_number,
+                }
+            )
         else:
             if self.cert is None:
                 self.cert = self.existing_certificate
-            result.update({
-                'notBefore': get_not_valid_before(self.cert).strftime("%Y%m%d%H%M%SZ"),
-                'notAfter': get_not_valid_after(self.cert).strftime("%Y%m%d%H%M%SZ"),
-                'serial_number': cryptography_serial_number_of_cert(self.cert),
-            })
+            result.update(
+                {
+                    "notBefore": get_not_valid_before(self.cert).strftime(
+                        "%Y%m%d%H%M%SZ"
+                    ),
+                    "notAfter": get_not_valid_after(self.cert).strftime(
+                        "%Y%m%d%H%M%SZ"
+                    ),
+                    "serial_number": cryptography_serial_number_of_cert(self.cert),
+                }
+            )
 
         return result
 
@@ -255,39 +316,53 @@ def generate_serial_number():
 
 class OwnCACertificateProvider(CertificateProvider):
     def validate_module_args(self, module):
-        if module.params['ownca_path'] is None and module.params['ownca_content'] is None:
-            module.fail_json(msg='One of ownca_path and ownca_content must be specified for the ownca provider.')
-        if module.params['ownca_privatekey_path'] is None and module.params['ownca_privatekey_content'] is None:
-            module.fail_json(msg='One of ownca_privatekey_path and ownca_privatekey_content must be specified for the ownca provider.')
+        if (
+            module.params["ownca_path"] is None
+            and module.params["ownca_content"] is None
+        ):
+            module.fail_json(
+                msg="One of ownca_path and ownca_content must be specified for the ownca provider."
+            )
+        if (
+            module.params["ownca_privatekey_path"] is None
+            and module.params["ownca_privatekey_content"] is None
+        ):
+            module.fail_json(
+                msg="One of ownca_privatekey_path and ownca_privatekey_content must be specified for the ownca provider."
+            )
 
     def needs_version_two_certs(self, module):
-        return module.params['ownca_version'] == 2
+        return module.params["ownca_version"] == 2
 
     def create_backend(self, module, backend):
-        if backend == 'cryptography':
+        if backend == "cryptography":
             return OwnCACertificateBackendCryptography(module)
 
 
 def add_ownca_provider_to_argument_spec(argument_spec):
-    argument_spec.argument_spec['provider']['choices'].append('ownca')
-    argument_spec.argument_spec.update(dict(
-        ownca_path=dict(type='path'),
-        ownca_content=dict(type='str'),
-        ownca_privatekey_path=dict(type='path'),
-        ownca_privatekey_content=dict(type='str', no_log=True),
-        ownca_privatekey_passphrase=dict(type='str', no_log=True),
-        ownca_digest=dict(type='str', default='sha256'),
-        ownca_version=dict(type='int', default=3),
-        ownca_not_before=dict(type='str', default='+0s'),
-        ownca_not_after=dict(type='str', default='+3650d'),
-        ownca_create_subject_key_identifier=dict(
-            type='str',
-            default='create_if_not_provided',
-            choices=['create_if_not_provided', 'always_create', 'never_create']
-        ),
-        ownca_create_authority_key_identifier=dict(type='bool', default=True),
-    ))
-    argument_spec.mutually_exclusive.extend([
-        ['ownca_path', 'ownca_content'],
-        ['ownca_privatekey_path', 'ownca_privatekey_content'],
-    ])
+    argument_spec.argument_spec["provider"]["choices"].append("ownca")
+    argument_spec.argument_spec.update(
+        dict(
+            ownca_path=dict(type="path"),
+            ownca_content=dict(type="str"),
+            ownca_privatekey_path=dict(type="path"),
+            ownca_privatekey_content=dict(type="str", no_log=True),
+            ownca_privatekey_passphrase=dict(type="str", no_log=True),
+            ownca_digest=dict(type="str", default="sha256"),
+            ownca_version=dict(type="int", default=3),
+            ownca_not_before=dict(type="str", default="+0s"),
+            ownca_not_after=dict(type="str", default="+3650d"),
+            ownca_create_subject_key_identifier=dict(
+                type="str",
+                default="create_if_not_provided",
+                choices=["create_if_not_provided", "always_create", "never_create"],
+            ),
+            ownca_create_authority_key_identifier=dict(type="bool", default=True),
+        )
+    )
+    argument_spec.mutually_exclusive.extend(
+        [
+            ["ownca_path", "ownca_content"],
+            ["ownca_privatekey_path", "ownca_privatekey_content"],
+        ]
+    )

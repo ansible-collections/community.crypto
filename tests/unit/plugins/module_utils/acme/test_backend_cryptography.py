@@ -39,26 +39,26 @@ from .backend_data import (
 
 
 if not HAS_CURRENT_CRYPTOGRAPHY:
-    pytest.skip('cryptography not found')
+    pytest.skip("cryptography not found")
 
 
 @pytest.mark.parametrize("pem, result, dummy", TEST_KEYS)
 def test_eckeyparse_cryptography(pem, result, dummy, tmpdir):
-    fn = tmpdir / 'test.pem'
+    fn = tmpdir / "test.pem"
     fn.write(pem)
     module = MagicMock()
     backend = CryptographyBackend(module)
     key = backend.parse_key(key_file=str(fn))
-    key.pop('key_obj')
+    key.pop("key_obj")
     assert key == result
     key = backend.parse_key(key_content=pem)
-    key.pop('key_obj')
+    key.pop("key_obj")
     assert key == result
 
 
 @pytest.mark.parametrize("csr, result, openssl_output", TEST_CSRS)
 def test_csridentifiers_cryptography(csr, result, openssl_output, tmpdir):
-    fn = tmpdir / 'test.csr'
+    fn = tmpdir / "test.csr"
     fn.write(csr)
     module = MagicMock()
     backend = CryptographyBackend(module)
@@ -71,7 +71,7 @@ def test_csridentifiers_cryptography(csr, result, openssl_output, tmpdir):
 @pytest.mark.parametrize("timezone, now, expected_days", TEST_CERT_DAYS)
 def test_certdays_cryptography(timezone, now, expected_days, tmpdir):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        fn = tmpdir / 'test-cert.pem'
+        fn = tmpdir / "test-cert.pem"
         fn.write(TEST_CERT)
         module = MagicMock()
         backend = CryptographyBackend(module)
@@ -81,9 +81,11 @@ def test_certdays_cryptography(timezone, now, expected_days, tmpdir):
         assert days == expected_days
 
 
-@pytest.mark.parametrize("cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO)
+@pytest.mark.parametrize(
+    "cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO
+)
 def test_get_cert_information(cert_content, expected_cert_info, openssl_output, tmpdir):
-    fn = tmpdir / 'test-cert.pem'
+    fn = tmpdir / "test-cert.pem"
     fn.write(cert_content)
     module = MagicMock()
     backend = CryptographyBackend(module)
@@ -103,7 +105,9 @@ def test_get_cert_information(cert_content, expected_cert_info, openssl_output, 
 # @pytest.mark.parametrize("timezone", TIMEZONES)
 # Due to a bug in freezegun (https://github.com/spulec/freezegun/issues/348, https://github.com/spulec/freezegun/issues/553)
 # this only works with timezone = UTC if CRYPTOGRAPHY_TIMEZONE is truish
-@pytest.mark.parametrize("timezone", [datetime.timedelta(hours=0)] if CRYPTOGRAPHY_TIMEZONE else TIMEZONES)
+@pytest.mark.parametrize(
+    "timezone", [datetime.timedelta(hours=0)] if CRYPTOGRAPHY_TIMEZONE else TIMEZONES
+)
 def test_now(timezone):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
@@ -127,7 +131,9 @@ def test_parse_acme_timestamp(timezone, input, expected):
         assert ts_expected == timestamp
 
 
-@pytest.mark.parametrize("timezone, start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP)
+@pytest.mark.parametrize(
+    "timezone, start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP
+)
 def test_interpolate_timestamp(timezone, start, end, percentage, expected):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()

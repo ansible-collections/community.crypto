@@ -19,48 +19,48 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 
 PEM_TEST_CASES = [
-    (b'', [], False, 'raw'),
-    (b'random stuff\nblabla', [], False, 'raw'),
-    (b'-----BEGIN PRIVATE KEY-----', [], False, 'raw'),
+    (b"", [], False, "raw"),
+    (b"random stuff\nblabla", [], False, "raw"),
+    (b"-----BEGIN PRIVATE KEY-----", [], False, "raw"),
     (
-        b'-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----',
-        ['-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----'],
+        b"-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
+        ["-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----"],
         True,
-        'pkcs8',
+        "pkcs8",
     ),
     (
-        b'foo=bar\n# random stuff\n-----BEGIN RSA PRIVATE KEY-----\nblabla\n-----END RSA PRIVATE KEY-----\nmore stuff\n',
-        ['-----BEGIN RSA PRIVATE KEY-----\nblabla\n-----END RSA PRIVATE KEY-----\n'],
+        b"foo=bar\n# random stuff\n-----BEGIN RSA PRIVATE KEY-----\nblabla\n-----END RSA PRIVATE KEY-----\nmore stuff\n",
+        ["-----BEGIN RSA PRIVATE KEY-----\nblabla\n-----END RSA PRIVATE KEY-----\n"],
         True,
-        'pkcs1',
+        "pkcs1",
     ),
     (
-        b'foo=bar\n# random stuff\n-----BEGIN CERTIFICATE-----\nblabla\n-----END CERTIFICATE-----\nmore stuff\n'
-        b'\n-----BEGIN CERTIFICATE-----\nfoobar\n-----END CERTIFICATE-----',
+        b"foo=bar\n# random stuff\n-----BEGIN CERTIFICATE-----\nblabla\n-----END CERTIFICATE-----\nmore stuff\n"
+        b"\n-----BEGIN CERTIFICATE-----\nfoobar\n-----END CERTIFICATE-----",
         [
-            '-----BEGIN CERTIFICATE-----\nblabla\n-----END CERTIFICATE-----\n',
-            '-----BEGIN CERTIFICATE-----\nfoobar\n-----END CERTIFICATE-----',
+            "-----BEGIN CERTIFICATE-----\nblabla\n-----END CERTIFICATE-----\n",
+            "-----BEGIN CERTIFICATE-----\nfoobar\n-----END CERTIFICATE-----",
         ],
         True,
-        'unknown-pem',
+        "unknown-pem",
     ),
     (
-        b'-----BEGINCERTIFICATE-----\n-----BEGIN CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n-----END CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n',
+        b"-----BEGINCERTIFICATE-----\n-----BEGIN CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n-----END CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n",
         [
-            '-----BEGIN CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n-----END CERTIFICATE-----\n',
+            "-----BEGIN CERTIFICATE-----\n-----BEGINCERTIFICATE-----\n-----END CERTIFICATE-----\n",
         ],
         True,
-        'unknown-pem',
+        "unknown-pem",
     ),
 ]
 
 
-@pytest.mark.parametrize('data, pems, is_pem, private_key_type', PEM_TEST_CASES)
+@pytest.mark.parametrize("data, pems, is_pem, private_key_type", PEM_TEST_CASES)
 def test_pem_handling(data, pems, is_pem, private_key_type):
     assert identify_pem_format(data) == is_pem
     assert identify_private_key_format(data) == private_key_type
     try:
-        text = data.decode('utf-8')
+        text = data.decode("utf-8")
         assert split_pem_list(text) == pems
         first_pem = pems[0] if pems else None
         assert extract_first_pem(text) == first_pem

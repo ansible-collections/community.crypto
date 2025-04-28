@@ -182,21 +182,21 @@ class PrivateKeyModule(OpenSSLObject):
 
     def __init__(self, module, module_backend):
         super(PrivateKeyModule, self).__init__(
-            module.params['path'],
-            module.params['state'],
-            module.params['force'],
+            module.params["path"],
+            module.params["state"],
+            module.params["force"],
             module.check_mode,
         )
         self.module_backend = module_backend
-        self.return_content = module.params['return_content']
+        self.return_content = module.params["return_content"]
         if self.force:
-            module_backend.regenerate = 'always'
+            module_backend.regenerate = "always"
 
-        self.backup = module.params['backup']
+        self.backup = module.params["backup"]
         self.backup_file = None
 
-        if module.params['mode'] is None:
-            module.params['mode'] = '0600'
+        if module.params["mode"] is None:
+            module.params["mode"] = "0600"
 
         module_backend.set_existing(load_file_if_exists(self.path, module))
 
@@ -227,10 +227,12 @@ class PrivateKeyModule(OpenSSLObject):
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
-        if module.check_file_absent_if_check_mode(file_args['path']):
+        if module.check_file_absent_if_check_mode(file_args["path"]):
             self.changed = True
         else:
-            self.changed = module.set_fs_attributes_if_different(file_args, self.changed)
+            self.changed = module.set_fs_attributes_if_different(
+                file_args, self.changed
+            )
 
     def remove(self, module):
         self.module_backend.set_existing(None)
@@ -242,10 +244,10 @@ class PrivateKeyModule(OpenSSLObject):
         """Serialize the object into a dictionary."""
 
         result = self.module_backend.dump(include_key=self.return_content)
-        result['filename'] = self.path
-        result['changed'] = self.changed
+        result["filename"] = self.path
+        result["changed"] = self.changed
         if self.backup_file:
-            result['backup_file'] = self.backup_file
+            result["backup_file"] = self.backup_file
 
         return result
 
@@ -253,34 +255,37 @@ class PrivateKeyModule(OpenSSLObject):
 def main():
 
     argument_spec = get_privatekey_argument_spec()
-    argument_spec.argument_spec.update(dict(
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        force=dict(type='bool', default=False),
-        path=dict(type='path', required=True),
-        backup=dict(type='bool', default=False),
-        return_content=dict(type='bool', default=False),
-    ))
+    argument_spec.argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            force=dict(type="bool", default=False),
+            path=dict(type="path", required=True),
+            backup=dict(type="bool", default=False),
+            return_content=dict(type="bool", default=False),
+        )
+    )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,
         add_file_common_args=True,
     )
 
-    base_dir = os.path.dirname(module.params['path']) or '.'
+    base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg='The directory %s does not exist or the file is not a directory' % base_dir
+            msg="The directory %s does not exist or the file is not a directory"
+            % base_dir,
         )
 
     backend, module_backend = select_backend(
         module=module,
-        backend=module.params['select_crypto_backend'],
+        backend=module.params["select_crypto_backend"],
     )
 
     try:
         private_key = PrivateKeyModule(module, module_backend)
 
-        if private_key.state == 'present':
+        if private_key.state == "present":
             private_key.generate(module)
         else:
             private_key.remove(module)
@@ -291,5 +296,5 @@ def main():
         module.fail_json(msg=to_native(exc))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

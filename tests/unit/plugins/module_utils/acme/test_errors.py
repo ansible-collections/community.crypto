@@ -21,97 +21,78 @@ from ansible_collections.community.internal_test_tools.tests.unit.compat.mock im
 TEST_FORMAT_ERROR_PROBLEM = [
     (
         {
-            'type': 'foo',
+            "type": "foo",
         },
-        '',
-        'Error foo'
+        "",
+        "Error foo",
     ),
+    ({"type": "foo", "title": "bar"}, "", 'Error "bar" (foo)'),
+    ({"type": "foo", "detail": "bar baz"}, "", 'Error foo: "bar baz"'),
+    ({"type": "foo", "subproblems": []}, "", "Error foo Subproblems:"),
     (
         {
-            'type': 'foo',
-            'title': 'bar'
-        },
-        '',
-        'Error "bar" (foo)'
-    ),
-    (
-        {
-            'type': 'foo',
-            'detail': 'bar baz'
-        },
-        '',
-        'Error foo: "bar baz"'
-    ),
-    (
-        {
-            'type': 'foo',
-            'subproblems': []
-        },
-        '',
-        'Error foo Subproblems:'
-    ),
-    (
-        {
-            'type': 'foo',
-            'subproblems': [
+            "type": "foo",
+            "subproblems": [
                 {
-                    'type': 'bar',
+                    "type": "bar",
                 },
-            ]
+            ],
         },
-        '',
-        'Error foo Subproblems:\n(0) Error bar'
+        "",
+        "Error foo Subproblems:\n(0) Error bar",
     ),
     (
         {
-            'type': 'foo',
-            'subproblems': [
+            "type": "foo",
+            "subproblems": [
                 {
-                    'type': 'bar',
-                    'subproblems': [
+                    "type": "bar",
+                    "subproblems": [
                         {
-                            'type': 'baz',
+                            "type": "baz",
                         },
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
-        '',
-        'Error foo Subproblems:\n(0) Error bar Subproblems:\n(0.0) Error baz'
+        "",
+        "Error foo Subproblems:\n(0) Error bar Subproblems:\n(0.0) Error baz",
     ),
     (
         {
-            'type': 'foo',
-            'title': 'Foo Error',
-            'detail': 'Foo went wrong',
-            'subproblems': [
+            "type": "foo",
+            "title": "Foo Error",
+            "detail": "Foo went wrong",
+            "subproblems": [
                 {
-                    'type': 'bar',
-                    'detail': 'Bar went wrong',
-                    'subproblems': [
+                    "type": "bar",
+                    "detail": "Bar went wrong",
+                    "subproblems": [
                         {
-                            'type': 'baz',
-                            'title': 'Baz Error',
+                            "type": "baz",
+                            "title": "Baz Error",
                         },
-                    ]
+                    ],
                 },
                 {
-                    'type': 'bar2',
-                    'title': 'Bar 2 Error',
-                    'detail': 'Bar really went wrong'
+                    "type": "bar2",
+                    "title": "Bar 2 Error",
+                    "detail": "Bar really went wrong",
                 },
-            ]
+            ],
         },
-        'X.',
+        "X.",
         'Error "Foo Error" (foo): "Foo went wrong" Subproblems:\n'
         '(X.0) Error bar: "Bar went wrong" Subproblems:\n'
         '(X.0.0) Error "Baz Error" (baz)\n'
-        '(X.1) Error "Bar 2 Error" (bar2): "Bar really went wrong"'
+        '(X.1) Error "Bar 2 Error" (bar2): "Bar really went wrong"',
     ),
 ]
 
 
-@pytest.mark.parametrize("problem, subproblem_prefix, result", TEST_FORMAT_ERROR_PROBLEM)
+@pytest.mark.parametrize(
+    "problem, subproblem_prefix, result", TEST_FORMAT_ERROR_PROBLEM
+)
 def test_format_error_problem(problem, subproblem_prefix, result):
     res = format_error_problem(problem, subproblem_prefix)
     assert res == result
@@ -119,14 +100,14 @@ def test_format_error_problem(problem, subproblem_prefix, result):
 
 def create_regular_response(response_text):
     response = MagicMock()
-    response.read = MagicMock(return_value=response_text.encode('utf-8'))
+    response.read = MagicMock(return_value=response_text.encode("utf-8"))
     response.closed = False
     return response
 
 
 def create_error_response():
     response = MagicMock()
-    response.read = MagicMock(side_effect=AttributeError('read'))
+    response.read = MagicMock(side_effect=AttributeError("read"))
     response.closed = True
     return response
 
@@ -142,220 +123,219 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
     (
         {},
         None,
-        'ACME request failed.',
-        {
-        },
+        "ACME request failed.",
+        {},
     ),
     (
         {
-            'msg': 'Foo',
-            'extras': {
-                'foo': 'bar',
+            "msg": "Foo",
+            "extras": {
+                "foo": "bar",
             },
         },
         None,
-        'Foo.',
+        "Foo.",
         {
-            'foo': 'bar',
+            "foo": "bar",
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
             },
         },
         None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.',
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.",
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
             },
-            'response': create_regular_response('xxx'),
-        },
-        None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx',
-        {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
-        },
-    ),
-    (
-        {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
-            },
-            'response': create_regular_response('xxx'),
-        },
-        create_decode_error('yyy'),
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx',
-        {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
-        },
-    ),
-    (
-        {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
-            },
-            'response': create_regular_response('xxx'),
-        },
-        lambda content: dict(foo='bar'),
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
-        {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
-        },
-    ),
-    (
-        {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
-            },
-            'response': create_error_response(),
-        },
-        None,
-        'ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.',
-        {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
-        },
-    ),
-    (
-        {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
-                'body': 'xxx',
-            },
-            'response': create_error_response(),
-        },
-        lambda content: dict(foo='bar'),
-        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
-        {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
-        },
-    ),
-    (
-        {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
-            },
-            'content': 'xxx',
+            "response": create_regular_response("xxx"),
         },
         None,
         "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx",
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 400,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
             },
-            'content_json': {
-                'foo': 'bar',
+            "response": create_regular_response("xxx"),
+        },
+        create_decode_error("yyy"),
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx",
+        {
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
+        },
+    ),
+    (
+        {
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
             },
-            'extras': {
-                'bar': 'baz',
-            }
+            "response": create_regular_response("xxx"),
+        },
+        lambda content: dict(foo="bar"),
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
+        {
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
+        },
+    ),
+    (
+        {
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
+            },
+            "response": create_error_response(),
+        },
+        None,
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created.",
+        {
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
+        },
+    ),
+    (
+        {
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
+                "body": "xxx",
+            },
+            "response": create_error_response(),
+        },
+        lambda content: dict(foo="bar"),
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
+        {
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
+        },
+    ),
+    (
+        {
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
+            },
+            "content": "xxx",
+        },
+        None,
+        "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The raw error result: xxx",
+        {
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
+        },
+    ),
+    (
+        {
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 400,
+            },
+            "content_json": {
+                "foo": "bar",
+            },
+            "extras": {
+                "bar": "baz",
+            },
         },
         None,
         "ACME request failed for https://ca.example.com/foo with HTTP status 400 Bad Request. The JSON error result: {'foo': 'bar'}",
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 400,
-            'bar': 'baz',
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 400,
+            "bar": "baz",
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 201,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 201,
             },
-            'content_json': {
-                'type': 'foo',
+            "content_json": {
+                "type": "foo",
             },
         },
         None,
         "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'type': 'foo'}",
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 201,
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 201,
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 400,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 400,
             },
-            'content_json': {
-                'type': 'foo',
+            "content_json": {
+                "type": "foo",
             },
         },
         None,
         "ACME request failed for https://ca.example.com/foo with status 400 Bad Request. Error foo.",
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 400,
-            'problem': {
-                'type': 'foo',
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 400,
+            "problem": {
+                "type": "foo",
             },
-            'subproblems': [],
+            "subproblems": [],
         },
     ),
     (
         {
-            'info': {
-                'url': 'https://ca.example.com/foo',
-                'status': 400,
+            "info": {
+                "url": "https://ca.example.com/foo",
+                "status": 400,
             },
-            'content_json': {
-                'type': 'foo',
-                'title': 'Foo Error',
-                'subproblems': [
+            "content_json": {
+                "type": "foo",
+                "title": "Foo Error",
+                "subproblems": [
                     {
-                        'type': 'bar',
-                        'detail': 'This is a bar error',
-                        'details': 'Details.',
+                        "type": "bar",
+                        "detail": "This is a bar error",
+                        "details": "Details.",
                     },
                 ],
             },
         },
         None,
-        "ACME request failed for https://ca.example.com/foo with status 400 Bad Request. Error \"Foo Error\" (foo). Subproblems:\n"
-        "(0) Error bar: \"This is a bar error\".",
+        'ACME request failed for https://ca.example.com/foo with status 400 Bad Request. Error "Foo Error" (foo). Subproblems:\n'
+        '(0) Error bar: "This is a bar error".',
         {
-            'http_url': 'https://ca.example.com/foo',
-            'http_status': 400,
-            'problem': {
-                'type': 'foo',
-                'title': 'Foo Error',
+            "http_url": "https://ca.example.com/foo",
+            "http_status": 400,
+            "problem": {
+                "type": "foo",
+                "title": "Foo Error",
             },
-            'subproblems': [
+            "subproblems": [
                 {
-                    'type': 'bar',
-                    'detail': 'This is a bar error',
-                    'details': 'Details.',
+                    "type": "bar",
+                    "detail": "This is a bar error",
+                    "details": "Details.",
                 },
             ],
         },

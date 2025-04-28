@@ -213,33 +213,48 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            size=dict(type='int'),
-            type=dict(type='str', default='rsa', choices=['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519']),
-            force=dict(type='bool', default=False),
-            path=dict(type='path', required=True),
-            comment=dict(type='str'),
-            regenerate=dict(
-                type='str',
-                default='partial_idempotence',
-                choices=['never', 'fail', 'partial_idempotence', 'full_idempotence', 'always']
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            size=dict(type="int"),
+            type=dict(
+                type="str",
+                default="rsa",
+                choices=["rsa", "dsa", "rsa1", "ecdsa", "ed25519"],
             ),
-            passphrase=dict(type='str', no_log=True),
+            force=dict(type="bool", default=False),
+            path=dict(type="path", required=True),
+            comment=dict(type="str"),
+            regenerate=dict(
+                type="str",
+                default="partial_idempotence",
+                choices=[
+                    "never",
+                    "fail",
+                    "partial_idempotence",
+                    "full_idempotence",
+                    "always",
+                ],
+            ),
+            passphrase=dict(type="str", no_log=True),
             private_key_format=dict(
-                type='str',
-                default='auto',
+                type="str",
+                default="auto",
                 no_log=False,
-                choices=['auto', 'pkcs1', 'pkcs8', 'ssh']),
-            backend=dict(type='str', default='auto', choices=['auto', 'cryptography', 'opensshbin'])
+                choices=["auto", "pkcs1", "pkcs8", "ssh"],
+            ),
+            backend=dict(
+                type="str",
+                default="auto",
+                choices=["auto", "cryptography", "opensshbin"],
+            ),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
     )
 
-    keypair = select_backend(module, module.params['backend'])[1]
+    keypair = select_backend(module, module.params["backend"])[1]
 
     keypair.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

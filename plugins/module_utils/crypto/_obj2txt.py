@@ -36,6 +36,7 @@ __metaclass__ = type
 #          It must **ONLY** be used in compatibility code for older
 #          cryptography versions!
 
+
 def obj2txt(openssl_lib, openssl_ffi, obj):
     # Set to 80 on the recommendation of
     # https://www.openssl.org/docs/crypto/OBJ_nid2ln.html#return_values

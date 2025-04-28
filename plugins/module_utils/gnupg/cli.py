@@ -39,19 +39,32 @@ class GPGRunner(object):
 def get_fingerprint_from_stdout(stdout):
     lines = stdout.splitlines(False)
     for line in lines:
-        if line.startswith('fpr:'):
-            parts = line.split(':')
+        if line.startswith("fpr:"):
+            parts = line.split(":")
             if len(parts) <= 9 or not parts[9]:
-                raise GPGError('Result line "{line}" does not have fingerprint as 10th component'.format(line=line))
+                raise GPGError(
+                    'Result line "{line}" does not have fingerprint as 10th component'.format(
+                        line=line
+                    )
+                )
             return parts[9]
-    raise GPGError('Cannot extract fingerprint from stdout "{stdout}"'.format(stdout=stdout))
+    raise GPGError(
+        'Cannot extract fingerprint from stdout "{stdout}"'.format(stdout=stdout)
+    )
 
 
 def get_fingerprint_from_file(gpg_runner, path):
     if not os.path.exists(path):
-        raise GPGError('{path} does not exist'.format(path=path))
+        raise GPGError("{path} does not exist".format(path=path))
     stdout = gpg_runner.run_command(
-        ['--no-keyring', '--with-colons', '--import-options', 'show-only', '--import', path],
+        [
+            "--no-keyring",
+            "--with-colons",
+            "--import-options",
+            "show-only",
+            "--import",
+            path,
+        ],
         check_rc=True,
     )[1]
     return get_fingerprint_from_stdout(stdout)
@@ -59,7 +72,14 @@ def get_fingerprint_from_file(gpg_runner, path):
 
 def get_fingerprint_from_bytes(gpg_runner, content):
     stdout = gpg_runner.run_command(
-        ['--no-keyring', '--with-colons', '--import-options', 'show-only', '--import', '/dev/stdin'],
+        [
+            "--no-keyring",
+            "--with-colons",
+            "--import-options",
+            "show-only",
+            "--import",
+            "/dev/stdin",
+        ],
         data=content,
         check_rc=True,
     )[1]

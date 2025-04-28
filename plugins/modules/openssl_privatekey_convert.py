@@ -86,19 +86,19 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 class PrivateKeyConvertModule(OpenSSLObject):
     def __init__(self, module, module_backend):
         super(PrivateKeyConvertModule, self).__init__(
-            module.params['dest_path'],
-            'present',
+            module.params["dest_path"],
+            "present",
             False,
             module.check_mode,
         )
         self.module_backend = module_backend
 
-        self.backup = module.params['backup']
+        self.backup = module.params["backup"]
         self.backup_file = None
 
-        module.params['path'] = module.params['dest_path']
-        if module.params['mode'] is None:
-            module.params['mode'] = '0600'
+        module.params["path"] = module.params["dest_path"]
+        if module.params["mode"] is None:
+            module.params["mode"] = "0600"
 
         module_backend.set_existing_destination(load_file_if_exists(self.path, module))
 
@@ -115,18 +115,20 @@ class PrivateKeyConvertModule(OpenSSLObject):
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
-        if module.check_file_absent_if_check_mode(file_args['path']):
+        if module.check_file_absent_if_check_mode(file_args["path"]):
             self.changed = True
         else:
-            self.changed = module.set_fs_attributes_if_different(file_args, self.changed)
+            self.changed = module.set_fs_attributes_if_different(
+                file_args, self.changed
+            )
 
     def dump(self):
         """Serialize the object into a dictionary."""
 
         result = self.module_backend.dump()
-        result['changed'] = self.changed
+        result["changed"] = self.changed
         if self.backup_file:
-            result['backup_file'] = self.backup_file
+            result["backup_file"] = self.backup_file
 
         return result
 
@@ -134,20 +136,23 @@ class PrivateKeyConvertModule(OpenSSLObject):
 def main():
 
     argument_spec = get_privatekey_argument_spec()
-    argument_spec.argument_spec.update(dict(
-        dest_path=dict(type='path', required=True),
-        backup=dict(type='bool', default=False),
-    ))
+    argument_spec.argument_spec.update(
+        dict(
+            dest_path=dict(type="path", required=True),
+            backup=dict(type="bool", default=False),
+        )
+    )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,
         add_file_common_args=True,
     )
 
-    base_dir = os.path.dirname(module.params['dest_path']) or '.'
+    base_dir = os.path.dirname(module.params["dest_path"]) or "."
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg='The directory %s does not exist or the file is not a directory' % base_dir
+            msg="The directory %s does not exist or the file is not a directory"
+            % base_dir,
         )
 
     module_backend = select_backend(module=module)
@@ -163,5 +168,5 @@ def main():
         module.fail_json(msg=to_native(exc))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

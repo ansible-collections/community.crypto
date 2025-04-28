@@ -151,13 +151,14 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 
 class GenericCertificate(object):
     """Retrieve a certificate using the given module backend."""
+
     def __init__(self, module, module_backend):
         self.check_mode = module.check_mode
         self.module = module
         self.module_backend = module_backend
         self.changed = False
-        if module.params['content'] is not None:
-            self.module_backend.set_existing(module.params['content'].encode('utf-8'))
+        if module.params["content"] is not None:
+            self.module_backend.set_existing(module.params["content"].encode("utf-8"))
 
     def generate(self, module):
         if self.module_backend.needs_regeneration():
@@ -165,46 +166,50 @@ class GenericCertificate(object):
                 self.module_backend.generate_certificate()
             else:
                 self.module.deprecate(
-                    'Check mode support for x509_certificate_pipe will change in community.crypto 3.0.0'
-                    ' to behave the same as without check mode. You can get that behavior right now'
-                    ' by adding `check_mode: false` to the x509_certificate_pipe task. If you think this'
-                    ' breaks your use-case of this module, please create an issue in the'
-                    ' community.crypto repository',
-                    version='3.0.0',
-                    collection_name='community.crypto',
+                    "Check mode support for x509_certificate_pipe will change in community.crypto 3.0.0"
+                    " to behave the same as without check mode. You can get that behavior right now"
+                    " by adding `check_mode: false` to the x509_certificate_pipe task. If you think this"
+                    " breaks your use-case of this module, please create an issue in the"
+                    " community.crypto repository",
+                    version="3.0.0",
+                    collection_name="community.crypto",
                 )
             self.changed = True
 
     def dump(self, check_mode=False):
         result = self.module_backend.dump(include_certificate=True)
-        result.update({
-            'changed': self.changed,
-        })
+        result.update(
+            {
+                "changed": self.changed,
+            }
+        )
         return result
 
 
 def main():
     argument_spec = get_certificate_argument_spec()
-    argument_spec.argument_spec['provider']['required'] = True
+    argument_spec.argument_spec["provider"]["required"] = True
     add_entrust_provider_to_argument_spec(argument_spec)
     add_ownca_provider_to_argument_spec(argument_spec)
     add_selfsigned_provider_to_argument_spec(argument_spec)
-    argument_spec.argument_spec.update(dict(
-        content=dict(type='str'),
-    ))
+    argument_spec.argument_spec.update(
+        dict(
+            content=dict(type="str"),
+        )
+    )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,
     )
 
     try:
-        provider = module.params['provider']
+        provider = module.params["provider"]
         provider_map = {
-            'entrust': EntrustCertificateProvider,
-            'ownca': OwnCACertificateProvider,
-            'selfsigned': SelfSignedCertificateProvider,
+            "entrust": EntrustCertificateProvider,
+            "ownca": OwnCACertificateProvider,
+            "selfsigned": SelfSignedCertificateProvider,
         }
 
-        backend = module.params['select_crypto_backend']
+        backend = module.params["select_crypto_backend"]
         module_backend = select_backend(module, backend, provider_map[provider]())
         certificate = GenericCertificate(module, module_backend)
         certificate.generate(module)

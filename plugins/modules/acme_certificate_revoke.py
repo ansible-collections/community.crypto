@@ -137,18 +137,28 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 def main():
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
-        private_key_src=dict(type='path'),
-        private_key_content=dict(type='str', no_log=True),
-        private_key_passphrase=dict(type='str', no_log=True),
-        certificate=dict(type='path', required=True),
-        revoke_reason=dict(type='int'),
+        private_key_src=dict(type="path"),
+        private_key_content=dict(type="str", no_log=True),
+        private_key_passphrase=dict(type="str", no_log=True),
+        certificate=dict(type="path", required=True),
+        revoke_reason=dict(type="int"),
     )
     argument_spec.update(
         required_one_of=(
-            ['account_key_src', 'account_key_content', 'private_key_src', 'private_key_content'],
+            [
+                "account_key_src",
+                "account_key_content",
+                "private_key_src",
+                "private_key_content",
+            ],
         ),
         mutually_exclusive=(
-            ['account_key_src', 'account_key_content', 'private_key_src', 'private_key_content'],
+            [
+                "account_key_src",
+                "account_key_content",
+                "private_key_src",
+                "private_key_content",
+            ],
         ),
     )
     module = argument_spec.create_ansible_module()
@@ -158,70 +168,86 @@ def main():
         client = ACMEClient(module, backend)
         account = ACMEAccount(client)
         # Load certificate
-        certificate = pem_to_der(module.params.get('certificate'))
+        certificate = pem_to_der(module.params.get("certificate"))
         certificate = nopad_b64(certificate)
         # Construct payload
-        payload = {
-            'certificate': certificate
-        }
-        if module.params.get('revoke_reason') is not None:
-            payload['reason'] = module.params.get('revoke_reason')
+        payload = {"certificate": certificate}
+        if module.params.get("revoke_reason") is not None:
+            payload["reason"] = module.params.get("revoke_reason")
         # Determine endpoint
-        if module.params.get('acme_version') == 1:
-            endpoint = client.directory['revoke-cert']
-            payload['resource'] = 'revoke-cert'
+        if module.params.get("acme_version") == 1:
+            endpoint = client.directory["revoke-cert"]
+            payload["resource"] = "revoke-cert"
         else:
-            endpoint = client.directory['revokeCert']
+            endpoint = client.directory["revokeCert"]
         # Get hold of private key (if available) and make sure it comes from disk
-        private_key = module.params.get('private_key_src')
-        private_key_content = module.params.get('private_key_content')
+        private_key = module.params.get("private_key_src")
+        private_key_content = module.params.get("private_key_content")
         # Revoke certificate
         if private_key or private_key_content:
-            passphrase = module.params['private_key_passphrase']
+            passphrase = module.params["private_key_passphrase"]
             # Step 1: load and parse private key
             try:
-                private_key_data = client.parse_key(private_key, private_key_content, passphrase=passphrase)
+                private_key_data = client.parse_key(
+                    private_key, private_key_content, passphrase=passphrase
+                )
             except KeyParsingError as e:
-                raise ModuleFailException("Error while parsing private key: {msg}".format(msg=e.msg))
+                raise ModuleFailException(
+                    "Error while parsing private key: {msg}".format(msg=e.msg)
+                )
             # Step 2: sign revokation request with private key
             jws_header = {
-                "alg": private_key_data['alg'],
-                "jwk": private_key_data['jwk'],
+                "alg": private_key_data["alg"],
+                "jwk": private_key_data["jwk"],
             }
             result, info = client.send_signed_request(
-                endpoint, payload, key_data=private_key_data, jws_header=jws_header, fail_on_error=False)
+                endpoint,
+                payload,
+                key_data=private_key_data,
+                jws_header=jws_header,
+                fail_on_error=False,
+            )
         else:
             # Step 1: get hold of account URI
             created, account_data = account.setup_account(allow_creation=False)
             if created:
-                raise AssertionError('Unwanted account creation')
+                raise AssertionError("Unwanted account creation")
             if account_data is None:
-                raise ModuleFailException(msg='Account does not exist or is deactivated.')
+                raise ModuleFailException(
+                    msg="Account does not exist or is deactivated."
+                )
             # Step 2: sign revokation request with account key
-            result, info = client.send_signed_request(endpoint, payload, fail_on_error=False)
-        if info['status'] != 200:
+            result, info = client.send_signed_request(
+                endpoint, payload, fail_on_error=False
+            )
+        if info["status"] != 200:
             already_revoked = False
             # Standardized error from draft 14 on (https://tools.ietf.org/html/rfc8555#section-7.6)
-            if result.get('type') == 'urn:ietf:params:acme:error:alreadyRevoked':
+            if result.get("type") == "urn:ietf:params:acme:error:alreadyRevoked":
                 already_revoked = True
             else:
                 # Hack for Boulder errors
-                if module.params.get('acme_version') == 1:
-                    error_type = 'urn:acme:error:malformed'
+                if module.params.get("acme_version") == 1:
+                    error_type = "urn:acme:error:malformed"
                 else:
-                    error_type = 'urn:ietf:params:acme:error:malformed'
-                if result.get('type') == error_type and result.get('detail') == 'Certificate already revoked':
+                    error_type = "urn:ietf:params:acme:error:malformed"
+                if (
+                    result.get("type") == error_type
+                    and result.get("detail") == "Certificate already revoked"
+                ):
                     # Fallback: boulder returns this in case the certificate was already revoked.
                     already_revoked = True
             # If we know the certificate was already revoked, we do not fail,
             # but successfully terminate while indicating no change
             if already_revoked:
                 module.exit_json(changed=False)
-            raise ACMEProtocolException(module, 'Failed to revoke certificate', info=info, content_json=result)
+            raise ACMEProtocolException(
+                module, "Failed to revoke certificate", info=info, content_json=result
+            )
         module.exit_json(changed=True)
     except ModuleFailException as e:
         e.do_fail(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

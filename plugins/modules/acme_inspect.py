@@ -252,17 +252,19 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 def main():
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
-        url=dict(type='str'),
-        method=dict(type='str', choices=['get', 'post', 'directory-only'], default='get'),
-        content=dict(type='str'),
-        fail_on_acme_error=dict(type='bool', default=True),
+        url=dict(type="str"),
+        method=dict(
+            type="str", choices=["get", "post", "directory-only"], default="get"
+        ),
+        content=dict(type="str"),
+        fail_on_acme_error=dict(type="bool", default=True),
     )
     argument_spec.update(
         required_if=(
-            ['method', 'get', ['url']],
-            ['method', 'post', ['url', 'content']],
-            ['method', 'get', ['account_key_src', 'account_key_content'], True],
-            ['method', 'post', ['account_key_src', 'account_key_content'], True],
+            ["method", "get", ["url"]],
+            ["method", "post", ["url", "content"]],
+            ["method", "get", ["account_key_src", "account_key_content"], True],
+            ["method", "post", ["account_key_src", "account_key_content"], True],
         ),
     )
     module = argument_spec.create_ansible_module()
@@ -273,31 +275,40 @@ def main():
     try:
         # Get hold of ACMEClient and ACMEAccount objects (includes directory)
         client = ACMEClient(module, backend)
-        method = module.params['method']
-        result['directory'] = client.directory.directory
+        method = module.params["method"]
+        result["directory"] = client.directory.directory
         # Do we have to do more requests?
-        if method != 'directory-only':
-            url = module.params['url']
-            fail_on_acme_error = module.params['fail_on_acme_error']
+        if method != "directory-only":
+            url = module.params["url"]
+            fail_on_acme_error = module.params["fail_on_acme_error"]
             # Do request
-            if method == 'get':
-                data, info = client.get_request(url, parse_json_result=False, fail_on_error=False)
-            elif method == 'post':
+            if method == "get":
+                data, info = client.get_request(
+                    url, parse_json_result=False, fail_on_error=False
+                )
+            elif method == "post":
                 changed = True  # only POSTs can change
                 data, info = client.send_signed_request(
-                    url, to_bytes(module.params['content']), parse_json_result=False, encode_payload=False, fail_on_error=False)
+                    url,
+                    to_bytes(module.params["content"]),
+                    parse_json_result=False,
+                    encode_payload=False,
+                    fail_on_error=False,
+                )
             # Update results
-            result.update(dict(
-                headers=info,
-                output_text=to_native(data),
-            ))
+            result.update(
+                dict(
+                    headers=info,
+                    output_text=to_native(data),
+                )
+            )
             # See if we can parse the result as JSON
             try:
-                result['output_json'] = module.from_json(to_text(data))
+                result["output_json"] = module.from_json(to_text(data))
             except Exception:
                 pass
             # Fail if error was returned
-            if fail_on_acme_error and info['status'] >= 400:
+            if fail_on_acme_error and info["status"] >= 400:
                 raise ACMEProtocolException(module, info=info, content=data)
         # Done!
         module.exit_json(changed=changed, **result)
@@ -305,5 +316,5 @@ def main():
         e.do_fail(module, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

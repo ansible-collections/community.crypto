@@ -156,7 +156,8 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-    HAS_CRYPTOGRAPHY = (LooseVersion(cryptography.__version__) >= LooseVersion('1.5'))
+
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.5")
     _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -164,44 +165,55 @@ except ImportError:
 
 
 class Certificate(object):
-    '''
+    """
     Stores PEM with parsed certificate.
-    '''
+    """
+
     def __init__(self, pem, cert):
-        if not (pem.endswith('\n') or pem.endswith('\r')):
-            pem = pem + '\n'
+        if not (pem.endswith("\n") or pem.endswith("\r")):
+            pem = pem + "\n"
         self.pem = pem
         self.cert = cert
 
 
 def is_parent(module, cert, potential_parent):
-    '''
+    """
     Tests whether the given certificate has been issued by the potential parent certificate.
-    '''
+    """
     # Check issuer
     if cert.cert.issuer != potential_parent.cert.subject:
         return False
     # Check signature
     public_key = potential_parent.cert.public_key()
     try:
-        if isinstance(public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
+        if isinstance(
+            public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey
+        ):
             public_key.verify(
                 cert.cert.signature,
                 cert.cert.tbs_certificate_bytes,
                 cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15(),
-                cert.cert.signature_hash_algorithm
+                cert.cert.signature_hash_algorithm,
             )
-        elif isinstance(public_key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey):
+        elif isinstance(
+            public_key,
+            cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
+        ):
             public_key.verify(
                 cert.cert.signature,
                 cert.cert.tbs_certificate_bytes,
-                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(cert.cert.signature_hash_algorithm),
+                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(
+                    cert.cert.signature_hash_algorithm
+                ),
             )
         elif CRYPTOGRAPHY_HAS_ED25519_SIGN and isinstance(
-                public_key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey):
+            public_key,
+            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+        ):
             public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
         elif CRYPTOGRAPHY_HAS_ED448_SIGN and isinstance(
-                public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey):
+            public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
+        ):
             public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
         else:
             # Unknown public key type
@@ -211,24 +223,30 @@ def is_parent(module, cert, potential_parent):
     except cryptography.exceptions.InvalidSignature:
         return False
     except cryptography.exceptions.UnsupportedAlgorithm:
-        module.warn('Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm))
+        module.warn(
+            'Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm)
+        )
         return False
     except Exception as e:
-        module.fail_json(msg='Unknown error on signature validation: {0}'.format(e))
+        module.fail_json(msg="Unknown error on signature validation: {0}".format(e))
 
 
 def parse_PEM_list(module, text, source, fail_on_error=True):
-    '''
+    """
     Parse concatenated PEM certificates. Return list of ``Certificate`` objects.
-    '''
+    """
     result = []
     for cert_pem in split_pem_list(text):
         # Try to load PEM certificate
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(to_bytes(cert_pem), _cryptography_backend)
+            cert = cryptography.x509.load_pem_x509_certificate(
+                to_bytes(cert_pem), _cryptography_backend
+            )
             result.append(Certificate(cert_pem, cert))
         except Exception as e:
-            msg = 'Cannot parse certificate #{0} from {1}: {2}'.format(len(result) + 1, source, e)
+            msg = "Cannot parse certificate #{0} from {1}: {2}".format(
+                len(result) + 1, source, e
+            )
             if fail_on_error:
                 module.fail_json(msg=msg)
             else:
@@ -237,14 +255,19 @@ def parse_PEM_list(module, text, source, fail_on_error=True):
 
 
 def load_PEM_list(module, path, fail_on_error=True):
-    '''
+    """
     Load concatenated PEM certificates from file. Return list of ``Certificate`` objects.
-    '''
+    """
     try:
         with open(path, "rb") as f:
-            return parse_PEM_list(module, f.read().decode('utf-8'), source=path, fail_on_error=fail_on_error)
+            return parse_PEM_list(
+                module,
+                f.read().decode("utf-8"),
+                source=path,
+                fail_on_error=fail_on_error,
+            )
     except Exception as e:
-        msg = 'Cannot read certificate file {0}: {1}'.format(path, e)
+        msg = "Cannot read certificate file {0}: {1}".format(path, e)
         if fail_on_error:
             module.fail_json(msg=msg)
         else:
@@ -253,9 +276,9 @@ def load_PEM_list(module, path, fail_on_error=True):
 
 
 class CertificateSet(object):
-    '''
+    """
     Stores a set of certificates. Allows to search for parent (issuer of a certificate).
-    '''
+    """
 
     def __init__(self, module):
         self.module = module
@@ -273,10 +296,10 @@ class CertificateSet(object):
             self.certificate_by_cert[cert.cert] = cert
 
     def load(self, path):
-        '''
+        """
         Load lists of PEM certificates from a file or a directory.
-        '''
-        b_path = to_bytes(path, errors='surrogate_or_strict')
+        """
+        b_path = to_bytes(path, errors="surrogate_or_strict")
         if os.path.isdir(b_path):
             for directory, dummy, files in os.walk(b_path, followlinks=True):
                 for file in files:
@@ -285,9 +308,9 @@ class CertificateSet(object):
             self._load_file(b_path)
 
     def find_parent(self, cert):
-        '''
+        """
         Search for the parent (issuer) of a certificate. Return ``None`` if none was found.
-        '''
+        """
         potential_parents = self.certificates_by_issuer.get(cert.cert.issuer, [])
         for potential_parent in potential_parents:
             if is_parent(self.module, cert, potential_parent):
@@ -296,55 +319,62 @@ class CertificateSet(object):
 
 
 def format_cert(cert):
-    '''
+    """
     Return human readable representation of certificate for error messages.
-    '''
+    """
     return str(cert.cert)
 
 
 def check_cycle(module, occured_certificates, next):
-    '''
+    """
     Make sure that next is not in occured_certificates so far, and add it.
-    '''
+    """
     next_cert = next.cert
     if next_cert in occured_certificates:
-        module.fail_json(msg='Found cycle while building certificate chain')
+        module.fail_json(msg="Found cycle while building certificate chain")
     occured_certificates.add(next_cert)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            input_chain=dict(type='str', required=True),
-            root_certificates=dict(type='list', required=True, elements='path'),
-            intermediate_certificates=dict(type='list', default=[], elements='path'),
+            input_chain=dict(type="str", required=True),
+            root_certificates=dict(type="list", required=True, elements="path"),
+            intermediate_certificates=dict(type="list", default=[], elements="path"),
         ),
         supports_check_mode=True,
     )
 
     if not HAS_CRYPTOGRAPHY:
-        module.fail_json(msg=missing_required_lib('cryptography >= 1.5'), exception=CRYPTOGRAPHY_IMP_ERR)
+        module.fail_json(
+            msg=missing_required_lib("cryptography >= 1.5"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
 
     # Load chain
-    chain = parse_PEM_list(module, module.params['input_chain'], source='input chain')
+    chain = parse_PEM_list(module, module.params["input_chain"], source="input chain")
     if len(chain) == 0:
-        module.fail_json(msg='Input chain must contain at least one certificate')
+        module.fail_json(msg="Input chain must contain at least one certificate")
 
     # Check chain
     for i, parent in enumerate(chain):
         if i > 0:
             if not is_parent(module, chain[i - 1], parent):
-                module.fail_json(msg=('Cannot verify input chain: certificate #{2}: {3} is not issuer ' +
-                                      'of certificate #{0}: {1}').format(i, format_cert(chain[i - 1]), i + 1, format_cert(parent)))
+                module.fail_json(
+                    msg=(
+                        "Cannot verify input chain: certificate #{2}: {3} is not issuer "
+                        + "of certificate #{0}: {1}"
+                    ).format(i, format_cert(chain[i - 1]), i + 1, format_cert(parent))
+                )
 
     # Load intermediate certificates
     intermediates = CertificateSet(module)
-    for path in module.params['intermediate_certificates']:
+    for path in module.params["intermediate_certificates"]:
         intermediates.load(path)
 
     # Load root certificates
     roots = CertificateSet(module)
-    for path in module.params['root_certificates']:
+    for path in module.params["root_certificates"]:
         roots.load(path)
 
     # Try to complete chain
@@ -366,7 +396,11 @@ def main():
             completed.append(intermediate)
             current = intermediate
         else:
-            module.fail_json(msg='Cannot complete chain. Stuck at certificate {0}'.format(format_cert(current)))
+            module.fail_json(
+                msg="Cannot complete chain. Stuck at certificate {0}".format(
+                    format_cert(current)
+                )
+            )
 
     # Return results
     complete_chain = chain + completed

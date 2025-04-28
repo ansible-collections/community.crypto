@@ -237,15 +237,15 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
 def calculate_days_remaining(expiry_date):
     days_remaining = None
     if expiry_date:
-        expiry_datetime = datetime.datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M:%SZ')
+        expiry_datetime = datetime.datetime.strptime(expiry_date, "%Y-%m-%dT%H:%M:%SZ")
         days_remaining = (expiry_datetime - datetime.datetime.now()).days
     return days_remaining
 
 
 class EcsDomain(object):
-    '''
+    """
     Entrust Certificate Services domain class.
-    '''
+    """
 
     def __init__(self, module):
         self.changed = False
@@ -270,53 +270,76 @@ class EcsDomain(object):
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
         try:
             self.ecs_client = ECSClient(
-                entrust_api_user=module.params['entrust_api_user'],
-                entrust_api_key=module.params['entrust_api_key'],
-                entrust_api_cert=module.params['entrust_api_client_cert_path'],
-                entrust_api_cert_key=module.params['entrust_api_client_cert_key_path'],
-                entrust_api_specification_path=module.params['entrust_api_specification_path']
+                entrust_api_user=module.params["entrust_api_user"],
+                entrust_api_key=module.params["entrust_api_key"],
+                entrust_api_cert=module.params["entrust_api_client_cert_path"],
+                entrust_api_cert_key=module.params["entrust_api_client_cert_key_path"],
+                entrust_api_specification_path=module.params[
+                    "entrust_api_specification_path"
+                ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(msg='Failed to initialize Entrust Provider: {0}'.format(to_native(e)))
+            module.fail_json(
+                msg="Failed to initialize Entrust Provider: {0}".format(to_native(e))
+            )
         try:
             self.ecs_client.GetAppVersion()
         except RestOperationException as e:
-            module.fail_json(msg='Please verify credential information. Received exception when testing ECS connection: {0}'.format(to_native(e.message)))
+            module.fail_json(
+                msg="Please verify credential information. Received exception when testing ECS connection: {0}".format(
+                    to_native(e.message)
+                )
+            )
 
     def set_domain_details(self, domain_details):
-        if domain_details.get('verificationMethod'):
-            self.verification_method = domain_details['verificationMethod'].lower()
-        self.domain_status = domain_details['verificationStatus']
-        self.ov_eligible = domain_details.get('ovEligible')
-        self.ov_days_remaining = calculate_days_remaining(domain_details.get('ovExpiry'))
-        self.ev_eligible = domain_details.get('evEligible')
-        self.ev_days_remaining = calculate_days_remaining(domain_details.get('evExpiry'))
-        self.client_id = domain_details['clientId']
+        if domain_details.get("verificationMethod"):
+            self.verification_method = domain_details["verificationMethod"].lower()
+        self.domain_status = domain_details["verificationStatus"]
+        self.ov_eligible = domain_details.get("ovEligible")
+        self.ov_days_remaining = calculate_days_remaining(
+            domain_details.get("ovExpiry")
+        )
+        self.ev_eligible = domain_details.get("evEligible")
+        self.ev_days_remaining = calculate_days_remaining(
+            domain_details.get("evExpiry")
+        )
+        self.client_id = domain_details["clientId"]
 
-        if self.verification_method == 'dns' and domain_details.get('dnsMethod'):
-            self.dns_location = domain_details['dnsMethod']['recordDomain']
-            self.dns_resource_type = domain_details['dnsMethod']['recordType']
-            self.dns_contents = domain_details['dnsMethod']['recordValue']
-        elif self.verification_method == 'web_server' and domain_details.get('webServerMethod'):
-            self.file_location = domain_details['webServerMethod']['fileLocation']
-            self.file_contents = domain_details['webServerMethod']['fileContents']
-        elif self.verification_method == 'email' and domain_details.get('emailMethod'):
-            self.emails = domain_details['emailMethod']
+        if self.verification_method == "dns" and domain_details.get("dnsMethod"):
+            self.dns_location = domain_details["dnsMethod"]["recordDomain"]
+            self.dns_resource_type = domain_details["dnsMethod"]["recordType"]
+            self.dns_contents = domain_details["dnsMethod"]["recordValue"]
+        elif self.verification_method == "web_server" and domain_details.get(
+            "webServerMethod"
+        ):
+            self.file_location = domain_details["webServerMethod"]["fileLocation"]
+            self.file_contents = domain_details["webServerMethod"]["fileContents"]
+        elif self.verification_method == "email" and domain_details.get("emailMethod"):
+            self.emails = domain_details["emailMethod"]
 
     def check(self, module):
         try:
-            domain_details = self.ecs_client.GetDomain(clientId=module.params['client_id'], domain=module.params['domain_name'])
+            domain_details = self.ecs_client.GetDomain(
+                clientId=module.params["client_id"], domain=module.params["domain_name"]
+            )
             self.set_domain_details(domain_details)
-            if self.domain_status != 'APPROVED' and self.domain_status != 'INITIAL_VERIFICATION' and self.domain_status != 'RE_VERIFICATION':
+            if (
+                self.domain_status != "APPROVED"
+                and self.domain_status != "INITIAL_VERIFICATION"
+                and self.domain_status != "RE_VERIFICATION"
+            ):
                 return False
 
             # If domain verification is in process, we want to return the random values and treat it as a valid.
-            if self.domain_status == 'INITIAL_VERIFICATION' or self.domain_status == 'RE_VERIFICATION':
+            if (
+                self.domain_status == "INITIAL_VERIFICATION"
+                or self.domain_status == "RE_VERIFICATION"
+            ):
                 # Unless the verification method has changed, in which case we need to do a reverify request.
-                if self.verification_method != module.params['verification_method']:
+                if self.verification_method != module.params["verification_method"]:
                     return False
 
-            if self.domain_status == 'EXPIRING':
+            if self.domain_status == "EXPIRING":
                 return False
 
             return True
@@ -327,83 +350,112 @@ class EcsDomain(object):
         if not self.check(module):
             body = {}
 
-            body['verificationMethod'] = module.params['verification_method'].upper()
-            if module.params['verification_method'] == 'email':
+            body["verificationMethod"] = module.params["verification_method"].upper()
+            if module.params["verification_method"] == "email":
                 emailMethod = {}
-                if module.params['verification_email']:
-                    emailMethod['emailSource'] = 'SPECIFIED'
-                    emailMethod['email'] = module.params['verification_email']
+                if module.params["verification_email"]:
+                    emailMethod["emailSource"] = "SPECIFIED"
+                    emailMethod["email"] = module.params["verification_email"]
                 else:
-                    emailMethod['emailSource'] = 'INCLUDE_WHOIS'
-                body['emailMethod'] = emailMethod
+                    emailMethod["emailSource"] = "INCLUDE_WHOIS"
+                body["emailMethod"] = emailMethod
             # Only populate domain name in body if it is not an existing domain
             if not self.domain_status:
-                body['domainName'] = module.params['domain_name']
+                body["domainName"] = module.params["domain_name"]
             try:
                 if not self.domain_status:
-                    self.ecs_client.AddDomain(clientId=module.params['client_id'], Body=body)
+                    self.ecs_client.AddDomain(
+                        clientId=module.params["client_id"], Body=body
+                    )
                 else:
-                    self.ecs_client.ReverifyDomain(clientId=module.params['client_id'], domain=module.params['domain_name'], Body=body)
+                    self.ecs_client.ReverifyDomain(
+                        clientId=module.params["client_id"],
+                        domain=module.params["domain_name"],
+                        Body=body,
+                    )
 
                 time.sleep(5)
-                result = self.ecs_client.GetDomain(clientId=module.params['client_id'], domain=module.params['domain_name'])
+                result = self.ecs_client.GetDomain(
+                    clientId=module.params["client_id"],
+                    domain=module.params["domain_name"],
+                )
 
                 # It takes a bit of time before the random values are available
-                if module.params['verification_method'] == 'dns' or module.params['verification_method'] == 'web_server':
+                if (
+                    module.params["verification_method"] == "dns"
+                    or module.params["verification_method"] == "web_server"
+                ):
                     for i in range(4):
                         # Check both that random values are now available, and that they're different than were populated by previous 'check'
-                        if module.params['verification_method'] == 'dns':
-                            if result.get('dnsMethod') and result['dnsMethod']['recordValue'] != self.dns_contents:
+                        if module.params["verification_method"] == "dns":
+                            if (
+                                result.get("dnsMethod")
+                                and result["dnsMethod"]["recordValue"]
+                                != self.dns_contents
+                            ):
                                 break
-                        elif module.params['verification_method'] == 'web_server':
-                            if result.get('webServerMethod') and result['webServerMethod']['fileContents'] != self.file_contents:
+                        elif module.params["verification_method"] == "web_server":
+                            if (
+                                result.get("webServerMethod")
+                                and result["webServerMethod"]["fileContents"]
+                                != self.file_contents
+                            ):
                                 break
                     time.sleep(10)
-                    result = self.ecs_client.GetDomain(clientId=module.params['client_id'], domain=module.params['domain_name'])
+                    result = self.ecs_client.GetDomain(
+                        clientId=module.params["client_id"],
+                        domain=module.params["domain_name"],
+                    )
                 self.changed = True
                 self.set_domain_details(result)
             except RestOperationException as e:
-                module.fail_json(msg='Failed to request domain validation from Entrust (ECS) {0}'.format(e.message))
+                module.fail_json(
+                    msg="Failed to request domain validation from Entrust (ECS) {0}".format(
+                        e.message
+                    )
+                )
 
     def dump(self):
         result = {
-            'changed': self.changed,
-            'client_id': self.client_id,
-            'domain_status': self.domain_status,
+            "changed": self.changed,
+            "client_id": self.client_id,
+            "domain_status": self.domain_status,
         }
 
         if self.verification_method:
-            result['verification_method'] = self.verification_method
+            result["verification_method"] = self.verification_method
         if self.ov_eligible is not None:
-            result['ov_eligible'] = self.ov_eligible
+            result["ov_eligible"] = self.ov_eligible
         if self.ov_days_remaining:
-            result['ov_days_remaining'] = self.ov_days_remaining
+            result["ov_days_remaining"] = self.ov_days_remaining
         if self.ev_eligible is not None:
-            result['ev_eligible'] = self.ev_eligible
+            result["ev_eligible"] = self.ev_eligible
         if self.ev_days_remaining:
-            result['ev_days_remaining'] = self.ev_days_remaining
+            result["ev_days_remaining"] = self.ev_days_remaining
         if self.emails:
-            result['emails'] = self.emails
+            result["emails"] = self.emails
 
-        if self.verification_method == 'dns':
-            result['dns_location'] = self.dns_location
-            result['dns_contents'] = self.dns_contents
-            result['dns_resource_type'] = self.dns_resource_type
-        elif self.verification_method == 'web_server':
-            result['file_location'] = self.file_location
-            result['file_contents'] = self.file_contents
-        elif self.verification_method == 'email':
-            result['emails'] = self.emails
+        if self.verification_method == "dns":
+            result["dns_location"] = self.dns_location
+            result["dns_contents"] = self.dns_contents
+            result["dns_resource_type"] = self.dns_resource_type
+        elif self.verification_method == "web_server":
+            result["file_location"] = self.file_location
+            result["file_contents"] = self.file_contents
+        elif self.verification_method == "email":
+            result["emails"] = self.emails
 
         return result
 
 
 def ecs_domain_argument_spec():
     return dict(
-        client_id=dict(type='int', default=1),
-        domain_name=dict(type='str', required=True),
-        verification_method=dict(type='str', required=True, choices=['dns', 'email', 'manual', 'web_server']),
-        verification_email=dict(type='str'),
+        client_id=dict(type="int", default=1),
+        domain_name=dict(type="str", required=True),
+        verification_method=dict(
+            type="str", required=True, choices=["dns", "email", "manual", "web_server"]
+        ),
+        verification_email=dict(type="str"),
     )
 
 
@@ -415,8 +467,15 @@ def main():
         supports_check_mode=False,
     )
 
-    if module.params['verification_email'] and module.params['verification_method'] != 'email':
-        module.fail_json(msg='The verification_email field is invalid when verification_method="{0}".'.format(module.params['verification_method']))
+    if (
+        module.params["verification_email"]
+        and module.params["verification_method"] != "email"
+    ):
+        module.fail_json(
+            msg='The verification_email field is invalid when verification_method="{0}".'.format(
+                module.params["verification_method"]
+            )
+        )
 
     domain = EcsDomain(module)
     domain.request_domain(module)
@@ -424,5 +483,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

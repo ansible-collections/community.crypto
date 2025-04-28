@@ -39,38 +39,34 @@ TEST_LINKS_HEADER = [
         [],
     ),
     (
-        {
-            'link': '<foo>; rel="bar"'
-        },
+        {"link": '<foo>; rel="bar"'},
         [
-            ('foo', 'bar'),
+            ("foo", "bar"),
+        ],
+    ),
+    (
+        {"link": '<foo>; rel="bar", <baz>; rel="bam"'},
+        [
+            ("foo", "bar"),
+            ("baz", "bam"),
         ],
     ),
     (
         {
-            'link': '<foo>; rel="bar", <baz>; rel="bam"'
+            "link": '<https://one.example.com>; rel="preconnect", <https://two.example.com>; rel="preconnect", <https://three.example.com>; rel="preconnect"'
         },
         [
-            ('foo', 'bar'),
-            ('baz', 'bam'),
-        ],
-    ),
-    (
-        {
-            'link': '<https://one.example.com>; rel="preconnect", <https://two.example.com>; rel="preconnect", <https://three.example.com>; rel="preconnect"'
-        },
-        [
-            ('https://one.example.com', 'preconnect'),
-            ('https://two.example.com', 'preconnect'),
-            ('https://three.example.com', 'preconnect'),
+            ("https://one.example.com", "preconnect"),
+            ("https://two.example.com", "preconnect"),
+            ("https://three.example.com", "preconnect"),
         ],
     ),
 ]
 
 
 TEST_RETRY_AFTER_HEADER = [
-    ('120', datetime.datetime(2024, 4, 29, 0, 2, 0)),
-    ('Wed, 21 Oct 2015 07:28:00 GMT', datetime.datetime(2015, 10, 21, 7, 28, 0)),
+    ("120", datetime.datetime(2024, 4, 29, 0, 2, 0)),
+    ("Wed, 21 Oct 2015 07:28:00 GMT", datetime.datetime(2015, 10, 21, 7, 28, 0)),
 ]
 
 
@@ -81,9 +77,9 @@ TEST_COMPUTE_CERT_ID = [
             not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
             serial_number=1,
             subject_key_identifier=None,
-            authority_key_identifier=b'\x00\xff',
+            authority_key_identifier=b"\x00\xff",
         ),
-        'AP8.AQ',
+        "AP8.AQ",
     ),
     (
         # AKI, serial number, and expected result taken from
@@ -93,21 +89,21 @@ TEST_COMPUTE_CERT_ID = [
             not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
             serial_number=0x87654321,
             subject_key_identifier=None,
-            authority_key_identifier=b'\x69\x88\x5B\x6B\x87\x46\x40\x41\xE1\xB3\x7B\x84\x7B\xA0\xAE\x2C\xDE\x01\xC8\xD4',
+            authority_key_identifier=b"\x69\x88\x5b\x6b\x87\x46\x40\x41\xe1\xb3\x7b\x84\x7b\xa0\xae\x2c\xde\x01\xc8\xd4",
         ),
-        'aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE',
+        "aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE",
     ),
 ]
 
 
 @pytest.mark.parametrize("value, result", NOPAD_B64)
 def test_nopad_b64(value, result):
-    assert nopad_b64(value.encode('utf-8')) == result
+    assert nopad_b64(value.encode("utf-8")) == result
 
 
 @pytest.mark.parametrize("pem, der", TEST_PEM_DERS)
 def test_pem_to_der(pem, der, tmpdir):
-    fn = tmpdir / 'test.pem'
+    fn = tmpdir / "test.pem"
     fn.write(pem)
     assert pem_to_der(str(fn)) == der
 
@@ -126,7 +122,9 @@ def test_process_links(value, expected_result):
 
 @pytest.mark.parametrize("value, expected_result", TEST_RETRY_AFTER_HEADER)
 def test_parse_retry_after(value, expected_result):
-    assert expected_result == parse_retry_after(value, now=datetime.datetime(2024, 4, 29, 0, 0, 0))
+    assert expected_result == parse_retry_after(
+        value, now=datetime.datetime(2024, 4, 29, 0, 0, 0)
+    )
 
 
 @pytest.mark.parametrize("cert_info, expected_result", TEST_COMPUTE_CERT_ID)

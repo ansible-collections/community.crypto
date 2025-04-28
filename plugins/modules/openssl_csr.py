@@ -266,21 +266,21 @@ class CertificateSigningRequestModule(OpenSSLObject):
 
     def __init__(self, module, module_backend):
         super(CertificateSigningRequestModule, self).__init__(
-            module.params['path'],
-            module.params['state'],
-            module.params['force'],
-            module.check_mode
+            module.params["path"],
+            module.params["state"],
+            module.params["force"],
+            module.check_mode,
         )
         self.module_backend = module_backend
-        self.return_content = module.params['return_content']
+        self.return_content = module.params["return_content"]
 
-        self.backup = module.params['backup']
+        self.backup = module.params["backup"]
         self.backup_file = None
 
         self.module_backend.set_existing(load_file_if_exists(self.path, module))
 
     def generate(self, module):
-        '''Generate the certificate signing request.'''
+        """Generate the certificate signing request."""
         if self.force or self.module_backend.needs_regeneration():
             if not self.check_mode:
                 self.module_backend.generate_csr()
@@ -291,10 +291,12 @@ class CertificateSigningRequestModule(OpenSSLObject):
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
-        if module.check_file_absent_if_check_mode(file_args['path']):
+        if module.check_file_absent_if_check_mode(file_args["path"]):
             self.changed = True
         else:
-            self.changed = module.set_fs_attributes_if_different(file_args, self.changed)
+            self.changed = module.set_fs_attributes_if_different(
+                file_args, self.changed
+            )
 
     def remove(self, module):
         self.module_backend.set_existing(None)
@@ -303,43 +305,53 @@ class CertificateSigningRequestModule(OpenSSLObject):
         super(CertificateSigningRequestModule, self).remove(module)
 
     def dump(self):
-        '''Serialize the object into a dictionary.'''
+        """Serialize the object into a dictionary."""
         result = self.module_backend.dump(include_csr=self.return_content)
-        result.update({
-            'filename': self.path,
-            'changed': self.changed,
-        })
+        result.update(
+            {
+                "filename": self.path,
+                "changed": self.changed,
+            }
+        )
         if self.backup_file:
-            result['backup_file'] = self.backup_file
+            result["backup_file"] = self.backup_file
         return result
 
 
 def main():
     argument_spec = get_csr_argument_spec()
-    argument_spec.argument_spec.update(dict(
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        force=dict(type='bool', default=False),
-        path=dict(type='path', required=True),
-        backup=dict(type='bool', default=False),
-        return_content=dict(type='bool', default=False),
-    ))
-    argument_spec.required_if.extend([('state', 'present', rof, True) for rof in argument_spec.required_one_of])
+    argument_spec.argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            force=dict(type="bool", default=False),
+            path=dict(type="path", required=True),
+            backup=dict(type="bool", default=False),
+            return_content=dict(type="bool", default=False),
+        )
+    )
+    argument_spec.required_if.extend(
+        [("state", "present", rof, True) for rof in argument_spec.required_one_of]
+    )
     argument_spec.required_one_of = []
     module = argument_spec.create_ansible_module(
         add_file_common_args=True,
         supports_check_mode=True,
     )
 
-    base_dir = os.path.dirname(module.params['path']) or '.'
+    base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):
-        module.fail_json(name=base_dir, msg='The directory %s does not exist or the file is not a directory' % base_dir)
+        module.fail_json(
+            name=base_dir,
+            msg="The directory %s does not exist or the file is not a directory"
+            % base_dir,
+        )
 
     try:
-        backend = module.params['select_crypto_backend']
+        backend = module.params["select_crypto_backend"]
         backend, module_backend = select_backend(module, backend)
 
         csr = CertificateSigningRequestModule(module, module_backend)
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             csr.generate(module)
         else:
             csr.remove(module)

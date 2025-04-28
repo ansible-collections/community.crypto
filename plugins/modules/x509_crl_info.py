@@ -195,36 +195,42 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path'),
-            content=dict(type='str'),
-            list_revoked_certificates=dict(type='bool', default=True),
-            name_encoding=dict(type='str', default='ignore', choices=['ignore', 'idna', 'unicode']),
+            path=dict(type="path"),
+            content=dict(type="str"),
+            list_revoked_certificates=dict(type="bool", default=True),
+            name_encoding=dict(
+                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
+            ),
         ),
-        required_one_of=(
-            ['path', 'content'],
-        ),
-        mutually_exclusive=(
-            ['path', 'content'],
-        ),
+        required_one_of=(["path", "content"],),
+        mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
     )
 
-    if module.params['content'] is None:
+    if module.params["content"] is None:
         try:
-            with open(module.params['path'], 'rb') as f:
+            with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(msg='Error while reading CRL file from disk: {0}'.format(e))
+            module.fail_json(
+                msg="Error while reading CRL file from disk: {0}".format(e)
+            )
     else:
-        data = module.params['content'].encode('utf-8')
+        data = module.params["content"].encode("utf-8")
         if not identify_pem_format(data):
             try:
-                data = base64.b64decode(module.params['content'])
+                data = base64.b64decode(module.params["content"])
             except (binascii.Error, TypeError) as e:
-                module.fail_json(msg='Error while Base64 decoding content: {0}'.format(e))
+                module.fail_json(
+                    msg="Error while Base64 decoding content: {0}".format(e)
+                )
 
     try:
-        result = get_crl_info(module, data, list_revoked_certificates=module.params['list_revoked_certificates'])
+        result = get_crl_info(
+            module,
+            data,
+            list_revoked_certificates=module.params["list_revoked_certificates"],
+        )
         module.exit_json(**result)
     except OpenSSLObjectError as e:
         module.fail_json(msg=to_native(e))
