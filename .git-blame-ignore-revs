@@ -4,3 +4,5 @@
 
 # Reformat YAML: https://github.com/ansible-collections/community.crypto/pull/866
 33ef158b094f16d5e04ea9db3ed8bad010744d02
+# Reformat with black, keeping Python 2 compatibility: https://github.com/ansible-collections/community.crypto/pull/871
+aec1826c34051b9e7f8af7950489915b661e320b
