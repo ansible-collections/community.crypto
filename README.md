@@ -8,7 +8,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/crypto/)
 [![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
-[![EOL CI](https://github.com/ansible-collections/community.crypto/actions/workflows/ansible-test.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Nox CI](https://github.com/ansible-collections/community.crypto/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.crypto)](https://api.reuse.software/info/github.com/ansible-collections/community.crypto)
@@ -40,7 +39,7 @@ For more information about communication, see the [Ansible communication guide](
 
 ## Tested with Ansible
 
-Tested with the current Ansible 2.9, ansible-base 2.10, ansible-core 2.11, ansible-core 2.12, ansible-core 2.13, ansible-core 2.14, ansible-core 2.15, ansible-core 2.16, ansible-core-2.17, and ansible-core 2.18 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
+Tested with the current ansible-core-2.17, ansible-core 2.18, and ansible-core 2.19 releases and the current development version of ansible-core. Ansible-core versions before 2.17 are not supported; please use community.crypto 2.x.y with these.
 
 ## External requirements
 
@@ -57,59 +56,6 @@ Browsing the [**devel** collection documentation](https://docs.ansible.com/ansib
 We also separately publish [**latest commit** collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/) which shows docs for the _latest commit in the `main` branch_.
 
 If you use the Ansible package and do not update collections independently, use **latest**. If you install or update this collection directly from Galaxy, use **devel**. If you are looking to contribute, use **latest commit**.
-
-## Included content
-
-- OpenSSL / PKI modules and plugins:
-  - certificate_complete_chain module
-  - openssl_csr_info module and filter
-  - openssl_csr_pipe module
-  - openssl_csr module
-  - openssl_dhparam module
-  - openssl_pkcs12 module
-  - openssl_privatekey_convert module
-  - openssl_privatekey_info module and filter
-  - openssl_privatekey_pipe module
-  - openssl_privatekey module
-  - openssl_publickey_info module and filter
-  - openssl_publickey module
-  - openssl_signature_info module
-  - openssl_signature module
-  - split_pem filter
-  - x509_certificate_convert module
-  - x509_certificate_info module and filter
-  - x509_certificate_pipe module
-  - x509_certificate module
-  - x509_crl_info module and filter
-  - x509_crl module
-- OpenSSH modules and plugins:
-  - openssh_cert module
-  - openssh_keypair module
-- ACME modules and plugins:
-  - acme_account_info module
-  - acme_account module
-  - acme_ari_info module
-  - acme_certificate module
-  - acme_certificate_deactivate_authz module
-  - acme_certificate_order_create module
-  - acme_certificate_order_finalize module
-  - acme_certificate_order_info module
-  - acme_certificate_order_validate module
-  - acme_certificate_revoke module
-  - acme_challenge_cert_helper module
-  - acme_inspect module
-- ECS modules and plugins:
-  - ecs_certificate module
-  - ecs_domain module
-- GnuPG modules and plugins:
-  - gpg_fingerprint lookup and filter
-- Miscellaneous modules and plugins:
-  - crypto_info module
-  - get_certificate module
-  - luks_device module
-  - parse_serial and to_serial filters
-
-You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/).
 
 ## Using this collection
 
@@ -146,14 +92,6 @@ See the [changelog](https://github.com/ansible-collections/community.crypto/blob
 ## Roadmap
 
 We plan to regularly release minor and patch versions, whenever new features are added or bugs fixed. Our collection follows [semantic versioning](https://semver.org/), so breaking changes will only happen in major releases.
-
-Most modules will drop PyOpenSSL support in version 2.0.0 of the collection, i.e. in the next major version. We currently plan to release 2.0.0 somewhen during 2021. Around then, the supported versions of the most common distributions will contain a new enough version of ``cryptography``.
-
-Once 2.0.0 has been released, bugfixes will still be backported to 1.0.0 for some time, and some features might also be backported. If we do not want to backport something ourselves because we think it is not worth the effort, backport PRs by non-maintainers are usually accepted.
-
-In 2.0.0, the following notable features will be removed:
-* PyOpenSSL backends of all modules, except ``openssl_pkcs12`` which does not have a ``cryptography`` backend due to lack of support of PKCS#12 functionality in ``cryptography``.
-* The ``assertonly`` provider of ``x509_certificate`` will be removed.
 
 ## More information
 

@@ -83,17 +83,6 @@ stages:
               test: '2.17/sanity/1'
             - name: Units
               test: '2.17/units/1'
-  - stage: Ansible_2_16
-    displayName: Sanity & Units 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.16/sanity/1'
-            - name: Units
-              test: '2.16/units/1'
 ### Docker
   - stage: Docker_devel
     displayName: Docker devel
@@ -143,23 +132,6 @@ stages:
               test: ubuntu2204
             - name: Alpine 3.19
               test: alpine319
-          groups:
-            - 1
-            - 2
-  - stage: Docker_2_16
-    displayName: Docker 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.16/linux/{0}
-          targets:
-            - name: Fedora 38
-              test: fedora38
-            - name: openSUSE 15
-              test: opensuse15
-            - name: Alpine 3
-              test: alpine3
           groups:
             - 1
             - 2
@@ -253,27 +225,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Remote_2_16
-    displayName: Remote 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.16/{0}
-          targets:
-            - name: macOS 13.2
-              test: macos/13.2
-            - name: RHEL 9.2
-              test: rhel/9.2
-            - name: RHEL 8.8
-              test: rhel/8.8
-            - name: RHEL 7.9
-              test: rhel/7.9
-            # - name: FreeBSD 13.2
-            #   test: freebsd/13.2
-          groups:
-            - 1
-            - 2
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -285,8 +236,8 @@ stages:
           testFormat: devel/generic/{0}
           targets:
             - test: "3.8"
-            # - test: "3.9"
-            # - test: "3.10"
+            - test: "3.9"
+            - test: "3.10"
             - test: "3.11"
             - test: "3.13"
           groups:
@@ -320,21 +271,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Generic_2_16
-    displayName: Generic 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.16/generic/{0}
-          targets:
-            - test: "2.7"
-            - test: "3.6"
-            - test: "3.11"
-          groups:
-            - 1
-            - 2
 
   ## Finally
 
@@ -344,20 +280,16 @@ stages:
       - Ansible_devel
       - Ansible_2_18
       - Ansible_2_17
-      - Ansible_2_16
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_18
       - Remote_2_17
-      - Remote_2_16
       - Docker_devel
       - Docker_2_18
       - Docker_2_17
-      - Docker_2_16
       - Docker_community_devel
       - Generic_devel
       - Generic_2_18
       - Generic_2_17
-      - Generic_2_16
     jobs:
       - template: templates/coverage.yml
