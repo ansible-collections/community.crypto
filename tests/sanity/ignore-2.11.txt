@@ -8,6 +8,13 @@ noxfile.py compile-2.6!skip # Uses Python 3.6+ syntax
 noxfile.py compile-2.7!skip # Uses Python 3.6+ syntax
 noxfile.py future-import-boilerplate
 noxfile.py metaclass-boilerplate
+plugins/module_utils/crypto/cryptography_support.py pep8:E203
+plugins/module_utils/crypto/module_backends/certificate_info.py pep8:E203
+plugins/module_utils/crypto/module_backends/csr_info.py pep8:E203
+plugins/module_utils/crypto/pem.py pep8:E203
+plugins/module_utils/crypto/support.py pep8:E203
+plugins/module_utils/openssh/utils.py pep8:E203
+plugins/module_utils/serial.py pep8:E203
 plugins/modules/acme_account_info.py validate-modules:return-syntax-error
 plugins/modules/acme_certificate.py validate-modules:invalid-documentation
 plugins/modules/acme_certificate.py yamllint:unparsable-with-libyaml
@@ -28,6 +35,7 @@ plugins/modules/openssl_csr_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_csr_pipe.py validate-modules:invalid-documentation
 plugins/modules/openssl_privatekey_info.py validate-modules:invalid-documentation
 plugins/modules/openssl_publickey_info.py validate-modules:invalid-documentation
+plugins/modules/x509_certificate_convert.py pep8:E203
 plugins/modules/x509_certificate_convert.py validate-modules:invalid-documentation
 plugins/modules/x509_certificate_info.py validate-modules:invalid-documentation
 plugins/modules/x509_crl.py validate-modules:invalid-documentation
@@ -41,3 +49,4 @@ tests/create-certificates.py future-import-boilerplate
 tests/create-certificates.py metaclass-boilerplate
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang
+tests/unit/plugins/module_utils/crypto/test_asn1.py pep8:E203
