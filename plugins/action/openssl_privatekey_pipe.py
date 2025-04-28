@@ -50,37 +50,15 @@ class PrivateKeyModule(object):
 
         if self.module_backend.needs_regeneration():
             # Regenerate
-            if not self.check_mode:
-                self.module_backend.generate_private_key()
-                privatekey_data = self.module_backend.get_private_key_data()
-                self.privatekey_bytes = privatekey_data
-            else:
-                self.module.deprecate(
-                    "Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0"
-                    " to behave the same as without check mode. You can get that behavior right now"
-                    " by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this"
-                    " breaks your use-case of this module, please create an issue in the"
-                    " community.crypto repository",
-                    version="3.0.0",
-                    collection_name="community.crypto",
-                )
+            self.module_backend.generate_private_key()
+            privatekey_data = self.module_backend.get_private_key_data()
+            self.privatekey_bytes = privatekey_data
             self.changed = True
         elif self.module_backend.needs_conversion():
             # Convert
-            if not self.check_mode:
-                self.module_backend.convert_private_key()
-                privatekey_data = self.module_backend.get_private_key_data()
-                self.privatekey_bytes = privatekey_data
-            else:
-                self.module.deprecate(
-                    "Check mode support for openssl_privatekey_pipe will change in community.crypto 3.0.0"
-                    " to behave the same as without check mode. You can get that behavior right now"
-                    " by adding `check_mode: false` to the openssl_privatekey_pipe task. If you think this"
-                    " breaks your use-case of this module, please create an issue in the"
-                    " community.crypto repository",
-                    version="3.0.0",
-                    collection_name="community.crypto",
-                )
+            self.module_backend.convert_private_key()
+            privatekey_data = self.module_backend.get_private_key_data()
+            self.privatekey_bytes = privatekey_data
             self.changed = True
 
     def dump(self):
