@@ -7,6 +7,7 @@ removed_features:
   - "acme.acme module utils - the ``get_default_argspec()`` function has been removed. Use ``create_default_argspec()`` instead (https://github.com/ansible-collections/community.crypto/pull/873)."
   - "acme.backends module utils - the methods ``get_ordered_csr_identifiers()`` and ``get_cert_information()`` of ``CryptoBackend`` now must be implemented (https://github.com/ansible-collections/community.crypto/pull/873)."
   - "acme_* modules - support for ACME v1 has been removed (https://github.com/ansible-collections/community.crypto/pull/873)."
+  - "acme.documentation docs fragment - the ``documentation`` docs fragment has been removed. Use both the ``basic`` and ``account`` docs fragments in ``acme`` instead (https://github.com/ansible-collections/community.crypto/pull/873)."
 breaking_changes:
   - "get_certificate - the default for ``asn1_base64`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.crypto/pull/873)."
   - "acme.certificates module utils - the ``retrieve_acme_v1_certificate()`` helper function has been removed (https://github.com/ansible-collections/community.crypto/pull/873)."
