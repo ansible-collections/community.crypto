@@ -10,7 +10,7 @@
 [sessions.lint]
 run_isort = true
 isort_config = "tests/nox-config-isort.cfg"
-run_black = false
+run_black = true
 run_flake8 = true
 flake8_config = "tests/nox-config-flake8.ini"
 run_pylint = false

@@ -6,3 +6,5 @@
 33ef158b094f16d5e04ea9db3ed8bad010744d02
 # Reformat with black, keeping Python 2 compatibility: https://github.com/ansible-collections/community.crypto/pull/871
 aec1826c34051b9e7f8af7950489915b661e320b
+# Reformat with black another time, this time without Python 2 compatibility
+797bd8a6e2a6f4a37a89ecb15ca34ec88b33258d
