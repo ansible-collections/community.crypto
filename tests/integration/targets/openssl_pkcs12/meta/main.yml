@@ -5,5 +5,4 @@
 
 dependencies:
   - setup_openssl
-  - setup_pyopenssl
   - setup_remote_tmp_dir
