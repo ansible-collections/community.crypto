@@ -102,6 +102,7 @@ options:
       - This is B(not considered during idempotency checks).
       - This value is B(not used).
     type: int
+    # TODO: deprecate!
   encryption_level:
     description:
       - Determines the encryption level used.
