@@ -7,9 +7,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 # Ansible Community Crypto Collection
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/crypto/)
-[![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
-[![EOL CI](https://github.com/ansible-collections/community.crypto/actions/workflows/ansible-test.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
-[![Nox CI](https://github.com/ansible-collections/community.crypto/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.crypto/actions)
+[![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=stable-2)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
+[![EOL CI](https://github.com/ansible-collections/community.crypto/actions/workflows/ansible-test.yml/badge.svg?branch=stable-2)](https://github.com/ansible-collections/community.crypto/actions)
+[![Nox CI](https://github.com/ansible-collections/community.crypto/actions/workflows/nox.yml/badge.svg?branch=stable-2)](https://github.com/ansible-collections/community.crypto/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.crypto)](https://codecov.io/gh/ansible-collections/community.crypto)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.crypto)](https://api.reuse.software/info/github.com/ansible-collections/community.crypto)
 
@@ -54,7 +54,7 @@ Browsing the [**latest** collection documentation](https://docs.ansible.com/ansi
 
 Browsing the [**devel** collection documentation](https://docs.ansible.com/ansible/devel/collections/community/crypto) shows docs for the _latest version released on Galaxy_.
 
-We also separately publish [**latest commit** collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/) which shows docs for the _latest commit in the `main` branch_.
+We also separately publish [**latest commit** collection documentation](https://ansible-collections.github.io/community.crypto/branch/stable-2/) which shows docs for the _latest commit in the `stable-2` branch_.
 
 If you use the Ansible package and do not update collections independently, use **latest**. If you install or update this collection directly from Galaxy, use **devel**. If you are looking to contribute, use **latest commit**.
 
@@ -109,7 +109,7 @@ If you use the Ansible package and do not update collections independently, use 
   - luks_device module
   - parse_serial and to_serial filters
 
-You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/).
+You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/stable-2/).
 
 ## Using this collection
 
@@ -141,7 +141,7 @@ See [Ansible's dev guide](https://docs.ansible.com/ansible/devel/dev_guide/devel
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.crypto/blob/main/CHANGELOG.md).
+See the [changelog](https://github.com/ansible-collections/community.crypto/blob/stable-2/CHANGELOG.md).
 
 ## Roadmap
 
@@ -166,8 +166,8 @@ In 2.0.0, the following notable features will be removed:
 
 This collection is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
 
-See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.crypto/blob/main/COPYING) for the full text.
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.crypto/blob/stable-2/COPYING) for the full text.
 
-Parts of the collection are licensed under the [Apache 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/Apache-2.0.txt) (`plugins/module_utils/crypto/_obj2txt.py` and `plugins/module_utils/crypto/_objects_data.py`), the [BSD 2-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-2-Clause.txt) (`plugins/module_utils/ecs/api.py`), the [BSD 3-Clause license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/BSD-3-Clause.txt) (`plugins/module_utils/crypto/_obj2txt.py`, `tests/integration/targets/prepare_jinja2_compat/filter_plugins/jinja_compatibility.py`), and the [PSF 2.0 license](https://github.com/ansible-collections/community.crypto/blob/main/LICENSES/PSF-2.0.txt) (`plugins/module_utils/_version.py`). This only applies to vendored files in ``plugins/module_utils/`` and to the ECS module utils.
+Parts of the collection are licensed under the [Apache 2.0 license](https://github.com/ansible-collections/community.crypto/blob/stable-2/LICENSES/Apache-2.0.txt) (`plugins/module_utils/crypto/_obj2txt.py` and `plugins/module_utils/crypto/_objects_data.py`), the [BSD 2-Clause license](https://github.com/ansible-collections/community.crypto/blob/stable-2/LICENSES/BSD-2-Clause.txt) (`plugins/module_utils/ecs/api.py`), the [BSD 3-Clause license](https://github.com/ansible-collections/community.crypto/blob/stable-2/LICENSES/BSD-3-Clause.txt) (`plugins/module_utils/crypto/_obj2txt.py`, `tests/integration/targets/prepare_jinja2_compat/filter_plugins/jinja_compatibility.py`), and the [PSF 2.0 license](https://github.com/ansible-collections/community.crypto/blob/stable-2/LICENSES/PSF-2.0.txt) (`plugins/module_utils/_version.py`). This only applies to vendored files in ``plugins/module_utils/`` and to the ECS module utils.
 
 All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `REUSE.toml`. This conforms to the [REUSE specification](https://reuse.software/spec/).
