@@ -4,6 +4,20 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.1
+=======
+
+Release Summary
+---------------
+
+Bugfix and maintenance release with improved CI.
+
+Bugfixes
+--------
+
+- luks_device - mark parameter ``passphrase_encoding`` as ``no_log=False`` to avoid confusing warning (https://github.com/ansible-collections/community.crypto/pull/867).
+- luks_device - removing a specific keyslot with ``remove_keyslot`` caused the module to hang while cryptsetup was waiting for a passphrase from stdin, while the module did not supply one. Since a keyslot is not necessary, do not provide one (https://github.com/ansible-collections/community.crypto/issues/864, https://github.com/ansible-collections/community.crypto/pull/868).
+
 v2.26.0
 =======
 

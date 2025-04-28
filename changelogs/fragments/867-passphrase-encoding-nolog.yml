@@ -1,2 +1,0 @@
-bugfixes:
-  - "luks_device - mark parameter ``passphrase_encoding`` as ``no_log=False`` to avoid confusing warning (https://github.com/ansible-collections/community.crypto/pull/867)."
