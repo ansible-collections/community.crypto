@@ -69,11 +69,12 @@ options:
   acme_version:
     description:
       - The ACME version of the endpoint.
-      - Must be V(1) for the classic Let's Encrypt and Buypass ACME endpoints, or V(2) for standardized ACME v2 endpoints.
-      - The value V(1) is deprecated since community.crypto 2.0.0 and will be removed from community.crypto 3.0.0.
-    required: true
+      - Must be V(2) for standardized ACME v2 endpoints.
+      - The value V(1) is no longer supported since community.crypto 3.0.0.
     type: int
-    choices: [1, 2]
+    default: 2
+    choices:
+      - 2
   acme_directory:
     description:
       - The ACME directory to use. This is the entry point URL to access the ACME CA server API.
@@ -130,11 +131,12 @@ options:
   acme_version:
     description:
       - The ACME version of the endpoint.
-      - Must be V(1) for the classic Let's Encrypt and Buypass ACME endpoints, or V(2) for standardized ACME v2 endpoints.
-      - The value V(1) is deprecated since community.crypto 2.0.0 and will be removed from community.crypto 3.0.0.
-    required: true
+      - Must be V(2) for standardized ACME v2 endpoints.
+      - The value V(1) is no longer supported since community.crypto 3.0.0.
     type: int
-    choices: [1, 2]
+    default: 2
+    choices:
+      - 2
   acme_directory:
     description:
       - The ACME directory to use. This is the entry point URL to access the ACME CA server API.

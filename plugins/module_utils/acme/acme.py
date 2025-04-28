@@ -142,12 +142,6 @@ class ACMEDirectory(object):
         self.request_timeout = module.params["request_timeout"]
 
         # Check whether self.version matches what we expect
-        if self.version == 1:
-            for key in ("new-reg", "new-authz", "new-cert"):
-                if key not in self.directory:
-                    raise ModuleFailException(
-                        "ACME directory does not seem to follow protocol ACME v1"
-                    )
         if self.version == 2:
             for key in ("newNonce", "newAccount", "newOrder"):
                 if key not in self.directory:
@@ -168,7 +162,7 @@ class ACMEDirectory(object):
         return self.directory.get(key, default_value)
 
     def get_nonce(self, resource=None):
-        url = self.directory_root if self.version == 1 else self.directory["newNonce"]
+        url = self.directory["newNonce"]
         if resource is not None:
             url = resource
         retry_count = 0
@@ -260,9 +254,8 @@ class ACMEClient(object):
         requests.
         """
         self.account_uri = uri
-        if self.version != 1:
-            self.account_jws_header.pop("jwk")
-            self.account_jws_header["kid"] = self.account_uri
+        self.account_jws_header.pop("jwk")
+        self.account_jws_header["kid"] = self.account_uri
 
     def parse_key(self, key_file=None, key_content=None, passphrase=None):
         """
@@ -339,8 +332,7 @@ class ACMEClient(object):
         while True:
             protected = copy.deepcopy(jws_header)
             protected["nonce"] = self.directory.get_nonce()
-            if self.version != 1:
-                protected["url"] = url
+            protected["url"] = url
 
             self._log("URL", url)
             self._log("protected", protected)
@@ -348,10 +340,6 @@ class ACMEClient(object):
             data = self.sign_request(
                 protected, payload, key_data, encode_payload=encode_payload
             )
-            if self.version == 1:
-                data["header"] = jws_header.copy()
-                for k, v in protected.items():
-                    data["header"].pop(k, None)
             self._log("signed request", data)
             data = self.module.jsonify(data)
 
@@ -440,7 +428,7 @@ class ACMEClient(object):
         Perform a GET-like request. Will try POST-as-GET for ACMEv2, with fallback
         to GET if server replies with a status code of 405.
         """
-        if not get_only and self.version != 1:
+        if not get_only:
             # Try POST-as-GET
             content, info = self.send_signed_request(
                 uri, None, parse_json_result=False, fail_on_error=False
@@ -562,7 +550,7 @@ def create_default_argspec(
     result = ArgumentSpec(
         argument_spec=dict(
             acme_directory=dict(type="str", required=True),
-            acme_version=dict(type="int", required=True, choices=[1, 2]),
+            acme_version=dict(type="int", choices=[2], default=2),
             validate_certs=dict(type="bool", default=True),
             select_crypto_backend=dict(
                 type="str", default="auto", choices=["auto", "openssl", "cryptography"]
@@ -592,7 +580,7 @@ def create_default_argspec(
     return result
 
 
-def create_backend(module, needs_acme_v2):
+def create_backend(module, needs_acme_v2=True):
     if not HAS_IPADDRESS:
         module.fail_json(
             msg=missing_required_lib("ipaddress"), exception=IPADDRESS_IMPORT_ERROR
@@ -643,18 +631,6 @@ def create_backend(module, needs_acme_v2):
             "Disabling certificate validation for communications with ACME endpoint. "
             "This should only be done for testing against a local ACME server for "
             "development purposes, but *never* for production purposes."
-        )
-
-    if needs_acme_v2 and module.params["acme_version"] < 2:
-        module.fail_json(
-            msg="The {0} module requires the ACME v2 protocol!".format(module._name)
-        )
-
-    if module.params["acme_version"] == 1:
-        module.deprecate(
-            "The value 1 for 'acme_version' is deprecated. Please switch to ACME v2",
-            version="3.0.0",
-            collection_name="community.crypto",
         )
 
     # AnsibleModule() changes the locale, so change it back to C because we rely

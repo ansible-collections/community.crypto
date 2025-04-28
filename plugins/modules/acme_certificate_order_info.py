@@ -380,8 +380,6 @@ def main():
         order_uri=dict(type="str", required=True),
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    if module.params["acme_version"] == 1:
-        module.fail_json("The module does not support acme_version=1")
 
     backend = create_backend(module, False)
 

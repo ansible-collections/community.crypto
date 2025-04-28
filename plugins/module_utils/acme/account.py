@@ -53,61 +53,49 @@ class ACMEAccount(object):
         """
         contact = contact or []
 
-        if self.client.version == 1:
-            new_reg = {"resource": "new-reg", "contact": contact}
-            if agreement:
-                new_reg["agreement"] = agreement
-            else:
-                new_reg["agreement"] = self.client.directory["meta"]["terms-of-service"]
-            if external_account_binding is not None:
-                raise ModuleFailException(
-                    "External account binding is not supported for ACME v1"
-                )
-            url = self.client.directory["new-reg"]
-        else:
-            if (
-                external_account_binding is not None
-                or self.client.directory["meta"].get("externalAccountRequired")
-            ) and allow_creation:
-                # Some ACME servers such as ZeroSSL do not like it when you try to register an existing account
-                # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
-                # to see whether the account already exists.
+        if (
+            external_account_binding is not None
+            or self.client.directory["meta"].get("externalAccountRequired")
+        ) and allow_creation:
+            # Some ACME servers such as ZeroSSL do not like it when you try to register an existing account
+            # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
+            # to see whether the account already exists.
 
-                # Note that we pass contact here: ZeroSSL does not accept registration calls without contacts, even
-                # if onlyReturnExisting is set to true.
-                created, data = self._new_reg(contact=contact, allow_creation=False)
-                if data:
-                    # An account already exists! Return data
-                    return created, data
-                # An account does not yet exist. Try to create one next.
+            # Note that we pass contact here: ZeroSSL does not accept registration calls without contacts, even
+            # if onlyReturnExisting is set to true.
+            created, data = self._new_reg(contact=contact, allow_creation=False)
+            if data:
+                # An account already exists! Return data
+                return created, data
+            # An account does not yet exist. Try to create one next.
 
-            new_reg = {"contact": contact}
-            if not allow_creation:
-                # https://tools.ietf.org/html/rfc8555#section-7.3.1
-                new_reg["onlyReturnExisting"] = True
-            if terms_agreed:
-                new_reg["termsOfServiceAgreed"] = True
-            url = self.client.directory["newAccount"]
-            if external_account_binding is not None:
-                new_reg["externalAccountBinding"] = self.client.sign_request(
-                    {
-                        "alg": external_account_binding["alg"],
-                        "kid": external_account_binding["kid"],
-                        "url": url,
-                    },
-                    self.client.account_jwk,
-                    self.client.backend.create_mac_key(
-                        external_account_binding["alg"], external_account_binding["key"]
-                    ),
-                )
-            elif (
-                self.client.directory["meta"].get("externalAccountRequired")
-                and allow_creation
-            ):
-                raise ModuleFailException(
-                    "To create an account, an external account binding must be specified. "
-                    "Use the acme_account module with the external_account_binding option."
-                )
+        new_reg = {"contact": contact}
+        if not allow_creation:
+            # https://tools.ietf.org/html/rfc8555#section-7.3.1
+            new_reg["onlyReturnExisting"] = True
+        if terms_agreed:
+            new_reg["termsOfServiceAgreed"] = True
+        url = self.client.directory["newAccount"]
+        if external_account_binding is not None:
+            new_reg["externalAccountBinding"] = self.client.sign_request(
+                {
+                    "alg": external_account_binding["alg"],
+                    "kid": external_account_binding["kid"],
+                    "url": url,
+                },
+                self.client.account_jwk,
+                self.client.backend.create_mac_key(
+                    external_account_binding["alg"], external_account_binding["key"]
+                ),
+            )
+        elif (
+            self.client.directory["meta"].get("externalAccountRequired")
+            and allow_creation
+        ):
+            raise ModuleFailException(
+                "To create an account, an external account binding must be specified. "
+                "Use the acme_account module with the external_account_binding option."
+            )
 
         result, info = self.client.send_signed_request(
             url, new_reg, fail_on_error=False
@@ -120,12 +108,12 @@ class ACMEAccount(object):
                 content=result,
             )
 
-        if info["status"] in ([200, 201] if self.client.version == 1 else [201]):
+        if info["status"] == 201:
             # Account did not exist
             if "location" in info:
                 self.client.set_account_uri(info["location"])
             return True, result
-        elif info["status"] == (409 if self.client.version == 1 else 200):
+        elif info["status"] == 200:
             # Account did exist
             if result.get("status") == "deactivated":
                 # A bug in Pebble (https://github.com/letsencrypt/pebble/issues/179) and
@@ -178,28 +166,21 @@ class ACMEAccount(object):
         """
         if self.client.account_uri is None:
             raise ModuleFailException("Account URI unknown")
-        if self.client.version == 1:
+        # try POST-as-GET first (draft-15 or newer)
+        data = None
+        result, info = self.client.send_signed_request(
+            self.client.account_uri, data, fail_on_error=False
+        )
+        # check whether that failed with a malformed request error
+        if (
+            info["status"] >= 400
+            and result.get("type") == "urn:ietf:params:acme:error:malformed"
+        ):
+            # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
             data = {}
-            data["resource"] = "reg"
             result, info = self.client.send_signed_request(
                 self.client.account_uri, data, fail_on_error=False
             )
-        else:
-            # try POST-as-GET first (draft-15 or newer)
-            data = None
-            result, info = self.client.send_signed_request(
-                self.client.account_uri, data, fail_on_error=False
-            )
-            # check whether that failed with a malformed request error
-            if (
-                info["status"] >= 400
-                and result.get("type") == "urn:ietf:params:acme:error:malformed"
-            ):
-                # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
-                data = {}
-                result, info = self.client.send_signed_request(
-                    self.client.account_uri, data, fail_on_error=False
-                )
         if not isinstance(result, Mapping):
             raise ACMEProtocolException(
                 self.client.module,
@@ -319,8 +300,6 @@ class ACMEAccount(object):
             account_data = dict(account_data)
             account_data.update(update_request)
         else:
-            if self.client.version == 1:
-                update_request["resource"] = "reg"
             account_data, info = self.client.send_signed_request(
                 self.client.account_uri, update_request
             )

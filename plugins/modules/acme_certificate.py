@@ -102,13 +102,13 @@ options:
     description:
       - URI to a terms of service document you agree to when using the ACME v1 service at O(acme_directory).
       - Default is latest gathered from O(acme_directory) URL.
-      - This option will only be used when O(acme_version) is 1.
+      - This option has no longer any effect.
+        # TODO: deprecate!
     type: str
   terms_agreed:
     description:
       - Boolean indicating whether you agree to the terms of service document.
       - ACME servers can require this to be true.
-      - This option will only be used when O(acme_version) is not 1.
     type: bool
     default: false
   modify_account:
@@ -433,7 +433,6 @@ EXAMPLES = r"""
     data: "{{ sample_com_challenge }}"
     # We use Let's Encrypt's ACME v2 endpoint
     acme_directory: https://acme-v02.api.letsencrypt.org/directory
-    acme_version: 2
     # The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided
     # as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.
     # As long as Let's Encrypt provides alternate chains with the cross-signed root(s) when
@@ -580,10 +579,8 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.acme import 
 from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
     CertificateChain,
     Criterium,
-    retrieve_acme_v1_certificate,
 )
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
-    Authorization,
     combine_identifier,
     normalize_combined_identifier,
     split_identifier,
@@ -669,33 +666,21 @@ class ACMECertificateClient(object):
 
         # Make sure account exists
         modify_account = module.params["modify_account"]
-        if modify_account or self.version > 1:
-            contact = []
-            if module.params["account_email"]:
-                contact.append("mailto:" + module.params["account_email"])
-            created, account_data = self.account.setup_account(
-                contact,
-                agreement=module.params.get("agreement"),
-                terms_agreed=module.params.get("terms_agreed"),
-                allow_creation=modify_account,
-            )
-            if account_data is None:
-                raise ModuleFailException(
-                    msg="Account does not exist or is deactivated."
-                )
-            updated = False
-            if not created and account_data and modify_account:
-                updated, account_data = self.account.update_account(
-                    account_data, contact
-                )
-            self.changed = created or updated
-        else:
-            # This happens if modify_account is False and the ACME v1
-            # protocol is used. In this case, we do not call setup_account()
-            # to avoid accidental creation of an account. This is OK
-            # since for ACME v1, the account URI is not needed to send a
-            # signed ACME request.
-            pass
+        contact = []
+        if module.params["account_email"]:
+            contact.append("mailto:" + module.params["account_email"])
+        created, account_data = self.account.setup_account(
+            contact,
+            agreement=module.params.get("agreement"),
+            terms_agreed=module.params.get("terms_agreed"),
+            allow_creation=modify_account,
+        )
+        if account_data is None:
+            raise ModuleFailException(msg="Account does not exist or is deactivated.")
+        updated = False
+        if not created and account_data and modify_account:
+            updated, account_data = self.account.update_account(account_data, contact)
+        self.changed = created or updated
 
         if self.csr is not None and not os.path.exists(self.csr):
             raise ModuleFailException("CSR %s not found" % (self.csr))
@@ -712,13 +697,9 @@ class ACMECertificateClient(object):
         """
         if self.data is None:
             return True
-        if self.version == 1:
-            # As soon as self.data is a non-empty object, we are in the second stage.
-            return not self.data
-        else:
-            # We are in the second stage if data.order_uri is given (which has been
-            # stored in self.order_uri by the constructor).
-            return self.order_uri is None
+        # We are in the second stage if data.order_uri is given (which has been
+        # stored in self.order_uri by the constructor).
+        return self.order_uri is None
 
     def _get_cert_info_or_none(self):
         if self.module.params.get("dest"):
@@ -735,40 +716,30 @@ class ACMECertificateClient(object):
         respectively start a new order for ACME v2.
         """
         self.authorizations = {}
-        if self.version == 1:
-            for identifier_type, identifier in self.identifiers:
-                if identifier_type != "dns":
-                    raise ModuleFailException("ACME v1 only supports DNS identifiers!")
-            for identifier_type, identifier in self.identifiers:
-                authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[
-                    normalize_combined_identifier(authz.combined_identifier)
-                ] = authz
-        else:
-            replaces_cert_id = None
-            if self.include_renewal_cert_id == "always" or (
-                self.include_renewal_cert_id == "when_ari_supported"
-                and self.client.directory.has_renewal_info_endpoint()
-            ):
-                cert_info = self._get_cert_info_or_none()
-                if cert_info is not None:
-                    replaces_cert_id = compute_cert_id(
-                        self.client.backend,
-                        cert_info=cert_info,
-                        none_if_required_information_is_missing=True,
-                    )
-            self.order = Order.create_with_error_handling(
-                self.client,
-                self.identifiers,
-                error_strategy=self.order_creation_error_strategy,
-                error_max_retries=self.order_creation_max_retries,
-                replaces_cert_id=replaces_cert_id,
-                profile=self.profile,
-                message_callback=self.module.warn,
-            )
-            self.order_uri = self.order.url
-            self.order.load_authorizations(self.client)
-            self.authorizations.update(self.order.authorizations)
+        replaces_cert_id = None
+        if self.include_renewal_cert_id == "always" or (
+            self.include_renewal_cert_id == "when_ari_supported"
+            and self.client.directory.has_renewal_info_endpoint()
+        ):
+            cert_info = self._get_cert_info_or_none()
+            if cert_info is not None:
+                replaces_cert_id = compute_cert_id(
+                    self.client.backend,
+                    cert_info=cert_info,
+                    none_if_required_information_is_missing=True,
+                )
+        self.order = Order.create_with_error_handling(
+            self.client,
+            self.identifiers,
+            error_strategy=self.order_creation_error_strategy,
+            error_max_retries=self.order_creation_max_retries,
+            replaces_cert_id=replaces_cert_id,
+            profile=self.profile,
+            message_callback=self.module.warn,
+        )
+        self.order_uri = self.order.url
+        self.order.load_authorizations(self.client)
+        self.authorizations.update(self.order.authorizations)
         self.changed = True
 
     def get_challenges_data(self, first_step):
@@ -815,20 +786,11 @@ class ACMECertificateClient(object):
         self.authorizations = {}
 
         # Step 1: obtain challenge information
-        if self.version == 1:
-            # For ACME v1, we attempt to create new authzs. Existing ones
-            # will be returned instead.
-            for identifier_type, identifier in self.identifiers:
-                authz = Authorization.create(self.client, identifier_type, identifier)
-                self.authorizations[combine_identifier(identifier_type, identifier)] = (
-                    authz
-                )
-        else:
-            # For ACME v2, we obtain the order object by fetching the
-            # order URI, and extract the information from there.
-            self.order = Order.from_url(self.client, self.order_uri)
-            self.order.load_authorizations(self.client)
-            self.authorizations.update(self.order.authorizations)
+        # For ACME v2, we obtain the order object by fetching the
+        # order URI, and extract the information from there.
+        self.order = Order.from_url(self.client, self.order_uri)
+        self.order.load_authorizations(self.client)
+        self.authorizations.update(self.order.authorizations)
 
         # Step 2: validate pending challenges
         authzs_to_wait_for = []
@@ -897,33 +859,25 @@ class ACMECertificateClient(object):
                     module=self.module,
                 )
 
-        if self.version == 1:
-            cert = retrieve_acme_v1_certificate(
-                self.client, pem_to_der(self.csr, self.csr_content)
-            )
-        else:
-            self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
-            cert = CertificateChain.download(self.client, self.order.certificate_uri)
-            if (
-                self.module.params["retrieve_all_alternates"]
-                or self.select_chain_matcher
-            ):
-                # Retrieve alternate chains
-                alternate_chains = self.download_alternate_chains(cert)
+        self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
+        cert = CertificateChain.download(self.client, self.order.certificate_uri)
+        if self.module.params["retrieve_all_alternates"] or self.select_chain_matcher:
+            # Retrieve alternate chains
+            alternate_chains = self.download_alternate_chains(cert)
 
-                # Prepare return value for all alternate chains
-                if self.module.params["retrieve_all_alternates"]:
-                    self.all_chains = [cert.to_json()]
-                    for alt_chain in alternate_chains:
-                        self.all_chains.append(alt_chain.to_json())
+            # Prepare return value for all alternate chains
+            if self.module.params["retrieve_all_alternates"]:
+                self.all_chains = [cert.to_json()]
+                for alt_chain in alternate_chains:
+                    self.all_chains.append(alt_chain.to_json())
 
-                # Try to select alternate chain depending on criteria
-                if self.select_chain_matcher:
-                    matching_chain = self.find_matching_chain([cert] + alternate_chains)
-                    if matching_chain:
-                        cert = matching_chain
-                    else:
-                        self.module.debug("Found no matching alternative chain")
+            # Try to select alternate chain depending on criteria
+            if self.select_chain_matcher:
+                matching_chain = self.find_matching_chain([cert] + alternate_chains)
+                if matching_chain:
+                    cert = matching_chain
+                else:
+                    self.module.debug("Found no matching alternative chain")
 
         if cert.cert is not None:
             pem_cert = cert.cert

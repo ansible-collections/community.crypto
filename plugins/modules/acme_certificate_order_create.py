@@ -215,7 +215,6 @@ EXAMPLES = r"""
 - name: Create a challenge for sample.com using a account key file.
   community.crypto.acme_certificate_order_create:
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     csr: /etc/pki/cert/csr/sample.com.csr
   register: sample_com_challenge
@@ -238,7 +237,6 @@ EXAMPLES = r"""
 - name: Let the challenge be validated
   community.crypto.acme_certificate_order_validate:
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     order_uri: "{{ sample_com_challenge.order_uri }}"
     challenge: dns-01
@@ -246,7 +244,6 @@ EXAMPLES = r"""
 - name: Retrieve the cert and intermediate certificate
   community.crypto.acme_certificate_order_finalize:
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     csr: /etc/pki/cert/csr/sample.com.csr
     order_uri: "{{ sample_com_challenge.order_uri }}"
@@ -405,8 +402,6 @@ def main():
         order_creation_max_retries=dict(type="int", default=3),
     )
     module = argument_spec.create_ansible_module()
-    if module.params["acme_version"] == 1:
-        module.fail_json("The module does not support acme_version=1")
 
     backend = create_backend(module, False)
 
