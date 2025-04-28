@@ -57,59 +57,6 @@ We also separately publish [**latest commit** collection documentation](https://
 
 If you use the Ansible package and do not update collections independently, use **latest**. If you install or update this collection directly from Galaxy, use **devel**. If you are looking to contribute, use **latest commit**.
 
-## Included content
-
-- OpenSSL / PKI modules and plugins:
-  - certificate_complete_chain module
-  - openssl_csr_info module and filter
-  - openssl_csr_pipe module
-  - openssl_csr module
-  - openssl_dhparam module
-  - openssl_pkcs12 module
-  - openssl_privatekey_convert module
-  - openssl_privatekey_info module and filter
-  - openssl_privatekey_pipe module
-  - openssl_privatekey module
-  - openssl_publickey_info module and filter
-  - openssl_publickey module
-  - openssl_signature_info module
-  - openssl_signature module
-  - split_pem filter
-  - x509_certificate_convert module
-  - x509_certificate_info module and filter
-  - x509_certificate_pipe module
-  - x509_certificate module
-  - x509_crl_info module and filter
-  - x509_crl module
-- OpenSSH modules and plugins:
-  - openssh_cert module
-  - openssh_keypair module
-- ACME modules and plugins:
-  - acme_account_info module
-  - acme_account module
-  - acme_ari_info module
-  - acme_certificate module
-  - acme_certificate_deactivate_authz module
-  - acme_certificate_order_create module
-  - acme_certificate_order_finalize module
-  - acme_certificate_order_info module
-  - acme_certificate_order_validate module
-  - acme_certificate_revoke module
-  - acme_challenge_cert_helper module
-  - acme_inspect module
-- ECS modules and plugins:
-  - ecs_certificate module
-  - ecs_domain module
-- GnuPG modules and plugins:
-  - gpg_fingerprint lookup and filter
-- Miscellaneous modules and plugins:
-  - crypto_info module
-  - get_certificate module
-  - luks_device module
-  - parse_serial and to_serial filters
-
-You can also find a list of all modules and plugins with documentation on the [Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/crypto/), or the [latest commit collection documentation](https://ansible-collections.github.io/community.crypto/branch/main/).
-
 ## Using this collection
 
 Before using the crypto community collection, you need to install the collection with the `ansible-galaxy` CLI:
