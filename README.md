@@ -93,14 +93,6 @@ See the [changelog](https://github.com/ansible-collections/community.crypto/blob
 
 We plan to regularly release minor and patch versions, whenever new features are added or bugs fixed. Our collection follows [semantic versioning](https://semver.org/), so breaking changes will only happen in major releases.
 
-Most modules will drop PyOpenSSL support in version 2.0.0 of the collection, i.e. in the next major version. We currently plan to release 2.0.0 somewhen during 2021. Around then, the supported versions of the most common distributions will contain a new enough version of ``cryptography``.
-
-Once 2.0.0 has been released, bugfixes will still be backported to 1.0.0 for some time, and some features might also be backported. If we do not want to backport something ourselves because we think it is not worth the effort, backport PRs by non-maintainers are usually accepted.
-
-In 2.0.0, the following notable features will be removed:
-* PyOpenSSL backends of all modules, except ``openssl_pkcs12`` which does not have a ``cryptography`` backend due to lack of support of PKCS#12 functionality in ``cryptography``.
-* The ``assertonly`` provider of ``x509_certificate`` will be removed.
-
 ## More information
 
 - [Ansible Collection overview](https://github.com/ansible-collections/overview)
