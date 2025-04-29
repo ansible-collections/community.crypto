@@ -101,7 +101,7 @@
   when: select_crypto_backend != 'cryptography'
 
 - block:
-    - name: (Selfsigned validateion, {{ select_crypto_backend }} Validate certificate v2 is failed
+    - name: (Selfsigned validation, {{ select_crypto_backend }} Validate certificate v2 is failed
       assert:
         that:
           - selfsigned_v2_cert is failed
