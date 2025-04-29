@@ -183,7 +183,7 @@
 <h1>community.crypto.get_certificate module – Get a certificate from a host:port<a class="headerlink" href="#community-crypto-get-certificate-module-get-a-certificate-from-a-host-port" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.26.1).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.0-dev0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -235,11 +235,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether to encode the ASN.1 values in the <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-get-certificate-module-return-extensions"><span class="std std-ref"><span class="pre">extensions</span></span></a></code> return value with Base64 or not.</p>
 <p>The documentation claimed for a long time that the values are Base64 encoded, but they never were. For compatibility this option is set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>.</p>
-<p>The default value <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> is <strong>deprecated</strong> and will change to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> in community.crypto 3.0.0.</p>
+<p>The default value was changed from <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> incommunity.crypto 3.0.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 </ul>
 </div></td>
 </tr>

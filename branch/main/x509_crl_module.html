@@ -183,7 +183,7 @@
 <h1>community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)<a class="headerlink" href="#community-crypto-x509-crl-module-generate-certificate-revocation-lists-crls" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.26.1).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.0-dev0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -264,7 +264,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>This parameter was called <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> before community.crypto 2.13.0. It has been renamed to avoid a collision with the common <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> parameter for setting the CRL file’s access mode.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;generate&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;update&quot;</span></code></p></li>
 </ul>
 </div></td>
@@ -359,15 +359,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-crl-module-parameter-mode"><strong>mode</strong></p>
-<a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>This parameter has been renamed to <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-crl-mode"><span class="std std-ref"><span class="pre">crl_mode</span></span></a></strong></code>. The old name <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is now deprecated and will be removed in community.crypto 3.0.0. Replace usage of this parameter with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-crl-mode"><span class="std std-ref"><span class="pre">crl_mode</span></span></a></strong></code>.</p>
-<p>Note that from community.crypto 3.0.0 on, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> will be used for the CRL file’s mode.</p>
-<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
-<ul class="simple">
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;generate&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;update&quot;</span></code></p></li>
-</ul>
+<td><div class="ansible-option-cell"><p>The permissions the resulting filesystem object should have.</p>
+<p>For those used to <code class="docutils literal notranslate"><span class="pre">/usr/bin/chmod</span></code> remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">'644'</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">'1777'</span></code>) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">0755</span></code>) works sometimes, but can fail in loops and some other circumstances.</p>
+<p>Giving Ansible a number without following either of these rules will end up with a decimal number which will have unexpected results.</p>
+<p>As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">u+rwx</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">u=rw,g=r,o=r</span></code>).</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does not</strong> exist, the default <code class="docutils literal notranslate"><span class="pre">umask</span></code> on the system will be used when setting the mode for the newly created filesystem object.</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does</strong> exist, the mode of the existing filesystem object will be used.</p>
+<p>Specifying <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-crl-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">

@@ -182,7 +182,7 @@
 <h1>community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive<a class="headerlink" href="#community-crypto-openssl-pkcs12-module-generate-openssl-pkcs-12-archive" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.26.1).</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.0-dev0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
@@ -205,14 +205,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>This module allows one to (re-)generate PKCS#12.</p></li>
-<li><p>The module can use the cryptography Python library, or the pyOpenSSL Python library. By default, it tries to detect which one is available, assuming none of the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-iter-size"><span class="std std-ref"><span class="pre">iter_size</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-maciter-size"><span class="std std-ref"><span class="pre">maciter_size</span></span></a></strong></code> options are used. This can be overridden with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option.</p></li>
+<li><p>The module uses the cryptography Python library.</p></li>
 </ul>
 </section>
 <section id="requirements">
 <span id="ansible-collections-community-crypto-openssl-pkcs12-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>PyOpenSSL &gt;= 0.15, &lt; 23.3.0 or cryptography &gt;= 3.0</p></li>
+<li><p>cryptography &gt;= 3.0</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -329,8 +329,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>Number of times to repeat the encryption step.</p>
 <p>This is <strong>not considered during idempotency checks</strong>.</p>
-<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend, or when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-encryption-level"><span class="std std-ref"><span class="pre">encryption_level=compatibility2022</span></span></a></code>.</p>
-<p>When using it, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">2048</span></code> for <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">50000</span></code> for <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>.</p>
+<p>This is only used when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-encryption-level"><span class="std std-ref"><span class="pre">encryption_level=compatibility2022</span></span></a></code>.</p>
+<p>When using it, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">50000</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -339,7 +339,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </div></td>
 <td><div class="ansible-option-cell"><p>Number of times to repeat the MAC step.</p>
 <p>This is <strong>not considered during idempotency checks</strong>.</p>
-<p>This is only used by the <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend. When using it, the default is <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>This value is <strong>not used</strong>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -456,15 +456,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <p><em class="ansible-option-versionadded">added in community.crypto 1.7.0</em></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
-<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code>. If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-iter-size"><span class="std std-ref"><span class="pre">iter_size</span></span></a></strong></code> is used together with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-encryption-level"><span class="std std-ref"><span class="pre">encryption_level</span></span></a></strong></code> is not <code class="ansible-value docutils literal notranslate"><span class="pre">compatibility2022</span></code>, or if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-maciter-size"><span class="std std-ref"><span class="pre">maciter_size</span></span></a></strong></code> is used, <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> will always result in <code class="docutils literal notranslate"><span class="pre">pyopenssl</span></code> to be chosen for backwards compatibility.</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">pyopenssl</span></code>, will try to use the <a class="reference external" href="https://pypi.org/project/pyOpenSSL/">pyOpenSSL</a> library.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
 <p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
-<p><strong>Note</strong> that the <code class="ansible-value docutils literal notranslate"><span class="pre">pyopenssl</span></code> backend is deprecated and will be removed from community.crypto 3.0.0.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">pyopenssl</span></code> has been removed for community.crypto 3.0.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cryptography&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;pyopenssl&quot;</span></code></p></li>
 </ul>
 </div></td>
 </tr>
