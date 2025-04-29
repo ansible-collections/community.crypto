@@ -21,7 +21,7 @@
     privatekey_path: "{{ output_path }}/pkcs12-cert.key"
     provider: selfsigned
 
-- name: Create PKCS#12 with cryptography backend
+- name: Create PKCS#12
   community.crypto.openssl_pkcs12:
     action: export
     path: "{{ output_path }}/pkcs12-1.p12"
@@ -30,17 +30,3 @@
     privatekey_path: "{{ output_path }}/pkcs12-cert.key"
     certificate_path: "{{ output_path }}/pkcs12-cert.pem"
     state: present
-    select_crypto_backend: cryptography
-  when: cryptography_version.stdout is ansible.builtin.version('3.0', '>=')
-
-- name: Create PKCS#12 with PyOpenSSL backend
-  community.crypto.openssl_pkcs12:
-    action: export
-    path: "{{ output_path }}/pkcs12-2.p12"
-    mode: '0644'
-    friendly_name: foo
-    privatekey_path: "{{ output_path }}/pkcs12-cert.key"
-    certificate_path: "{{ output_path }}/pkcs12-cert.pem"
-    state: present
-    select_crypto_backend: pyopenssl
-  when: not (has_no_pyopenssl | default(false))

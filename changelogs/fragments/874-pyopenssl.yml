@@ -1,0 +1,4 @@
+removed_features:
+  - "crypto.support module utils - remove ``pyopenssl`` backend (https://github.com/ansible-collections/community.crypto/pull/874)."
+  - "time module utils - remove ``pyopenssl`` backend (https://github.com/ansible-collections/community.crypto/pull/874)."
+  - "execution environment dependencies - remove PyOpenSSL dependency (https://github.com/ansible-collections/community.crypto/pull/874)."
