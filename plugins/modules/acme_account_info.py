@@ -233,9 +233,7 @@ def get_orders_list(module, client, orders_url):
         if not res.get("orders"):
             if orders:
                 module.warn(
-                    "When retrieving orders list part {0}, got empty result list".format(
-                        orders_url
-                    )
+                    f"When retrieving orders list part {orders_url}, got empty result list"
                 )
             break
         # Add order URLs to result list

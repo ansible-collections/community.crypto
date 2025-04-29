@@ -146,7 +146,7 @@ def get_relative_time_option(
     result = to_native(input_string)
     if result is None:
         raise OpenSSLObjectError(
-            'The timespec "%s" for %s is not valid' % input_string, input_name
+            f'The timespec "{input_string}" for {input_name} is not valid'
         )
     # Relative time
     if result.startswith("+") or result.startswith("-"):
@@ -179,5 +179,5 @@ def get_relative_time_option(
                 return add_or_remove_timezone(res, with_timezone=with_timezone)
 
         raise OpenSSLObjectError(
-            'The time spec "%s" for %s is invalid' % (input_string, input_name)
+            f'The time spec "{input_string}" for {input_name} is invalid'
         )

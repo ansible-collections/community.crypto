@@ -201,7 +201,7 @@ if (
     ],
 )
 def test_parse_dn_component_failure(name, options, message):
-    with pytest.raises(OpenSSLObjectError, match="^%s$" % re.escape(message)):
+    with pytest.raises(OpenSSLObjectError, match=f"^{re.escape(message)}$"):
         _parse_dn_component(name, **options)
 
 
@@ -245,5 +245,5 @@ def test_parse_dn(name, expected):
     ],
 )
 def test_parse_dn_failure(name, message):
-    with pytest.raises(OpenSSLObjectError, match="^%s$" % re.escape(message)):
+    with pytest.raises(OpenSSLObjectError, match=f"^{re.escape(message)}$"):
         _parse_dn(name)

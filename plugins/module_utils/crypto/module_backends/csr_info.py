@@ -258,9 +258,9 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
             ext_keyusage_ext = self.csr.extensions.get_extension_for_class(
                 x509.BasicConstraints
             )
-            result = ["CA:{0}".format("TRUE" if ext_keyusage_ext.value.ca else "FALSE")]
+            result = [f"CA:{'TRUE' if ext_keyusage_ext.value.ca else 'FALSE'}"]
             if ext_keyusage_ext.value.path_length is not None:
-                result.append("pathlen:{0}".format(ext_keyusage_ext.value.path_length))
+                result.append(f"pathlen:{ext_keyusage_ext.value.path_length}")
             return sorted(result), ext_keyusage_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -380,16 +380,14 @@ def select_backend(module, backend, content, validate_signature=True):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
@@ -397,4 +395,4 @@ def select_backend(module, backend, content, validate_signature=True):
             module, content, validate_signature=validate_signature
         )
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")

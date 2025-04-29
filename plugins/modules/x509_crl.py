@@ -560,9 +560,7 @@ class CRL(OpenSSLObject):
 
         self.digest = select_message_digest(module.params["digest"])
         if self.digest is None:
-            raise CRLError(
-                'The digest "{0}" is not supported'.format(module.params["digest"])
-            )
+            raise CRLError(f"The digest \"{module.params['digest']}\" is not supported")
 
         self.module = module
 
@@ -578,7 +576,7 @@ class CRL(OpenSSLObject):
                 "invalidity_date": None,
                 "invalidity_date_critical": False,
             }
-            path_prefix = "revoked_certificates[{0}].".format(i)
+            path_prefix = f"revoked_certificates[{i}]."
             if rc["path"] is not None or rc["content"] is not None:
                 # Load certificate from file or content
                 try:
@@ -591,15 +589,11 @@ class CRL(OpenSSLObject):
                 except OpenSSLObjectError as e:
                     if rc["content"] is not None:
                         module.fail_json(
-                            msg="Cannot parse certificate from {0}content: {1}".format(
-                                path_prefix, to_native(e)
-                            )
+                            msg=f"Cannot parse certificate from {path_prefix}content: {e}"
                         )
                     else:
                         module.fail_json(
-                            msg='Cannot read certificate "{1}" from {0}path: {2}'.format(
-                                path_prefix, rc["path"], to_native(e)
-                            )
+                            msg=f'Cannot read certificate "{rc["path"]}" from {path_prefix}path: {e}'
                         )
             else:
                 # Specify serial_number (and potentially issuer) directly
@@ -668,23 +662,17 @@ class CRL(OpenSSLObject):
                 return check_type_int(value)
             except TypeError as exc:
                 self.module.fail_json(
-                    msg="Error while parsing revoked_certificates[{idx}].serial_number as an integer: {exc}".format(
-                        idx=index + 1,
-                        exc=to_native(exc),
-                    )
+                    msg=f"Error while parsing revoked_certificates[{index + 1}].serial_number as an integer: {exc}"
                 )
         if self.serial_numbers_format == "hex-octets":
             try:
                 return parse_serial(check_type_str(value))
             except (TypeError, ValueError) as exc:
                 self.module.fail_json(
-                    msg="Error while parsing revoked_certificates[{idx}].serial_number as an colon-separated hex octet string: {exc}".format(
-                        idx=index + 1,
-                        exc=to_native(exc),
-                    )
+                    msg=f"Error while parsing revoked_certificates[{index + 1}].serial_number as an colon-separated hex octet string: {exc}"
                 )
         raise RuntimeError(
-            "Unexpected value %s of serial_numbers" % (self.serial_numbers_format,)
+            f"Unexpected value {self.serial_numbers_format} of serial_numbers"
         )
 
     def _get_info(self, data):
@@ -1026,9 +1014,7 @@ def main():
 
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(
-            msg=missing_required_lib(
-                "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
-            ),
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 

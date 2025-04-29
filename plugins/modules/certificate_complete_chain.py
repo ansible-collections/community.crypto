@@ -212,18 +212,16 @@ def is_parent(module, cert, potential_parent):
             public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
         else:
             # Unknown public key type
-            module.warn('Unknown public key type "{0}"'.format(public_key))
+            module.warn(f'Unknown public key type "{public_key}"')
             return False
         return True
     except cryptography.exceptions.InvalidSignature:
         return False
     except cryptography.exceptions.UnsupportedAlgorithm:
-        module.warn(
-            'Unsupported algorithm "{0}"'.format(cert.cert.signature_hash_algorithm)
-        )
+        module.warn(f'Unsupported algorithm "{cert.cert.signature_hash_algorithm}"')
         return False
     except Exception as e:
-        module.fail_json(msg="Unknown error on signature validation: {0}".format(e))
+        module.fail_json(msg=f"Unknown error on signature validation: {e}")
 
 
 def parse_PEM_list(module, text, source, fail_on_error=True):
@@ -239,9 +237,7 @@ def parse_PEM_list(module, text, source, fail_on_error=True):
             )
             result.append(Certificate(cert_pem, cert))
         except Exception as e:
-            msg = "Cannot parse certificate #{0} from {1}: {2}".format(
-                len(result) + 1, source, e
-            )
+            msg = f"Cannot parse certificate #{len(result) + 1} from {source}: {e}"
             if fail_on_error:
                 module.fail_json(msg=msg)
             else:
@@ -262,7 +258,7 @@ def load_PEM_list(module, path, fail_on_error=True):
                 fail_on_error=fail_on_error,
             )
     except Exception as e:
-        msg = "Cannot read certificate file {0}: {1}".format(path, e)
+        msg = f"Cannot read certificate file {path}: {e}"
         if fail_on_error:
             module.fail_json(msg=msg)
         else:
@@ -357,9 +353,9 @@ def main():
             if not is_parent(module, chain[i - 1], parent):
                 module.fail_json(
                     msg=(
-                        "Cannot verify input chain: certificate #{2}: {3} is not issuer "
-                        + "of certificate #{0}: {1}"
-                    ).format(i, format_cert(chain[i - 1]), i + 1, format_cert(parent))
+                        f"Cannot verify input chain: certificate #{i + 1}: {format_cert(parent)} is not issuer "
+                        f"of certificate #{i}: {format_cert(chain[i - 1])}"
+                    )
                 )
 
     # Load intermediate certificates
@@ -392,9 +388,7 @@ def main():
             current = intermediate
         else:
             module.fail_json(
-                msg="Cannot complete chain. Stuck at certificate {0}".format(
-                    format_cert(current)
-                )
+                msg=f"Cannot complete chain. Stuck at certificate {format_cert(current)}"
             )
 
     # Return results

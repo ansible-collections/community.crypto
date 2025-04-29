@@ -53,15 +53,13 @@ def _reduce_fractional_digits(timestamp_str):
     # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
     m = _FRACTIONAL_MATCHER.match(timestamp_str)
     if not m:
-        raise BackendException(
-            "Cannot parse ISO 8601 timestamp {0!r}".format(timestamp_str)
-        )
+        raise BackendException(f"Cannot parse ISO 8601 timestamp {timestamp_str!r}")
     timestamp, fractional, timezone = m.groups()
     if len(fractional) > 7:
         # Python does not support anything smaller than microseconds
         # (Golang supports nanoseconds, Boulder often emits more fractional digits, which Python chokes on)
         fractional = fractional[:7]
-    return "%s%s%s" % (timestamp, fractional, timezone)
+    return f"{timestamp}{fractional}{timezone}"
 
 
 def _parse_acme_timestamp(timestamp_str, with_timezone):
@@ -87,9 +85,7 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
                 if with_timezone
                 else remove_timezone(result)
             )
-    raise BackendException(
-        "Cannot parse ISO 8601 timestamp {0!r}".format(timestamp_str)
-    )
+    raise BackendException(f"Cannot parse ISO 8601 timestamp {timestamp_str!r}")
 
 
 @six.add_metaclass(abc.ABCMeta)

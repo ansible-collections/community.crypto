@@ -301,7 +301,7 @@ class PublicKey(OpenSSLObject):
 
         if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
             raise PublicKeyError(
-                "The private key %s does not exist" % self.privatekey_path
+                f"The private key {self.privatekey_path} does not exist"
             )
 
         if not self.check(module, perms_required=False) or self.force:
@@ -461,9 +461,7 @@ def main():
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(minimal_cryptography_version)
+                msg=f"Cannot detect the required Python library cryptography (>= {minimal_cryptography_version})",
             )
 
     if module.params["format"] == "OpenSSH" and backend != "cryptography":
@@ -473,7 +471,7 @@ def main():
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(minimal_cryptography_version)
+                    f"cryptography >= {minimal_cryptography_version}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
@@ -482,8 +480,7 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory '%s' does not exist or the file is not a directory"
-            % base_dir,
+            msg=f"The directory '{base_dir}' does not exist or the file is not a directory",
         )
 
     try:

@@ -32,9 +32,8 @@ def der_to_pem(der_cert):
     """
     Convert the DER format certificate in der_cert to a PEM format certificate and return it.
     """
-    return """-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----\n""".format(
-        "\n".join(textwrap.wrap(base64.b64encode(der_cert).decode("utf8"), 64))
-    )
+    content = "\n".join(textwrap.wrap(base64.b64encode(der_cert).decode("utf8"), 64))
+    return f"-----BEGIN CERTIFICATE-----\n{content}\n-----END CERTIFICATE-----\n"
 
 
 def pem_to_der(pem_filename=None, pem_content=None):
@@ -52,7 +51,7 @@ def pem_to_der(pem_filename=None, pem_content=None):
                 lines = list(f)
         except Exception as err:
             raise ModuleFailException(
-                "cannot load PEM file {0}: {1}".format(pem_filename, to_native(err)),
+                f"cannot load PEM file {pem_filename}: {to_native(err)}",
                 exception=traceback.format_exc(),
             )
     else:
@@ -104,7 +103,7 @@ def parse_retry_after(value, relative_with_timezone=True, now=None):
     except ValueError:
         pass
 
-    raise ValueError("Cannot parse Retry-After header value %s" % repr(value))
+    raise ValueError(f"Cannot parse Retry-After header value {repr(value)}")
 
 
 def compute_cert_id(
@@ -138,4 +137,4 @@ def compute_cert_id(
     serial = to_native(base64.urlsafe_b64encode(serial_bytes)).replace("=", "")
 
     # Compose cert ID
-    return "{aki}.{serial}".format(aki=aki, serial=serial)
+    return f"{aki}.{serial}"

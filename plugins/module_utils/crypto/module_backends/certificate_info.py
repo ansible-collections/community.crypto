@@ -332,11 +332,9 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 x509.BasicConstraints
             )
             result = []
-            result.append(
-                "CA:{0}".format("TRUE" if ext_keyusage_ext.value.ca else "FALSE")
-            )
+            result.append(f"CA:{'TRUE' if ext_keyusage_ext.value.ca else 'FALSE'}")
             if ext_keyusage_ext.value.path_length is not None:
-                result.append("pathlen:{0}".format(ext_keyusage_ext.value.path_length))
+                result.append(f"pathlen:{ext_keyusage_ext.value.path_length}")
             return sorted(result), ext_keyusage_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False
@@ -474,20 +472,17 @@ def select_backend(module, backend, content):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect any of the required Python libraries "
-                    "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         return backend, CertificateInfoRetrievalCryptography(module, content)
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")

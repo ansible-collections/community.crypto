@@ -259,7 +259,7 @@ def main():
                 )
             )
         except Exception as e:
-            raise ModuleFailException("Error while loading private key: {0}".format(e))
+            raise ModuleFailException(f"Error while loading private key: {e}")
 
         # Some common attributes
         domain = to_text(challenge_data["resource"])
@@ -276,7 +276,7 @@ def main():
             san = cryptography.x509.IPAddress(ipaddress.ip_address(identifier))
         else:
             raise ModuleFailException(
-                'Unsupported identifier type "{0}"'.format(identifier_type)
+                f'Unsupported identifier type "{identifier_type}"'
             )
 
         # Generate regular self-signed certificate

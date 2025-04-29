@@ -231,7 +231,7 @@ def main():
         )
     except ModuleFailException as e:
         if module.params["treat_parsing_error_as_non_existing"]:
-            complete(True, msg="Certificate cannot be parsed: {0}".format(e.msg))
+            complete(True, msg=f"Certificate cannot be parsed: {e.msg}")
         e.do_fail(module)
 
     result["parsable"] = True
@@ -265,24 +265,18 @@ def main():
             )
             msg_append = ""
             if "explanationURL" in renewal_info:
-                msg_append = ". Information on renewal interval: {0}".format(
-                    renewal_info["explanationURL"]
-                )
+                msg_append = f". Information on renewal interval: {renewal_info['explanationURL']}"
             result["supports_ari"] = True
             if now > window_end:
                 complete(
                     True,
-                    msg="The suggested renewal interval provided by ARI is in the past{0}".format(
-                        msg_append
-                    ),
+                    msg=f"The suggested renewal interval provided by ARI is in the past{msg_append}",
                 )
             if module.params["ari_algorithm"] == "start":
                 if now > window_start:
                     complete(
                         True,
-                        msg="The suggested renewal interval provided by ARI has begun{0}".format(
-                            msg_append
-                        ),
+                        msg=f"The suggested renewal interval provided by ARI has begun{msg_append}",
                     )
             else:
                 random_time = backend.interpolate_timestamp(
@@ -291,10 +285,7 @@ def main():
                 if now > random_time:
                     complete(
                         True,
-                        msg="The picked random renewal time {0} in sugested renewal internal provided by ARI is in the past{1}".format(
-                            random_time,
-                            msg_append,
-                        ),
+                        msg=f"The picked random renewal time {random_time} in sugested renewal internal provided by ARI is in the past{msg_append}",
                     )
 
         if module.params["remaining_days"] is not None:
@@ -302,7 +293,7 @@ def main():
             if remaining_days < module.params["remaining_days"]:
                 complete(
                     True,
-                    msg="The certificate expires in {0} days".format(remaining_days),
+                    msg=f"The certificate expires in {remaining_days} days",
                 )
 
         if module.params["remaining_percentage"] is not None:
@@ -314,10 +305,8 @@ def main():
             if timestamp < now:
                 complete(
                     True,
-                    msg="The remaining percentage {0}% of the certificate's lifespan was reached on {1}".format(
-                        module.params["remaining_percentage"] * 100,
-                        timestamp,
-                    ),
+                    msg=f"The remaining percentage {module.params['remaining_percentage'] * 100}%"
+                    f" of the certificate's lifespan was reached on {timestamp}",
                 )
 
         complete(False)

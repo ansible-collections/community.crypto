@@ -62,7 +62,7 @@ class ACMECertificateClient:
             raise ModuleFailException(msg="Account does not exist or is deactivated.")
 
         if self.csr is not None and not os.path.exists(self.csr):
-            raise ModuleFailException("CSR %s not found" % (self.csr))
+            raise ModuleFailException(f"CSR {self.csr} not found")
 
         # Extract list of identifiers from CSR
         if self.csr is not None or self.csr_content is not None:
@@ -84,9 +84,7 @@ class ACMECertificateClient:
                     )
                 except ValueError as exc:
                     self.module.warn(
-                        "Error while parsing criterium: {error}. Ignoring criterium.".format(
-                            error=exc
-                        )
+                        f"Error while parsing criterium: {exc}. Ignoring criterium."
                     )
         return select_chain_matcher
 
@@ -154,17 +152,13 @@ class ACMECertificateClient:
         for authz in order.authorizations.values():
             if authz.status not in ("valid", "pending"):
                 bad_authzs.append(
-                    "{authz} (status={status!r})".format(
-                        authz=authz.combined_identifier,
-                        status=authz.status,
-                    )
+                    f"{authz.combined_identifier} (status={authz.status!r})"
                 )
         if bad_authzs:
+            bad_authzs = ", ".join(sorted(bad_authzs))
             raise ModuleFailException(
                 "Some of the authorizations for the order are in a bad state, so the order"
-                " can no longer be satisfied: {bad_authzs}".format(
-                    bad_authzs=", ".join(sorted(bad_authzs)),
-                ),
+                f" can no longer be satisfied: {bad_authzs}",
             )
 
     def collect_invalid_authzs(self, order):
@@ -201,18 +195,14 @@ class ACMECertificateClient:
                 alt_cert = CertificateChain.download(self.client, alternate)
             except ModuleFailException as e:
                 self.module.warn(
-                    "Error while downloading alternative certificate {0}: {1}".format(
-                        alternate, e
-                    )
+                    f"Error while downloading alternative certificate {alternate}: {e}"
                 )
                 continue
             if alt_cert.cert is not None:
                 alternate_chains.append(alt_cert)
             else:
                 self.module.warn(
-                    "Error while downloading alternative certificate {0}: no certificate found".format(
-                        alternate
-                    )
+                    f"Error while downloading alternative certificate {alternate}: no certificate found"
                 )
         return alternate_chains
 
@@ -222,22 +212,18 @@ class ACMECertificateClient:
         """
         if order.status != "valid":
             raise ModuleFailException(
-                "The order must be valid, but has state {state!r}!".format(
-                    state=order.state
-                )
+                f"The order must be valid, but has state {order.state!r}!"
             )
 
         if not order.certificate_uri:
             raise ModuleFailException(
-                "Order's crtificate URL {url!r} is empty!".format(
-                    url=order.certificate_uri
-                )
+                f"Order's crtificate URL {order.certificate_uri!r} is empty!"
             )
 
         cert = CertificateChain.download(self.client, order.certificate_uri)
         if cert.cert is None:
             raise ModuleFailException(
-                "Certificate at {url} is empty!".format(url=order.certificate_uri)
+                f"Certificate at {order.certificate_uri} is empty!"
             )
 
         alternate_chains = None
@@ -256,7 +242,7 @@ class ACMECertificateClient:
         for identifier, authz in order.authorizations.items():
             if authz.status != "valid":
                 authz.raise_error(
-                    'Status is {status!r} and not "valid"'.format(status=authz.status),
+                    f'Status is {authz.status!r} and not "valid"',
                     module=self.module,
                 )
 
@@ -269,7 +255,7 @@ class ACMECertificateClient:
             for chain in chains:
                 if matcher.match(chain):
                     self.module.debug(
-                        "Found matching chain for criterium {0}".format(criterium_idx)
+                        f"Found matching chain for criterium {criterium_idx}"
                     )
                     return chain
         return None
@@ -312,9 +298,7 @@ class ACMECertificateClient:
                     pass
                 if authz is None or authz.status != "deactivated":
                     self.module.warn(
-                        warning="Could not deactivate authz object {0}.".format(
-                            authz_uri
-                        )
+                        warning=f"Could not deactivate authz object {authz_uri}."
                     )
         else:
             for authz in order.authorizations.values():
@@ -325,7 +309,5 @@ class ACMECertificateClient:
                     pass
                 if authz.status != "deactivated":
                     self.module.warn(
-                        warning="Could not deactivate authz object {0}.".format(
-                            authz.url
-                        )
+                        warning=f"Could not deactivate authz object {authz.url}."
                     )

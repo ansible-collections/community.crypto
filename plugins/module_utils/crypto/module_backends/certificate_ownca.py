@@ -93,21 +93,17 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
-                "The certificate signing request file {0} does not exist".format(
-                    self.csr_path
-                )
+                f"The certificate signing request file {self.csr_path} does not exist"
             )
         if self.ca_cert_content is None and not os.path.exists(self.ca_cert_path):
             raise CertificateError(
-                "The CA certificate file {0} does not exist".format(self.ca_cert_path)
+                f"The CA certificate file {self.ca_cert_path} does not exist"
             )
         if self.ca_privatekey_content is None and not os.path.exists(
             self.ca_privatekey_path
         ):
             raise CertificateError(
-                "The CA private key file {0} does not exist".format(
-                    self.ca_privatekey_path
-                )
+                f"The CA private key file {self.ca_privatekey_path} does not exist"
             )
 
         self._ensure_csr_loaded()
@@ -134,8 +130,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         if cryptography_key_needs_digest_for_signing(self.ca_private_key):
             if self.digest is None:
                 raise CertificateError(
-                    "The digest %s is not supported with the cryptography backend"
-                    % module.params["ownca_digest"]
+                    f"The digest {module.params['ownca_digest']} is not supported with the cryptography backend"
                 )
         else:
             self.digest = None

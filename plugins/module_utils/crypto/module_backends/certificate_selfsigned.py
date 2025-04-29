@@ -67,13 +67,11 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
 
         if self.csr_path is not None and not os.path.exists(self.csr_path):
             raise CertificateError(
-                "The certificate signing request file {0} does not exist".format(
-                    self.csr_path
-                )
+                f"The certificate signing request file {self.csr_path} does not exist"
             )
         if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
             raise CertificateError(
-                "The private key file {0} does not exist".format(self.privatekey_path)
+                f"The private key file {self.privatekey_path} does not exist"
             )
 
         self._module = module
@@ -90,9 +88,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                 digest = self.digest
                 if digest is None:
                     self.module.fail_json(
-                        msg='Unsupported digest "{0}"'.format(
-                            module.params["selfsigned_digest"]
-                        )
+                        msg=f'Unsupported digest "{module.params["selfsigned_digest"]}"'
                     )
             try:
                 self.csr = csr.sign(self.privatekey, digest, default_backend())
@@ -109,8 +105,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest is None:
                 raise CertificateError(
-                    "The digest %s is not supported with the cryptography backend"
-                    % module.params["selfsigned_digest"]
+                    f"The digest {module.params['selfsigned_digest']} is not supported with the cryptography backend"
                 )
         else:
             self.digest = None

@@ -31,17 +31,17 @@ class AcmeCertificateBackend(CertificateBackend):
             )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
-                "The certificate signing request file %s does not exist" % self.csr_path
+                f"The certificate signing request file {self.csr_path} does not exist"
             )
 
         if not os.path.exists(self.accountkey_path):
             raise CertificateError(
-                "The account key %s does not exist" % self.accountkey_path
+                f"The account key {self.accountkey_path} does not exist"
             )
 
         if not os.path.exists(self.challenge_path):
             raise CertificateError(
-                "The challenge path %s does not exist" % self.challenge_path
+                f"The challenge path {self.challenge_path} does not exist"
             )
 
         self.acme_tiny_path = self.module.get_bin_path("acme-tiny", required=True)
@@ -66,7 +66,7 @@ class AcmeCertificateBackend(CertificateBackend):
                 except Exception:
                     pass
                 self.module.fail_json(
-                    msg="failed to create temporary CSR file: %s" % to_native(err),
+                    msg=f"failed to create temporary CSR file: {to_native(err)}",
                     exception=traceback.format_exc(),
                 )
             f.close()

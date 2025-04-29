@@ -90,7 +90,7 @@ class KeypairBackend(OpensshModule):
             result = 256
         else:
             return self.module.fail_json(
-                msg="%s is not a valid value for key type" % self.type
+                msg=f"{self.type} is not a valid value for key type"
             )
 
         return result
@@ -100,8 +100,7 @@ class KeypairBackend(OpensshModule):
 
         if os.path.isdir(self.private_key_path):
             self.module.fail_json(
-                msg="%s is a directory. Please specify a path to a file."
-                % self.private_key_path
+                msg=f"{self.private_key_path} is a directory. Please specify a path to a file."
             )
 
     def _execute(self):
@@ -562,4 +561,4 @@ def select_backend(module, backend):
             module.fail_json(msg=missing_required_lib("cryptography >= 2.6"))
         return backend, KeypairBackendCryptography(module)
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")

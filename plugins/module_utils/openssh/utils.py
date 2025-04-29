@@ -91,7 +91,7 @@ class OpensshParser:
 
     def __init__(self, data):
         if not isinstance(data, (bytes, bytearray)):
-            raise TypeError("Data must be bytes-like not %s" % type(data))
+            raise TypeError(f"Data must be bytes-like not {type(data)}")
 
         self._data = memoryview(data) if PY3 else data
         self._pos = 0
@@ -174,7 +174,7 @@ class OpensshParser:
 
     def _check_position(self, offset):
         if self._pos + offset > len(self._data):
-            raise ValueError("Insufficient data remaining at position: %s" % self._pos)
+            raise ValueError(f"Insufficient data remaining at position: {self._pos}")
         elif self._pos + offset < 0:
             raise ValueError("Position cannot be less than zero.")
         else:
@@ -210,7 +210,7 @@ class OpensshParser:
             signature_data["R"] = cls._big_int(signature_blob[:32], "little")
             signature_data["S"] = cls._big_int(signature_blob[32:], "little")
         else:
-            raise ValueError("%s is not a valid signature type" % signature_type)
+            raise ValueError(f"{signature_type} is not a valid signature type")
 
         signature_data["signature_type"] = signature_type
 
@@ -220,7 +220,7 @@ class OpensshParser:
     def _big_int(cls, raw_string, byte_order, signed=False):
         if byte_order not in ("big", "little"):
             raise ValueError(
-                "Byte_order must be one of (big, little) not %s" % byte_order
+                f"Byte_order must be one of (big, little) not {byte_order}"
             )
 
         if PY3:
@@ -279,7 +279,7 @@ class _OpensshWriter:
         if buffer is not None:
             if not isinstance(buffer, (bytes, bytearray)):
                 raise TypeError(
-                    "Buffer must be a bytes-like object not %s" % type(buffer)
+                    f"Buffer must be a bytes-like object not {type(buffer)}"
                 )
         else:
             buffer = bytearray()
@@ -288,7 +288,7 @@ class _OpensshWriter:
 
     def boolean(self, value):
         if not isinstance(value, bool):
-            raise TypeError("Value must be of type bool not %s" % type(value))
+            raise TypeError(f"Value must be of type bool not {type(value)}")
 
         self._buff.extend(_BOOLEAN.pack(value))
 
@@ -296,10 +296,10 @@ class _OpensshWriter:
 
     def uint32(self, value):
         if not isinstance(value, int):
-            raise TypeError("Value must be of type int not %s" % type(value))
+            raise TypeError(f"Value must be of type int not {type(value)}")
         if value < 0 or value > _UINT32_MAX:
             raise ValueError(
-                "Value must be a positive integer less than %s" % _UINT32_MAX
+                f"Value must be a positive integer less than {_UINT32_MAX}"
             )
 
         self._buff.extend(_UINT32.pack(value))
@@ -308,10 +308,10 @@ class _OpensshWriter:
 
     def uint64(self, value):
         if not isinstance(value, (long, int)):
-            raise TypeError("Value must be of type (long, int) not %s" % type(value))
+            raise TypeError(f"Value must be of type (long, int) not {type(value)}")
         if value < 0 or value > _UINT64_MAX:
             raise ValueError(
-                "Value must be a positive integer less than %s" % _UINT64_MAX
+                f"Value must be a positive integer less than {_UINT64_MAX}"
             )
 
         self._buff.extend(_UINT64.pack(value))
@@ -320,7 +320,7 @@ class _OpensshWriter:
 
     def string(self, value):
         if not isinstance(value, (bytes, bytearray)):
-            raise TypeError("Value must be bytes-like not %s" % type(value))
+            raise TypeError(f"Value must be bytes-like not {type(value)}")
         self.uint32(len(value))
         self._buff.extend(value)
 
@@ -328,7 +328,7 @@ class _OpensshWriter:
 
     def mpint(self, value):
         if not isinstance(value, (int, long)):
-            raise TypeError("Value must be of type (long, int) not %s" % type(value))
+            raise TypeError(f"Value must be of type (long, int) not {type(value)}")
 
         self.string(self._int_to_mpint(value))
 
@@ -336,18 +336,18 @@ class _OpensshWriter:
 
     def name_list(self, value):
         if not isinstance(value, list):
-            raise TypeError("Value must be a list of byte strings not %s" % type(value))
+            raise TypeError(f"Value must be a list of byte strings not {type(value)}")
 
         try:
             self.string(",".join(value).encode("ASCII"))
         except UnicodeEncodeError as e:
-            raise ValueError("Name-list's must consist of US-ASCII characters: %s" % e)
+            raise ValueError(f"Name-list's must consist of US-ASCII characters: {e}")
 
         return self
 
     def string_list(self, value):
         if not isinstance(value, list):
-            raise TypeError("Value must be a list of byte string not %s" % type(value))
+            raise TypeError(f"Value must be a list of byte string not {type(value)}")
 
         writer = _OpensshWriter()
         for s in value:

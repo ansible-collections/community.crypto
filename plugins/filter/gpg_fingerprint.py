@@ -54,9 +54,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
 def gpg_fingerprint(input):
     if not isinstance(input, string_types):
         raise AnsibleFilterError(
-            "The input for the community.crypto.gpg_fingerprint filter must be a string; got {type} instead".format(
-                type=type(input)
-            )
+            f"The input for the community.crypto.gpg_fingerprint filter must be a string; got {type(input)} instead"
         )
     try:
         gpg = PluginGPGRunner()

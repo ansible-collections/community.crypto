@@ -273,7 +273,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(ectype)
         if ecclass is None:
             self.module.fail_json(
-                msg="Your cryptography version does not support {0}".format(ectype)
+                msg=f"Your cryptography version does not support {ectype}"
             )
         return ecclass
 
@@ -385,9 +385,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             if self.type == "ECC" and self.curve in self.curves:
                 if self.curves[self.curve]["deprecated"]:
                     self.module.warn(
-                        "Elliptic curves of type {0} should not be used for new keys!".format(
-                            self.curve
-                        )
+                        f"Elliptic curves of type {self.curve} should not be used for new keys!"
                     )
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
@@ -397,9 +395,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 )
         except cryptography.exceptions.UnsupportedAlgorithm:
             self.module.fail_json(
-                msg="Cryptography backend does not support the algorithm required for {0}".format(
-                    self.type
-                )
+                msg=f"Cryptography backend does not support the algorithm required for {self.type}"
             )
 
     def get_private_key_data(self):
@@ -426,9 +422,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 )
         except AttributeError:
             self.module.fail_json(
-                msg='Cryptography backend does not support the selected output format "{0}"'.format(
-                    self.format
-                )
+                msg=f'Cryptography backend does not support the selected output format "{self.format}"'
             )
 
         # Select key encryption
@@ -454,15 +448,11 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             )
         except ValueError:
             self.module.fail_json(
-                msg='Cryptography backend cannot serialize the private key in the required format "{0}"'.format(
-                    self.format
-                )
+                msg=f'Cryptography backend cannot serialize the private key in the required format "{self.format}"'
             )
         except Exception:
             self.module.fail_json(
-                msg='Error while serializing the private key in the required format "{0}"'.format(
-                    self.format
-                ),
+                msg=f'Error while serializing the private key in the required format "{self.format}"',
                 exception=traceback.format_exc(),
             )
 
@@ -611,21 +601,19 @@ def select_backend(module, backend):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         return backend, PrivateKeyCryptographyBackend(module)
     else:
-        raise Exception("Unsupported value for backend: {0}".format(backend))
+        raise Exception(f"Unsupported value for backend: {backend}")
 
 
 def get_privatekey_argument_spec():

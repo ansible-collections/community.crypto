@@ -32,9 +32,7 @@ class PrivateKeyModule:
                 try:
                     data = base64.b64decode(module.params["content"])
                 except Exception as e:
-                    module.fail_json(
-                        msg="Cannot decode Base64 encoded data: {0}".format(e)
-                    )
+                    module.fail_json(msg=f"Cannot decode Base64 encoded data: {e}")
             else:
                 data = to_bytes(module.params["content"])
             module_backend.set_existing(data)

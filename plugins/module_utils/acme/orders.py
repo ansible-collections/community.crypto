@@ -133,11 +133,7 @@ class Order:
                     ):
                         if message_callback:
                             message_callback(
-                                "Stop passing `replaces={replaces}` due to error {code} {type} when creating ACME order".format(
-                                    code=exc.error_code,
-                                    type=exc.error_type,
-                                    replaces=replaces_cert_id,
-                                )
+                                f"Stop passing `replaces={replaces_cert_id}` due to error {exc.error_code} {exc.error_type} when creating ACME order"
                             )
                         replaces_cert_id = None
                         continue
@@ -167,9 +163,7 @@ class Order:
         if self.status != "valid":
             raise ACMEProtocolException(
                 client.module,
-                'Failed to wait for order to complete; got status "{status}"'.format(
-                    status=self.status
-                ),
+                f'Failed to wait for order to complete; got status "{self.status}"',
                 content_json=self.data,
             )
 
@@ -198,9 +192,7 @@ class Order:
             if self.status not in ["procesing", "valid", "invalid"]:
                 raise ACMEProtocolException(
                     client.module,
-                    'Failed to finalize order; got status "{status}"'.format(
-                        status=self.status
-                    ),
+                    f'Failed to finalize order; got status "{self.status}"',
                     info=info,
                     content_json=result,
                 )

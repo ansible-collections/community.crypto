@@ -369,8 +369,7 @@ def main():
     if get_certificate_chain and sys.version_info < (3, 10):
         module.fail_json(
             msg="get_certificate_chain=true can only be used with Python 3.10 (Python 3.13+ officially supports this). "
-            "The Python version used to run the get_certificate module is %s"
-            % sys.version
+            f"The Python version used to run the get_certificate module is {sys.version}"
         )
 
     backend = module.params.get("select_crypto_backend")
@@ -388,16 +387,14 @@ def main():
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
@@ -437,14 +434,12 @@ def main():
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
         except Exception as e:
-            module.fail_json(
-                msg="Failed to get cert from {0}:{1}, error: {2}".format(host, port, e)
-            )
+            module.fail_json(msg=f"Failed to get cert from {host}:{port}, error: {e}")
     else:
         # Python >= 2.7.9
         try:
             if proxy_host:
-                connect = "CONNECT %s:%s HTTP/1.0\r\n\r\n" % (host, port)
+                connect = f"CONNECT {host}:{port} HTTP/1.0\r\n\r\n"
                 sock = socket()
                 atexit.register(sock.close)
                 sock.connect((proxy_host, proxy_port))
@@ -489,9 +484,7 @@ def main():
                         # If tls_ctx_option_attr is not an integer
                         else:
                             module.fail_json(
-                                msg="Failed to determine the numeric value for {0}".format(
-                                    tls_ctx_option_str
-                                )
+                                msg=f"Failed to determine the numeric value for {tls_ctx_option_str}"
                             )
                     # If the item is an integer
                     elif isinstance(tls_ctx_option, int):
@@ -500,9 +493,7 @@ def main():
                     # If the item is not a string nor integer
                     else:
                         module.fail_json(
-                            msg="tls_ctx_options must be a string or integer, got {0!r}".format(
-                                tls_ctx_option
-                            )
+                            msg=f"tls_ctx_options must be a string or integer, got {tls_ctx_option!r}"
                         )
                         tls_ctx_option_int = (
                             0  # make pylint happy; this code is actually unreachable
@@ -513,9 +504,7 @@ def main():
                         ctx.options |= tls_ctx_option_int
                     except Exception:
                         module.fail_json(
-                            msg="Failed to add {0} to CTX options".format(
-                                tls_ctx_option_str or tls_ctx_option_int
-                            )
+                            msg=f"Failed to add {tls_ctx_option_str or tls_ctx_option_int} to CTX options"
                         )
 
             tls_sock = ctx.wrap_socket(sock, server_hostname=server_name or host)
@@ -568,15 +557,11 @@ def main():
         except Exception as e:
             if proxy_host:
                 module.fail_json(
-                    msg="Failed to get cert via proxy {0}:{1} from {2}:{3}, error: {4}".format(
-                        proxy_host, proxy_port, host, port, e
-                    )
+                    msg=f"Failed to get cert via proxy {proxy_host}:{proxy_port} from {host}:{port}, error: {e}"
                 )
             else:
                 module.fail_json(
-                    msg="Failed to get cert from {0}:{1}, error: {2}".format(
-                        host, port, e
-                    )
+                    msg=f"Failed to get cert from {host}:{port}, error: {e}"
                 )
 
     result["cert"] = cert

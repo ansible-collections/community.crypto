@@ -91,14 +91,12 @@ class CryptographyChainMatcher(ChainMatcher):
             except Exception:
                 if criterium_idx is None:
                     module.warn(
-                        "Criterium has invalid {0} value. Ignoring criterium.".format(
-                            name
-                        )
+                        f"Criterium has invalid {name} value. Ignoring criterium."
                     )
                 else:
                     module.warn(
-                        "Criterium {0} in select_chain has invalid {1} value. "
-                        "Ignoring criterium.".format(criterium_idx, name)
+                        f"Criterium {criterium_idx} in select_chain has invalid {name} value. "
+                        "Ignoring criterium."
                     )
         return None
 
@@ -181,9 +179,7 @@ class CryptographyChainMatcher(ChainMatcher):
                 if matches:
                     return True
             except Exception as e:
-                self.module.warn(
-                    "Error while loading certificate {0}: {1}".format(cert, e)
-                )
+                self.module.warn(f"Error while loading certificate {cert}: {e}")
         return False
 
 
@@ -211,7 +207,7 @@ class CryptographyBackend(CryptoBackend):
                 backend=_cryptography_backend,
             )
         except Exception as e:
-            raise KeyParsingError("error while loading key: {0}".format(e))
+            raise KeyParsingError(f"error while loading key: {e}")
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
             pk = key.public_key().public_numbers()
             return {
@@ -250,9 +246,7 @@ class CryptographyBackend(CryptoBackend):
                 point_size = 66
                 curve = "P-521"
             else:
-                raise KeyParsingError(
-                    "unknown elliptic curve: {0}".format(pk.curve.name)
-                )
+                raise KeyParsingError(f"unknown elliptic curve: {pk.curve.name}")
             num_bytes = (bits + 7) // 8
             return {
                 "key_obj": key,
@@ -268,10 +262,10 @@ class CryptographyBackend(CryptoBackend):
                 "point_size": point_size,
             }
         else:
-            raise KeyParsingError('unknown key type "{0}"'.format(type(key)))
+            raise KeyParsingError(f'unknown key type "{type(key)}"')
 
     def sign(self, payload64, protected64, key_data):
-        sign_payload = "{0}.{1}".format(protected64, payload64).encode("utf8")
+        sign_payload = f"{protected64}.{payload64}".encode("utf8")
         if "mac_obj" in key_data:
             mac = key_data["mac_obj"]()
             mac.update(sign_payload)
@@ -320,16 +314,12 @@ class CryptographyBackend(CryptoBackend):
             hashbytes = 64
         else:
             raise BackendException(
-                "Unsupported MAC key algorithm for cryptography backend: {0}".format(
-                    alg
-                )
+                f"Unsupported MAC key algorithm for cryptography backend: {alg}"
             )
         key_bytes = base64.urlsafe_b64decode(key)
         if len(key_bytes) < hashbytes:
             raise BackendException(
-                "{0} key must be at least {1} bytes long (after Base64 decoding)".format(
-                    alg, hashbytes
-                )
+                f"{alg} key must be at least {hashbytes} bytes long (after Base64 decoding)"
             )
         return {
             "mac_obj": lambda: cryptography.hazmat.primitives.hmac.HMAC(
@@ -382,7 +372,7 @@ class CryptographyBackend(CryptoBackend):
                         add_identifier(("ip", name.value.compressed))
                     else:
                         raise BackendException(
-                            "Found unsupported SAN identifier {0}".format(name)
+                            f"Found unsupported SAN identifier {name}"
                         )
         return result
 
@@ -425,10 +415,8 @@ class CryptographyBackend(CryptoBackend):
             )
         except Exception as e:
             if cert_filename is None:
-                raise BackendException("Cannot parse certificate: {0}".format(e))
-            raise BackendException(
-                "Cannot parse certificate {0}: {1}".format(cert_filename, e)
-            )
+                raise BackendException(f"Cannot parse certificate: {e}")
+            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
 
         if now is None:
             now = self.get_now()
@@ -460,10 +448,8 @@ class CryptographyBackend(CryptoBackend):
             )
         except Exception as e:
             if cert_filename is None:
-                raise BackendException("Cannot parse certificate: {0}".format(e))
-            raise BackendException(
-                "Cannot parse certificate {0}: {1}".format(cert_filename, e)
-            )
+                raise BackendException(f"Cannot parse certificate: {e}")
+            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
 
         ski = None
         try:

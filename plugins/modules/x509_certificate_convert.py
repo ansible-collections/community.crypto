@@ -152,16 +152,12 @@ def parse_certificate(input, strict=False):
         pems = split_pem_list(to_text(input))
         if len(pems) > 1 and strict:
             raise ValueError(
-                "The input contains {count} PEM objects, expecting only one since strict=true".format(
-                    count=len(pems)
-                )
+                f"The input contains {len(pems)} PEM objects, expecting only one since strict=true"
             )
         pem_header_type, content = extract_pem(pems[0], strict=strict)
         if strict and pem_header_type not in ("CERTIFICATE", "X509 CERTIFICATE"):
             raise ValueError(
-                "type is {type!r}, expecting CERTIFICATE or X509 CERTIFICATE".format(
-                    type=pem_header_type
-                )
+                f"type is {pem_header_type!r}, expecting CERTIFICATE or X509 CERTIFICATE"
             )
         input = base64.b64decode(content)
     else:
@@ -187,18 +183,14 @@ class X509CertificateConvertModule(OpenSSLObject):
                 try:
                     self.input = base64.b64decode(self.input)
                 except Exception as exc:
-                    module.fail_json(
-                        msg="Cannot Base64 decode src_content: {exc}".format(exc=exc)
-                    )
+                    module.fail_json(msg=f"Cannot Base64 decode src_content: {exc}")
         else:
             try:
                 with open(self.src_path, "rb") as f:
                     self.input = f.read()
             except Exception as exc:
                 module.fail_json(
-                    msg="Failure while reading file {fn}: {exc}".format(
-                        fn=self.src_path, exc=exc
-                    )
+                    msg=f"Failure while reading file {self.src_path}: {exc}"
                 )
 
         self.format = module.params["format"]
@@ -210,7 +202,7 @@ class X509CertificateConvertModule(OpenSSLObject):
                 self.input, strict=self.strict
             )
         except Exception as exc:
-            module.fail_json(msg="Error while parsing PEM: {exc}".format(exc=exc))
+            module.fail_json(msg=f"Error while parsing PEM: {exc}")
 
         if module.params["verify_cert_parsable"]:
             self.verify_cert_parsable(module)
@@ -237,16 +229,14 @@ class X509CertificateConvertModule(OpenSSLObject):
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         try:
             load_der_x509_certificate(self.input, default_backend())
         except Exception as exc:
-            module.fail_json(
-                msg="Error while parsing certificate: {exc}".format(exc=exc)
-            )
+            module.fail_json(msg=f"Error while parsing certificate: {exc}")
 
     def needs_conversion(self):
         if self.dest_content is None or self.dest_content_format is None:
@@ -263,11 +253,9 @@ class X509CertificateConvertModule(OpenSSLObject):
         if self.format == "der":
             return self.input
         data = to_bytes(base64.b64encode(self.input))
-        lines = [to_bytes("{0}{1}{2}".format(PEM_START, self.wanted_pem_type, PEM_END))]
+        lines = [to_bytes(f"{PEM_START}{self.wanted_pem_type}{PEM_END}")]
         lines += [data[i : i + 64] for i in range(0, len(data), 64)]
-        lines.append(
-            to_bytes("{0}{1}{2}\n".format(PEM_END_START, self.wanted_pem_type, PEM_END))
-        )
+        lines.append(to_bytes(f"{PEM_END_START}{self.wanted_pem_type}{PEM_END}\n"))
         return b"\n".join(lines)
 
     def generate(self, module):
@@ -323,8 +311,7 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory %s does not exist or the file is not a directory"
-            % base_dir,
+            msg=f"The directory {base_dir} does not exist or the file is not a directory",
         )
 
     try:

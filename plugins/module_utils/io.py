@@ -19,7 +19,7 @@ def load_file(path, module=None):
     except Exception as exc:
         if module is None:
             raise
-        module.fail_json("Error while loading {0} - {1}".format(path, str(exc)))
+        module.fail_json(f"Error while loading {path} - {str(exc)}")
 
 
 def load_file_if_exists(path, module=None, ignore_errors=False):
@@ -40,13 +40,13 @@ def load_file_if_exists(path, module=None, ignore_errors=False):
             return None
         if module is None:
             raise
-        module.fail_json("Error while loading {0} - {1}".format(path, str(exc)))
+        module.fail_json(f"Error while loading {path} - {str(exc)}")
     except Exception as exc:
         if ignore_errors:
             return None
         if module is None:
             raise
-        module.fail_json("Error while loading {0} - {1}".format(path, str(exc)))
+        module.fail_json(f"Error while loading {path} - {str(exc)}")
 
 
 def write_file(module, content, default_mode=None, path=None):
@@ -83,9 +83,7 @@ def write_file(module, content, default_mode=None, path=None):
                 os.remove(tmp_name)
             except Exception:
                 pass
-            module.fail_json(
-                msg="Error while writing result into temporary file: {0}".format(e)
-            )
+            module.fail_json(msg=f"Error while writing result into temporary file: {e}")
         # Update destination to wanted permissions
         if os.path.exists(file_args["path"]):
             module.set_fs_attributes_if_different(file_args, False)
@@ -101,4 +99,4 @@ def write_file(module, content, default_mode=None, path=None):
             os.remove(tmp_name)
         except Exception:
             pass
-        module.fail_json(msg="Error while writing result: {0}".format(e))
+        module.fail_json(msg=f"Error while writing result: {e}")

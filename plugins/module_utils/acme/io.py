@@ -22,7 +22,7 @@ def read_file(fn, mode="b"):
         with open(fn, "r" + mode) as f:
             return f.read()
     except Exception as e:
-        raise ModuleFailException('Error while reading file "{0}": {1}'.format(fn, e))
+        raise ModuleFailException(f'Error while reading file "{fn}": {e}')
 
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
@@ -44,7 +44,7 @@ def write_file(module, dest, content):
             pass
         os.remove(tmpsrc)
         raise ModuleFailException(
-            "failed to create temporary content file: %s" % to_native(err),
+            f"failed to create temporary content file: {to_native(err)}",
             exception=traceback.format_exc(),
         )
     f.close()
@@ -56,26 +56,26 @@ def write_file(module, dest, content):
             os.remove(tmpsrc)
         except Exception:
             pass
-        raise ModuleFailException("Source %s does not exist" % (tmpsrc))
+        raise ModuleFailException(f"Source {tmpsrc} does not exist")
     if not os.access(tmpsrc, os.R_OK):
         os.remove(tmpsrc)
-        raise ModuleFailException("Source %s not readable" % (tmpsrc))
+        raise ModuleFailException(f"Source {tmpsrc} not readable")
     checksum_src = module.sha1(tmpsrc)
     # check if there is no dest file
     if os.path.exists(dest):
         # raise an error if copy has no permission on dest
         if not os.access(dest, os.W_OK):
             os.remove(tmpsrc)
-            raise ModuleFailException("Destination %s not writable" % (dest))
+            raise ModuleFailException(f"Destination {dest} not writable")
         if not os.access(dest, os.R_OK):
             os.remove(tmpsrc)
-            raise ModuleFailException("Destination %s not readable" % (dest))
+            raise ModuleFailException(f"Destination {dest} not readable")
         checksum_dest = module.sha1(dest)
     else:
         dirname = os.path.dirname(dest) or "."
         if not os.access(dirname, os.W_OK):
             os.remove(tmpsrc)
-            raise ModuleFailException("Destination dir %s not writable" % (dirname))
+            raise ModuleFailException(f"Destination dir {dirname} not writable")
     if checksum_src != checksum_dest:
         try:
             shutil.copyfile(tmpsrc, dest)
@@ -83,7 +83,7 @@ def write_file(module, dest, content):
         except Exception as err:
             os.remove(tmpsrc)
             raise ModuleFailException(
-                "failed to copy %s to %s: %s" % (tmpsrc, dest, to_native(err)),
+                f"failed to copy {tmpsrc} to {dest}: {to_native(err)}",
                 exception=traceback.format_exc(),
             )
     os.remove(tmpsrc)

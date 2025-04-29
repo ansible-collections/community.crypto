@@ -271,13 +271,10 @@ def main():
 
             missing_challenge_authzs = [k for k, v in challenges.items() if v is None]
             if missing_challenge_authzs:
+                missing_challenge_authzs = ", ".join(sorted(missing_challenge_authzs))
                 raise ModuleFailException(
                     "The challenge parameter must be supplied if there are pending authorizations."
-                    " The following authorizations are pending: {missing_challenge_authzs}".format(
-                        missing_challenge_authzs=", ".join(
-                            sorted(missing_challenge_authzs)
-                        ),
-                    )
+                    f" The following authorizations are pending: {missing_challenge_authzs}"
                 )
 
             bad_challenge_authzs = [
@@ -286,17 +283,14 @@ def main():
                 if authz.find_challenge(challenges[authz.combined_identifier]) is None
             ]
             if bad_challenge_authzs:
-                raise ModuleFailException(
-                    "The following authorizations do not support the selected challenges: {authz_challenges_pairs}".format(
-                        authz_challenges_pairs=", ".join(
-                            sorted(
-                                "{authz} with {challenge}".format(
-                                    authz=authz, challenge=challenges[authz]
-                                )
-                                for authz in bad_challenge_authzs
-                            )
-                        ),
+                authz_challenges_pairs = ", ".join(
+                    sorted(
+                        f"{authz} with {challenges[authz]}"
+                        for authz in bad_challenge_authzs
                     )
+                )
+                raise ModuleFailException(
+                    f"The following authorizations do not support the selected challenges: {authz_challenges_pairs}"
                 )
 
             really_pending_authzs = [

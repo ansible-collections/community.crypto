@@ -493,9 +493,7 @@ class Handler:
             return b64decode(to_native(passphrase))
         except Exception as exc:
             self._module.fail_json(
-                "Error while base64-decoding '{parameter_name}': {exc}".format(
-                    parameter_name=parameter_name, exc=exc
-                )
+                f"Error while base64-decoding '{parameter_name}': {exc}"
             )
 
     def _run_command(self, command, data=None):
@@ -531,10 +529,10 @@ class Handler:
 
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while generating LUKS name for %s: %s" % (device, result[STDERR])
+                f"Error while generating LUKS name for {device}: {result[STDERR]}"
             )
         dev_uuid = result[STDOUT].strip()
-        return "luks-%s" % dev_uuid
+        return f"luks-{dev_uuid}"
 
 
 class CryptHandler(Handler):
@@ -551,7 +549,7 @@ class CryptHandler(Handler):
         result = self._run_command([self._lsblk_bin, device, "-nlo", "type,name"])
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while obtaining LUKS name for %s: %s" % (device, result[STDERR])
+                f"Error while obtaining LUKS name for {device}: {result[STDERR]}"
             )
 
         for line in result[STDOUT].splitlines(False):
@@ -595,9 +593,9 @@ class CryptHandler(Handler):
         """check if a keyslot is set"""
         result = self._run_command([self._cryptsetup_bin, "luksDump", device])
         if result[RETURN_CODE] != 0:
-            raise ValueError("Error while dumping LUKS header from %s" % (device,))
-        result_luks1 = "Key Slot %d: ENABLED" % (keyslot) in result[STDOUT]
-        result_luks2 = " %d: luks2" % (keyslot) in result[STDOUT]
+            raise ValueError(f"Error while dumping LUKS header from {device}")
+        result_luks1 = f"Key Slot {keyslot}: ENABLED" in result[STDOUT]
+        result_luks2 = f" {keyslot}: luks2" in result[STDOUT]
         return result_luks1 or result_luks2
 
     def _add_pbkdf_options(self, options, pbkdf):
@@ -657,9 +655,7 @@ class CryptHandler(Handler):
 
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
-            raise ValueError(
-                "Error while creating LUKS on %s: %s" % (device, result[STDERR])
-            )
+            raise ValueError(f"Error while creating LUKS on {device}: {result[STDERR]}")
 
     def run_luks_open(
         self,
@@ -696,14 +692,13 @@ class CryptHandler(Handler):
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while opening LUKS container on %s: %s"
-                % (device, result[STDERR])
+                f"Error while opening LUKS container on {device}: {result[STDERR]}"
             )
 
     def run_luks_close(self, name):
         result = self._run_command([self._cryptsetup_bin, "close", name])
         if result[RETURN_CODE] != 0:
-            raise ValueError("Error while closing LUKS container %s" % (name))
+            raise ValueError(f"Error while closing LUKS container {name}")
 
     def run_luks_remove(self, device):
         wipefs_bin = self._module.get_bin_path("wipefs", True)
@@ -714,8 +709,7 @@ class CryptHandler(Handler):
         result = self._run_command([wipefs_bin, "--all", device])
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while wiping LUKS container signatures for %s: %s"
-                % (device, result[STDERR])
+                f"Error while wiping LUKS container signatures for {device}: {result[STDERR]}"
             )
 
         # For LUKS2, sometimes both `cryptsetup erase` and `wipefs` do **not**
@@ -725,8 +719,7 @@ class CryptHandler(Handler):
             wipe_luks_headers(device)
         except Exception as exc:
             raise ValueError(
-                "Error while wiping LUKS container signatures for %s: %s"
-                % (device, exc)
+                f"Error while wiping LUKS container signatures for {device}: {exc}"
             )
 
     def run_luks_add_key(
@@ -766,8 +759,7 @@ class CryptHandler(Handler):
         result = self._run_command(args, data=b"".join(data) or None)
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while adding new LUKS keyslot to %s: %s"
-                % (device, result[STDERR])
+                f"Error while adding new LUKS keyslot to {device}: {result[STDERR]}"
             )
 
     def run_luks_remove_key(
@@ -779,7 +771,7 @@ class CryptHandler(Handler):
         if not force_remove_last_key:
             result = self._run_command([self._cryptsetup_bin, "luksDump", device])
             if result[RETURN_CODE] != 0:
-                raise ValueError("Error while dumping LUKS header from %s" % (device,))
+                raise ValueError(f"Error while dumping LUKS header from {device}")
             keyslot_count = 0
             keyslot_area = False
             keyslot_re = re.compile(r"^Key Slot [0-9]+: ENABLED")
@@ -802,9 +794,8 @@ class CryptHandler(Handler):
                     keyslot_area = False
             if keyslot_count < 2:
                 self._module.fail_json(
-                    msg="LUKS device %s has less than two active keyslots. "
-                    "To be able to remove a key, please set "
-                    "`force_remove_last_key` to `true`." % device
+                    msg=f"LUKS device {device} has less than two active keyslots. "
+                    "To be able to remove a key, please set `force_remove_last_key` to `true`."
                 )
 
         if keyslot is None:
@@ -820,7 +811,7 @@ class CryptHandler(Handler):
         result = self._run_command(args, data=passphrase)
         if result[RETURN_CODE] != 0:
             raise ValueError(
-                "Error while removing LUKS key from %s: %s" % (device, result[STDERR])
+                f"Error while removing LUKS key from {device}: {result[STDERR]}"
             )
 
     def luks_test_key(self, device, keyfile, passphrase, keyslot=None):
@@ -859,8 +850,7 @@ class CryptHandler(Handler):
             return False
 
         raise ValueError(
-            "Error while testing whether keyslot exists on %s: %s"
-            % (device, result[STDERR])
+            f"Error while testing whether keyslot exists on {device}: {result[STDERR]}"
         )
 
 
@@ -921,8 +911,7 @@ class ConditionsHandler(Handler):
             # the container is already open but with different name:
             # suspicious. back off
             self._module.fail_json(
-                msg="LUKS container is already opened "
-                "under different name '%s'." % name
+                msg=f"LUKS container is already opened under different name '{name}'."
             )
 
         # container is opened and the names match
@@ -1069,13 +1058,11 @@ class ConditionsHandler(Handler):
 
             if luks_type == "luks1" and not 0 <= self._module.params[param] <= 7:
                 self._module.fail_json(
-                    msg="%s must be between 0 and 7 when using LUKS1."
-                    % self._module.params[param]
+                    msg=f"{self._module.params[param]} must be between 0 and 7 when using LUKS1."
                 )
             elif luks_type == "luks2" and not 0 <= self._module.params[param] <= 31:
                 self._module.fail_json(
-                    msg="%s must be between 0 and 31 when using LUKS2."
-                    % self._module.params[param]
+                    msg=f"{self._module.params[param]} must be between 0 and 31 when using LUKS2."
                 )
 
 
@@ -1151,7 +1138,7 @@ def run_module():
             statinfo = os.stat(module.params["device"])
             mode = statinfo.st_mode
             if not stat.S_ISBLK(mode) and not stat.S_ISCHR(mode):
-                raise Exception("{0} is not a device".format(module.params["device"]))
+                raise Exception(f"{module.params['device']} is not a device")
         except Exception as e:
             module.fail_json(msg=str(e))
 
@@ -1202,7 +1189,7 @@ def run_module():
                     module.params["pbkdf"],
                 )
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["changed"] = True
         if module.check_mode:
             module.exit_json(**result)
@@ -1219,7 +1206,7 @@ def run_module():
             try:
                 name = crypt.generate_luks_name(conditions.device)
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         if not module.check_mode:
             try:
                 crypt.run_luks_open(
@@ -1235,7 +1222,7 @@ def run_module():
                     name,
                 )
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["name"] = name
         result["changed"] = True
         if module.check_mode:
@@ -1247,14 +1234,14 @@ def run_module():
             try:
                 name = crypt.get_container_name_by_device(conditions.device)
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         else:
             name = module.params["name"]
         if not module.check_mode:
             try:
                 crypt.run_luks_close(name)
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["name"] = name
         result["changed"] = True
         if module.check_mode:
@@ -1274,7 +1261,7 @@ def run_module():
                     module.params["pbkdf"],
                 )
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["changed"] = True
         if module.check_mode:
             module.exit_json(**result)
@@ -1292,7 +1279,7 @@ def run_module():
                     force_remove_last_key=last_key,
                 )
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["changed"] = True
         if module.check_mode:
             module.exit_json(**result)
@@ -1303,7 +1290,7 @@ def run_module():
             try:
                 crypt.run_luks_remove(conditions.device)
             except ValueError as e:
-                module.fail_json(msg="luks_device error: %s" % e)
+                module.fail_json(msg=f"luks_device error: {e}")
         result["changed"] = True
         if module.check_mode:
             module.exit_json(**result)

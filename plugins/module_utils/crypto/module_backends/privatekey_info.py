@@ -173,7 +173,7 @@ def _is_cryptography_key_consistent(
             return False
     # For X25519 and X448, there's no test yet.
     if warn_func is not None:
-        warn_func("Cannot determine consistency for key of type %s" % type(key))
+        warn_func(f"Cannot determine consistency for key of type {type(key)}")
     return None
 
 
@@ -338,16 +338,14 @@ def select_backend(
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
@@ -359,4 +357,4 @@ def select_backend(
             check_consistency=check_consistency,
         )
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")

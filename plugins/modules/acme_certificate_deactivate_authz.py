@@ -98,9 +98,7 @@ def main():
                 # ignore errors
                 pass
             if authz.status != "deactivated":
-                module.warn(
-                    warning="Could not deactivate authz object {0}.".format(authz.url)
-                )
+                module.warn(warning=f"Could not deactivate authz object {authz.url}.")
 
         module.exit_json(changed=changed)
     except ModuleFailException as e:

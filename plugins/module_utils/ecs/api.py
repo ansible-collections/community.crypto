@@ -73,12 +73,8 @@ def generate_docstring(operation_spec):
     if len(parameters) != 0:
         docs += "\tArguments:\n\n"
     for parameter in parameters:
-        docs += "{0} ({1}:{2}): {3}\n".format(
-            parameter.get("name"),
-            parameter.get("type", "No Type"),
-            "Required" if parameter.get("required", False) else "Not Required",
-            parameter.get("description"),
-        )
+        req = "Required" if parameter.get("required", False) else "Not Required"
+        docs += f"{parameter.get('name')} ({parameter.get('type', 'No Type')}:{req}): {parameter.get('description')}\n"
 
     return docs
 
@@ -104,11 +100,8 @@ class RestOperation:
             self.parameters = {}
         else:
             self.parameters = parameters
-        self.url = "{scheme}://{host}{base_path}{uri}".format(
-            scheme="https",
-            host=session._spec.get("host"),
-            base_path=session._spec.get("basePath"),
-            uri=uri,
+        self.url = (
+            f"https://{session._spec.get('host')}{session._spec.get('basePath')}{uri}"
         )
 
     def restmethod(self, *args, **kwargs):
@@ -204,7 +197,7 @@ class Resource:
                         operation_name = "Patch"
                     else:
                         raise SessionConfigurationException(
-                            to_native("Invalid REST method type {0}".format(method))
+                            to_native(f"Invalid REST method type {method}")
                         )
 
                     # Get the non-parameter parts of the URL and append to the operation name
@@ -286,9 +279,7 @@ class ECSSession:
         ):
             raise SessionConfigurationException(
                 to_native(
-                    "OpenAPI specification was not found at location {0}.".format(
-                        entrust_api_specification_path
-                    )
+                    f"OpenAPI specification was not found at location {entrust_api_specification_path}."
                 )
             )
         if not valid_file_format.match(entrust_api_specification_path):
@@ -315,9 +306,7 @@ class ECSSession:
             except HTTPError as e:
                 raise SessionConfigurationException(
                     to_native(
-                        "Error downloading specification from address '{0}', received error code '{1}'".format(
-                            entrust_api_specification_path, e.getcode()
-                        )
+                        f"Error downloading specification from address '{entrust_api_specification_path}', received error code '{e.getcode()}'"
                     )
                 )
         else:
@@ -344,9 +333,8 @@ class ECSSession:
         ):
             raise SessionConfigurationException(
                 to_native(
-                    "Parameter provided for entrust_api_specification_path of value '{0}' was not a valid file path or HTTPS address.".format(
-                        entrust_api_specification_path
-                    )
+                    f"Parameter provided for entrust_api_specification_path of value '{entrust_api_specification_path}'"
+                    " was not a valid file path or HTTPS address."
                 )
             )
 
@@ -355,18 +343,14 @@ class ECSSession:
             if not file_path or not os.path.isfile(file_path):
                 raise SessionConfigurationException(
                     to_native(
-                        "Parameter provided for {0} of value '{1}' was not a valid file path.".format(
-                            required_file, file_path
-                        )
+                        f"Parameter provided for {required_file} of value '{file_path}' was not a valid file path."
                     )
                 )
 
         for required_var in ["entrust_api_user", "entrust_api_key"]:
             if not kwargs.get(required_var):
                 raise SessionConfigurationException(
-                    to_native(
-                        "Parameter provided for {0} was missing.".format(required_var)
-                    )
+                    to_native(f"Parameter provided for {required_var} was missing.")
                 )
 
         config["entrust_api_cert"] = kwargs.get("entrust_api_cert")

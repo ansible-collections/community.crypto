@@ -285,7 +285,7 @@ class DHParameterOpenSSL(DHParameterBase):
         try:
             module.atomic_move(os.path.abspath(tmpsrc), os.path.abspath(self.path))
         except Exception as e:
-            module.fail_json(msg="Failed to write to file %s: %s" % (self.path, str(e)))
+            module.fail_json(msg=f"Failed to write to file {self.path}: {str(e)}")
 
     def _check_params_valid(self, module):
         """Check if the params are in the correct state"""
@@ -381,8 +381,7 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory '%s' does not exist or the file is not a directory"
-            % base_dir,
+            msg=f"The directory '{base_dir}' does not exist or the file is not a directory",
         )
 
     if module.params["state"] == "present":
@@ -405,9 +404,9 @@ def main():
             if backend == "auto":
                 module.fail_json(
                     msg=(
-                        "Cannot detect either the required Python library cryptography (>= {0}) "
+                        f"Cannot detect either the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION}) "
                         "or the OpenSSL binary openssl"
-                    ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    )
                 )
 
         if backend == "openssl":
@@ -416,7 +415,7 @@ def main():
             if not CRYPTOGRAPHY_FOUND:
                 module.fail_json(
                     msg=missing_required_lib(
-                        "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                        f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                     ),
                     exception=CRYPTOGRAPHY_IMP_ERR,
                 )

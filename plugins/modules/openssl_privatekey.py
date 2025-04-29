@@ -268,8 +268,7 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory %s does not exist or the file is not a directory"
-            % base_dir,
+            msg=f"The directory {base_dir} does not exist or the file is not a directory",
         )
 
     backend, module_backend = select_backend(
