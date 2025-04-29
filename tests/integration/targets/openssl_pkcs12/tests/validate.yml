@@ -81,8 +81,7 @@
 - name: '({{ select_crypto_backend }}) Load "empty" file'
   set_fact:
     empty_contents: "{{ slurp.results[0].content | b64decode }}"
-    empty_expected_pyopenssl: "{{ (slurp.results[2].content | b64decode) ~ (slurp.results[1].content | b64decode) }}"
-    empty_expected_cryptography: "{{ (slurp.results[1].content | b64decode) ~ (slurp.results[2].content | b64decode) }}"
+    empty_expected: "{{ (slurp.results[1].content | b64decode) ~ (slurp.results[2].content | b64decode) }}"
 
 - name: '({{ select_crypto_backend }}) Check "empty" file'
   assert:
@@ -91,7 +90,7 @@
       - p12_empty_idem is not changed
       - p12_empty_concat_idem is not changed
       - p12_empty_concat_content_idem is not changed
-      - (empty_contents == empty_expected_cryptography) or (empty_contents == empty_expected_pyopenssl and select_crypto_backend == 'pyopenssl')
+      - empty_contents == empty_expected
 
 - name: '({{ select_crypto_backend }}) PKCS#12 with compatibility2022 settings'
   when:

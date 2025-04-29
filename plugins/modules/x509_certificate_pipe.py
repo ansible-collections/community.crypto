@@ -33,10 +33,7 @@ attributes:
   check_mode:
     support: full
     details:
-      - Currently in check mode, private keys will not be (re-)generated, only the changed status is set. This will change
-        in community.crypto 3.0.0.
-      - From community.crypto 3.0.0 on, the module will ignore check mode and always behave as if check mode is not active.
-        If you think this breaks your use-case of this module, please create an issue in the community.crypto repository.
+      - Since community.crypto 3.0.0 the module ignores check mode and always behaves as if check mode is not active.
 options:
   provider:
     description:
@@ -162,18 +159,7 @@ class GenericCertificate(object):
 
     def generate(self, module):
         if self.module_backend.needs_regeneration():
-            if not self.check_mode:
-                self.module_backend.generate_certificate()
-            else:
-                self.module.deprecate(
-                    "Check mode support for x509_certificate_pipe will change in community.crypto 3.0.0"
-                    " to behave the same as without check mode. You can get that behavior right now"
-                    " by adding `check_mode: false` to the x509_certificate_pipe task. If you think this"
-                    " breaks your use-case of this module, please create an issue in the"
-                    " community.crypto repository",
-                    version="3.0.0",
-                    collection_name="community.crypto",
-                )
+            self.module_backend.generate_certificate()
             self.changed = True
 
     def dump(self, check_mode=False):

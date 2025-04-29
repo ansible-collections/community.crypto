@@ -18,11 +18,9 @@ author:
 short_description: Generate OpenSSL PKCS#12 archive
 description:
   - This module allows one to (re-)generate PKCS#12.
-  - The module can use the cryptography Python library, or the pyOpenSSL Python library. By default, it tries to detect which
-    one is available, assuming none of the O(iter_size) and O(maciter_size) options are used. This can be overridden with
-    the O(select_crypto_backend) option.
+  - The module uses the cryptography Python library.
 requirements:
-  - PyOpenSSL >= 0.15, < 23.3.0 or cryptography >= 3.0
+  - cryptography >= 3.0
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes
@@ -95,15 +93,16 @@ options:
     description:
       - Number of times to repeat the encryption step.
       - This is B(not considered during idempotency checks).
-      - This is only used by the C(pyopenssl) backend, or when O(encryption_level=compatibility2022).
-      - When using it, the default is V(2048) for C(pyopenssl) and V(50000) for C(cryptography).
+      - This is only used when O(encryption_level=compatibility2022).
+      - When using it, the default is V(50000).
     type: int
   maciter_size:
     description:
       - Number of times to repeat the MAC step.
       - This is B(not considered during idempotency checks).
-      - This is only used by the C(pyopenssl) backend. When using it, the default is V(1).
+      - This value is B(not used).
     type: int
+    # TODO: deprecate!
   encryption_level:
     description:
       - Determines the encryption level used.
@@ -170,15 +169,12 @@ options:
   select_crypto_backend:
     description:
       - Determines which crypto backend to use.
-      - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(pyopenssl). If
-        O(iter_size) is used together with O(encryption_level) is not V(compatibility2022), or if O(maciter_size) is used,
-        V(auto) will always result in C(pyopenssl) to be chosen for backwards compatibility.
-      - If set to V(pyopenssl), will try to use the L(pyOpenSSL,https://pypi.org/project/pyOpenSSL/) library.
+      - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
-      - B(Note) that the V(pyopenssl) backend is deprecated and will be removed from community.crypto 3.0.0.
+      - The value V(pyopenssl) has been removed for community.crypto 3.0.0.
     type: str
     default: auto
-    choices: [auto, cryptography, pyopenssl]
+    choices: [auto, cryptography]
     version_added: 1.7.0
 seealso:
   - module: community.crypto.x509_certificate
@@ -315,23 +311,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = "3.0"
-MINIMAL_PYOPENSSL_VERSION = "0.15"
-MAXIMAL_PYOPENSSL_VERSION = "23.3.0"
-
-PYOPENSSL_IMP_ERR = None
-try:
-    import OpenSSL
-    from OpenSSL import crypto
-    from OpenSSL.crypto import (
-        load_pkcs12 as _load_pkcs12,  # this got removed in pyOpenSSL 23.3.0
-    )
-
-    PYOPENSSL_VERSION = LooseVersion(OpenSSL.__version__)
-except (ImportError, AttributeError):
-    PYOPENSSL_IMP_ERR = traceback.format_exc()
-    PYOPENSSL_FOUND = False
-else:
-    PYOPENSSL_FOUND = True
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -628,88 +607,6 @@ class Pkcs(OpenSSLObject):
             self.pkcs12_bytes = content
 
 
-class PkcsPyOpenSSL(Pkcs):
-    def __init__(self, module):
-        super(PkcsPyOpenSSL, self).__init__(module, "pyopenssl")
-        if self.encryption_level != "auto":
-            module.fail_json(
-                msg="The PyOpenSSL backend only supports encryption_level = auto"
-            )
-
-    def generate_bytes(self, module):
-        """Generate PKCS#12 file archive."""
-        self.pkcs12 = crypto.PKCS12()
-
-        if self.other_certificates:
-            self.pkcs12.set_ca_certificates(self.other_certificates)
-
-        if self.certificate_content:
-            self.pkcs12.set_certificate(
-                load_certificate(
-                    None, content=self.certificate_content, backend=self.backend
-                )
-            )
-
-        if self.friendly_name:
-            self.pkcs12.set_friendlyname(to_bytes(self.friendly_name))
-
-        if self.privatekey_content:
-            try:
-                self.pkcs12.set_privatekey(
-                    load_privatekey(
-                        None,
-                        content=self.privatekey_content,
-                        passphrase=self.privatekey_passphrase,
-                        backend=self.backend,
-                    )
-                )
-            except OpenSSLBadPassphraseError as exc:
-                raise PkcsError(exc)
-
-        return self.pkcs12.export(self.passphrase, self.iter_size, self.maciter_size)
-
-    def parse_bytes(self, pkcs12_content):
-        try:
-            p12 = crypto.load_pkcs12(pkcs12_content, self.passphrase)
-            pkey = p12.get_privatekey()
-            if pkey is not None:
-                pkey = crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey)
-            crt = p12.get_certificate()
-            if crt is not None:
-                crt = crypto.dump_certificate(crypto.FILETYPE_PEM, crt)
-            other_certs = []
-            if p12.get_ca_certificates() is not None:
-                other_certs = [
-                    crypto.dump_certificate(crypto.FILETYPE_PEM, other_cert)
-                    for other_cert in p12.get_ca_certificates()
-                ]
-
-            friendly_name = p12.get_friendlyname()
-
-            return (pkey, crt, other_certs, friendly_name)
-        except crypto.Error as exc:
-            raise PkcsError(exc)
-
-    def _dump_privatekey(self, pkcs12):
-        pk = pkcs12.get_privatekey()
-        return crypto.dump_privatekey(crypto.FILETYPE_PEM, pk) if pk else None
-
-    def _dump_certificate(self, pkcs12):
-        cert = pkcs12.get_certificate()
-        return crypto.dump_certificate(crypto.FILETYPE_PEM, cert) if cert else None
-
-    def _dump_other_certificates(self, pkcs12):
-        if pkcs12.get_ca_certificates() is None:
-            return []
-        return [
-            crypto.dump_certificate(crypto.FILETYPE_PEM, other_cert)
-            for other_cert in pkcs12.get_ca_certificates()
-        ]
-
-    def _get_friendly_name(self, pkcs12):
-        return pkcs12.get_friendlyname()
-
-
 class PkcsCryptography(Pkcs):
     def __init__(self, module):
         super(PkcsCryptography, self).__init__(
@@ -839,52 +736,20 @@ def select_backend(module, backend):
             CRYPTOGRAPHY_FOUND
             and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
         )
-        can_use_pyopenssl = (
-            PYOPENSSL_FOUND
-            and PYOPENSSL_VERSION >= LooseVersion(MINIMAL_PYOPENSSL_VERSION)
-            and PYOPENSSL_VERSION < LooseVersion(MAXIMAL_PYOPENSSL_VERSION)
-        )
-
-        # If no restrictions are provided, first try cryptography, then pyOpenSSL
-        if (
-            module.params["iter_size"] is not None
-            and module.params["encryption_level"] != "compatibility2022"
-        ) or module.params["maciter_size"] is not None:
-            # If iter_size (for encryption_level != compatibility2022) or maciter_size is specified, use pyOpenSSL backend
-            backend = "pyopenssl"
-        elif can_use_cryptography:
+        if can_use_cryptography:
             backend = "cryptography"
-        elif can_use_pyopenssl:
-            backend = "pyopenssl"
 
         # Success?
         if backend == "auto":
             module.fail_json(
                 msg=(
-                    "Cannot detect any of the required Python libraries "
-                    "cryptography (>= {0}) or PyOpenSSL (>= {1}, < {2})"
+                    "Cannot detect the required Python library cryptography (>= {0})"
                 ).format(
                     MINIMAL_CRYPTOGRAPHY_VERSION,
-                    MINIMAL_PYOPENSSL_VERSION,
-                    MAXIMAL_PYOPENSSL_VERSION,
                 )
             )
 
-    if backend == "pyopenssl":
-        if not PYOPENSSL_FOUND:
-            msg = missing_required_lib(
-                "pyOpenSSL >= {0}, < {1}".format(
-                    MINIMAL_PYOPENSSL_VERSION, MAXIMAL_PYOPENSSL_VERSION
-                )
-            )
-            module.fail_json(msg=msg, exception=PYOPENSSL_IMP_ERR)
-        module.deprecate(
-            "The module is using the PyOpenSSL backend. This backend has been deprecated",
-            version="3.0.0",
-            collection_name="community.crypto",
-        )
-        return backend, PkcsPyOpenSSL(module)
-    elif backend == "cryptography":
+    if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
@@ -924,7 +789,7 @@ def main():
         backup=dict(type="bool", default=False),
         return_content=dict(type="bool", default=False),
         select_crypto_backend=dict(
-            type="str", default="auto", choices=["auto", "cryptography", "pyopenssl"]
+            type="str", default="auto", choices=["auto", "cryptography"]
         ),
     )
 

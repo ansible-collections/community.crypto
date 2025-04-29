@@ -68,20 +68,6 @@ def test_challenge_from_to_json():
     assert challenge.token == "foo"
     assert challenge.to_json() == data
 
-    data = {
-        "uri": "xxx",
-        "type": "type",
-        "status": "valid",
-    }
-    client.version = 1
-    challenge = Challenge.from_json(client, data)
-    assert challenge.data == data
-    assert challenge.type == "type"
-    assert challenge.url == "xxx"
-    assert challenge.status == "valid"
-    assert challenge.token is None
-    assert challenge.to_json() == data
-
 
 def test_authorization_from_to_json():
     client = MagicMock()
@@ -152,30 +138,6 @@ def test_authorization_from_to_json():
             "value": "example.com",
         },
         "wildcard": True,
-    }
-
-    client.version = 1
-
-    data = {
-        "challenges": [],
-        "identifier": {
-            "type": "dns",
-            "value": "example.com",
-        },
-    }
-    authz = Authorization.from_json(client, data, "xxx")
-    assert authz.url == "xxx"
-    assert authz.status == "pending"
-    assert authz.identifier == "example.com"
-    assert authz.identifier_type == "dns"
-    assert authz.challenges == []
-    assert authz.to_json() == {
-        "uri": "xxx",
-        "challenges": [],
-        "identifier": {
-            "type": "dns",
-            "value": "example.com",
-        },
     }
 
 

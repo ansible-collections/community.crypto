@@ -27,7 +27,7 @@ notes:
   - "Using the C(ansible) tool, M(community.crypto.acme_inspect) can be used to directly execute ACME requests without the
     need of writing a playbook. For example, the following command retrieves the ACME account with ID 1 from Let's Encrypt
     (assuming C(/path/to/key) is the correct private account key): C(ansible localhost -m acme_inspect -a \"account_key_src=/path/to/key
-    acme_directory=https://acme-v02.api.letsencrypt.org/directory acme_version=2 account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1
+    acme_directory=https://acme-v02.api.letsencrypt.org/directory account_uri=https://acme-v02.api.letsencrypt.org/acme/acct/1
     method=get url=https://acme-v02.api.letsencrypt.org/acme/acct/1\")."
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
@@ -83,14 +83,12 @@ EXAMPLES = r"""
 - name: Get directory
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     method: directory-only
   register: directory
 
 - name: Create an account
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     url: "{{ directory.newAccount}}"
     method: post
@@ -102,7 +100,6 @@ EXAMPLES = r"""
 - name: Get account information
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
@@ -111,7 +108,6 @@ EXAMPLES = r"""
 - name: Update account contacts
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ account_creation.headers.location }}"
@@ -127,7 +123,6 @@ EXAMPLES = r"""
 - name: Create certificate order
   community.crypto.acme_certificate:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     csr: /etc/pki/cert/csr/sample.com.csr
@@ -141,7 +136,6 @@ EXAMPLES = r"""
 - name: Get order information
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ certificate_request.order_uri }}"
@@ -151,7 +145,6 @@ EXAMPLES = r"""
 - name: Get first authz for order
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ order.output_json.authorizations[0] }}"
@@ -161,7 +154,6 @@ EXAMPLES = r"""
 - name: Get HTTP-01 challenge for authz
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ authz.output_json.challenges | selectattr('type', 'equalto', 'http-01') }}"
@@ -171,7 +163,6 @@ EXAMPLES = r"""
 - name: Activate HTTP-01 challenge manually
   community.crypto.acme_inspect:
     acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
-    acme_version: 2
     account_key_src: /etc/pki/cert/private/account.key
     account_uri: "{{ account_creation.headers.location }}"
     url: "{{ http01challenge.url }}"

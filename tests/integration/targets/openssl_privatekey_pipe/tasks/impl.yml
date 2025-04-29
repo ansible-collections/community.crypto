@@ -91,9 +91,11 @@
 - assert:
     that:
       - update_check is changed
-      - update_check.privatekey == 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+      - update_check.privatekey != 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+      - update_check.privatekey != result.privatekey
       - update_check_return is changed
-      - update_check_return.privatekey == result.privatekey
+      - update_check_return.privatekey != 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+      - update_check_return.privatekey != result.privatekey
       - update is changed
       - update.privatekey != result.privatekey
       - update_info.public_data.size == default_rsa_key_size

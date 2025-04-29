@@ -174,12 +174,7 @@ def main():
         payload = {"certificate": certificate}
         if module.params.get("revoke_reason") is not None:
             payload["reason"] = module.params.get("revoke_reason")
-        # Determine endpoint
-        if module.params.get("acme_version") == 1:
-            endpoint = client.directory["revoke-cert"]
-            payload["resource"] = "revoke-cert"
-        else:
-            endpoint = client.directory["revokeCert"]
+        endpoint = client.directory["revokeCert"]
         # Get hold of private key (if available) and make sure it comes from disk
         private_key = module.params.get("private_key_src")
         private_key_content = module.params.get("private_key_content")
@@ -227,12 +222,8 @@ def main():
                 already_revoked = True
             else:
                 # Hack for Boulder errors
-                if module.params.get("acme_version") == 1:
-                    error_type = "urn:acme:error:malformed"
-                else:
-                    error_type = "urn:ietf:params:acme:error:malformed"
                 if (
-                    result.get("type") == error_type
+                    result.get("type") == "urn:ietf:params:acme:error:malformed"
                     and result.get("detail") == "Certificate already revoked"
                 ):
                     # Fallback: boulder returns this in case the certificate was already revoked.

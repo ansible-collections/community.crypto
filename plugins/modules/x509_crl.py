@@ -59,17 +59,9 @@ options:
       - This parameter was called O(mode) before community.crypto 2.13.0. It has been renamed to avoid a collision with the
         common O(mode) parameter for setting the CRL file's access mode.
     type: str
-        # default: generate
+    default: generate
     choices: [generate, update]
     version_added: 2.13.0
-  mode:
-    description:
-      - This parameter has been renamed to O(crl_mode). The old name O(mode) is now deprecated and will be removed in community.crypto
-        3.0.0. Replace usage of this parameter with O(crl_mode).
-      - Note that from community.crypto 3.0.0 on, O(mode) will be used for the CRL file's mode.
-    type: str
-        # default: generate
-    choices: [generate, update]
 
   force:
     description:
@@ -968,15 +960,8 @@ def main():
             state=dict(type="str", default="present", choices=["present", "absent"]),
             crl_mode=dict(
                 type="str",
-                # default='generate',
+                default="generate",
                 choices=["generate", "update"],
-            ),
-            mode=dict(
-                type="str",
-                # default='generate',
-                choices=["generate", "update"],
-                removed_in_version="3.0.0",
-                removed_from_collection="community.crypto",
             ),
             force=dict(type="bool", default=False),
             backup=dict(type="bool", default=False),
@@ -1043,16 +1028,6 @@ def main():
         supports_check_mode=True,
         add_file_common_args=True,
     )
-
-    if module.params["mode"]:
-        if module.params["crl_mode"]:
-            module.fail_json(
-                "You cannot use both `mode` and `crl_mode`. Use `crl_mode`."
-            )
-        module.params["crl_mode"] = module.params["mode"]
-    # TODO: in 3.0.0, once the option `mode` has been removed, remove this:
-    module.params.pop("mode", None)
-    # From then on, `mode` will be the file mode of the CRL file
 
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(

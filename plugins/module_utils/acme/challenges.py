@@ -79,16 +79,10 @@ class Challenge(object):
 
     @classmethod
     def from_json(cls, client, data, url=None):
-        return cls(data, url or (data["uri"] if client.version == 1 else data["url"]))
+        return cls(data, url or data["url"])
 
     def call_validate(self, client):
         challenge_response = {}
-        if client.version == 1:
-            token = re.sub(r"[^A-Za-z0-9_\-]", "_", self.token)
-            key_authorization = create_key_authorization(client, token)
-            challenge_response["resource"] = "challenge"
-            challenge_response["keyAuthorization"] = key_authorization
-            challenge_response["type"] = self.type
         client.send_signed_request(
             self.url,
             challenge_response,
@@ -160,13 +154,7 @@ class Authorization(object):
             ]
         else:
             self.challenges = []
-        if client.version == 1 and "status" not in data:
-            # https://tools.ietf.org/html/draft-ietf-acme-acme-02#section-6.1.2
-            # "status (required, string): ...
-            # If this field is missing, then the default value is "pending"."
-            self.status = "pending"
-        else:
-            self.status = data["status"]
+        self.status = data["status"]
         self.identifier = data["identifier"]["value"]
         self.identifier_type = data["identifier"]["type"]
         if data.get("wildcard", False):
@@ -206,15 +194,11 @@ class Authorization(object):
                 "value": identifier,
             },
         }
-        if client.version == 1:
-            url = client.directory["new-authz"]
-            new_authz["resource"] = "new-authz"
-        else:
-            if "newAuthz" not in client.directory.directory:
-                raise ACMEProtocolException(
-                    client.module, "ACME endpoint does not support pre-authorization"
-                )
-            url = client.directory["newAuthz"]
+        if "newAuthz" not in client.directory.directory:
+            raise ACMEProtocolException(
+                client.module, "ACME endpoint does not support pre-authorization"
+            )
+        url = client.directory["newAuthz"]
 
         result, info = client.send_signed_request(
             url,
@@ -338,8 +322,6 @@ class Authorization(object):
         if not self.can_deactivate():
             return
         authz_deactivate = {"status": "deactivated"}
-        if client.version == 1:
-            authz_deactivate["resource"] = "authz"
         result, info = client.send_signed_request(
             self.url, authz_deactivate, fail_on_error=False
         )
@@ -357,8 +339,6 @@ class Authorization(object):
         """
         authz = cls(url)
         authz_deactivate = {"status": "deactivated"}
-        if client.version == 1:
-            authz_deactivate["resource"] = "authz"
         result, info = client.send_signed_request(
             url, authz_deactivate, fail_on_error=True
         )
