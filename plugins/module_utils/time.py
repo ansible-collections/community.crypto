@@ -143,11 +143,12 @@ def convert_relative_to_datetime(relative_time_string, with_timezone=False, now=
 def get_relative_time_option(
     input_string, input_name, backend="cryptography", with_timezone=False, now=None
 ):
-    """Return an absolute timespec if a relative timespec or an ASN1 formatted
+    """
+    Return an absolute timespec if a relative timespec or an ASN1 formatted
     string is provided.
 
-    The return value will be a datetime object for the cryptography backend,
-    and a ASN1 formatted string for the pyopenssl backend."""
+    The return value will be a datetime object for the cryptography backend.
+    """
     result = to_native(input_string)
     if result is None:
         raise OpenSSLObjectError(
@@ -158,14 +159,10 @@ def get_relative_time_option(
         result_datetime = convert_relative_to_datetime(
             result, with_timezone=with_timezone, now=now
         )
-        if backend == "pyopenssl":
-            return result_datetime.strftime("%Y%m%d%H%M%SZ")
-        elif backend == "cryptography":
+        if backend == "cryptography":
             return result_datetime
     # Absolute time
-    if backend == "pyopenssl":
-        return input_string
-    elif backend == "cryptography":
+    if backend == "cryptography":
         for date_fmt, length in [
             (
                 "%Y%m%d%H%M%SZ",
