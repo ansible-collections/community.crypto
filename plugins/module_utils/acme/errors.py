@@ -22,11 +22,11 @@ def format_error_problem(problem, subproblem_prefix=""):
         "type", "about:blank"
     )  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
     if "title" in problem:
-        msg = f"Error \"{problem['title']}\" ({error_type})"
+        msg = f'Error "{problem["title"]}" ({error_type})'
     else:
         msg = f"Error {error_type}"
     if "detail" in problem:
-        msg += f": \"{problem['detail']}\""
+        msg += f': "{problem["detail"]}"'
     subproblems = problem.get("subproblems")
     if subproblems is not None:
         msg = f"{msg} Subproblems:"

@@ -547,9 +547,9 @@ def _dn_escape_value(value):
         value = value.replace(ch, f"\\{ch}")
     value = value.replace("\0", "\\00")
     if value.startswith((" ", "#")):
-        value = f"\\{value[0]}" + value[1:]
+        value = f"\\{value[0]}{value[1:]}"
     if value.endswith(" "):
-        value = value[:-1] + "\\ "
+        value = f"{value[:-1]}\\ "
     return value
 
 

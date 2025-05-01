@@ -665,9 +665,7 @@ class EcsCertificate:
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(
-                msg=f"Failed to initialize Entrust Provider: {to_native(e)}"
-            )
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
             self.ecs_client.GetAppVersion()
         except RestOperationException as e:

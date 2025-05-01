@@ -442,7 +442,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
             )
         else:
             raise ValueError(
-                "Curve must be one of {(b','.join(list(_ECDSA_CURVE_IDENTIFIERS.values()))).decode('UTF-8')}"
+                "Curve must be one of {(b','.join(_ECDSA_CURVE_IDENTIFIERS.values())).decode('UTF-8')}"
             )
 
     # See https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
@@ -702,7 +702,7 @@ def get_option_type(name):
     else:
         raise ValueError(
             f"{name} is not a valid option. "
-            + "Custom options must start with 'critical:' or 'extension:' to indicate type"
+            "Custom options must start with 'critical:' or 'extension:' to indicate type"
         )
     return result
 

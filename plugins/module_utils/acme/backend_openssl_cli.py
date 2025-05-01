@@ -66,7 +66,7 @@ def _decode_octets(octets_text):
 
 def _extract_octets(out_text, name, required=True, potential_prefixes=None):
     part = (
-        ("(?:%s)" % "|".join(re.escape(pp) for pp in potential_prefixes))
+        f"(?:{'|'.join(re.escape(pp) for pp in potential_prefixes)})"
         if potential_prefixes
         else ""
     )
@@ -107,7 +107,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 except Exception:
                     pass
                 raise KeyParsingError(
-                    f"failed to create temporary content file: {to_native(err)}",
+                    f"failed to create temporary content file: {err}",
                     exception=traceback.format_exc(),
                 )
             f.close()

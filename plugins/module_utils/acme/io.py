@@ -44,7 +44,7 @@ def write_file(module, dest, content):
             pass
         os.remove(tmpsrc)
         raise ModuleFailException(
-            f"failed to create temporary content file: {to_native(err)}",
+            f"failed to create temporary content file: {err}",
             exception=traceback.format_exc(),
         )
     f.close()

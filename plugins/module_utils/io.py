@@ -19,7 +19,7 @@ def load_file(path, module=None):
     except Exception as exc:
         if module is None:
             raise
-        module.fail_json(f"Error while loading {path} - {str(exc)}")
+        module.fail_json(f"Error while loading {path} - {exc}")
 
 
 def load_file_if_exists(path, module=None, ignore_errors=False):
@@ -40,13 +40,13 @@ def load_file_if_exists(path, module=None, ignore_errors=False):
             return None
         if module is None:
             raise
-        module.fail_json(f"Error while loading {path} - {str(exc)}")
+        module.fail_json(f"Error while loading {path} - {exc}")
     except Exception as exc:
         if ignore_errors:
             return None
         if module is None:
             raise
-        module.fail_json(f"Error while loading {path} - {str(exc)}")
+        module.fail_json(f"Error while loading {path} - {exc}")
 
 
 def write_file(module, content, default_mode=None, path=None):

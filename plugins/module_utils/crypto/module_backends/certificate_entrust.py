@@ -96,9 +96,7 @@ class EntrustCertificateBackend(CertificateBackend):
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(
-                msg=f"Failed to initialize Entrust Provider: {to_native(e.message)}"
-            )
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e.message}")
 
     def generate_certificate(self):
         """(Re-)Generate certificate."""

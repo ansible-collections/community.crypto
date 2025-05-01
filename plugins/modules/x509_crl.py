@@ -560,7 +560,7 @@ class CRL(OpenSSLObject):
 
         self.digest = select_message_digest(module.params["digest"])
         if self.digest is None:
-            raise CRLError(f"The digest \"{module.params['digest']}\" is not supported")
+            raise CRLError(f'The digest "{module.params["digest"]}" is not supported')
 
         self.module = module
 
