@@ -125,7 +125,6 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -140,7 +139,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 
 def openssl_publickey_info_filter(data):
     """Extract information from OpenSSL PEM public key."""
-    if not isinstance(data, string_types):
+    if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
             f"The community.crypto.openssl_publickey_info input must be a text type, not {type(data)}"
         )

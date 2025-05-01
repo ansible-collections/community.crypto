@@ -41,7 +41,6 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
     GPGError,
     get_fingerprint_from_bytes,
@@ -52,7 +51,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
 
 
 def gpg_fingerprint(input):
-    if not isinstance(input, string_types):
+    if not isinstance(input, (str, bytes)):
         raise AnsibleFilterError(
             f"The input for the community.crypto.gpg_fingerprint filter must be a string; got {type(input)} instead"
         )

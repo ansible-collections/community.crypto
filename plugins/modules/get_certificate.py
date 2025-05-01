@@ -278,7 +278,6 @@ from ssl import (
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_get_extensions_from_cert,
@@ -443,7 +442,7 @@ def main():
             # For each item in the tls_ctx_options list
             for tls_ctx_option in tls_ctx_options:
                 # If the item is a string_type
-                if isinstance(tls_ctx_option, string_types):
+                if isinstance(tls_ctx_option, (str, bytes)):
                     # Convert tls_ctx_option to a native string
                     tls_ctx_option_str = to_native(tls_ctx_option)
                     # Get the tls_ctx_option_str attribute from ssl

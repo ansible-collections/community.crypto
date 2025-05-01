@@ -6,8 +6,7 @@
 from __future__ import annotations
 
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import binary_type
-from ansible.module_utils.six.moves.http_client import responses as http_responses
+from http_client import responses as http_responses
 
 
 def format_http_status(status_code):
@@ -75,7 +74,7 @@ class ACMEProtocolException(ModuleFailException):
 
         # Make sure that content_json is None or a dictionary
         if content_json is not None and not isinstance(content_json, dict):
-            if content is None and isinstance(content_json, binary_type):
+            if content is None and isinstance(content_json, bytes):
                 content = content_json
             content_json = None
 

@@ -9,13 +9,13 @@ import binascii
 import re
 import sys
 import traceback
-
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.six.moves.urllib.parse import (
+from urllib.parse import (
     ParseResult,
     urlparse,
     urlunparse,
 )
+
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )

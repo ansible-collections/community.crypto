@@ -310,7 +310,6 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -324,11 +323,11 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 
 def x509_certificate_info_filter(data, name_encoding="ignore"):
     """Extract information from X.509 PEM certificate."""
-    if not isinstance(data, string_types):
+    if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
             f"The community.crypto.x509_certificate_info input must be a text type, not {type(data)}"
         )
-    if not isinstance(name_encoding, string_types):
+    if not isinstance(name_encoding, (str, bytes)):
         raise AnsibleFilterError(
             f"The name_encoding option must be of a text type, not {type(name_encoding)}"
         )

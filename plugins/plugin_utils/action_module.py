@@ -17,7 +17,6 @@ import copy
 import traceback
 
 from ansible.errors import AnsibleError
-from ansible.module_utils import six
 from ansible.module_utils.basic import SEQUENCETYPE, remove_values
 from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.common.arg_spec import ArgumentSpecValidator
@@ -25,7 +24,6 @@ from ansible.module_utils.common.validation import (
     safe_eval,
 )
 from ansible.module_utils.errors import UnsupportedError
-from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 
 
@@ -129,7 +127,7 @@ class AnsibleActionModule:
 
     def warn(self, warning):
         # Copied from ansible.module_utils.common.warnings:
-        if isinstance(warning, string_types):
+        if isinstance(warning, (str, bytes)):
             self.__warnings.append(warning)
         else:
             raise TypeError(f"warn requires a string not a {type(warning)}")
@@ -141,7 +139,7 @@ class AnsibleActionModule:
             )
 
         # Copied from ansible.module_utils.common.warnings:
-        if isinstance(msg, string_types):
+        if isinstance(msg, (str, bytes)):
             # For compatibility, we accept that neither version nor date is set,
             # and treat that the same as if version would haven been set
             if date is not None:
@@ -209,8 +207,7 @@ class AnsibleActionModule:
         self._return_formatted(result)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ActionModuleBase(ActionBase):
+class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def setup_module(self):
         """Return pair (ArgumentSpec, kwargs)."""

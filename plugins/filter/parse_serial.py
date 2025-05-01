@@ -41,14 +41,13 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.serial import (
     parse_serial,
 )
 
 
 def parse_serial_filter(input):
-    if not isinstance(input, string_types):
+    if not isinstance(input, (str, bytes)):
         raise AnsibleFilterError(
             f"The input for the community.crypto.parse_serial filter must be a string; got {type(input)} instead"
         )

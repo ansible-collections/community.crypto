@@ -391,7 +391,6 @@ issuer_uri:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -440,7 +439,7 @@ def main():
     valid_at = module.params["valid_at"]
     if valid_at:
         for k, v in valid_at.items():
-            if not isinstance(v, string_types):
+            if not isinstance(v, (str, bytes)):
                 module.fail_json(
                     msg=f"The value for valid_at.{k} must be of type string (got {type(v)})"
                 )

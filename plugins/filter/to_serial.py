@@ -41,12 +41,11 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import integer_types
 from ansible_collections.community.crypto.plugins.module_utils.serial import to_serial
 
 
 def to_serial_filter(input):
-    if not isinstance(input, integer_types):
+    if not isinstance(input, int):
         raise AnsibleFilterError(
             f"The input for the community.crypto.to_serial filter must be an integer; got {type(input)} instead"
         )

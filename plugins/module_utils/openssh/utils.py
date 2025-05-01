@@ -10,8 +10,6 @@ import re
 from contextlib import contextmanager
 from struct import Struct
 
-from ansible.module_utils.six import PY3
-
 
 # Protocol References
 # -------------------
@@ -90,7 +88,7 @@ class OpensshParser:
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError(f"Data must be bytes-like not {type(data)}")
 
-        self._data = memoryview(data) if PY3 else data
+        self._data = memoryview(data)
         self._pos = 0
 
     def boolean(self):
@@ -122,7 +120,7 @@ class OpensshParser:
         value = self._data[self._pos : next_pos]
         self._pos = next_pos
         # Cast to bytes is required as a memoryview slice is itself a memoryview
-        return value if not PY3 else bytes(value)
+        return bytes(value)
 
     def mpint(self):
         return self._big_int(self.string(), "big", signed=True)
@@ -220,47 +218,7 @@ class OpensshParser:
                 f"Byte_order must be one of (big, little) not {byte_order}"
             )
 
-        if PY3:
-            return int.from_bytes(raw_string, byte_order, signed=signed)
-
-        result = 0
-        byte_length = len(raw_string)
-
-        if byte_length > 0:
-            # Check sign-bit
-            msb = raw_string[0] if byte_order == "big" else raw_string[-1]
-            negative = bool(ord(msb) & 0x80)
-            # Match pad value for two's complement
-            pad = b"\xff" if signed and negative else b"\x00"
-            # The definition of ``mpint`` enforces that unnecessary bytes are not encoded so they are added back
-            pad_length = 4 - byte_length % 4
-            if pad_length < 4:
-                raw_string = (
-                    pad * pad_length + raw_string
-                    if byte_order == "big"
-                    else raw_string + pad * pad_length
-                )
-                byte_length += pad_length
-            # Accumulate arbitrary precision integer bytes in the appropriate order
-            if byte_order == "big":
-                for i in range(0, byte_length, cls.UINT32_OFFSET):
-                    left_shift = result << cls.UINT32_OFFSET * 8
-                    result = (
-                        left_shift
-                        + _UINT32.unpack(raw_string[i : i + cls.UINT32_OFFSET])[0]
-                    )
-            else:
-                for i in range(byte_length, 0, -cls.UINT32_OFFSET):
-                    left_shift = result << cls.UINT32_OFFSET * 8
-                    result = (
-                        left_shift
-                        + _UINT32_LE.unpack(raw_string[i - cls.UINT32_OFFSET : i])[0]
-                    )
-            # Adjust for two's complement
-            if signed and negative:
-                result -= 1 << (8 * byte_length)
-
-        return result
+        return int.from_bytes(raw_string, byte_order, signed=signed)
 
 
 class _OpensshWriter:
@@ -370,42 +328,12 @@ class _OpensshWriter:
 
     @staticmethod
     def _int_to_mpint(num):
-        if PY3:
-            byte_length = (num.bit_length() + 7) // 8
-            try:
-                result = num.to_bytes(byte_length, "big", signed=True)
-            # Handles values which require \x00 or \xFF to pad sign-bit
-            except OverflowError:
-                result = num.to_bytes(byte_length + 1, "big", signed=True)
-        else:
-            result = bytes()
-            # 0 and -1 are treated as special cases since they are used as sentinels for all other values
-            if num == 0:
-                result += b"\x00"
-            elif num == -1:
-                result += b"\xff"
-            elif num > 0:
-                while num >> 32:
-                    result = _UINT32.pack(num & _UINT32_MAX) + result
-                    num = num >> 32
-                # Pack last 4 bytes individually to discard insignificant bytes
-                while num:
-                    result = _UBYTE.pack(num & _UBYTE_MAX) + result
-                    num = num >> 8
-                # Zero pad final byte if most-significant bit is 1 as per mpint definition
-                if ord(result[0]) & 0x80:
-                    result = b"\x00" + result
-            else:
-                while (num >> 32) < -1:
-                    result = _UINT32.pack(num & _UINT32_MAX) + result
-                    num = num >> 32
-                while num < -1:
-                    result = _UBYTE.pack(num & _UBYTE_MAX) + result
-                    num = num >> 8
-                if not ord(result[0]) & 0x80:
-                    result = b"\xff" + result
-
-        return result
+        byte_length = (num.bit_length() + 7) // 8
+        try:
+            return num.to_bytes(byte_length, "big", signed=True)
+        # Handles values which require \x00 or \xFF to pad sign-bit
+        except OverflowError:
+            return num.to_bytes(byte_length + 1, "big", signed=True)
 
     def bytes(self):
         return bytes(self._buff)
