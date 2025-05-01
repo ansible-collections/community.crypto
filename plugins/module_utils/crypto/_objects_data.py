@@ -14,10 +14,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # https://github.com/openssl/openssl/blob/master/LICENSE.txt or LICENSES/Apache-2.0.txt
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 
 OID_MAP = {

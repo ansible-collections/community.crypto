@@ -4,23 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
-# Protocol References
-# -------------------
-# https://datatracker.ietf.org/doc/html/rfc4251
-# https://datatracker.ietf.org/doc/html/rfc4253
-# https://datatracker.ietf.org/doc/html/rfc5656
-# https://datatracker.ietf.org/doc/html/rfc8032
-# https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
-#
-# Inspired by:
-# ------------
-# https://github.com/pyca/cryptography/blob/main/src/cryptography/hazmat/primitives/serialization/ssh.py
-# https://github.com/paramiko/paramiko/blob/master/paramiko/message.py
+from __future__ import annotations
 
 import abc
 import binascii
@@ -44,6 +28,20 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     convert_relative_to_datetime,
 )
+
+
+# Protocol References
+# -------------------
+# https://datatracker.ietf.org/doc/html/rfc4251
+# https://datatracker.ietf.org/doc/html/rfc4253
+# https://datatracker.ietf.org/doc/html/rfc5656
+# https://datatracker.ietf.org/doc/html/rfc8032
+# https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
+#
+# Inspired by:
+# ------------
+# https://github.com/pyca/cryptography/blob/main/src/cryptography/hazmat/primitives/serialization/ssh.py
+# https://github.com/paramiko/paramiko/blob/master/paramiko/message.py
 
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD

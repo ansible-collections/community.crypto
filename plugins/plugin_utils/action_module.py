@@ -12,11 +12,7 @@
 
 # NOTE: THIS IS ONLY FOR ACTION PLUGINS!
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import copy

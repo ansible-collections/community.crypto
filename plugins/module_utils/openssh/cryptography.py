@@ -4,10 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import os
 from base64 import b64decode, b64encode
@@ -337,7 +334,7 @@ class AsymmetricKeypair(object):
             return self.__publickey.verify(
                 signature,
                 data,
-                **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"]
+                **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"],
             )
         except InvalidSignature:
             raise InvalidSignatureError
