@@ -213,7 +213,7 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
         raise AnsibleFilterError(to_native(exc))
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

@@ -19,7 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-class Order(object):
+class Order:
     def _setup(self, client, data):
         self.data = data
 

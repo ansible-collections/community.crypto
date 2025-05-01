@@ -81,7 +81,7 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CertificateSigningRequestBackend(object):
+class CertificateSigningRequestBackend:
     def __init__(self, module, backend):
         self.module = module
         self.backend = backend

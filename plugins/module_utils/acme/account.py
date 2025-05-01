@@ -12,7 +12,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-class ACMEAccount(object):
+class ACMEAccount:
     """
     ACME account object. Allows to create new accounts, check for existence of accounts,
     retrieve account data.

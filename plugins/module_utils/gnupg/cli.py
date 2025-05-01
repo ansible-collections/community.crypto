@@ -15,7 +15,7 @@ class GPGError(Exception):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class GPGRunner(object):
+class GPGRunner:
     @abc.abstractmethod
     def run_command(self, command, check_rc=True, data=None):
         """

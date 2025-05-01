@@ -57,7 +57,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CertificateInfoRetrieval(object):
+class CertificateInfoRetrieval:
     def __init__(self, module, backend, content):
         # content must be a bytes string
         self.module = module

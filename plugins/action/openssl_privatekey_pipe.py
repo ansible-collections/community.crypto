@@ -19,7 +19,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.action_module imp
 )
 
 
-class PrivateKeyModule(object):
+class PrivateKeyModule:
     def __init__(self, module, module_backend):
         self.module = module
         self.module_backend = module_backend

@@ -62,7 +62,7 @@ def split_identifier(identifier):
     return parts
 
 
-class Challenge(object):
+class Challenge:
     def __init__(self, data, url):
         self.data = data
 
@@ -135,7 +135,7 @@ class Challenge(object):
         return None
 
 
-class Authorization(object):
+class Authorization:
     def _setup(self, client, data):
         data["uri"] = self.url
         self.data = data

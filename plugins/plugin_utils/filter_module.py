@@ -9,7 +9,7 @@ from __future__ import annotations
 from ansible.errors import AnsibleFilterError
 
 
-class FilterModuleMock(object):
+class FilterModuleMock:
     def __init__(self, params):
         self.check_mode = True
         self.params = params

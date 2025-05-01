@@ -122,7 +122,7 @@ class InvalidSignatureError(OpenSSHError):
     pass
 
 
-class AsymmetricKeypair(object):
+class AsymmetricKeypair:
     """Container for newly generated asymmetric key pairs or those loaded from existing files"""
 
     @classmethod
@@ -349,7 +349,7 @@ class AsymmetricKeypair(object):
             self.__encryption_algorithm = serialization.NoEncryption()
 
 
-class OpensshKeypair(object):
+class OpensshKeypair:
     """Container for OpenSSH encoded asymmetric key pairs"""
 
     @classmethod

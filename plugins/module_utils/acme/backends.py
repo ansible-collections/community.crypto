@@ -93,7 +93,7 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CryptoBackend(object):
+class CryptoBackend:
     def __init__(self, module, with_timezone=False):
         self.module = module
         self._with_timezone = with_timezone

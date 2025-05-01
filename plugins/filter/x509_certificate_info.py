@@ -348,7 +348,7 @@ def x509_certificate_info_filter(data, name_encoding="ignore"):
         raise AnsibleFilterError(to_native(exc))
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

@@ -42,7 +42,7 @@ else:
     CRYPTOGRAPHY_FOUND = True
 
 
-class CRLInfoRetrieval(object):
+class CRLInfoRetrieval:
     def __init__(self, module, content, list_revoked_certificates=True):
         # content must be a bytes string
         self.module = module

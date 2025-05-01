@@ -159,7 +159,7 @@ except ImportError:
     HAS_CRYPTOGRAPHY = False
 
 
-class Certificate(object):
+class Certificate:
     """
     Stores PEM with parsed certificate.
     """
@@ -270,7 +270,7 @@ def load_PEM_list(module, path, fail_on_error=True):
             return []
 
 
-class CertificateSet(object):
+class CertificateSet:
     """
     Stores a set of certificates. Allows to search for parent (issuer of a certificate).
     """

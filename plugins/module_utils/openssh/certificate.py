@@ -103,7 +103,7 @@ if six.PY3:
     long = int
 
 
-class OpensshCertificateTimeParameters(object):
+class OpensshCertificateTimeParameters:
     def __init__(self, valid_from, valid_to):
         self._valid_from = self.to_datetime(valid_from)
         self._valid_to = self.to_datetime(valid_to)
@@ -232,7 +232,7 @@ class OpensshCertificateTimeParameters(object):
         return result
 
 
-class OpensshCertificateOption(object):
+class OpensshCertificateOption:
     def __init__(self, option_type, name, data):
         if option_type not in ("critical", "extension"):
             raise ValueError("type must be either 'critical' or 'extension'")
@@ -489,7 +489,7 @@ class OpensshED25519CertificateInfo(OpensshCertificateInfo):
 
 
 # See https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
-class OpensshCertificate(object):
+class OpensshCertificate:
     """Encapsulates a formatted OpenSSH certificate including signature and signing key"""
 
     def __init__(self, cert_info, signature):

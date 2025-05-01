@@ -96,7 +96,7 @@ class PublicKeyParseError(OpenSSLObjectError):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PublicKeyInfoRetrieval(object):
+class PublicKeyInfoRetrieval:
     def __init__(self, module, backend, content=None, key=None):
         # content must be a bytes string
         self.module = module

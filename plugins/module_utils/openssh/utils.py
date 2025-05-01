@@ -82,7 +82,7 @@ def secure_write(path, mode, content):
 
 
 # See https://datatracker.ietf.org/doc/html/rfc4251#section-5 for SSH data types
-class OpensshParser(object):
+class OpensshParser:
     """Parser for OpenSSH encoded objects"""
 
     BOOLEAN_OFFSET = 1
@@ -266,7 +266,7 @@ class OpensshParser(object):
         return result
 
 
-class _OpensshWriter(object):
+class _OpensshWriter:
     """Writes SSH encoded values to a bytes-like buffer
 
     .. warning::

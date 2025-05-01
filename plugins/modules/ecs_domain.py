@@ -237,7 +237,7 @@ def calculate_days_remaining(expiry_date):
     return days_remaining
 
 
-class EcsDomain(object):
+class EcsDomain:
     """
     Entrust Certificate Services domain class.
     """

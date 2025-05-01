@@ -141,7 +141,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-class GenericCertificate(object):
+class GenericCertificate:
     """Retrieve a certificate using the given module backend."""
 
     def __init__(self, module, module_backend):

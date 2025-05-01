@@ -30,7 +30,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-class ACMECertificateClient(object):
+class ACMECertificateClient:
     """
     ACME v2 client class. Uses an ACME account object and a CSR to
     start and validate ACME challenges and download the respective

@@ -56,7 +56,7 @@ class CertificateError(OpenSSLObjectError):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CertificateBackend(object):
+class CertificateBackend:
     def __init__(self, module, backend):
         self.module = module
         self.backend = backend
@@ -323,7 +323,7 @@ class CertificateBackend(object):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CertificateProvider(object):
+class CertificateProvider:
     @abc.abstractmethod
     def validate_module_args(self, module):
         """Check module arguments"""

@@ -137,7 +137,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-class CertificateSigningRequestModule(object):
+class CertificateSigningRequestModule:
     def __init__(self, module, module_backend):
         self.check_mode = module.check_mode
         self.module = module

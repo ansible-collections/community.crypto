@@ -155,7 +155,7 @@ def openssl_publickey_info_filter(data):
         raise AnsibleFilterError(to_native(exc))
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

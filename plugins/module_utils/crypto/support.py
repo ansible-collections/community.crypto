@@ -308,7 +308,7 @@ def select_message_digest(digest_string):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class OpenSSLObject(object):
+class OpenSSLObject:
 
     def __init__(self, path, state, force, check_mode):
         self.path = path

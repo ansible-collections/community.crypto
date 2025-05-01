@@ -35,7 +35,7 @@ class _ModuleExitException(Exception):
         self.result = result
 
 
-class AnsibleActionModule(object):
+class AnsibleActionModule:
     def __init__(
         self,
         action_plugin,

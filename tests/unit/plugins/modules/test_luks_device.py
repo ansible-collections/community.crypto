@@ -8,7 +8,7 @@ import pytest
 from ansible_collections.community.crypto.plugins.modules import luks_device
 
 
-class DummyModule(object):
+class DummyModule:
     # module to mock AnsibleModule class
     def __init__(self):
         self.params = dict()

@@ -58,7 +58,7 @@ def split_pem_filter(data):
     return split_pem_list(data)
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

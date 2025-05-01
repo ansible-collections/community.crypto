@@ -117,7 +117,7 @@ def _is_failed(info, expected_status_codes=None):
     return False
 
 
-class ACMEDirectory(object):
+class ACMEDirectory:
     """
     The ACME server directory. Gives access to the available resources,
     and allows to obtain a Replay-Nonce. The acme_directory URL
@@ -193,7 +193,7 @@ class ACMEDirectory(object):
         return "renewalInfo" in self.directory
 
 
-class ACMEClient(object):
+class ACMEClient:
     """
     ACME client object. Handles the authorized communication with the
     ACME server.

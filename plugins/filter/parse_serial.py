@@ -60,7 +60,7 @@ def parse_serial_filter(input):
         raise AnsibleFilterError(to_native(exc))
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

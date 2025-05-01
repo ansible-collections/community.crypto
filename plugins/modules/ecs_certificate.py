@@ -622,7 +622,7 @@ def convert_module_param_to_json_bool(module, dict_param_name, param_name):
     return body
 
 
-class EcsCertificate(object):
+class EcsCertificate:
     """
     Entrust Certificate Services certificate class.
     """

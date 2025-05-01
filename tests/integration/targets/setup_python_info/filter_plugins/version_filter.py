@@ -30,7 +30,7 @@ def version_lookup(data, distribution, os_family, distribution_version, distribu
     return python_version in data
 
 
-class FilterModule(object):
+class FilterModule:
     """ IP address and network manipulation filters """
 
     def filters(self):

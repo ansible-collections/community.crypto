@@ -61,7 +61,7 @@ def _restore_all_on_failure(f):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class OpensshModule(object):
+class OpensshModule:
     def __init__(self, module):
         self.module = module
 
@@ -164,7 +164,7 @@ class OpensshModule(object):
             self.changed = True
 
 
-class KeygenCommand(object):
+class KeygenCommand:
     def __init__(self, module):
         self._bin_path = module.get_bin_path("ssh-keygen", True)
         self._run_command = module.run_command
@@ -264,7 +264,7 @@ class KeygenCommand(object):
         return self._run_command(command, **kwargs)
 
 
-class PrivateKey(object):
+class PrivateKey:
     def __init__(self, size, key_type, fingerprint, format=""):
         self._size = size
         self._type = key_type
@@ -306,7 +306,7 @@ class PrivateKey(object):
         }
 
 
-class PublicKey(object):
+class PublicKey:
     def __init__(self, type_string, data, comment):
         self._type_string = type_string
         self._data = data

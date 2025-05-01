@@ -170,7 +170,7 @@ class DHParameterError(Exception):
     pass
 
 
-class DHParameterBase(object):
+class DHParameterBase:
 
     def __init__(self, module):
         self.state = module.params["state"]

@@ -476,7 +476,7 @@ def wipe_luks_headers(device):
                 f.write(b"\x00\x00\x00\x00\x00\x00")
 
 
-class Handler(object):
+class Handler:
 
     def __init__(self, module):
         self._module = module

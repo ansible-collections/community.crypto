@@ -192,7 +192,7 @@ class PrivateKeyParseError(OpenSSLObjectError):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PrivateKeyInfoRetrieval(object):
+class PrivateKeyInfoRetrieval:
     def __init__(
         self,
         module,

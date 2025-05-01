@@ -96,7 +96,7 @@ def bind(instance, method, operation_spec):
     return binding_scope_fn
 
 
-class RestOperation(object):
+class RestOperation:
     def __init__(self, session, uri, method, parameters=None):
         self.session = session
         self.method = method
@@ -177,7 +177,7 @@ class RestOperation(object):
         )
 
 
-class Resource(object):
+class Resource:
     """Implement basic CRUD operations against a path."""
 
     def __init__(self, session):
@@ -224,7 +224,7 @@ class Resource(object):
 
 
 # Session to encapsulate the connection parameters of the module_utils Request object, the api spec, etc
-class ECSSession(object):
+class ECSSession:
     def __init__(self, name, **kwargs):
         """
         Initialize our session
