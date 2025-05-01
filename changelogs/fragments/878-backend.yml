@@ -1,0 +1,2 @@
+minor_changes:
+  - "No longer provide cryptography's ``backend`` parameter. This will break with cryptography < 3.1 (https://github.com/ansible-collections/community.crypto/pull/878)."

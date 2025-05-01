@@ -322,7 +322,6 @@ class DHParameterCryptography(DHParameterBase):
 
     def __init__(self, module):
         super(DHParameterCryptography, self).__init__(module)
-        self.crypto_backend = cryptography.hazmat.backends.default_backend()
 
     def _do_generate(self, module):
         """Actually generate the DH params."""
@@ -330,7 +329,6 @@ class DHParameterCryptography(DHParameterBase):
         params = cryptography.hazmat.primitives.asymmetric.dh.generate_parameters(
             generator=2,
             key_size=self.size,
-            backend=self.crypto_backend,
         )
         # Serialize parameters
         result = params.parameter_bytes(
@@ -349,7 +347,7 @@ class DHParameterCryptography(DHParameterBase):
             with open(self.path, "rb") as f:
                 data = f.read()
             params = cryptography.hazmat.primitives.serialization.load_pem_parameters(
-                data, backend=self.crypto_backend
+                data
             )
         except Exception:
             return False

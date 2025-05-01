@@ -137,7 +137,6 @@ MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography  # noqa: F401, pylint: disable=unused-import
-    from cryptography.hazmat.backends import default_backend
     from cryptography.x509 import load_der_x509_certificate
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -234,7 +233,7 @@ class X509CertificateConvertModule(OpenSSLObject):
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         try:
-            load_der_x509_certificate(self.input, default_backend())
+            load_der_x509_certificate(self.input)
         except Exception as exc:
             module.fail_json(msg=f"Error while parsing certificate: {exc}")
 

@@ -320,8 +320,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self._add_curve("brainpoolP384r1", "BrainpoolP384R1", deprecated=True)
         self._add_curve("brainpoolP512r1", "BrainpoolP512R1", deprecated=True)
 
-        self.cryptography_backend = cryptography.hazmat.backends.default_backend()
-
         if not CRYPTOGRAPHY_HAS_X25519 and self.type == "X25519":
             self.module.fail_json(
                 msg="Your cryptography version does not support X25519"
@@ -357,13 +355,12 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.asymmetric.rsa.generate_private_key(
                         public_exponent=65537,  # OpenSSL always uses this
                         key_size=self.size,
-                        backend=self.cryptography_backend,
                     )
                 )
             if self.type == "DSA":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.dsa.generate_private_key(
-                        key_size=self.size, backend=self.cryptography_backend
+                        key_size=self.size
                     )
                 )
             if CRYPTOGRAPHY_HAS_X25519_FULL and self.type == "X25519":
@@ -390,7 +387,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
                         curve=self.curves[self.curve]["create"](self.size),
-                        backend=self.cryptography_backend,
                     )
                 )
         except cryptography.exceptions.UnsupportedAlgorithm:
@@ -498,7 +494,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         data,
                         None if self.passphrase is None else to_bytes(self.passphrase),
-                        backend=self.cryptography_backend,
                     )
                 )
         except Exception as e:
@@ -523,7 +518,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         self.existing_private_key_bytes,
                         None if self.passphrase is None else to_bytes(self.passphrase),
-                        backend=self.cryptography_backend,
                     )
                 )
         except Exception:

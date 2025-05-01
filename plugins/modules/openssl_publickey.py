@@ -217,7 +217,6 @@ MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = "1.4"
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization as crypto_serialization
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
@@ -354,7 +353,7 @@ class PublicKey(OpenSSLObject):
                     if self.format == "OpenSSH":
                         # Read and dump public key. Makes sure that the comment is stripped off.
                         current_publickey = crypto_serialization.load_ssh_public_key(
-                            publickey_content, backend=default_backend()
+                            publickey_content
                         )
                         publickey_content = current_publickey.public_bytes(
                             crypto_serialization.Encoding.OpenSSH,
@@ -362,7 +361,7 @@ class PublicKey(OpenSSLObject):
                         )
                     else:
                         current_publickey = crypto_serialization.load_pem_public_key(
-                            publickey_content, backend=default_backend()
+                            publickey_content
                         )
                         publickey_content = current_publickey.public_bytes(
                             crypto_serialization.Encoding.PEM,

@@ -136,8 +136,6 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
             module=module, backend="cryptography"
         )
 
-        self.cryptography_backend = cryptography.hazmat.backends.default_backend()
-
     def get_private_key_data(self):
         """Return bytes for self.src_private_key in output format"""
         # Select export format and encoding
@@ -269,7 +267,6 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         data,
                         None if passphrase is None else to_bytes(passphrase),
-                        backend=self.cryptography_backend,
                     ),
                 )
         except Exception as e:

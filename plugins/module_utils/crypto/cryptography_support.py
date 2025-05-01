@@ -27,7 +27,6 @@ try:
     import cryptography
     from cryptography import x509
     from cryptography.exceptions import InvalidSignature
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -119,13 +118,9 @@ def cryptography_get_extensions_from_cert(cert):
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
-        try:
-            # For certain old versions of cryptography, backend is a MultiBackend object,
-            # which has no _lib attribute. In that case, revert to the old approach.
-            backend._lib
-        except AttributeError:
-            backend = cert._backend
 
         x509_obj = cert._x509
         # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
@@ -175,13 +170,9 @@ def cryptography_get_extensions_from_csr(csr):
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
-        try:
-            # For certain old versions of cryptography, backend is a MultiBackend object,
-            # which has no _lib attribute. In that case, revert to the old approach.
-            backend._lib
-        except AttributeError:
-            backend = csr._backend
 
         extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
         extensions = backend._ffi.gc(
@@ -825,6 +816,8 @@ def _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=None):
     friendly_name = None
     if certificate:
         # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
 
         # This code basically does what load_key_and_certificates() does, but without error-checking.

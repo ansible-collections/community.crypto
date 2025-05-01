@@ -34,7 +34,6 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 try:
     import cryptography
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives.serialization import Encoding
 except ImportError:
     pass
@@ -91,7 +90,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                         msg=f'Unsupported digest "{module.params["selfsigned_digest"]}"'
                     )
             try:
-                self.csr = csr.sign(self.privatekey, digest, default_backend())
+                self.csr = csr.sign(self.privatekey, digest)
             except TypeError as e:
                 if (
                     str(e) == "Algorithm must be a registered hash algorithm."
@@ -143,7 +142,6 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
             certificate = cert_builder.sign(
                 private_key=self.privatekey,
                 algorithm=self.digest,
-                backend=default_backend(),
             )
         except TypeError as e:
             if (

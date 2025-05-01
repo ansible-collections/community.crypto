@@ -299,7 +299,6 @@ try:
     import cryptography
     import cryptography.exceptions
     import cryptography.x509
-    from cryptography.hazmat.backends import default_backend as cryptography_backend
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
@@ -528,9 +527,7 @@ def main():
     result["cert"] = cert
 
     if backend == "cryptography":
-        x509 = cryptography.x509.load_pem_x509_certificate(
-            to_bytes(cert), cryptography_backend()
-        )
+        x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert))
         result["subject"] = {}
         for attribute in x509.subject:
             result["subject"][cryptography_oid_to_name(attribute.oid, short=True)] = (

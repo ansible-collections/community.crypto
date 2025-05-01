@@ -489,7 +489,6 @@ CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives.serialization import Encoding
     from cryptography.x509 import (
         CertificateRevocationListBuilder,
@@ -642,11 +641,11 @@ class CRL(OpenSSLObject):
                 data = f.read()
             self.actual_format = "pem" if identify_pem_format(data) else "der"
             if self.actual_format == "pem":
-                self.crl = x509.load_pem_x509_crl(data, default_backend())
+                self.crl = x509.load_pem_x509_crl(data)
                 if self.return_content:
                     self.crl_content = data
             else:
-                self.crl = x509.load_der_x509_crl(data, default_backend())
+                self.crl = x509.load_der_x509_crl(data)
                 if self.return_content:
                     self.crl_content = base64.b64encode(data)
         except Exception:
@@ -783,7 +782,6 @@ class CRL(OpenSSLObject):
         return True
 
     def _generate_crl(self):
-        backend = default_backend()
         crl = CertificateRevocationListBuilder()
 
         try:
@@ -830,12 +828,12 @@ class CRL(OpenSSLObject):
                     x509.InvalidityDate(entry["invalidity_date"]),
                     entry["invalidity_date_critical"],
                 )
-            crl = crl.add_revoked_certificate(revoked_cert.build(backend))
+            crl = crl.add_revoked_certificate(revoked_cert.build())
 
         digest = None
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             digest = self.digest
-        self.crl = crl.sign(self.privatekey, digest, backend=backend)
+        self.crl = crl.sign(self.privatekey, digest)
         if self.format == "pem":
             return self.crl.public_bytes(Encoding.PEM)
         else:

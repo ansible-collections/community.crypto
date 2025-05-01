@@ -75,11 +75,6 @@ else:
     HAS_CURRENT_CRYPTOGRAPHY = LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion(
         CRYPTOGRAPHY_MINIMAL_VERSION
     )
-    try:
-        if HAS_CURRENT_CRYPTOGRAPHY:
-            _cryptography_backend = cryptography.hazmat.backends.default_backend()
-    except Exception:
-        CRYPTOGRAPHY_ERROR = traceback.format_exc()
 
 
 class CryptographyChainMatcher(ChainMatcher):
@@ -150,9 +145,7 @@ class CryptographyChainMatcher(ChainMatcher):
             chain = chain[:1]
         for cert in chain:
             try:
-                x509 = cryptography.x509.load_pem_x509_certificate(
-                    to_bytes(cert), cryptography.hazmat.backends.default_backend()
-                )
+                x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert))
                 matches = True
                 if not self._match_subject(x509.subject, self.subject):
                     matches = False
@@ -204,7 +197,6 @@ class CryptographyBackend(CryptoBackend):
             key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
                 key_content,
                 password=to_bytes(passphrase) if passphrase is not None else None,
-                backend=_cryptography_backend,
             )
         except Exception as e:
             raise KeyParsingError(f"error while loading key: {e}")
@@ -323,7 +315,7 @@ class CryptographyBackend(CryptoBackend):
             )
         return {
             "mac_obj": lambda: cryptography.hazmat.primitives.hmac.HMAC(
-                key_bytes, hashalg(), _cryptography_backend
+                key_bytes, hashalg()
             ),
             "type": "hmac",
             "alg": alg,
@@ -346,7 +338,7 @@ class CryptographyBackend(CryptoBackend):
             csr_content = read_file(csr_filename)
         else:
             csr_content = to_bytes(csr_content)
-        csr = cryptography.x509.load_pem_x509_csr(csr_content, _cryptography_backend)
+        csr = cryptography.x509.load_pem_x509_csr(csr_content)
 
         identifiers = set()
         result = []
@@ -410,9 +402,7 @@ class CryptographyBackend(CryptoBackend):
         cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
 
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(
-                cert_content, _cryptography_backend
-            )
+            cert = cryptography.x509.load_pem_x509_certificate(cert_content)
         except Exception as e:
             if cert_filename is None:
                 raise BackendException(f"Cannot parse certificate: {e}")
@@ -443,9 +433,7 @@ class CryptographyBackend(CryptoBackend):
         cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
 
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(
-                cert_content, _cryptography_backend
-            )
+            cert = cryptography.x509.load_pem_x509_certificate(cert_content)
         except Exception as e:
             if cert_filename is None:
                 raise BackendException(f"Cannot parse certificate: {e}")

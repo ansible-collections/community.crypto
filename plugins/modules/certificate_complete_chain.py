@@ -153,7 +153,6 @@ try:
     import cryptography.x509.oid
 
     HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.5")
-    _cryptography_backend = cryptography.hazmat.backends.default_backend()
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -232,9 +231,7 @@ def parse_PEM_list(module, text, source, fail_on_error=True):
     for cert_pem in split_pem_list(text):
         # Try to load PEM certificate
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(
-                to_bytes(cert_pem), _cryptography_backend
-            )
+            cert = cryptography.x509.load_pem_x509_certificate(to_bytes(cert_pem))
             result.append(Certificate(cert_pem, cert))
         except Exception as e:
             msg = f"Cannot parse certificate #{len(result) + 1} from {source}: {e}"

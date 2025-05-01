@@ -348,7 +348,6 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         super(CertificateSigningRequestCryptographyBackend, self).__init__(
             module, "cryptography"
         )
-        self.cryptography_backend = cryptography.hazmat.backends.default_backend()
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
@@ -493,7 +492,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     f'Unsupported digest "{self.digest}"'
                 )
         try:
-            self.csr = csr.sign(self.privatekey, digest, self.cryptography_backend)
+            self.csr = csr.sign(self.privatekey, digest)
         except TypeError as e:
             if (
                 str(e) == "Algorithm must be a registered hash algorithm."

@@ -276,10 +276,8 @@ def add_crypto_information(module):
 
     curves = []
     if CRYPTOGRAPHY_HAS_EC:
-        import cryptography.hazmat.backends
         import cryptography.hazmat.primitives.asymmetric.ec
 
-        backend = cryptography.hazmat.backends.default_backend()
         for curve_name, constructor_name in CURVES:
             ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(
                 constructor_name
@@ -287,7 +285,7 @@ def add_crypto_information(module):
             if ecclass:
                 try:
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
-                        curve=ecclass(), backend=backend
+                        curve=ecclass()
                     )
                     curves.append(curve_name)
                 except UnsupportedAlgorithm:

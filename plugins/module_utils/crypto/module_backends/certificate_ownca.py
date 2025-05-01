@@ -44,7 +44,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 try:
     import cryptography
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives.serialization import Encoding
 except ImportError:
     pass
@@ -191,7 +190,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             certificate = cert_builder.sign(
                 private_key=self.ca_private_key,
                 algorithm=self.digest,
-                backend=default_backend(),
             )
         except TypeError as e:
             if (
