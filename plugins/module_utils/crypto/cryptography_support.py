@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import ipaddress
 import re
 import sys
 import traceback
@@ -24,8 +25,6 @@ from ._asn1 import serialize_asn1_string_as_der
 
 
 try:
-    import ipaddress
-
     import cryptography
     from cryptography import x509
     from cryptography.exceptions import InvalidSignature

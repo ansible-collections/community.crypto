@@ -149,6 +149,7 @@ regular_certificate:
 
 import base64
 import datetime
+import ipaddress
 import sys
 import traceback
 
@@ -173,8 +174,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
-    import ipaddress
-
     import cryptography
     import cryptography.hazmat.backends
     import cryptography.hazmat.primitives.asymmetric.ec

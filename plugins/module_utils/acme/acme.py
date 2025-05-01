@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import ipaddress
 import json
 import locale
 import time
@@ -40,16 +41,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
-
-
-try:
-    import ipaddress  # noqa: F401, pylint: disable=unused-import
-except ImportError:
-    HAS_IPADDRESS = False
-    IPADDRESS_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_IPADDRESS = True
-    IPADDRESS_IMPORT_ERROR = None
 
 
 # -1 usually means connection problems
@@ -556,11 +547,6 @@ def create_default_argspec(
 
 
 def create_backend(module, needs_acme_v2=True):
-    if not HAS_IPADDRESS:
-        module.fail_json(
-            msg=missing_required_lib("ipaddress"), exception=IPADDRESS_IMPORT_ERROR
-        )
-
     backend = module.params["select_crypto_backend"]
 
     # Backend autodetect
