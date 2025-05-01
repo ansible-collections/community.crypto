@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2013, Romeo Theriault <romeot () hawaii.edu>
 # Copyright (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
 # Copyright (c) 2021 Felix Fontein <felix@fontein.de>

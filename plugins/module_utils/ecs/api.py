@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is licensed under the
 # Modified BSD License. Modules you write using this snippet, which is embedded

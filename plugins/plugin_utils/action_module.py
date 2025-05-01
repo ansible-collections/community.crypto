@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2012-2013 Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2016 Toshio Kuratomi <tkuratomi@ansible.com>
 # Copyright (c) 2019 Ansible Project
