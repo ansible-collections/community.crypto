@@ -40,7 +40,6 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
@@ -48,7 +47,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 
 def split_pem_filter(data):
     """Split PEM file."""
-    if not isinstance(data, string_types):
+    if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
             f"The community.crypto.split_pem input must be a text type, not {type(data)}"
         )

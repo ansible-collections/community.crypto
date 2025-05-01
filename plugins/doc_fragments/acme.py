@@ -19,7 +19,6 @@ notes:
     to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.
 requirements:
   - either openssl or L(cryptography,https://cryptography.io/) >= 1.5
-  - ipaddress
 options:
   acme_version:
     description:

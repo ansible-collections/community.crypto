@@ -12,7 +12,7 @@ module: x509_certificate_info
 short_description: Provide information of OpenSSL X.509 certificates
 description:
   - This module allows one to query information on OpenSSL certificates.
-  - It uses the cryptography python library to interact with OpenSSL.
+  - It uses the cryptography Python library to interact with OpenSSL.
   - Note that this module was called C(openssl_certificate_info) when included directly in Ansible up to version 2.9. When
     moved to the collection C(community.crypto), it was renamed to M(community.crypto.x509_certificate_info). From Ansible
     2.10 on, it can still be used by the old short name (or by C(ansible.builtin.openssl_certificate_info)), which redirects
@@ -391,7 +391,6 @@ issuer_uri:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -440,7 +439,7 @@ def main():
     valid_at = module.params["valid_at"]
     if valid_at:
         for k, v in valid_at.items():
-            if not isinstance(v, string_types):
+            if not isinstance(v, (str, bytes)):
                 module.fail_json(
                     msg=f"The value for valid_at.{k} must be of type string (got {type(v)})"
                 )

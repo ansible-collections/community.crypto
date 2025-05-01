@@ -10,11 +10,9 @@ import datetime
 import json
 import locale
 import time
-import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.six import PY3
 from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     CRYPTOGRAPHY_ERROR,
@@ -41,16 +39,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
-
-
-try:
-    import ipaddress  # noqa: F401, pylint: disable=unused-import
-except ImportError:
-    HAS_IPADDRESS = False
-    IPADDRESS_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_IPADDRESS = True
-    IPADDRESS_IMPORT_ERROR = None
 
 
 # -1 usually means connection problems
@@ -345,7 +333,7 @@ class ACMEClient:
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
                 # In Python 3, read() simply returns ''
-                if PY3 and resp.closed:
+                if resp.closed:
                     raise TypeError
                 content = resp.read()
             except (AttributeError, TypeError):
@@ -440,7 +428,7 @@ class ACMEClient:
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
                 # In Python 3, read() simply returns ''
-                if PY3 and resp.closed:
+                if resp.closed:
                     raise TypeError
                 content = resp.read()
             except (AttributeError, TypeError):
@@ -557,11 +545,6 @@ def create_default_argspec(
 
 
 def create_backend(module, needs_acme_v2=True):
-    if not HAS_IPADDRESS:
-        module.fail_json(
-            msg=missing_required_lib("ipaddress"), exception=IPADDRESS_IMPORT_ERROR
-        )
-
     backend = module.params["select_crypto_backend"]
 
     # Backend autodetect

@@ -6,16 +6,16 @@ from __future__ import annotations
 
 import base64
 import binascii
+import ipaddress
 import re
-import sys
 import traceback
-
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.six.moves.urllib.parse import (
+from urllib.parse import (
     ParseResult,
     urlparse,
     urlunparse,
 )
+
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
@@ -24,8 +24,6 @@ from ._asn1 import serialize_asn1_string_as_der
 
 
 try:
-    import ipaddress
-
     import cryptography
     from cryptography import x509
     from cryptography.exceptions import InvalidSignature
@@ -286,12 +284,8 @@ DN_COMPONENT_START_RE = re.compile(b"^ *([a-zA-z0-9.]+) *= *")
 DN_HEX_LETTER = b"0123456789abcdef"
 
 
-if sys.version_info[0] < 3:
-    _int_to_byte = chr
-else:
-
-    def _int_to_byte(value):
-        return bytes((value,))
+def _int_to_byte(value):
+    return bytes((value,))
 
 
 def _parse_dn_component(name, sep=b",", decode_remainder=True):

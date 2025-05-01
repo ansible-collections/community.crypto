@@ -14,11 +14,11 @@ import json
 import os
 import re
 import traceback
+from urllib.error import HTTPError
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_text
-from ansible.module_utils.six.moves.urllib.error import HTTPError
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import Request
 
 

@@ -8,7 +8,6 @@ import abc
 import binascii
 import datetime as _datetime
 import os
-import sys
 from base64 import b64encode
 from datetime import datetime
 from hashlib import sha256
@@ -68,13 +67,8 @@ _ECDSA_CURVE_IDENTIFIERS_LOOKUP = {
     b"nistp521": "ecdsa-nistp521",
 }
 
-_USE_TIMEZONE = sys.version_info >= (3, 6)
-
-
-_ALWAYS = _add_or_remove_timezone(datetime(1970, 1, 1), with_timezone=_USE_TIMEZONE)
-_FOREVER = (
-    datetime(9999, 12, 31, 23, 59, 59, 999999, _UTC) if _USE_TIMEZONE else datetime.max
-)
+_ALWAYS = _add_or_remove_timezone(datetime(1970, 1, 1), with_timezone=True)
+_FOREVER = datetime(9999, 12, 31, 23, 59, 59, 999999, _UTC)
 
 _CRITICAL_OPTIONS = (
     "force-command",
@@ -98,9 +92,6 @@ _EXTENSIONS = (
     "permit-pty",
     "permit-user-rc",
 )
-
-if six.PY3:
-    long = int
 
 
 class OpensshCertificateTimeParameters:
@@ -172,13 +163,13 @@ class OpensshCertificateTimeParameters:
                 result = OpensshCertificateTimeParameters._time_string_to_datetime(
                     time_string_or_timestamp.strip()
                 )
-            elif isinstance(time_string_or_timestamp, (long, int)):
+            elif isinstance(time_string_or_timestamp, int):
                 result = OpensshCertificateTimeParameters._timestamp_to_datetime(
                     time_string_or_timestamp
                 )
             else:
                 raise ValueError(
-                    f"Value must be of type (str, unicode, int, long) not {type(time_string_or_timestamp)}"
+                    f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
                 )
         except ValueError:
             raise
@@ -192,12 +183,7 @@ class OpensshCertificateTimeParameters:
             result = _FOREVER
         else:
             try:
-                if _USE_TIMEZONE:
-                    result = datetime.fromtimestamp(
-                        timestamp, tz=_datetime.timezone.utc
-                    )
-                else:
-                    result = datetime.utcfromtimestamp(timestamp)
+                result = datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
             except OverflowError:
                 raise ValueError
         return result
@@ -210,15 +196,13 @@ class OpensshCertificateTimeParameters:
         elif time_string == "forever":
             result = _FOREVER
         elif is_relative_time_string(time_string):
-            result = convert_relative_to_datetime(
-                time_string, with_timezone=_USE_TIMEZONE
-            )
+            result = convert_relative_to_datetime(time_string, with_timezone=True)
         else:
             for time_format in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
                 try:
                     result = _add_or_remove_timezone(
                         datetime.strptime(time_string, time_format),
-                        with_timezone=_USE_TIMEZONE,
+                        with_timezone=True,
                     )
                 except ValueError:
                     pass

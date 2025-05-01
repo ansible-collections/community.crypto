@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import ipaddress
 import json
 import re
 import time
@@ -20,12 +21,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
-
-
-try:
-    import ipaddress
-except ImportError:
-    pass
 
 
 def create_key_authorization(client, token):

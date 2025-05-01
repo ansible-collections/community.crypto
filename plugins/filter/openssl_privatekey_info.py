@@ -148,7 +148,6 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -165,11 +164,11 @@ def openssl_privatekey_info_filter(
     data, passphrase=None, return_private_key_data=False
 ):
     """Extract information from X.509 PEM certificate."""
-    if not isinstance(data, string_types):
+    if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
             f"The community.crypto.openssl_privatekey_info input must be a text type, not {type(data)}"
         )
-    if passphrase is not None and not isinstance(passphrase, string_types):
+    if passphrase is not None and not isinstance(passphrase, (str, bytes)):
         raise AnsibleFilterError(
             f"The passphrase option must be a text type, not {type(passphrase)}"
         )

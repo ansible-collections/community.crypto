@@ -8,6 +8,7 @@ from __future__ import annotations
 import base64
 import binascii
 import datetime
+import ipaddress
 import os
 import re
 import tempfile
@@ -31,12 +32,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     ensure_utc_timezone,
 )
-
-
-try:
-    import ipaddress
-except ImportError:
-    pass
 
 
 _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
