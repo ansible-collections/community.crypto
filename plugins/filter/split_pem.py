@@ -50,8 +50,7 @@ def split_pem_filter(data):
     """Split PEM file."""
     if not isinstance(data, string_types):
         raise AnsibleFilterError(
-            "The community.crypto.split_pem input must be a text type, not %s"
-            % type(data)
+            f"The community.crypto.split_pem input must be a text type, not {type(data)}"
         )
 
     data = to_text(data)

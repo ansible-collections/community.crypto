@@ -431,9 +431,7 @@ def main():
             with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(
-                msg="Error while reading certificate file from disk: {0}".format(e)
-            )
+            module.fail_json(msg=f"Error while reading certificate file from disk: {e}")
 
     backend, module_backend = select_backend(
         module, module.params["select_crypto_backend"], data
@@ -444,12 +442,10 @@ def main():
         for k, v in valid_at.items():
             if not isinstance(v, string_types):
                 module.fail_json(
-                    msg="The value for valid_at.{0} must be of type string (got {1})".format(
-                        k, type(v)
-                    )
+                    msg=f"The value for valid_at.{k} must be of type string (got {type(v)})"
                 )
             valid_at[k] = get_relative_time_option(
-                v, "valid_at.{0}".format(k), with_timezone=CRYPTOGRAPHY_TIMEZONE
+                v, f"valid_at.{k}", with_timezone=CRYPTOGRAPHY_TIMEZONE
             )
 
     try:

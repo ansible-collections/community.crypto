@@ -78,7 +78,7 @@ TEST_CASES = [
 @pytest.mark.parametrize("value, expected", TEST_CASES)
 def test_serialize_asn1_string_as_der(value, expected):
     actual = serialize_asn1_string_as_der(value)
-    print("%s | %s" % (value, base64.b16encode(actual).decode()))
+    print(f"{value} | {base64.b16encode(actual).decode()}")
     assert actual == expected
 
 
@@ -121,10 +121,8 @@ def test_test_cases(value, expected, tmp_path):
         b_data = fd.read()
 
     hex_str = base64.b16encode(b_data).decode().lower()
-    print(
-        "%s | \\x%s"
-        % (value, "\\x".join([hex_str[i : i + 2] for i in range(0, len(hex_str), 2)]))
-    )
+    value = "\\x".join([hex_str[i : i + 2] for i in range(0, len(hex_str), 2)])
+    print(f"{value} | \\x{value}")
 
     # This is a know edge case where openssl asn1parse does not work properly.
     if value != "UTF8:café":

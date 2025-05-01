@@ -144,7 +144,7 @@ def test_default_key_params(keytype, size, passphrase, comment):
         "ed25519": 256,
     }
 
-    default_comment = "%s@%s" % (getuser(), gethostname())
+    default_comment = f"{getuser()}@{gethostname()}"
     pair = OpensshKeypair.generate(
         keytype=keytype, size=size, passphrase=passphrase, comment=comment
     )

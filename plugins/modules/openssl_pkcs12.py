@@ -737,24 +737,20 @@ def select_backend(module, backend):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library cryptography (>= {0})"
-                ).format(
-                    MINIMAL_CRYPTOGRAPHY_VERSION,
-                )
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         return backend, PkcsCryptography(module)
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")
 
 
 def main():
@@ -812,8 +808,7 @@ def main():
     if not os.path.isdir(base_dir):
         module.fail_json(
             name=base_dir,
-            msg="The directory '%s' does not exist or the path is not a directory"
-            % base_dir,
+            msg=f"The directory '{base_dir}' does not exist or the path is not a directory",
         )
 
     try:
@@ -862,7 +857,7 @@ def main():
         result = pkcs12.dump()
         result["changed"] = changed
         if os.path.exists(module.params["path"]):
-            file_mode = "%04o" % stat.S_IMODE(os.stat(module.params["path"]).st_mode)
+            file_mode = f"{stat.S_IMODE(os.stat(module.params['path']).st_mode):04o}"
             result["mode"] = file_mode
 
         module.exit_json(**result)

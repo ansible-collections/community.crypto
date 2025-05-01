@@ -242,7 +242,7 @@ def cryptography_name_to_oid(name):
     if dotted is None:
         if DOTTED_OID.match(name):
             return x509.oid.ObjectIdentifier(name)
-        raise OpenSSLObjectError('Cannot find OID for "{0}"'.format(name))
+        raise OpenSSLObjectError(f'Cannot find OID for "{name}"')
     return x509.oid.ObjectIdentifier(dotted)
 
 
@@ -297,7 +297,7 @@ else:
 def _parse_dn_component(name, sep=b",", decode_remainder=True):
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
-        raise OpenSSLObjectError('cannot start part in "{0}"'.format(to_text(name)))
+        raise OpenSSLObjectError(f'cannot start part in "{to_text(name)}"')
     oid = cryptography_name_to_oid(to_text(m.group(1)))
     idx = len(m.group(0))
     decoded_name = []
@@ -314,7 +314,7 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
                 idx2 = DN_HEX_LETTER.find(ch2.lower())
                 if idx1 < 0 or idx2 < 0:
                     raise OpenSSLObjectError(
-                        'Invalid hex sequence entry "{0}"'.format(to_text(ch1 + ch2))
+                        f'Invalid hex sequence entry "{to_text(ch1 + ch2)}"'
                     )
                 idx += 2
                 decoded_name.append(_int_to_byte(idx1 * 16 + idx2))
@@ -333,17 +333,13 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
                     if idx1 >= 0:
                         if idx + 2 >= length:
                             raise OpenSSLObjectError(
-                                'Hex escape sequence "\\{0}" incomplete at end of string'.format(
-                                    to_text(ch)
-                                )
+                                f'Hex escape sequence "\\{to_text(ch)}" incomplete at end of string'
                             )
                         ch2 = name[idx + 2 : idx + 3]
                         idx2 = DN_HEX_LETTER.find(ch2.lower())
                         if idx2 < 0:
                             raise OpenSSLObjectError(
-                                'Hex escape sequence "\\{0}" has invalid second letter'.format(
-                                    to_text(ch + ch2)
-                                )
+                                f'Hex escape sequence "\\{to_text(ch + ch2)}" has invalid second letter'
                             )
                         ch = _int_to_byte(idx1 * 16 + idx2)
                         idx += 1
@@ -375,17 +371,13 @@ def _parse_dn(name):
             attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                'Error while parsing distinguished name "{0}": {1}'.format(
-                    to_text(original_name), e
-                )
+                f'Error while parsing distinguished name "{to_text(original_name)}": {e}'
             )
         result.append(attribute)
         if name:
             if name[0:1] != sep or len(name) < 2:
                 raise OpenSSLObjectError(
-                    'Error while parsing distinguished name "{0}": unexpected end of string'.format(
-                        to_text(original_name)
-                    )
+                    f'Error while parsing distinguished name "{to_text(original_name)}": unexpected end of string'
                 )
             name = name[1:]
     return result
@@ -398,9 +390,7 @@ def cryptography_parse_relative_distinguished_name(rdn):
             names.append(_parse_dn_component(to_bytes(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                'Error while parsing relative distinguished name "{0}": {1}'.format(
-                    part, e
-                )
+                f'Error while parsing relative distinguished name "{part}": {e}'
             )
     return cryptography.x509.RelativeDistinguishedName(names)
 
@@ -420,16 +410,14 @@ def _adjust_idn(value, idn_rewrite):
     if idn_rewrite == "idna" and _is_ascii(value):
         return value
     if idn_rewrite not in ("idna", "unicode"):
-        raise ValueError('Invalid value for idn_rewrite: "{0}"'.format(idn_rewrite))
+        raise ValueError(f'Invalid value for idn_rewrite: "{idn_rewrite}"')
     if not HAS_IDNA:
+        what = "IDNA" if idn_rewrite == "unicode" else "Unicode"
+        dest = "Unicode" if idn_rewrite == "unicode" else "IDNA"
         raise OpenSSLObjectError(
             missing_required_lib(
                 "idna",
-                reason='to transform {what} DNS name "{name}" to {dest}'.format(
-                    name=value,
-                    what="IDNA" if idn_rewrite == "unicode" else "Unicode",
-                    dest="Unicode" if idn_rewrite == "unicode" else "IDNA",
-                ),
+                reason=f'to transform {what} DNS name "{value}" to {dest}',
             )
         )
     # Since IDNA does not like '*' or empty labels (except one empty label at the end),
@@ -450,16 +438,11 @@ def _adjust_idn(value, idn_rewrite):
                 elif idn_rewrite == "unicode" and part.startswith("xn--"):
                     parts[index] = part.encode("ascii").decode("idna")
             except Exception as exc2003:
+                what = "IDNA" if idn_rewrite == "unicode" else "Unicode"
+                dest = "Unicode" if idn_rewrite == "unicode" else "IDNA"
                 raise OpenSSLObjectError(
-                    'Error while transforming part "{part}" of {what} DNS name "{name}" to {dest}.'
-                    ' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'.format(
-                        part=part,
-                        name=value,
-                        what="IDNA" if idn_rewrite == "unicode" else "Unicode",
-                        dest="Unicode" if idn_rewrite == "unicode" else "IDNA",
-                        exc2003=exc2003,
-                        exc2008=exc2008,
-                    )
+                    f'Error while transforming part "{part}" of {what} DNS name "{value}" to {dest}.'
+                    f' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'
                 )
     return ".".join(parts)
 
@@ -468,18 +451,18 @@ def _adjust_idn_email(value, idn_rewrite):
     idx = value.find("@")
     if idx < 0:
         return value
-    return "{0}@{1}".format(value[:idx], _adjust_idn(value[idx + 1 :], idn_rewrite))
+    return f"{value[:idx]}@{_adjust_idn(value[idx + 1:], idn_rewrite)}"
 
 
 def _adjust_idn_url(value, idn_rewrite):
     url = urlparse(value)
     host = _adjust_idn(url.hostname, idn_rewrite)
     if url.username is not None and url.password is not None:
-        host = "{0}:{1}@{2}".format(url.username, url.password, host)
+        host = f"{url.username}:{url.password}@{host}"
     elif url.username is not None:
-        host = "{0}@{1}".format(url.username, host)
+        host = f"{url.username}@{host}"
     if url.port is not None:
-        host = "{0}:{1}".format(host, url.port)
+        host = f"{host}:{url.port}"
     return urlunparse(
         ParseResult(
             scheme=url.scheme,
@@ -514,9 +497,7 @@ def cryptography_get_name(name, what="Subject Alternative Name"):
         if name.startswith("RID:"):
             m = re.match(r"^([0-9]+(?:\.[0-9]+)*)$", to_text(name[4:]))
             if not m:
-                raise OpenSSLObjectError(
-                    'Cannot parse {what} "{name}"'.format(name=name, what=what)
-                )
+                raise OpenSSLObjectError(f'Cannot parse {what} "{name}"')
             return x509.RegisteredID(x509.oid.ObjectIdentifier(m.group(1)))
         if name.startswith("otherName:"):
             # otherName can either be a raw ASN.1 hex string or in the format that OpenSSL works with.
@@ -534,9 +515,9 @@ def cryptography_get_name(name, what="Subject Alternative Name"):
             name = to_text(name[10:], errors="surrogate_or_strict")
             if ";" not in name:
                 raise OpenSSLObjectError(
-                    'Cannot parse {what} otherName "{name}", must be in the '
+                    f'Cannot parse {what} otherName "{name}", must be in the '
                     'format "otherName:<OID>;<ASN.1 OpenSSL Encoded String>" or '
-                    '"otherName:<OID>;<hex string>"'.format(name=name, what=what)
+                    '"otherName:<OID>;<hex string>"'
                 )
 
             oid, value = name.split(";", 1)
@@ -547,21 +528,13 @@ def cryptography_get_name(name, what="Subject Alternative Name"):
                 x509.Name(reversed(_parse_dn(to_bytes(name[8:]))))
             )
     except Exception as e:
-        raise OpenSSLObjectError(
-            'Cannot parse {what} "{name}": {error}'.format(
-                name=name, what=what, error=e
-            )
-        )
+        raise OpenSSLObjectError(f'Cannot parse {what} "{name}": {e}')
     if ":" not in name:
         raise OpenSSLObjectError(
-            'Cannot parse {what} "{name}" (forgot "DNS:" prefix?)'.format(
-                name=name, what=what
-            )
+            f'Cannot parse {what} "{name}" (forgot "DNS:" prefix?)'
         )
     raise OpenSSLObjectError(
-        'Cannot parse {what} "{name}" (potentially unsupported by cryptography backend)'.format(
-            name=name, what=what
-        )
+        f'Cannot parse {what} "{name}" (potentially unsupported by cryptography backend)'
     )
 
 
@@ -571,12 +544,12 @@ def _dn_escape_value(value):
     """
     value = value.replace("\\", "\\\\")
     for ch in [",", "+", "<", ">", ";", '"']:
-        value = value.replace(ch, "\\%s" % ch)
+        value = value.replace(ch, f"\\{ch}")
     value = value.replace("\0", "\\00")
     if value.startswith((" ", "#")):
-        value = "\\%s" % value[0] + value[1:]
+        value = f"\\{value[0]}{value[1:]}"
     if value.endswith(" "):
-        value = value[:-1] + "\\ "
+        value = f"{value[:-1]}\\ "
     return value
 
 
@@ -590,36 +563,29 @@ def cryptography_decode_name(name, idn_rewrite="ignore"):
             'idn_rewrite must be one of "ignore", "idna", or "unicode"'
         )
     if isinstance(name, x509.DNSName):
-        return "DNS:{0}".format(_adjust_idn(name.value, idn_rewrite))
+        return f"DNS:{_adjust_idn(name.value, idn_rewrite)}"
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
-            return "IP:{0}/{1}".format(
-                name.value.network_address.compressed, name.value.prefixlen
-            )
-        return "IP:{0}".format(name.value.compressed)
+            return f"IP:{name.value.network_address.compressed}/{name.value.prefixlen}"
+        return f"IP:{name.value.compressed}"
     if isinstance(name, x509.RFC822Name):
-        return "email:{0}".format(_adjust_idn_email(name.value, idn_rewrite))
+        return f"email:{_adjust_idn_email(name.value, idn_rewrite)}"
     if isinstance(name, x509.UniformResourceIdentifier):
-        return "URI:{0}".format(_adjust_idn_url(name.value, idn_rewrite))
+        return f"URI:{_adjust_idn_url(name.value, idn_rewrite)}"
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas
         return "dirName:" + ",".join(
             [
-                "{0}={1}".format(
-                    to_text(cryptography_oid_to_name(attribute.oid, short=True)),
-                    _dn_escape_value(attribute.value),
-                )
+                f"{to_text(cryptography_oid_to_name(attribute.oid, short=True))}={_dn_escape_value(attribute.value)}"
                 for attribute in reversed(list(name.value))
             ]
         )
     if isinstance(name, x509.RegisteredID):
-        return "RID:{0}".format(name.value.dotted_string)
+        return f"RID:{name.value.dotted_string}"
     if isinstance(name, x509.OtherName):
-        return "otherName:{0};{1}".format(
-            name.type_id.dotted_string, _get_hex(name.value)
-        )
-    raise OpenSSLObjectError('Cannot decode name "{0}"'.format(name))
+        return f"otherName:{name.type_id.dotted_string};{_get_hex(name.value)}"
+    raise OpenSSLObjectError(f'Cannot decode name "{name}"')
 
 
 def _cryptography_get_keyusage(usage):
@@ -645,7 +611,7 @@ def _cryptography_get_keyusage(usage):
         return "encipher_only"
     if usage in ("Decipher Only", "decipherOnly"):
         return "decipher_only"
-    raise OpenSSLObjectError('Unknown key usage "{0}"'.format(usage))
+    raise OpenSSLObjectError(f'Unknown key usage "{usage}"')
 
 
 def cryptography_parse_key_usage_params(usages):
@@ -685,9 +651,7 @@ def cryptography_get_basic_constraints(constraints):
                     ca = False
                 else:
                     raise OpenSSLObjectError(
-                        'Unknown basic constraint value "{0}" for CA'.format(
-                            constraint[3:]
-                        )
+                        f'Unknown basic constraint value "{constraint[3:]}" for CA'
                     )
             elif constraint.startswith("pathlen:"):
                 v = constraint[len("pathlen:") :]
@@ -695,12 +659,10 @@ def cryptography_get_basic_constraints(constraints):
                     path_length = int(v)
                 except Exception as e:
                     raise OpenSSLObjectError(
-                        'Cannot parse path length constraint "{0}" ({1})'.format(v, e)
+                        f'Cannot parse path length constraint "{v}" ({e})'
                     )
             else:
-                raise OpenSSLObjectError(
-                    'Unknown basic constraint "{0}"'.format(constraint)
-                )
+                raise OpenSSLObjectError(f'Unknown basic constraint "{constraint}"')
     return ca, path_length
 
 
@@ -958,7 +920,7 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
             signer_public_key.verify(signature, data)
             return True
         raise OpenSSLObjectError(
-            "Unsupported public key type {0}".format(type(signer_public_key))
+            f"Unsupported public key type {type(signer_public_key)}"
         )
     except InvalidSignature:
         return False

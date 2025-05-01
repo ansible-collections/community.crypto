@@ -161,9 +161,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 )
         except AttributeError:
             self.module.fail_json(
-                msg='Cryptography backend does not support the selected output format "{0}"'.format(
-                    self.format
-                )
+                msg=f'Cryptography backend does not support the selected output format "{self.format}"'
             )
 
         # Select key encryption
@@ -186,15 +184,11 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
             )
         except ValueError:
             self.module.fail_json(
-                msg='Cryptography backend cannot serialize the private key in the required format "{0}"'.format(
-                    self.format
-                )
+                msg=f'Cryptography backend cannot serialize the private key in the required format "{self.format}"'
             )
         except Exception:
             self.module.fail_json(
-                msg='Error while serializing the private key in the required format "{0}"'.format(
-                    self.format
-                ),
+                msg=f'Error while serializing the private key in the required format "{self.format}"',
                 exception=traceback.format_exc(),
             )
 
@@ -285,9 +279,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
 def select_backend(module):
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(
-            msg=missing_required_lib(
-                "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
-            ),
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
     return PrivateKeyConvertCryptographyBackend(module)

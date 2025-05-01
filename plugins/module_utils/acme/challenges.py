@@ -37,11 +37,11 @@ def create_key_authorization(client, token):
         client.account_jwk, sort_keys=True, separators=(",", ":")
     )
     thumbprint = nopad_b64(hashlib.sha256(accountkey_json.encode("utf8")).digest())
-    return "{0}.{1}".format(token, thumbprint)
+    return f"{token}.{thumbprint}"
 
 
 def combine_identifier(identifier_type, identifier):
-    return "{type}:{identifier}".format(type=identifier_type, identifier=identifier)
+    return f"{identifier_type}:{identifier}"
 
 
 def normalize_combined_identifier(identifier):
@@ -55,9 +55,7 @@ def split_identifier(identifier):
     parts = identifier.split(":", 1)
     if len(parts) != 2:
         raise ModuleFailException(
-            'Identifier "{identifier}" is not of the form <type>:<identifier>'.format(
-                identifier=identifier
-            )
+            f'Identifier "{identifier}" is not of the form <type>:<identifier>'
         )
     return parts
 
@@ -94,7 +92,7 @@ class Challenge:
         if self.type == "http-01":
             # https://tools.ietf.org/html/rfc8555#section-8.3
             return {
-                "resource": ".well-known/acme-challenge/{token}".format(token=token),
+                "resource": f".well-known/acme-challenge/{token}",
                 "resource_value": key_authorization,
             }
 
@@ -104,9 +102,7 @@ class Challenge:
             # https://tools.ietf.org/html/rfc8555#section-8.4
             resource = "_acme-challenge"
             value = nopad_b64(hashlib.sha256(to_bytes(key_authorization)).digest())
-            record = "{0}.{1}".format(
-                resource, identifier[2:] if identifier.startswith("*.") else identifier
-            )
+            record = f"{resource}.{identifier[2:] if identifier.startswith('*.') else identifier}"
             return {
                 "resource": resource,
                 "resource_value": value,
@@ -152,7 +148,7 @@ class Authorization:
         self.identifier = data["identifier"]["value"]
         self.identifier_type = data["identifier"]["type"]
         if data.get("wildcard", False):
-            self.identifier = "*.{0}".format(self.identifier)
+            self.identifier = f"*.{self.identifier}"
 
     def __init__(self, url):
         self.url = url
@@ -238,23 +234,17 @@ class Authorization:
         # details for all of them before failing
         for challenge in self.challenges:
             if challenge.status == "invalid":
-                msg = "Challenge {type}".format(type=challenge.type)
+                msg = f"Challenge {challenge.type}"
                 if "error" in challenge.data:
-                    msg = "{msg}: {problem}".format(
-                        msg=msg,
-                        problem=format_error_problem(
-                            challenge.data["error"],
-                            subproblem_prefix="{0}.".format(challenge.type),
-                        ),
+                    problem = format_error_problem(
+                        challenge.data["error"],
+                        subproblem_prefix=f"{challenge.type}.",
                     )
+                    msg = f"{msg}: {problem}"
                 error_details.append(msg)
         raise ACMEProtocolException(
             module,
-            "Failed to validate challenge for {identifier}: {error}. {details}".format(
-                identifier=self.combined_identifier,
-                error=error_msg,
-                details="; ".join(error_details),
-            ),
+            f"Failed to validate challenge for {self.combined_identifier}: {error_msg}. {'; '.join(error_details)}",
             extras=dict(
                 identifier=self.combined_identifier,
                 authorization=self.data,
@@ -287,10 +277,7 @@ class Authorization:
         challenge = self.find_challenge(challenge_type)
         if challenge is None:
             raise ModuleFailException(
-                'Found no challenge of type "{challenge}" for identifier {identifier}!'.format(
-                    challenge=challenge_type,
-                    identifier=self.combined_identifier,
-                )
+                f'Found no challenge of type "{challenge_type}" for identifier {self.combined_identifier}!'
             )
 
         challenge.call_validate(client)

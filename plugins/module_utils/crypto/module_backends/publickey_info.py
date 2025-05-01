@@ -84,7 +84,7 @@ def _get_cryptography_public_key_info(key):
         key_public_data["y"] = public_numbers.y
         key_public_data["exponent_size"] = key.curve.key_size
     else:
-        key_type = "unknown ({0})".format(type(key))
+        key_type = f"unknown ({type(key)})"
     return key_type, key_public_data
 
 
@@ -174,17 +174,14 @@ def select_backend(module, backend, content=None, key=None):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect any of the required Python libraries "
-                    "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
@@ -192,4 +189,4 @@ def select_backend(module, backend, content=None, key=None):
             module, content=content, key=key
         )
     else:
-        raise ValueError("Unsupported value for backend: {0}".format(backend))
+        raise ValueError(f"Unsupported value for backend: {backend}")

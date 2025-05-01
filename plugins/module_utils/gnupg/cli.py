@@ -39,19 +39,15 @@ def get_fingerprint_from_stdout(stdout):
             parts = line.split(":")
             if len(parts) <= 9 or not parts[9]:
                 raise GPGError(
-                    'Result line "{line}" does not have fingerprint as 10th component'.format(
-                        line=line
-                    )
+                    f'Result line "{line}" does not have fingerprint as 10th component'
                 )
             return parts[9]
-    raise GPGError(
-        'Cannot extract fingerprint from stdout "{stdout}"'.format(stdout=stdout)
-    )
+    raise GPGError(f'Cannot extract fingerprint from stdout "{stdout}"')
 
 
 def get_fingerprint_from_file(gpg_runner, path):
     if not os.path.exists(path):
-        raise GPGError("{path} does not exist".format(path=path))
+        raise GPGError(f"{path} does not exist")
     stdout = gpg_runner.run_command(
         [
             "--no-keyring",

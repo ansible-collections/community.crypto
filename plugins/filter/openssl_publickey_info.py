@@ -142,8 +142,7 @@ def openssl_publickey_info_filter(data):
     """Extract information from OpenSSL PEM public key."""
     if not isinstance(data, string_types):
         raise AnsibleFilterError(
-            "The community.crypto.openssl_publickey_info input must be a text type, not %s"
-            % type(data)
+            f"The community.crypto.openssl_publickey_info input must be a text type, not {type(data)}"
         )
 
     module = FilterModuleMock({})

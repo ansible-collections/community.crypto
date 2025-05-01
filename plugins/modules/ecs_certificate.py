@@ -665,16 +665,12 @@ class EcsCertificate:
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(
-                msg="Failed to initialize Entrust Provider: {0}".format(to_native(e))
-            )
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
             self.ecs_client.GetAppVersion()
         except RestOperationException as e:
             module.fail_json(
-                msg="Please verify credential information. Received exception when testing ECS connection: {0}".format(
-                    to_native(e.message)
-                )
+                msg=f"Please verify credential information. Received exception when testing ECS connection: {e.message}"
             )
 
     # Conversion of the fields that go into the 'tracking' parameter of the request object
@@ -744,7 +740,7 @@ class EcsCertificate:
         try:
             # Use serial_number to identify if certificate is an Entrust Certificate
             # with an associated tracking ID
-            serial_number = "{0:X}".format(self.cert.serial_number)
+            serial_number = f"{self.cert.serial_number:X}"
             cert_results = self.ecs_client.GetCertificates(
                 serialNumber=serial_number
             ).get("certificates", {})
@@ -764,9 +760,7 @@ class EcsCertificate:
             self.cert_days = calculate_cert_days(self.cert_details.get("expiresAfter"))
         except RestOperationException as e:
             module.fail_json(
-                'Failed to get details of certificate with tracking_id="{0}", Error: '.format(
-                    self.tracking_id
-                ),
+                f'Failed to get details of certificate with tracking_id="{self.tracking_id}", Error: ',
                 to_native(e.message),
             )
 
@@ -782,10 +776,9 @@ class EcsCertificate:
                 and module.params["tracking_id"] != self.tracking_id
             ):
                 module.warn(
-                    'tracking_id parameter of "{0}" provided, but will be ignored. Valid certificate was present in path "{1}" with '
-                    'tracking_id of "{2}".'.format(
-                        module.params["tracking_id"], self.path, self.tracking_id
-                    )
+                    f'tracking_id parameter of "{module.params["tracking_id"]}" provided, but will be ignored.'
+                    f' Valid certificate was present in path "{self.path}" with '
+                    f'tracking_id of "{self.tracking_id}".'
                 )
 
         # If we did not end up setting tracking_id based on existing cert, get from module params
@@ -822,10 +815,10 @@ class EcsCertificate:
             # We will be performing a reissue operation.
             if self.request_type != "new" and not self.tracking_id:
                 module.warn(
-                    'No existing Entrust certificate found in path={0} and no tracking_id was provided, setting request_type to "new" for this task'
-                    "run. Future playbook runs that point to the pathination file in {1} will use request_type={2}".format(
-                        self.path, self.path, self.request_type
-                    )
+                    f"No existing Entrust certificate found in path={self.path}"
+                    ' and no tracking_id was provided, setting request_type to "new" for this task'
+                    "run. Future playbook runs that point to the pathination file"
+                    f" in {self.path} will use request_type={self.request_type}"
                 )
                 self.request_type = "new"
             elif self.request_type == "new" and self.tracking_id:
@@ -860,9 +853,7 @@ class EcsCertificate:
                     self.set_cert_details(module)
                 except RestOperationException as e:
                     module.fail_json(
-                        msg="Failed to request new certificate from Entrust (ECS) {0}".format(
-                            e.message
-                        )
+                        msg=f"Failed to request new certificate from Entrust (ECS) {e.message}"
                     )
 
                 if self.request_type != "validate_only":
@@ -1020,9 +1011,7 @@ def main():
         MINIMAL_CRYPTOGRAPHY_VERSION
     ):
         module.fail_json(
-            msg=missing_required_lib(
-                "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
-            ),
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 
@@ -1033,9 +1022,7 @@ def main():
             or module.params["request_type"] == "validate_only"
         ):
             module.fail_json(
-                msg='The tracking_id field is invalid when request_type="{0}".'.format(
-                    module.params["request_type"]
-                )
+                msg=f'The tracking_id field is invalid when request_type="{module.params["request_type"]}".'
             )
 
     # A reissued request can not specify an expiration date or lifetime
@@ -1053,15 +1040,12 @@ def main():
         module_params_csr = module.params["csr"]
         if module_params_csr is None:
             module.fail_json(
-                msg="The csr field is required when request_type={0}".format(
-                    module.params["request_type"]
-                )
+                msg=f"The csr field is required when request_type={module.params['request_type']}"
             )
         elif not os.path.exists(module_params_csr):
             module.fail_json(
-                msg="The csr field of {0} was not a valid path. csr is required when request_type={1}".format(
-                    module_params_csr, module.params["request_type"]
-                )
+                msg=f"The csr field of {module_params_csr} was not a valid path."
+                f" csr is required when request_type={module.params['request_type']}"
             )
 
     if module.params["ou"] and len(module.params["ou"]) > 1:
@@ -1088,9 +1072,7 @@ def main():
     if module.params["cert_expiry"]:
         if not validate_cert_expiry(module.params["cert_expiry"]):
             module.fail_json(
-                msg='The "cert_expiry" parameter of "{0}" is not a valid date or date-time'.format(
-                    module.params["cert_expiry"]
-                )
+                msg=f'The "cert_expiry" parameter of "{module.params["cert_expiry"]}" is not a valid date or date-time'
             )
 
     certificate = EcsCertificate(module)

@@ -163,7 +163,7 @@ class CertificateSigningRequestBackend:
         if not self.subjectAltName and module.params["use_common_name_for_san"]:
             for sub in self.subject:
                 if sub[0] in ("commonName", "CN"):
-                    self.subjectAltName = ["DNS:%s" % sub[1]]
+                    self.subjectAltName = [f"DNS:{sub[1]}"]
                     self.using_common_name_for_san = True
                     break
 
@@ -174,7 +174,7 @@ class CertificateSigningRequestBackend:
                 )
             except Exception as e:
                 raise CertificateSigningRequestError(
-                    "Cannot parse subject_key_identifier: {0}".format(e)
+                    f"Cannot parse subject_key_identifier: {e}"
                 )
 
         if self.authority_key_identifier is not None:
@@ -184,7 +184,7 @@ class CertificateSigningRequestBackend:
                 )
             except Exception as e:
                 raise CertificateSigningRequestError(
-                    "Cannot parse authority_key_identifier: {0}".format(e)
+                    f"Cannot parse authority_key_identifier: {e}"
                 )
 
         self.existing_csr = None
@@ -337,9 +337,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
             result.append(cryptography.x509.DistributionPoint(**params))
         except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError(
-                "Error while parsing CRL distribution point #{index}: {error}".format(
-                    index=index, error=e
-                )
+                f"Error while parsing CRL distribution point #{index}: {e}"
             )
     return result
 
@@ -446,9 +444,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     critical=self.name_constraints_critical,
                 )
             except TypeError as e:
-                raise OpenSSLObjectError(
-                    "Error while parsing name constraint: {0}".format(e)
-                )
+                raise OpenSSLObjectError(f"Error while parsing name constraint: {e}")
 
         if self.create_subject_key_identifier:
             csr = csr.add_extension(
@@ -494,7 +490,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             digest = select_message_digest(self.digest)
             if digest is None:
                 raise CertificateSigningRequestError(
-                    'Unsupported digest "{0}"'.format(self.digest)
+                    f'Unsupported digest "{self.digest}"'
                 )
         try:
             self.csr = csr.sign(self.privatekey, digest, self.cryptography_backend)
@@ -518,7 +514,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             # https://github.com/kjd/idna/commit/ebefacd3134d0f5da4745878620a6a1cba86d130
             # and then
             # https://github.com/kjd/idna/commit/ea03c7b5db7d2a99af082e0239da2b68aeea702a).
-            msg = "Error while creating CSR: {0}\n".format(e)
+            msg = f"Error while creating CSR: {e}\n"
             if self.using_common_name_for_san:
                 self.module.fail_json(
                     msg=msg
@@ -813,23 +809,20 @@ def select_backend(module, backend):
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect any of the required Python libraries "
-                    "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
     if backend == "cryptography":
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
         return backend, CertificateSigningRequestCryptographyBackend(module)
     else:
-        raise Exception("Unsupported value for backend: {0}".format(backend))
+        raise Exception(f"Unsupported value for backend: {backend}")
 
 
 def get_csr_argument_spec():

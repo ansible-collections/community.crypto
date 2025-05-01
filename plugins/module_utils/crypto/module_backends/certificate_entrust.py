@@ -56,9 +56,7 @@ class EntrustCertificateBackend(CertificateBackend):
             )
         if self.csr_content is None and not os.path.exists(self.csr_path):
             raise CertificateError(
-                "The certificate signing request file {0} does not exist".format(
-                    self.csr_path
-                )
+                f"The certificate signing request file {self.csr_path} does not exist"
             )
 
         self._ensure_csr_loaded()
@@ -77,7 +75,7 @@ class EntrustCertificateBackend(CertificateBackend):
                 self.module.fail_json(
                     msg=(
                         "Entrust provider does not currently support multiple validated organizations. Multiple organizations found in "
-                        "Subject DN: '{0}'. ".format(self.csr.subject)
+                        f"Subject DN: '{self.csr.subject}'. "
                     )
                 )
         # If no organization in the CSR, explicitly tell ECS that it should be blank in issued cert, not defaulted to
@@ -98,11 +96,7 @@ class EntrustCertificateBackend(CertificateBackend):
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(
-                msg="Failed to initialize Entrust Provider: {0}".format(
-                    to_native(e.message)
-                )
-            )
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e.message}")
 
     def generate_certificate(self):
         """(Re-)Generate certificate."""
@@ -138,9 +132,7 @@ class EntrustCertificateBackend(CertificateBackend):
             self.trackingId = result.get("trackingId")
         except RestOperationException as e:
             self.module.fail_json(
-                msg="Failed to request new certificate from Entrust Certificate Services (ECS): {0}".format(
-                    to_native(e.message)
-                )
+                msg=f"Failed to request new certificate from Entrust Certificate Services (ECS): {e.message}"
             )
 
         self.cert_bytes = to_bytes(result.get("endEntityCert"))
@@ -159,9 +151,7 @@ class EntrustCertificateBackend(CertificateBackend):
             cert_details = self._get_cert_details()
         except RestOperationException as e:
             self.module.fail_json(
-                msg="Failed to get status of existing certificate from Entrust Certificate Services (ECS): {0}.".format(
-                    to_native(e.message)
-                )
+                msg=f"Failed to get status of existing certificate from Entrust Certificate Services (ECS): {e.message}."
             )
 
         # Always issue a new certificate if the certificate is expired, suspended or revoked
@@ -189,8 +179,8 @@ class EntrustCertificateBackend(CertificateBackend):
             serial_number = None
             expiry = None
             if self.backend == "cryptography":
-                serial_number = "{0:X}".format(
-                    cryptography_serial_number_of_cert(self.existing_certificate)
+                serial_number = (
+                    f"{cryptography_serial_number_of_cert(self.existing_certificate):X}"
                 )
                 expiry = get_not_valid_after(self.existing_certificate)
 

@@ -44,7 +44,7 @@ _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTY
 
 def _extract_date(out_text, name, cert_filename_suffix=""):
     try:
-        date_str = re.search(r"\s+%s\s*:\s+(.*)" % name, out_text).group(1)
+        date_str = re.search(rf"\s+{name}\s*:\s+(.*)", out_text).group(1)
         # For some reason Python's strptime() does not return any timezone information,
         # even though the information is there and a supported timezone for all supported
         # Python implementations (GMT). So we have to modify the datetime object by
@@ -53,12 +53,10 @@ def _extract_date(out_text, name, cert_filename_suffix=""):
             datetime.datetime.strptime(date_str, "%b %d %H:%M:%S %Y %Z")
         )
     except AttributeError:
-        raise BackendException(
-            "No '{0}' date found{1}".format(name, cert_filename_suffix)
-        )
+        raise BackendException(f"No '{name}' date found{cert_filename_suffix}")
     except ValueError as exc:
         raise BackendException(
-            "Failed to parse '{0}' date{1}: {2}".format(name, cert_filename_suffix, exc)
+            f"Failed to parse '{name}' date{cert_filename_suffix}: {exc}"
         )
 
 
@@ -67,20 +65,18 @@ def _decode_octets(octets_text):
 
 
 def _extract_octets(out_text, name, required=True, potential_prefixes=None):
-    regexp = r"\s+%s:\s*\n\s+%s([A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2})*)\s*\n" % (
-        name,
-        (
-            ("(?:%s)" % "|".join(re.escape(pp) for pp in potential_prefixes))
-            if potential_prefixes
-            else ""
-        ),
+    part = (
+        f"(?:{'|'.join(re.escape(pp) for pp in potential_prefixes)})"
+        if potential_prefixes
+        else ""
     )
+    regexp = rf"\s+{name}:\s*\n\s+{part}([A-Fa-f0-9]{{2}}(?::[A-Fa-f0-9]{{2}})*)\s*\n"
     match = re.search(regexp, out_text, re.MULTILINE | re.DOTALL)
     if match is not None:
         return _decode_octets(match.group(1))
     if not required:
         return None
-    raise BackendException("No '{0}' octet string found".format(name))
+    raise BackendException(f"No '{name}' octet string found")
 
 
 class OpenSSLCLIBackend(CryptoBackend):
@@ -111,7 +107,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 except Exception:
                     pass
                 raise KeyParsingError(
-                    "failed to create temporary content file: %s" % to_native(err),
+                    f"failed to create temporary content file: {err}",
                     exception=traceback.format_exc(),
                 )
             f.close()
@@ -132,7 +128,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             # FIXME: add some kind of auto-detection
             account_key_type = "rsa"
         if account_key_type not in ("rsa", "ec"):
-            raise KeyParsingError('unknown key type "%s"' % account_key_type)
+            raise KeyParsingError(f'unknown key type "{account_key_type}"')
 
         openssl_keydump_cmd = [
             self.openssl_binary,
@@ -149,9 +145,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                "Error while running {cmd}: {stderr}".format(
-                    cmd=" ".join(openssl_keydump_cmd), stderr=to_text(err)
-                )
+                f"Error while running {' '.join(openssl_keydump_cmd)}: {to_text(err)}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")
@@ -166,9 +160,9 @@ class OpenSSLCLIBackend(CryptoBackend):
             pub_exp = re.search(
                 r"\npublicExponent: ([0-9]+)", out_text, re.MULTILINE | re.DOTALL
             ).group(1)
-            pub_exp = "{0:x}".format(int(pub_exp))
+            pub_exp = f"{int(pub_exp):x}"
             if len(pub_exp) % 2:
-                pub_exp = "0{0}".format(pub_exp)
+                pub_exp = f"0{pub_exp}"
 
             return {
                 "key_file": key_file,
@@ -214,12 +208,12 @@ class OpenSSLCLIBackend(CryptoBackend):
                 curve = "P-521"
             else:
                 raise KeyParsingError(
-                    "unknown elliptic curve: %s / %s" % (asn1_oid_curve, nist_curve)
+                    f"unknown elliptic curve: {asn1_oid_curve} / {nist_curve}"
                 )
             num_bytes = (bits + 7) // 8
             if len(pub_hex) != 2 * num_bytes:
                 raise KeyParsingError(
-                    "bad elliptic curve point (%s / %s)" % (asn1_oid_curve, nist_curve)
+                    f"bad elliptic curve point ({asn1_oid_curve} / {nist_curve})"
                 )
             return {
                 "key_file": key_file,
@@ -236,7 +230,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             }
 
     def sign(self, payload64, protected64, key_data):
-        sign_payload = "{0}.{1}".format(protected64, payload64).encode("utf8")
+        sign_payload = f"{protected64}.{payload64}".encode("utf8")
         if key_data["type"] == "hmac":
             hex_key = to_native(
                 binascii.hexlify(base64.urlsafe_b64decode(key_data["jwk"]["k"]))
@@ -245,7 +239,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 "-mac",
                 "hmac",
                 "-macopt",
-                "hexkey:{0}".format(hex_key),
+                f"hexkey:{hex_key}",
                 "-binary",
             ]
         else:
@@ -253,7 +247,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         openssl_sign_cmd = [
             self.openssl_binary,
             "dgst",
-            "-{0}".format(key_data["hash"]),
+            f"-{key_data['hash']}",
         ] + cmd_postfix
 
         rc, out, err = self.module.run_command(
@@ -265,9 +259,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                "Error while running {cmd}: {stderr}".format(
-                    cmd=" ".join(openssl_sign_cmd), stderr=to_text(err)
-                )
+                f"Error while running {' '.join(openssl_sign_cmd)}: {to_text(err)}"
             )
 
         if key_data["type"] == "ec":
@@ -279,14 +271,13 @@ class OpenSSLCLIBackend(CryptoBackend):
             )
             expected_len = 2 * key_data["point_size"]
             sig = re.findall(
-                r"prim:\s+INTEGER\s+:([0-9A-F]{1,%s})\n" % expected_len,
+                rf"prim:\s+INTEGER\s+:([0-9A-F]{{1,{expected_len}}})\n",
                 to_text(der_out, errors="surrogate_or_strict"),
             )
             if len(sig) != 2:
+                der_output = to_text(der_out, errors="surrogate_or_strict")
                 raise BackendException(
-                    "failed to generate Elliptic Curve signature; cannot parse DER output: {0}".format(
-                        to_text(der_out, errors="surrogate_or_strict")
-                    )
+                    f"failed to generate Elliptic Curve signature; cannot parse DER output: {der_output}"
                 )
             sig[0] = (expected_len - len(sig[0])) * "0" + sig[0]
             sig[1] = (expected_len - len(sig[1])) * "0" + sig[1]
@@ -311,14 +302,12 @@ class OpenSSLCLIBackend(CryptoBackend):
             hashbytes = 64
         else:
             raise BackendException(
-                "Unsupported MAC key algorithm for OpenSSL backend: {0}".format(alg)
+                f"Unsupported MAC key algorithm for OpenSSL backend: {alg}"
             )
         key_bytes = base64.urlsafe_b64decode(key)
         if len(key_bytes) < hashbytes:
             raise BackendException(
-                "{0} key must be at least {1} bytes long (after Base64 decoding)".format(
-                    alg, hashbytes
-                )
+                f"{alg} key must be at least {hashbytes} bytes long (after Base64 decoding)"
             )
         return {
             "type": "hmac",
@@ -370,9 +359,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                "Error while running {cmd}: {stderr}".format(
-                    cmd=" ".join(openssl_csr_cmd), stderr=to_text(err)
-                )
+                f"Error while running {' '.join(openssl_csr_cmd)}: {to_text(err)}"
             )
 
         identifiers = set()
@@ -404,9 +391,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 elif san.lower().startswith("ip address:"):
                     add_identifier(("ip", self._normalize_ip(san[11:])))
                 else:
-                    raise BackendException(
-                        'Found unsupported SAN identifier "{0}"'.format(san)
-                    )
+                    raise BackendException(f'Found unsupported SAN identifier "{san}"')
         return result
 
     def get_csr_identifiers(self, csr_filename=None, csr_content=None):
@@ -438,7 +423,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         elif cert_filename is not None:
             if not os.path.exists(cert_filename):
                 return -1
-            cert_filename_suffix = " in {0}".format(cert_filename)
+            cert_filename_suffix = f" in {cert_filename}"
         else:
             return -1
 
@@ -459,9 +444,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                "Error while running {cmd}: {stderr}".format(
-                    cmd=" ".join(openssl_cert_cmd), stderr=to_text(err)
-                )
+                f"Error while running {' '.join(openssl_cert_cmd)}: {to_text(err)}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")
@@ -489,7 +472,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         filename = cert_filename
         data = None
         if cert_filename is not None:
-            cert_filename_suffix = " in {0}".format(cert_filename)
+            cert_filename_suffix = f" in {cert_filename}"
         else:
             filename = "/dev/stdin"
             data = to_bytes(cert_content)
@@ -512,9 +495,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                "Error while running {cmd}: {stderr}".format(
-                    cmd=" ".join(openssl_cert_cmd), stderr=to_text(err)
-                )
+                f"Error while running {' '.join(openssl_cert_cmd)}: {to_text(err)}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")

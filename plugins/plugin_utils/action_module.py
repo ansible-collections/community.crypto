@@ -99,9 +99,7 @@ class AnsibleActionModule:
             # Before ansible-core 2.14.2, deprecations were always for aliases:
             if "name" in d:
                 self.deprecate(
-                    "Alias '{name}' is deprecated. See the module docs for more information".format(
-                        name=d["name"]
-                    ),
+                    f"Alias '{d['name']}' is deprecated. See the module docs for more information",
                     version=d.get("version"),
                     date=d.get("date"),
                     collection_name=d.get("collection_name"),
@@ -116,19 +114,13 @@ class AnsibleActionModule:
                 )
 
         for w in self._validation_result._warnings:
-            self.warn(
-                "Both option {option} and its alias {alias} are set.".format(
-                    option=w["option"], alias=w["alias"]
-                )
-            )
+            self.warn(f"Both option {w['option']} and its alias {w['alias']} are set.")
 
         # Fail for validation errors, even in check mode
         if error:
             msg = self._validation_result.errors.msg
             if isinstance(error, UnsupportedError):
-                msg = "Unsupported parameters for ({name}) {kind}: {msg}".format(
-                    name=self._name, kind="module", msg=msg
-                )
+                msg = f"Unsupported parameters for ({self._name}) module: {msg}"
 
             self.fail_json(msg=msg)
 
@@ -140,7 +132,7 @@ class AnsibleActionModule:
         if isinstance(warning, string_types):
             self.__warnings.append(warning)
         else:
-            raise TypeError("warn requires a string not a %s" % type(warning))
+            raise TypeError(f"warn requires a string not a {type(warning)}")
 
     def deprecate(self, msg, version=None, date=None, collection_name=None):
         if version is not None and date is not None:
@@ -161,7 +153,7 @@ class AnsibleActionModule:
                     {"msg": msg, "version": version, "collection_name": collection_name}
                 )
         else:
-            raise TypeError("deprecate requires a string not a %s" % type(msg))
+            raise TypeError(f"deprecate requires a string not a {type(msg)}")
 
     def _return_formatted(self, kwargs):
         if "invocation" not in kwargs:

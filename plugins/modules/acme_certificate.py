@@ -643,9 +643,7 @@ class ACMECertificateClient:
                     )
                 except ValueError as exc:
                     self.module.warn(
-                        "Error while parsing criterium: {error}. Ignoring criterium.".format(
-                            error=exc
-                        )
+                        f"Error while parsing criterium: {exc}. Ignoring criterium."
                     )
 
         if self.profile is not None:
@@ -654,9 +652,7 @@ class ACMECertificateClient:
                 raise ModuleFailException(msg="The ACME CA does not support profiles.")
             if self.profile not in meta_profiles:
                 raise ModuleFailException(
-                    msg="The ACME CA does not support selected profile {0!r}.".format(
-                        self.profile
-                    )
+                    msg=f"The ACME CA does not support selected profile {self.profile!r}."
                 )
 
         # Make sure account exists
@@ -678,7 +674,7 @@ class ACMECertificateClient:
         self.changed = created or updated
 
         if self.csr is not None and not os.path.exists(self.csr):
-            raise ModuleFailException("CSR %s not found" % (self.csr))
+            raise ModuleFailException(f"CSR {self.csr} not found")
 
         # Extract list of identifiers from CSR
         self.identifiers = self.client.backend.get_ordered_csr_identifiers(
@@ -758,9 +754,7 @@ class ACMECertificateClient:
                 and self.challenge not in data[authz.identifier]
             ):
                 raise ModuleFailException(
-                    "Found no challenge of type '{0}' for identifier {1}!".format(
-                        self.challenge, type_identifier
-                    )
+                    f"Found no challenge of type '{self.challenge}' for identifier {type_identifier}!"
                 )
         # Get DNS challenge data
         data_dns = {}
@@ -812,9 +806,7 @@ class ACMECertificateClient:
                 alt_cert = CertificateChain.download(self.client, alternate)
             except ModuleFailException as e:
                 self.module.warn(
-                    "Error while downloading alternative certificate {0}: {1}".format(
-                        alternate, e
-                    )
+                    f"Error while downloading alternative certificate {alternate}: {e}"
                 )
                 continue
             alternate_chains.append(alt_cert)
@@ -825,7 +817,7 @@ class ACMECertificateClient:
             for chain in chains:
                 if matcher.match(chain):
                     self.module.debug(
-                        "Found matching chain for criterium {0}".format(criterium_idx)
+                        f"Found matching chain for criterium {criterium_idx}"
                     )
                     return chain
         return None
@@ -844,13 +836,11 @@ class ACMECertificateClient:
             )
             if authz is None:
                 raise ModuleFailException(
-                    'Found no authorization information for "{identifier}"!'.format(
-                        identifier=combine_identifier(identifier_type, identifier)
-                    )
+                    f'Found no authorization information for "{combine_identifier(identifier_type, identifier)}"!'
                 )
             if authz.status != "valid":
                 authz.raise_error(
-                    'Status is "{status}" and not "valid"'.format(status=authz.status),
+                    f'Status is "{authz.status}" and not "valid"',
                     module=self.module,
                 )
 
@@ -911,7 +901,7 @@ class ACMECertificateClient:
                 pass
             if authz.status != "deactivated":
                 self.module.warn(
-                    warning="Could not deactivate authz object {0}.".format(authz.url)
+                    warning=f"Could not deactivate authz object {authz.url}."
                 )
 
 

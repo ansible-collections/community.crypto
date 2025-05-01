@@ -44,12 +44,9 @@ class PluginGPGRunner(GPGRunner):
         stdout = to_native(stdout, errors="surrogate_or_replace")
         stderr = to_native(stderr, errors="surrogate_or_replace")
         if check_rc and p.returncode != 0:
+            stdout_n = (to_native(stdout, errors="surrogate_or_replace"),)
+            stderr_n = (to_native(stderr, errors="surrogate_or_replace"),)
             raise GPGError(
-                'Running {cmd} yielded return code {rc} with stdout: "{stdout}" and stderr: "{stderr}")'.format(
-                    cmd=" ".join(command),
-                    rc=p.returncode,
-                    stdout=to_native(stdout, errors="surrogate_or_replace"),
-                    stderr=to_native(stderr, errors="surrogate_or_replace"),
-                )
+                f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'
             )
         return p.returncode, stdout, stderr

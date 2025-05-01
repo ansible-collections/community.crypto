@@ -73,7 +73,7 @@ class OpensshModule:
             self._execute()
         except Exception as e:
             self.module.fail_json(
-                msg="unexpected error occurred: %s" % to_native(e),
+                msg=f"unexpected error occurred: {to_native(e)}",
                 exception=traceback.format_exc(),
             )
 
@@ -125,8 +125,7 @@ class OpensshModule:
         if not os.path.isdir(base_dir):
             self.module.fail_json(
                 name=base_dir,
-                msg="The directory %s does not exist or the file is not a directory"
-                % base_dir,
+                msg=f"The directory {base_dir} does not exist or the file is not a directory",
             )
 
     def _get_ssh_version(self):
@@ -253,8 +252,7 @@ class KeygenCommand:
                 os.chmod(private_key_path, stat.S_IWUSR + stat.S_IRUSR)
             except (IOError, OSError) as e:
                 raise e(
-                    "The private key at %s is not writeable preventing a comment update"
-                    % private_key_path
+                    f"The private key at {private_key_path} is not writeable preventing a comment update"
                 )
 
         command = [self._bin_path, "-q"]
@@ -332,7 +330,7 @@ class PublicKey:
         return not self == other
 
     def __str__(self):
-        return "%s %s" % (self._type_string, self._data)
+        return f"{self._type_string} {self._data}"
 
     @property
     def comment(self):

@@ -341,9 +341,7 @@ def main():
             with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(
-                msg="Error while reading CSR file from disk: {0}".format(e)
-            )
+            module.fail_json(msg=f"Error while reading CSR file from disk: {e}")
 
     backend, module_backend = select_backend(
         module, module.params["select_crypto_backend"], data, validate_signature=True

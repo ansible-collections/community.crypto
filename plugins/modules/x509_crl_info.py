@@ -207,18 +207,14 @@ def main():
             with open(module.params["path"], "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
-            module.fail_json(
-                msg="Error while reading CRL file from disk: {0}".format(e)
-            )
+            module.fail_json(msg=f"Error while reading CRL file from disk: {e}")
     else:
         data = module.params["content"].encode("utf-8")
         if not identify_pem_format(data):
             try:
                 data = base64.b64decode(module.params["content"])
             except (binascii.Error, TypeError) as e:
-                module.fail_json(
-                    msg="Error while Base64 decoding content: {0}".format(e)
-                )
+                module.fail_json(msg=f"Error while Base64 decoding content: {e}")
 
     try:
         result = get_crl_info(

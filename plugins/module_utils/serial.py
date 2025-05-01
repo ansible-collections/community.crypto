@@ -37,9 +37,7 @@ def parse_serial(value):
                 raise ValueError("the value is not in range [0, 255]")
         except ValueError as exc:
             raise ValueError(
-                "The {idx}{th} part {part!r} is not a hexadecimal number in range [0, 255]: {exc}".format(
-                    idx=i + 1, th=th(i + 1), part=part, exc=exc
-                )
+                f"The {i + 1}{th(i + 1)} part {part!r} is not a hexadecimal number in range [0, 255]: {exc}"
             )
         result = (result << 8) | part_value
     return result

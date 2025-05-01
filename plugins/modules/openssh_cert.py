@@ -360,7 +360,7 @@ class Certificate(OpensshModule):
         elif LooseVersion(ssh_version) < LooseVersion("7.6"):
             self.module.fail_json(
                 msg="Signing with CA key in ssh agent requires ssh 7.6 or newer."
-                + " Your version is: %s" % ssh_version
+                + f" Your version is: {ssh_version}"
             )
 
     def _exists(self):
@@ -371,10 +371,8 @@ class Certificate(OpensshModule):
             self.original_data = OpensshCertificate.load(self.path)
         except (TypeError, ValueError) as e:
             if self.regenerate in ("never", "fail"):
-                self.module.fail_json(
-                    msg="Unable to read existing certificate: %s" % to_native(e)
-                )
-            self.module.warn("Unable to read existing certificate: %s" % to_native(e))
+                self.module.fail_json(msg=f"Unable to read existing certificate: {e}")
+            self.module.warn(f"Unable to read existing certificate: {e}")
 
     def _set_time_parameters(self):
         try:
@@ -486,15 +484,13 @@ class Certificate(OpensshModule):
             self._safe_secure_move([(temp_certificate, self.path)])
         except OSError as e:
             self.module.fail_json(
-                msg="Unable to write certificate to %s: %s" % (self.path, to_native(e))
+                msg=f"Unable to write certificate to {self.path}: {e}"
             )
 
         try:
             self.data = OpensshCertificate.load(self.path)
         except (TypeError, ValueError) as e:
-            self.module.fail_json(
-                msg="Unable to read new certificate: %s" % to_native(e)
-            )
+            self.module.fail_json(msg=f"Unable to read new certificate: {e}")
 
     def _generate_temp_certificate(self):
         key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
@@ -502,9 +498,7 @@ class Certificate(OpensshModule):
         try:
             self.module.preserved_copy(self.public_key, key_copy)
         except OSError as e:
-            self.module.fail_json(
-                msg="Unable to stage temporary key: %s" % to_native(e)
-            )
+            self.module.fail_json(msg=f"Unable to stage temporary key: {e}")
         self.module.add_cleanup_file(key_copy)
 
         self.ssh_keygen.generate_certificate(
@@ -535,7 +529,7 @@ class Certificate(OpensshModule):
             os.remove(self.path)
         except OSError as e:
             self.module.fail_json(
-                msg="Unable to remove existing certificate: %s" % to_native(e)
+                msg=f"Unable to remove existing certificate: {to_native(e)}"
             )
 
     @property

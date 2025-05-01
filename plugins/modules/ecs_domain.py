@@ -275,15 +275,13 @@ class EcsDomain:
             )
         except SessionConfigurationException as e:
             module.fail_json(
-                msg="Failed to initialize Entrust Provider: {0}".format(to_native(e))
+                msg=f"Failed to initialize Entrust Provider: {to_native(e)}"
             )
         try:
             self.ecs_client.GetAppVersion()
         except RestOperationException as e:
             module.fail_json(
-                msg="Please verify credential information. Received exception when testing ECS connection: {0}".format(
-                    to_native(e.message)
-                )
+                msg=f"Please verify credential information. Received exception when testing ECS connection: {e.message}"
             )
 
     def set_domain_details(self, domain_details):
@@ -405,9 +403,7 @@ class EcsDomain:
                 self.set_domain_details(result)
             except RestOperationException as e:
                 module.fail_json(
-                    msg="Failed to request domain validation from Entrust (ECS) {0}".format(
-                        e.message
-                    )
+                    msg=f"Failed to request domain validation from Entrust (ECS) {e.message}"
                 )
 
     def dump(self):
@@ -467,9 +463,7 @@ def main():
         and module.params["verification_method"] != "email"
     ):
         module.fail_json(
-            msg='The verification_email field is invalid when verification_method="{0}".'.format(
-                module.params["verification_method"]
-            )
+            msg=f'The verification_email field is invalid when verification_method="{module.params["verification_method"]}".'
         )
 
     domain = EcsDomain(module)

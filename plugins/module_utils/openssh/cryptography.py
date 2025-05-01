@@ -137,8 +137,7 @@ class AsymmetricKeypair:
 
         if keytype not in _ALGORITHM_PARAMETERS.keys():
             raise InvalidKeyTypeError(
-                "%s is not a valid keytype. Valid keytypes are %s"
-                % (keytype, ", ".join(_ALGORITHM_PARAMETERS.keys()))
+                f"{keytype} is not a valid keytype. Valid keytypes are {', '.join(_ALGORITHM_PARAMETERS)}"
             )
 
         if not size:
@@ -146,7 +145,7 @@ class AsymmetricKeypair:
         else:
             if size not in _ALGORITHM_PARAMETERS[keytype]["valid_sizes"]:
                 raise InvalidKeySizeError(
-                    "%s is not a valid key size for %s keys" % (size, keytype)
+                    f"{size} is not a valid key size for {keytype} keys"
                 )
 
         if passphrase:
@@ -229,9 +228,7 @@ class AsymmetricKeypair:
         elif isinstance(privatekey, Ed25519PrivateKey):
             keytype = "ed25519"
         else:
-            raise InvalidKeyTypeError(
-                "Key type '%s' is not supported" % type(privatekey)
-            )
+            raise InvalidKeyTypeError(f"Key type '{type(privatekey)}' is not supported")
 
         return cls(
             keytype=keytype,
@@ -363,7 +360,7 @@ class OpensshKeypair:
         """
 
         if comment is None:
-            comment = "%s@%s" % (getuser(), gethostname())
+            comment = f"{getuser()}@{gethostname()}"
 
         asym_keypair = AsymmetricKeypair.generate(keytype, size, passphrase)
         openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, "SSH")
@@ -457,7 +454,7 @@ class OpensshKeypair:
         validate_comment(comment)
 
         encoded_publickey += (
-            (" %s" % comment).encode(encoding=_TEXT_ENCODING) if comment else b""
+            f" {comment}".encode(encoding=_TEXT_ENCODING) if comment else b""
         )
 
         return encoded_publickey
@@ -541,7 +538,7 @@ class OpensshKeypair:
 
         self.__comment = comment
         encoded_comment = (
-            (" %s" % self.__comment).encode(encoding=_TEXT_ENCODING)
+            f" {self.__comment}".encode(encoding=_TEXT_ENCODING)
             if self.__comment
             else b""
         )
@@ -578,12 +575,11 @@ def load_privatekey(path, passphrase, key_format):
         privatekey_loader = privatekey_loaders[key_format]
     except KeyError:
         raise InvalidKeyFormatError(
-            "%s is not a valid key format (%s)"
-            % (key_format, ",".join(privatekey_loaders.keys()))
+            f"{key_format} is not a valid key format ({','.join(privatekey_loaders)})"
         )
 
     if not os.path.exists(path):
-        raise InvalidPrivateKeyFileError("No file was found at %s" % path)
+        raise InvalidPrivateKeyFileError(f"No file was found at {path}")
 
     try:
         with open(path, "rb") as f:
@@ -631,12 +627,11 @@ def load_publickey(path, key_format):
         publickey_loader = publickey_loaders[key_format]
     except KeyError:
         raise InvalidKeyFormatError(
-            "%s is not a valid key format (%s)"
-            % (key_format, ",".join(publickey_loaders.keys()))
+            f"{key_format} is not a valid key format ({','.join(publickey_loaders)})"
         )
 
     if not os.path.exists(path):
-        raise InvalidPublicKeyFileError("No file was found at %s" % path)
+        raise InvalidPublicKeyFileError(f"No file was found at {path}")
 
     try:
         with open(path, "rb") as f:
@@ -689,13 +684,13 @@ def get_encryption_algorithm(passphrase):
 
 def validate_comment(comment):
     if not hasattr(comment, "encode"):
-        raise InvalidCommentError("%s cannot be encoded to text" % comment)
+        raise InvalidCommentError(f"{comment} cannot be encoded to text")
 
 
 def extract_comment(path):
 
     if not os.path.exists(path):
-        raise InvalidPublicKeyFileError("No file was found at %s" % path)
+        raise InvalidPublicKeyFileError(f"No file was found at {path}")
 
     try:
         with open(path, "rb") as f:
@@ -715,6 +710,5 @@ def calculate_fingerprint(openssh_publickey):
     decoded_pubkey = b64decode(openssh_publickey.split(b" ")[1])
     digest.update(decoded_pubkey)
 
-    return "SHA256:%s" % b64encode(digest.finalize()).decode(
-        encoding=_TEXT_ENCODING
-    ).rstrip("=")
+    value = b64encode(digest.finalize()).decode(encoding=_TEXT_ENCODING).rstrip("=")
+    return f"SHA256:{value}"

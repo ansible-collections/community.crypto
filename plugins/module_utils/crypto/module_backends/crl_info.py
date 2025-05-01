@@ -58,7 +58,7 @@ class CRLInfoRetrieval:
             else:
                 self.crl = x509.load_der_x509_crl(self.content, default_backend())
         except ValueError as e:
-            self.module.fail_json(msg="Error while decoding CRL: {0}".format(e))
+            self.module.fail_json(msg=f"Error while decoding CRL: {e}")
 
         result = {
             "changed": False,
@@ -96,9 +96,7 @@ class CRLInfoRetrieval:
 def get_crl_info(module, content, list_revoked_certificates=True):
     if not CRYPTOGRAPHY_FOUND:
         module.fail_json(
-            msg=missing_required_lib(
-                "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
-            ),
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 

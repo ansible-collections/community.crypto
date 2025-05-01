@@ -229,8 +229,7 @@ def main():
             base64.urlsafe_b64decode(key)
         except Exception as e:
             module.fail_json(
-                msg="Key for external_account_binding must be Base64 URL encoded (%s)"
-                % e
+                msg=f"Key for external_account_binding must be Base64 URL encoded ({e})"
             )
         module.params["external_account_binding"]["key"] = key
 
@@ -296,7 +295,7 @@ def main():
                 )
             except KeyParsingError as e:
                 raise ModuleFailException(
-                    "Error while parsing new account key: {msg}".format(msg=e.msg)
+                    f"Error while parsing new account key: {e.msg}"
                 )
             # Verify that the account exists and has not been deactivated
             created, account_data = account.setup_account(allow_creation=False)

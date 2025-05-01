@@ -82,8 +82,7 @@ def serialize_asn1_string_as_der(value):
 
     if value_type != "UTF8":
         raise ValueError(
-            'The ASN.1 serialized string is not a known type "{0}", only UTF8 types are '
-            "supported".format(value_type)
+            f'The ASN.1 serialized string is not a known type "{value_type}", only UTF8 types are supported'
         )
 
     b_value = to_bytes(asn1_value, encoding="utf-8", errors="surrogate_or_strict")
@@ -117,7 +116,7 @@ def pack_asn1(tag_class, constructed, tag_number, b_data):
     b_asn1_data = bytearray()
 
     if tag_class < 0 or tag_class > 3:
-        raise ValueError("tag_class must be between 0 and 3 not %s" % tag_class)
+        raise ValueError(f"tag_class must be between 0 and 3 not {tag_class}")
 
     # Bit 8 and 7 denotes the class.
     identifier_octets = tag_class << 6

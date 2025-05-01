@@ -179,7 +179,7 @@ def load_publickey(path=None, content=None, backend=None):
                 content, backend=cryptography_backend()
             )
         except Exception as e:
-            raise OpenSSLObjectError("Error while deserializing key: {0}".format(e))
+            raise OpenSSLObjectError(f"Error while deserializing key: {e}")
 
 
 def load_certificate(
@@ -209,9 +209,7 @@ def load_certificate(
                     cert_content, cryptography_backend()
                 )
             except ValueError as exc:
-                raise OpenSSLObjectError(
-                    "Cannot parse DER certificate: {0}".format(exc)
-                )
+                raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
 
 
 def load_certificate_request(path, content=None, backend="cryptography"):
@@ -241,31 +239,30 @@ def parse_name_field(input_dict, name_field_name=None):
             for entry in value:
                 if not isinstance(entry, six.string_types):
                     raise TypeError(
-                        ("Values %s must be strings" % error_str).format(
+                        f"Values {error_str} must be strings".format(
                             key=key, name=name_field_name
                         )
                     )
                 if not entry:
                     raise ValueError(
-                        ("Values for %s must not be empty strings" % error_str).format(
-                            key=key
+                        f"Values for {error_str} must not be empty strings".format(
+                            key=key, name=name_field_name
                         )
                     )
                 result.append((key, entry))
         elif isinstance(value, six.string_types):
             if not value:
                 raise ValueError(
-                    ("Value for %s must not be an empty string" % error_str).format(
-                        key=key
+                    f"Value for {error_str} must not be an empty string".format(
+                        key=key, name=name_field_name
                     )
                 )
             result.append((key, value))
         else:
             raise TypeError(
                 (
-                    "Value for %s must be either a string or a list of strings"
-                    % error_str
-                ).format(key=key)
+                    f"Value for {error_str} must be either a string or a list of strings"
+                ).format(key=key, name=name_field_name)
             )
     return result
 
@@ -277,17 +274,13 @@ def parse_ordered_name_field(input_list, name_field_name):
     for index, entry in enumerate(input_list):
         if len(entry) != 1:
             raise ValueError(
-                "Entry #{index} in {name} must be a dictionary with exactly one key-value pair".format(
-                    name=name_field_name, index=index + 1
-                )
+                f"Entry #{index + 1} in {name_field_name} must be a dictionary with exactly one key-value pair"
             )
         try:
             result.extend(parse_name_field(entry, name_field_name=name_field_name))
         except (TypeError, ValueError) as exc:
             raise ValueError(
-                "Error while processing entry #{index} in {name}: {error}".format(
-                    name=name_field_name, index=index + 1, error=exc
-                )
+                f"Error while processing entry #{index + 1} in {name_field_name}: {exc}"
             )
     return result
 

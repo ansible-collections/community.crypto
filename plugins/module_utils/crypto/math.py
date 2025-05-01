@@ -162,9 +162,9 @@ else:
     def _convert_int_to_bytes(count, n):
         if n == 0 and count == 0:
             return ""
-        h = "%x" % n
+        h = f"{n:x}"
         if len(h) > 2 * count:
-            raise Exception("Number {1} needs more than {0} bytes!".format(count, n))
+            raise Exception(f"Number {n} needs more than {count} bytes!")
         return ("0" * (2 * count - len(h)) + h).decode("hex")
 
     def _convert_bytes_to_int(data):
@@ -174,7 +174,7 @@ else:
         return v
 
     def _to_hex(no):
-        return "%x" % no
+        return f"{no:x}"
 
 
 def convert_int_to_bytes(no, count=None):

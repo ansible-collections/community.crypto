@@ -230,9 +230,7 @@ class SignatureCryptography(SignatureBase):
 
             if signature is None:
                 self.module.fail_json(
-                    msg="Unsupported key type. Your cryptography version is {0}".format(
-                        CRYPTOGRAPHY_VERSION
-                    )
+                    msg=f"Unsupported key type. Your cryptography version is {CRYPTOGRAPHY_VERSION}"
                 )
 
             result["signature"] = base64.b64encode(signature)
@@ -261,7 +259,7 @@ def main():
     if not os.path.isfile(module.params["path"]):
         module.fail_json(
             name=module.params["path"],
-            msg="The file {0} does not exist".format(module.params["path"]),
+            msg=f"The file {module.params['path']} does not exist",
         )
 
     backend = module.params["select_crypto_backend"]
@@ -279,16 +277,14 @@ def main():
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=(
-                    "Cannot detect the required Python library " "cryptography (>= {0})"
-                ).format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})",
             )
     try:
         if backend == "cryptography":
             if not CRYPTOGRAPHY_FOUND:
                 module.fail_json(
                     msg=missing_required_lib(
-                        "cryptography >= {0}".format(MINIMAL_CRYPTOGRAPHY_VERSION)
+                        f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                     ),
                     exception=CRYPTOGRAPHY_IMP_ERR,
                 )

@@ -326,19 +326,16 @@ def x509_certificate_info_filter(data, name_encoding="ignore"):
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, string_types):
         raise AnsibleFilterError(
-            "The community.crypto.x509_certificate_info input must be a text type, not %s"
-            % type(data)
+            f"The community.crypto.x509_certificate_info input must be a text type, not {type(data)}"
         )
     if not isinstance(name_encoding, string_types):
         raise AnsibleFilterError(
-            "The name_encoding option must be of a text type, not %s"
-            % type(name_encoding)
+            f"The name_encoding option must be of a text type, not {type(name_encoding)}"
         )
     name_encoding = to_native(name_encoding)
     if name_encoding not in ("ignore", "idna", "unicode"):
         raise AnsibleFilterError(
-            'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "%s"'
-            % name_encoding
+            f'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "{name_encoding}"'
         )
 
     module = FilterModuleMock({"name_encoding": name_encoding})

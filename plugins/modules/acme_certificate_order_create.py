@@ -414,9 +414,7 @@ def main():
                 )
             if profile not in meta_profiles:
                 raise ModuleFailException(
-                    msg="The ACME CA does not support selected profile {0!r}.".format(
-                        profile
-                    )
+                    msg=f"The ACME CA does not support selected profile {profile!r}."
                 )
 
         order = None

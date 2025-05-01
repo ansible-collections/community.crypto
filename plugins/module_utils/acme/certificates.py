@@ -44,9 +44,7 @@ class CertificateChain:
             "application/pem-certificate-chain"
         ):
             raise ModuleFailException(
-                "Cannot download certificate chain from {0}, as content type is not application/pem-certificate-chain: {1} (headers: {2})".format(
-                    url, content, info
-                )
+                f"Cannot download certificate chain from {url}, as content type is not application/pem-certificate-chain: {content} (headers: {info})"
             )
 
         result = cls(url)
@@ -63,9 +61,7 @@ class CertificateChain:
 
         if result.cert is None:
             raise ModuleFailException(
-                "Failed to parse certificate chain download from {0}: {1} (headers: {2})".format(
-                    url, content, info
-                )
+                f"Failed to parse certificate chain download from {url}: {content} (headers: {info})"
             )
 
         return result

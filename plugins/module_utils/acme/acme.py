@@ -66,7 +66,7 @@ def _decode_retry(module, response, info, retry_count):
     if retry_count >= RETRY_COUNT:
         raise ACMEProtocolException(
             module,
-            msg="Giving up after {retry} retries".format(retry=RETRY_COUNT),
+            msg=f"Giving up after {RETRY_COUNT} retries",
             info=info,
             response=response,
         )
@@ -77,8 +77,7 @@ def _decode_retry(module, response, info, retry_count):
     except (TypeError, ValueError):
         retry_after = 10
     module.log(
-        "Retrieved a %s HTTP status on %s, retrying in %s seconds"
-        % (format_http_status(info["status"]), info["url"], retry_after)
+        f"Retrieved a {format_http_status(info['status'])} HTTP status on {info['url']}, retrying in {retry_after} seconds"
     )
 
     time.sleep(retry_after)
@@ -94,9 +93,7 @@ def _assert_fetch_url_success(
     allow_server_error=True,
 ):
     if info["status"] < 0:
-        raise NetworkException(
-            msg="Failure downloading %s, %s" % (info["url"], info["msg"])
-        )
+        raise NetworkException(msg=f"Failure downloading {info['url']}, {info['msg']}")
 
     if (
         (300 <= info["status"] < 400 and not allow_redirect)
@@ -169,16 +166,12 @@ class ACMEDirectory:
                 continue
             if info["status"] not in (200, 204):
                 raise NetworkException(
-                    "Failed to get replay-nonce, got status {0}".format(
-                        format_http_status(info["status"])
-                    )
+                    f"Failed to get replay-nonce, got status {format_http_status(info['status'])}"
                 )
             if "replay-nonce" in info:
                 return info["replay-nonce"]
             self.module.log(
-                "HEAD to {0} did return status {1}, but no replay-nonce header!".format(
-                    url, format_http_status(info["status"])
-                )
+                f"HEAD to {url} did return status {format_http_status(info['status'])}, but no replay-nonce header!"
             )
             if retry_count >= 5:
                 raise ACMEProtocolException(
@@ -228,9 +221,7 @@ class ACMEClient:
                     passphrase=self.account_key_passphrase,
                 )
             except KeyParsingError as e:
-                raise ModuleFailException(
-                    "Error while parsing account key: {msg}".format(msg=e.msg)
-                )
+                raise ModuleFailException(f"Error while parsing account key: {e.msg}")
             self.account_jwk = self.account_key_data["jwk"]
             self.account_jws_header = {
                 "alg": self.account_key_data["alg"],
@@ -276,7 +267,7 @@ class ACMEClient:
             protected64 = nopad_b64(self.module.jsonify(protected).encode("utf8"))
         except Exception as e:
             raise ModuleFailException(
-                "Failed to encode payload / headers as JSON: {0}".format(e)
+                f"Failed to encode payload / headers as JSON: {e}"
             )
 
         return self.backend.sign(payload64, protected64, key_data)
@@ -287,16 +278,13 @@ class ACMEClient:
         """
         if self._debug:
             with open("acme.log", "ab") as f:
-                f.write(
-                    "[{0}] {1}\n".format(
-                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%s"), msg
-                    ).encode("utf-8")
-                )
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%s")
+                f.write(f"[{timestamp}] {msg}\n".encode("utf-8"))
                 if data is not None:
                     f.write(
-                        "{0}\n\n".format(
-                            json.dumps(data, indent=2, sort_keys=True)
-                        ).encode("utf-8")
+                        f"{json.dumps(data, indent=2, sort_keys=True)}\n\n".encode(
+                            "utf-8"
+                        )
                     )
 
     def send_signed_request(
@@ -389,9 +377,7 @@ class ACMEClient:
                             result = content
                     except ValueError:
                         raise NetworkException(
-                            "Failed to parse the ACME response: {0} {1}".format(
-                                url, content
-                            )
+                            f"Failed to parse the ACME response: {url} {content}"
                         )
                 else:
                     result = content
@@ -471,9 +457,7 @@ class ACMEClient:
                         parsed_json_result = True
                     except ValueError:
                         raise NetworkException(
-                            "Failed to parse the ACME response: {0} {1}".format(
-                                uri, content
-                            )
+                            f"Failed to parse the ACME response: {uri} {content}"
                         )
                 else:
                     result = content
@@ -513,9 +497,7 @@ class ACMEClient:
                 cert_filename=cert_filename,
                 cert_content=cert_content,
             )
-        url = "{base}/{cert_id}".format(
-            base=self.directory.directory["renewalInfo"].rstrip("/"), cert_id=cert_id
-        )
+        url = f"{self.directory.directory['renewalInfo'].rstrip('/')}/{cert_id}"
 
         data, info = self.get_request(
             url, parse_json_result=True, fail_on_error=True, get_only=True
@@ -593,31 +575,25 @@ def create_backend(module, needs_acme_v2=True):
             if CRYPTOGRAPHY_VERSION is None:
                 msg = missing_required_lib("cryptography")
             else:
-                msg = "Unexpected error while preparing cryptography: {0}".format(
-                    CRYPTOGRAPHY_ERROR.splitlines()[-1]
-                )
+                msg = f"Unexpected error while preparing cryptography: {CRYPTOGRAPHY_ERROR.splitlines()[-1]}"
             module.fail_json(msg=msg, exception=CRYPTOGRAPHY_ERROR)
         if not HAS_CURRENT_CRYPTOGRAPHY:
             # We succeeded importing cryptography, but its version is too old.
+            mrl = missing_required_lib(
+                f"cryptography >= {CRYPTOGRAPHY_MINIMAL_VERSION}"
+            )
             module.fail_json(
-                msg="Found cryptography, but only version {0}. {1}".format(
-                    CRYPTOGRAPHY_VERSION,
-                    missing_required_lib(
-                        "cryptography >= {0}".format(CRYPTOGRAPHY_MINIMAL_VERSION)
-                    ),
-                )
+                msg=f"Found cryptography, but only version {CRYPTOGRAPHY_VERSION}. {mrl}"
             )
         module.debug(
-            "Using cryptography backend (library version {0})".format(
-                CRYPTOGRAPHY_VERSION
-            )
+            f"Using cryptography backend (library version {CRYPTOGRAPHY_VERSION})"
         )
         module_backend = CryptographyBackend(module)
     elif backend == "openssl":
         module.debug("Using OpenSSL binary backend")
         module_backend = OpenSSLCLIBackend(module)
     else:
-        module.fail_json(msg='Unknown crypto backend "{0}"!'.format(backend))
+        module.fail_json(msg=f'Unknown crypto backend "{backend}"!')
 
     # Check common module parameters
     if not module.params["validate_certs"]:

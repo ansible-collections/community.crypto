@@ -190,8 +190,7 @@ def main():
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(
-                msg="Error while reading public key file from disk: {0}".format(e),
-                **result,
+                msg=f"Error while reading public key file from disk: {e}", **result
             )
 
     backend, module_backend = select_backend(

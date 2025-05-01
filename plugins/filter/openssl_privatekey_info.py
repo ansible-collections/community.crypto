@@ -167,17 +167,15 @@ def openssl_privatekey_info_filter(
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, string_types):
         raise AnsibleFilterError(
-            "The community.crypto.openssl_privatekey_info input must be a text type, not %s"
-            % type(data)
+            f"The community.crypto.openssl_privatekey_info input must be a text type, not {type(data)}"
         )
     if passphrase is not None and not isinstance(passphrase, string_types):
         raise AnsibleFilterError(
-            "The passphrase option must be a text type, not %s" % type(passphrase)
+            f"The passphrase option must be a text type, not {type(passphrase)}"
         )
     if not isinstance(return_private_key_data, bool):
         raise AnsibleFilterError(
-            "The return_private_key_data option must be a boolean, not %s"
-            % type(return_private_key_data)
+            f"The return_private_key_data option must be a boolean, not {type(return_private_key_data)}"
         )
 
     module = FilterModuleMock({})

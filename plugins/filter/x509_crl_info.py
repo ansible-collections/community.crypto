@@ -177,24 +177,20 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, string_types):
         raise AnsibleFilterError(
-            "The community.crypto.x509_crl_info input must be a text type, not %s"
-            % type(data)
+            f"The community.crypto.x509_crl_info input must be a text type, not {type(data)}"
         )
     if not isinstance(name_encoding, string_types):
         raise AnsibleFilterError(
-            "The name_encoding option must be of a text type, not %s"
-            % type(name_encoding)
+            f"The name_encoding option must be of a text type, not {type(name_encoding)}"
         )
     if not isinstance(list_revoked_certificates, bool):
         raise AnsibleFilterError(
-            "The list_revoked_certificates option must be a boolean, not %s"
-            % type(list_revoked_certificates)
+            f"The list_revoked_certificates option must be a boolean, not {type(list_revoked_certificates)}"
         )
     name_encoding = to_native(name_encoding)
     if name_encoding not in ("ignore", "idna", "unicode"):
         raise AnsibleFilterError(
-            'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "%s"'
-            % name_encoding
+            f'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "{name_encoding}"'
         )
 
     data = to_bytes(data)

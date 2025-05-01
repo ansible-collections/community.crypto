@@ -110,8 +110,7 @@ class OpensshCertificateTimeParameters:
 
         if self._valid_from > self._valid_to:
             raise ValueError(
-                "Valid from: %s must not be greater than Valid to: %s"
-                % (valid_from, valid_to)
+                f"Valid from: {valid_from} must not be greater than Valid to: {valid_to}"
             )
 
     def __eq__(self, other):
@@ -129,10 +128,7 @@ class OpensshCertificateTimeParameters:
     @property
     def validity_string(self):
         if not (self._valid_from == _ALWAYS and self._valid_to == _FOREVER):
-            return "%s:%s" % (
-                self.valid_from(date_format="openssh"),
-                self.valid_to(date_format="openssh"),
-            )
+            return f"{self.valid_from(date_format='openssh')}:{self.valid_to(date_format='openssh')}"
         return ""
 
     def valid_from(self, date_format):
@@ -166,7 +162,7 @@ class OpensshCertificateTimeParameters:
                 (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
             )
         else:
-            raise ValueError("%s is not a valid format" % date_format)
+            raise ValueError(f"{date_format} is not a valid format")
         return result
 
     @staticmethod
@@ -182,8 +178,7 @@ class OpensshCertificateTimeParameters:
                 )
             else:
                 raise ValueError(
-                    "Value must be of type (str, unicode, int, long) not %s"
-                    % type(time_string_or_timestamp)
+                    f"Value must be of type (str, unicode, int, long) not {type(time_string_or_timestamp)}"
                 )
         except ValueError:
             raise
@@ -238,10 +233,10 @@ class OpensshCertificateOption:
             raise ValueError("type must be either 'critical' or 'extension'")
 
         if not isinstance(name, six.string_types):
-            raise TypeError("name must be a string not %s" % type(name))
+            raise TypeError(f"name must be a string not {type(name)}")
 
         if not isinstance(data, six.string_types):
-            raise TypeError("data must be a string not %s" % type(data))
+            raise TypeError(f"data must be a string not {type(data)}")
 
         self._option_type = option_type
         self._name = name.lower()
@@ -267,7 +262,7 @@ class OpensshCertificateOption:
 
     def __str__(self):
         if self._data:
-            return "%s=%s" % (self._name, self._data)
+            return f"{self._name}={self._data}"
         return self._name
 
     @property
@@ -286,7 +281,7 @@ class OpensshCertificateOption:
     def from_string(cls, option_string):
         if not isinstance(option_string, six.string_types):
             raise ValueError(
-                "option_string must be a string not %s" % type(option_string)
+                f"option_string must be a string not {type(option_string)}"
             )
         option_type = None
 
@@ -356,7 +351,7 @@ class OpensshCertificateInfo:
         elif cert_type == "host" or cert_type == _HOST_TYPE:
             self._cert_type = _HOST_TYPE
         else:
-            raise ValueError("%s is not a valid certificate type" % cert_type)
+            raise ValueError(f"{cert_type} is not a valid certificate type")
 
     def signing_key_fingerprint(self):
         return fingerprint(self.signing_key)
@@ -447,8 +442,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
             )
         else:
             raise ValueError(
-                "Curve must be one of %s"
-                % (b",".join(list(_ECDSA_CURVE_IDENTIFIERS.values()))).decode("UTF-8")
+                "Curve must be one of {(b','.join(_ECDSA_CURVE_IDENTIFIERS.values())).decode('UTF-8')}"
             )
 
     # See https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
@@ -500,13 +494,13 @@ class OpensshCertificate:
     @classmethod
     def load(cls, path):
         if not os.path.exists(path):
-            raise ValueError("%s is not a valid path." % path)
+            raise ValueError(f"{path} is not a valid path.")
 
         try:
             with open(path, "rb") as cert_file:
                 data = cert_file.read()
         except (IOError, OSError) as e:
-            raise ValueError("%s cannot be opened for reading: %s" % (path, e))
+            raise ValueError(f"{path} cannot be opened for reading: {e}")
 
         try:
             format_identifier, b64_cert = data.split(b" ")[:2]
@@ -520,7 +514,7 @@ class OpensshCertificate:
                 break
         else:
             raise ValueError(
-                "Invalid certificate format identifier: %s" % format_identifier
+                f"Invalid certificate format identifier: {format_identifier}"
             )
 
         parser = OpensshParser(cert)
@@ -532,12 +526,11 @@ class OpensshCertificate:
             cert_info = cls._parse_cert_info(pub_key_type, parser)
             signature = parser.string()
         except (TypeError, ValueError) as e:
-            raise ValueError("Invalid certificate data: %s" % e)
+            raise ValueError(f"Invalid certificate data: {e}")
 
         if parser.remaining_bytes():
             raise ValueError(
-                "%s bytes of additional data was not parsed while loading %s"
-                % (parser.remaining_bytes(), path)
+                f"{parser.remaining_bytes()} bytes of additional data was not parsed while loading {path}"
             )
 
         return cls(
@@ -651,7 +644,7 @@ class OpensshCertificate:
 
 def apply_directives(directives):
     if any(d not in _DIRECTIVES for d in directives):
-        raise ValueError("directives must be one of %s" % ", ".join(_DIRECTIVES))
+        raise ValueError(f"directives must be one of {', '.join(_DIRECTIVES)}")
 
     directive_to_option = {
         "no-x11-forwarding": OpensshCertificateOption(
@@ -696,7 +689,7 @@ def get_cert_info_object(key_type):
     elif key_type == "ed25519":
         cert_info = OpensshED25519CertificateInfo()
     else:
-        raise ValueError("%s is not a valid key type" % key_type)
+        raise ValueError(f"{key_type} is not a valid key type")
 
     return cert_info
 
@@ -708,8 +701,8 @@ def get_option_type(name):
         result = "extension"
     else:
         raise ValueError(
-            "%s is not a valid option. " % name
-            + "Custom options must start with 'critical:' or 'extension:' to indicate type"
+            f"{name} is not a valid option. "
+            "Custom options must start with 'critical:' or 'extension:' to indicate type"
         )
     return result
 
