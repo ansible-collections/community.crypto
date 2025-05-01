@@ -5,8 +5,9 @@
 
 from __future__ import annotations
 
+from http.client import responses as http_responses
+
 from ansible.module_utils.common.text.converters import to_text
-from http_client import responses as http_responses
 
 
 def format_http_status(status_code):
