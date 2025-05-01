@@ -154,33 +154,24 @@ TEST_PARSE_ACME_TIMESTAMP = cartesian_product(
                 microsecond=333333,
             ),
         ),
+        (
+            "2024-01-01T00:11:22+0100",
+            dict(year=2023, month=12, day=31, hour=23, minute=11, second=22),
+        ),
+        (
+            "2024-01-01T00:11:22.123+0100",
+            dict(
+                year=2023,
+                month=12,
+                day=31,
+                hour=23,
+                minute=11,
+                second=22,
+                microsecond=123000,
+            ),
+        ),
     ],
 )
-
-if sys.version_info >= (3, 5):
-    TEST_PARSE_ACME_TIMESTAMP.extend(
-        cartesian_product(
-            TIMEZONES,
-            [
-                (
-                    "2024-01-01T00:11:22+0100",
-                    dict(year=2023, month=12, day=31, hour=23, minute=11, second=22),
-                ),
-                (
-                    "2024-01-01T00:11:22.123+0100",
-                    dict(
-                        year=2023,
-                        month=12,
-                        day=31,
-                        hour=23,
-                        minute=11,
-                        second=22,
-                        microsecond=123000,
-                    ),
-                ),
-            ],
-        )
-    )
 
 
 TEST_INTERPOLATE_TIMESTAMP = cartesian_product(

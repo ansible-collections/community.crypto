@@ -286,12 +286,8 @@ DN_COMPONENT_START_RE = re.compile(b"^ *([a-zA-z0-9.]+) *= *")
 DN_HEX_LETTER = b"0123456789abcdef"
 
 
-if sys.version_info[0] < 3:
-    _int_to_byte = chr
-else:
-
-    def _int_to_byte(value):
-        return bytes((value,))
+def _int_to_byte(value):
+    return bytes((value,))
 
 
 def _parse_dn_component(name, sep=b",", decode_remainder=True):

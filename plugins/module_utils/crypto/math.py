@@ -99,82 +99,36 @@ def quick_is_not_prime(n):
     return False
 
 
-python_version = (sys.version_info[0], sys.version_info[1])
-if python_version >= (2, 7) or python_version >= (3, 1):
-    # Ansible still supports Python 2.6 on remote nodes
-
-    def count_bytes(no):
-        """
-        Given an integer, compute the number of bytes necessary to store its absolute value.
-        """
-        no = abs(no)
-        if no == 0:
-            return 0
-        return (no.bit_length() + 7) // 8
-
-    def count_bits(no):
-        """
-        Given an integer, compute the number of bits necessary to store its absolute value.
-        """
-        no = abs(no)
-        if no == 0:
-            return 0
-        return no.bit_length()
-
-else:
-    # Slow, but works
-    def count_bytes(no):
-        """
-        Given an integer, compute the number of bytes necessary to store its absolute value.
-        """
-        no = abs(no)
-        count = 0
-        while no > 0:
-            no >>= 8
-            count += 1
-        return count
-
-    def count_bits(no):
-        """
-        Given an integer, compute the number of bits necessary to store its absolute value.
-        """
-        no = abs(no)
-        count = 0
-        while no > 0:
-            no >>= 1
-            count += 1
-        return count
+def count_bytes(no):
+    """
+    Given an integer, compute the number of bytes necessary to store its absolute value.
+    """
+    no = abs(no)
+    if no == 0:
+        return 0
+    return (no.bit_length() + 7) // 8
 
 
-if sys.version_info[0] >= 3:
-    # Python 3 (and newer)
-    def _convert_int_to_bytes(count, no):
-        return no.to_bytes(count, byteorder="big")
+def count_bits(no):
+    """
+    Given an integer, compute the number of bits necessary to store its absolute value.
+    """
+    no = abs(no)
+    if no == 0:
+        return 0
+    return no.bit_length()
 
-    def _convert_bytes_to_int(data):
-        return int.from_bytes(data, byteorder="big", signed=False)
 
-    def _to_hex(no):
-        return hex(no)[2:]
+def _convert_int_to_bytes(count, no):
+    return no.to_bytes(count, byteorder="big")
 
-else:
-    # Python 2
-    def _convert_int_to_bytes(count, n):
-        if n == 0 and count == 0:
-            return ""
-        h = f"{n:x}"
-        if len(h) > 2 * count:
-            raise Exception(f"Number {n} needs more than {count} bytes!")
-        return ("0" * (2 * count - len(h)) + h).decode("hex")
 
-    def _convert_bytes_to_int(data):
-        v = 0
-        for x in data:
-            v = (v << 8) | ord(x)
-        return v
+def _convert_bytes_to_int(data):
+    return int.from_bytes(data, byteorder="big", signed=False)
 
-    def _to_hex(no):
-        return f"{no:x}"
+
+def _to_hex(no):
+    return f"{no:x}"
 
 
 def convert_int_to_bytes(no, count=None):

@@ -194,23 +194,12 @@ except ImportError:
 
 
 # Convert byte string to ASN1 encoded octet string
-if sys.version_info[0] >= 3:
-
-    def encode_octet_string(octet_string):
-        if len(octet_string) >= 128:
-            raise ModuleFailException(
-                "Cannot handle octet strings with more than 128 bytes"
-            )
-        return bytes([0x4, len(octet_string)]) + octet_string
-
-else:
-
-    def encode_octet_string(octet_string):
-        if len(octet_string) >= 128:
-            raise ModuleFailException(
-                "Cannot handle octet strings with more than 128 bytes"
-            )
-        return b"\x04" + chr(len(octet_string)) + octet_string
+def encode_octet_string(octet_string):
+    if len(octet_string) >= 128:
+        raise ModuleFailException(
+            "Cannot handle octet strings with more than 128 bytes"
+        )
+    return bytes([0x4, len(octet_string)]) + octet_string
 
 
 def main():
