@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import PY3, binary_type
+from ansible.module_utils.six import binary_type
 from ansible.module_utils.six.moves.http_client import responses as http_responses
 
 
@@ -67,7 +67,7 @@ class ACMEProtocolException(ModuleFailException):
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
                 # In Python 3, read() simply returns ''
-                if PY3 and response.closed:
+                if response.closed:
                     raise TypeError
                 content = response.read()
             except (AttributeError, TypeError):

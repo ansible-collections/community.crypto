@@ -25,9 +25,6 @@ from ansible.module_utils.six import PY3
 # https://github.com/pyca/cryptography/blob/main/src/cryptography/hazmat/primitives/serialization/ssh.py
 # https://github.com/paramiko/paramiko/blob/master/paramiko/message.py
 
-if PY3:
-    long = int
-
 # 0 (False) or 1 (True) encoded as a single byte
 _BOOLEAN = Struct(b"?")
 # Unsigned 8-bit integer in network-byte-order
@@ -307,8 +304,8 @@ class _OpensshWriter:
         return self
 
     def uint64(self, value):
-        if not isinstance(value, (long, int)):
-            raise TypeError(f"Value must be of type (long, int) not {type(value)}")
+        if not isinstance(value, int):
+            raise TypeError(f"Value must be of type int not {type(value)}")
         if value < 0 or value > _UINT64_MAX:
             raise ValueError(
                 f"Value must be a positive integer less than {_UINT64_MAX}"
@@ -327,8 +324,8 @@ class _OpensshWriter:
         return self
 
     def mpint(self, value):
-        if not isinstance(value, (int, long)):
-            raise TypeError(f"Value must be of type (long, int) not {type(value)}")
+        if not isinstance(value, int):
+            raise TypeError(f"Value must be of type int not {type(value)}")
 
         self.string(self._int_to_mpint(value))
 

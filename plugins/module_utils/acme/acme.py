@@ -14,7 +14,6 @@ import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.six import PY3
 from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     CRYPTOGRAPHY_ERROR,
@@ -345,7 +344,7 @@ class ACMEClient:
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
                 # In Python 3, read() simply returns ''
-                if PY3 and resp.closed:
+                if resp.closed:
                     raise TypeError
                 content = resp.read()
             except (AttributeError, TypeError):
@@ -440,7 +439,7 @@ class ACMEClient:
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
                 # In Python 3, read() simply returns ''
-                if PY3 and resp.closed:
+                if resp.closed:
                     raise TypeError
                 content = resp.read()
             except (AttributeError, TypeError):

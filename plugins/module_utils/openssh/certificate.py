@@ -94,9 +94,6 @@ _EXTENSIONS = (
     "permit-user-rc",
 )
 
-if six.PY3:
-    long = int
-
 
 class OpensshCertificateTimeParameters:
     def __init__(self, valid_from, valid_to):
@@ -167,13 +164,13 @@ class OpensshCertificateTimeParameters:
                 result = OpensshCertificateTimeParameters._time_string_to_datetime(
                     time_string_or_timestamp.strip()
                 )
-            elif isinstance(time_string_or_timestamp, (long, int)):
+            elif isinstance(time_string_or_timestamp, int):
                 result = OpensshCertificateTimeParameters._timestamp_to_datetime(
                     time_string_or_timestamp
                 )
             else:
                 raise ValueError(
-                    f"Value must be of type (str, unicode, int, long) not {type(time_string_or_timestamp)}"
+                    f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
                 )
         except ValueError:
             raise
