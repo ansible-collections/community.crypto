@@ -75,37 +75,51 @@ options:
     description:
       - The countryName field of the certificate signing request subject.
     type: str
-    aliases: [C, countryName]
+    aliases:
+      - C
+      - countryName
   state_or_province_name:
     description:
       - The stateOrProvinceName field of the certificate signing request subject.
     type: str
-    aliases: [ST, stateOrProvinceName]
+    aliases:
+      - ST
+      - stateOrProvinceName
   locality_name:
     description:
       - The localityName field of the certificate signing request subject.
     type: str
-    aliases: [L, localityName]
+    aliases:
+      - L
+      - localityName
   organization_name:
     description:
       - The organizationName field of the certificate signing request subject.
     type: str
-    aliases: [O, organizationName]
+    aliases:
+      - O
+      - organizationName
   organizational_unit_name:
     description:
       - The organizationalUnitName field of the certificate signing request subject.
     type: str
-    aliases: [OU, organizationalUnitName]
+    aliases:
+      - OU
+      - organizationalUnitName
   common_name:
     description:
       - The commonName field of the certificate signing request subject.
     type: str
-    aliases: [CN, commonName]
+    aliases:
+      - CN
+      - commonName
   email_address:
     description:
       - The emailAddress field of the certificate signing request subject.
     type: str
-    aliases: [E, emailAddress]
+    aliases:
+      - E
+      - emailAddress
   subject_alt_name:
     description:
       - Subject Alternative Name (SAN) extension to attach to the certificate signing request.
@@ -116,63 +130,75 @@ options:
       - More at U(https://tools.ietf.org/html/rfc5280#section-4.2.1.6).
     type: list
     elements: str
-    aliases: [subjectAltName]
+    aliases:
+      - subjectAltName
   subject_alt_name_critical:
     description:
       - Should the subjectAltName extension be considered as critical.
     type: bool
     default: false
-    aliases: [subjectAltName_critical]
+    aliases:
+      - subjectAltName_critical
   use_common_name_for_san:
     description:
       - If set to V(true), the module will fill the common name in for O(subject_alt_name) with C(DNS:) prefix if no SAN is
         specified.
     type: bool
     default: true
-    aliases: [useCommonNameForSAN]
+    aliases:
+      - useCommonNameForSAN
   key_usage:
     description:
       - This defines the purpose (for example encipherment, signature, certificate signing) of the key contained in the certificate.
     type: list
     elements: str
-    aliases: [keyUsage]
+    aliases:
+      - keyUsage
   key_usage_critical:
     description:
       - Should the keyUsage extension be considered as critical.
     type: bool
     default: false
-    aliases: [keyUsage_critical]
+    aliases:
+      - keyUsage_critical
   extended_key_usage:
     description:
       - Additional restrictions (for example client authentication, server authentication) on the allowed purposes for which
         the public key may be used.
     type: list
     elements: str
-    aliases: [extKeyUsage, extendedKeyUsage]
+    aliases:
+      - extKeyUsage
+      - extendedKeyUsage
   extended_key_usage_critical:
     description:
       - Should the extkeyUsage extension be considered as critical.
     type: bool
     default: false
-    aliases: [extKeyUsage_critical, extendedKeyUsage_critical]
+    aliases:
+      - extKeyUsage_critical
+      - extendedKeyUsage_critical
   basic_constraints:
     description:
       - Indicates basic constraints, such as if the certificate is a CA.
     type: list
     elements: str
-    aliases: [basicConstraints]
+    aliases:
+      - basicConstraints
   basic_constraints_critical:
     description:
       - Should the basicConstraints extension be considered as critical.
     type: bool
     default: false
-    aliases: [basicConstraints_critical]
+    aliases:
+      - basicConstraints_critical
   ocsp_must_staple:
     description:
       - Indicates that the certificate should contain the OCSP Must Staple extension (U(https://tools.ietf.org/html/rfc7633)).
     type: bool
     default: false
-    aliases: [ocspMustStaple]
+    aliases:
+      - ocspMustStaple
   ocsp_must_staple_critical:
     description:
       - Should the OCSP Must Staple extension be considered as critical.
@@ -180,7 +206,8 @@ options:
         OCSP Must Staple are required to reject such certificates (see U(https://tools.ietf.org/html/rfc7633#section-4)).
     type: bool
     default: false
-    aliases: [ocspMustStaple_critical]
+    aliases:
+      - ocspMustStaple_critical
   name_constraints_permitted:
     description:
       - For CA certificates, this specifies a list of identifiers which describe subtrees of names that this CA is allowed

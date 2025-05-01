@@ -377,7 +377,8 @@ options:
       - This is only used by the V(selfsigned) provider.
     type: str
     default: +0s
-    aliases: [ selfsigned_notBefore ]
+    aliases:
+      - selfsigned_notBefore
 
   selfsigned_not_after:
     description:
@@ -395,7 +396,8 @@ options:
         Please see U(https://support.apple.com/en-us/HT210176) for more details.
     type: str
     default: +3650d
-    aliases: [ selfsigned_notAfter ]
+    aliases:
+      - selfsigned_notAfter
 
   selfsigned_create_subject_key_identifier:
     description:
