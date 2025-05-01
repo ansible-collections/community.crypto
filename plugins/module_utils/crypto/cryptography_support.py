@@ -103,18 +103,29 @@ from .basic import (
 
 
 CRYPTOGRAPHY_TIMEZONE = False
+_CRYPTOGRAPHY_36_0_OR_NEWER = False
 if _HAS_CRYPTOGRAPHY:
     CRYPTOGRAPHY_TIMEZONE = LooseVersion(cryptography.__version__) >= LooseVersion(
         "42.0.0"
     )
 
+    _CRYPTOGRAPHY_36_0_OR_NEWER = LooseVersion(
+        cryptography.__version__
+    ) >= LooseVersion("36.0")
 
 DOTTED_OID = re.compile(r"^\d+(?:\.\d+)+$")
 
 
 def cryptography_get_extensions_from_cert(cert):
     result = dict()
-    try:
+
+    if _CRYPTOGRAPHY_36_0_OR_NEWER:
+        for ext in cert.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
+            )
+    else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
@@ -149,24 +160,20 @@ def cryptography_get_extensions_from_cert(cert):
                 oid = exts[i].oid.dotted_string
             result[oid] = entry
 
-    except Exception:
-        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use its public_bytes() feature in that case. We will later switch this around
-        # so that this code will be the default, but for now this will act as a fallback
-        # since it will re-serialize de-serialized data, which can be different (if the
-        # original data was not canonicalized) from what was contained in the certificate.
-        for ext in cert.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
-            )
-
     return result
 
 
 def cryptography_get_extensions_from_csr(csr):
     result = dict()
-    try:
+
+    if _CRYPTOGRAPHY_36_0_OR_NEWER:
+        for ext in csr.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
+            )
+
+    else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
@@ -210,18 +217,6 @@ def cryptography_get_extensions_from_csr(csr):
             except AttributeError:
                 oid = exts[i].oid.dotted_string
             result[oid] = entry
-
-    except Exception:
-        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use its public_bytes() feature in that case. We will later switch this around
-        # so that this code will be the default, but for now this will act as a fallback
-        # since it will re-serialize de-serialized data, which can be different (if the
-        # original data was not canonicalized) from what was contained in the CSR.
-        for ext in csr.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
-            )
 
     return result
 
