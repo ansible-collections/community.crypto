@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import os
 from base64 import b64decode, b64encode
@@ -127,7 +122,7 @@ class InvalidSignatureError(OpenSSHError):
     pass
 
 
-class AsymmetricKeypair(object):
+class AsymmetricKeypair:
     """Container for newly generated asymmetric key pairs or those loaded from existing files"""
 
     @classmethod
@@ -337,7 +332,7 @@ class AsymmetricKeypair(object):
             return self.__publickey.verify(
                 signature,
                 data,
-                **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"]
+                **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"],
             )
         except InvalidSignature:
             raise InvalidSignatureError
@@ -354,7 +349,7 @@ class AsymmetricKeypair(object):
             self.__encryption_algorithm = serialization.NoEncryption()
 
 
-class OpensshKeypair(object):
+class OpensshKeypair:
     """Container for OpenSSH encoded asymmetric key pairs"""
 
     @classmethod

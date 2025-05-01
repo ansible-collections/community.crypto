@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import abc
 import os
@@ -66,7 +61,7 @@ def _restore_all_on_failure(f):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class OpensshModule(object):
+class OpensshModule:
     def __init__(self, module):
         self.module = module
 
@@ -169,7 +164,7 @@ class OpensshModule(object):
             self.changed = True
 
 
-class KeygenCommand(object):
+class KeygenCommand:
     def __init__(self, module):
         self._bin_path = module.get_bin_path("ssh-keygen", True)
         self._run_command = module.run_command
@@ -187,7 +182,7 @@ class KeygenCommand(object):
         type,
         time_parameters,
         use_agent,
-        **kwargs
+        **kwargs,
     ):
         args = [self._bin_path, "-s", signing_key_path, "-P", "", "-I", identifier]
 
@@ -269,7 +264,7 @@ class KeygenCommand(object):
         return self._run_command(command, **kwargs)
 
 
-class PrivateKey(object):
+class PrivateKey:
     def __init__(self, size, key_type, fingerprint, format=""):
         self._size = size
         self._type = key_type
@@ -311,7 +306,7 @@ class PrivateKey(object):
         }
 
 
-class PublicKey(object):
+class PublicKey:
     def __init__(self, type_string, data, comment):
         self._type_string = type_string
         self._data = data

@@ -1,14 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Copyright 2019 Entrust Datacard Corporation.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -242,7 +237,7 @@ def calculate_days_remaining(expiry_date):
     return days_remaining
 
 
-class EcsDomain(object):
+class EcsDomain:
     """
     Entrust Certificate Services domain class.
     """

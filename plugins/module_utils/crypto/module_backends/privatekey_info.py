@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
 # Copyright (c) 2017, Markus Teufelberger <mteufelberger+ansible@mgit.at>
 # Copyright (c) 2020, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import traceback
@@ -198,7 +192,7 @@ class PrivateKeyParseError(OpenSSLObjectError):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PrivateKeyInfoRetrieval(object):
+class PrivateKeyInfoRetrieval:
     def __init__(
         self,
         module,

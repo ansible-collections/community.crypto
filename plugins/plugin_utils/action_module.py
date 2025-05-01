@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2012-2013 Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2016 Toshio Kuratomi <tkuratomi@ansible.com>
 # Copyright (c) 2019 Ansible Project
@@ -12,11 +10,7 @@
 
 # NOTE: THIS IS ONLY FOR ACTION PLUGINS!
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import copy
@@ -41,7 +35,7 @@ class _ModuleExitException(Exception):
         self.result = result
 
 
-class AnsibleActionModule(object):
+class AnsibleActionModule:
     def __init__(
         self,
         action_plugin,

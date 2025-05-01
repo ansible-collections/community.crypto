@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2016, Yanis Guenane <yanis+ansible@guenane.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import errno
@@ -314,7 +308,7 @@ def select_message_digest(digest_string):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class OpenSSLObject(object):
+class OpenSSLObject:
 
     def __init__(self, path, state, force, check_mode):
         self.path = path

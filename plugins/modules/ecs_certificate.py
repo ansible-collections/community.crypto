@@ -1,14 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Copyright (c), Entrust Datacard Corporation, 2019
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -627,7 +622,7 @@ def convert_module_param_to_json_bool(module, dict_param_name, param_name):
     return body
 
 
-class EcsCertificate(object):
+class EcsCertificate:
     """
     Entrust Certificate Services certificate class.
     """

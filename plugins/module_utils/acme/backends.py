@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
 # Copyright (c) 2021 Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import datetime
@@ -99,7 +93,7 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CryptoBackend(object):
+class CryptoBackend:
     def __init__(self, module, with_timezone=False):
         self.module = module
         self._with_timezone = with_timezone

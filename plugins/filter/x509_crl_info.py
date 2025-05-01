@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2022, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 name: x509_crl_info
@@ -217,7 +213,7 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
         raise AnsibleFilterError(to_native(exc))
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible jinja2 filters"""
 
     def filters(self):

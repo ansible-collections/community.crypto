@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2024 Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import os
 
@@ -36,7 +30,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-class ACMECertificateClient(object):
+class ACMECertificateClient:
     """
     ACME v2 client class. Uses an ACME account object and a CSR to
     start and validate ACME challenges and download the respective

@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2023, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import abc
 import os
@@ -19,7 +15,7 @@ class GPGError(Exception):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class GPGRunner(object):
+class GPGRunner:
     @abc.abstractmethod
     def run_command(self, command, check_rc=True, data=None):
         """

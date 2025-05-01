@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is licensed under the
 # Modified BSD License. Modules you write using this snippet, which is embedded
@@ -10,10 +8,7 @@
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import json
 import os
@@ -101,7 +96,7 @@ def bind(instance, method, operation_spec):
     return binding_scope_fn
 
 
-class RestOperation(object):
+class RestOperation:
     def __init__(self, session, uri, method, parameters=None):
         self.session = session
         self.method = method
@@ -182,7 +177,7 @@ class RestOperation(object):
         )
 
 
-class Resource(object):
+class Resource:
     """Implement basic CRUD operations against a path."""
 
     def __init__(self, session):
@@ -229,7 +224,7 @@ class Resource(object):
 
 
 # Session to encapsulate the connection parameters of the module_utils Request object, the api spec, etc
-class ECSSession(object):
+class ECSSession:
     def __init__(self, name, **kwargs):
         """
         Initialize our session

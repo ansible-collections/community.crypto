@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
 # Copyright (c) 2021 Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 
@@ -26,7 +20,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 
-class CertificateChain(object):
+class CertificateChain:
     """
     Download and parse the certificate chain.
     https://tools.ietf.org/html/rfc8555#section-7.4.2
@@ -98,7 +92,7 @@ class CertificateChain(object):
         }
 
 
-class Criterium(object):
+class Criterium:
     def __init__(self, criterium, index=None):
         self.index = index
         self.test_certificates = criterium["test_certificates"]
@@ -109,7 +103,7 @@ class Criterium(object):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class ChainMatcher(object):
+class ChainMatcher:
     @abc.abstractmethod
     def match(self, certificate):
         """

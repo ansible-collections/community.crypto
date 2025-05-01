@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2020, Doug Stanley <doug+ansible@technologixllc.com>
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
+from __future__ import annotations
 
 import os
 import re
@@ -87,7 +82,7 @@ def secure_write(path, mode, content):
 
 
 # See https://datatracker.ietf.org/doc/html/rfc4251#section-5 for SSH data types
-class OpensshParser(object):
+class OpensshParser:
     """Parser for OpenSSH encoded objects"""
 
     BOOLEAN_OFFSET = 1
@@ -271,7 +266,7 @@ class OpensshParser(object):
         return result
 
 
-class _OpensshWriter(object):
+class _OpensshWriter:
     """Writes SSH encoded values to a bytes-like buffer
 
     .. warning::

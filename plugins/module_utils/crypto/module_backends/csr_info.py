@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2016-2017, Yanis Guenane <yanis+ansible@guenane.org>
 # Copyright (c) 2017, Markus Teufelberger <mteufelberger+ansible@mgit.at>
 # Copyright (c) 2020, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 import abc
 import binascii
@@ -55,7 +49,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CSRInfoRetrieval(object):
+class CSRInfoRetrieval:
     def __init__(self, module, backend, content, validate_signature):
         # content must be a bytes string
         self.module = module
