@@ -150,7 +150,6 @@ regular_certificate:
 import base64
 import datetime
 import ipaddress
-import sys
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

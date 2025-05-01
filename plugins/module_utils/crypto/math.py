@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-import sys
-
 
 def binary_exp_mod(f, e, m):
     """Computes f^e mod m in O(log e) multiplications modulo m."""

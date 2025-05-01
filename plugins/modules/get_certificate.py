@@ -273,7 +273,6 @@ from ssl import (
     CERT_REQUIRED,
     DER_cert_to_PEM_cert,
     create_default_context,
-    get_server_certificate,
 )
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

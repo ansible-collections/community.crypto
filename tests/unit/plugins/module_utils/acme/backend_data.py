@@ -7,7 +7,6 @@ from __future__ import annotations
 import base64
 import datetime
 import os
-import sys
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,

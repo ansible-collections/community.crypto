@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import datetime
-import sys
 
 import pytest
 from ansible.module_utils.common.collections import is_sequence

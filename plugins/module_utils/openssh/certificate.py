@@ -8,7 +8,6 @@ import abc
 import binascii
 import datetime as _datetime
 import os
-import sys
 from base64 import b64encode
 from datetime import datetime
 from hashlib import sha256

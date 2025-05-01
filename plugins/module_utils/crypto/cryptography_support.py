@@ -8,7 +8,6 @@ import base64
 import binascii
 import ipaddress
 import re
-import sys
 import traceback
 from urllib.parse import (
     ParseResult,

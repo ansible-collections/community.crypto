@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import datetime
 import re
-import sys
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
