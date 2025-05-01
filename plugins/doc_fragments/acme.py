@@ -86,7 +86,8 @@ options:
       - Mutually exclusive with O(account_key_content).
       - Required if O(account_key_content) is not used.
     type: path
-    aliases: [account_key]
+    aliases:
+      - account_key
   account_key_content:
     description:
       - Content of the ACME account RSA or Elliptic Curve key.
