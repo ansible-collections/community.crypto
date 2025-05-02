@@ -16,8 +16,6 @@ description:
     return variables are still returned. Note that key consistency checks are not available all key types; if none is available,
     V(none) is returned for RV(key_is_consistent).
   - It uses the cryptography python library to interact with OpenSSL.
-requirements:
-  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
@@ -25,6 +23,7 @@ extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
 options:
   path:
     description:

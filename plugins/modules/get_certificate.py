@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: none
@@ -121,7 +122,6 @@ notes:
   - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 requirements:
   - "Python >= 3.10 when O(get_certificate_chain=true)"
-  - "cryptography >= 3.4"
 
 seealso:
   - plugin: community.crypto.to_serial
@@ -284,6 +284,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     get_not_valid_after,
     get_not_valid_before,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
@@ -292,7 +295,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

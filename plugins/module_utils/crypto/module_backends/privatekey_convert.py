@@ -22,13 +22,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_private_key_format,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import load_file
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

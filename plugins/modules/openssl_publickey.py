@@ -14,8 +14,6 @@ description:
   - Public keys are generated in PEM or OpenSSH format. Private keys must be OpenSSL PEM keys. B(OpenSSH private keys are
     not supported), use the M(community.crypto.openssh_keypair) module to manage these.
   - The module uses the cryptography Python library.
-requirements:
-  - cryptography >= 3.4
 author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
@@ -23,6 +21,7 @@ extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes
   - community.crypto.attributes.files
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: full
@@ -200,6 +199,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     get_fingerprint,
     load_privatekey,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
@@ -209,7 +211,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

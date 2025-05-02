@@ -19,8 +19,6 @@ description:
     to M(community.crypto.x509_certificate_info). When using FQCNs or when using the
     L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
     keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid a deprecation warning.
-requirements:
-  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
@@ -29,6 +27,7 @@ extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
   - community.crypto.name_encoding
 options:
   path:

@@ -14,16 +14,15 @@ description:
   - This module allows one to query information on OpenSSL Certificate Signing Requests (CSR).
   - In case the CSR signature cannot be validated, the module will fail. In this case, all return variables are still returned.
   - It uses the cryptography python library to interact with OpenSSL.
-requirements:
-  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
-  - community.crypto.name_encoding
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
+  - community.crypto.name_encoding
 options:
   path:
     description:

@@ -19,11 +19,10 @@ description:
     validated in the ECS system. It is I(not) the responsibility of this module to perform those steps.
 notes:
   - O(path) must be specified as the output location of the certificate.
-requirements:
-  - cryptography >= 3.4
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.files
+  - community.crypto.cryptography_dep.minimum
   - community.crypto.ecs_credential
 attributes:
   check_mode:
@@ -558,6 +557,9 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
     ECSClient,
     RestOperationException,
@@ -581,7 +583,7 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 
 def validate_cert_expiry(cert_expiry):

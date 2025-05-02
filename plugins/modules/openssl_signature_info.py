@@ -13,8 +13,6 @@ short_description: Verify signatures with openssl
 description:
   - This module allows one to verify a signature for a file by a certificate.
   - The module uses the cryptography Python library.
-requirements:
-  - cryptography >= 3.4
 author:
   - Patrick Pichler (@aveexy)
   - Markus Teufelberger (@MarkusTeufelberger)
@@ -22,6 +20,7 @@ extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
 options:
   path:
     description:
@@ -88,12 +87,15 @@ import base64
 import os
 import traceback
 
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
