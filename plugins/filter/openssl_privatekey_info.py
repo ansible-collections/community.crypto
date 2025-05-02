@@ -147,7 +147,7 @@ _value:
 """
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -192,7 +192,7 @@ def openssl_privatekey_info_filter(
     except PrivateKeyParseError as exc:
         raise AnsibleFilterError(exc.error_message)
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(to_native(exc))
+        raise AnsibleFilterError(str(exc))
 
 
 class FilterModule:

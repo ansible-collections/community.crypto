@@ -157,13 +157,13 @@ class CSRInfoRetrieval:
 
         ski = self._get_subject_key_identifier()
         if ski is not None:
-            ski = to_native(binascii.hexlify(ski))
+            ski = binascii.hexlify(ski).decode("ascii")
             ski = ":".join([ski[i : i + 2] for i in range(0, len(ski), 2)])
         result["subject_key_identifier"] = ski
 
         aki, aci, acsn = self._get_authority_key_identifier()
         if aki is not None:
-            aki = to_native(binascii.hexlify(aki))
+            aki = binascii.hexlify(aki).decode("ascii")
             aki = ":".join([aki[i : i + 2] for i in range(0, len(aki), 2)])
         result["authority_key_identifier"] = aki
         result["authority_cert_issuer"] = aci

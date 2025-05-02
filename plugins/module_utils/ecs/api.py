@@ -59,7 +59,7 @@ class RestOperationException(Exception):
     def __init__(self, error):
         self.status = to_native(error.get("status", None))
         self.errors = [to_native(err.get("message")) for err in error.get("errors", {})]
-        self.message = to_native(" ".join(self.errors))
+        self.message = " ".join(self.errors)
 
 
 def generate_docstring(operation_spec):
@@ -197,7 +197,7 @@ class Resource:
                         operation_name = "Patch"
                     else:
                         raise SessionConfigurationException(
-                            to_native(f"Invalid REST method type {method}")
+                            f"Invalid REST method type {method}"
                         )
 
                     # Get the non-parameter parts of the URL and append to the operation name
@@ -242,7 +242,7 @@ class ECSSession:
             if self._config:
                 break
         if self._config is None:
-            raise SessionConfigurationException(to_native("No Configuration Found."))
+            raise SessionConfigurationException("No Configuration Found.")
 
         # set up auth if passed
         entrust_api_user = self.get_config("entrust_api_user")
@@ -251,9 +251,7 @@ class ECSSession:
             self.request.url_username = entrust_api_user
             self.request.url_password = entrust_api_key
         else:
-            raise SessionConfigurationException(
-                to_native("User and key must be provided.")
-            )
+            raise SessionConfigurationException("User and key must be provided.")
 
         # set up client certificate if passed (support all-in one or cert + key)
         entrust_api_cert = self.get_config("entrust_api_cert")
@@ -264,9 +262,7 @@ class ECSSession:
                 self.request.client_key = entrust_api_cert_key
         else:
             raise SessionConfigurationException(
-                to_native(
-                    "Client certificate for authentication to the API must be provided."
-                )
+                "Client certificate for authentication to the API must be provided."
             )
 
         # set up the spec
@@ -278,15 +274,11 @@ class ECSSession:
             entrust_api_specification_path
         ):
             raise SessionConfigurationException(
-                to_native(
-                    f"OpenAPI specification was not found at location {entrust_api_specification_path}."
-                )
+                f"OpenAPI specification was not found at location {entrust_api_specification_path}."
             )
         if not valid_file_format.match(entrust_api_specification_path):
             raise SessionConfigurationException(
-                to_native(
-                    "OpenAPI specification filename must end in .json, .yml or .yaml"
-                )
+                "OpenAPI specification filename must end in .json, .yml or .yaml"
             )
 
         self.verify = True
@@ -305,9 +297,7 @@ class ECSSession:
                     self._spec = yaml.safe_load(http_response_contents)
             except HTTPError as e:
                 raise SessionConfigurationException(
-                    to_native(
-                        f"Error downloading specification from address '{entrust_api_specification_path}', received error code '{e.getcode()}'"
-                    )
+                    f"Error downloading specification from address '{entrust_api_specification_path}', received error code '{e.getcode()}'"
                 )
         else:
             with open(entrust_api_specification_path) as f:
@@ -332,25 +322,21 @@ class ECSSession:
             and not os.path.isfile(entrust_api_specification_path)
         ):
             raise SessionConfigurationException(
-                to_native(
-                    f"Parameter provided for entrust_api_specification_path of value '{entrust_api_specification_path}'"
-                    " was not a valid file path or HTTPS address."
-                )
+                f"Parameter provided for entrust_api_specification_path of value '{entrust_api_specification_path}'"
+                " was not a valid file path or HTTPS address."
             )
 
         for required_file in ["entrust_api_cert", "entrust_api_cert_key"]:
             file_path = kwargs.get(required_file)
             if not file_path or not os.path.isfile(file_path):
                 raise SessionConfigurationException(
-                    to_native(
-                        f"Parameter provided for {required_file} of value '{file_path}' was not a valid file path."
-                    )
+                    f"Parameter provided for {required_file} of value '{file_path}' was not a valid file path."
                 )
 
         for required_var in ["entrust_api_user", "entrust_api_key"]:
             if not kwargs.get(required_var):
                 raise SessionConfigurationException(
-                    to_native(f"Parameter provided for {required_var} was missing.")
+                    f"Parameter provided for {required_var} was missing."
                 )
 
         config["entrust_api_cert"] = kwargs.get("entrust_api_cert")

@@ -10,7 +10,6 @@ import stat
 import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,
 )
@@ -73,7 +72,7 @@ class OpensshModule:
             self._execute()
         except Exception as e:
             self.module.fail_json(
-                msg=f"unexpected error occurred: {to_native(e)}",
+                msg=f"unexpected error occurred: {e}",
                 exception=traceback.format_exc(),
             )
 

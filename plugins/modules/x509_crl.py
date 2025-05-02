@@ -429,7 +429,7 @@ import os
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.validation import check_type_int, check_type_str
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLBadPassphraseError,
@@ -543,7 +543,7 @@ class CRL(OpenSSLObject):
                 self.issuer_ordered = False
                 self.issuer = parse_name_field(module.params["issuer"], "issuer")
         except (TypeError, ValueError) as exc:
-            module.fail_json(msg=to_native(exc))
+            module.fail_json(msg=str(exc))
 
         self.last_update = get_relative_time_option(
             module.params["last_update"],
@@ -1040,7 +1040,7 @@ def main():
         result = crl.dump()
         module.exit_json(**result)
     except OpenSSLObjectError as exc:
-        module.fail_json(msg=to_native(exc))
+        module.fail_json(msg=str(exc))
 
 
 if __name__ == "__main__":

@@ -11,7 +11,6 @@ import shutil
 import tempfile
 import traceback
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
@@ -83,7 +82,7 @@ def write_file(module, dest, content):
         except Exception as err:
             os.remove(tmpsrc)
             raise ModuleFailException(
-                f"failed to copy {tmpsrc} to {dest}: {to_native(err)}",
+                f"failed to copy {tmpsrc} to {dest}: {err}",
                 exception=traceback.format_exc(),
             )
     os.remove(tmpsrc)

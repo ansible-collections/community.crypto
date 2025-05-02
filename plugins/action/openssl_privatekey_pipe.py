@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import base64
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -102,4 +102,4 @@ class ActionModule(ActionModuleBase):
                 module.params["content"] = "ANSIBLE_NO_LOG_VALUE"
             module.exit_json(**result)
         except OpenSSLObjectError as exc:
-            module.fail_json(msg=to_native(exc))
+            module.fail_json(msg=str(exc))

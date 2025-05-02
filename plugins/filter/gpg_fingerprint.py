@@ -40,7 +40,7 @@ _value:
 """
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
     GPGError,
     get_fingerprint_from_bytes,
@@ -59,7 +59,7 @@ def gpg_fingerprint(input):
         gpg = PluginGPGRunner()
         return get_fingerprint_from_bytes(gpg, to_bytes(input))
     except GPGError as exc:
-        raise AnsibleFilterError(to_native(exc))
+        raise AnsibleFilterError(str(exc))
 
 
 class FilterModule:

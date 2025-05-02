@@ -554,7 +554,7 @@ import time
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
 )
@@ -760,8 +760,7 @@ class EcsCertificate:
             self.cert_days = calculate_cert_days(self.cert_details.get("expiresAfter"))
         except RestOperationException as e:
             module.fail_json(
-                f'Failed to get details of certificate with tracking_id="{self.tracking_id}", Error: ',
-                to_native(e.message),
+                msg=f'Failed to get details of certificate with tracking_id="{self.tracking_id}", Error: {e.message}'
             )
 
     def check(self, module):

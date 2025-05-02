@@ -15,7 +15,7 @@ from urllib.parse import (
     urlunparse,
 )
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
@@ -95,7 +95,7 @@ def cryptography_get_extensions_from_cert(cert):
         for ext in cert.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
+                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
             )
     else:
         # Since cryptography will not give us the DER value for an extension
@@ -120,7 +120,7 @@ def cryptography_get_extensions_from_cert(cert):
             der = backend._ffi.buffer(data.data, data.length)[:]
             entry = dict(
                 critical=(crit == 1),
-                value=to_native(base64.b64encode(der)),
+                value=base64.b64encode(der).decode("ascii"),
             )
             try:
                 oid = obj2txt(
@@ -142,7 +142,7 @@ def cryptography_get_extensions_from_csr(csr):
         for ext in csr.extensions:
             result[ext.oid.dotted_string] = dict(
                 critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
+                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
             )
 
     else:
@@ -178,7 +178,7 @@ def cryptography_get_extensions_from_csr(csr):
             der = backend._ffi.buffer(data.data, data.length)[:]
             entry = dict(
                 critical=(crit == 1),
-                value=to_native(base64.b64encode(der)),
+                value=base64.b64encode(der).decode("ascii"),
             )
             try:
                 oid = obj2txt(

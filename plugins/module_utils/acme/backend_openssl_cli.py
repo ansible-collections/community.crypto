@@ -14,7 +14,7 @@ import re
 import tempfile
 import traceback
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
     CryptoBackend,
@@ -140,7 +140,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_keydump_cmd)}: {to_text(err)}"
+                f"Error while running {' '.join(openssl_keydump_cmd)}: {err}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")
@@ -227,9 +227,9 @@ class OpenSSLCLIBackend(CryptoBackend):
     def sign(self, payload64, protected64, key_data):
         sign_payload = f"{protected64}.{payload64}".encode("utf8")
         if key_data["type"] == "hmac":
-            hex_key = to_native(
+            hex_key = (
                 binascii.hexlify(base64.urlsafe_b64decode(key_data["jwk"]["k"]))
-            )
+            ).decode("ascii")
             cmd_postfix = [
                 "-mac",
                 "hmac",
@@ -254,7 +254,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_sign_cmd)}: {to_text(err)}"
+                f"Error while running {' '.join(openssl_sign_cmd)}: {err}"
             )
 
         if key_data["type"] == "ec":
@@ -317,7 +317,7 @@ class OpenSSLCLIBackend(CryptoBackend):
     @staticmethod
     def _normalize_ip(ip):
         try:
-            return to_native(ipaddress.ip_address(to_text(ip)).compressed)
+            return ipaddress.ip_address(to_text(ip)).compressed
         except ValueError:
             # We do not want to error out on something IPAddress() cannot parse
             return ip
@@ -354,7 +354,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_csr_cmd)}: {to_text(err)}"
+                f"Error while running {' '.join(openssl_csr_cmd)}: {err}"
             )
 
         identifiers = set()
@@ -439,7 +439,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_cert_cmd)}: {to_text(err)}"
+                f"Error while running {' '.join(openssl_cert_cmd)}: {err}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")
@@ -490,7 +490,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_cert_cmd)}: {to_text(err)}"
+                f"Error while running {' '.join(openssl_cert_cmd)}: {err}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")

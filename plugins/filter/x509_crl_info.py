@@ -205,7 +205,7 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
             module, content=data, list_revoked_certificates=list_revoked_certificates
         )
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(to_native(exc))
+        raise AnsibleFilterError(str(exc))
 
 
 class FilterModule:

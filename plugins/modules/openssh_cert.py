@@ -286,7 +286,6 @@ info:
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
@@ -381,7 +380,7 @@ class Certificate(OpensshModule):
                 valid_to=self.module.params["valid_to"],
             )
         except ValueError as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
     def _execute(self):
         if self.state == "present":
@@ -447,7 +446,7 @@ class Certificate(OpensshModule):
                 valid_to=self.original_data.valid_before,
             )
         except ValueError as e:
-            return self.module.fail_json(msg=to_native(e))
+            return self.module.fail_json(msg=str(e))
 
         if self.ignore_timestamps:
             return original_time_parameters.within_range(self.valid_at)
@@ -463,7 +462,7 @@ class Certificate(OpensshModule):
         try:
             critical_options, extensions = parse_option_list(self.options)
         except ValueError as e:
-            return self.module.fail_json(msg=to_native(e))
+            return self.module.fail_json(msg=str(e))
 
         return all(
             [
@@ -528,9 +527,7 @@ class Certificate(OpensshModule):
         try:
             os.remove(self.path)
         except OSError as e:
-            self.module.fail_json(
-                msg=f"Unable to remove existing certificate: {to_native(e)}"
-            )
+            self.module.fail_json(msg=f"Unable to remove existing certificate: {e}")
 
     @property
     def _result(self):

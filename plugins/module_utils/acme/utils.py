@@ -12,7 +12,6 @@ import textwrap
 import traceback
 from urllib.parse import unquote
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
@@ -51,7 +50,7 @@ def pem_to_der(pem_filename=None, pem_content=None):
                 lines = list(f)
         except Exception as err:
             raise ModuleFailException(
-                f"cannot load PEM file {pem_filename}: {to_native(err)}",
+                f"cannot load PEM file {pem_filename}: {err}",
                 exception=traceback.format_exc(),
             )
     else:
@@ -126,15 +125,17 @@ def compute_cert_id(
         raise ModuleFailException(
             "Certificate has no Authority Key Identifier extension"
         )
-    aki = to_native(
-        base64.urlsafe_b64encode(cert_info.authority_key_identifier)
-    ).replace("=", "")
+    aki = (
+        (base64.urlsafe_b64encode(cert_info.authority_key_identifier))
+        .decode("ascii")
+        .replace("=", "")
+    )
 
     # Convert serial number to string
     serial_bytes = convert_int_to_bytes(cert_info.serial_number)
     if ord(serial_bytes[:1]) >= 128:
         serial_bytes = b"\x00" + serial_bytes
-    serial = to_native(base64.urlsafe_b64encode(serial_bytes)).replace("=", "")
+    serial = (base64.urlsafe_b64encode(serial_bytes)).decode("ascii").replace("=", "")
 
     # Compose cert ID
     return f"{aki}.{serial}"

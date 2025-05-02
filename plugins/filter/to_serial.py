@@ -40,7 +40,6 @@ _value:
 """
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.serial import to_serial
 
 
@@ -56,7 +55,7 @@ def to_serial_filter(input):
     try:
         return to_serial(input)
     except ValueError as exc:
-        raise AnsibleFilterError(to_native(exc))
+        raise AnsibleFilterError(str(exc))
 
 
 class FilterModule:

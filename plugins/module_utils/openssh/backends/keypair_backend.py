@@ -10,7 +10,7 @@ import os
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
@@ -216,7 +216,7 @@ class KeypairBackend(OpensshModule):
                 ]
             )
         except OSError as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
     def _generate_temp_keypair(self):
         temp_private_key = os.path.join(
@@ -227,7 +227,7 @@ class KeypairBackend(OpensshModule):
         try:
             self._generate_keypair(temp_private_key)
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
         for f in (temp_private_key, temp_public_key):
             self.module.add_cleanup_file(f)
@@ -283,7 +283,7 @@ class KeypairBackend(OpensshModule):
                 to_bytes(content),
             )
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
         self.module.add_cleanup_file(temp_public_key)
 
         return temp_public_key
@@ -304,7 +304,7 @@ class KeypairBackend(OpensshModule):
             if self._public_key_exists():
                 os.remove(self.public_key_path)
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
     @property
     def _result(self):
@@ -396,7 +396,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
                 check_rc=True,
             )
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
     def _private_key_valid_backend(self):
         return True
@@ -520,13 +520,13 @@ class KeypairBackendCryptography(KeypairBackend):
         try:
             keypair.comment = self.comment
         except InvalidCommentError as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
         try:
             temp_public_key = self._create_temp_public_key(keypair.public_key + b"\n")
             self._safe_secure_move([(temp_public_key, self.public_key_path)])
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=str(e))
 
     def _private_key_valid_backend(self):
         # avoids breaking behavior and prevents
