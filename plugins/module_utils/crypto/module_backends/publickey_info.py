@@ -27,6 +27,10 @@ MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
+    import cryptography.hazmat.primitives.asymmetric.ed448
+    import cryptography.hazmat.primitives.asymmetric.ed25519
+    import cryptography.hazmat.primitives.asymmetric.x448
+    import cryptography.hazmat.primitives.asymmetric.x25519
     from cryptography.hazmat.primitives import serialization
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
