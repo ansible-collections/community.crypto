@@ -220,7 +220,6 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
     ECSClient,
     RestOperationException,
@@ -274,9 +273,7 @@ class EcsDomain:
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(
-                msg=f"Failed to initialize Entrust Provider: {to_native(e)}"
-            )
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
             self.ecs_client.GetAppVersion()
         except RestOperationException as e:

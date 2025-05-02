@@ -3,3 +3,4 @@ minor_changes:
   - "Python code modernization: update ``__future__`` imports, remove Python 2 specific boilerplates (https://github.com/ansible-collections/community.crypto/pull/876)."
   - "Python code modernization: use ``unittest.mock`` instead of ``ansible_collections.community.internal_test_tools.tests.unit.compat.mock`` (https://github.com/ansible-collections/community.crypto/pull/881)."
   - "Python code modernization: remove Python 3 specific code (https://github.com/ansible-collections/community.crypto/pull/877)."
+  - "Python code modernization: avoid unnecessary string conversion (https://github.com/ansible-collections/community.crypto/pull/880)."

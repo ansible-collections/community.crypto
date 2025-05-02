@@ -212,7 +212,7 @@ class DHParameterBase:
             os.remove(self.path)
             self.changed = True
         except OSError as exc:
-            module.fail_json(msg=to_native(exc))
+            module.fail_json(msg=str(exc))
 
     def check(self, module):
         """Ensure the resource is in its desired state."""
@@ -279,7 +279,7 @@ class DHParameterOpenSSL(DHParameterBase):
         command = [self.openssl_bin, "dhparam", "-out", tmpsrc, str(self.size)]
         rc, dummy, err = module.run_command(command, check_rc=False)
         if rc != 0:
-            raise DHParameterError(to_native(err))
+            raise DHParameterError(str(err))
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         try:
@@ -429,7 +429,7 @@ def main():
         try:
             dhparam.generate(module)
         except DHParameterError as exc:
-            module.fail_json(msg=to_native(exc))
+            module.fail_json(msg=str(exc))
     else:
         dhparam = DHParameterAbsent(module)
 
@@ -442,7 +442,7 @@ def main():
             try:
                 dhparam.remove(module)
             except Exception as exc:
-                module.fail_json(msg=to_native(exc))
+                module.fail_json(msg=str(exc))
 
     result = dhparam.dump()
 

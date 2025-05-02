@@ -229,7 +229,7 @@ class PrivateKeyInfoRetrieval:
             )
             result["can_parse_key"] = True
         except OpenSSLObjectError as exc:
-            raise PrivateKeyParseError(to_native(exc), result)
+            raise PrivateKeyParseError(str(exc), result)
 
         result["public_key"] = to_native(self._get_public_key(binary=False))
         pk = self._get_public_key(binary=True)

@@ -9,7 +9,7 @@ import os
 import tempfile
 import traceback
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
     CertificateBackend,
     CertificateError,
@@ -66,7 +66,7 @@ class AcmeCertificateBackend(CertificateBackend):
                 except Exception:
                     pass
                 self.module.fail_json(
-                    msg=f"failed to create temporary CSR file: {to_native(err)}",
+                    msg=f"failed to create temporary CSR file: {err}",
                     exception=traceback.format_exc(),
                 )
             f.close()

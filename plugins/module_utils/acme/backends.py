@@ -11,7 +11,6 @@ import re
 from collections import namedtuple
 
 from ansible.module_utils import six
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
 )
@@ -106,7 +105,7 @@ class CryptoBackend:
                 value, name, backend="cryptography", with_timezone=self._with_timezone
             )
         except OpenSSLObjectError as exc:
-            raise BackendException(to_native(exc))
+            raise BackendException(str(exc))
 
     def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
         start = get_epoch_seconds(timestamp_start)

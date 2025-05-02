@@ -9,7 +9,6 @@ import traceback
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -116,7 +115,7 @@ class PublicKeyInfoRetrieval:
             try:
                 self.key = load_publickey(content=self.content, backend=self.backend)
             except OpenSSLObjectError as e:
-                raise PublicKeyParseError(to_native(e), {})
+                raise PublicKeyParseError(str(e), {})
 
         pk = self._get_public_key(binary=True)
         result["fingerprints"] = (

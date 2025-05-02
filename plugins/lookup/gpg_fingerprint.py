@@ -43,7 +43,6 @@ _value:
 """
 
 from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
     GPGError,
@@ -65,4 +64,4 @@ class LookupModule(LookupBase):
                 result.append(get_fingerprint_from_file(gpg, path))
             return result
         except GPGError as exc:
-            raise AnsibleLookupError(to_native(exc))
+            raise AnsibleLookupError(str(exc))

@@ -11,7 +11,7 @@ import traceback
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
@@ -157,7 +157,7 @@ class CertificateSigningRequestBackend:
                 )
                 self.ordered_subject = True
         except ValueError as exc:
-            raise CertificateSigningRequestError(to_native(exc))
+            raise CertificateSigningRequestError(str(exc))
 
         self.using_common_name_for_san = False
         if not self.subjectAltName and module.params["use_common_name_for_san"]:
