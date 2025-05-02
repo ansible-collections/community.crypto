@@ -652,7 +652,7 @@ class EcsCertificate:
         self.ecs_client = None
         if self.path and os.path.exists(self.path):
             try:
-                self.cert = load_certificate(self.path, backend="cryptography")
+                self.cert = load_certificate(self.path)
             except Exception:
                 self.cert = None
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid

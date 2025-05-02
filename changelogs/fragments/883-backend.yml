@@ -1,0 +1,2 @@
+minor_changes:
+  - "Remove ``backend`` parameter from internal code whenever possible (https://github.com/ansible-collections/community.crypto/pull/883)."

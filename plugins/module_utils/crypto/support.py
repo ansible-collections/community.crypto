@@ -98,20 +98,17 @@ def get_fingerprint_of_bytes(source, prefer_one=False):
     return fingerprint
 
 
-def get_fingerprint_of_privatekey(privatekey, backend="cryptography", prefer_one=False):
+def get_fingerprint_of_privatekey(privatekey, prefer_one=False):
     """Generate the fingerprint of the public key."""
 
-    if backend == "cryptography":
-        publickey = privatekey.public_key().public_bytes(
-            serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
-        )
+    publickey = privatekey.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
 
     return get_fingerprint_of_bytes(publickey, prefer_one=prefer_one)
 
 
-def get_fingerprint(
-    path, passphrase=None, content=None, backend="cryptography", prefer_one=False
-):
+def get_fingerprint(path, passphrase=None, content=None, prefer_one=False):
     """Generate the fingerprint of the public key."""
 
     privatekey = load_privatekey(
@@ -119,16 +116,16 @@ def get_fingerprint(
         passphrase=passphrase,
         content=content,
         check_passphrase=False,
-        backend=backend,
     )
 
-    return get_fingerprint_of_privatekey(
-        privatekey, backend=backend, prefer_one=prefer_one
-    )
+    return get_fingerprint_of_privatekey(privatekey, prefer_one=prefer_one)
 
 
 def load_privatekey(
-    path, passphrase=None, check_passphrase=True, content=None, backend="cryptography"
+    path,
+    passphrase=None,
+    check_passphrase=True,
+    content=None,
 ):
     """Load the specified OpenSSL private key.
 
@@ -145,23 +142,20 @@ def load_privatekey(
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
 
-    if backend == "cryptography":
-        try:
-            result = load_pem_private_key(
-                priv_key_detail,
-                None if passphrase is None else to_bytes(passphrase),
-            )
-        except TypeError:
-            raise OpenSSLBadPassphraseError(
-                "Wrong or empty passphrase provided for private key"
-            )
-        except ValueError:
-            raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
-
-    return result
+    try:
+        return load_pem_private_key(
+            priv_key_detail,
+            None if passphrase is None else to_bytes(passphrase),
+        )
+    except TypeError:
+        raise OpenSSLBadPassphraseError(
+            "Wrong or empty passphrase provided for private key"
+        )
+    except ValueError:
+        raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
 
 
-def load_publickey(path=None, content=None, backend=None):
+def load_publickey(path=None, content=None):
     if content is None:
         if path is None:
             raise OpenSSLObjectError("Must provide either path or content")
@@ -171,16 +165,13 @@ def load_publickey(path=None, content=None, backend=None):
         except (IOError, OSError) as exc:
             raise OpenSSLObjectError(exc)
 
-    if backend == "cryptography":
-        try:
-            return serialization.load_pem_public_key(content)
-        except Exception as e:
-            raise OpenSSLObjectError(f"Error while deserializing key: {e}")
+    try:
+        return serialization.load_pem_public_key(content)
+    except Exception as e:
+        raise OpenSSLObjectError(f"Error while deserializing key: {e}")
 
 
-def load_certificate(
-    path, content=None, backend="cryptography", der_support_enabled=False
-):
+def load_certificate(path, content=None, der_support_enabled=False):
     """Load the specified certificate."""
 
     try:
@@ -191,20 +182,19 @@ def load_certificate(
             cert_content = content
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
-    if backend == "cryptography":
-        if der_support_enabled is False or identify_pem_format(cert_content):
-            try:
-                return x509.load_pem_x509_certificate(cert_content)
-            except ValueError as exc:
-                raise OpenSSLObjectError(exc)
-        elif der_support_enabled:
-            try:
-                return x509.load_der_x509_certificate(cert_content)
-            except ValueError as exc:
-                raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
+    if der_support_enabled is False or identify_pem_format(cert_content):
+        try:
+            return x509.load_pem_x509_certificate(cert_content)
+        except ValueError as exc:
+            raise OpenSSLObjectError(exc)
+    elif der_support_enabled:
+        try:
+            return x509.load_der_x509_certificate(cert_content)
+        except ValueError as exc:
+            raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
 
 
-def load_certificate_request(path, content=None, backend="cryptography"):
+def load_certificate_request(path, content=None):
     """Load the specified certificate signing request."""
     try:
         if content is None:
@@ -214,11 +204,10 @@ def load_certificate_request(path, content=None, backend="cryptography"):
             csr_content = content
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
-    if backend == "cryptography":
-        try:
-            return x509.load_pem_x509_csr(csr_content)
-        except ValueError as exc:
-            raise OpenSSLObjectError(exc)
+    try:
+        return x509.load_pem_x509_csr(csr_content)
+    except ValueError as exc:
+        raise OpenSSLObjectError(exc)
 
 
 def parse_name_field(input_dict, name_field_name=None):

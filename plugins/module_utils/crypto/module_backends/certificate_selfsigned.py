@@ -40,9 +40,7 @@ except ImportError:
 
 class SelfSignedCertificateBackendCryptography(CertificateBackend):
     def __init__(self, module):
-        super(SelfSignedCertificateBackendCryptography, self).__init__(
-            module, "cryptography"
-        )
+        super(SelfSignedCertificateBackendCryptography, self).__init__(module)
 
         self.create_subject_key_identifier = module.params[
             "selfsigned_create_subject_key_identifier"
@@ -50,13 +48,11 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         self.notBefore = get_relative_time_option(
             module.params["selfsigned_not_before"],
             "selfsigned_not_before",
-            backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.notAfter = get_relative_time_option(
             module.params["selfsigned_not_after"],
             "selfsigned_not_after",
-            backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["selfsigned_digest"])
@@ -206,9 +202,8 @@ class SelfSignedCertificateProvider(CertificateProvider):
     def needs_version_two_certs(self, module):
         return module.params["selfsigned_version"] == 2
 
-    def create_backend(self, module, backend):
-        if backend == "cryptography":
-            return SelfSignedCertificateBackendCryptography(module)
+    def create_backend(self, module):
+        return SelfSignedCertificateBackendCryptography(module)
 
 
 def add_selfsigned_provider_to_argument_spec(argument_spec):

@@ -173,7 +173,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "+1d2h3m4s",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 2, 3, 4),
@@ -181,7 +180,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "-1w10d24h",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2023, 12, 14, 0, 0, 0),
@@ -189,7 +187,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "20240102040506Z",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 4, 5, 6),
@@ -197,7 +194,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "202401020405Z",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 4, 5, 0),
@@ -205,7 +201,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "+1d2h3m4s",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 2, 3, 4, tzinfo=UTC),
@@ -213,7 +208,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "-1w10d24h",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2023, 12, 14, 0, 0, 0, tzinfo=UTC),
@@ -221,7 +215,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "20240102040506Z",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 4, 5, 6, tzinfo=UTC),
@@ -229,7 +222,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "202401020405Z",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 4, 5, 0, tzinfo=UTC),
@@ -237,7 +229,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "20240102040506+0100",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 3, 5, 6),
@@ -245,7 +236,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "202401020405+0100",
             "foo",
-            "cryptography",
             False,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 3, 5, 0),
@@ -253,7 +243,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "20240102040506+0100",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 3, 5, 6, tzinfo=UTC),
@@ -261,7 +250,6 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
         (
             "202401020405+0100",
             "foo",
-            "cryptography",
             True,
             datetime.datetime(2024, 1, 1, 0, 0, 0),
             datetime.datetime(2024, 1, 2, 3, 5, 0, tzinfo=UTC),
@@ -344,17 +332,16 @@ def test_convert_relative_to_datetime(
 
 
 @pytest.mark.parametrize(
-    "timezone, input_string, input_name, backend, with_timezone, now, expected",
+    "timezone, input_string, input_name, with_timezone, now, expected",
     TEST_GET_RELATIVE_TIME_OPTION,
 )
 def test_get_relative_time_option(
-    timezone, input_string, input_name, backend, with_timezone, now, expected
+    timezone, input_string, input_name, with_timezone, now, expected
 ):
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output = get_relative_time_option(
             input_string,
             input_name,
-            backend=backend,
             with_timezone=with_timezone,
             now=now,
         )

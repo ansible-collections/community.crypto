@@ -346,8 +346,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
         if self.module.params["private_key_format"] != "auto":
             self.module.fail_json(
-                msg="'auto' is the only valid option for "
-                + "'private_key_format' when 'backend' is not 'cryptography'"
+                msg="'auto' is the only valid option for 'private_key_format' when 'backend' is not 'cryptography'"
             )
 
         self.ssh_keygen = KeygenCommand(self.module)
@@ -550,14 +549,13 @@ def select_backend(module, backend):
     if backend == "opensshbin":
         if not can_use_opensshbin:
             module.fail_json(msg="Cannot find the OpenSSH binary in the PATH")
-        return backend, KeypairBackendOpensshBin(module)
-    elif backend == "cryptography":
+        return KeypairBackendOpensshBin(module)
+    if backend == "cryptography":
         if not can_use_cryptography:
             module.fail_json(
                 msg=missing_required_lib(
                     f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
                 )
             )
-        return backend, KeypairBackendCryptography(module)
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+        return KeypairBackendCryptography(module)
+    raise ValueError(f"Unsupported value for backend: {backend}")

@@ -140,7 +140,6 @@ CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
-    import cryptography.hazmat.backends
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.asymmetric.rsa

@@ -69,14 +69,13 @@ class PrivateKeyError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyConvertBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
         self.src_path = module.params["src_path"]
         self.src_content = module.params["src_content"]
         self.src_passphrase = module.params["src_passphrase"]
         self.format = module.params["format"]
         self.dest_passphrase = module.params["dest_passphrase"]
-        self.backend = backend
 
         self.src_private_key = None
         if self.src_path is not None:
@@ -135,9 +134,7 @@ class PrivateKeyConvertBackend:
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     def __init__(self, module):
-        super(PrivateKeyConvertCryptographyBackend, self).__init__(
-            module=module, backend="cryptography"
-        )
+        super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
 
     def get_private_key_data(self):
         """Return bytes for self.src_private_key in output format"""

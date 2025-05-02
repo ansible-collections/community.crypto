@@ -53,10 +53,9 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 @six.add_metaclass(abc.ABCMeta)
 class CSRInfoRetrieval:
-    def __init__(self, module, backend, content, validate_signature):
+    def __init__(self, module, content, validate_signature):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
         self.validate_signature = validate_signature
 
@@ -115,7 +114,8 @@ class CSRInfoRetrieval:
     def get_info(self, prefer_one_fingerprint=False):
         result = dict()
         self.csr = load_certificate_request(
-            None, content=self.content, backend=self.backend
+            None,
+            content=self.content,
         )
 
         subject = self._get_subject_ordered()
@@ -146,7 +146,6 @@ class CSRInfoRetrieval:
 
         public_key_info = get_publickey_info(
             self.module,
-            self.backend,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -185,7 +184,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
     def __init__(self, module, content, validate_signature):
         super(CSRInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content, validate_signature
+            module, content, validate_signature
         )
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
@@ -352,12 +351,11 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
 
 def get_csr_info(
-    module, backend, content, validate_signature=True, prefer_one_fingerprint=False
+    module, content, validate_signature=True, prefer_one_fingerprint=False
 ):
-    if backend == "cryptography":
-        info = CSRInfoRetrievalCryptography(
-            module, content, validate_signature=validate_signature
-        )
+    info = CSRInfoRetrievalCryptography(
+        module, content, validate_signature=validate_signature
+    )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
@@ -379,16 +377,11 @@ def select_backend(module, backend, content, validate_signature=True):
                 msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CSRInfoRetrievalCryptography(
-            module, content, validate_signature=validate_signature
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
         )
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+    return CSRInfoRetrievalCryptography(
+        module, content, validate_signature=validate_signature
+    )

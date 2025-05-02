@@ -181,7 +181,6 @@ def openssl_privatekey_info_filter(
     try:
         result = get_privatekey_info(
             module,
-            "cryptography",
             content=to_bytes(data),
             passphrase=passphrase,
             return_private_key_data=return_private_key_data,

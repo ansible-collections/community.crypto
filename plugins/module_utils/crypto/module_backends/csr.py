@@ -85,9 +85,8 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class CertificateSigningRequestBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
-        self.backend = backend
         self.digest = module.params["digest"]
         self.privatekey_path = module.params["privatekey_path"]
         self.privatekey_content = module.params["privatekey_content"]
@@ -202,7 +201,6 @@ class CertificateSigningRequestBackend:
         try:
             result = get_csr_info(
                 self.module,
-                self.backend,
                 data,
                 validate_signature=False,
                 prefer_one_fingerprint=True,
@@ -240,7 +238,6 @@ class CertificateSigningRequestBackend:
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
-                backend=self.backend,
             )
         except OpenSSLBadPassphraseError as exc:
             raise CertificateSigningRequestError(exc)
@@ -256,7 +253,8 @@ class CertificateSigningRequestBackend:
             return True
         try:
             self.existing_csr = load_certificate_request(
-                None, content=self.existing_csr_bytes, backend=self.backend
+                None,
+                content=self.existing_csr_bytes,
             )
         except Exception:
             return True
@@ -340,9 +338,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, module):
-        super(CertificateSigningRequestCryptographyBackend, self).__init__(
-            module, "cryptography"
-        )
+        super(CertificateSigningRequestCryptographyBackend, self).__init__(module)
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
@@ -774,17 +770,12 @@ def select_backend(module, backend):
                 msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CertificateSigningRequestCryptographyBackend(module)
-    else:
-        raise Exception(f"Unsupported value for backend: {backend}")
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
+    return CertificateSigningRequestCryptographyBackend(module)
 
 
 def get_csr_argument_spec():

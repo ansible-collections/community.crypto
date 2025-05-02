@@ -97,10 +97,9 @@ class PublicKeyParseError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PublicKeyInfoRetrieval:
-    def __init__(self, module, backend, content=None, key=None):
+    def __init__(self, module, content=None, key=None):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
         self.key = key
 
@@ -116,7 +115,7 @@ class PublicKeyInfoRetrieval:
         result = dict()
         if self.key is None:
             try:
-                self.key = load_publickey(content=self.content, backend=self.backend)
+                self.key = load_publickey(content=self.content)
             except OpenSSLObjectError as e:
                 raise PublicKeyParseError(str(e), {})
 
@@ -138,7 +137,7 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 
     def __init__(self, module, content=None, key=None):
         super(PublicKeyInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content=content, key=key
+            module, content=content, key=key
         )
 
     def _get_public_key(self, binary):
@@ -151,11 +150,8 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
         return _get_cryptography_public_key_info(self.key)
 
 
-def get_publickey_info(
-    module, backend, content=None, key=None, prefer_one_fingerprint=False
-):
-    if backend == "cryptography":
-        info = PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
+def get_publickey_info(module, content=None, key=None, prefer_one_fingerprint=False):
+    info = PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
@@ -177,16 +173,9 @@ def select_backend(module, backend, content=None, key=None):
                 msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, PublicKeyInfoRetrievalCryptography(
-            module, content=content, key=key
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
         )
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+    return PublicKeyInfoRetrievalCryptography(module, content=content, key=key)

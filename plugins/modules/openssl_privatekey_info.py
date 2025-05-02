@@ -245,7 +245,7 @@ def main():
 
     result["can_load_key"] = True
 
-    backend, module_backend = select_backend(
+    module_backend = select_backend(
         module,
         module.params["select_crypto_backend"],
         data,

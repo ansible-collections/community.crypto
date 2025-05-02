@@ -340,14 +340,14 @@ else:
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
 
-def load_certificate_set(filename, backend):
+def load_certificate_set(filename):
     """
     Load list of concatenated PEM files, and return a list of parsed certificates.
     """
     with open(filename, "rb") as f:
         data = f.read().decode("utf-8")
     return [
-        load_certificate(None, content=cert.encode("utf-8"), backend=backend)
+        load_certificate(None, content=cert.encode("utf-8"))
         for cert in split_pem_list(data)
     ]
 
@@ -357,14 +357,13 @@ class PkcsError(OpenSSLObjectError):
 
 
 class Pkcs(OpenSSLObject):
-    def __init__(self, module, backend, iter_size_default=2048):
+    def __init__(self, module, iter_size_default=2048):
         super(Pkcs, self).__init__(
             module.params["path"],
             module.params["state"],
             module.params["force"],
             module.check_mode,
         )
-        self.backend = backend
         self.action = module.params["action"]
         self.other_certificates = module.params["other_certificates"]
         self.other_certificates_parse_all = module.params[
@@ -416,11 +415,11 @@ class Pkcs(OpenSSLObject):
                 self.other_certificates = []
                 for other_cert_bundle in filenames:
                     self.other_certificates.extend(
-                        load_certificate_set(other_cert_bundle, self.backend)
+                        load_certificate_set(other_cert_bundle)
                     )
             else:
                 self.other_certificates = [
-                    load_certificate(other_cert, backend=self.backend)
+                    load_certificate(other_cert)
                     for other_cert in self.other_certificates
                 ]
         elif self.other_certificates_content:
@@ -432,9 +431,7 @@ class Pkcs(OpenSSLObject):
                     )
                 )
             self.other_certificates = [
-                load_certificate(
-                    None, content=to_bytes(other_cert), backend=self.backend
-                )
+                load_certificate(None, content=to_bytes(other_cert))
                 for other_cert in certs
             ]
 
@@ -475,7 +472,6 @@ class Pkcs(OpenSSLObject):
                         None,
                         content=self.privatekey_content,
                         passphrase=self.privatekey_passphrase,
-                        backend=self.backend,
                     )
                 except OpenSSLObjectError:
                     return False
@@ -606,9 +602,7 @@ class Pkcs(OpenSSLObject):
 
 class PkcsCryptography(Pkcs):
     def __init__(self, module):
-        super(PkcsCryptography, self).__init__(
-            module, "cryptography", iter_size_default=50000
-        )
+        super(PkcsCryptography, self).__init__(module, iter_size_default=50000)
         if (
             self.encryption_level == "compatibility2022"
             and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022
@@ -628,16 +622,13 @@ class PkcsCryptography(Pkcs):
                     None,
                     content=self.privatekey_content,
                     passphrase=self.privatekey_passphrase,
-                    backend=self.backend,
                 )
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc)
 
         cert = None
         if self.certificate_content:
-            cert = load_certificate(
-                None, content=self.certificate_content, backend=self.backend
-            )
+            cert = load_certificate(None, content=self.certificate_content)
 
         friendly_name = (
             to_bytes(self.friendly_name) if self.friendly_name is not None else None
@@ -742,17 +733,12 @@ def select_backend(module, backend):
                 msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, PkcsCryptography(module)
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
+    return PkcsCryptography(module)
 
 
 def main():
@@ -804,7 +790,7 @@ def main():
         supports_check_mode=True,
     )
 
-    backend, pkcs12 = select_backend(module, module.params["select_crypto_backend"])
+    pkcs12 = select_backend(module, module.params["select_crypto_backend"])
 
     base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):

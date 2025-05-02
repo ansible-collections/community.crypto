@@ -582,9 +582,7 @@ class CRL(OpenSSLObject):
                 try:
                     if rc["content"] is not None:
                         rc["content"] = rc["content"].encode("utf-8")
-                    cert = load_certificate(
-                        rc["path"], content=rc["content"], backend="cryptography"
-                    )
+                    cert = load_certificate(rc["path"], content=rc["content"])
                     result["serial_number"] = cert.serial_number
                 except OpenSSLObjectError as e:
                     if rc["content"] is not None:
@@ -631,7 +629,6 @@ class CRL(OpenSSLObject):
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
-                backend="cryptography",
             )
         except OpenSSLBadPassphraseError as exc:
             raise CRLError(exc)

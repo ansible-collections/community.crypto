@@ -175,7 +175,7 @@ def main():
 
     try:
         backend = module.params["select_crypto_backend"]
-        backend, module_backend = select_backend(module, backend)
+        module_backend = select_backend(module, backend)
 
         csr = CertificateSigningRequestModule(module, module_backend)
         csr.generate(module)

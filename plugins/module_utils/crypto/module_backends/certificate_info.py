@@ -60,10 +60,9 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 @six.add_metaclass(abc.ABCMeta)
 class CertificateInfoRetrieval:
-    def __init__(self, module, backend, content):
+    def __init__(self, module, content):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
 
     @abc.abstractmethod
@@ -151,7 +150,6 @@ class CertificateInfoRetrieval:
         self.cert = load_certificate(
             None,
             content=self.content,
-            backend=self.backend,
             der_support_enabled=der_support_enabled,
         )
 
@@ -193,7 +191,6 @@ class CertificateInfoRetrieval:
 
         public_key_info = get_publickey_info(
             self.module,
-            self.backend,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -235,9 +232,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
     def __init__(self, module, content):
-        super(CertificateInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content
-        )
+        super(CertificateInfoRetrievalCryptography, self).__init__(module, content)
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
     def _get_der_bytes(self):
@@ -445,9 +440,8 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         return None
 
 
-def get_certificate_info(module, backend, content, prefer_one_fingerprint=False):
-    if backend == "cryptography":
-        info = CertificateInfoRetrievalCryptography(module, content)
+def get_certificate_info(module, content, prefer_one_fingerprint=False):
+    info = CertificateInfoRetrievalCryptography(module, content)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
@@ -469,14 +463,9 @@ def select_backend(module, backend, content):
                 msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CertificateInfoRetrievalCryptography(module, content)
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
+    return CertificateInfoRetrievalCryptography(module, content)

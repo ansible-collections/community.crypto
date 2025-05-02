@@ -75,7 +75,7 @@ class PrivateKeyError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
         self.type = module.params["type"]
         self.size = module.params["size"]
@@ -85,7 +85,6 @@ class PrivateKeyBackend:
         self.format = module.params["format"]
         self.format_mismatch = module.params.get("format_mismatch", "regenerate")
         self.regenerate = module.params.get("regenerate", "full_idempotence")
-        self.backend = backend
 
         self.private_key = None
 
@@ -103,7 +102,6 @@ class PrivateKeyBackend:
             result.update(
                 get_privatekey_info(
                     self.module,
-                    self.backend,
                     data,
                     passphrase=self.passphrase,
                     return_private_key_data=False,
@@ -219,16 +217,14 @@ class PrivateKeyBackend:
 
     def _get_fingerprint(self):
         if self.private_key:
-            return get_fingerprint_of_privatekey(self.private_key, backend=self.backend)
+            return get_fingerprint_of_privatekey(self.private_key)
         try:
             self._ensure_existing_private_key_loaded()
         except Exception:
             # Ignore errors
             pass
         if self.existing_private_key:
-            return get_fingerprint_of_privatekey(
-                self.existing_private_key, backend=self.backend
-            )
+            return get_fingerprint_of_privatekey(self.existing_private_key)
 
     def dump(self, include_key):
         """Serialize the object into a dictionary."""
@@ -297,9 +293,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         }
 
     def __init__(self, module):
-        super(PrivateKeyCryptographyBackend, self).__init__(
-            module=module, backend="cryptography"
-        )
+        super(PrivateKeyCryptographyBackend, self).__init__(module=module)
 
         self.curves = dict()
         self._add_curve("secp224r1", "SECP224R1")
@@ -575,17 +569,13 @@ def select_backend(module, backend):
             module.fail_json(
                 msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, PrivateKeyCryptographyBackend(module)
-    else:
-        raise Exception(f"Unsupported value for backend: {backend}")
+
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
+    return PrivateKeyCryptographyBackend(module)
 
 
 def get_privatekey_argument_spec():

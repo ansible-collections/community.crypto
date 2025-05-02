@@ -60,9 +60,8 @@ class CertificateError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class CertificateBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
-        self.backend = backend
 
         self.force = module.params["force"]
         self.ignore_timestamps = module.params["ignore_timestamps"]
@@ -98,7 +97,7 @@ class CertificateBackend:
             return dict()
         try:
             result = get_certificate_info(
-                self.module, self.backend, data, prefer_one_fingerprint=True
+                self.module, data, prefer_one_fingerprint=True
             )
             result["can_parse_certificate"] = True
             return result
@@ -137,7 +136,6 @@ class CertificateBackend:
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
-                backend=self.backend,
             )
         except OpenSSLBadPassphraseError as exc:
             raise CertificateError(exc)
@@ -151,7 +149,6 @@ class CertificateBackend:
         self.csr = load_certificate_request(
             path=self.csr_path,
             content=self.csr_content,
-            backend=self.backend,
         )
 
     def _ensure_existing_certificate_loaded(self):
@@ -163,75 +160,72 @@ class CertificateBackend:
         self.existing_certificate = load_certificate(
             path=None,
             content=self.existing_certificate_bytes,
-            backend=self.backend,
         )
 
     def _check_privatekey(self):
         """Check whether provided parameters match, assuming self.existing_certificate and self.privatekey have been populated."""
-        if self.backend == "cryptography":
-            return cryptography_compare_public_keys(
-                self.existing_certificate.public_key(), self.privatekey.public_key()
-            )
+        return cryptography_compare_public_keys(
+            self.existing_certificate.public_key(), self.privatekey.public_key()
+        )
 
     def _check_csr(self):
         """Check whether provided parameters match, assuming self.existing_certificate and self.csr have been populated."""
-        if self.backend == "cryptography":
-            # Verify that CSR is signed by certificate's private key
-            if not self.csr.is_signature_valid:
-                return False
-            if not cryptography_compare_public_keys(
-                self.csr.public_key(), self.existing_certificate.public_key()
-            ):
-                return False
-            # Check subject
-            if (
-                self.check_csr_subject
-                and self.csr.subject != self.existing_certificate.subject
-            ):
-                return False
-            # Check extensions
-            if not self.check_csr_extensions:
-                return True
-            cert_exts = list(self.existing_certificate.extensions)
-            csr_exts = list(self.csr.extensions)
-            if self.create_subject_key_identifier != "never_create":
-                # Filter out SubjectKeyIdentifier extension before comparison
-                cert_exts = list(
-                    filter(
-                        lambda x: not isinstance(x.value, x509.SubjectKeyIdentifier),
-                        cert_exts,
-                    )
-                )
-                csr_exts = list(
-                    filter(
-                        lambda x: not isinstance(x.value, x509.SubjectKeyIdentifier),
-                        csr_exts,
-                    )
-                )
-            if self.create_authority_key_identifier:
-                # Filter out AuthorityKeyIdentifier extension before comparison
-                cert_exts = list(
-                    filter(
-                        lambda x: not isinstance(x.value, x509.AuthorityKeyIdentifier),
-                        cert_exts,
-                    )
-                )
-                csr_exts = list(
-                    filter(
-                        lambda x: not isinstance(x.value, x509.AuthorityKeyIdentifier),
-                        csr_exts,
-                    )
-                )
-            if len(cert_exts) != len(csr_exts):
-                return False
-            for cert_ext in cert_exts:
-                try:
-                    csr_ext = self.csr.extensions.get_extension_for_oid(cert_ext.oid)
-                    if cert_ext != csr_ext:
-                        return False
-                except cryptography.x509.ExtensionNotFound:
-                    return False
+        # Verify that CSR is signed by certificate's private key
+        if not self.csr.is_signature_valid:
+            return False
+        if not cryptography_compare_public_keys(
+            self.csr.public_key(), self.existing_certificate.public_key()
+        ):
+            return False
+        # Check subject
+        if (
+            self.check_csr_subject
+            and self.csr.subject != self.existing_certificate.subject
+        ):
+            return False
+        # Check extensions
+        if not self.check_csr_extensions:
             return True
+        cert_exts = list(self.existing_certificate.extensions)
+        csr_exts = list(self.csr.extensions)
+        if self.create_subject_key_identifier != "never_create":
+            # Filter out SubjectKeyIdentifier extension before comparison
+            cert_exts = list(
+                filter(
+                    lambda x: not isinstance(x.value, x509.SubjectKeyIdentifier),
+                    cert_exts,
+                )
+            )
+            csr_exts = list(
+                filter(
+                    lambda x: not isinstance(x.value, x509.SubjectKeyIdentifier),
+                    csr_exts,
+                )
+            )
+        if self.create_authority_key_identifier:
+            # Filter out AuthorityKeyIdentifier extension before comparison
+            cert_exts = list(
+                filter(
+                    lambda x: not isinstance(x.value, x509.AuthorityKeyIdentifier),
+                    cert_exts,
+                )
+            )
+            csr_exts = list(
+                filter(
+                    lambda x: not isinstance(x.value, x509.AuthorityKeyIdentifier),
+                    csr_exts,
+                )
+            )
+        if len(cert_exts) != len(csr_exts):
+            return False
+        for cert_ext in cert_exts:
+            try:
+                csr_ext = self.csr.extensions.get_extension_for_oid(cert_ext.oid)
+                if cert_ext != csr_ext:
+                    return False
+            except cryptography.x509.ExtensionNotFound:
+                return False
+        return True
 
     def _check_subject_key_identifier(self):
         """Check whether Subject Key Identifier matches, assuming self.existing_certificate has been populated."""
@@ -336,7 +330,7 @@ class CertificateProvider:
         """Whether the provider needs to create a version 2 certificate."""
 
     @abc.abstractmethod
-    def create_backend(self, module, backend):
+    def create_backend(self, module):
         """Create an implementation for a backend.
 
         Return value must be instance of CertificateBackend.
@@ -369,20 +363,17 @@ def select_backend(module, backend, provider):
                 msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
             )
 
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        if provider.needs_version_two_certs(module):
-            module.fail_json(
-                msg="The cryptography backend does not support v2 certificates"
-            )
+    if not CRYPTOGRAPHY_FOUND:
+        module.fail_json(
+            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
+            exception=CRYPTOGRAPHY_IMP_ERR,
+        )
+    if provider.needs_version_two_certs(module):
+        module.fail_json(
+            msg="The cryptography backend does not support v2 certificates"
+        )
 
-    return provider.create_backend(module, backend)
+    return provider.create_backend(module)
 
 
 def get_certificate_argument_spec():

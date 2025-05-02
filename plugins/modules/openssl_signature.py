@@ -133,15 +133,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 class SignatureBase(OpenSSLObject):
 
-    def __init__(self, module, backend):
+    def __init__(self, module):
         super(SignatureBase, self).__init__(
             path=module.params["path"],
             state="present",
             force=False,
             check_mode=module.check_mode,
         )
-
-        self.backend = backend
 
         self.privatekey_path = module.params["privatekey_path"]
         self.privatekey_content = module.params["privatekey_content"]
@@ -161,8 +159,8 @@ class SignatureBase(OpenSSLObject):
 # Implementation with using cryptography
 class SignatureCryptography(SignatureBase):
 
-    def __init__(self, module, backend):
-        super(SignatureCryptography, self).__init__(module, backend)
+    def __init__(self, module):
+        super(SignatureCryptography, self).__init__(module)
 
     def run(self):
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
@@ -178,7 +176,6 @@ class SignatureCryptography(SignatureBase):
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
-                backend=self.backend,
             )
 
             signature = None
@@ -275,7 +272,7 @@ def main():
                     ),
                     exception=CRYPTOGRAPHY_IMP_ERR,
                 )
-            _sign = SignatureCryptography(module, backend)
+            _sign = SignatureCryptography(module)
 
         result = _sign.run()
 
