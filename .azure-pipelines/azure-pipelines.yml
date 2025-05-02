@@ -147,6 +147,8 @@ stages:
           targets:
             - name: Debian Bookworm
               test: debian-bookworm/3.11
+            - name: Debian Bullseye
+              test: debian-bullseye/3.9
             - name: ArchLinux
               test: archlinux/3.13
           groups:
