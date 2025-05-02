@@ -121,22 +121,18 @@ complete_chain:
 """
 
 import os
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
@@ -148,13 +144,8 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion(
-        COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
-    )
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    HAS_CRYPTOGRAPHY = False
+    pass
 
 
 class Certificate:
@@ -332,13 +323,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAS_CRYPTOGRAPHY:
-        module.fail_json(
-            msg=missing_required_lib(
-                f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
-            ),
-            exception=CRYPTOGRAPHY_IMP_ERR,
-        )
+    assert_required_cryptography_version(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
 
     # Load chain
     chain = parse_PEM_list(module, module.params["input_chain"], source="input chain")

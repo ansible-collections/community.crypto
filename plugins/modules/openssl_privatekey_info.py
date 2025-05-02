@@ -247,7 +247,6 @@ def main():
 
     module_backend = select_backend(
         module,
-        module.params["select_crypto_backend"],
         data,
         passphrase=module.params["passphrase"],
         return_private_key_data=module.params["return_private_key_data"],

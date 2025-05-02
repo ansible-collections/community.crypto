@@ -106,9 +106,8 @@ backup_file:
 
 import base64
 import os
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -126,6 +125,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
@@ -135,15 +135,11 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography  # noqa: F401, pylint: disable=unused-import
     from cryptography.x509 import load_der_x509_certificate
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 def parse_certificate(input, strict=False):
@@ -226,13 +222,7 @@ class X509CertificateConvertModule(OpenSSLObject):
                 pass
 
     def verify_cert_parsable(self, module):
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
+        assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
         try:
             load_der_x509_certificate(self.input)
         except Exception as exc:

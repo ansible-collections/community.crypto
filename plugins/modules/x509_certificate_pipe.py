@@ -188,8 +188,7 @@ def main():
             "selfsigned": SelfSignedCertificateProvider,
         }
 
-        backend = module.params["select_crypto_backend"]
-        module_backend = select_backend(module, backend, provider_map[provider]())
+        module_backend = select_backend(module, provider_map[provider]())
         certificate = GenericCertificate(module, module_backend)
         certificate.generate(module)
         result = certificate.dump()

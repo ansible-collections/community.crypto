@@ -340,8 +340,7 @@ def main():
         )
 
     try:
-        backend = module.params["select_crypto_backend"]
-        module_backend = select_backend(module, backend)
+        module_backend = select_backend(module)
 
         csr = CertificateSigningRequestModule(module, module_backend)
         if module.params["state"] == "present":

@@ -191,9 +191,7 @@ def main():
                 msg=f"Error while reading public key file from disk: {e}", **result
             )
 
-    module_backend = select_backend(
-        module, module.params["select_crypto_backend"], data
-    )
+    module_backend = select_backend(module, data)
 
     try:
         result.update(module_backend.get_info())

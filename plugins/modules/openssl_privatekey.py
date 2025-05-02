@@ -270,10 +270,7 @@ def main():
             msg=f"The directory {base_dir} does not exist or the file is not a directory",
         )
 
-    module_backend = select_backend(
-        module=module,
-        backend=module.params["select_crypto_backend"],
-    )
+    module_backend = select_backend(module=module)
 
     try:
         private_key = PrivateKeyModule(module, module_backend)

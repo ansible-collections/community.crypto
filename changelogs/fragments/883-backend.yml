@@ -1,2 +1,5 @@
 minor_changes:
   - "Remove ``backend`` parameter from internal code whenever possible (https://github.com/ansible-collections/community.crypto/pull/883)."
+breaking_changes:
+  - "Ignore value of ``select_crypto_backend`` for all modules except acme_* and ..., and always assume the value ``auto``.
+     This ensures that the ``cryptography`` version is always checked (https://github.com/ansible-collections/community.crypto/pull/883)."

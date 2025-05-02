@@ -6,10 +6,8 @@
 from __future__ import annotations
 
 import abc
-import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
@@ -32,26 +30,17 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
-CRYPTOGRAPHY_VERSION = None
 try:
     import cryptography
     from cryptography import x509
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 class CertificateError(OpenSSLObjectError):
@@ -337,38 +326,17 @@ class CertificateProvider:
         """
 
 
-def select_backend(module, backend, provider):
+def select_backend(module, provider):
     """
     :type module: AnsibleModule
-    :type backend: str
     :type provider: CertificateProvider
     """
     provider.validate_module_args(module)
 
-    backend = module.params["select_crypto_backend"]
-    if backend == "auto":
-        # Detect what backend we can use
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
-        # If cryptography is available we'll use it
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Fail if no backend has been found
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if not CRYPTOGRAPHY_FOUND:
-        module.fail_json(
-            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
-            exception=CRYPTOGRAPHY_IMP_ERR,
-        )
     if provider.needs_version_two_certs(module):
+        # TODO: remove
         module.fail_json(
             msg="The cryptography backend does not support v2 certificates"
         )

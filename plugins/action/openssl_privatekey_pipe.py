@@ -79,10 +79,7 @@ class ActionModule(ActionModuleBase):
 
     @staticmethod
     def run_module(module):
-        module_backend = select_backend(
-            module=module,
-            backend=module.params["select_crypto_backend"],
-        )
+        module_backend = select_backend(module=module)
 
         try:
             private_key = PrivateKeyModule(module, module_backend)

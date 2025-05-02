@@ -96,10 +96,10 @@ signature:
 
 import base64
 import os
-import traceback
 
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
@@ -108,7 +108,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.hazmat.primitives.asymmetric.padding
@@ -116,12 +115,9 @@ try:
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -246,33 +242,10 @@ def main():
             msg=f"The file {module.params['path']} does not exist",
         )
 
-    backend = module.params["select_crypto_backend"]
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
-        # Decision
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})",
-            )
     try:
-        if backend == "cryptography":
-            if not CRYPTOGRAPHY_FOUND:
-                module.fail_json(
-                    msg=missing_required_lib(
-                        f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                    ),
-                    exception=CRYPTOGRAPHY_IMP_ERR,
-                )
-            _sign = SignatureCryptography(module)
+        _sign = SignatureCryptography(module)
 
         result = _sign.run()
 

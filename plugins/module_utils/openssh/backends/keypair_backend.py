@@ -22,6 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.
     parse_private_key_format,
 )
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+    CRYPTOGRAPHY_VERSION,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPassphraseError,
@@ -530,7 +531,9 @@ class KeypairBackendCryptography(KeypairBackend):
 
 
 def select_backend(module, backend):
-    can_use_cryptography = HAS_OPENSSH_SUPPORT
+    can_use_cryptography = HAS_OPENSSH_SUPPORT and LooseVersion(
+        CRYPTOGRAPHY_VERSION
+    ) >= LooseVersion(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
     can_use_opensshbin = bool(module.get_bin_path("ssh-keygen"))
 
     if backend == "auto":

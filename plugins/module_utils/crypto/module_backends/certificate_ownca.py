@@ -22,7 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_not_valid_before,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    CRYPTOGRAPHY_VERSION,
     CertificateBackend,
     CertificateError,
     CertificateProvider,
@@ -34,9 +33,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
 )
 
 
@@ -166,10 +162,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                         x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
                             ext.value
                         )
-                        if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
-                        else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                            ext
-                        )
                     ),
                     critical=False,
                 )
@@ -219,10 +211,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                 expected_ext = (
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
                         ext.value
-                    )
-                    if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
-                    else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                        ext
                     )
                 )
             except cryptography.x509.ExtensionNotFound:

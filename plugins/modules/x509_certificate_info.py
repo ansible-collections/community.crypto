@@ -430,9 +430,7 @@ def main():
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading certificate file from disk: {e}")
 
-    module_backend = select_backend(
-        module, module.params["select_crypto_backend"], data
-    )
+    module_backend = select_backend(module, data)
 
     valid_at = module.params["valid_at"]
     if valid_at:
