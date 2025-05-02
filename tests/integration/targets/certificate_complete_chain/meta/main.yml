@@ -4,6 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependencies:
-  - prepare_jinja2_compat
   - setup_openssl
   - setup_remote_tmp_dir
