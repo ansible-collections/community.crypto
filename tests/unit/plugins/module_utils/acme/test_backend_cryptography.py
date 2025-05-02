@@ -5,6 +5,9 @@
 from __future__ import annotations
 
 import datetime
+from unittest.mock import (
+    MagicMock,
+)
 
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
@@ -17,9 +20,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     UTC,
     ensure_utc_timezone,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
 )
 from freezegun import freeze_time
 

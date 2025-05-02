@@ -4,14 +4,15 @@
 
 from __future__ import annotations
 
+from unittest.mock import (
+    MagicMock,
+)
+
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
 )
 from ansible_collections.community.crypto.plugins.module_utils.acme.orders import Order
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
-)
 
 
 def test_order_from_json():
