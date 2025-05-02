@@ -32,25 +32,25 @@
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format (test - privatekey's publickey)"
   shell: 'ssh-keygen -y -f {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_publickey
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format  (test - publickey)"
   slurp:
     src: '{{ remote_tmp_dir }}/publickey-ssh.pub'
   register: publickey
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format (assert)"
   assert:
     that:
       - privatekey_publickey.stdout == publickey.content | b64decode
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format - test idempotence (issue 33256)"
   assert:
     that:
       - publickey_ssh_idempotence is not changed
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Validate publickey2 (test - Ensure key has been removed)"
   stat:

@@ -534,7 +534,7 @@
           - privatekey_fmt_2_step_6.privatekey == (slurp.content | b64decode)
       when: privatekey_fmt_2_step_1 is not failed
 
-  when: 'select_crypto_backend == "cryptography" and cryptography_version.stdout is version("2.6", ">=")'
+  when: select_crypto_backend == "cryptography"
 
 
 # Test regenerate option
@@ -871,4 +871,4 @@
           - result.results[0].fingerprint == result.results[2].fingerprint
           - result.results[0].fingerprint == result.results[3].fingerprint
           - result.results[0].fingerprint != result.results[4].fingerprint
-  when: 'select_crypto_backend == "cryptography" and cryptography_version.stdout is version("2.6", ">=")'
+  when: select_crypto_backend == "cryptography"

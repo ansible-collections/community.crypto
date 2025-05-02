@@ -159,7 +159,6 @@
       assert:
         that:
           - "'IP Address:127.0.0.1' in cert_8_text.stdout or 'IP:127.0.0.1' in cert_8_text.stdout"
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: Validate that orders were not retrieved
   assert:

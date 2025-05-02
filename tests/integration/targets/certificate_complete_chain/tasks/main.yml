@@ -10,11 +10,6 @@
 
 - block:
 
-    - name: Make sure testhost directory exists
-      file:
-        path: '{{ remote_tmp_dir }}/files/'
-        state: directory
-      when: ansible_version.string is version('2.10', '<')
     - name: Copy test files to testhost
       copy:
         src: '{{ role_path }}/files/'
@@ -29,4 +24,4 @@
     - name: Run tests with created certificates
       import_tasks: created.yml
 
-  when: cryptography_version.stdout is version('1.5', '>=')
+  when: cryptography_version.stdout is version('3.4', '>=')

@@ -77,15 +77,6 @@
       - generate_csr_invalid_san is failed
       - "'Subject Alternative Name' in generate_csr_invalid_san.msg"
 
-- name: "({{ select_crypto_backend }}) Validate invalid SAN (2/2)"
-  # Note that modern cryptography versions simply accept this name.
-  # The error has been observed with cryptography 1.7.2 and 1.9, but not with 2.3 and newer.
-  assert:
-    that:
-      - generate_csr_invalid_san_2 is failed
-      - "'The label system:kube-controller-manager is not a valid A-label' in generate_csr_invalid_san_2.msg"
-  when: cryptography_version.stdout is version('2.0', '<')
-
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (test - everything)"
   shell: "{{ openssl_binary }} req -noout -in {{ remote_tmp_dir }}/csr_ocsp.csr -text"
   register: csr_ocsp
@@ -313,18 +304,7 @@
           "IP:::1:0:0/112",
         ]
 
-- name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)"
-  assert:
-    that:
-      - generate_csr_ed25519_ed448.results[0] is failed
-      - generate_csr_ed25519_ed448.results[1] is failed
-      - generate_csr_ed25519_ed448.results[0].msg == 'Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer.'
-      - generate_csr_ed25519_ed448.results[1].msg == 'Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer.'
-      - generate_csr_ed25519_ed448_idempotent.results[0] is failed
-      - generate_csr_ed25519_ed448_idempotent.results[1] is failed
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=') and cryptography_version.stdout is version('2.8', '<') and generate_csr_ed25519_ed448_privatekey is not failed
-
-- name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.8)"
+- name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests"
   assert:
     that:
       - generate_csr_ed25519_ed448 is succeeded
@@ -333,9 +313,9 @@
       - generate_csr_ed25519_ed448_idempotent is succeeded
       - generate_csr_ed25519_ed448_idempotent.results[0] is not changed
       - generate_csr_ed25519_ed448_idempotent.results[1] is not changed
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.8', '>=') and generate_csr_ed25519_ed448_privatekey is not failed
+  when: select_crypto_backend == 'cryptography' and generate_csr_ed25519_ed448_privatekey is not failed
 
-- name: "({{ select_crypto_backend }}) Verify CRL distribution endpoints (for cryptography >= 1.6)"
+- name: "({{ select_crypto_backend }}) Verify CRL distribution endpoints"
   assert:
     that:
       - crl_distribution_endpoints_1 is changed
@@ -343,4 +323,4 @@
       - crl_distribution_endpoints_3 is changed
       - crl_distribution_endpoints_4 is changed
       - crl_distribution_endpoints_5 is changed
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.6', '>=')
+  when: select_crypto_backend == 'cryptography'

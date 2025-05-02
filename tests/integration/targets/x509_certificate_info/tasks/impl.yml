@@ -39,8 +39,8 @@
       - result.public_key_data.size == (default_rsa_key_size_certificates | int)
       - "result.subject_alt_name == [
           'DNS:www.ansible.com',
-          'DNS:' ~ ('öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--7ca3a') ~ '.com',
-          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'DNS:xn--7ca3a.com',
+          'DNS:xn--74h.com',
           'IP:1.2.3.4',
           'IP:::1',
           'email:test@example.org',
@@ -49,7 +49,7 @@
       - "result_idna.subject_alt_name == [
           'DNS:www.ansible.com',
           'DNS:xn--7ca3a.com',
-          'DNS:' ~ ('www.xn--7ca3a' if cryptography_version.stdout is version('2.1', '<') else 'xn--74h') ~ '.com',
+          'DNS:xn--74h.com',
           'IP:1.2.3.4',
           'IP:::1',
           'email:test@example.org',
@@ -58,7 +58,7 @@
       - "result_unicode.subject_alt_name == [
           'DNS:www.ansible.com',
           'DNS:öç.com',
-          'DNS:' ~ ('www.öç' if cryptography_version.stdout is version('2.1', '<') else '☺') ~ '.com',
+          'DNS:☺.com',
           'IP:1.2.3.4',
           'IP:::1',
           'email:test@example.org',
@@ -74,8 +74,6 @@
       - result.extensions_by_oid['2.5.29.17'].critical == false
       - >
         result.extensions_by_oid['2.5.29.17'].value == (
-          'MIGCgg93d3cuYW5zaWJsZS5jb22CDXhuLS03Y2EzYS5jb22CEXd3dy54bi0tN2NhM2EuY29thwQBAgMEhxAAAAAAAAAAAAAAAAAAAAABgRB0ZXN0QGV4YW1wbGUub3JnhiNodHRwczovL2V4YW1wbGUub3JnL3Rlc3QvaW5kZXguaHRtbA=='
-          if cryptography_version.stdout is version('2.1', '<') else
           'MHyCD3d3dy5hbnNpYmxlLmNvbYINeG4tLTdjYTNhLmNvbYILeG4tLTc0aC5jb22HBAECAwSHEAAAAAAAAAAAAAAAAAAAAAGBEHRlc3RAZXhhbXBsZS5vcmeGI2h0dHBzOi8vZXhhbXBsZS5vcmcvdGVzdC9pbmRleC5odG1s'
         )
       # Basic Constraints
@@ -100,7 +98,6 @@
     expected_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: ({{select_crypto_backend}}) Read file
   slurp:
@@ -152,7 +149,6 @@
     expected_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: ({{select_crypto_backend}}) Get certificate info
   x509_certificate_info:
@@ -166,7 +162,6 @@
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none
       - result.authority_cert_serial_number is none
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: Copy packed cert 1 to remote
   copy:
