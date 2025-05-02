@@ -156,6 +156,8 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule
 
 
+CRYPTOGRAPHY_VERSION: str | None
+CRYPTOGRAPHY_IMP_ERR: str | None
 try:
     import cryptography
     from cryptography.exceptions import UnsupportedAlgorithm
@@ -165,10 +167,10 @@ try:
         # only got added in 0.2, so let's guard the import
         from cryptography.exceptions import InternalError as CryptographyInternalError
     except ImportError:
-        CryptographyInternalError = Exception
+        CryptographyInternalError = Exception  # type: ignore
 except ImportError:
-    UnsupportedAlgorithm = Exception
-    CryptographyInternalError = Exception
+    UnsupportedAlgorithm = Exception  # type: ignore
+    CryptographyInternalError = Exception  # type: ignore
     HAS_CRYPTOGRAPHY = False
     CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()

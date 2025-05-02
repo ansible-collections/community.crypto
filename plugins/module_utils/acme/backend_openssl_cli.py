@@ -133,14 +133,14 @@ class OpenSSLCLIBackend(CryptoBackend):
             "-noout",
             "-text",
         ]
-        rc, out, err = self.module.run_command(
+        rc, out, stderr = self.module.run_command(
             openssl_keydump_cmd,
             check_rc=False,
             environ_update=_OPENSSL_ENVIRONMENT_UPDATE,
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_keydump_cmd)}: {err}"
+                f"Error while running {' '.join(openssl_keydump_cmd)}: {stderr}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")

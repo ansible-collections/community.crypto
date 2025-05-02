@@ -55,7 +55,7 @@ try:
     )
 except ImportError:
     # Error handled in the calling module.
-    _load_pkcs12 = None
+    _load_pkcs12 = None  # type: ignore
 
 try:
     import idna
@@ -175,7 +175,7 @@ def cryptography_get_extensions_from_csr(csr):
             crit = backend._lib.X509_EXTENSION_get_critical(ext)
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
+            der: bytes = backend._ffi.buffer(data.data, data.length)[:]  # type: ignore
             entry = dict(
                 critical=(crit == 1),
                 value=base64.b64encode(der).decode("ascii"),

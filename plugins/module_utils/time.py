@@ -13,28 +13,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 )
 
 
-try:
-    UTC = datetime.timezone.utc
-except AttributeError:
-    _DURATION_ZERO = datetime.timedelta(0)
-
-    class _UTCClass(datetime.tzinfo):
-        def utcoffset(self, dt):
-            return _DURATION_ZERO
-
-        def dst(self, dt):
-            return _DURATION_ZERO
-
-        def tzname(self, dt):
-            return "UTC"
-
-        def fromutc(self, dt):
-            return dt
-
-        def __repr__(self):
-            return "UTC"
-
-    UTC = _UTCClass()
+UTC = datetime.timezone.utc
 
 
 def get_now_datetime(with_timezone):

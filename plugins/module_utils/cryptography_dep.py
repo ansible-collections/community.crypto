@@ -19,6 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 
 _CRYPTOGRAPHY_IMP_ERR = None
+_CRYPTOGRAPHY_FILE = None
 try:
     import cryptography
     from cryptography import x509  # noqa: F401, pylint: disable=unused-import
@@ -28,7 +29,6 @@ try:
 except ImportError:
     _CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     _CRYPTOGRAPHY_FOUND = False
-    _CRYPTOGRAPHY_FILE = None
 else:
     _CRYPTOGRAPHY_FOUND = True
 
