@@ -4,12 +4,13 @@
 
 from __future__ import annotations
 
+from unittest.mock import (
+    MagicMock,
+)
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.io import (
     read_file,
     write_file,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
 )
 
 

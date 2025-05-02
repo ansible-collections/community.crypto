@@ -4,13 +4,14 @@
 
 from __future__ import annotations
 
+from unittest.mock import (
+    MagicMock,
+)
+
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     format_error_problem,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
 )
 
 
