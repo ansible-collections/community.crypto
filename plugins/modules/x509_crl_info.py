@@ -12,14 +12,13 @@ version_added: '1.0.0'
 short_description: Retrieve information on Certificate Revocation Lists (CRLs)
 description:
   - This module allows one to retrieve information on Certificate Revocation Lists (CRLs).
-requirements:
-  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.info_module
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
   - community.crypto.name_encoding
 options:
   path:

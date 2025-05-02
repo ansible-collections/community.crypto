@@ -9,10 +9,6 @@ from base64 import b64decode, b64encode
 from getpass import getuser
 from socket import gethostname
 
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
-)
-
 
 try:
     from cryptography import __version__ as CRYPTOGRAPHY_VERSION
@@ -24,11 +20,6 @@ try:
         Ed25519PrivateKey,
         Ed25519PublicKey,
     )
-
-    if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.4"):
-        HAS_OPENSSH_PRIVATE_FORMAT = True
-    else:
-        HAS_OPENSSH_PRIVATE_FORMAT = False
 
     HAS_OPENSSH_SUPPORT = True
 
@@ -70,7 +61,6 @@ try:
         },
     }
 except ImportError:
-    HAS_OPENSSH_PRIVATE_FORMAT = False
     HAS_OPENSSH_SUPPORT = False
     CRYPTOGRAPHY_VERSION = "0.0"
     _ALGORITHM_PARAMETERS = {}
@@ -413,11 +403,7 @@ class OpensshKeypair:
         """
 
         if key_format == "SSH":
-            # Default to PEM format if SSH not available
-            if not HAS_OPENSSH_PRIVATE_FORMAT:
-                privatekey_format = serialization.PrivateFormat.PKCS8
-            else:
-                privatekey_format = serialization.PrivateFormat.OpenSSH
+            privatekey_format = serialization.PrivateFormat.OpenSSH
         elif key_format == "PKCS8":
             privatekey_format = serialization.PrivateFormat.PKCS8
         elif key_format == "PKCS1":

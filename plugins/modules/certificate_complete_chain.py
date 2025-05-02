@@ -17,11 +17,10 @@ description:
   - Note that this module does I(not) check for validity of the chains. It only checks that issuer and subject match, and
     that the signature is correct. It ignores validity dates and key usage completely. If you need to verify that a generated
     chain is valid, please use C(openssl verify ...).
-requirements:
-  - "cryptography >= 3.4"
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: full
@@ -129,6 +128,9 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
@@ -148,7 +150,9 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("3.4")
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion(
+        COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
+    )
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -331,7 +335,9 @@ def main():
 
     if not HAS_CRYPTOGRAPHY:
         module.fail_json(
-            msg=missing_required_lib("cryptography >= 3.4"),
+            msg=missing_required_lib(
+                f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
+            ),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 

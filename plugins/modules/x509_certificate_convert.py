@@ -124,13 +124,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

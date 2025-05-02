@@ -11,6 +11,9 @@ import os
 from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
@@ -19,7 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.
     parse_private_key_format,
 )
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
-    HAS_OPENSSH_PRIVATE_FORMAT,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPassphraseError,
@@ -434,15 +436,6 @@ class KeypairBackendCryptography(KeypairBackend):
                 # OpenSSH made SSH formatted private keys available in version 6.5,
                 # but still defaulted to PKCS1 format with the exception of ed25519 keys
                 result = "PKCS1"
-
-            if result == "SSH" and not HAS_OPENSSH_PRIVATE_FORMAT:
-                self.module.fail_json(
-                    msg=missing_required_lib(
-                        "cryptography >= 3.4",
-                        reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 "
-                        + "or for ed25519 keys",
-                    )
-                )
         else:
             result = key_format.upper()
 
@@ -548,8 +541,10 @@ def select_backend(module, backend):
             backend = "cryptography"
         else:
             module.fail_json(
-                msg="Cannot find either the OpenSSH binary in the PATH "
-                + "or cryptography >= 3.4 installed on this system"
+                msg=(
+                    "Cannot find either the OpenSSH binary in the PATH "
+                    f"or cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION} installed on this system"
+                )
             )
 
     if backend == "opensshbin":
@@ -558,7 +553,11 @@ def select_backend(module, backend):
         return backend, KeypairBackendOpensshBin(module)
     elif backend == "cryptography":
         if not can_use_cryptography:
-            module.fail_json(msg=missing_required_lib("cryptography >= 3.4"))
+            module.fail_json(
+                msg=missing_required_lib(
+                    f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
+                )
+            )
         return backend, KeypairBackendCryptography(module)
     else:
         raise ValueError(f"Unsupported value for backend: {backend}")

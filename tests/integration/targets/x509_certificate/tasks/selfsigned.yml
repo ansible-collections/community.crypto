@@ -480,6 +480,6 @@
           register: selfsigned_certificate_ed25519_ed448_idempotence
           ignore_errors: true
 
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('3.4', '>=')
+  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('3.3', '>=')
 
 - import_tasks: ../tests/validate_selfsigned.yml

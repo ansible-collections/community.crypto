@@ -24,12 +24,15 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate_request,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

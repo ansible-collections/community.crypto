@@ -18,4 +18,4 @@
       vars:
         select_crypto_backend: cryptography
 
-  when: cryptography_version.stdout is version('3.4', '>=')
+  when: cryptography_version.stdout is version('3.3', '>=')

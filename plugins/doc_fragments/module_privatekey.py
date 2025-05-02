@@ -22,7 +22,7 @@ attributes:
     details:
       - The option O(regenerate=always) generally disables idempotency.
 requirements:
-  - cryptography >= 3.4
+  - cryptography >= 3.3
 options:
   size:
     description:

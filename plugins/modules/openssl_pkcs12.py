@@ -14,12 +14,11 @@ short_description: Generate OpenSSL PKCS#12 archive
 description:
   - This module allows one to (re-)generate PKCS#12.
   - The module uses the cryptography Python library.
-requirements:
-  - cryptography >= 3.4
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes
   - community.crypto.attributes.files
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: full
@@ -296,6 +295,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     load_certificate,
     load_privatekey,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
@@ -305,7 +307,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

@@ -694,4 +694,4 @@
             - Ed448
           ignore_errors: true
 
-  when: cryptography_version.stdout is version('3.4', '>=')
+  when: cryptography_version.stdout is version('3.3', '>=')

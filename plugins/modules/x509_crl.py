@@ -14,14 +14,13 @@ description:
   - This module allows one to (re)generate or update Certificate Revocation Lists (CRLs).
   - Certificates on the revocation list can be either specified by serial number and (optionally) their issuer, or as a path
     to a certificate file in PEM format.
-requirements:
-  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes
   - community.crypto.attributes.files
+  - community.crypto.cryptography_dep.minimum
   - community.crypto.name_encoding
 attributes:
   check_mode:
@@ -470,6 +469,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     parse_ordered_name_field,
     select_message_digest,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.io import write_file
 from ansible_collections.community.crypto.plugins.module_utils.serial import (
     parse_serial,
@@ -482,7 +484,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

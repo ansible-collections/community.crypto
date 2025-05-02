@@ -21,10 +21,9 @@ seealso:
   - name: ACME TLS ALPN Challenge Extension
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
-requirements:
-  - "cryptography >= 3.4"
 extends_documentation_fragment:
   - community.crypto.attributes
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: none
@@ -163,6 +162,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_not_valid_after,
     set_not_valid_before,
 )
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
@@ -184,7 +186,9 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("3.4")
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion(
+        COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
+    )
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -215,10 +219,16 @@ def main():
         # Some callbacks die when exception is provided with value None
         if CRYPTOGRAPHY_IMP_ERR:
             module.fail_json(
-                msg=missing_required_lib("cryptography >= 3.4"),
+                msg=missing_required_lib(
+                    f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
+                ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
-        module.fail_json(msg=missing_required_lib("cryptography >= 3.4"))
+        module.fail_json(
+            msg=missing_required_lib(
+                f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
+            )
+        )
 
     try:
         # Get parameters

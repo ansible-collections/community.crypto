@@ -18,7 +18,7 @@ attributes:
   idempotent:
     support: full
 requirements:
-  - cryptography >= 3.4
+  - cryptography >= 3.3
 options:
   digest:
     description:

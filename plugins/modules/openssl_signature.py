@@ -13,13 +13,12 @@ short_description: Sign data with openssl
 description:
   - This module allows one to sign data using a private key.
   - The module uses the cryptography Python library.
-requirements:
-  - cryptography >= 3.4
 author:
   - Patrick Pichler (@aveexy)
   - Markus Teufelberger (@MarkusTeufelberger)
 extends_documentation_fragment:
   - community.crypto.attributes
+  - community.crypto.cryptography_dep.minimum
 attributes:
   check_mode:
     support: full
@@ -99,12 +98,15 @@ import base64
 import os
 import traceback
 
+from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+    COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+)
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
