@@ -20,7 +20,7 @@ description:
 notes:
   - O(path) must be specified as the output location of the certificate.
 requirements:
-  - cryptography >= 1.6
+  - cryptography >= 3.4
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.files
@@ -581,7 +581,7 @@ except ImportError:
 else:
     CRYPTOGRAPHY_FOUND = True
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 
 def validate_cert_expiry(cert_expiry):

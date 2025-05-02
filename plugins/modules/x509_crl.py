@@ -15,7 +15,7 @@ description:
   - Certificates on the revocation list can be either specified by serial number and (optionally) their issuer, or as a path
     to a certificate file in PEM format.
 requirements:
-  - cryptography >= 1.2
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
@@ -482,7 +482,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

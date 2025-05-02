@@ -26,7 +26,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 # crypto_utils
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

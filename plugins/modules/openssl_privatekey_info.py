@@ -17,7 +17,7 @@ description:
     V(none) is returned for RV(key_is_consistent).
   - It uses the cryptography python library to interact with OpenSSL.
 requirements:
-  - cryptography >= 1.2.3
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)

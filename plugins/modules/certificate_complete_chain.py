@@ -18,7 +18,7 @@ description:
     that the signature is correct. It ignores validity dates and key usage completely. If you need to verify that a generated
     chain is valid, please use C(openssl verify ...).
 requirements:
-  - "cryptography >= 1.5"
+  - "cryptography >= 3.4"
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.idempotent_not_modify_state
@@ -148,7 +148,7 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.5")
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("3.4")
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -331,7 +331,7 @@ def main():
 
     if not HAS_CRYPTOGRAPHY:
         module.fail_json(
-            msg=missing_required_lib("cryptography >= 1.5"),
+            msg=missing_required_lib("cryptography >= 3.4"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 

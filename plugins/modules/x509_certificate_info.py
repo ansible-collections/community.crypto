@@ -20,7 +20,7 @@ description:
     L(collections,https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook)
     keyword, the new name M(community.crypto.x509_certificate_info) should be used to avoid a deprecation warning.
 requirements:
-  - cryptography >= 1.6
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)

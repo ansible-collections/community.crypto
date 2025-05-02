@@ -17,7 +17,7 @@ description:
   - The module can use the cryptography Python library, or the C(openssl) executable. By default, it tries to detect which
     one is available. This can be overridden with the O(select_crypto_backend) option.
 requirements:
-  - Either cryptography >= 2.0
+  - Either cryptography >= 3.4
   - Or OpenSSL binary C(openssl)
 author:
   - Thom Wiggers (@thomwiggers)
@@ -148,7 +148,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "2.0"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

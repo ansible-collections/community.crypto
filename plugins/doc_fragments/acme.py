@@ -18,7 +18,7 @@ notes:
     another ACME server, please L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
     to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.
 requirements:
-  - either openssl or L(cryptography,https://cryptography.io/) >= 1.5
+  - either openssl or L(cryptography,https://cryptography.io/) >= 3.4
 options:
   acme_version:
     description:

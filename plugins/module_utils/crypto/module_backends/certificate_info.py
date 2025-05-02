@@ -36,7 +36,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -340,20 +340,12 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
 
     def _get_ocsp_must_staple(self):
         try:
-            try:
-                # This only works with cryptography >= 2.1
-                tlsfeature_ext = self.cert.extensions.get_extension_for_class(
-                    x509.TLSFeature
-                )
-                value = (
-                    cryptography.x509.TLSFeatureType.status_request
-                    in tlsfeature_ext.value
-                )
-            except AttributeError:
-                # Fallback for cryptography < 2.1
-                oid = x509.oid.ObjectIdentifier("1.3.6.1.5.5.7.1.24")
-                tlsfeature_ext = self.cert.extensions.get_extension_for_oid(oid)
-                value = tlsfeature_ext.value.value == b"\x30\x03\x02\x01\x05"
+            tlsfeature_ext = self.cert.extensions.get_extension_for_class(
+                x509.TLSFeature
+            )
+            value = (
+                cryptography.x509.TLSFeatureType.status_request in tlsfeature_ext.value
+            )
             return value, tlsfeature_ext.critical
         except cryptography.x509.ExtensionNotFound:
             return None, False

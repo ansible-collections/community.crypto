@@ -15,8 +15,7 @@ description:
     not supported), use the M(community.crypto.openssh_keypair) module to manage these.
   - The module uses the cryptography Python library.
 requirements:
-  - cryptography >= 1.2.3 (older versions might work as well)
-  - Needs cryptography >= 1.4 if O(format) is C(OpenSSH)
+  - cryptography >= 3.4
 author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
@@ -211,8 +210,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2.3"
-MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = "1.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -441,16 +439,12 @@ def main():
         mutually_exclusive=(["privatekey_path", "privatekey_content"],),
     )
 
-    minimal_cryptography_version = MINIMAL_CRYPTOGRAPHY_VERSION
-    if module.params["format"] == "OpenSSH":
-        minimal_cryptography_version = MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH
-
     backend = module.params["select_crypto_backend"]
     if backend == "auto":
         # Detection what is possible
         can_use_cryptography = (
             CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(minimal_cryptography_version)
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
         )
 
         # Decision
@@ -460,7 +454,7 @@ def main():
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {minimal_cryptography_version})",
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})",
             )
 
     if module.params["format"] == "OpenSSH" and backend != "cryptography":
@@ -470,7 +464,7 @@ def main():
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    f"cryptography >= {minimal_cryptography_version}"
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )

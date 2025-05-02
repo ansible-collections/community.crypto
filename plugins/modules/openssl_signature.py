@@ -14,7 +14,7 @@ description:
   - This module allows one to sign data using a private key.
   - The module uses the cryptography Python library.
 requirements:
-  - cryptography >= 1.4 (some key types require newer versions)
+  - cryptography >= 3.4
 author:
   - Patrick Pichler (@aveexy)
   - Markus Teufelberger (@MarkusTeufelberger)
@@ -62,10 +62,6 @@ options:
     type: str
     default: auto
     choices: [auto, cryptography]
-notes:
-  - "When using the C(cryptography) backend, the following key types require at least the following C(cryptography) version:\n
-    RSA keys: C(cryptography) >= 1.4\nDSA and ECDSA keys: C(cryptography) >= 1.5\ned448 and ed25519 keys: C(cryptography)
-    >= 2.6."
 seealso:
   - module: community.crypto.openssl_signature_info
   - module: community.crypto.openssl_privatekey
@@ -108,7 +104,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

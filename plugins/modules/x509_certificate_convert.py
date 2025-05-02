@@ -85,8 +85,6 @@ seealso:
   - module: community.crypto.x509_certificate
   - module: community.crypto.x509_certificate_pipe
   - module: community.crypto.x509_certificate_info
-requirements:
-  - cryptography >= 1.6 if O(verify_cert_parsable=true)
 """
 
 EXAMPLES = r"""
@@ -132,7 +130,7 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

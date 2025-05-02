@@ -438,7 +438,7 @@ class KeypairBackendCryptography(KeypairBackend):
             if result == "SSH" and not HAS_OPENSSH_PRIVATE_FORMAT:
                 self.module.fail_json(
                     msg=missing_required_lib(
-                        "cryptography >= 3.0",
+                        "cryptography >= 3.4",
                         reason="to load/dump private keys in the default OpenSSH format for OpenSSH >= 7.8 "
                         + "or for ed25519 keys",
                     )
@@ -549,7 +549,7 @@ def select_backend(module, backend):
         else:
             module.fail_json(
                 msg="Cannot find either the OpenSSH binary in the PATH "
-                + "or cryptography >= 2.6 installed on this system"
+                + "or cryptography >= 3.4 installed on this system"
             )
 
     if backend == "opensshbin":
@@ -558,7 +558,7 @@ def select_backend(module, backend):
         return backend, KeypairBackendOpensshBin(module)
     elif backend == "cryptography":
         if not can_use_cryptography:
-            module.fail_json(msg=missing_required_lib("cryptography >= 2.6"))
+            module.fail_json(msg=missing_required_lib("cryptography >= 3.4"))
         return backend, KeypairBackendCryptography(module)
     else:
         raise ValueError(f"Unsupported value for backend: {backend}")

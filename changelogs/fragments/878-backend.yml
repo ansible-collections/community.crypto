@@ -5,3 +5,4 @@ minor_changes:
 removed_features:
   - "crypto.basic module utils - remove ``CRYPTOGRAPHY_HAS_*`` flags. All tested features are supported since cryptography 3.0 (https://github.com/ansible-collections/community.crypto/pull/878)."
   - "crypto.cryptography_support module utils - remove ``cryptography_serial_number_of_cert()`` helper function (https://github.com/ansible-collections/community.crypto/pull/878)."
+  - "The collection no longer supports cryptography < 3.4 (https://github.com/ansible-collections/community.crypto/pull/878)."

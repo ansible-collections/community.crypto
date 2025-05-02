@@ -15,7 +15,7 @@ description:
   - This module allows one to (re-)generate PKCS#12.
   - The module uses the cryptography Python library.
 requirements:
-  - cryptography >= 3.0
+  - cryptography >= 3.4
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes
@@ -305,7 +305,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "3.0"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:

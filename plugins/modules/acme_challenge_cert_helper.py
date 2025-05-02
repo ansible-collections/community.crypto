@@ -22,7 +22,7 @@ seealso:
     description: The specification of the C(tls-alpn-01) challenge (RFC 8737).
     link: https://www.rfc-editor.org/rfc/rfc8737.html
 requirements:
-  - "cryptography >= 1.3"
+  - "cryptography >= 3.4"
 extends_documentation_fragment:
   - community.crypto.attributes
 attributes:
@@ -184,7 +184,7 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.3")
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("3.4")
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -215,10 +215,10 @@ def main():
         # Some callbacks die when exception is provided with value None
         if CRYPTOGRAPHY_IMP_ERR:
             module.fail_json(
-                msg=missing_required_lib("cryptography >= 1.3"),
+                msg=missing_required_lib("cryptography >= 3.4"),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )
-        module.fail_json(msg=missing_required_lib("cryptography >= 1.3"))
+        module.fail_json(msg=missing_required_lib("cryptography >= 3.4"))
 
     try:
         # Get parameters

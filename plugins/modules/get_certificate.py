@@ -121,7 +121,7 @@ notes:
   - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
 requirements:
   - "Python >= 3.10 when O(get_certificate_chain=true)"
-  - "cryptography >= 1.6"
+  - "cryptography >= 3.4"
 
 seealso:
   - plugin: community.crypto.to_serial
@@ -292,7 +292,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.6"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
