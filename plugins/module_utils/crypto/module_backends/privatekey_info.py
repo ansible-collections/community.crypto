@@ -13,8 +13,6 @@ from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED25519,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
@@ -115,13 +113,9 @@ def _is_cryptography_key_consistent(
         result = _check_dsa_consistency(key_public_data, key_private_data)
         if result is not None:
             return result
-        try:
-            signature = key.sign(
-                SIGNATURE_TEST_DATA, cryptography.hazmat.primitives.hashes.SHA256()
-            )
-        except AttributeError:
-            # sign() was added in cryptography 1.5, but we support older versions
-            return None
+        signature = key.sign(
+            SIGNATURE_TEST_DATA, cryptography.hazmat.primitives.hashes.SHA256()
+        )
         try:
             key.public_key().verify(
                 signature,
@@ -134,16 +128,12 @@ def _is_cryptography_key_consistent(
     if isinstance(
         key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
     ):
-        try:
-            signature = key.sign(
-                SIGNATURE_TEST_DATA,
-                cryptography.hazmat.primitives.asymmetric.ec.ECDSA(
-                    cryptography.hazmat.primitives.hashes.SHA256()
-                ),
-            )
-        except AttributeError:
-            # sign() was added in cryptography 1.5, but we support older versions
-            return None
+        signature = key.sign(
+            SIGNATURE_TEST_DATA,
+            cryptography.hazmat.primitives.asymmetric.ec.ECDSA(
+                cryptography.hazmat.primitives.hashes.SHA256()
+            ),
+        )
         try:
             key.public_key().verify(
                 signature,
@@ -156,13 +146,11 @@ def _is_cryptography_key_consistent(
         except cryptography.exceptions.InvalidSignature:
             return False
     has_simple_sign_function = False
-    if CRYPTOGRAPHY_HAS_ED25519 and isinstance(
+    if isinstance(
         key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey
     ):
         has_simple_sign_function = True
-    if CRYPTOGRAPHY_HAS_ED448 and isinstance(
-        key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
-    ):
+    if isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
         has_simple_sign_function = True
     if has_simple_sign_function:
         signature = key.sign(SIGNATURE_TEST_DATA)

@@ -11,7 +11,6 @@ from random import randrange
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_key_needs_digest_for_signing,
-    cryptography_serial_number_of_cert,
     cryptography_verify_certificate_signature,
     get_not_valid_after,
     get_not_valid_before,
@@ -89,17 +88,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                     self.module.fail_json(
                         msg=f'Unsupported digest "{module.params["selfsigned_digest"]}"'
                     )
-            try:
-                self.csr = csr.sign(self.privatekey, digest)
-            except TypeError as e:
-                if (
-                    str(e) == "Algorithm must be a registered hash algorithm."
-                    and digest is None
-                ):
-                    self.module.fail_json(
-                        msg="Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer."
-                    )
-                raise
+            self.csr = csr.sign(self.privatekey, digest)
 
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest is None:
@@ -138,20 +127,10 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         except ValueError as e:
             raise CertificateError(str(e))
 
-        try:
-            certificate = cert_builder.sign(
-                private_key=self.privatekey,
-                algorithm=self.digest,
-            )
-        except TypeError as e:
-            if (
-                str(e) == "Algorithm must be a registered hash algorithm."
-                and self.digest is None
-            ):
-                self.module.fail_json(
-                    msg="Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer."
-                )
-            raise
+        certificate = cert_builder.sign(
+            private_key=self.privatekey,
+            algorithm=self.digest,
+        )
 
         self.cert = certificate
 
@@ -199,7 +178,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                     "notAfter": get_not_valid_after(self.cert).strftime(
                         "%Y%m%d%H%M%SZ"
                     ),
-                    "serial_number": cryptography_serial_number_of_cert(self.cert),
+                    "serial_number": self.cert.serial_number,
                 }
             )
 

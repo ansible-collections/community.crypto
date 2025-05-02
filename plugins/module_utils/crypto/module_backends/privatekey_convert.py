@@ -14,10 +14,6 @@ from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_X25519,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -197,14 +193,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
             if format == "raw":
                 if passphrase is not None:
                     raise PrivateKeyError("Cannot load raw key with passphrase")
-                if len(data) == 56 and CRYPTOGRAPHY_HAS_X448:
+                if len(data) == 56:
                     return (
                         format,
                         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                             data
                         ),
                     )
-                if len(data) == 57 and CRYPTOGRAPHY_HAS_ED448:
+                if len(data) == 57:
                     return (
                         format,
                         cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.from_private_bytes(
@@ -212,54 +208,39 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                         ),
                     )
                 if len(data) == 32:
-                    if CRYPTOGRAPHY_HAS_X25519 and not CRYPTOGRAPHY_HAS_ED25519:
-                        return (
-                            format,
-                            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
-                                data
-                            ),
-                        )
-                    if CRYPTOGRAPHY_HAS_ED25519 and not CRYPTOGRAPHY_HAS_X25519:
-                        return (
-                            format,
-                            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
-                                data
-                            ),
-                        )
-                    if CRYPTOGRAPHY_HAS_X25519 and CRYPTOGRAPHY_HAS_ED25519:
-                        if isinstance(
-                            current_hint,
-                            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
-                        ):
-                            try:
-                                return (
-                                    format,
-                                    cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
-                                        data
-                                    ),
-                                )
-                            except Exception:
-                                return (
-                                    format,
-                                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
-                                        data
-                                    ),
-                                )
-                        else:
-                            try:
-                                return (
-                                    format,
-                                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
-                                        data
-                                    ),
-                                )
-                            except Exception:
-                                return (
-                                    format,
-                                    cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
-                                        data
-                                    ),
-                                )
+                    if isinstance(
+                        current_hint,
+                        cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+                    ):
+                        try:
+                            return (
+                                format,
+                                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
+                                    data
+                                ),
+                            )
+                        except Exception:
+                            return (
+                                format,
+                                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
+                                    data
+                                ),
+                            )
+                    else:
+                        try:
+                            return (
+                                format,
+                                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
+                                    data
+                                ),
+                            )
+                        except Exception:
+                            return (
+                                format,
+                                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
+                                    data
+                                ),
+                            )
                 raise PrivateKeyError("Cannot load raw key")
             else:
                 return (

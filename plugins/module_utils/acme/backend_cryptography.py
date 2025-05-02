@@ -29,7 +29,6 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_name_to_oid,
-    cryptography_serial_number_of_cert,
     get_not_valid_after,
     get_not_valid_before,
 )
@@ -460,7 +459,7 @@ class CryptographyBackend(CryptoBackend):
         return CertificateInformation(
             not_valid_after=get_not_valid_after(cert),
             not_valid_before=get_not_valid_before(cert),
-            serial_number=cryptography_serial_number_of_cert(cert),
+            serial_number=cert.serial_number,
             subject_key_identifier=ski,
             authority_key_identifier=aki,
         )

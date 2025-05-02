@@ -18,7 +18,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_decode_name,
     cryptography_get_extensions_from_cert,
     cryptography_oid_to_name,
-    cryptography_serial_number_of_cert,
     get_not_valid_after,
     get_not_valid_before,
 )
@@ -416,7 +415,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             return None, None, None
 
     def _get_serial_number(self):
-        return cryptography_serial_number_of_cert(self.cert)
+        return self.cert.serial_number
 
     def _get_all_extensions(self):
         return cryptography_get_extensions_from_cert(self.cert)

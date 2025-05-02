@@ -309,19 +309,11 @@ def parse_crl_distribution_points(module, crl_distribution_points):
             if parse_crl_distribution_point["relative_name"] is not None:
                 if not parse_crl_distribution_point["relative_name"]:
                     raise OpenSSLObjectError("relative_name must not be empty")
-                try:
-                    params["relative_name"] = (
-                        cryptography_parse_relative_distinguished_name(
-                            parse_crl_distribution_point["relative_name"]
-                        )
+                params["relative_name"] = (
+                    cryptography_parse_relative_distinguished_name(
+                        parse_crl_distribution_point["relative_name"]
                     )
-                except Exception:
-                    # If cryptography's version is < 1.6, the error is probably caused by that
-                    if CRYPTOGRAPHY_VERSION < LooseVersion("1.6"):
-                        raise OpenSSLObjectError(
-                            "Cannot specify relative_name for cryptography < 1.6"
-                        )
-                    raise
+                )
             if parse_crl_distribution_point["crl_issuer"] is not None:
                 if not parse_crl_distribution_point["crl_issuer"]:
                     raise OpenSSLObjectError("crl_issuer must not be empty")
@@ -409,21 +401,12 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
 
         if self.ocspMustStaple:
-            try:
-                # This only works with cryptography >= 2.1
-                csr = csr.add_extension(
-                    cryptography.x509.TLSFeature(
-                        [cryptography.x509.TLSFeatureType.status_request]
-                    ),
-                    critical=self.ocspMustStaple_critical,
-                )
-            except AttributeError:
-                csr = csr.add_extension(
-                    cryptography.x509.UnrecognizedExtension(
-                        CRYPTOGRAPHY_MUST_STAPLE_NAME, CRYPTOGRAPHY_MUST_STAPLE_VALUE
-                    ),
-                    critical=self.ocspMustStaple_critical,
-                )
+            csr = csr.add_extension(
+                cryptography.x509.TLSFeature(
+                    [cryptography.x509.TLSFeatureType.status_request]
+                ),
+                critical=self.ocspMustStaple_critical,
+            )
 
         if self.name_constraints_permitted or self.name_constraints_excluded:
             try:
@@ -493,15 +476,6 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 )
         try:
             self.csr = csr.sign(self.privatekey, digest)
-        except TypeError as e:
-            if (
-                str(e) == "Algorithm must be a registered hash algorithm."
-                and digest is None
-            ):
-                self.module.fail_json(
-                    msg="Signing with Ed25519 and Ed448 keys requires cryptography 2.8 or newer."
-                )
-            raise
         except UnicodeError as e:
             # This catches IDNAErrors, which happens when a bad name is passed as a SAN
             # (https://github.com/ansible-collections/community.crypto/issues/105).
@@ -635,22 +609,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 return bc_ext is None
 
         def _check_ocspMustStaple(extensions):
-            try:
-                # This only works with cryptography >= 2.1
-                tlsfeature_ext = _find_extension(
-                    extensions, cryptography.x509.TLSFeature
-                )
-                has_tlsfeature = True
-            except AttributeError:
-                tlsfeature_ext = next(
-                    (
-                        ext
-                        for ext in extensions
-                        if ext.value.oid == CRYPTOGRAPHY_MUST_STAPLE_NAME
-                    ),
-                    None,
-                )
-                has_tlsfeature = False
+            tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
+            has_tlsfeature = True
             if self.ocspMustStaple:
                 if (
                     not tlsfeature_ext

@@ -126,11 +126,6 @@ else:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_DSA_SIGN,
-    CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-    CRYPTOGRAPHY_HAS_RSA_SIGN,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
@@ -191,42 +186,37 @@ class SignatureCryptography(SignatureBase):
 
             signature = None
 
-            if CRYPTOGRAPHY_HAS_DSA_SIGN:
-                if isinstance(
-                    private_key,
-                    cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey,
-                ):
-                    signature = private_key.sign(_in, _hash)
+            if isinstance(
+                private_key,
+                cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey,
+            ):
+                signature = private_key.sign(_in, _hash)
 
-            if CRYPTOGRAPHY_HAS_EC_SIGN:
-                if isinstance(
-                    private_key,
-                    cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
-                ):
-                    signature = private_key.sign(
-                        _in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash)
-                    )
+            elif isinstance(
+                private_key,
+                cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
+            ):
+                signature = private_key.sign(
+                    _in, cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash)
+                )
 
-            if CRYPTOGRAPHY_HAS_ED25519_SIGN:
-                if isinstance(
-                    private_key,
-                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
-                ):
-                    signature = private_key.sign(_in)
+            elif isinstance(
+                private_key,
+                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+            ):
+                signature = private_key.sign(_in)
 
-            if CRYPTOGRAPHY_HAS_ED448_SIGN:
-                if isinstance(
-                    private_key,
-                    cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
-                ):
-                    signature = private_key.sign(_in)
+            elif isinstance(
+                private_key,
+                cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+            ):
+                signature = private_key.sign(_in)
 
-            if CRYPTOGRAPHY_HAS_RSA_SIGN:
-                if isinstance(
-                    private_key,
-                    cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey,
-                ):
-                    signature = private_key.sign(_in, _padding, _hash)
+            elif isinstance(
+                private_key,
+                cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey,
+            ):
+                signature = private_key.sign(_in, _padding, _hash)
 
             if signature is None:
                 self.module.fail_json(

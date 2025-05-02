@@ -455,7 +455,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_key_needs_digest_for_signing,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
-    cryptography_serial_number_of_cert,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
     get_crl_info,
@@ -584,7 +583,7 @@ class CRL(OpenSSLObject):
                     cert = load_certificate(
                         rc["path"], content=rc["content"], backend="cryptography"
                     )
-                    result["serial_number"] = cryptography_serial_number_of_cert(cert)
+                    result["serial_number"] = cert.serial_number
                 except OpenSSLObjectError as e:
                     if rc["content"] is not None:
                         module.fail_json(

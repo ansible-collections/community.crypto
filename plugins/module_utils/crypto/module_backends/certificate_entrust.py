@@ -11,7 +11,6 @@ import os
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
-    cryptography_serial_number_of_cert,
     get_not_valid_after,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -179,9 +178,7 @@ class EntrustCertificateBackend(CertificateBackend):
             serial_number = None
             expiry = None
             if self.backend == "cryptography":
-                serial_number = (
-                    f"{cryptography_serial_number_of_cert(self.existing_certificate):X}"
-                )
+                serial_number = f"{self.existing_certificate.serial_number:X}"
                 expiry = get_not_valid_after(self.existing_certificate)
 
             # get some information about the expiry of this certificate

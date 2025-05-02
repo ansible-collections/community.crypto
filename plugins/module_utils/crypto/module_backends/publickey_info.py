@@ -11,10 +11,6 @@ from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_X25519,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
@@ -58,19 +54,17 @@ def _get_cryptography_public_key_info(key):
         key_public_data["q"] = parameter_numbers.q
         key_public_data["g"] = parameter_numbers.g
         key_public_data["y"] = public_numbers.y
-    elif CRYPTOGRAPHY_HAS_X25519 and isinstance(
+    elif isinstance(
         key, cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey
     ):
         key_type = "X25519"
-    elif CRYPTOGRAPHY_HAS_X448 and isinstance(
-        key, cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey
-    ):
+    elif isinstance(key, cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey):
         key_type = "X448"
-    elif CRYPTOGRAPHY_HAS_ED25519 and isinstance(
+    elif isinstance(
         key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey
     ):
         key_type = "Ed25519"
-    elif CRYPTOGRAPHY_HAS_ED448 and isinstance(
+    elif isinstance(
         key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
     ):
         key_type = "Ed448"
