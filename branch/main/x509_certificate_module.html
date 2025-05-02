@@ -219,7 +219,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
 <li><p>acme-tiny &gt;= 4.0.0 (if using the <code class="ansible-value docutils literal notranslate"><span class="pre">acme</span></code> provider)</p></li>
-<li><p>cryptography &gt;= 1.6 (if using <code class="ansible-value docutils literal notranslate"><span class="pre">selfsigned</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code> provider)</p></li>
+<li><p>cryptography &gt;= 3.4 (if using <code class="ansible-value docutils literal notranslate"><span class="pre">selfsigned</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code> provider)</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -488,7 +488,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <td><div class="ansible-option-cell"><p>Create a Authority Key Identifier from the CA’s certificate. If the CSR provided a authority key identifier, it is ignored.</p>
 <p>The Authority Key Identifier is generated from the CA certificate’s Subject Key Identifier, if available. If it is not available, the CA certificate’s public key will be used.</p>
 <p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code> provider.</p>
-<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -505,7 +504,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>A value of <code class="ansible-value docutils literal notranslate"><span class="pre">always_create</span></code> always creates a SKI. If the CSR provides one, that one is ignored.</p>
 <p>A value of <code class="ansible-value docutils literal notranslate"><span class="pre">never_create</span></code> never creates a SKI. If the CSR provides one, that one is used.</p>
 <p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code> provider.</p>
-<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;create_if_not_provided&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -700,7 +698,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <p>A value of <code class="ansible-value docutils literal notranslate"><span class="pre">always_create</span></code> always creates a SKI. If the CSR provides one, that one is ignored.</p>
 <p>A value of <code class="ansible-value docutils literal notranslate"><span class="pre">never_create</span></code> never creates a SKI. If the CSR provides one, that one is used.</p>
 <p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">selfsigned</span></code> provider.</p>
-<p>Note that this is only supported if the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend is used!</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;create_if_not_provided&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>

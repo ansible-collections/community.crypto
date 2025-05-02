@@ -221,7 +221,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span id="ansible-collections-community-crypto-openssl-privatekey-pipe-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>cryptography &gt;= 1.2.3 (older versions might work as well)</p></li>
+<li><p>cryptography &gt;= 3.4</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -318,7 +318,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p>Determines behavior of the module if the format of a private key does not match the expected format, but all other parameters are as expected.</p>
 <p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">regenerate</span></code> (default), generates a new private key.</p>
 <p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">convert</span></code>, the key will be converted to the new format instead.</p>
-<p>Only supported by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;regenerate&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -395,7 +394,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The algorithm used to generate the TLS/SSL private key.</p>
-<p>Note that <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code> require the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend. <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code> needs cryptography 2.5 or newer, while <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code> require cryptography 2.6 or newer. For <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, the minimal cryptography version required depends on the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-pipe-module-parameter-curve"><span class="std std-ref"><span class="pre">curve</span></span></a></strong></code> option.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;DSA&quot;</span></code></p></li>
