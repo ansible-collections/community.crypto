@@ -26,18 +26,15 @@
 - name: Add cryptography backend
   set_fact:
     backends: "{{ backends + [ { 'backend': 'cryptography' } ] }}"
-  when: cryptography_version.stdout is version('1.4', '>=')
 
 - name: Add RSA tests
   set_fact:
     key_types: "{{ key_types + [ { 'type': 'RSA', 'size': default_rsa_key_size } ] }}"
-  when: cryptography_version.stdout is version('1.4', '>=')
 
 - name: Add DSA + ECDSA tests
   set_fact:
     key_types: "{{ key_types + [ { 'type': 'DSA', 'size': 2048 }, { 'type': 'ECC', 'curve': 'secp256r1' } ] }}"
   when:
-    - cryptography_version.stdout is version('1.5', '>=')
     # FreeBSD 11 fails on secp256r1 keys
     - not ansible_os_family == 'FreeBSD'
 
@@ -45,8 +42,6 @@
   set_fact:
     key_types: "{{ key_types + [ { 'type': 'Ed25519' }, { 'type': 'Ed448' } ] }}"
   when:
-    # The module under tests works with >= 2.6, but we also need to be able to create a certificate which requires 2.8
-    - cryptography_version.stdout is version('2.8', '>=')
     # FreeBSD doesn't have support for Ed448/25519
     - not ansible_os_family == 'FreeBSD'
 

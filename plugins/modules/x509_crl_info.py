@@ -13,7 +13,7 @@ short_description: Retrieve information on Certificate Revocation Lists (CRLs)
 description:
   - This module allows one to retrieve information on Certificate Revocation Lists (CRLs).
 requirements:
-  - cryptography >= 1.2
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:

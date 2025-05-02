@@ -16,11 +16,6 @@ from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X25519_FULL,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_info import (
@@ -39,7 +34,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2.3"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -48,8 +43,12 @@ try:
     import cryptography.hazmat.backends
     import cryptography.hazmat.primitives.asymmetric.dsa
     import cryptography.hazmat.primitives.asymmetric.ec
+    import cryptography.hazmat.primitives.asymmetric.ed448
+    import cryptography.hazmat.primitives.asymmetric.ed25519
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.asymmetric.x448
+    import cryptography.hazmat.primitives.asymmetric.x25519
     import cryptography.hazmat.primitives.serialization
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
@@ -320,27 +319,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self._add_curve("brainpoolP384r1", "BrainpoolP384R1", deprecated=True)
         self._add_curve("brainpoolP512r1", "BrainpoolP512R1", deprecated=True)
 
-        self.cryptography_backend = cryptography.hazmat.backends.default_backend()
-
-        if not CRYPTOGRAPHY_HAS_X25519 and self.type == "X25519":
-            self.module.fail_json(
-                msg="Your cryptography version does not support X25519"
-            )
-        if not CRYPTOGRAPHY_HAS_X25519_FULL and self.type == "X25519":
-            self.module.fail_json(
-                msg="Your cryptography version does not support X25519 serialization"
-            )
-        if not CRYPTOGRAPHY_HAS_X448 and self.type == "X448":
-            self.module.fail_json(msg="Your cryptography version does not support X448")
-        if not CRYPTOGRAPHY_HAS_ED25519 and self.type == "Ed25519":
-            self.module.fail_json(
-                msg="Your cryptography version does not support Ed25519"
-            )
-        if not CRYPTOGRAPHY_HAS_ED448 and self.type == "Ed448":
-            self.module.fail_json(
-                msg="Your cryptography version does not support Ed448"
-            )
-
     def _get_wanted_format(self):
         if self.format not in ("auto", "auto_ignore"):
             return self.format
@@ -357,28 +335,27 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.asymmetric.rsa.generate_private_key(
                         public_exponent=65537,  # OpenSSL always uses this
                         key_size=self.size,
-                        backend=self.cryptography_backend,
                     )
                 )
             if self.type == "DSA":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.dsa.generate_private_key(
-                        key_size=self.size, backend=self.cryptography_backend
+                        key_size=self.size
                     )
                 )
-            if CRYPTOGRAPHY_HAS_X25519_FULL and self.type == "X25519":
+            if self.type == "X25519":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.generate()
                 )
-            if CRYPTOGRAPHY_HAS_X448 and self.type == "X448":
+            if self.type == "X448":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.generate()
                 )
-            if CRYPTOGRAPHY_HAS_ED25519 and self.type == "Ed25519":
+            if self.type == "Ed25519":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.generate()
                 )
-            if CRYPTOGRAPHY_HAS_ED448 and self.type == "Ed448":
+            if self.type == "Ed448":
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.generate()
                 )
@@ -390,7 +367,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
                         curve=self.curves[self.curve]["create"](self.size),
-                        backend=self.cryptography_backend,
                     )
                 )
         except cryptography.exceptions.UnsupportedAlgorithm:
@@ -462,43 +438,37 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             # Interpret bytes depending on format.
             format = identify_private_key_format(data)
             if format == "raw":
-                if len(data) == 56 and CRYPTOGRAPHY_HAS_X448:
+                if len(data) == 56:
                     return cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                         data
                     )
-                if len(data) == 57 and CRYPTOGRAPHY_HAS_ED448:
+                if len(data) == 57:
                     return cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.from_private_bytes(
                         data
                     )
                 if len(data) == 32:
-                    if CRYPTOGRAPHY_HAS_X25519 and (
-                        self.type == "X25519" or not CRYPTOGRAPHY_HAS_ED25519
-                    ):
+                    if self.type == "X25519":
                         return cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
                             data
                         )
-                    if CRYPTOGRAPHY_HAS_ED25519 and (
-                        self.type == "Ed25519" or not CRYPTOGRAPHY_HAS_X25519
-                    ):
+                    if self.type == "Ed25519":
                         return cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
                             data
                         )
-                    if CRYPTOGRAPHY_HAS_X25519 and CRYPTOGRAPHY_HAS_ED25519:
-                        try:
-                            return cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
-                                data
-                            )
-                        except Exception:
-                            return cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
-                                data
-                            )
+                    try:
+                        return cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
+                            data
+                        )
+                    except Exception:
+                        return cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
+                            data
+                        )
                 raise PrivateKeyError("Cannot load raw key")
             else:
                 return (
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         data,
                         None if self.passphrase is None else to_bytes(self.passphrase),
-                        backend=self.cryptography_backend,
                     )
                 )
         except Exception as e:
@@ -523,7 +493,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         self.existing_private_key_bytes,
                         None if self.passphrase is None else to_bytes(self.passphrase),
-                        backend=self.cryptography_backend,
                     )
                 )
         except Exception:
@@ -544,22 +513,22 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return (
                 self.type == "DSA" and self.size == self.existing_private_key.key_size
             )
-        if CRYPTOGRAPHY_HAS_X25519 and isinstance(
+        if isinstance(
             self.existing_private_key,
             cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
         ):
             return self.type == "X25519"
-        if CRYPTOGRAPHY_HAS_X448 and isinstance(
+        if isinstance(
             self.existing_private_key,
             cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
         ):
             return self.type == "X448"
-        if CRYPTOGRAPHY_HAS_ED25519 and isinstance(
+        if isinstance(
             self.existing_private_key,
             cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
         ):
             return self.type == "Ed25519"
-        if CRYPTOGRAPHY_HAS_ED448 and isinstance(
+        if isinstance(
             self.existing_private_key,
             cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
         ):

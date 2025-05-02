@@ -14,7 +14,7 @@ description:
   - This module allows one to verify a signature for a file by a certificate.
   - The module uses the cryptography Python library.
 requirements:
-  - cryptography >= 1.4 (some key types require newer versions)
+  - cryptography >= 3.4
 author:
   - Patrick Pichler (@aveexy)
   - Markus Teufelberger (@MarkusTeufelberger)
@@ -51,10 +51,6 @@ options:
     type: str
     default: auto
     choices: [auto, cryptography]
-notes:
-  - "When using the C(cryptography) backend, the following key types require at least the following C(cryptography) version:\n
-    RSA keys: C(cryptography) >= 1.4\nDSA and ECDSA keys: C(cryptography) >= 1.5\ned448 and ed25519 keys: C(cryptography)
-    >= 2.6."
 seealso:
   - module: community.crypto.openssl_signature
   - module: community.crypto.x509_certificate
@@ -97,7 +93,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -115,11 +111,6 @@ else:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_DSA_SIGN,
-    CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-    CRYPTOGRAPHY_HAS_RSA_SIGN,
     OpenSSLObjectError,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
@@ -181,74 +172,53 @@ class SignatureInfoCryptography(SignatureInfoBase):
             verified = False
             valid = False
 
-            if CRYPTOGRAPHY_HAS_DSA_SIGN:
-                try:
-                    if isinstance(
-                        public_key,
-                        cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey,
-                    ):
-                        public_key.verify(_signature, _in, _hash)
-                        verified = True
-                        valid = True
-                except cryptography.exceptions.InvalidSignature:
+            try:
+                if isinstance(
+                    public_key,
+                    cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey,
+                ):
+                    public_key.verify(_signature, _in, _hash)
                     verified = True
-                    valid = False
+                    valid = True
 
-            if CRYPTOGRAPHY_HAS_EC_SIGN:
-                try:
-                    if isinstance(
-                        public_key,
-                        cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
-                    ):
-                        public_key.verify(
-                            _signature,
-                            _in,
-                            cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash),
-                        )
-                        verified = True
-                        valid = True
-                except cryptography.exceptions.InvalidSignature:
+                elif isinstance(
+                    public_key,
+                    cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
+                ):
+                    public_key.verify(
+                        _signature,
+                        _in,
+                        cryptography.hazmat.primitives.asymmetric.ec.ECDSA(_hash),
+                    )
                     verified = True
-                    valid = False
+                    valid = True
 
-            if CRYPTOGRAPHY_HAS_ED25519_SIGN:
-                try:
-                    if isinstance(
-                        public_key,
-                        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
-                    ):
-                        public_key.verify(_signature, _in)
-                        verified = True
-                        valid = True
-                except cryptography.exceptions.InvalidSignature:
+                elif isinstance(
+                    public_key,
+                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+                ):
+                    public_key.verify(_signature, _in)
                     verified = True
-                    valid = False
+                    valid = True
 
-            if CRYPTOGRAPHY_HAS_ED448_SIGN:
-                try:
-                    if isinstance(
-                        public_key,
-                        cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
-                    ):
-                        public_key.verify(_signature, _in)
-                        verified = True
-                        valid = True
-                except cryptography.exceptions.InvalidSignature:
+                elif isinstance(
+                    public_key,
+                    cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
+                ):
+                    public_key.verify(_signature, _in)
                     verified = True
-                    valid = False
+                    valid = True
 
-            if CRYPTOGRAPHY_HAS_RSA_SIGN:
-                try:
-                    if isinstance(
-                        public_key,
-                        cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey,
-                    ):
-                        public_key.verify(_signature, _in, _padding, _hash)
-                        verified = True
-                        valid = True
-                except cryptography.exceptions.InvalidSignature:
+                elif isinstance(
+                    public_key,
+                    cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey,
+                ):
+                    public_key.verify(_signature, _in, _padding, _hash)
                     verified = True
-                    valid = False
+                    valid = True
+            except cryptography.exceptions.InvalidSignature:
+                verified = True
+                valid = False
 
             if not verified:
                 self.module.fail_json(

@@ -37,7 +37,7 @@
         that:
           - result is success or skip_tests
 
-  when: cryptography_version.stdout is version('1.6', '>=')
+  when: cryptography_version.stdout is version('3.4', '>=')
 
 - block:
 

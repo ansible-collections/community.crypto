@@ -15,7 +15,7 @@ description:
   - Certificates on the revocation list can be either specified by serial number and (optionally) their issuer, or as a path
     to a certificate file in PEM format.
 requirements:
-  - cryptography >= 1.2
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
@@ -455,7 +455,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_key_needs_digest_for_signing,
     cryptography_name_to_oid,
     cryptography_oid_to_name,
-    cryptography_serial_number_of_cert,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
     get_crl_info,
@@ -483,13 +482,12 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives.serialization import Encoding
     from cryptography.x509 import (
         CertificateRevocationListBuilder,
@@ -585,7 +583,7 @@ class CRL(OpenSSLObject):
                     cert = load_certificate(
                         rc["path"], content=rc["content"], backend="cryptography"
                     )
-                    result["serial_number"] = cryptography_serial_number_of_cert(cert)
+                    result["serial_number"] = cert.serial_number
                 except OpenSSLObjectError as e:
                     if rc["content"] is not None:
                         module.fail_json(
@@ -642,11 +640,11 @@ class CRL(OpenSSLObject):
                 data = f.read()
             self.actual_format = "pem" if identify_pem_format(data) else "der"
             if self.actual_format == "pem":
-                self.crl = x509.load_pem_x509_crl(data, default_backend())
+                self.crl = x509.load_pem_x509_crl(data)
                 if self.return_content:
                     self.crl_content = data
             else:
-                self.crl = x509.load_der_x509_crl(data, default_backend())
+                self.crl = x509.load_der_x509_crl(data)
                 if self.return_content:
                     self.crl_content = base64.b64encode(data)
         except Exception:
@@ -783,7 +781,6 @@ class CRL(OpenSSLObject):
         return True
 
     def _generate_crl(self):
-        backend = default_backend()
         crl = CertificateRevocationListBuilder()
 
         try:
@@ -830,12 +827,12 @@ class CRL(OpenSSLObject):
                     x509.InvalidityDate(entry["invalidity_date"]),
                     entry["invalidity_date_critical"],
                 )
-            crl = crl.add_revoked_certificate(revoked_cert.build(backend))
+            crl = crl.add_revoked_certificate(revoked_cert.build())
 
         digest = None
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             digest = self.digest
-        self.crl = crl.sign(self.privatekey, digest, backend=backend)
+        self.crl = crl.sign(self.privatekey, digest)
         if self.format == "pem":
             return self.crl.public_bytes(Encoding.PEM)
         else:

@@ -15,8 +15,7 @@ description:
     not supported), use the M(community.crypto.openssh_keypair) module to manage these.
   - The module uses the cryptography Python library.
 requirements:
-  - cryptography >= 1.2.3 (older versions might work as well)
-  - Needs cryptography >= 1.4 if O(format) is C(OpenSSH)
+  - cryptography >= 3.4
 author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
@@ -211,13 +210,11 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2.3"
-MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH = "1.4"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization as crypto_serialization
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
@@ -354,7 +351,7 @@ class PublicKey(OpenSSLObject):
                     if self.format == "OpenSSH":
                         # Read and dump public key. Makes sure that the comment is stripped off.
                         current_publickey = crypto_serialization.load_ssh_public_key(
-                            publickey_content, backend=default_backend()
+                            publickey_content
                         )
                         publickey_content = current_publickey.public_bytes(
                             crypto_serialization.Encoding.OpenSSH,
@@ -362,7 +359,7 @@ class PublicKey(OpenSSLObject):
                         )
                     else:
                         current_publickey = crypto_serialization.load_pem_public_key(
-                            publickey_content, backend=default_backend()
+                            publickey_content
                         )
                         publickey_content = current_publickey.public_bytes(
                             crypto_serialization.Encoding.PEM,
@@ -442,16 +439,12 @@ def main():
         mutually_exclusive=(["privatekey_path", "privatekey_content"],),
     )
 
-    minimal_cryptography_version = MINIMAL_CRYPTOGRAPHY_VERSION
-    if module.params["format"] == "OpenSSH":
-        minimal_cryptography_version = MINIMAL_CRYPTOGRAPHY_VERSION_OPENSSH
-
     backend = module.params["select_crypto_backend"]
     if backend == "auto":
         # Detection what is possible
         can_use_cryptography = (
             CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(minimal_cryptography_version)
+            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
         )
 
         # Decision
@@ -461,7 +454,7 @@ def main():
         # Success?
         if backend == "auto":
             module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {minimal_cryptography_version})",
+                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})",
             )
 
     if module.params["format"] == "OpenSSH" and backend != "cryptography":
@@ -471,7 +464,7 @@ def main():
         if not CRYPTOGRAPHY_FOUND:
             module.fail_json(
                 msg=missing_required_lib(
-                    f"cryptography >= {minimal_cryptography_version}"
+                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
                 ),
                 exception=CRYPTOGRAPHY_IMP_ERR,
             )

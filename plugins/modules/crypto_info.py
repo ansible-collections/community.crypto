@@ -154,22 +154,6 @@ openssl:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_DSA,
-    CRYPTOGRAPHY_HAS_DSA_SIGN,
-    CRYPTOGRAPHY_HAS_EC,
-    CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-    CRYPTOGRAPHY_HAS_RSA,
-    CRYPTOGRAPHY_HAS_RSA_SIGN,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X25519_FULL,
-    HAS_CRYPTOGRAPHY,
-)
 
 
 try:
@@ -185,9 +169,11 @@ try:
 except ImportError:
     UnsupportedAlgorithm = Exception
     CryptographyInternalError = Exception
+    HAS_CRYPTOGRAPHY = False
     CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
 else:
+    HAS_CRYPTOGRAPHY = True
     CRYPTOGRAPHY_VERSION = cryptography.__version__
     CRYPTOGRAPHY_IMP_ERR = None
 
@@ -222,64 +208,153 @@ def add_crypto_information(module):
         result["python_cryptography_import_error"] = CRYPTOGRAPHY_IMP_ERR
         return result
 
-    has_ed25519 = CRYPTOGRAPHY_HAS_ED25519
-    if has_ed25519:
-        try:
-            from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-                Ed25519PrivateKey,
-            )
+    # Test for DSA
+    has_dsa = False
+    has_dsa_sign = False
+    try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/dsa/
+        import cryptography.hazmat.primitives.asymmetric.dsa
 
+        has_dsa = True
+        try:
+            # added later in 1.5
+            cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey.sign
+            has_dsa_sign = True
+        except AttributeError:
+            pass
+    except ImportError:
+        pass
+
+    # Test for RSA
+    has_rsa = False
+    has_rsa_sign = False
+    try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
+        import cryptography.hazmat.primitives.asymmetric.rsa
+
+        has_rsa = True
+        try:
+            # added later in 1.4
+            cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey.sign
+            has_rsa_sign = True
+        except AttributeError:
+            pass
+    except ImportError:
+        pass
+
+    # Test for Ed25519
+    has_ed25519 = False
+    has_ed25519_sign = False
+    try:
+        # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/
+        import cryptography.hazmat.primitives.asymmetric.ed25519
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+            Ed25519PrivateKey,
+        )
+
+        try:
             Ed25519PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
-        except UnsupportedAlgorithm:
-            has_ed25519 = False
 
-    has_ed448 = CRYPTOGRAPHY_HAS_ED448
-    if has_ed448:
+        has_ed25519 = True
         try:
-            from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
+            # added with the primitive in 2.6
+            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.sign
+            has_ed25519_sign = True
+        except AttributeError:
+            pass
+    except (ImportError, UnsupportedAlgorithm):
+        pass
 
+    # Test for Ed448
+    has_ed448 = False
+    has_ed448_sign = False
+    try:
+        # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed448/
+        import cryptography.hazmat.primitives.asymmetric.ed448
+        from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
+
+        try:
             Ed448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
-        except UnsupportedAlgorithm:
-            has_ed448 = False
 
-    has_x25519 = CRYPTOGRAPHY_HAS_X25519
-    if has_x25519:
+        has_ed448 = True
         try:
-            from cryptography.hazmat.primitives.asymmetric.x25519 import (
-                X25519PrivateKey,
-            )
+            # added with the primitive in 2.6
+            cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.sign
+            has_ed448_sign = True
+        except AttributeError:
+            pass
+    except (ImportError, UnsupportedAlgorithm):
+        pass
 
-            if CRYPTOGRAPHY_HAS_X25519_FULL:
-                X25519PrivateKey.from_private_bytes(b"")
+    # Test for X25519
+    has_x25519 = False
+    has_x25519_full = False
+    try:
+        # added in 2.0 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/
+        import cryptography.hazmat.primitives.asymmetric.x25519
+
+        try:
+            # added later in 2.5
+            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.private_bytes
+            full = True
+        except AttributeError:
+            full = False
+
+        try:
+            if full:
+                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
+                    b""
+                )
             else:
                 # Some versions do not support serialization and deserialization - use generate() instead
-                X25519PrivateKey.generate()
+                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.generate()
         except ValueError:
             pass
-        except UnsupportedAlgorithm:
-            has_x25519 = False
 
-    has_x448 = CRYPTOGRAPHY_HAS_X448
-    if has_x448:
+        has_x25519 = True
+        has_x25519_full = full
+    except (ImportError, UnsupportedAlgorithm):
+        pass
+
+    # Test for X448
+    has_x448 = False
+    try:
+        # added in 2.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x448/
+        import cryptography.hazmat.primitives.asymmetric.x448
+
         try:
             from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
 
             X448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
-        except UnsupportedAlgorithm:
-            has_x448 = False
 
+        has_x448 = True
+    except (ImportError, UnsupportedAlgorithm):
+        pass
+
+    # Test for ECC
+    has_ec = False
+    has_ec_sign = False
     curves = []
-    if CRYPTOGRAPHY_HAS_EC:
-        import cryptography.hazmat.backends
+    try:
+        # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ec/
         import cryptography.hazmat.primitives.asymmetric.ec
 
-        backend = cryptography.hazmat.backends.default_backend()
+        has_ec = True
+        try:
+            # added later in 1.5
+            cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey.sign
+            has_ec_sign = True
+        except AttributeError:
+            pass
+    except ImportError:
+        pass
+    else:
         for curve_name, constructor_name in CURVES:
             ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(
                 constructor_name
@@ -287,7 +362,7 @@ def add_crypto_information(module):
             if ecclass:
                 try:
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
-                        curve=ecclass(), backend=backend
+                        curve=ecclass()
                     )
                     curves.append(curve_name)
                 except UnsupportedAlgorithm:
@@ -300,21 +375,22 @@ def add_crypto_information(module):
                     # curves removed.
                     pass
 
+    # Compose result
     info = {
         "version": CRYPTOGRAPHY_VERSION,
         "curves": curves,
-        "has_ec": CRYPTOGRAPHY_HAS_EC,
-        "has_ec_sign": CRYPTOGRAPHY_HAS_EC_SIGN,
+        "has_ec": has_ec,
+        "has_ec_sign": has_ec_sign,
         "has_ed25519": has_ed25519,
-        "has_ed25519_sign": has_ed25519 and CRYPTOGRAPHY_HAS_ED25519_SIGN,
+        "has_ed25519_sign": has_ed25519_sign,
         "has_ed448": has_ed448,
-        "has_ed448_sign": has_ed448 and CRYPTOGRAPHY_HAS_ED448_SIGN,
-        "has_dsa": CRYPTOGRAPHY_HAS_DSA,
-        "has_dsa_sign": CRYPTOGRAPHY_HAS_DSA_SIGN,
-        "has_rsa": CRYPTOGRAPHY_HAS_RSA,
-        "has_rsa_sign": CRYPTOGRAPHY_HAS_RSA_SIGN,
+        "has_ed448_sign": has_ed448_sign,
+        "has_dsa": has_dsa,
+        "has_dsa_sign": has_dsa_sign,
+        "has_rsa": has_rsa,
+        "has_rsa_sign": has_rsa_sign,
         "has_x25519": has_x25519,
-        "has_x25519_serialization": has_x25519 and CRYPTOGRAPHY_HAS_X25519_FULL,
+        "has_x25519_serialization": has_x25519 and has_x25519_full,
         "has_x448": has_x448,
     }
     result["python_cryptography_capabilities"] = info

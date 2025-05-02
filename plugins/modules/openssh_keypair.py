@@ -15,8 +15,7 @@ description:
     V(rsa), V(dsa), V(rsa1), V(ed25519) or V(ecdsa) private keys.
 requirements:
   - ssh-keygen (if O(backend=openssh))
-  - cryptography >= 2.6 (if O(backend=cryptography) and OpenSSH < 7.8 is installed)
-  - cryptography >= 3.0 (if O(backend=cryptography) and OpenSSH >= 7.8 is installed)
+  - cryptography >= 3.4 (if O(backend=cryptography))
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.crypto.attributes

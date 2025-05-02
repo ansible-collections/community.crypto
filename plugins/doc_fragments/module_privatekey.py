@@ -22,7 +22,7 @@ attributes:
     details:
       - The option O(regenerate=always) generally disables idempotency.
 requirements:
-  - cryptography >= 1.2.3 (older versions might work as well)
+  - cryptography >= 3.4
 options:
   size:
     description:
@@ -32,9 +32,6 @@ options:
   type:
     description:
       - The algorithm used to generate the TLS/SSL private key.
-      - Note that V(ECC), V(X25519), V(X448), V(Ed25519), and V(Ed448) require the C(cryptography) backend. V(X25519) needs
-        cryptography 2.5 or newer, while V(X448), V(Ed25519), and V(Ed448) require cryptography 2.6 or newer. For V(ECC),
-        the minimal cryptography version required depends on the O(curve) option.
     type: str
     default: RSA
     choices: [DSA, ECC, Ed25519, Ed448, RSA, X25519, X448]
@@ -101,7 +98,6 @@ options:
         parameters are as expected.
       - If set to V(regenerate) (default), generates a new private key.
       - If set to V(convert), the key will be converted to the new format instead.
-      - Only supported by the C(cryptography) backend.
     type: str
     default: regenerate
     choices: [regenerate, convert]

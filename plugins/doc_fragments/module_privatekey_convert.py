@@ -10,7 +10,7 @@ class ModuleDocFragment:
     # Standard files documentation fragment
     DOCUMENTATION = r"""
 requirements:
-  - cryptography >= 1.2.3 (older versions might work as well)
+  - cryptography >= 3.4
 attributes:
   diff_mode:
     support: none

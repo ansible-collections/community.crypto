@@ -18,7 +18,7 @@ description:
     that the signature is correct. It ignores validity dates and key usage completely. If you need to verify that a generated
     chain is valid, please use C(openssl verify ...).
 requirements:
-  - "cryptography >= 1.5"
+  - "cryptography >= 3.4"
 extends_documentation_fragment:
   - community.crypto.attributes
   - community.crypto.attributes.idempotent_not_modify_state
@@ -126,10 +126,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     split_pem_list,
 )
@@ -152,8 +148,7 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("1.5")
-    _cryptography_backend = cryptography.hazmat.backends.default_backend()
+    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion("3.4")
 except ImportError:
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     HAS_CRYPTOGRAPHY = False
@@ -201,12 +196,12 @@ def is_parent(module, cert, potential_parent):
                     cert.cert.signature_hash_algorithm
                 ),
             )
-        elif CRYPTOGRAPHY_HAS_ED25519_SIGN and isinstance(
+        elif isinstance(
             public_key,
             cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
         ):
             public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
-        elif CRYPTOGRAPHY_HAS_ED448_SIGN and isinstance(
+        elif isinstance(
             public_key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
         ):
             public_key.verify(cert.cert.signature, cert.cert.tbs_certificate_bytes)
@@ -232,9 +227,7 @@ def parse_PEM_list(module, text, source, fail_on_error=True):
     for cert_pem in split_pem_list(text):
         # Try to load PEM certificate
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(
-                to_bytes(cert_pem), _cryptography_backend
-            )
+            cert = cryptography.x509.load_pem_x509_certificate(to_bytes(cert_pem))
             result.append(Certificate(cert_pem, cert))
         except Exception as e:
             msg = f"Cannot parse certificate #{len(result) + 1} from {source}: {e}"
@@ -338,7 +331,7 @@ def main():
 
     if not HAS_CRYPTOGRAPHY:
         module.fail_json(
-            msg=missing_required_lib("cryptography >= 1.5"),
+            msg=missing_required_lib("cryptography >= 3.4"),
             exception=CRYPTOGRAPHY_IMP_ERR,
         )
 

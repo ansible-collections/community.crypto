@@ -15,7 +15,7 @@ description:
   - In case the CSR signature cannot be validated, the module will fail. In this case, all return variables are still returned.
   - It uses the cryptography python library to interact with OpenSSL.
 requirements:
-  - cryptography >= 1.3
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)

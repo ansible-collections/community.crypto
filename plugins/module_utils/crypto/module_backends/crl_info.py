@@ -26,13 +26,12 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 # crypto_utils
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "1.2"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
@@ -54,9 +53,9 @@ class CRLInfoRetrieval:
         self.crl_pem = identify_pem_format(self.content)
         try:
             if self.crl_pem:
-                self.crl = x509.load_pem_x509_crl(self.content, default_backend())
+                self.crl = x509.load_pem_x509_crl(self.content)
             else:
-                self.crl = x509.load_der_x509_crl(self.content, default_backend())
+                self.crl = x509.load_der_x509_crl(self.content)
         except ValueError as e:
             self.module.fail_json(msg=f"Error while decoding CRL: {e}")
 

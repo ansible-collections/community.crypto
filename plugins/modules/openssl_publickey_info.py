@@ -14,7 +14,7 @@ description:
   - It uses the cryptography python library to interact with OpenSSL.
 version_added: 1.7.0
 requirements:
-  - cryptography >= 1.2.3
+  - cryptography >= 3.4
 author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:

@@ -41,7 +41,7 @@
       - result.extensions_by_oid['2.5.29.15'].critical == true
       - result.extensions_by_oid['2.5.29.15'].value in ['AwMA/4A=', 'AwMH/4A=']
       # Subject Alternative Names
-      - result.subject_alt_name[1] == ("DNS:âņsïbłè.com" if cryptography_version.stdout is version('2.1', '<') else "DNS:xn--sb-oia0a7a53bya.com")
+      - result.subject_alt_name[1] == "DNS:xn--sb-oia0a7a53bya.com"
       - result_unicode.subject_alt_name[1] == "DNS:âņsïbłè.com"
       - result_idna.subject_alt_name[1] == "DNS:xn--sb-oia0a7a53bya.com"
       - result.extensions_by_oid['2.5.29.17'].critical == false
@@ -68,7 +68,6 @@
     expected_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: "({{ select_crypto_backend }}) Read CSR"
   slurp:
@@ -111,7 +110,6 @@
     expected_authority_cert_issuer:
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
-  when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
   openssl_csr_info:
@@ -125,4 +123,3 @@
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none
       - result.authority_cert_serial_number is none
-  when: cryptography_version.stdout is version('1.3', '>=')

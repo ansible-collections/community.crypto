@@ -27,9 +27,11 @@ try:
     import cryptography
     from cryptography import x509
     from cryptography.exceptions import InvalidSignature
-    from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import padding
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        load_key_and_certificates as _load_key_and_certificates,
+    )
 
     _HAS_CRYPTOGRAPHY = True
 except ImportError:
@@ -38,34 +40,13 @@ except ImportError:
     pass
 
 try:
-    import cryptography.hazmat.primitives.asymmetric.rsa
-except ImportError:
-    pass
-try:
-    import cryptography.hazmat.primitives.asymmetric.ec
-except ImportError:
-    pass
-try:
-    import cryptography.hazmat.primitives.asymmetric.dsa
-except ImportError:
-    pass
-try:
-    import cryptography.hazmat.primitives.asymmetric.ed25519
-except ImportError:
-    pass
-try:
     import cryptography.hazmat.primitives.asymmetric.ed448
+    import cryptography.hazmat.primitives.asymmetric.ed25519
+    import cryptography.hazmat.primitives.asymmetric.rsa
+    import cryptography.hazmat.primitives.asymmetric.x448
+    import cryptography.hazmat.primitives.asymmetric.x25519
 except ImportError:
     pass
-
-try:
-    # This is a separate try/except since this is only present in cryptography 2.5 or newer
-    from cryptography.hazmat.primitives.serialization.pkcs12 import (
-        load_key_and_certificates as _load_key_and_certificates,
-    )
-except ImportError:
-    # Error handled in the calling module.
-    _load_key_and_certificates = None
 
 try:
     # This is a separate try/except since this is only present in cryptography 36.0.0 or newer
@@ -89,43 +70,40 @@ from ansible.module_utils.basic import missing_required_lib
 from ._obj2txt import obj2txt
 from ._objects import NORMALIZE_NAMES, NORMALIZE_NAMES_SHORT, OID_LOOKUP, OID_MAP
 from .basic import (
-    CRYPTOGRAPHY_HAS_DSA_SIGN,
-    CRYPTOGRAPHY_HAS_EC_SIGN,
-    CRYPTOGRAPHY_HAS_ED448,
-    CRYPTOGRAPHY_HAS_ED448_SIGN,
-    CRYPTOGRAPHY_HAS_ED25519,
-    CRYPTOGRAPHY_HAS_ED25519_SIGN,
-    CRYPTOGRAPHY_HAS_RSA_SIGN,
-    CRYPTOGRAPHY_HAS_X448,
-    CRYPTOGRAPHY_HAS_X25519,
-    CRYPTOGRAPHY_HAS_X25519_FULL,
     OpenSSLObjectError,
 )
 
 
 CRYPTOGRAPHY_TIMEZONE = False
+_CRYPTOGRAPHY_36_0_OR_NEWER = False
 if _HAS_CRYPTOGRAPHY:
     CRYPTOGRAPHY_TIMEZONE = LooseVersion(cryptography.__version__) >= LooseVersion(
         "42.0.0"
     )
 
+    _CRYPTOGRAPHY_36_0_OR_NEWER = LooseVersion(
+        cryptography.__version__
+    ) >= LooseVersion("36.0")
 
 DOTTED_OID = re.compile(r"^\d+(?:\.\d+)+$")
 
 
 def cryptography_get_extensions_from_cert(cert):
     result = dict()
-    try:
+
+    if _CRYPTOGRAPHY_36_0_OR_NEWER:
+        for ext in cert.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
+            )
+    else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
-        try:
-            # For certain old versions of cryptography, backend is a MultiBackend object,
-            # which has no _lib attribute. In that case, revert to the old approach.
-            backend._lib
-        except AttributeError:
-            backend = cert._backend
 
         x509_obj = cert._x509
         # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
@@ -154,34 +132,26 @@ def cryptography_get_extensions_from_cert(cert):
                 oid = exts[i].oid.dotted_string
             result[oid] = entry
 
-    except Exception:
-        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use its public_bytes() feature in that case. We will later switch this around
-        # so that this code will be the default, but for now this will act as a fallback
-        # since it will re-serialize de-serialized data, which can be different (if the
-        # original data was not canonicalized) from what was contained in the certificate.
-        for ext in cert.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
-            )
-
     return result
 
 
 def cryptography_get_extensions_from_csr(csr):
     result = dict()
-    try:
+
+    if _CRYPTOGRAPHY_36_0_OR_NEWER:
+        for ext in csr.extensions:
+            result[ext.oid.dotted_string] = dict(
+                critical=ext.critical,
+                value=to_native(base64.b64encode(ext.value.public_bytes())),
+            )
+
+    else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
         # the extension parsing ourselves.
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
-        try:
-            # For certain old versions of cryptography, backend is a MultiBackend object,
-            # which has no _lib attribute. In that case, revert to the old approach.
-            backend._lib
-        except AttributeError:
-            backend = csr._backend
 
         extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
         extensions = backend._ffi.gc(
@@ -219,18 +189,6 @@ def cryptography_get_extensions_from_csr(csr):
             except AttributeError:
                 oid = exts[i].oid.dotted_string
             result[oid] = entry
-
-    except Exception:
-        # In case the above method breaks, we likely have cryptography 36.0.0 or newer.
-        # Use its public_bytes() feature in that case. We will later switch this around
-        # so that this code will be the default, but for now this will act as a fallback
-        # since it will re-serialize de-serialized data, which can be different (if the
-        # original data was not canonicalized) from what was contained in the CSR.
-        for ext in csr.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=to_native(base64.b64encode(ext.value.public_bytes())),
-            )
 
     return result
 
@@ -665,13 +623,11 @@ def cryptography_key_needs_digest_for_signing(key):
 
     Ed25519 and Ed448 keys do not; they need None to be passed as the digest algorithm.
     """
-    if CRYPTOGRAPHY_HAS_ED25519 and isinstance(
+    if isinstance(
         key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey
     ):
         return False
-    if CRYPTOGRAPHY_HAS_ED448 and isinstance(
-        key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
-    ):
+    if isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
         return False
     return True
 
@@ -693,33 +649,28 @@ def cryptography_compare_public_keys(key1, key2):
 
     Needs special logic for Ed25519 and Ed448 keys, since they do not have public_numbers().
     """
-    if CRYPTOGRAPHY_HAS_ED25519:
-        res = _compare_public_keys(
-            key1,
-            key2,
-            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
-        )
-        if res is not None:
-            return res
-    if CRYPTOGRAPHY_HAS_ED448:
-        res = _compare_public_keys(
-            key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
-        )
-        if res is not None:
-            return res
+    res = _compare_public_keys(
+        key1,
+        key2,
+        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+    )
+    if res is not None:
+        return res
+    res = _compare_public_keys(
+        key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
+    )
+    if res is not None:
+        return res
     return key1.public_numbers() == key2.public_numbers()
 
 
-def _compare_private_keys(key1, key2, clazz, has_no_private_bytes=False):
+def _compare_private_keys(key1, key2, clazz):
     a = isinstance(key1, clazz)
     b = isinstance(key2, clazz)
     if not (a or b):
         return None
     if not a or not b:
         return False
-    if has_no_private_bytes:
-        # We do not have the private_bytes() function - compare associated public keys
-        return cryptography_compare_public_keys(a.public_key(), b.public_key())
     encryption_algorithm = cryptography.hazmat.primitives.serialization.NoEncryption()
     a = key1.private_bytes(
         serialization.Encoding.Raw,
@@ -739,57 +690,35 @@ def cryptography_compare_private_keys(key1, key2):
 
     Needs special logic for Ed25519, X25519, and Ed448 keys, since they do not have private_numbers().
     """
-    if CRYPTOGRAPHY_HAS_ED25519:
-        res = _compare_private_keys(
-            key1,
-            key2,
-            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
-        )
-        if res is not None:
-            return res
-    if CRYPTOGRAPHY_HAS_X25519:
-        res = _compare_private_keys(
-            key1,
-            key2,
-            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
-            has_no_private_bytes=not CRYPTOGRAPHY_HAS_X25519_FULL,
-        )
-        if res is not None:
-            return res
-    if CRYPTOGRAPHY_HAS_ED448:
-        res = _compare_private_keys(
-            key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
-        )
-        if res is not None:
-            return res
-    if CRYPTOGRAPHY_HAS_X448:
-        res = _compare_private_keys(
-            key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
-        )
-        if res is not None:
-            return res
+    res = _compare_private_keys(
+        key1,
+        key2,
+        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+    )
+    if res is not None:
+        return res
+    res = _compare_private_keys(
+        key1,
+        key2,
+        cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+    )
+    if res is not None:
+        return res
+    res = _compare_private_keys(
+        key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
+    )
+    if res is not None:
+        return res
+    res = _compare_private_keys(
+        key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
+    )
+    if res is not None:
+        return res
     return key1.private_numbers() == key2.private_numbers()
-
-
-def cryptography_serial_number_of_cert(cert):
-    """Returns cert.serial_number.
-
-    Also works for old versions of cryptography.
-    """
-    try:
-        return cert.serial_number
-    except AttributeError:
-        # The property was called "serial" before cryptography 1.4
-        return cert.serial
 
 
 def parse_pkcs12(pkcs12_bytes, passphrase=None):
     """Returns a tuple (private_key, certificate, additional_certificates, friendly_name)."""
-    if _load_pkcs12 is None and _load_key_and_certificates is None:
-        raise ValueError(
-            "neither load_pkcs12() nor load_key_and_certificates() present in the current cryptography version"
-        )
-
     if passphrase is not None:
         passphrase = to_bytes(passphrase)
 
@@ -825,6 +754,8 @@ def _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=None):
     friendly_name = None
     if certificate:
         # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
+        from cryptography.hazmat.backends import default_backend
+
         backend = default_backend()
 
         # This code basically does what load_key_and_certificates() does, but without error-checking.
@@ -877,7 +808,7 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
     Check whether the given signature of the given data was signed by the given public key object.
     """
     try:
-        if CRYPTOGRAPHY_HAS_RSA_SIGN and isinstance(
+        if isinstance(
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey,
         ):
@@ -885,7 +816,7 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
                 signature, data, padding.PKCS1v15(), hash_algorithm
             )
             return True
-        if CRYPTOGRAPHY_HAS_EC_SIGN and isinstance(
+        if isinstance(
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
         ):
@@ -895,19 +826,19 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
                 cryptography.hazmat.primitives.asymmetric.ec.ECDSA(hash_algorithm),
             )
             return True
-        if CRYPTOGRAPHY_HAS_DSA_SIGN and isinstance(
+        if isinstance(
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey,
         ):
             signer_public_key.verify(signature, data, hash_algorithm)
             return True
-        if CRYPTOGRAPHY_HAS_ED25519_SIGN and isinstance(
+        if isinstance(
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
         ):
             signer_public_key.verify(signature, data)
             return True
-        if CRYPTOGRAPHY_HAS_ED448_SIGN and isinstance(
+        if isinstance(
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
         ):

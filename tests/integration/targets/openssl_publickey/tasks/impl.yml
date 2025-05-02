@@ -56,7 +56,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     format: OpenSSH
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - OpenSSH format - test idempotence (issue 33256)"
   openssl_publickey:
@@ -64,7 +64,7 @@
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     format: OpenSSH
     select_crypto_backend: '{{ select_crypto_backend }}'
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.4.0', '>=')
+  when: select_crypto_backend == 'cryptography'
   register: publickey_ssh_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate publickey2 - standard"

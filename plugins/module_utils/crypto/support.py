@@ -26,7 +26,6 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (  # 
 
 try:
     from cryptography import x509
-    from cryptography.hazmat.backends import default_backend as cryptography_backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
 except ImportError:
@@ -151,7 +150,6 @@ def load_privatekey(
             result = load_pem_private_key(
                 priv_key_detail,
                 None if passphrase is None else to_bytes(passphrase),
-                cryptography_backend(),
             )
         except TypeError:
             raise OpenSSLBadPassphraseError(
@@ -175,9 +173,7 @@ def load_publickey(path=None, content=None, backend=None):
 
     if backend == "cryptography":
         try:
-            return serialization.load_pem_public_key(
-                content, backend=cryptography_backend()
-            )
+            return serialization.load_pem_public_key(content)
         except Exception as e:
             raise OpenSSLObjectError(f"Error while deserializing key: {e}")
 
@@ -198,16 +194,12 @@ def load_certificate(
     if backend == "cryptography":
         if der_support_enabled is False or identify_pem_format(cert_content):
             try:
-                return x509.load_pem_x509_certificate(
-                    cert_content, cryptography_backend()
-                )
+                return x509.load_pem_x509_certificate(cert_content)
             except ValueError as exc:
                 raise OpenSSLObjectError(exc)
         elif der_support_enabled:
             try:
-                return x509.load_der_x509_certificate(
-                    cert_content, cryptography_backend()
-                )
+                return x509.load_der_x509_certificate(cert_content)
             except ValueError as exc:
                 raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
 
@@ -224,7 +216,7 @@ def load_certificate_request(path, content=None, backend="cryptography"):
         raise OpenSSLObjectError(exc)
     if backend == "cryptography":
         try:
-            return x509.load_pem_x509_csr(csr_content, cryptography_backend())
+            return x509.load_pem_x509_csr(csr_content)
         except ValueError as exc:
             raise OpenSSLObjectError(exc)
 

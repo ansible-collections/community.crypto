@@ -18,7 +18,7 @@ attributes:
   idempotent:
     support: full
 requirements:
-  - cryptography >= 1.3
+  - cryptography >= 3.4
 options:
   digest:
     description:
@@ -237,7 +237,6 @@ options:
       - Create the Subject Key Identifier from the public key.
       - Please note that commercial CAs can ignore the value, respectively use a value of their own choice instead. Specifying
         this option is mostly useful for self-signed certificates or for own CAs.
-      - Note that this is only supported if the C(cryptography) backend is used!
     type: bool
     default: false
   subject_key_identifier:
@@ -247,7 +246,6 @@ options:
       - Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option
         is mostly useful for self-signed certificates or for own CAs.
       - Note that this option can only be used if O(create_subject_key_identifier) is V(false).
-      - Note that this is only supported if the C(cryptography) backend is used!
     type: str
   authority_key_identifier:
     description:
@@ -255,7 +253,6 @@ options:
       - 'Example: V(00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33).'
       - Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option
         is mostly useful for self-signed certificates or for own CAs.
-      - Note that this is only supported if the C(cryptography) backend is used!
       - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier), O(authority_cert_issuer)
         and O(authority_cert_serial_number) is specified.
     type: str
@@ -268,7 +265,6 @@ options:
       - If specified, O(authority_cert_serial_number) must also be specified.
       - Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option
         is mostly useful for self-signed certificates or for own CAs.
-      - Note that this is only supported if the C(cryptography) backend is used!
       - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier), O(authority_cert_issuer)
         and O(authority_cert_serial_number) is specified.
     type: list
@@ -277,7 +273,6 @@ options:
     description:
       - The authority cert serial number.
       - If specified, O(authority_cert_issuer) must also be specified.
-      - Note that this is only supported if the C(cryptography) backend is used!
       - Please note that commercial CAs ignore this value, respectively use a value of their own choice. Specifying this option
         is mostly useful for self-signed certificates or for own CAs.
       - The C(AuthorityKeyIdentifier) extension will only be added if at least one of O(authority_key_identifier), O(authority_cert_issuer)
@@ -288,7 +283,6 @@ options:
   crl_distribution_points:
     description:
       - Allows to specify one or multiple CRL distribution points.
-      - Only supported by the C(cryptography) backend.
     type: list
     elements: dict
     suboptions:
@@ -304,7 +298,6 @@ options:
           - Describes how the CRL can be retrieved relative to the CRL issuer.
           - Mutually exclusive with O(crl_distribution_points[].full_name).
           - 'Example: V(/CN=example.com).'
-          - Can only be used when cryptography >= 1.6 is installed.
         type: list
         elements: str
       crl_issuer:

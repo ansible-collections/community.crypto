@@ -17,7 +17,7 @@ description:
   - The module can use the cryptography Python library, or the C(openssl) executable. By default, it tries to detect which
     one is available. This can be overridden with the O(select_crypto_backend) option.
 requirements:
-  - Either cryptography >= 2.0
+  - Either cryptography >= 3.4
   - Or OpenSSL binary C(openssl)
 author:
   - Thom Wiggers (@thomwiggers)
@@ -148,7 +148,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-MINIMAL_CRYPTOGRAPHY_VERSION = "2.0"
+MINIMAL_CRYPTOGRAPHY_VERSION = "3.4"
 
 CRYPTOGRAPHY_IMP_ERR = None
 try:
@@ -322,7 +322,6 @@ class DHParameterCryptography(DHParameterBase):
 
     def __init__(self, module):
         super(DHParameterCryptography, self).__init__(module)
-        self.crypto_backend = cryptography.hazmat.backends.default_backend()
 
     def _do_generate(self, module):
         """Actually generate the DH params."""
@@ -330,7 +329,6 @@ class DHParameterCryptography(DHParameterBase):
         params = cryptography.hazmat.primitives.asymmetric.dh.generate_parameters(
             generator=2,
             key_size=self.size,
-            backend=self.crypto_backend,
         )
         # Serialize parameters
         result = params.parameter_bytes(
@@ -349,7 +347,7 @@ class DHParameterCryptography(DHParameterBase):
             with open(self.path, "rb") as f:
                 data = f.read()
             params = cryptography.hazmat.primitives.serialization.load_pem_parameters(
-                data, backend=self.crypto_backend
+                data
             )
         except Exception:
             return False

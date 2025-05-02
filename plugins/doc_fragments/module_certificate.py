@@ -22,7 +22,7 @@ attributes:
       - If relative timestamps are used and O(ignore_timestamps=false), the module is not idempotent.
       - The option O(force=true) generally disables idempotency.
 requirements:
-  - cryptography >= 1.6 (if using V(selfsigned) or V(ownca) provider)
+  - cryptography >= 3.4 (if using V(selfsigned) or V(ownca) provider)
 options:
   force:
     description:
@@ -304,7 +304,6 @@ options:
         ignored.
       - A value of V(never_create) never creates a SKI. If the CSR provides one, that one is used.
       - This is only used by the V(ownca) provider.
-      - Note that this is only supported if the C(cryptography) backend is used!
     type: str
     choices: [create_if_not_provided, always_create, never_create]
     default: create_if_not_provided
@@ -316,7 +315,6 @@ options:
       - The Authority Key Identifier is generated from the CA certificate's Subject Key Identifier,
         if available. If it is not available, the CA certificate's public key will be used.
       - This is only used by the V(ownca) provider.
-      - Note that this is only supported if the C(cryptography) backend is used!
     type: bool
     default: true
 """
@@ -403,7 +401,6 @@ options:
         ignored.
       - A value of V(never_create) never creates a SKI. If the CSR provides one, that one is used.
       - This is only used by the V(selfsigned) provider.
-      - Note that this is only supported if the C(cryptography) backend is used!
     type: str
     choices: [create_if_not_provided, always_create, never_create]
     default: create_if_not_provided

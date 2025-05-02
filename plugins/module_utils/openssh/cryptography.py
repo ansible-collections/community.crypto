@@ -25,7 +25,7 @@ try:
         Ed25519PublicKey,
     )
 
-    if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.0"):
+    if LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion("3.4"):
         HAS_OPENSSH_PRIVATE_FORMAT = True
     else:
         HAS_OPENSSH_PRIVATE_FORMAT = False

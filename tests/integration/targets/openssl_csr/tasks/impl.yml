@@ -884,7 +884,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: everything_info
 
-- name: "({{ select_crypto_backend }}) Ed25519 and Ed448 tests (for cryptography >= 2.6)"
+- name: "({{ select_crypto_backend }}) Ed25519 and Ed448 tests"
   block:
     - name: "({{ select_crypto_backend }}) Generate privatekeys"
       openssl_privatekey:
@@ -926,9 +926,9 @@
           register: generate_csr_ed25519_ed448_idempotent
           ignore_errors: true
 
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=')
+  when: select_crypto_backend == 'cryptography'
 
-- name: "({{ select_crypto_backend }}) CRL distribution endpoints (for cryptography >= 1.6)"
+- name: "({{ select_crypto_backend }}) CRL distribution endpoints"
   block:
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints"
       openssl_csr:
@@ -1015,4 +1015,4 @@
         select_crypto_backend: '{{ select_crypto_backend }}'
       register: crl_distribution_endpoints_5
 
-  when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('1.6', '>=')
+  when: select_crypto_backend == 'cryptography'
