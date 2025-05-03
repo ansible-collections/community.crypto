@@ -10,6 +10,7 @@ skip_list:
   - meta-runtime[unsupported-version]
   - no-changed-when
   - sanity[cannot-ignore]  # some of the rules you cannot ignore actually MUST be ignored, like yamllint:unparsable-with-libyaml
+  - yaml  # we're using yamllint ourselves
 
   # To be checked and maybe fixed:
   - fqcn[action]
