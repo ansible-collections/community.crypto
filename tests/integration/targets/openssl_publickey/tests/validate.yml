@@ -20,8 +20,15 @@
   command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
+- name: "({{ select_crypto_backend }}) Fetch public key"
+  ansible.builtin.slurp:
+    src: '{{ remote_tmp_dir }}/publickey.pub'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Validate public key (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey.pub'
+  command:
+    cmd: '{{ openssl_binary }} rsa -pubin -noout -modulus'
+    stdin: '{{ slurp.content | b64decode }}'
   register: publickey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate public key (assert)"
@@ -75,8 +82,15 @@
   register: privatekey3_modulus
   when: openssl_version is version('0.9.8zh', '>=')
 
+- name: "({{ select_crypto_backend }}) Fetch publickey3"
+  ansible.builtin.slurp:
+    src: '{{ remote_tmp_dir }}/publickey3.pub'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Validate publickey3 (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey3.pub'
+  command:
+    cmd: '{{ openssl_binary }} rsa -pubin -noout -modulus'
+    stdin: '{{ slurp.content | b64decode }}'
   register: publickey3_modulus
   when: openssl_version is version('0.9.8zh', '>=')
 
@@ -96,8 +110,15 @@
   register: privatekey4_modulus
   when: openssl_version is version('0.9.8zh', '>=')
 
+- name: "({{ select_crypto_backend }}) Fetch publickey4"
+  ansible.builtin.slurp:
+    src: '{{ remote_tmp_dir }}/publickey4.pub'
+  register: slurp
+
 - name: "({{ select_crypto_backend }}) Validate publickey4 (test - publickey modulus)"
-  shell: '{{ openssl_binary }} rsa -pubin -noout -modulus < {{ remote_tmp_dir }}/publickey4.pub'
+  command:
+    cmd: '{{ openssl_binary }} rsa -pubin -noout -modulus'
+    stdin: '{{ slurp.content | b64decode }}'
   register: publickey4_modulus
   when: openssl_version is version('0.9.8zh', '>=')
 
