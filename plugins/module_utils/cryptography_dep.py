@@ -24,9 +24,11 @@ try:
     from cryptography import x509  # noqa: F401, pylint: disable=unused-import
 
     _CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    _CRYPTOGRAPHY_FILE = cryptography.__file__
 except ImportError:
     _CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     _CRYPTOGRAPHY_FOUND = False
+    _CRYPTOGRAPHY_FILE = None
 else:
     _CRYPTOGRAPHY_FOUND = True
 
@@ -47,7 +49,10 @@ def assert_required_cryptography_version(
         )
     if _CRYPTOGRAPHY_VERSION < LooseVersion(minimum_cryptography_version):
         module.fail_json(
-            msg=f"Cannot detect the required Python library cryptography (>= {minimum_cryptography_version})",
+            msg=(
+                f"Cannot detect the required Python library cryptography (>= {minimum_cryptography_version})."
+                f" Only found a too old version ({_CRYPTOGRAPHY_VERSION}) at {_CRYPTOGRAPHY_FILE}."
+            ),
         )
 
 
