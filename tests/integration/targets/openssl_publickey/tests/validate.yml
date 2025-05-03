@@ -17,7 +17,7 @@
       - publickey.publickey == publickey_idempotence.publickey
 
 - name: "({{ select_crypto_backend }}) Validate public key (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate public key (test - publickey modulus)"
@@ -30,7 +30,7 @@
       - publickey_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate public key - OpenSSH format (test - privatekey's publickey)"
-  shell: 'ssh-keygen -y -f {{ remote_tmp_dir }}/privatekey.pem'
+  command: 'ssh-keygen -y -f {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_publickey
   when: select_crypto_backend == 'cryptography'
 
@@ -71,7 +71,7 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate publickey3 (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey3.pem -passin pass:ansible'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey3.pem -passin pass:ansible'
   register: privatekey3_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
@@ -92,7 +92,7 @@
       - publickey3_idempotence is not changed
 
 - name: "({{ select_crypto_backend }}) Validate publickey4 (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey4_modulus
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 

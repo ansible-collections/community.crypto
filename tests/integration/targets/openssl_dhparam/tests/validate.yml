@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "[{{ select_crypto_backend }}] Validate generated params"
-  shell: '{{ openssl_binary }} dhparam -in {{ remote_tmp_dir }}/{{ item }}.pem -noout -check'
+  command: '{{ openssl_binary }} dhparam -in {{ remote_tmp_dir }}/{{ item }}.pem -noout -check'
   with_items:
     - dh768
     - dh512

@@ -13,7 +13,6 @@ skip_list:
 
   # To be checked and maybe fixed:
   - command-instead-of-module
-  - command-instead-of-shell
   - fqcn[action]
   - fqcn[action-core]
   - ignore-errors

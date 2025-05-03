@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - privatekey modulus)
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate behavior for no CSR
@@ -15,7 +15,7 @@
       - selfsigned_certificate_no_csr_idempotence_check is not changed
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate with no CSR (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert_no_csr.pem'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert_no_csr.pem'
   register: cert_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate with no CSR (test - certificate version == default == 3)
@@ -47,7 +47,7 @@
       - selfsigned_certificate_no_csr.certificate == selfsigned_certificate_no_csr_idempotence.certificate
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert.pem'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert.pem'
   register: cert_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate (test - issuer value)
@@ -109,11 +109,11 @@
   when: select_crypto_backend == 'cryptography'
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (test - privatekey modulus)
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey2_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (test - certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert2.pem'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/cert2.pem'
   register: cert2_modulus
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (assert)
@@ -145,11 +145,11 @@
       - cert3_selfsigned_idem is not changed
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (test - privatekey's pubkey)
-  shell: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey_ecc.pem'
+  command: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey_ecc.pem'
   register: privatekey_ecc_pubkey
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (test - certificate pubkey)
-  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/cert_ecc.pem'
+  command: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/cert_ecc.pem'
   register: cert_ecc_pubkey
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate ECC certificate (assert)
