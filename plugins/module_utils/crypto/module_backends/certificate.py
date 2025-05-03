@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import abc
 
-from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
 )
@@ -47,8 +46,7 @@ class CertificateError(OpenSSLObjectError):
     pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CertificateBackend:
+class CertificateBackend(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
 
@@ -308,8 +306,7 @@ class CertificateBackend:
         return result
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CertificateProvider:
+class CertificateProvider(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def validate_module_args(self, module):
         """Check module arguments"""

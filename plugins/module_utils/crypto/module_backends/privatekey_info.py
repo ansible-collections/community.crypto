@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import abc
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -172,8 +171,7 @@ class PrivateKeyParseError(OpenSSLObjectError):
         self.result = result
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PrivateKeyInfoRetrieval:
+class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
         self,
         module,

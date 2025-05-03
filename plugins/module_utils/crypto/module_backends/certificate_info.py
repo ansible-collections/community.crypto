@@ -9,7 +9,6 @@ from __future__ import annotations
 import abc
 import binascii
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
@@ -48,8 +47,7 @@ except ImportError:
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CertificateInfoRetrieval:
+class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(self, module, content):
         # content must be a bytes string
         self.module = module

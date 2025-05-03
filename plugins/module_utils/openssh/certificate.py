@@ -12,7 +12,6 @@ from base64 import b64encode
 from datetime import datetime
 from hashlib import sha256
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     OpensshParser,
@@ -159,7 +158,7 @@ class OpensshCertificateTimeParameters:
     @staticmethod
     def to_datetime(time_string_or_timestamp):
         try:
-            if isinstance(time_string_or_timestamp, six.string_types):
+            if isinstance(time_string_or_timestamp, (str, bytes)):
                 result = OpensshCertificateTimeParameters._time_string_to_datetime(
                     time_string_or_timestamp.strip()
                 )
@@ -216,10 +215,10 @@ class OpensshCertificateOption:
         if option_type not in ("critical", "extension"):
             raise ValueError("type must be either 'critical' or 'extension'")
 
-        if not isinstance(name, six.string_types):
+        if not isinstance(name, (str, bytes)):
             raise TypeError(f"name must be a string not {type(name)}")
 
-        if not isinstance(data, six.string_types):
+        if not isinstance(data, (str, bytes)):
             raise TypeError(f"data must be a string not {type(data)}")
 
         self._option_type = option_type
@@ -263,7 +262,7 @@ class OpensshCertificateOption:
 
     @classmethod
     def from_string(cls, option_string):
-        if not isinstance(option_string, six.string_types):
+        if not isinstance(option_string, (str, bytes)):
             raise ValueError(
                 f"option_string must be a string not {type(option_string)}"
             )
@@ -287,8 +286,7 @@ class OpensshCertificateOption:
         )
 
 
-@six.add_metaclass(abc.ABCMeta)
-class OpensshCertificateInfo:
+class OpensshCertificateInfo(metaclass=abc.ABCMeta):
     """Encapsulates all certificate information which is signed by a CA key"""
 
     def __init__(

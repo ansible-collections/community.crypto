@@ -10,7 +10,6 @@ import datetime
 import re
 from collections import namedtuple
 
-from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
 )
@@ -86,8 +85,7 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
     raise BackendException(f"Cannot parse ISO 8601 timestamp {timestamp_str!r}")
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CryptoBackend:
+class CryptoBackend(metaclass=abc.ABCMeta):
     def __init__(self, module, with_timezone=False):
         self.module = module
         self._with_timezone = with_timezone

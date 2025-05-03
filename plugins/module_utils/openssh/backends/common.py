@@ -9,7 +9,6 @@ import os
 import stat
 import traceback
 
-from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,
 )
@@ -59,8 +58,7 @@ def _restore_all_on_failure(f):
     return backup_and_restore
 
 
-@six.add_metaclass(abc.ABCMeta)
-class OpensshModule:
+class OpensshModule(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
 

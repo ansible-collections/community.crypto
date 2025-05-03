@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import abc
 
-from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
@@ -98,8 +97,7 @@ class Criterium:
         self.authority_key_identifier = criterium["authority_key_identifier"]
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ChainMatcher:
+class ChainMatcher(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def match(self, certificate):
         """

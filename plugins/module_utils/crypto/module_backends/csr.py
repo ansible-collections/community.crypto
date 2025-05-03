@@ -8,7 +8,6 @@ from __future__ import annotations
 import abc
 import binascii
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
@@ -69,8 +68,7 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 #  - module.fail_json(msg: str, **kwargs)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CertificateSigningRequestBackend:
+class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
         self.digest = module.params["digest"]
