@@ -994,7 +994,9 @@ def main():
         supports_check_mode=True,
     )
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     # If validate_only is used, pointing to an existing tracking_id is an invalid operation
     if module.params["tracking_id"]:

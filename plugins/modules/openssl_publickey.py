@@ -428,7 +428,9 @@ def main():
         mutually_exclusive=(["privatekey_path", "privatekey_content"],),
     )
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):

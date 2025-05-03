@@ -245,7 +245,9 @@ def main():
             msg=f"The file {module.params['path']} does not exist",
         )
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     try:
         _sign = SignatureCryptography(module)

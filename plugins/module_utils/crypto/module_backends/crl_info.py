@@ -84,7 +84,9 @@ class CRLInfoRetrieval:
 
 
 def get_crl_info(module, content, list_revoked_certificates=True):
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
     info = CRLInfoRetrieval(
         module, content, list_revoked_certificates=list_revoked_certificates
     )

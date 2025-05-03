@@ -297,7 +297,9 @@ def select_backend(
     return_private_key_data=False,
     check_consistency=False,
 ):
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
     return PrivateKeyInfoRetrievalCryptography(
         module,
         content,

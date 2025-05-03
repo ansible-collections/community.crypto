@@ -207,7 +207,9 @@ def main():
         mutually_exclusive=(["private_key_src", "private_key_content"],),
     )
 
-    assert_required_cryptography_version(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
+    )
 
     try:
         # Get parameters

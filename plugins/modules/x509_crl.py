@@ -998,7 +998,9 @@ def main():
         add_file_common_args=True,
     )
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     try:
         crl = CRL(module)

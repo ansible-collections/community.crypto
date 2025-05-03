@@ -434,5 +434,7 @@ def get_certificate_info(module, content, prefer_one_fingerprint=False):
 
 
 def select_backend(module, content):
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
     return CertificateInfoRetrievalCryptography(module, content)

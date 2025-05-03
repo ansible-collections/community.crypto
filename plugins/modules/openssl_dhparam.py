@@ -411,7 +411,9 @@ def main():
         if backend == "openssl":
             dhparam = DHParameterOpenSSL(module)
         elif backend == "cryptography":
-            assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+            assert_required_cryptography_version(
+                module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+            )
             dhparam = DHParameterCryptography(module)
         else:
             raise AssertionError("Internal error: unknown backend")

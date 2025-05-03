@@ -222,7 +222,9 @@ class X509CertificateConvertModule(OpenSSLObject):
                 pass
 
     def verify_cert_parsable(self, module):
-        assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+        assert_required_cryptography_version(
+            module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+        )
         try:
             load_der_x509_certificate(self.input)
         except Exception as exc:

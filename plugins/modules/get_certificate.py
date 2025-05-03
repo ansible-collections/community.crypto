@@ -361,7 +361,9 @@ def main():
             f"The Python version used to run the get_certificate module is {sys.version}"
         )
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     result = dict(
         changed=False,

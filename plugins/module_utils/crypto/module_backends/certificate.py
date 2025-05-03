@@ -330,7 +330,9 @@ def select_backend(module, provider):
     """
     provider.validate_module_args(module)
 
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
 
     if provider.needs_version_two_certs(module):
         # TODO: remove

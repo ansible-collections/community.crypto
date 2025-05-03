@@ -348,7 +348,9 @@ def get_csr_info(
 
 
 def select_backend(module, content, validate_signature=True):
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
     return CSRInfoRetrievalCryptography(
         module, content, validate_signature=validate_signature
     )

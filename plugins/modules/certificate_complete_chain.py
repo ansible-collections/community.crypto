@@ -323,7 +323,9 @@ def main():
         supports_check_mode=True,
     )
 
-    assert_required_cryptography_version(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
+    )
 
     # Load chain
     chain = parse_PEM_list(module, module.params["input_chain"], source="input chain")

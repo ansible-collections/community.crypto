@@ -733,7 +733,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
 
 def select_backend(module):
-    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    assert_required_cryptography_version(
+        module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
+    )
     return CertificateSigningRequestCryptographyBackend(module)
 
 
