@@ -45,4 +45,4 @@ doc_fragment = "community.crypto.attributes.actiongroup_acme"
 [sessions.build_import_check]
 run_galaxy_importer = true
 
-# [sessions.ansible_lint]
+[sessions.ansible_lint]
