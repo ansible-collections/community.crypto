@@ -37,7 +37,7 @@
         that:
           - result is success or skip_tests
 
-  when: cryptography_version.stdout is version('3.3', '>=')
+  when: cryptography_version is version('3.3', '>=')
 
 - block:
 
@@ -48,4 +48,4 @@
   # The module doesn't work with CentOS 6. Since the pyOpenSSL installed there is too old,
   # we never noticed before. This becomes a problem with the new cryptography backend,
   # since there is a new enough cryptography version...
-  when: cryptography_version.stdout is version('1.6', '>=') and not skip_tests
+  when: cryptography_version is version('1.6', '>=') and not skip_tests

@@ -15,7 +15,7 @@
         select_crypto_backend: openssl
 
   # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
-  when: openssl_version.stdout is version('1.0.0', '>=')
+  when: openssl_version is version('1.0.0', '>=')
 
 - name: Remove output directory
   file:
@@ -33,4 +33,4 @@
       vars:
         select_crypto_backend: cryptography
 
-  when: cryptography_version.stdout is version('3.3', '>=')
+  when: cryptography_version is version('3.3', '>=')

@@ -75,13 +75,13 @@
   register: privatekey5
   # Current version of OS/X that runs in the CI (10.11) does not have an up to date version of the OpenSSL library
   # leading to this test to fail when run in the CI. However, this test has been run for 10.12 and has returned successfully.
-  when: openssl_version.stdout is version('0.9.8zh', '>=')
+  when: openssl_version is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (assert - Passphrase protected key + idempotence)"
   assert:
     that:
       - privatekey5.stdout == (default_rsa_key_size | string)
-  when: openssl_version.stdout is version('0.9.8zh', '>=')
+  when: openssl_version is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 idempotence (assert - Passphrase protected key + idempotence)"
   assert:
@@ -92,19 +92,19 @@
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (test - Passphrase protected key with non ascii character)"
   shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey6.pem -passin pass:ànsïblé | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey6
-  when: openssl_version.stdout is version('0.9.8zh', '>=')
+  when: openssl_version is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (assert - Passphrase protected key with non ascii character)"
   assert:
     that:
       - privatekey6.stdout == (default_rsa_key_size | string)
-  when: openssl_version.stdout is version('0.9.8zh', '>=')
+  when: openssl_version is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (dump with OpenSSL)"
   shell: "{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"
   loop: "{{ privatekey_ecc_generate.results }}"
   register: privatekey_ecc_dump
-  when: openssl_version.stdout is version('0.9.8zh', '>=') and 'skip_reason' not in item
+  when: openssl_version is version('0.9.8zh', '>=') and 'skip_reason' not in item
   loop_control:
     label: "{{ item.item.curve }}"
 

@@ -158,7 +158,7 @@
     curve: "{{ item.curve }}"
     select_crypto_backend: '{{ select_crypto_backend }}'
   when: |
-    cryptography_version.stdout is version(item.min_cryptography_version, '>=') and
+    cryptography_version is version(item.min_cryptography_version, '>=') and
     item.openssl_name in openssl_ecc_list
   loop: "{{ ecc_types }}"
   loop_control:
@@ -172,7 +172,7 @@
     curve: "{{ item.curve }}"
     select_crypto_backend: '{{ select_crypto_backend }}'
   when: |
-    cryptography_version.stdout is version(item.min_cryptography_version, '>=') and
+    cryptography_version is version(item.min_cryptography_version, '>=') and
     item.openssl_name in openssl_ecc_list
   loop: "{{ ecc_types }}"
   loop_control:
@@ -185,7 +185,7 @@
         path: '{{ remote_tmp_dir }}/privatekey-{{ item.type }}.pem'
         type: "{{ item.type }}"
         select_crypto_backend: '{{ select_crypto_backend }}'
-      when: cryptography_version.stdout is version(item.min_version, '>=')
+      when: cryptography_version is version(item.min_version, '>=')
       loop: "{{ types }}"
       loop_control:
         label: "{{ item.type }}"
@@ -197,7 +197,7 @@
         path: '{{ remote_tmp_dir }}/privatekey-{{ item.type }}.pem'
         type: "{{ item.type }}"
         select_crypto_backend: '{{ select_crypto_backend }}'
-      when: cryptography_version.stdout is version(item.min_version, '>=')
+      when: cryptography_version is version(item.min_version, '>=')
       loop: "{{ types }}"
       loop_control:
         label: "{{ item.type }}"
