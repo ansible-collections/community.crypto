@@ -8,7 +8,7 @@
   register: ownca_verify_ca
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert.pem'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert.pem'
   register: ownca_cert_modulus
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca issuer value)
@@ -72,7 +72,7 @@
 
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (test - ownca certificate modulus)
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert2.pem'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert2.pem'
   register: ownca_cert2_modulus
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (assert)
@@ -104,7 +104,7 @@
       - ownca_cert3_idem is not changed
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca certificate pubkey)
-  shell: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem'
+  command: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem'
   register: ownca_cert_ecc_pubkey
 
 - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca issuer value)

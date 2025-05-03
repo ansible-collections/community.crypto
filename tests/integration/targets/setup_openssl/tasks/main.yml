@@ -85,6 +85,10 @@
   shell: "{{ openssl_binary }} version | cut -d' ' -f2"
   register: openssl_version
 
+- name: Make openssl version a string
+  set_fact:
+    openssl_version: "{{ openssl_version.stdout }}"
+
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
 
@@ -115,9 +119,13 @@
             state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
             extra_args: "-c {{ remote_constraints }}"
 
+- name: Obtain cryptography information
+  community.crypto.crypto_info:
+  register: crypto_info
+
 - name: Register cryptography version
-  command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
-  register: cryptography_version
+  set_fact:
+    cryptography_version: "{{ crypto_info.python_cryptography_capabilities.version }}"
 
 - name: Print default key sizes
   debug:

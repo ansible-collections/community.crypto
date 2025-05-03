@@ -19,7 +19,7 @@
 
 - set_fact:
     backends: "{{ backends + ['cryptography'] }}"
-  when: cryptography_version.stdout is version('3.3', '>=') and bcrypt_version.stdout is version('3.1.5', '>=')
+  when: cryptography_version is version('3.3', '>=') and bcrypt_version.stdout is version('3.1.5', '>=')
 
 - include_tasks: ../tests/core.yml
   loop: "{{ backends }}"
@@ -47,4 +47,4 @@
     loop_var: backend
 
 - include_tasks: ../tests/cryptography_backend.yml
-  when: cryptography_version.stdout is version('3.3', '>=') and bcrypt_version.stdout is version('3.1.5', '>=')
+  when: cryptography_version is version('3.3', '>=') and bcrypt_version.stdout is version('3.1.5', '>=')

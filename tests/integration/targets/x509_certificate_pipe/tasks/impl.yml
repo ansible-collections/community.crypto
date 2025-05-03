@@ -102,17 +102,17 @@
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_modulus
@@ -209,17 +209,17 @@
   register: ownca_generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
+  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_modulus

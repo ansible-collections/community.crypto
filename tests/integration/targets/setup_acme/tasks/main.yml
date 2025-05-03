@@ -23,5 +23,5 @@
       ACME directory: {{ acme_directory_url }}
       ACME server supports ARI: {{ acme_supports_ari }}
       ACME server supports profiles: {{ acme_supports_profiles }}
-      OpenSSL version is {{ openssl_version.stdout }}
-      cryptography version is {{ cryptography_version.stdout }}
+      OpenSSL version is {{ openssl_version }}
+      cryptography version is {{ cryptography_version }}

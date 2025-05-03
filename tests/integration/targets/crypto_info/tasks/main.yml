@@ -20,11 +20,15 @@
   command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: local_cryptography_version
 
+- name: Set cryptography version
+  set_fact:
+    local_cryptography_version: "{{ local_cryptography_version.stdout }}"
+
 - name: Determine complex version-based capabilities
   set_fact:
     supports_ed25519: >-
       {{
-        local_cryptography_version.stdout is version("2.6", ">=")
+        local_cryptography_version is version("2.6", ">=")
         and not (
           ansible_os_family == "FreeBSD" and
           ansible_facts.distribution_version is version("12.1", ">=") and
@@ -33,7 +37,7 @@
       }}
     supports_ed448: >-
       {{
-        local_cryptography_version.stdout is version("2.6", ">=")
+        local_cryptography_version is version("2.6", ">=")
         and not (
           ansible_os_family == "FreeBSD" and
           ansible_facts.distribution_version is version("12.1", ">=") and
@@ -46,21 +50,21 @@
     that:
       - result.python_cryptography_installed
       - "'python_cryptography_import_error' not in result"
-      - result.python_cryptography_capabilities.version == local_cryptography_version.stdout
+      - result.python_cryptography_capabilities.version == local_cryptography_version
       - "'secp256r1' in result.python_cryptography_capabilities.curves"
-      - result.python_cryptography_capabilities.has_ec == (local_cryptography_version.stdout is version('0.5', '>='))
-      - result.python_cryptography_capabilities.has_ec_sign == (local_cryptography_version.stdout is version('1.5', '>='))
+      - result.python_cryptography_capabilities.has_ec == (local_cryptography_version is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_ec_sign == (local_cryptography_version is version('1.5', '>='))
       - result.python_cryptography_capabilities.has_ed25519 == supports_ed25519
       - result.python_cryptography_capabilities.has_ed25519_sign == supports_ed25519
       - result.python_cryptography_capabilities.has_ed448 == supports_ed448
       - result.python_cryptography_capabilities.has_ed448_sign == supports_ed448
-      - result.python_cryptography_capabilities.has_dsa == (local_cryptography_version.stdout is version('0.5', '>='))
-      - result.python_cryptography_capabilities.has_dsa_sign == (local_cryptography_version.stdout is version('1.5', '>='))
-      - result.python_cryptography_capabilities.has_rsa == (local_cryptography_version.stdout is version('0.5', '>='))
-      - result.python_cryptography_capabilities.has_rsa_sign == (local_cryptography_version.stdout is version('1.4', '>='))
-      - result.python_cryptography_capabilities.has_x25519 == (local_cryptography_version.stdout is version('2.0', '>='))
-      - result.python_cryptography_capabilities.has_x25519_serialization == (local_cryptography_version.stdout is version('2.5', '>='))
-      - result.python_cryptography_capabilities.has_x448 == (local_cryptography_version.stdout is version('2.5', '>='))
+      - result.python_cryptography_capabilities.has_dsa == (local_cryptography_version is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_dsa_sign == (local_cryptography_version is version('1.5', '>='))
+      - result.python_cryptography_capabilities.has_rsa == (local_cryptography_version is version('0.5', '>='))
+      - result.python_cryptography_capabilities.has_rsa_sign == (local_cryptography_version is version('1.4', '>='))
+      - result.python_cryptography_capabilities.has_x25519 == (local_cryptography_version is version('2.0', '>='))
+      - result.python_cryptography_capabilities.has_x25519_serialization == (local_cryptography_version is version('2.5', '>='))
+      - result.python_cryptography_capabilities.has_x448 == (local_cryptography_version is version('2.5', '>='))
 
 - name: Find OpenSSL binary
   command: which openssl

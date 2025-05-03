@@ -146,4 +146,4 @@
 
 - name: Running tests
   include_tasks: impl.yml
-  when: cryptography_version.stdout is version('3.3', '>=')
+  when: cryptography_version is version('3.3', '>=')
