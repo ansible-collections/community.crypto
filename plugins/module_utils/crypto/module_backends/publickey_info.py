@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import abc
 
-from ansible.module_utils import six
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -85,8 +84,7 @@ class PublicKeyParseError(OpenSSLObjectError):
         self.result = result
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PublicKeyInfoRetrieval:
+class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(self, module, content=None, key=None):
         # content must be a bytes string
         self.module = module

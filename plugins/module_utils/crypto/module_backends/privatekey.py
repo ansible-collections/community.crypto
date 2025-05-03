@@ -9,7 +9,6 @@ import abc
 import base64
 import traceback
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
@@ -64,8 +63,7 @@ class PrivateKeyError(OpenSSLObjectError):
 #  - module.fail_json(msg: str, **kwargs)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PrivateKeyBackend:
+class PrivateKeyBackend(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
         self.type = module.params["type"]

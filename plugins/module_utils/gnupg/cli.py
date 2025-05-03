@@ -7,15 +7,12 @@ from __future__ import annotations
 import abc
 import os
 
-from ansible.module_utils import six
-
 
 class GPGError(Exception):
     pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class GPGRunner:
+class GPGRunner(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def run_command(self, command, check_rc=True, data=None):
         """

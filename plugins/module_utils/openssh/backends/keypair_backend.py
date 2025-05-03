@@ -8,7 +8,6 @@ from __future__ import annotations
 import abc
 import os
 
-from ansible.module_utils import six
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
@@ -40,8 +39,7 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-@six.add_metaclass(abc.ABCMeta)
-class KeypairBackend(OpensshModule):
+class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
     def __init__(self, module):
         super(KeypairBackend, self).__init__(module)

@@ -9,7 +9,6 @@ import errno
 import hashlib
 import os
 
-from ansible.module_utils import six
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_pem_format,
@@ -218,7 +217,7 @@ def parse_name_field(input_dict, name_field_name=None):
     for key, value in input_dict.items():
         if isinstance(value, list):
             for entry in value:
-                if not isinstance(entry, six.string_types):
+                if not isinstance(entry, (str, bytes)):
                     raise TypeError(
                         f"Values {error_str} must be strings".format(
                             key=key, name=name_field_name
@@ -231,7 +230,7 @@ def parse_name_field(input_dict, name_field_name=None):
                         )
                     )
                 result.append((key, entry))
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, (str, bytes)):
             if not value:
                 raise ValueError(
                     f"Value for {error_str} must not be an empty string".format(
@@ -281,8 +280,7 @@ def select_message_digest(digest_string):
     return digest
 
 
-@six.add_metaclass(abc.ABCMeta)
-class OpenSSLObject:
+class OpenSSLObject(metaclass=abc.ABCMeta):
 
     def __init__(self, path, state, force, check_mode):
         self.path = path
