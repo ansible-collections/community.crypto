@@ -131,7 +131,7 @@
     that:
       - publickey5_pubkey.stdout == privatekey5_pubkey.stdout
 
-- name:
+- name: "({{ select_crypto_backend }}) Verify bad passphrase errors"
   assert:
     that:
       - passphrase_error_1 is failed
