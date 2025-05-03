@@ -166,6 +166,9 @@ options:
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
       - The value V(pyopenssl) has been removed for community.crypto 3.0.0.
+      - Note that with community.crypto 3.0.0, all remaining values behave the same.
+        This option will be deprecated in a later version.
+        We recommend to not set it explicitly.
     type: str
     default: auto
     choices: [auto, cryptography]
