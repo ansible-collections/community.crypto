@@ -12,7 +12,6 @@ skip_list:
   - sanity[cannot-ignore]  # some of the rules you cannot ignore actually MUST be ignored, like yamllint:unparsable-with-libyaml
 
   # To be checked and maybe fixed:
-  - command-instead-of-module
   - fqcn[action]
   - fqcn[action-core]
   - ignore-errors

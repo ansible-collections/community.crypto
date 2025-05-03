@@ -71,17 +71,6 @@
   get_url:
     url: https://raw.githubusercontent.com/diafygi/acme-tiny/master/acme_tiny.py
     dest: "{{ remote_tmp_dir }}/acme-tiny"
-  when: ansible_python_version is version('2.7', '>=')
-
-- name: Get hold of acme-tiny executable (Python 2.6)
-  command:
-    cmd: >-
-      curl https://raw.githubusercontent.com/diafygi/acme-tiny/master/acme_tiny.py --output "{{ remote_tmp_dir }}/acme-tiny"
-  when: ansible_python_version is version('2.7', '<')
-
-- name: Make sure acme-tiny is executable
-  file:
-    path: "{{ remote_tmp_dir }}/acme-tiny"
     mode: "0755"
 
 - name: "Monkey-patch acme-tiny: Disable certificate validation"
