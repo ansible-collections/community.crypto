@@ -76,6 +76,9 @@ options:
       - Determines which crypto backend to use.
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+      - Note that with community.crypto 3.0.0, all values behave the same.
+        This option will be deprecated in a later version.
+        We recommend to not set it explicitly.
     type: str
     default: auto
     choices: [auto, cryptography]
@@ -265,7 +268,6 @@ import atexit
 import base64
 import ssl
 import sys
-import traceback
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
 from ssl import (
@@ -275,7 +277,7 @@ from ssl import (
     create_default_context,
 )
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
@@ -286,29 +288,21 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
     import cryptography.x509
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 def send_starttls_packet(sock, server_type):
@@ -367,32 +361,7 @@ def main():
             f"The Python version used to run the get_certificate module is {sys.version}"
         )
 
-    backend = module.params.get("select_crypto_backend")
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Try cryptography
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
     result = dict(
         changed=False,
@@ -529,56 +498,55 @@ def main():
 
     result["cert"] = cert
 
-    if backend == "cryptography":
-        x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert))
-        result["subject"] = {}
-        for attribute in x509.subject:
-            result["subject"][cryptography_oid_to_name(attribute.oid, short=True)] = (
-                attribute.value
-            )
-
-        result["expired"] = get_not_valid_after(x509) < get_now_datetime(
-            with_timezone=CRYPTOGRAPHY_TIMEZONE
+    x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert))
+    result["subject"] = {}
+    for attribute in x509.subject:
+        result["subject"][cryptography_oid_to_name(attribute.oid, short=True)] = (
+            attribute.value
         )
 
-        result["extensions"] = []
-        for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
-            oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
-            ext = {
-                "critical": entry["critical"],
-                "asn1_data": entry["value"],
-                "name": cryptography_oid_to_name(oid, short=True),
-            }
-            if not asn1_base64:
-                ext["asn1_data"] = base64.b64decode(ext["asn1_data"])
-            result["extensions"].append(ext)
+    result["expired"] = get_not_valid_after(x509) < get_now_datetime(
+        with_timezone=CRYPTOGRAPHY_TIMEZONE
+    )
 
-        result["issuer"] = {}
-        for attribute in x509.issuer:
-            result["issuer"][cryptography_oid_to_name(attribute.oid, short=True)] = (
-                attribute.value
-            )
+    result["extensions"] = []
+    for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
+        oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
+        ext = {
+            "critical": entry["critical"],
+            "asn1_data": entry["value"],
+            "name": cryptography_oid_to_name(oid, short=True),
+        }
+        if not asn1_base64:
+            ext["asn1_data"] = base64.b64decode(ext["asn1_data"])
+        result["extensions"].append(ext)
 
-        result["not_after"] = get_not_valid_after(x509).strftime("%Y%m%d%H%M%SZ")
-        result["not_before"] = get_not_valid_before(x509).strftime("%Y%m%d%H%M%SZ")
-
-        result["serial_number"] = x509.serial_number
-        result["signature_algorithm"] = cryptography_oid_to_name(
-            x509.signature_algorithm_oid
+    result["issuer"] = {}
+    for attribute in x509.issuer:
+        result["issuer"][cryptography_oid_to_name(attribute.oid, short=True)] = (
+            attribute.value
         )
 
-        # We need the -1 offset to get the same values as pyOpenSSL
-        if x509.version == cryptography.x509.Version.v1:
-            result["version"] = 1 - 1
-        elif x509.version == cryptography.x509.Version.v3:
-            result["version"] = 3 - 1
-        else:
-            result["version"] = "unknown"
+    result["not_after"] = get_not_valid_after(x509).strftime("%Y%m%d%H%M%SZ")
+    result["not_before"] = get_not_valid_before(x509).strftime("%Y%m%d%H%M%SZ")
 
-        if verified_chain is not None:
-            result["verified_chain"] = verified_chain
-        if unverified_chain is not None:
-            result["unverified_chain"] = unverified_chain
+    result["serial_number"] = x509.serial_number
+    result["signature_algorithm"] = cryptography_oid_to_name(
+        x509.signature_algorithm_oid
+    )
+
+    # We need the -1 offset to get the same values as pyOpenSSL
+    if x509.version == cryptography.x509.Version.v1:
+        result["version"] = 1 - 1
+    elif x509.version == cryptography.x509.Version.v3:
+        result["version"] = 3 - 1
+    else:
+        result["version"] = "unknown"
+
+    if verified_chain is not None:
+        result["verified_chain"] = verified_chain
+    if unverified_chain is not None:
+        result["unverified_chain"] = unverified_chain
 
     module.exit_json(**result)
 

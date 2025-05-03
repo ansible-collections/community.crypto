@@ -8,10 +8,8 @@ from __future__ import annotations
 
 import abc
 import binascii
-import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
@@ -30,29 +28,21 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography import x509
     from cryptography.hazmat.primitives import serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
@@ -60,10 +50,9 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 @six.add_metaclass(abc.ABCMeta)
 class CertificateInfoRetrieval:
-    def __init__(self, module, backend, content):
+    def __init__(self, module, content):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
 
     @abc.abstractmethod
@@ -151,7 +140,6 @@ class CertificateInfoRetrieval:
         self.cert = load_certificate(
             None,
             content=self.content,
-            backend=self.backend,
             der_support_enabled=der_support_enabled,
         )
 
@@ -193,7 +181,6 @@ class CertificateInfoRetrieval:
 
         public_key_info = get_publickey_info(
             self.module,
-            self.backend,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -235,9 +222,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
     def __init__(self, module, content):
-        super(CertificateInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content
-        )
+        super(CertificateInfoRetrievalCryptography, self).__init__(module, content)
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
     def _get_der_bytes(self):
@@ -445,38 +430,11 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         return None
 
 
-def get_certificate_info(module, backend, content, prefer_one_fingerprint=False):
-    if backend == "cryptography":
-        info = CertificateInfoRetrievalCryptography(module, content)
+def get_certificate_info(module, content, prefer_one_fingerprint=False):
+    info = CertificateInfoRetrievalCryptography(module, content)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, backend, content):
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Try cryptography
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CertificateInfoRetrievalCryptography(module, content)
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+def select_backend(module, content):
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    return CertificateInfoRetrievalCryptography(module, content)

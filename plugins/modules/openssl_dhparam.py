@@ -132,15 +132,15 @@ import abc
 import os
 import re
 import tempfile
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
     count_bits,
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
@@ -153,7 +153,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
@@ -163,7 +162,6 @@ try:
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
     CRYPTOGRAPHY_FOUND = False
 else:
     CRYPTOGRAPHY_FOUND = True
@@ -413,13 +411,7 @@ def main():
         if backend == "openssl":
             dhparam = DHParameterOpenSSL(module)
         elif backend == "cryptography":
-            if not CRYPTOGRAPHY_FOUND:
-                module.fail_json(
-                    msg=missing_required_lib(
-                        f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                    ),
-                    exception=CRYPTOGRAPHY_IMP_ERR,
-                )
+            assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
             dhparam = DHParameterCryptography(module)
         else:
             raise AssertionError("Internal error: unknown backend")

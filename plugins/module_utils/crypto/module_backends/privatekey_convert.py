@@ -8,7 +8,6 @@ import abc
 import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
@@ -24,16 +23,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import load_file
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
-)
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
@@ -47,13 +43,8 @@ try:
     import cryptography.hazmat.primitives.asymmetric.x448
     import cryptography.hazmat.primitives.asymmetric.x25519
     import cryptography.hazmat.primitives.serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 class PrivateKeyError(OpenSSLObjectError):
@@ -69,14 +60,13 @@ class PrivateKeyError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyConvertBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
         self.src_path = module.params["src_path"]
         self.src_content = module.params["src_content"]
         self.src_passphrase = module.params["src_passphrase"]
         self.format = module.params["format"]
         self.dest_passphrase = module.params["dest_passphrase"]
-        self.backend = backend
 
         self.src_private_key = None
         if self.src_path is not None:
@@ -135,9 +125,7 @@ class PrivateKeyConvertBackend:
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     def __init__(self, module):
-        super(PrivateKeyConvertCryptographyBackend, self).__init__(
-            module=module, backend="cryptography"
-        )
+        super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
 
     def get_private_key_data(self):
         """Return bytes for self.src_private_key in output format"""
@@ -262,11 +250,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
 
 
 def select_backend(module):
-    if not CRYPTOGRAPHY_FOUND:
-        module.fail_json(
-            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
-            exception=CRYPTOGRAPHY_IMP_ERR,
-        )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
     return PrivateKeyConvertCryptographyBackend(module)
 
 

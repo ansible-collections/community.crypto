@@ -84,6 +84,9 @@ options:
       - Determines which crypto backend to use.
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+      - Note that with community.crypto 3.0.0, all values behave the same.
+        This option will be deprecated in a later version.
+        We recommend to not set it explicitly.
     type: str
     default: auto
     choices: [auto, cryptography]
@@ -183,9 +186,8 @@ publickey:
 """
 
 import os
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,
@@ -201,29 +203,20 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import (
     load_file_if_exists,
     write_file,
 )
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
-)
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
-    import cryptography
     from cryptography.hazmat.primitives import serialization as crypto_serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 class PublicKeyError(OpenSSLObjectError):
@@ -232,7 +225,7 @@ class PublicKeyError(OpenSSLObjectError):
 
 class PublicKey(OpenSSLObject):
 
-    def __init__(self, module, backend):
+    def __init__(self, module):
         super(PublicKey, self).__init__(
             module.params["path"],
             module.params["state"],
@@ -250,7 +243,6 @@ class PublicKey(OpenSSLObject):
         self.publickey_bytes = None
         self.return_content = module.params["return_content"]
         self.fingerprint = {}
-        self.backend = backend
 
         self.backup = module.params["backup"]
         self.backup_file = None
@@ -265,7 +257,7 @@ class PublicKey(OpenSSLObject):
         try:
             result.update(
                 get_publickey_info(
-                    self.module, self.backend, content=data, prefer_one_fingerprint=True
+                    self.module, content=data, prefer_one_fingerprint=True
                 )
             )
             result["can_parse_key"] = True
@@ -280,19 +272,17 @@ class PublicKey(OpenSSLObject):
             path=self.privatekey_path,
             content=self.privatekey_content,
             passphrase=self.privatekey_passphrase,
-            backend=self.backend,
         )
-        if self.backend == "cryptography":
-            if self.format == "OpenSSH":
-                return self.privatekey.public_key().public_bytes(
-                    crypto_serialization.Encoding.OpenSSH,
-                    crypto_serialization.PublicFormat.OpenSSH,
-                )
-            else:
-                return self.privatekey.public_key().public_bytes(
-                    crypto_serialization.Encoding.PEM,
-                    crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
-                )
+        if self.format == "OpenSSH":
+            return self.privatekey.public_key().public_bytes(
+                crypto_serialization.Encoding.OpenSSH,
+                crypto_serialization.PublicFormat.OpenSSH,
+            )
+        else:
+            return self.privatekey.public_key().public_bytes(
+                crypto_serialization.Encoding.PEM,
+                crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
 
     def generate(self, module):
         """Generate the public key."""
@@ -323,7 +313,6 @@ class PublicKey(OpenSSLObject):
             path=self.privatekey_path,
             content=self.privatekey_content,
             passphrase=self.privatekey_passphrase,
-            backend=self.backend,
         )
         file_args = module.load_file_common_arguments(module.params)
         if module.check_file_absent_if_check_mode(file_args["path"]):
@@ -348,24 +337,23 @@ class PublicKey(OpenSSLObject):
                 self.diff_before = self.diff_after = self._get_info(publickey_content)
                 if self.return_content:
                     self.publickey_bytes = publickey_content
-                if self.backend == "cryptography":
-                    if self.format == "OpenSSH":
-                        # Read and dump public key. Makes sure that the comment is stripped off.
-                        current_publickey = crypto_serialization.load_ssh_public_key(
-                            publickey_content
-                        )
-                        publickey_content = current_publickey.public_bytes(
-                            crypto_serialization.Encoding.OpenSSH,
-                            crypto_serialization.PublicFormat.OpenSSH,
-                        )
-                    else:
-                        current_publickey = crypto_serialization.load_pem_public_key(
-                            publickey_content
-                        )
-                        publickey_content = current_publickey.public_bytes(
-                            crypto_serialization.Encoding.PEM,
-                            crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
-                        )
+                if self.format == "OpenSSH":
+                    # Read and dump public key. Makes sure that the comment is stripped off.
+                    current_publickey = crypto_serialization.load_ssh_public_key(
+                        publickey_content
+                    )
+                    publickey_content = current_publickey.public_bytes(
+                        crypto_serialization.Encoding.OpenSSH,
+                        crypto_serialization.PublicFormat.OpenSSH,
+                    )
+                else:
+                    current_publickey = crypto_serialization.load_pem_public_key(
+                        publickey_content
+                    )
+                    publickey_content = current_publickey.public_bytes(
+                        crypto_serialization.Encoding.PEM,
+                        crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
+                    )
             except Exception:
                 return False
 
@@ -440,35 +428,7 @@ def main():
         mutually_exclusive=(["privatekey_path", "privatekey_content"],),
     )
 
-    backend = module.params["select_crypto_backend"]
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Decision
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})",
-            )
-
-    if module.params["format"] == "OpenSSH" and backend != "cryptography":
-        module.fail_json(msg="Format OpenSSH requires the cryptography backend.")
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
     base_dir = os.path.dirname(module.params["path"]) or "."
     if not os.path.isdir(base_dir):
@@ -478,7 +438,7 @@ def main():
         )
 
     try:
-        public_key = PublicKey(module, backend)
+        public_key = PublicKey(module)
 
         if public_key.state == "present":
             if module.check_mode:

@@ -7,10 +7,8 @@
 from __future__ import annotations
 
 import abc
-import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -28,25 +26,17 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography.hazmat.primitives import serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 SIGNATURE_TEST_DATA = b"1234"
 
@@ -187,7 +177,6 @@ class PrivateKeyInfoRetrieval:
     def __init__(
         self,
         module,
-        backend,
         content,
         passphrase=None,
         return_private_key_data=False,
@@ -195,7 +184,6 @@ class PrivateKeyInfoRetrieval:
     ):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
         self.passphrase = passphrase
         self.return_private_key_data = return_private_key_data
@@ -228,7 +216,6 @@ class PrivateKeyInfoRetrieval:
                     if self.passphrase is not None
                     else self.passphrase
                 ),
-                backend=self.backend,
             )
             result["can_parse_key"] = True
         except OpenSSLObjectError as exc:
@@ -269,7 +256,7 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
 
     def __init__(self, module, content, **kwargs):
         super(PrivateKeyInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content, **kwargs
+            module, content, **kwargs
         )
 
     def _get_public_key(self, binary):
@@ -291,61 +278,32 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
 
 def get_privatekey_info(
     module,
-    backend,
     content,
     passphrase=None,
     return_private_key_data=False,
     prefer_one_fingerprint=False,
 ):
-    if backend == "cryptography":
-        info = PrivateKeyInfoRetrievalCryptography(
-            module,
-            content,
-            passphrase=passphrase,
-            return_private_key_data=return_private_key_data,
-        )
+    info = PrivateKeyInfoRetrievalCryptography(
+        module,
+        content,
+        passphrase=passphrase,
+        return_private_key_data=return_private_key_data,
+    )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(
     module,
-    backend,
     content,
     passphrase=None,
     return_private_key_data=False,
     check_consistency=False,
 ):
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Try cryptography
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, PrivateKeyInfoRetrievalCryptography(
-            module,
-            content,
-            passphrase=passphrase,
-            return_private_key_data=return_private_key_data,
-            check_consistency=check_consistency,
-        )
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    return PrivateKeyInfoRetrievalCryptography(
+        module,
+        content,
+        passphrase=passphrase,
+        return_private_key_data=return_private_key_data,
+        check_consistency=check_consistency,
+    )

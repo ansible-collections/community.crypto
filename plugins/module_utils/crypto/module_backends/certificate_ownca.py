@@ -22,7 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_not_valid_before,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
-    CRYPTOGRAPHY_VERSION,
     CertificateBackend,
     CertificateError,
     CertificateProvider,
@@ -34,9 +33,6 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
 )
 
 
@@ -50,9 +46,7 @@ except ImportError:
 
 class OwnCACertificateBackendCryptography(CertificateBackend):
     def __init__(self, module):
-        super(OwnCACertificateBackendCryptography, self).__init__(
-            module, "cryptography"
-        )
+        super(OwnCACertificateBackendCryptography, self).__init__(module)
 
         self.create_subject_key_identifier = module.params[
             "ownca_create_subject_key_identifier"
@@ -63,13 +57,11 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         self.notBefore = get_relative_time_option(
             module.params["ownca_not_before"],
             "ownca_not_before",
-            backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.notAfter = get_relative_time_option(
             module.params["ownca_not_after"],
             "ownca_not_after",
-            backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["ownca_digest"])
@@ -106,14 +98,14 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         self._ensure_csr_loaded()
         self.ca_cert = load_certificate(
-            path=self.ca_cert_path, content=self.ca_cert_content, backend=self.backend
+            path=self.ca_cert_path,
+            content=self.ca_cert_content,
         )
         try:
             self.ca_private_key = load_privatekey(
                 path=self.ca_privatekey_path,
                 content=self.ca_privatekey_content,
                 passphrase=self.ca_privatekey_passphrase,
-                backend=self.backend,
             )
         except OpenSSLBadPassphraseError as exc:
             module.fail_json(msg=str(exc))
@@ -170,10 +162,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                         x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
                             ext.value
                         )
-                        if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
-                        else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                            ext
-                        )
                     ),
                     critical=False,
                 )
@@ -223,10 +211,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                 expected_ext = (
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
                         ext.value
-                    )
-                    if CRYPTOGRAPHY_VERSION >= LooseVersion("2.7")
-                    else x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                        ext
                     )
                 )
             except cryptography.x509.ExtensionNotFound:
@@ -310,9 +294,8 @@ class OwnCACertificateProvider(CertificateProvider):
     def needs_version_two_certs(self, module):
         return module.params["ownca_version"] == 2
 
-    def create_backend(self, module, backend):
-        if backend == "cryptography":
-            return OwnCACertificateBackendCryptography(module)
+    def create_backend(self, module):
+        return OwnCACertificateBackendCryptography(module)
 
 
 def add_ownca_provider_to_argument_spec(argument_spec):

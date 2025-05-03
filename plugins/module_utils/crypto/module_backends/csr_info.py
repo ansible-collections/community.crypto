@@ -8,10 +8,8 @@ from __future__ import annotations
 
 import abc
 import binascii
-import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
     cryptography_decode_name,
@@ -26,26 +24,18 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     from cryptography import x509
     from cryptography.hazmat.primitives import serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
@@ -53,10 +43,9 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 @six.add_metaclass(abc.ABCMeta)
 class CSRInfoRetrieval:
-    def __init__(self, module, backend, content, validate_signature):
+    def __init__(self, module, content, validate_signature):
         # content must be a bytes string
         self.module = module
-        self.backend = backend
         self.content = content
         self.validate_signature = validate_signature
 
@@ -115,7 +104,8 @@ class CSRInfoRetrieval:
     def get_info(self, prefer_one_fingerprint=False):
         result = dict()
         self.csr = load_certificate_request(
-            None, content=self.content, backend=self.backend
+            None,
+            content=self.content,
         )
 
         subject = self._get_subject_ordered()
@@ -146,7 +136,6 @@ class CSRInfoRetrieval:
 
         public_key_info = get_publickey_info(
             self.module,
-            self.backend,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -185,7 +174,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
     def __init__(self, module, content, validate_signature):
         super(CSRInfoRetrievalCryptography, self).__init__(
-            module, "cryptography", content, validate_signature
+            module, content, validate_signature
         )
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
@@ -352,43 +341,16 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
 
 def get_csr_info(
-    module, backend, content, validate_signature=True, prefer_one_fingerprint=False
+    module, content, validate_signature=True, prefer_one_fingerprint=False
 ):
-    if backend == "cryptography":
-        info = CSRInfoRetrievalCryptography(
-            module, content, validate_signature=validate_signature
-        )
+    info = CSRInfoRetrievalCryptography(
+        module, content, validate_signature=validate_signature
+    )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, backend, content, validate_signature=True):
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Try cryptography
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CSRInfoRetrievalCryptography(
-            module, content, validate_signature=validate_signature
-        )
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+def select_backend(module, content, validate_signature=True):
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    return CSRInfoRetrievalCryptography(
+        module, content, validate_signature=validate_signature
+    )

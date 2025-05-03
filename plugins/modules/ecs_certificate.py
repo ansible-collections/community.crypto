@@ -550,15 +550,15 @@ import datetime
 import os
 import re
 import time
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
     ECSClient,
@@ -567,21 +567,7 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
     ecs_client_argument_spec,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import write_file
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
-)
 
-
-CRYPTOGRAPHY_IMP_ERR = None
-try:
-    import cryptography
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
-except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -652,7 +638,7 @@ class EcsCertificate:
         self.ecs_client = None
         if self.path and os.path.exists(self.path):
             try:
-                self.cert = load_certificate(self.path, backend="cryptography")
+                self.cert = load_certificate(self.path)
             except Exception:
                 self.cert = None
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
@@ -1008,13 +994,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not CRYPTOGRAPHY_FOUND or CRYPTOGRAPHY_VERSION < LooseVersion(
-        MINIMAL_CRYPTOGRAPHY_VERSION
-    ):
-        module.fail_json(
-            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
-            exception=CRYPTOGRAPHY_IMP_ERR,
-        )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
     # If validate_only is used, pointing to an existing tracking_id is an invalid operation
     if module.params["tracking_id"]:

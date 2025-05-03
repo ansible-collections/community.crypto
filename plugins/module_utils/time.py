@@ -115,14 +115,12 @@ def convert_relative_to_datetime(relative_time_string, with_timezone=False, now=
         return now - offset
 
 
-def get_relative_time_option(
-    input_string, input_name, backend="cryptography", with_timezone=False, now=None
-):
+def get_relative_time_option(input_string, input_name, with_timezone=False, now=None):
     """
     Return an absolute timespec if a relative timespec or an ASN1 formatted
     string is provided.
 
-    The return value will be a datetime object for the cryptography backend.
+    The return value will be a datetime object.
     """
     result = to_native(input_string)
     if result is None:
@@ -131,34 +129,31 @@ def get_relative_time_option(
         )
     # Relative time
     if result.startswith("+") or result.startswith("-"):
-        result_datetime = convert_relative_to_datetime(
+        return convert_relative_to_datetime(
             result, with_timezone=with_timezone, now=now
         )
-        if backend == "cryptography":
-            return result_datetime
     # Absolute time
-    if backend == "cryptography":
-        for date_fmt, length in [
-            (
-                "%Y%m%d%H%M%SZ",
-                15,
-            ),  # this also parses '202401020304Z', but as datetime(2024, 1, 2, 3, 0, 4)
-            ("%Y%m%d%H%MZ", 13),
-            (
-                "%Y%m%d%H%M%S%z",
-                14 + 5,
-            ),  # this also parses '202401020304+0000', but as datetime(2024, 1, 2, 3, 0, 4, tzinfo=...)
-            ("%Y%m%d%H%M%z", 12 + 5),
-        ]:
-            if len(result) != length:
-                continue
-            try:
-                res = datetime.datetime.strptime(result, date_fmt)
-            except ValueError:
-                pass
-            else:
-                return add_or_remove_timezone(res, with_timezone=with_timezone)
+    for date_fmt, length in [
+        (
+            "%Y%m%d%H%M%SZ",
+            15,
+        ),  # this also parses '202401020304Z', but as datetime(2024, 1, 2, 3, 0, 4)
+        ("%Y%m%d%H%MZ", 13),
+        (
+            "%Y%m%d%H%M%S%z",
+            14 + 5,
+        ),  # this also parses '202401020304+0000', but as datetime(2024, 1, 2, 3, 0, 4, tzinfo=...)
+        ("%Y%m%d%H%M%z", 12 + 5),
+    ]:
+        if len(result) != length:
+            continue
+        try:
+            res = datetime.datetime.strptime(result, date_fmt)
+        except ValueError:
+            pass
+        else:
+            return add_or_remove_timezone(res, with_timezone=with_timezone)
 
-        raise OpenSSLObjectError(
-            f'The time spec "{input_string}" for {input_name} is invalid'
-        )
+    raise OpenSSLObjectError(
+        f'The time spec "{input_string}" for {input_name} is invalid'
+    )

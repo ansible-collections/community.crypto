@@ -18,8 +18,8 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 
 
 class AcmeCertificateBackend(CertificateBackend):
-    def __init__(self, module, backend):
-        super(AcmeCertificateBackend, self).__init__(module, backend)
+    def __init__(self, module):
+        super(AcmeCertificateBackend, self).__init__(module)
         self.accountkey_path = module.params["acme_accountkey_path"]
         self.challenge_path = module.params["acme_challenge_path"]
         self.use_chain = module.params["acme_chain"]
@@ -105,8 +105,8 @@ class AcmeCertificateProvider(CertificateProvider):
     def needs_version_two_certs(self, module):
         return False
 
-    def create_backend(self, module, backend):
-        return AcmeCertificateBackend(module, backend)
+    def create_backend(self, module):
+        return AcmeCertificateBackend(module)
 
 
 def add_acme_provider_to_argument_spec(argument_spec):

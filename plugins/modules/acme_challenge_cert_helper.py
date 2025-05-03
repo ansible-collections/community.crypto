@@ -149,9 +149,8 @@ regular_certificate:
 import base64
 import datetime
 import ipaddress
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
@@ -164,16 +163,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_now_datetime,
 )
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
-)
 
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.hazmat.backends
@@ -185,13 +181,8 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-
-    HAS_CRYPTOGRAPHY = LooseVersion(cryptography.__version__) >= LooseVersion(
-        COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
-    )
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    HAS_CRYPTOGRAPHY = False
+    pass
 
 
 # Convert byte string to ASN1 encoded octet string
@@ -215,20 +206,8 @@ def main():
         required_one_of=(["private_key_src", "private_key_content"],),
         mutually_exclusive=(["private_key_src", "private_key_content"],),
     )
-    if not HAS_CRYPTOGRAPHY:
-        # Some callbacks die when exception is provided with value None
-        if CRYPTOGRAPHY_IMP_ERR:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        module.fail_json(
-            msg=missing_required_lib(
-                f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
-            )
-        )
+
+    assert_required_cryptography_version(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
 
     try:
         # Get parameters

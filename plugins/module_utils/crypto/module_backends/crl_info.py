@@ -4,9 +4,6 @@
 
 from __future__ import annotations
 
-import traceback
-
-from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
     TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
@@ -21,9 +18,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
@@ -31,17 +26,10 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
-    import cryptography
     from cryptography import x509
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 class CRLInfoRetrieval:
@@ -96,12 +84,7 @@ class CRLInfoRetrieval:
 
 
 def get_crl_info(module, content, list_revoked_certificates=True):
-    if not CRYPTOGRAPHY_FOUND:
-        module.fail_json(
-            msg=missing_required_lib(f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"),
-            exception=CRYPTOGRAPHY_IMP_ERR,
-        )
-
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
     info = CRLInfoRetrieval(
         module, content, list_revoked_certificates=list_revoked_certificates
     )

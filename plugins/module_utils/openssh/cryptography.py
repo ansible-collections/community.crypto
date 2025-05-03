@@ -13,7 +13,6 @@ from socket import gethostname
 try:
     from cryptography import __version__ as CRYPTOGRAPHY_VERSION
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
-    from cryptography.hazmat.backends.openssl import backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, padding, rsa
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -149,19 +148,16 @@ class AsymmetricKeypair:
                 # if improper padding is used during signing
                 public_exponent=65537,
                 key_size=size,
-                backend=backend,
             )
         elif keytype == "dsa":
             privatekey = dsa.generate_private_key(
                 key_size=size,
-                backend=backend,
             )
         elif keytype == "ed25519":
             privatekey = Ed25519PrivateKey.generate()
         elif keytype == "ecdsa":
             privatekey = ec.generate_private_key(
                 _ALGORITHM_PARAMETERS["ecdsa"]["curves"][size],
-                backend=backend,
             )
 
         publickey = privatekey.public_key()
@@ -574,7 +570,6 @@ def load_privatekey(path, passphrase, key_format):
             privatekey = privatekey_loader(
                 data=content,
                 password=passphrase,
-                backend=backend,
             )
 
     except ValueError as e:
@@ -584,7 +579,6 @@ def load_privatekey(path, passphrase, key_format):
                 privatekey = privatekey_loaders["PEM"](
                     data=content,
                     password=passphrase,
-                    backend=backend,
                 )
             except ValueError as e:
                 raise InvalidPrivateKeyFileError(e)
@@ -625,7 +619,6 @@ def load_publickey(path, key_format):
 
             publickey = publickey_loader(
                 data=content,
-                backend=backend,
             )
     except ValueError as e:
         raise InvalidPublicKeyFileError(e)
@@ -692,7 +685,7 @@ def extract_comment(path):
 
 
 def calculate_fingerprint(openssh_publickey):
-    digest = hashes.Hash(hashes.SHA256(), backend=backend)
+    digest = hashes.Hash(hashes.SHA256())
     decoded_pubkey = b64decode(openssh_publickey.split(b" ")[1])
     digest.update(decoded_pubkey)
 

@@ -22,6 +22,7 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.
     parse_private_key_format,
 )
 from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+    CRYPTOGRAPHY_VERSION,
     HAS_OPENSSH_SUPPORT,
     InvalidCommentError,
     InvalidPassphraseError,
@@ -346,8 +347,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
         if self.module.params["private_key_format"] != "auto":
             self.module.fail_json(
-                msg="'auto' is the only valid option for "
-                + "'private_key_format' when 'backend' is not 'cryptography'"
+                msg="'auto' is the only valid option for 'private_key_format' when 'backend' is not 'cryptography'"
             )
 
         self.ssh_keygen = KeygenCommand(self.module)
@@ -531,7 +531,9 @@ class KeypairBackendCryptography(KeypairBackend):
 
 
 def select_backend(module, backend):
-    can_use_cryptography = HAS_OPENSSH_SUPPORT
+    can_use_cryptography = HAS_OPENSSH_SUPPORT and LooseVersion(
+        CRYPTOGRAPHY_VERSION
+    ) >= LooseVersion(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)
     can_use_opensshbin = bool(module.get_bin_path("ssh-keygen"))
 
     if backend == "auto":
@@ -550,14 +552,13 @@ def select_backend(module, backend):
     if backend == "opensshbin":
         if not can_use_opensshbin:
             module.fail_json(msg="Cannot find the OpenSSH binary in the PATH")
-        return backend, KeypairBackendOpensshBin(module)
-    elif backend == "cryptography":
+        return KeypairBackendOpensshBin(module)
+    if backend == "cryptography":
         if not can_use_cryptography:
             module.fail_json(
                 msg=missing_required_lib(
                     f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
                 )
             )
-        return backend, KeypairBackendCryptography(module)
-    else:
-        raise ValueError(f"Unsupported value for backend: {backend}")
+        return KeypairBackendCryptography(module)
+    raise ValueError(f"Unsupported value for backend: {backend}")

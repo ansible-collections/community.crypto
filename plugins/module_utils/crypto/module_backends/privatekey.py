@@ -10,7 +10,6 @@ import base64
 import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
@@ -31,15 +30,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
@@ -53,13 +49,8 @@ try:
     import cryptography.hazmat.primitives.asymmetric.x448
     import cryptography.hazmat.primitives.asymmetric.x25519
     import cryptography.hazmat.primitives.serialization
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    pass
 
 
 class PrivateKeyError(OpenSSLObjectError):
@@ -75,7 +66,7 @@ class PrivateKeyError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class PrivateKeyBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
         self.type = module.params["type"]
         self.size = module.params["size"]
@@ -85,7 +76,6 @@ class PrivateKeyBackend:
         self.format = module.params["format"]
         self.format_mismatch = module.params.get("format_mismatch", "regenerate")
         self.regenerate = module.params.get("regenerate", "full_idempotence")
-        self.backend = backend
 
         self.private_key = None
 
@@ -103,7 +93,6 @@ class PrivateKeyBackend:
             result.update(
                 get_privatekey_info(
                     self.module,
-                    self.backend,
                     data,
                     passphrase=self.passphrase,
                     return_private_key_data=False,
@@ -219,16 +208,14 @@ class PrivateKeyBackend:
 
     def _get_fingerprint(self):
         if self.private_key:
-            return get_fingerprint_of_privatekey(self.private_key, backend=self.backend)
+            return get_fingerprint_of_privatekey(self.private_key)
         try:
             self._ensure_existing_private_key_loaded()
         except Exception:
             # Ignore errors
             pass
         if self.existing_private_key:
-            return get_fingerprint_of_privatekey(
-                self.existing_private_key, backend=self.backend
-            )
+            return get_fingerprint_of_privatekey(self.existing_private_key)
 
     def dump(self, include_key):
         """Serialize the object into a dictionary."""
@@ -297,9 +284,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         }
 
     def __init__(self, module):
-        super(PrivateKeyCryptographyBackend, self).__init__(
-            module=module, backend="cryptography"
-        )
+        super(PrivateKeyCryptographyBackend, self).__init__(module=module)
 
         self.curves = dict()
         self._add_curve("secp224r1", "SECP224R1")
@@ -558,34 +543,9 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return False
 
 
-def select_backend(module, backend):
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Decision
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, PrivateKeyCryptographyBackend(module)
-    else:
-        raise Exception(f"Unsupported value for backend: {backend}")
+def select_backend(module):
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    return PrivateKeyCryptographyBackend(module)
 
 
 def get_privatekey_argument_spec():

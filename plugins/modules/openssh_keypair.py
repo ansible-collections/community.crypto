@@ -246,7 +246,7 @@ def main():
         add_file_common_args=True,
     )
 
-    keypair = select_backend(module, module.params["backend"])[1]
+    keypair = select_backend(module, module.params["backend"])
 
     keypair.execute()
 

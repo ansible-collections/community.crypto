@@ -57,6 +57,9 @@ options:
       - Determines which crypto backend to use.
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+      - Note that with community.crypto 3.0.0, all values behave the same.
+        This option will be deprecated in a later version.
+        We recommend to not set it explicitly.
     type: str
     default: auto
     choices: [auto, cryptography]
@@ -430,9 +433,7 @@ def main():
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading certificate file from disk: {e}")
 
-    backend, module_backend = select_backend(
-        module, module.params["select_crypto_backend"], data
-    )
+    module_backend = select_backend(module, data)
 
     valid_at = module.params["valid_at"]
     if valid_at:

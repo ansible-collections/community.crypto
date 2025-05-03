@@ -7,10 +7,8 @@ from __future__ import annotations
 
 import abc
 import binascii
-import traceback
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
     ArgumentSpec,
@@ -42,15 +40,12 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
-)
-from ansible_collections.community.crypto.plugins.module_utils.version import (
-    LooseVersion,
+    assert_required_cryptography_version,
 )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.exceptions
@@ -59,17 +54,8 @@ try:
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
     import cryptography.x509.oid
-
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
-    CRYPTOGRAPHY_MUST_STAPLE_NAME = cryptography.x509.oid.ObjectIdentifier(
-        "1.3.6.1.5.5.7.1.24"
-    )
-    CRYPTOGRAPHY_MUST_STAPLE_VALUE = b"\x30\x03\x02\x01\x05"
+    pass
 
 
 class CertificateSigningRequestError(OpenSSLObjectError):
@@ -85,9 +71,8 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 
 @six.add_metaclass(abc.ABCMeta)
 class CertificateSigningRequestBackend:
-    def __init__(self, module, backend):
+    def __init__(self, module):
         self.module = module
-        self.backend = backend
         self.digest = module.params["digest"]
         self.privatekey_path = module.params["privatekey_path"]
         self.privatekey_content = module.params["privatekey_content"]
@@ -202,7 +187,6 @@ class CertificateSigningRequestBackend:
         try:
             result = get_csr_info(
                 self.module,
-                self.backend,
                 data,
                 validate_signature=False,
                 prefer_one_fingerprint=True,
@@ -240,7 +224,6 @@ class CertificateSigningRequestBackend:
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
-                backend=self.backend,
             )
         except OpenSSLBadPassphraseError as exc:
             raise CertificateSigningRequestError(exc)
@@ -256,7 +239,8 @@ class CertificateSigningRequestBackend:
             return True
         try:
             self.existing_csr = load_certificate_request(
-                None, content=self.existing_csr_bytes, backend=self.backend
+                None,
+                content=self.existing_csr_bytes,
             )
         except Exception:
             return True
@@ -340,9 +324,7 @@ def parse_crl_distribution_points(module, crl_distribution_points):
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, module):
-        super(CertificateSigningRequestCryptographyBackend, self).__init__(
-            module, "cryptography"
-        )
+        super(CertificateSigningRequestCryptographyBackend, self).__init__(module)
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
@@ -613,20 +595,16 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
 
         def _check_ocspMustStaple(extensions):
             tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
-            has_tlsfeature = True
             if self.ocspMustStaple:
                 if (
                     not tlsfeature_ext
                     or tlsfeature_ext.critical != self.ocspMustStaple_critical
                 ):
                     return False
-                if has_tlsfeature:
-                    return (
-                        cryptography.x509.TLSFeatureType.status_request
-                        in tlsfeature_ext.value
-                    )
-                else:
-                    return tlsfeature_ext.value.value == CRYPTOGRAPHY_MUST_STAPLE_VALUE
+                return (
+                    cryptography.x509.TLSFeatureType.status_request
+                    in tlsfeature_ext.value
+                )
             else:
                 return tlsfeature_ext is None
 
@@ -756,35 +734,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         )
 
 
-def select_backend(module, backend):
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
-
-        # Try cryptography
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
-
-    if backend == "cryptography":
-        if not CRYPTOGRAPHY_FOUND:
-            module.fail_json(
-                msg=missing_required_lib(
-                    f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                ),
-                exception=CRYPTOGRAPHY_IMP_ERR,
-            )
-        return backend, CertificateSigningRequestCryptographyBackend(module)
-    else:
-        raise Exception(f"Unsupported value for backend: {backend}")
+def select_backend(module):
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
+    return CertificateSigningRequestCryptographyBackend(module)
 
 
 def get_csr_argument_spec():

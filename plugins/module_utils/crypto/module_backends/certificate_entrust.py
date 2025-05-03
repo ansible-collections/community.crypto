@@ -39,13 +39,12 @@ except ImportError:
 
 
 class EntrustCertificateBackend(CertificateBackend):
-    def __init__(self, module, backend):
-        super(EntrustCertificateBackend, self).__init__(module, backend)
+    def __init__(self, module):
+        super(EntrustCertificateBackend, self).__init__(module)
         self.trackingId = None
         self.notAfter = get_relative_time_option(
             module.params["entrust_not_after"],
             "entrust_not_after",
-            backend=self.backend,
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
 
@@ -64,19 +63,18 @@ class EntrustCertificateBackend(CertificateBackend):
         # We want to always force behavior of trying to use the organization provided in the CSR.
         # To that end we need to parse out the organization from the CSR.
         self.csr_org = None
-        if self.backend == "cryptography":
-            csr_subject_orgs = self.csr.subject.get_attributes_for_oid(
-                NameOID.ORGANIZATION_NAME
-            )
-            if len(csr_subject_orgs) == 1:
-                self.csr_org = csr_subject_orgs[0].value
-            elif len(csr_subject_orgs) > 1:
-                self.module.fail_json(
-                    msg=(
-                        "Entrust provider does not currently support multiple validated organizations. Multiple organizations found in "
-                        f"Subject DN: '{self.csr.subject}'. "
-                    )
+        csr_subject_orgs = self.csr.subject.get_attributes_for_oid(
+            NameOID.ORGANIZATION_NAME
+        )
+        if len(csr_subject_orgs) == 1:
+            self.csr_org = csr_subject_orgs[0].value
+        elif len(csr_subject_orgs) > 1:
+            self.module.fail_json(
+                msg=(
+                    "Entrust provider does not currently support multiple validated organizations. Multiple organizations found in "
+                    f"Subject DN: '{self.csr.subject}'. "
                 )
+            )
         # If no organization in the CSR, explicitly tell ECS that it should be blank in issued cert, not defaulted to
         # organization tied to the account.
         if self.csr_org is None:
@@ -136,7 +134,8 @@ class EntrustCertificateBackend(CertificateBackend):
 
         self.cert_bytes = to_bytes(result.get("endEntityCert"))
         self.cert = load_certificate(
-            path=None, content=self.cert_bytes, backend=self.backend
+            path=None,
+            content=self.cert_bytes,
         )
 
     def get_certificate_data(self):
@@ -175,11 +174,8 @@ class EntrustCertificateBackend(CertificateBackend):
         except Exception:
             return
         if self.existing_certificate:
-            serial_number = None
-            expiry = None
-            if self.backend == "cryptography":
-                serial_number = f"{self.existing_certificate.serial_number:X}"
-                expiry = get_not_valid_after(self.existing_certificate)
+            serial_number = f"{self.existing_certificate.serial_number:X}"
+            expiry = get_not_valid_after(self.existing_certificate)
 
             # get some information about the expiry of this certificate
             expiry_iso3339 = expiry.strftime("%Y-%m-%dT%H:%M:%S.00Z")
@@ -213,8 +209,8 @@ class EntrustCertificateProvider(CertificateProvider):
     def needs_version_two_certs(self, module):
         return False
 
-    def create_backend(self, module, backend):
-        return EntrustCertificateBackend(module, backend)
+    def create_backend(self, module):
+        return EntrustCertificateBackend(module)
 
 
 def add_entrust_provider_to_argument_spec(argument_spec):

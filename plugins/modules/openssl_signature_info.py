@@ -47,6 +47,9 @@ options:
       - Determines which crypto backend to use.
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+      - Note that with community.crypto 3.0.0, all values behave the same.
+        This option will be deprecated in a later version.
+        We recommend to not set it explicitly.
     type: str
     default: auto
     choices: [auto, cryptography]
@@ -85,10 +88,10 @@ valid:
 
 import base64
 import os
-import traceback
 
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
+    assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
@@ -97,7 +100,6 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
-CRYPTOGRAPHY_IMP_ERR = None
 try:
     import cryptography
     import cryptography.hazmat.primitives.asymmetric.padding
@@ -105,12 +107,9 @@ try:
 
     CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    CRYPTOGRAPHY_FOUND = False
-else:
-    CRYPTOGRAPHY_FOUND = True
+    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -122,15 +121,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 class SignatureInfoBase(OpenSSLObject):
 
-    def __init__(self, module, backend):
+    def __init__(self, module):
         super(SignatureInfoBase, self).__init__(
             path=module.params["path"],
             state="present",
             force=False,
             check_mode=module.check_mode,
         )
-
-        self.backend = backend
 
         self.signature = module.params["signature"]
         self.certificate_path = module.params["certificate_path"]
@@ -150,8 +147,8 @@ class SignatureInfoBase(OpenSSLObject):
 # Implementation with using cryptography
 class SignatureInfoCryptography(SignatureInfoBase):
 
-    def __init__(self, module, backend):
-        super(SignatureInfoCryptography, self).__init__(module, backend)
+    def __init__(self, module):
+        super(SignatureInfoCryptography, self).__init__(module)
 
     def run(self):
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
@@ -167,7 +164,6 @@ class SignatureInfoCryptography(SignatureInfoBase):
             certificate = load_certificate(
                 path=self.certificate_path,
                 content=self.certificate_content,
-                backend=self.backend,
             )
             public_key = certificate.public_key()
             verified = False
@@ -254,33 +250,10 @@ def main():
             msg=f"The file {module.params['path']} does not exist",
         )
 
-    backend = module.params["select_crypto_backend"]
-    if backend == "auto":
-        # Detection what is possible
-        can_use_cryptography = (
-            CRYPTOGRAPHY_FOUND
-            and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
-        )
+    assert_required_cryptography_version(MINIMAL_CRYPTOGRAPHY_VERSION)
 
-        # Decision
-        if can_use_cryptography:
-            backend = "cryptography"
-
-        # Success?
-        if backend == "auto":
-            module.fail_json(
-                msg=f"Cannot detect any of the required Python libraries cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION})"
-            )
     try:
-        if backend == "cryptography":
-            if not CRYPTOGRAPHY_FOUND:
-                module.fail_json(
-                    msg=missing_required_lib(
-                        f"cryptography >= {MINIMAL_CRYPTOGRAPHY_VERSION}"
-                    ),
-                    exception=CRYPTOGRAPHY_IMP_ERR,
-                )
-            _sign = SignatureInfoCryptography(module, backend)
+        _sign = SignatureInfoCryptography(module)
 
         result = _sign.run()
 

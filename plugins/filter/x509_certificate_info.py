@@ -339,7 +339,7 @@ def x509_certificate_info_filter(data, name_encoding="ignore"):
 
     module = FilterModuleMock({"name_encoding": name_encoding})
     try:
-        return get_certificate_info(module, "cryptography", content=to_bytes(data))
+        return get_certificate_info(module, content=to_bytes(data))
     except OpenSSLObjectError as exc:
         raise AnsibleFilterError(str(exc))
 
