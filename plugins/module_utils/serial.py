@@ -10,7 +10,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
 )
 
 
-def th(number):
+def th(number: int) -> str:
     abs_number = abs(number)
     mod_10 = abs_number % 10
     mod_100 = abs_number % 100
@@ -24,13 +24,13 @@ def th(number):
     return "th"
 
 
-def parse_serial(value):
+def parse_serial(value: str | bytes) -> int:
     """
     Given a colon-separated string of hexadecimal byte values, converts it to an integer.
     """
-    value = to_native(value)
+    value_str = to_native(value)
     result = 0
-    for i, part in enumerate(value.split(":")):
+    for i, part in enumerate(value_str.split(":")):
         try:
             part_value = int(part, 16)
             if part_value < 0 or part_value > 255:
@@ -43,11 +43,11 @@ def parse_serial(value):
     return result
 
 
-def to_serial(value):
+def to_serial(value: int) -> str:
     """
     Given an integer, converts its absolute value to a colon-separated string of hexadecimal byte values.
     """
-    value = convert_int_to_hex(value).upper()
-    if len(value) % 2 != 0:
-        value = "0" + value
-    return ":".join(value[i : i + 2] for i in range(0, len(value), 2))
+    value_str = convert_int_to_hex(value).upper()
+    if len(value_str) % 2 != 0:
+        value_str = f"0{value_str}"
+    return ":".join(value_str[i : i + 2] for i in range(0, len(value_str), 2))

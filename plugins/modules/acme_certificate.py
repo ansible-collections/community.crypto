@@ -662,7 +662,6 @@ class ACMECertificateClient:
             contact.append("mailto:" + module.params["account_email"])
         created, account_data = self.account.setup_account(
             contact,
-            agreement=module.params.get("agreement"),
             terms_agreed=module.params.get("terms_agreed"),
             allow_creation=modify_account,
         )

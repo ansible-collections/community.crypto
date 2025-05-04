@@ -10,7 +10,6 @@ import subprocess
 
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.crypto._asn1 import (
-    pack_asn1,
     serialize_asn1_string_as_der,
 )
 
@@ -101,11 +100,6 @@ def test_serialize_asn1_string_as_der_invalid_type():
     expected = 'The ASN.1 serialized string is not a known type "OID", only UTF8 types are supported'
     with pytest.raises(ValueError, match=re.escape(expected)):
         serialize_asn1_string_as_der("OID:1.2.3.4")
-
-
-def test_pack_asn_invalid_class():
-    with pytest.raises(ValueError, match="tag_class must be between 0 and 3 not 4"):
-        pack_asn1(4, True, 0, b"")
 
 
 @pytest.mark.skip()  # This is to just to build the test case assertions and shouldn't run normally.

@@ -11,6 +11,7 @@ import ipaddress
 import json
 import re
 import time
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
@@ -23,7 +24,13 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-def create_key_authorization(client, token):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .acme import ACMEClient
+
+
+def create_key_authorization(client: ACMEClient, token: str) -> str:
     """
     Returns the key authorization for the given token
     https://tools.ietf.org/html/rfc8555#section-8.1
@@ -35,41 +42,46 @@ def create_key_authorization(client, token):
     return f"{token}.{thumbprint}"
 
 
-def combine_identifier(identifier_type, identifier):
+def combine_identifier(identifier_type: str, identifier: str) -> str:
     return f"{identifier_type}:{identifier}"
 
 
-def normalize_combined_identifier(identifier):
+def normalize_combined_identifier(identifier: str) -> str:
     identifier_type, identifier = split_identifier(identifier)
     # Normalize DNS names and IPs
     identifier = identifier.lower()
     return combine_identifier(identifier_type, identifier)
 
 
-def split_identifier(identifier):
+def split_identifier(identifier: str) -> tuple[str, str]:
     parts = identifier.split(":", 1)
     if len(parts) != 2:
         raise ModuleFailException(
             f'Identifier "{identifier}" is not of the form <type>:<identifier>'
         )
-    return parts
+    return parts[0], parts[1]
+
+
+_Challenge = t.TypeVar("_Challenge", bound="Challenge")
 
 
 class Challenge:
-    def __init__(self, data, url):
+    def __init__(self, data: dict[str, t.Any], url: str) -> None:
         self.data = data
 
-        self.type = data["type"]
+        self.type: str = data["type"]
         self.url = url
-        self.status = data["status"]
-        self.token = data.get("token")
+        self.status: str = data["status"]
+        self.token: str | None = data.get("token")
 
     @classmethod
-    def from_json(cls, client, data, url=None):
+    def from_json(
+        cls: t.Type[_Challenge], client: ACMEClient, data: dict[str, t.Any], url=None
+    ) -> _Challenge:
         return cls(data, url or data["url"])
 
-    def call_validate(self, client):
-        challenge_response = {}
+    def call_validate(self, client: ACMEClient) -> None:
+        challenge_response: dict[str, t.Any] = {}
         client.send_signed_request(
             self.url,
             challenge_response,
@@ -77,10 +89,15 @@ class Challenge:
             expected_status_codes=[200, 202],
         )
 
-    def to_json(self):
+    def to_json(self) -> dict[str, t.Any]:
         return self.data.copy()
 
-    def get_validation_data(self, client, identifier_type, identifier):
+    def get_validation_data(
+        self, client: ACMEClient, identifier_type: str, identifier: str
+    ) -> dict[str, t.Any] | None:
+        if self.token is None:
+            return None
+
         token = re.sub(r"[^A-Za-z0-9_\-]", "_", self.token)
         key_authorization = create_key_authorization(client, token)
 
@@ -113,21 +130,33 @@ class Challenge:
                     resource += "."
             else:
                 resource = identifier
-            value = base64.b64encode(
+            b_value = base64.b64encode(
                 hashlib.sha256(to_bytes(key_authorization)).digest()
             )
             return {
                 "resource": resource,
                 "resource_original": combine_identifier(identifier_type, identifier),
-                "resource_value": value,
+                "resource_value": b_value,
             }
 
         # Unknown challenge type: ignore
         return None
 
 
+_Authorization = t.TypeVar("_Authorization", bound="Authorization")
+
+
 class Authorization:
-    def _setup(self, client, data):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+        self.data: dict[str, t.Any] | None = None
+        self.challenges: list[Challenge] = []
+        self.status: str | None = None
+        self.identifier_type: str | None = None
+        self.identifier: str | None = None
+
+    def _setup(self, client: ACMEClient, data: dict[str, t.Any]) -> None:
         data["uri"] = self.url
         self.data = data
         # While 'challenges' is a required field, apparently not every CA cares
@@ -145,29 +174,32 @@ class Authorization:
         if data.get("wildcard", False):
             self.identifier = f"*.{self.identifier}"
 
-    def __init__(self, url):
-        self.url = url
-
-        self.data = None
-        self.challenges = []
-        self.status = None
-        self.identifier_type = None
-        self.identifier = None
-
     @classmethod
-    def from_json(cls, client, data, url):
+    def from_json(
+        cls: t.Type[_Authorization],
+        client: ACMEClient,
+        data: dict[str, t.Any],
+        url: str,
+    ) -> _Authorization:
         result = cls(url)
         result._setup(client, data)
         return result
 
     @classmethod
-    def from_url(cls, client, url):
+    def from_url(
+        cls: t.Type[_Authorization], client: ACMEClient, url: str
+    ) -> _Authorization:
         result = cls(url)
         result.refresh(client)
         return result
 
     @classmethod
-    def create(cls, client, identifier_type, identifier):
+    def create(
+        cls: t.Type[_Authorization],
+        client: ACMEClient,
+        identifier_type: str,
+        identifier: str,
+    ) -> _Authorization:
         """
         Create a new authorization for the given identifier.
         Return the authorization object of the new authorization
@@ -194,23 +226,29 @@ class Authorization:
         return cls.from_json(client, result, info["location"])
 
     @property
-    def combined_identifier(self):
+    def combined_identifier(self) -> str:
+        if self.identifier_type is None or self.identifier is None:
+            raise ValueError("Data not present")
         return combine_identifier(self.identifier_type, self.identifier)
 
-    def to_json(self):
+    def to_json(self) -> dict[str, t.Any]:
+        if self.data is None:
+            raise ValueError("Data not present")
         return self.data.copy()
 
-    def refresh(self, client):
+    def refresh(self, client: ACMEClient) -> bool:
         result, dummy = client.get_request(self.url)
         changed = self.data != result
         self._setup(client, result)
         return changed
 
-    def get_challenge_data(self, client):
+    def get_challenge_data(self, client) -> dict[str, t.Any]:
         """
         Returns a dict with the data for all proposed (and supported) challenges
         of the given authorization.
         """
+        if self.identifier_type is None or self.identifier is None:
+            raise ValueError("Data not present")
         data = {}
         for challenge in self.challenges:
             validation_data = challenge.get_validation_data(
@@ -220,7 +258,7 @@ class Authorization:
                 data[challenge.type] = validation_data
         return data
 
-    def raise_error(self, error_msg, module=None):
+    def raise_error(self, error_msg: str, module: AnsibleModule):
         """
         Aborts with a specific error for a challenge.
         """
@@ -246,13 +284,13 @@ class Authorization:
             ),
         )
 
-    def find_challenge(self, challenge_type):
+    def find_challenge(self, challenge_type: str) -> Challenge | None:
         for challenge in self.challenges:
             if challenge_type == challenge.type:
                 return challenge
         return None
 
-    def wait_for_validation(self, client, callenge_type):
+    def wait_for_validation(self, client: ACMEClient, callenge_type: str) -> bool:
         while True:
             self.refresh(client)
             if self.status in ["valid", "invalid", "revoked"]:
@@ -264,7 +302,9 @@ class Authorization:
 
         return self.status == "valid"
 
-    def call_validate(self, client, challenge_type, wait=True):
+    def call_validate(
+        self, client: ACMEClient, challenge_type: str, wait: bool = True
+    ) -> bool:
         """
         Validate the authorization provided in the auth dict. Returns True
         when the validation was successful and False when it was not.
@@ -281,7 +321,7 @@ class Authorization:
             return self.status == "valid"
         return self.wait_for_validation(client, challenge_type)
 
-    def can_deactivate(self):
+    def can_deactivate(self) -> bool:
         """
         Deactivates this authorization.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
@@ -289,14 +329,14 @@ class Authorization:
         """
         return self.status in ("valid", "pending")
 
-    def deactivate(self, client):
+    def deactivate(self, client: ACMEClient) -> bool | None:
         """
         Deactivates this authorization.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
         https://tools.ietf.org/html/rfc8555#section-7.5.2
         """
         if not self.can_deactivate():
-            return
+            return None
         authz_deactivate = {"status": "deactivated"}
         result, info = client.send_signed_request(
             self.url, authz_deactivate, fail_on_error=False
@@ -307,7 +347,9 @@ class Authorization:
         return False
 
     @classmethod
-    def deactivate_url(cls, client, url):
+    def deactivate_url(
+        cls: t.Type[_Authorization], client: ACMEClient, url: str
+    ) -> _Authorization:
         """
         Deactivates this authorization.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
@@ -322,7 +364,7 @@ class Authorization:
         return authz
 
 
-def wait_for_validation(authzs, client):
+def wait_for_validation(authzs: t.Iterable[Authorization], client: ACMEClient) -> None:
     """
     Wait until a list of authz is valid. Fail if at least one of them is invalid or revoked.
     """

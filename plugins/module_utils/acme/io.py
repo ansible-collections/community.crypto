@@ -10,22 +10,27 @@ import os
 import shutil
 import tempfile
 import traceback
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
 )
 
 
-def read_file(fn, mode="b"):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+def read_file(fn: str | os.PathLike) -> bytes:
     try:
-        with open(fn, "r" + mode) as f:
+        with open(fn, "rb") as f:
             return f.read()
     except Exception as e:
         raise ModuleFailException(f'Error while reading file "{fn}": {e}')
 
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
-def write_file(module, dest, content):
+def write_file(module: AnsibleModule, dest: str | os.PathLike, content: bytes) -> bool:
     """
     Write content to destination file dest, only if the content
     has changed.

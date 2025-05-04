@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 
 PEM_START = "-----BEGIN "
 PEM_END_START = "-----END "
@@ -12,7 +14,7 @@ PKCS8_PRIVATEKEY_NAMES = ("PRIVATE KEY", "ENCRYPTED PRIVATE KEY")
 PKCS1_PRIVATEKEY_SUFFIX = " PRIVATE KEY"
 
 
-def identify_pem_format(content, encoding="utf-8"):
+def identify_pem_format(content: bytes, encoding: str = "utf-8") -> bool:
     """Given the contents of a binary file, tests whether this could be a PEM file."""
     try:
         first_pem = extract_first_pem(content.decode(encoding))
@@ -30,7 +32,9 @@ def identify_pem_format(content, encoding="utf-8"):
     return False
 
 
-def identify_private_key_format(content, encoding="utf-8"):
+def identify_private_key_format(
+    content: bytes, encoding: str = "utf-8"
+) -> t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"]:
     """Given the contents of a private key file, identifies its format."""
     # See https://github.com/openssl/openssl/blob/master/crypto/pem/pem_pkey.c#L40-L85
     # (PEM_read_bio_PrivateKey)
@@ -59,12 +63,12 @@ def identify_private_key_format(content, encoding="utf-8"):
     return "raw"
 
 
-def split_pem_list(text, keep_inbetween=False):
+def split_pem_list(text: str, keep_inbetween: bool = False) -> list[str]:
     """
     Split concatenated PEM objects into a list of strings, where each is one PEM object.
     """
     result = []
-    current = [] if keep_inbetween else None
+    current: list[str] | None = [] if keep_inbetween else None
     for line in text.splitlines(True):
         if line.strip():
             if not keep_inbetween and line.startswith("-----BEGIN "):
@@ -77,7 +81,7 @@ def split_pem_list(text, keep_inbetween=False):
     return result
 
 
-def extract_first_pem(text):
+def extract_first_pem(text: str) -> str | None:
     """
     Given one PEM or multiple concatenated PEM objects, return only the first one, or None if there is none.
     """
@@ -87,7 +91,7 @@ def extract_first_pem(text):
     return all_pems[0]
 
 
-def _extract_type(line, start=PEM_START):
+def _extract_type(line: str, start: str = PEM_START) -> str | None:
     if not line.startswith(start):
         return None
     if not line.endswith(PEM_END):
@@ -95,7 +99,7 @@ def _extract_type(line, start=PEM_START):
     return line[len(start) : -len(PEM_END)]
 
 
-def extract_pem(content, strict=False):
+def extract_pem(content: str, strict: bool = False) -> tuple[str, str]:
     lines = content.splitlines()
     if len(lines) < 3:
         raise ValueError(f"PEM must have at least 3 lines, have only {len(lines)}")
@@ -117,5 +121,4 @@ def extract_pem(content, strict=False):
             raise ValueError(
                 f"Last line has length {len(lines[-2])}, should be in (0, 64]"
             )
-    content = lines[1:-1]
-    return header_type, "".join(content)
+    return header_type, "".join(lines[1:-1])

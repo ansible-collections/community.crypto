@@ -5,11 +5,17 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible.module_utils.common._collections_compat import Mapping
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
 )
+
+
+if t.TYPE_CHECKING:
+    from .acme import ACMEClient
 
 
 class ACMEAccount:
@@ -18,20 +24,19 @@ class ACMEAccount:
     retrieve account data.
     """
 
-    def __init__(self, client):
+    def __init__(self, client: ACMEClient) -> None:
         # Set to true to enable logging of all signed requests
-        self._debug = False
+        self._debug: bool = False
 
         self.client = client
 
     def _new_reg(
         self,
-        contact=None,
-        agreement=None,
-        terms_agreed=False,
-        allow_creation=True,
-        external_account_binding=None,
-    ):
+        contact: list[str] | None = None,
+        terms_agreed: bool = False,
+        allow_creation: bool = True,
+        external_account_binding: dict[str, t.Any] | None = None,
+    ) -> tuple[bool, dict[str, t.Any] | None]:
         """
         Registers a new ACME account. Returns a pair ``(created, data)``.
         Here, ``created`` is ``True`` if the account was created and
@@ -63,7 +68,7 @@ class ACMEAccount:
                 return created, data
             # An account does not yet exist. Try to create one next.
 
-        new_reg = {"contact": contact}
+        new_reg: dict[str, t.Any] = {"contact": contact}
         if not allow_creation:
             # https://tools.ietf.org/html/rfc8555#section-7.3.1
             new_reg["onlyReturnExisting"] = True
@@ -99,7 +104,7 @@ class ACMEAccount:
                 self.client.module,
                 msg="Invalid account creation reply from ACME server",
                 info=info,
-                content=result,
+                content_json=result,
             )
 
         if info["status"] == 201:
@@ -152,7 +157,7 @@ class ACMEAccount:
                 content_json=result,
             )
 
-    def get_account_data(self):
+    def get_account_data(self) -> dict[str, t.Any] | None:
         """
         Retrieve account information. Can only be called when the account
         URI is already known (such as after calling setup_account).
@@ -161,7 +166,7 @@ class ACMEAccount:
         if self.client.account_uri is None:
             raise ModuleFailException("Account URI unknown")
         # try POST-as-GET first (draft-15 or newer)
-        data = None
+        data: dict[str, t.Any] | None = None
         result, info = self.client.send_signed_request(
             self.client.account_uri, data, fail_on_error=False
         )
@@ -180,7 +185,7 @@ class ACMEAccount:
                 self.client.module,
                 msg="Invalid account data retrieved from ACME server",
                 info=info,
-                content=result,
+                content_json=result,
             )
         if (
             info["status"] in (400, 403)
@@ -205,13 +210,12 @@ class ACMEAccount:
 
     def setup_account(
         self,
-        contact=None,
-        agreement=None,
-        terms_agreed=False,
-        allow_creation=True,
-        remove_account_uri_if_not_exists=False,
-        external_account_binding=None,
-    ):
+        contact: list[str] | None = None,
+        terms_agreed: bool = False,
+        allow_creation: bool = True,
+        remove_account_uri_if_not_exists: bool = False,
+        external_account_binding: dict[str, t.Any] | None = None,
+    ) -> tuple[bool, dict[str, t.Any] | None]:
         """
         Detect or create an account on the ACME server. For ACME v1,
         as the only way (without knowing an account URI) to test if an
@@ -253,7 +257,6 @@ class ACMEAccount:
         else:
             created, account_data = self._new_reg(
                 contact,
-                agreement=agreement,
                 terms_agreed=terms_agreed,
                 allow_creation=allow_creation and not self.client.module.check_mode,
                 external_account_binding=external_account_binding,
@@ -267,7 +270,9 @@ class ACMEAccount:
                 account_data = {"contact": contact or []}
         return created, account_data
 
-    def update_account(self, account_data, contact=None):
+    def update_account(
+        self, account_data: dict[str, t.Any], contact: list[str] | None = None
+    ) -> tuple[bool, dict[str, t.Any]]:
         """
         Update an account on the ACME server. Check mode is fully respected.
 
@@ -280,8 +285,11 @@ class ACMEAccount:
 
         https://tools.ietf.org/html/rfc8555#section-7.3.2
         """
+        if self.client.account_uri is None:
+            raise ModuleFailException("Cannot update account without account URI")
+
         # Create request
-        update_request = {}
+        update_request: dict[str, t.Any] = {}
         if contact is not None and account_data.get("contact", []) != contact:
             update_request["contact"] = list(contact)
 
@@ -302,7 +310,7 @@ class ACMEAccount:
                     self.client.module,
                     msg="Invalid account updating reply from ACME server",
                     info=info,
-                    content=account_data,
+                    content_json=account_data,
                 )
 
         return True, account_data

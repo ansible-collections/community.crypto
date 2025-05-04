@@ -9,6 +9,7 @@ import base64
 import binascii
 import os
 import traceback
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
@@ -75,10 +76,19 @@ else:
         CRYPTOGRAPHY_MINIMAL_VERSION
     )
 
+if t.TYPE_CHECKING:
+    import datetime
+
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .certificates import CertificateChain, Criterium
+
 
 class CryptographyChainMatcher(ChainMatcher):
     @staticmethod
-    def _parse_key_identifier(key_identifier, name, criterium_idx, module):
+    def _parse_key_identifier(
+        key_identifier: str | None, name: str, criterium_idx: int, module: AnsibleModule
+    ) -> bytes | None:
         if key_identifier:
             try:
                 return binascii.unhexlify(key_identifier.replace(":", ""))
@@ -94,11 +104,11 @@ class CryptographyChainMatcher(ChainMatcher):
                     )
         return None
 
-    def __init__(self, criterium, module):
+    def __init__(self, criterium: Criterium, module: AnsibleModule) -> None:
         self.criterium = criterium
         self.test_certificates = criterium.test_certificates
-        self.subject = []
-        self.issuer = []
+        self.subject: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]] = []
+        self.issuer: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]] = []
         if criterium.subject:
             self.subject = [
                 (cryptography_name_to_oid(k), to_native(v))
@@ -121,8 +131,13 @@ class CryptographyChainMatcher(ChainMatcher):
             criterium.index,
             module,
         )
+        self.module = module
 
-    def _match_subject(self, x509_subject, match_subject):
+    def _match_subject(
+        self,
+        x509_subject: cryptography.x509.Name,
+        match_subject: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]],
+    ) -> bool:
         for oid, value in match_subject:
             found = False
             for attribute in x509_subject:
@@ -133,7 +148,7 @@ class CryptographyChainMatcher(ChainMatcher):
                 return False
         return True
 
-    def match(self, certificate):
+    def match(self, certificate: CertificateChain) -> bool:
         """
         Check whether an alternate chain matches the specified criterium.
         """
@@ -152,19 +167,22 @@ class CryptographyChainMatcher(ChainMatcher):
                     matches = False
                 if self.subject_key_identifier:
                     try:
-                        ext = x509.extensions.get_extension_for_class(
+                        ext_ski = x509.extensions.get_extension_for_class(
                             cryptography.x509.SubjectKeyIdentifier
                         )
-                        if self.subject_key_identifier != ext.value.digest:
+                        if self.subject_key_identifier != ext_ski.value.digest:
                             matches = False
                     except cryptography.x509.ExtensionNotFound:
                         matches = False
                 if self.authority_key_identifier:
                     try:
-                        ext = x509.extensions.get_extension_for_class(
+                        ext_aki = x509.extensions.get_extension_for_class(
                             cryptography.x509.AuthorityKeyIdentifier
                         )
-                        if self.authority_key_identifier != ext.value.key_identifier:
+                        if (
+                            self.authority_key_identifier
+                            != ext_aki.value.key_identifier
+                        ):
                             matches = False
                     except cryptography.x509.ExtensionNotFound:
                         matches = False
@@ -176,59 +194,68 @@ class CryptographyChainMatcher(ChainMatcher):
 
 
 class CryptographyBackend(CryptoBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(CryptographyBackend, self).__init__(
             module, with_timezone=CRYPTOGRAPHY_TIMEZONE
         )
 
-    def parse_key(self, key_file=None, key_content=None, passphrase=None):
+    def parse_key(
+        self,
+        key_file: str | os.PathLike | None = None,
+        key_content: str | None = None,
+        passphrase: str | None = None,
+    ) -> dict[str, t.Any]:
         """
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         Raises KeyParsingError in case of errors.
         """
         # If key_content is not given, read key_file
         if key_content is None:
-            key_content = read_file(key_file)
+            if key_file is None:
+                raise KeyParsingError(
+                    "one of key_file and key_content must be specified"
+                )
+            b_key_content = read_file(key_file)
         else:
-            key_content = to_bytes(key_content)
+            b_key_content = to_bytes(key_content)
         # Parse key
         try:
             key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                key_content,
+                b_key_content,
                 password=to_bytes(passphrase) if passphrase is not None else None,
             )
         except Exception as e:
             raise KeyParsingError(f"error while loading key: {e}")
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-            pk = key.public_key().public_numbers()
+            rsa_pk = key.public_key().public_numbers()
             return {
                 "key_obj": key,
                 "type": "rsa",
                 "alg": "RS256",
                 "jwk": {
                     "kty": "RSA",
-                    "e": nopad_b64(convert_int_to_bytes(pk.e)),
-                    "n": nopad_b64(convert_int_to_bytes(pk.n)),
+                    "e": nopad_b64(convert_int_to_bytes(rsa_pk.e)),
+                    "n": nopad_b64(convert_int_to_bytes(rsa_pk.n)),
                 },
                 "hash": "sha256",
             }
         elif isinstance(
             key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
         ):
-            pk = key.public_key().public_numbers()
-            if pk.curve.name == "secp256r1":
+            ec_pk = key.public_key().public_numbers()
+            if ec_pk.curve.name == "secp256r1":
                 bits = 256
                 alg = "ES256"
                 hashalg = "sha256"
                 point_size = 32
                 curve = "P-256"
-            elif pk.curve.name == "secp384r1":
+            elif ec_pk.curve.name == "secp384r1":
                 bits = 384
                 alg = "ES384"
                 hashalg = "sha384"
                 point_size = 48
                 curve = "P-384"
-            elif pk.curve.name == "secp521r1":
+            elif ec_pk.curve.name == "secp521r1":
                 # Not yet supported on Let's Encrypt side, see
                 # https://github.com/letsencrypt/boulder/issues/2217
                 bits = 521
@@ -237,7 +264,7 @@ class CryptographyBackend(CryptoBackend):
                 point_size = 66
                 curve = "P-521"
             else:
-                raise KeyParsingError(f"unknown elliptic curve: {pk.curve.name}")
+                raise KeyParsingError(f"unknown elliptic curve: {ec_pk.curve.name}")
             num_bytes = (bits + 7) // 8
             return {
                 "key_obj": key,
@@ -246,8 +273,8 @@ class CryptographyBackend(CryptoBackend):
                 "jwk": {
                     "kty": "EC",
                     "crv": curve,
-                    "x": nopad_b64(convert_int_to_bytes(pk.x, count=num_bytes)),
-                    "y": nopad_b64(convert_int_to_bytes(pk.y, count=num_bytes)),
+                    "x": nopad_b64(convert_int_to_bytes(ec_pk.x, count=num_bytes)),
+                    "y": nopad_b64(convert_int_to_bytes(ec_pk.y, count=num_bytes)),
                 },
                 "hash": hashalg,
                 "point_size": point_size,
@@ -255,8 +282,11 @@ class CryptographyBackend(CryptoBackend):
         else:
             raise KeyParsingError(f'unknown key type "{type(key)}"')
 
-    def sign(self, payload64, protected64, key_data):
+    def sign(
+        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+    ) -> dict[str, t.Any]:
         sign_payload = f"{protected64}.{payload64}".encode("utf8")
+        hashalg: type[cryptography.hazmat.primitives.hashes.HashAlgorithm]
         if "mac_obj" in key_data:
             mac = key_data["mac_obj"]()
             mac.update(sign_payload)
@@ -292,8 +322,9 @@ class CryptographyBackend(CryptoBackend):
             "signature": nopad_b64(signature),
         }
 
-    def create_mac_key(self, alg, key):
+    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
+        hashalg: type[cryptography.hazmat.primitives.hashes.HashAlgorithm]
         if alg == "HS256":
             hashalg = cryptography.hazmat.primitives.hashes.SHA256
             hashbytes = 32
@@ -324,7 +355,11 @@ class CryptographyBackend(CryptoBackend):
             },
         }
 
-    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_ordered_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | None = None,
+    ) -> list[tuple[str, str]]:
         """
         Return a list of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -334,15 +369,19 @@ class CryptographyBackend(CryptoBackend):
         as the first element in the result.
         """
         if csr_content is None:
-            csr_content = read_file(csr_filename)
+            if csr_filename is None:
+                raise BackendException(
+                    "One of csr_content and csr_filename has to be provided"
+                )
+            b_csr_content = read_file(csr_filename)
         else:
-            csr_content = to_bytes(csr_content)
-        csr = cryptography.x509.load_pem_x509_csr(csr_content)
+            b_csr_content = to_bytes(csr_content)
+        csr = cryptography.x509.load_pem_x509_csr(b_csr_content)
 
         identifiers = set()
         result = []
 
-        def add_identifier(identifier):
+        def add_identifier(identifier: tuple[str, str]) -> None:
             if identifier in identifiers:
                 return
             identifiers.add(identifier)
@@ -350,7 +389,7 @@ class CryptographyBackend(CryptoBackend):
 
         for sub in csr.subject:
             if sub.oid == cryptography.x509.oid.NameOID.COMMON_NAME:
-                add_identifier(("dns", sub.value))
+                add_identifier(("dns", t.cast(str, sub.value)))
         for extension in csr.extensions:
             if (
                 extension.oid
@@ -367,7 +406,11 @@ class CryptographyBackend(CryptoBackend):
                         )
         return result
 
-    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | bytes | None = None,
+    ) -> set[tuple[str, str]]:
         """
         Return a set of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -379,7 +422,12 @@ class CryptographyBackend(CryptoBackend):
             )
         )
 
-    def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
+    def get_cert_days(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+        now: datetime.datetime | None = None,
+    ) -> int:
         """
         Return the days the certificate in cert_filename remains valid and -1
         if the file was not found. If cert_filename contains more than one
@@ -398,10 +446,10 @@ class CryptographyBackend(CryptoBackend):
             return -1
 
         # Make sure we have at most one PEM. Otherwise cryptography 36.0.0 will barf.
-        cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
+        b_cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
 
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(cert_content)
+            cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
                 raise BackendException(f"Cannot parse certificate: {e}")
@@ -413,13 +461,17 @@ class CryptographyBackend(CryptoBackend):
             now = add_or_remove_timezone(now, with_timezone=CRYPTOGRAPHY_TIMEZONE)
         return (get_not_valid_after(cert) - now).days
 
-    def create_chain_matcher(self, criterium):
+    def create_chain_matcher(self, criterium: Criterium) -> ChainMatcher:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
         return CryptographyChainMatcher(criterium, self.module)
 
-    def get_cert_information(self, cert_filename=None, cert_content=None):
+    def get_cert_information(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+    ) -> CertificateInformation:
         """
         Return some information on a X.509 certificate as a CertificateInformation object.
         """
@@ -429,10 +481,10 @@ class CryptographyBackend(CryptoBackend):
             cert_content = to_bytes(cert_content)
 
         # Make sure we have at most one PEM. Otherwise cryptography 36.0.0 will barf.
-        cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
+        b_cert_content = to_bytes(extract_first_pem(to_text(cert_content)) or "")
 
         try:
-            cert = cryptography.x509.load_pem_x509_certificate(cert_content)
+            cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
                 raise BackendException(f"Cannot parse certificate: {e}")
@@ -440,19 +492,19 @@ class CryptographyBackend(CryptoBackend):
 
         ski = None
         try:
-            ext = cert.extensions.get_extension_for_class(
+            ext_ski = cert.extensions.get_extension_for_class(
                 cryptography.x509.SubjectKeyIdentifier
             )
-            ski = ext.value.digest
+            ski = ext_ski.value.digest
         except cryptography.x509.ExtensionNotFound:
             pass
 
         aki = None
         try:
-            ext = cert.extensions.get_extension_for_class(
+            ext_aki = cert.extensions.get_extension_for_class(
                 cryptography.x509.AuthorityKeyIdentifier
             )
-            aki = ext.value.key_identifier
+            aki = ext_aki.value.key_identifier
         except cryptography.x509.ExtensionNotFound:
             pass
 

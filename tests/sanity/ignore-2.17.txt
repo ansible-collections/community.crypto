@@ -1,2 +1,10 @@
+plugins/module_utils/acme/acme.py pep8:E704
+plugins/module_utils/acme/acme.py pylint:unpacking-non-sequence
+plugins/module_utils/acme/backend_openssl_cli.py pep8:E704
+plugins/module_utils/crypto/cryptography_support.py pep8:E704
+plugins/module_utils/openssh/certificate.py pep8:E704
+plugins/modules/acme_account.py pylint:unpacking-non-sequence
+plugins/modules/acme_certificate_revoke.py pylint:unpacking-non-sequence
+plugins/modules/acme_inspect.py pylint:unpacking-non-sequence
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

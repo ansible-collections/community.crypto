@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 
-def binary_exp_mod(f, e, m):
+def binary_exp_mod(f: int, e: int, m: int) -> int:
     """Computes f^e mod m in O(log e) multiplications modulo m."""
     # Compute len_e = floor(log_2(e))
     len_e = -1
@@ -22,14 +22,14 @@ def binary_exp_mod(f, e, m):
     return result
 
 
-def simple_gcd(a, b):
+def simple_gcd(a: int, b: int) -> int:
     """Compute GCD of its two inputs."""
     while b != 0:
         a, b = b, a % b
     return a
 
 
-def quick_is_not_prime(n):
+def quick_is_not_prime(n: int) -> bool:
     """Does some quick checks to see if we can poke a hole into the primality of n.
 
     A result of `False` does **not** mean that the number is prime; it just means
@@ -97,7 +97,7 @@ def quick_is_not_prime(n):
     return False
 
 
-def count_bytes(no):
+def count_bytes(no: int) -> int:
     """
     Given an integer, compute the number of bytes necessary to store its absolute value.
     """
@@ -107,7 +107,7 @@ def count_bytes(no):
     return (no.bit_length() + 7) // 8
 
 
-def count_bits(no):
+def count_bits(no: int) -> int:
     """
     Given an integer, compute the number of bits necessary to store its absolute value.
     """
@@ -117,19 +117,7 @@ def count_bits(no):
     return no.bit_length()
 
 
-def _convert_int_to_bytes(count, no):
-    return no.to_bytes(count, byteorder="big")
-
-
-def _convert_bytes_to_int(data):
-    return int.from_bytes(data, byteorder="big", signed=False)
-
-
-def _to_hex(no):
-    return f"{no:x}"
-
-
-def convert_int_to_bytes(no, count=None):
+def convert_int_to_bytes(no: int, count: int | None = None) -> bytes:
     """
     Convert the absolute value of an integer to a byte string in network byte order.
 
@@ -142,10 +130,10 @@ def convert_int_to_bytes(no, count=None):
     no = abs(no)
     if count is None:
         count = count_bytes(no)
-    return _convert_int_to_bytes(count, no)
+    return no.to_bytes(count, byteorder="big")
 
 
-def convert_int_to_hex(no, digits=None):
+def convert_int_to_hex(no: int, digits: int | None = None) -> str:
     """
     Convert the absolute value of an integer to a string of hexadecimal digits.
 
@@ -154,14 +142,14 @@ def convert_int_to_hex(no, digits=None):
     the string will be longer.
     """
     no = abs(no)
-    value = _to_hex(no)
+    value = f"{no:x}"
     if digits is not None and len(value) < digits:
         value = "0" * (digits - len(value)) + value
     return value
 
 
-def convert_bytes_to_int(data):
+def convert_bytes_to_int(data: bytes) -> int:
     """
     Convert a byte string to an unsigned integer in network byte order.
     """
-    return _convert_bytes_to_int(data)
+    return int.from_bytes(data, byteorder="big", signed=False)

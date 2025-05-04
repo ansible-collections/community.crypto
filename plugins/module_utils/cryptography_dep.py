@@ -11,6 +11,7 @@ Must be kept in sync with plugins/doc_fragments/cryptography_dep.py.
 from __future__ import annotations
 
 import traceback
+import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.crypto.plugins.module_utils.version import (
@@ -18,19 +19,24 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
-_CRYPTOGRAPHY_IMP_ERR = None
-_CRYPTOGRAPHY_FILE = None
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+_CRYPTOGRAPHY_IMP_ERR: str | None = None
+_CRYPTOGRAPHY_FILE: str | None = None
 try:
     import cryptography
     from cryptography import x509  # noqa: F401, pylint: disable=unused-import
 
-    _CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
     _CRYPTOGRAPHY_FILE = cryptography.__file__
 except ImportError:
     _CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
-    _CRYPTOGRAPHY_FOUND = False
+    CRYPTOGRAPHY_FOUND = False
+    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
 else:
-    _CRYPTOGRAPHY_FOUND = True
+    CRYPTOGRAPHY_FOUND = True
 
 
 # Corresponds to the community.crypto.cryptography_dep.minimum doc fragment
@@ -38,25 +44,27 @@ COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION = "3.3"
 
 
 def assert_required_cryptography_version(
-    module,
+    module: AnsibleModule,
     *,
     minimum_cryptography_version: str = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
 ) -> None:
-    if not _CRYPTOGRAPHY_FOUND:
+    if not CRYPTOGRAPHY_FOUND:
         module.fail_json(
             msg=missing_required_lib(f"cryptography >= {minimum_cryptography_version}"),
             exception=_CRYPTOGRAPHY_IMP_ERR,
         )
-    if _CRYPTOGRAPHY_VERSION < LooseVersion(minimum_cryptography_version):
+    if CRYPTOGRAPHY_VERSION < LooseVersion(minimum_cryptography_version):
         module.fail_json(
             msg=(
                 f"Cannot detect the required Python library cryptography (>= {minimum_cryptography_version})."
-                f" Only found a too old version ({_CRYPTOGRAPHY_VERSION}) at {_CRYPTOGRAPHY_FILE}."
+                f" Only found a too old version ({CRYPTOGRAPHY_VERSION}) at {_CRYPTOGRAPHY_FILE}."
             ),
         )
 
 
 __all__ = (
     "COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION",
+    "CRYPTOGRAPHY_FOUND",
+    "CRYPTOGRAPHY_VERSION",
     "assert_required_cryptography_version",
 )

@@ -1,2 +1,6 @@
+plugins/module_utils/acme/acme.py pep8:E704
+plugins/module_utils/acme/backend_openssl_cli.py pep8:E704
+plugins/module_utils/crypto/cryptography_support.py pep8:E704
+plugins/module_utils/openssh/certificate.py pep8:E704
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

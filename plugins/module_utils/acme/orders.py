@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import time
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     Authorization,
@@ -13,14 +14,35 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.challenges i
 )
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ACMEProtocolException,
+    ModuleFailException,
 )
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     nopad_b64,
 )
 
 
+if t.TYPE_CHECKING:
+    from .acme import ACMEClient
+
+
+_Order = t.TypeVar("_Order", bound="Order")
+
+
 class Order:
-    def _setup(self, client, data):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+        self.data: dict[str, t.Any] | None = None
+
+        self.status = None
+        self.identifiers: list[tuple[str, str]] = []
+        self.replaces_cert_id = None
+        self.finalize_uri = None
+        self.certificate_uri = None
+        self.authorization_uris: list[str] = []
+        self.authorizations: dict[str, Authorization] = {}
+
+    def _setup(self, client: ACMEClient, data: dict[str, t.Any]) -> None:
         self.data = data
 
         self.status = data["status"]
@@ -33,33 +55,28 @@ class Order:
         self.authorization_uris = data["authorizations"]
         self.authorizations = {}
 
-    def __init__(self, url):
-        self.url = url
-
-        self.data = None
-
-        self.status = None
-        self.identifiers = []
-        self.replaces_cert_id = None
-        self.finalize_uri = None
-        self.certificate_uri = None
-        self.authorization_uris = []
-        self.authorizations = {}
-
     @classmethod
-    def from_json(cls, client, data, url):
+    def from_json(
+        cls: t.Type[_Order], client: ACMEClient, data: dict[str, t.Any], url: str
+    ) -> _Order:
         result = cls(url)
         result._setup(client, data)
         return result
 
     @classmethod
-    def from_url(cls, client, url):
+    def from_url(cls: t.Type[_Order], client: ACMEClient, url: str) -> _Order:
         result = cls(url)
         result.refresh(client)
         return result
 
     @classmethod
-    def create(cls, client, identifiers, replaces_cert_id=None, profile=None):
+    def create(
+        cls: t.Type[_Order],
+        client: ACMEClient,
+        identifiers: list[tuple[str, str]],
+        replaces_cert_id: str | None = None,
+        profile: str | None = None,
+    ) -> _Order:
         """
         Start a new certificate order (ACME v2 protocol).
         https://tools.ietf.org/html/rfc8555#section-7.4
@@ -72,7 +89,7 @@ class Order:
                     "value": identifier,
                 }
             )
-        new_order = {"identifiers": acme_identifiers}
+        new_order: dict[str, t.Any] = {"identifiers": acme_identifiers}
         if replaces_cert_id is not None:
             new_order["replaces"] = replaces_cert_id
         if profile is not None:
@@ -87,14 +104,16 @@ class Order:
 
     @classmethod
     def create_with_error_handling(
-        cls,
-        client,
-        identifiers,
-        error_strategy="auto",
-        error_max_retries=3,
-        replaces_cert_id=None,
-        profile=None,
-        message_callback=None,
+        cls: t.Type[_Order],
+        client: ACMEClient,
+        identifiers: list[tuple[str, str]],
+        error_strategy: t.Literal[
+            "auto", "fail", "always", "retry_without_replaces_cert_id"
+        ] = "auto",
+        error_max_retries: int = 3,
+        replaces_cert_id: str | None = None,
+        profile: str | None = None,
+        message_callback: t.Callable[[str], None] | None = None,
     ):
         """
         error_strategy can be one of the following strings:
@@ -140,20 +159,20 @@ class Order:
 
                 raise
 
-    def refresh(self, client):
+    def refresh(self, client: ACMEClient) -> bool:
         result, dummy = client.get_request(self.url)
         changed = self.data != result
         self._setup(client, result)
         return changed
 
-    def load_authorizations(self, client):
+    def load_authorizations(self, client: ACMEClient) -> None:
         for auth_uri in self.authorization_uris:
             authz = Authorization.from_url(client, auth_uri)
             self.authorizations[
                 normalize_combined_identifier(authz.combined_identifier)
             ] = authz
 
-    def wait_for_finalization(self, client):
+    def wait_for_finalization(self, client: ACMEClient) -> None:
         while True:
             self.refresh(client)
             if self.status in ["valid", "invalid", "pending", "ready"]:
@@ -167,12 +186,14 @@ class Order:
                 content_json=self.data,
             )
 
-    def finalize(self, client, csr_der, wait=True):
+    def finalize(self, client: ACMEClient, csr_der: bytes, wait: bool = True) -> None:
         """
         Create a new certificate based on the csr.
         Return the certificate object as dict
         https://tools.ietf.org/html/rfc8555#section-7.4
         """
+        if self.finalize_uri is None:
+            raise ModuleFailException("finalize_uri must be set")
         new_cert = {
             "csr": nopad_b64(csr_der),
         }

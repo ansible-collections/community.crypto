@@ -10,6 +10,7 @@ import datetime
 import json
 import locale
 import time
+import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
@@ -41,13 +42,24 @@ from ansible_collections.community.crypto.plugins.module_utils.argspec import (
 )
 
 
+if t.TYPE_CHECKING:
+    import os
+
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .account import ACMEAccount
+    from .backends import CertificateInformation, CryptoBackend
+
+
 # -1 usually means connection problems
 RETRY_STATUS_CODES = (-1, 408, 429, 503)
 
 RETRY_COUNT = 10
 
 
-def _decode_retry(module, response, info, retry_count):
+def _decode_retry(
+    module: AnsibleModule, response, info: dict[str, t.Any], retry_count: int
+) -> bool:
     if info["status"] not in RETRY_STATUS_CODES:
         return False
 
@@ -61,7 +73,8 @@ def _decode_retry(module, response, info, retry_count):
 
     # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
     try:
-        retry_after = min(max(1, int(info.get("retry-after"))), 60)
+        # TODO: use utils.parse_retry_after()
+        retry_after = min(max(1, int(info.get("retry-after", "10"))), 60)
     except (TypeError, ValueError):
         retry_after = 10
     module.log(
@@ -73,13 +86,13 @@ def _decode_retry(module, response, info, retry_count):
 
 
 def _assert_fetch_url_success(
-    module,
+    module: AnsibleModule,
     response,
-    info,
-    allow_redirect=False,
-    allow_client_error=True,
-    allow_server_error=True,
-):
+    info: dict[str, t.Any],
+    allow_redirect: bool = False,
+    allow_client_error: bool = True,
+    allow_server_error: bool = True,
+) -> None:
     if info["status"] < 0:
         raise NetworkException(msg=f"Failure downloading {info['url']}, {info['msg']}")
 
@@ -91,7 +104,9 @@ def _assert_fetch_url_success(
         raise ACMEProtocolException(module, info=info, response=response)
 
 
-def _is_failed(info, expected_status_codes=None):
+def _is_failed(
+    info: dict[str, t.Any], expected_status_codes: t.Iterable[int] | None = None
+) -> bool:
     if info["status"] < 200 or info["status"] >= 400:
         return True
     if (
@@ -111,12 +126,12 @@ class ACMEDirectory:
     https://tools.ietf.org/html/rfc8555#section-7.1.1
     """
 
-    def __init__(self, module, account):
+    def __init__(self, module: AnsibleModule, client: ACMEClient) -> None:
         self.module = module
         self.directory_root = module.params["acme_directory"]
         self.version = module.params["acme_version"]
 
-        self.directory, dummy = account.get_request(self.directory_root, get_only=True)
+        self.directory, dummy = client.get_request(self.directory_root, get_only=True)
 
         self.request_timeout = module.params["request_timeout"]
 
@@ -131,16 +146,16 @@ class ACMEDirectory:
             if "meta" not in self.directory:
                 self.directory["meta"] = {}
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> t.Any:
         return self.directory[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self.directory
 
-    def get(self, key, default_value=None):
+    def get(self, key: str, default_value: t.Any = None) -> t.Any:
         return self.directory.get(key, default_value)
 
-    def get_nonce(self, resource=None):
+    def get_nonce(self, resource: str | None = None) -> str:
         url = self.directory["newNonce"]
         if resource is not None:
             url = resource
@@ -170,7 +185,7 @@ class ACMEDirectory:
                 )
             retry_count += 1
 
-    def has_renewal_info_endpoint(self):
+    def has_renewal_info_endpoint(self) -> bool:
         return "renewalInfo" in self.directory
 
 
@@ -180,7 +195,7 @@ class ACMEClient:
     ACME server.
     """
 
-    def __init__(self, module, backend):
+    def __init__(self, module: AnsibleModule, backend: CryptoBackend) -> None:
         # Set to true to enable logging of all signed requests
         self._debug = False
 
@@ -221,16 +236,22 @@ class ACMEClient:
 
         self.directory = ACMEDirectory(module, self)
 
-    def set_account_uri(self, uri):
+    def set_account_uri(self, uri: str) -> None:
         """
         Set account URI. For ACME v2, it needs to be used to sending signed
         requests.
         """
         self.account_uri = uri
-        self.account_jws_header.pop("jwk")
-        self.account_jws_header["kid"] = self.account_uri
+        if self.account_jws_header:
+            self.account_jws_header.pop("jwk", None)
+            self.account_jws_header["kid"] = self.account_uri
 
-    def parse_key(self, key_file=None, key_content=None, passphrase=None):
+    def parse_key(
+        self,
+        key_file: str | os.PathLike | None = None,
+        key_content: str | None = None,
+        passphrase: str | None = None,
+    ) -> dict[str, t.Any]:
         """
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         In case of an error, raises KeyParsingError.
@@ -239,7 +260,13 @@ class ACMEClient:
             raise AssertionError("One of key_file and key_content must be specified!")
         return self.backend.parse_key(key_file, key_content, passphrase=passphrase)
 
-    def sign_request(self, protected, payload, key_data, encode_payload=True):
+    def sign_request(
+        self,
+        protected: dict[str, t.Any],
+        payload: str | dict[str, t.Any] | None,
+        key_data,
+        encode_payload: bool = True,
+    ) -> dict[str, t.Any]:
         """
         Signs an ACME request.
         """
@@ -260,7 +287,7 @@ class ACMEClient:
 
         return self.backend.sign(payload64, protected64, key_data)
 
-    def _log(self, msg, data=None):
+    def _log(self, msg: str, data: t.Any = None) -> None:
         """
         Write arguments to acme.log when logging is enabled.
         """
@@ -275,18 +302,49 @@ class ACMEClient:
                         )
                     )
 
+    @t.overload
     def send_signed_request(
         self,
-        url,
-        payload,
-        key_data=None,
-        jws_header=None,
-        parse_json_result=True,
-        encode_payload=True,
-        fail_on_error=True,
-        error_msg=None,
-        expected_status_codes=None,
-    ):
+        url: str,
+        payload: str | dict[str, t.Any] | None,
+        *,
+        key_data: dict[str, t.Any] | None = None,
+        jws_header: dict[str, t.Any] | None = None,
+        parse_json_result: t.Literal[True] = True,
+        encode_payload: bool = True,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[dict[str, t.Any], dict[str, t.Any]]: ...
+
+    @t.overload
+    def send_signed_request(
+        self,
+        url: str,
+        payload: str | dict[str, t.Any] | None,
+        *,
+        key_data: dict[str, t.Any] | None = None,
+        jws_header: dict[str, t.Any] | None = None,
+        parse_json_result: t.Literal[False],
+        encode_payload: bool = True,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[bytes, dict[str, t.Any]]: ...
+
+    def send_signed_request(
+        self,
+        url: str,
+        payload: str | dict[str, t.Any] | None,
+        *,
+        key_data: dict[str, t.Any] | None = None,
+        jws_header: dict[str, t.Any] | None = None,
+        parse_json_result: bool = True,
+        encode_payload: bool = True,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]:
         """
         Sends a JWS signed HTTP POST request to the ACME server and returns
         the response as dictionary (if parse_json_result is True) or in raw form
@@ -298,6 +356,8 @@ class ACMEClient:
         """
         key_data = key_data or self.account_key_data
         jws_header = jws_header or self.account_jws_header
+        if jws_header is None:
+            raise ModuleFailException("Missing JWS header")
         failed_tries = 0
         while True:
             protected = copy.deepcopy(jws_header)
@@ -382,16 +442,43 @@ class ACMEClient:
                 )
             return result, info
 
+    @t.overload
     def get_request(
         self,
-        uri,
-        parse_json_result=True,
-        headers=None,
-        get_only=False,
-        fail_on_error=True,
-        error_msg=None,
-        expected_status_codes=None,
-    ):
+        uri: str,
+        *,
+        parse_json_result: t.Literal[True] = True,
+        headers: dict[str, str] | None = None,
+        get_only: bool = False,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[dict[str, t.Any], dict[str, t.Any]]: ...
+
+    @t.overload
+    def get_request(
+        self,
+        uri: str,
+        *,
+        parse_json_result: t.Literal[False],
+        headers: dict[str, str] | None = None,
+        get_only: bool = False,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[bytes, dict[str, t.Any]]: ...
+
+    def get_request(
+        self,
+        uri: str,
+        *,
+        parse_json_result: bool = True,
+        headers: dict[str, str] | None = None,
+        get_only: bool = False,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]:
         """
         Perform a GET-like request. Will try POST-as-GET for ACMEv2, with fallback
         to GET if server replies with a status code of 405.
@@ -436,6 +523,7 @@ class ACMEClient:
 
         # Process result
         parsed_json_result = False
+        result: dict[str, t.Any] | bytes
         if parse_json_result:
             result = {}
             if content:
@@ -445,7 +533,7 @@ class ACMEClient:
                         parsed_json_result = True
                     except ValueError:
                         raise NetworkException(
-                            f"Failed to parse the ACME response: {uri} {content}"
+                            f"Failed to parse the ACME response: {uri} {content!r}"
                         )
                 else:
                     result = content
@@ -460,19 +548,21 @@ class ACMEClient:
                 msg=error_msg,
                 info=info,
                 content=content,
-                content_json=result if parsed_json_result else None,
+                content_json=(
+                    t.cast(dict[str, t.Any], result) if parsed_json_result else None
+                ),
             )
         return result, info
 
     def get_renewal_info(
         self,
-        cert_id=None,
-        cert_info=None,
-        cert_filename=None,
-        cert_content=None,
-        include_retry_after=False,
-        retry_after_relative_with_timezone=True,
-    ):
+        cert_id: str | None = None,
+        cert_info: CertificateInformation | None = None,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+        include_retry_after: bool = False,
+        retry_after_relative_with_timezone: bool = True,
+    ) -> dict[str, t.Any]:
         if not self.directory.has_renewal_info_endpoint():
             raise ModuleFailException(
                 "The ACME endpoint does not support ACME Renewal Information retrieval"
@@ -504,9 +594,9 @@ class ACMEClient:
 
 
 def create_default_argspec(
-    with_account=True,
-    require_account_key=True,
-    with_certificate=False,
+    with_account: bool = True,
+    require_account_key: bool = True,
+    with_certificate: bool = False,
 ):
     """
     Provides default argument spec for the options documented in the acme doc fragment.
@@ -544,7 +634,7 @@ def create_default_argspec(
     return result
 
 
-def create_backend(module, needs_acme_v2=True):
+def create_backend(module: AnsibleModule, needs_acme_v2: bool = True) -> CryptoBackend:
     backend = module.params["select_crypto_backend"]
 
     # Backend autodetect
@@ -552,6 +642,7 @@ def create_backend(module, needs_acme_v2=True):
         backend = "cryptography" if HAS_CURRENT_CRYPTOGRAPHY else "openssl"
 
     # Create backend object
+    module_backend: CryptoBackend
     if backend == "cryptography":
         if CRYPTOGRAPHY_ERROR is not None:
             # Either we could not import cryptography at all, or there was an unexpected error

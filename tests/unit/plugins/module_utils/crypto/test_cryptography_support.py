@@ -236,11 +236,11 @@ def test_parse_dn(name, expected):
     [
         (
             b"CN=\\0",
-            'Error while parsing distinguished name "CN=\\0": Hex escape sequence "\\0" incomplete at end of string',
+            "Error while parsing distinguished name 'CN=\\\\0': Hex escape sequence \"\\0\" incomplete at end of string",
         ),
         (
             b"CN=x,",
-            'Error while parsing distinguished name "CN=x,": unexpected end of string',
+            "Error while parsing distinguished name 'CN=x,': unexpected end of string",
         ),
     ],
 )

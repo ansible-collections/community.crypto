@@ -8,6 +8,7 @@ import abc
 import errno
 import hashlib
 import os
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
@@ -34,6 +35,14 @@ except ImportError:
 from .basic import OpenSSLBadPassphraseError, OpenSSLObjectError
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+        PublicKeyTypes,
+    )
+
+
 # This list of preferred fingerprints is used when prefer_one=True is supplied to the
 # fingerprinting methods.
 PREFERRED_FINGERPRINTS = (
@@ -48,18 +57,12 @@ PREFERRED_FINGERPRINTS = (
 )
 
 
-def get_fingerprint_of_bytes(source, prefer_one=False):
+def get_fingerprint_of_bytes(source: bytes, prefer_one: bool = False) -> dict[str, str]:
     """Generate the fingerprint of the given bytes."""
 
     fingerprint = {}
 
-    try:
-        algorithms = hashlib.algorithms
-    except AttributeError:
-        try:
-            algorithms = hashlib.algorithms_guaranteed
-        except AttributeError:
-            return None
+    algorithms: t.Iterable[str] = hashlib.algorithms_guaranteed
 
     if prefer_one:
         # Sort algorithms to have the ones in PREFERRED_FINGERPRINTS at the beginning
@@ -97,7 +100,9 @@ def get_fingerprint_of_bytes(source, prefer_one=False):
     return fingerprint
 
 
-def get_fingerprint_of_privatekey(privatekey, prefer_one=False):
+def get_fingerprint_of_privatekey(
+    privatekey: PrivateKeyTypes, prefer_one: bool = False
+) -> dict[str, str]:
     """Generate the fingerprint of the public key."""
 
     publickey = privatekey.public_key().public_bytes(
@@ -107,11 +112,16 @@ def get_fingerprint_of_privatekey(privatekey, prefer_one=False):
     return get_fingerprint_of_bytes(publickey, prefer_one=prefer_one)
 
 
-def get_fingerprint(path, passphrase=None, content=None, prefer_one=False):
+def get_fingerprint(
+    path: os.PathLike | None = None,
+    passphrase: str | bytes | None = None,
+    content: bytes | None = None,
+    prefer_one: bool = False,
+) -> dict[str, str]:
     """Generate the fingerprint of the public key."""
 
     privatekey = load_privatekey(
-        path,
+        path=path,
         passphrase=passphrase,
         content=content,
         check_passphrase=False,
@@ -121,11 +131,11 @@ def get_fingerprint(path, passphrase=None, content=None, prefer_one=False):
 
 
 def load_privatekey(
-    path,
-    passphrase=None,
-    check_passphrase=True,
-    content=None,
-):
+    path: os.PathLike | None = None,
+    passphrase: str | bytes | None = None,
+    check_passphrase: bool = True,
+    content: bytes | None = None,
+) -> PrivateKeyTypes:
     """Load the specified OpenSSL private key.
 
     The content can also be specified via content; in that case,
@@ -134,6 +144,8 @@ def load_privatekey(
 
     try:
         if content is None:
+            if path is None:
+                raise OpenSSLObjectError("Must provide either path or content")
             with open(path, "rb") as b_priv_key_fh:
                 priv_key_detail = b_priv_key_fh.read()
         else:
@@ -154,7 +166,9 @@ def load_privatekey(
         raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
 
 
-def load_publickey(path=None, content=None):
+def load_publickey(
+    path: os.PathLike | None = None, content: bytes | None = None
+) -> PublicKeyTypes:
     if content is None:
         if path is None:
             raise OpenSSLObjectError("Must provide either path or content")
@@ -170,11 +184,17 @@ def load_publickey(path=None, content=None):
         raise OpenSSLObjectError(f"Error while deserializing key: {e}")
 
 
-def load_certificate(path, content=None, der_support_enabled=False):
+def load_certificate(
+    path: os.PathLike | None = None,
+    content: bytes | None = None,
+    der_support_enabled: bool = False,
+) -> x509.Certificate:
     """Load the specified certificate."""
 
     try:
         if content is None:
+            if path is None:
+                raise OpenSSLObjectError("Must provide either path or content")
             with open(path, "rb") as cert_fh:
                 cert_content = cert_fh.read()
         else:
@@ -193,10 +213,14 @@ def load_certificate(path, content=None, der_support_enabled=False):
             raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
 
 
-def load_certificate_request(path, content=None):
+def load_certificate_request(
+    path: os.PathLike | None = None, content: bytes | None = None
+) -> x509.CertificateSigningRequest:
     """Load the specified certificate signing request."""
     try:
         if content is None:
+            if path is None:
+                raise OpenSSLObjectError("Must provide either path or content")
             with open(path, "rb") as csr_fh:
                 csr_content = csr_fh.read()
         else:
@@ -209,45 +233,44 @@ def load_certificate_request(path, content=None):
         raise OpenSSLObjectError(exc)
 
 
-def parse_name_field(input_dict, name_field_name=None):
+def parse_name_field(
+    input_dict: dict[str, list[str | bytes] | str | bytes],
+    name_field_name: str | None = None,
+) -> list[tuple[str, str | bytes]]:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
-    error_str = "{key}" if name_field_name is None else "{key} in {name}"
+
+    def error_str(key: str) -> str:
+        if name_field_name is None:
+            return f"{key}"
+        return f"{key} in {name_field_name}"
 
     result = []
     for key, value in input_dict.items():
         if isinstance(value, list):
             for entry in value:
                 if not isinstance(entry, (str, bytes)):
-                    raise TypeError(
-                        f"Values {error_str} must be strings".format(
-                            key=key, name=name_field_name
-                        )
-                    )
+                    raise TypeError(f"Values {error_str(key)} must be strings")
                 if not entry:
                     raise ValueError(
-                        f"Values for {error_str} must not be empty strings".format(
-                            key=key, name=name_field_name
-                        )
+                        f"Values for {error_str(key)} must not be empty strings"
                     )
                 result.append((key, entry))
         elif isinstance(value, (str, bytes)):
             if not value:
                 raise ValueError(
-                    f"Value for {error_str} must not be an empty string".format(
-                        key=key, name=name_field_name
-                    )
+                    f"Value for {error_str(key)} must not be an empty string"
                 )
             result.append((key, value))
         else:
             raise TypeError(
-                (
-                    f"Value for {error_str} must be either a string or a list of strings"
-                ).format(key=key, name=name_field_name)
+                f"Value for {error_str(key)} must be either a string or a list of strings"
             )
     return result
 
 
-def parse_ordered_name_field(input_list, name_field_name):
+def parse_ordered_name_field(
+    input_list: list[dict[str, list[str | bytes] | str | bytes]], name_field_name: str
+) -> list[tuple[str, str | bytes]]:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
     result = []
@@ -265,24 +288,23 @@ def parse_ordered_name_field(input_list, name_field_name):
     return result
 
 
-def select_message_digest(digest_string):
-    digest = None
+def select_message_digest(digest_string: str) -> hashes.HashAlgorithm | None:
     if digest_string == "sha256":
-        digest = hashes.SHA256()
-    elif digest_string == "sha384":
-        digest = hashes.SHA384()
-    elif digest_string == "sha512":
-        digest = hashes.SHA512()
-    elif digest_string == "sha1":
-        digest = hashes.SHA1()
-    elif digest_string == "md5":
-        digest = hashes.MD5()
-    return digest
+        return hashes.SHA256()
+    if digest_string == "sha384":
+        return hashes.SHA384()
+    if digest_string == "sha512":
+        return hashes.SHA512()
+    if digest_string == "sha1":
+        return hashes.SHA1()
+    if digest_string == "md5":
+        return hashes.MD5()
+    return None
 
 
 class OpenSSLObject(metaclass=abc.ABCMeta):
 
-    def __init__(self, path, state, force, check_mode):
+    def __init__(self, path: str, state: str, force: bool, check_mode: bool) -> None:
         self.path = path
         self.state = state
         self.force = force
@@ -290,13 +312,13 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         self.changed = False
         self.check_mode = check_mode
 
-    def check(self, module, perms_required=True):
+    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
-        def _check_state():
+        def _check_state() -> bool:
             return os.path.exists(self.path)
 
-        def _check_perms(module):
+        def _check_perms(module) -> bool:
             file_args = module.load_file_common_arguments(module.params)
             if module.check_file_absent_if_check_mode(file_args["path"]):
                 return False
@@ -308,18 +330,14 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         return _check_state() and _check_perms(module)
 
     @abc.abstractmethod
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
-        pass
-
     @abc.abstractmethod
-    def generate(self):
+    def generate(self) -> None:
         """Generate the resource."""
 
-        pass
-
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         """Remove the resource from the filesystem."""
         if self.check_mode:
             if os.path.exists(self.path):

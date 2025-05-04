@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import os
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
@@ -30,6 +31,14 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .backends import CryptoBackend
+    from .certificates import ChainMatcher
+    from .challenges import Challenge
+
+
 class ACMECertificateClient:
     """
     ACME v2 client class. Uses an ACME account object and a CSR to
@@ -37,7 +46,13 @@ class ACMECertificateClient:
     certificates.
     """
 
-    def __init__(self, module, backend, client=None, account=None):
+    def __init__(
+        self,
+        module: AnsibleModule,
+        backend: CryptoBackend,
+        client: ACMEClient | None = None,
+        account: ACMEAccount | None = None,
+    ) -> None:
         self.module = module
         self.version = module.params["acme_version"]
         self.csr = module.params.get("csr")
@@ -66,13 +81,17 @@ class ACMECertificateClient:
 
         # Extract list of identifiers from CSR
         if self.csr is not None or self.csr_content is not None:
-            self.identifiers = self.client.backend.get_ordered_csr_identifiers(
-                csr_filename=self.csr, csr_content=self.csr_content
+            self.identifiers: list[tuple[str, str]] | None = (
+                self.client.backend.get_ordered_csr_identifiers(
+                    csr_filename=self.csr, csr_content=self.csr_content
+                )
             )
         else:
             self.identifiers = None
 
-    def parse_select_chain(self, select_chain):
+    def parse_select_chain(
+        self, select_chain: list[dict[str, t.Any]] | None
+    ) -> list[ChainMatcher]:
         select_chain_matcher = []
         if select_chain:
             for criterium_idx, criterium in enumerate(select_chain):
@@ -88,14 +107,16 @@ class ACMECertificateClient:
                     )
         return select_chain_matcher
 
-    def load_order(self):
+    def load_order(self) -> Order:
         if not self.order_uri:
             raise ModuleFailException("The order URI has not been provided")
         order = Order.from_url(self.client, self.order_uri)
         order.load_authorizations(self.client)
         return order
 
-    def create_order(self, replaces_cert_id=None, profile=None):
+    def create_order(
+        self, replaces_cert_id: str | None = None, profile: str | None = None
+    ) -> Order:
         """
         Create a new order.
         """
@@ -114,31 +135,31 @@ class ACMECertificateClient:
         order.load_authorizations(self.client)
         return order
 
-    def get_challenges_data(self, order):
+    def get_challenges_data(
+        self, order: Order
+    ) -> tuple[list[dict[str, t.Any]], dict[str, list[str]]]:
         """
         Get challenge details.
 
         Return a tuple of generic challenge details, and specialized DNS challenge details.
         """
-        # Get general challenge data
-        data = []
+        data: list[dict[str, t.Any]] = []
+        data_dns: dict[str, list[str]] = {}
+        dns_challenge_type = "dns-01"
         for authz in order.authorizations.values():
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
             if authz.status == "valid":
                 continue
+            challenge_data = authz.get_challenge_data(self.client)
             data.append(
                 dict(
                     identifier=authz.identifier,
                     identifier_type=authz.identifier_type,
-                    challenges=authz.get_challenge_data(self.client),
+                    challenges=challenge_data,
                 )
             )
-        # Get DNS challenge data
-        data_dns = {}
-        dns_challenge_type = "dns-01"
-        for entry in data:
-            dns_challenge = entry["challenges"].get(dns_challenge_type)
+            dns_challenge = challenge_data.get(dns_challenge_type)
             if dns_challenge:
                 values = data_dns.get(dns_challenge["record"])
                 if values is None:
@@ -147,7 +168,7 @@ class ACMECertificateClient:
                 values.append(dns_challenge["resource_value"])
         return data, data_dns
 
-    def check_that_authorizations_can_be_used(self, order):
+    def check_that_authorizations_can_be_used(self, order: Order) -> None:
         bad_authzs = []
         for authz in order.authorizations.values():
             if authz.status not in ("valid", "pending"):
@@ -155,27 +176,32 @@ class ACMECertificateClient:
                     f"{authz.combined_identifier} (status={authz.status!r})"
                 )
         if bad_authzs:
-            bad_authzs = ", ".join(sorted(bad_authzs))
+            bad_authzs_str = ", ".join(sorted(bad_authzs))
             raise ModuleFailException(
                 "Some of the authorizations for the order are in a bad state, so the order"
-                f" can no longer be satisfied: {bad_authzs}",
+                f" can no longer be satisfied: {bad_authzs_str}",
             )
 
-    def collect_invalid_authzs(self, order):
+    def collect_invalid_authzs(self, order: Order) -> list[Authorization]:
         return [
             authz
             for authz in order.authorizations.values()
             if authz.status == "invalid"
         ]
 
-    def collect_pending_authzs(self, order):
+    def collect_pending_authzs(self, order: Order) -> list[Authorization]:
         return [
             authz
             for authz in order.authorizations.values()
             if authz.status == "pending"
         ]
 
-    def call_validate(self, pending_authzs, get_challenge, wait=True):
+    def call_validate(
+        self,
+        pending_authzs: list[Authorization],
+        get_challenge: t.Callable[[Authorization], str],
+        wait: bool = True,
+    ) -> list[tuple[Authorization, str, Challenge | None]]:
         authzs_with_challenges_to_wait_for = []
         for authz in pending_authzs:
             challenge_type = get_challenge(authz)
@@ -185,10 +211,12 @@ class ACMECertificateClient:
             )
         return authzs_with_challenges_to_wait_for
 
-    def wait_for_validation(self, authzs_to_wait_for):
+    def wait_for_validation(self, authzs_to_wait_for: list[Authorization]) -> None:
         wait_for_validation(authzs_to_wait_for, self.client)
 
-    def _download_alternate_chains(self, cert):
+    def _download_alternate_chains(
+        self, cert: CertificateChain
+    ) -> list[CertificateChain]:
         alternate_chains = []
         for alternate in cert.alternates:
             try:
@@ -206,13 +234,15 @@ class ACMECertificateClient:
                 )
         return alternate_chains
 
-    def download_certificate(self, order, download_all_chains=True):
+    def download_certificate(
+        self, order: Order, download_all_chains: bool = True
+    ) -> CertificateChain:
         """
         Download certificate from a valid oder.
         """
         if order.status != "valid":
             raise ModuleFailException(
-                f"The order must be valid, but has state {order.state!r}!"
+                f"The order must be valid, but has state {order.status!r}!"
             )
 
         if not order.certificate_uri:
@@ -232,7 +262,9 @@ class ACMECertificateClient:
 
         return cert, alternate_chains
 
-    def get_certificate(self, order, download_all_chains=True):
+    def get_certificate(
+        self, order: Order, download_all_chains: bool = True
+    ) -> CertificateChain:
         """
         Request a new certificate and downloads it, and optionally all certificate chains.
         First verifies whether all authorizations are valid; if not, aborts with an error.
@@ -250,7 +282,11 @@ class ACMECertificateClient:
 
         return self.download_certificate(order, download_all_chains=download_all_chains)
 
-    def find_matching_chain(self, chains, select_chain_matcher):
+    def find_matching_chain(
+        self,
+        chains: list[CertificateChain],
+        select_chain_matcher: t.Iterable[ChainMatcher],
+    ) -> CertificateChain | None:
         for criterium_idx, matcher in enumerate(select_chain_matcher):
             for chain in chains:
                 if matcher.match(chain):
@@ -261,9 +297,15 @@ class ACMECertificateClient:
         return None
 
     def write_cert_chain(
-        self, cert, cert_dest=None, fullchain_dest=None, chain_dest=None
-    ):
+        self,
+        cert: CertificateChain,
+        cert_dest: str | os.PathLike | None = None,
+        fullchain_dest: str | os.PathLike | None = None,
+        chain_dest: str | os.PathLike | None = None,
+    ) -> bool:
         changed = False
+        if cert.cert is None:
+            raise ValueError("Certificate is not present")
 
         if cert_dest and write_file(self.module, cert_dest, cert.cert.encode("utf8")):
             changed = True
@@ -282,7 +324,7 @@ class ACMECertificateClient:
 
         return changed
 
-    def deactivate_authzs(self, order):
+    def deactivate_authzs(self, order: Order) -> None:
         """
         Deactivates all valid authz's. Does not raise exceptions.
         https://community.letsencrypt.org/t/authorization-deactivation/19860/2
