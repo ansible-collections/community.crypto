@@ -597,7 +597,7 @@ def create_default_argspec(
     with_account: bool = True,
     require_account_key: bool = True,
     with_certificate: bool = False,
-):
+) -> ArgumentSpec:
     """
     Provides default argument spec for the options documented in the acme doc fragment.
     """

@@ -371,6 +371,8 @@ account_uri:
   type: str
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
     create_default_argspec,
@@ -383,7 +385,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
         deactivate_authzs=dict(type="bool", default=True),

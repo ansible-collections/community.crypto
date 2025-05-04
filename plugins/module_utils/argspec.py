@@ -74,7 +74,7 @@ class ArgumentSpec:
         return self
 
     def create_ansible_module_helper(
-        self, clazz: type[_T], args: tuple, **kwargs: dict[str, t.Any]
+        self, clazz: type[_T], args: tuple, **kwargs: t.Any
     ) -> _T:
         for forbidden_name in (
             "argument_spec",
@@ -100,7 +100,7 @@ class ArgumentSpec:
         )
         return instance
 
-    def create_ansible_module(self, **kwargs: dict[str, t.Any]) -> AnsibleModule:
+    def create_ansible_module(self, **kwargs: t.Any) -> AnsibleModule:
         return self.create_ansible_module_helper(AnsibleModule, (), **kwargs)
 
 

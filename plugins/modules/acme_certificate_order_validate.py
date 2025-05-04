@@ -229,6 +229,8 @@ validating_challenges:
       returned: always
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
     create_default_argspec,
@@ -241,7 +243,13 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+        Authorization,
+    )
+
+
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=False)
     argument_spec.update_argspec(
         order_uri=dict(type="str", required=True),
@@ -271,10 +279,12 @@ def main():
 
             missing_challenge_authzs = [k for k, v in challenges.items() if v is None]
             if missing_challenge_authzs:
-                missing_challenge_authzs = ", ".join(sorted(missing_challenge_authzs))
+                missing_challenge_authzs_str = ", ".join(
+                    sorted(missing_challenge_authzs)
+                )
                 raise ModuleFailException(
                     "The challenge parameter must be supplied if there are pending authorizations."
-                    f" The following authorizations are pending: {missing_challenge_authzs}"
+                    f" The following authorizations are pending: {missing_challenge_authzs_str}"
                 )
 
             bad_challenge_authzs = [
@@ -293,11 +303,13 @@ def main():
                     f"The following authorizations do not support the selected challenges: {authz_challenges_pairs}"
                 )
 
+            def is_pending(authz: Authorization) -> bool:
+                challenge_name = challenges[authz.combined_identifier]
+                challenge_obj = authz.find_challenge(challenge_name)
+                return challenge_obj is not None and challenge_obj.status == "pending"
+
             really_pending_authzs = [
-                authz
-                for authz in pending_authzs
-                if authz.find_challenge(challenges[authz.combined_identifier]).status
-                == "pending"
+                authz for authz in pending_authzs if is_pending(authz)
             ]
 
             # Step 4: validate pending authorizations
@@ -320,7 +332,7 @@ def main():
                     identifier_type=authz.identifier_type,
                     authz_url=authz.url,
                     challenge_type=challenge_type,
-                    challenge_url=challenge.url,
+                    challenge_url=challenge.url if challenge else None,
                 )
                 for authz, challenge_type, challenge in authzs_with_challenges_to_wait_for
             ],

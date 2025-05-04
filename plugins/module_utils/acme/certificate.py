@@ -234,9 +234,24 @@ class ACMECertificateClient:
                 )
         return alternate_chains
 
+    @t.overload
     def download_certificate(
-        self, order: Order, download_all_chains: bool = True
-    ) -> CertificateChain:
+        self, order: Order, *, download_all_chains: t.Literal[True] = True
+    ) -> tuple[CertificateChain, list[CertificateChain]]: ...
+
+    @t.overload
+    def download_certificate(
+        self, order: Order, *, download_all_chains: t.Literal[False]
+    ) -> tuple[CertificateChain, None]: ...
+
+    @t.overload
+    def download_certificate(
+        self, order: Order, *, download_all_chains: bool = True
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]: ...
+
+    def download_certificate(
+        self, order: Order, *, download_all_chains: bool = True
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]:
         """
         Download certificate from a valid oder.
         """
@@ -262,9 +277,24 @@ class ACMECertificateClient:
 
         return cert, alternate_chains
 
+    @t.overload
     def get_certificate(
-        self, order: Order, download_all_chains: bool = True
-    ) -> CertificateChain:
+        self, order: Order, *, download_all_chains: t.Literal[True] = True
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]: ...
+
+    @t.overload
+    def get_certificate(
+        self, order: Order, *, download_all_chains: t.Literal[False]
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]: ...
+
+    @t.overload
+    def get_certificate(
+        self, order: Order, *, download_all_chains: bool = True
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]: ...
+
+    def get_certificate(
+        self, order: Order, *, download_all_chains: bool = True
+    ) -> tuple[CertificateChain, list[CertificateChain] | None]:
         """
         Request a new certificate and downloads it, and optionally all certificate chains.
         First verifies whether all authorizations are valid; if not, aborts with an error.

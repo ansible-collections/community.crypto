@@ -208,6 +208,26 @@ class ACMEAccount:
             )
         return result
 
+    @t.overload
+    def setup_account(
+        self,
+        contact: list[str] | None = None,
+        terms_agreed: bool = False,
+        allow_creation: t.Literal[True] = True,
+        remove_account_uri_if_not_exists: bool = False,
+        external_account_binding: dict[str, t.Any] | None = None,
+    ) -> tuple[bool, dict[str, t.Any]]: ...
+
+    @t.overload
+    def setup_account(
+        self,
+        contact: list[str] | None = None,
+        terms_agreed: bool = False,
+        allow_creation: bool = True,
+        remove_account_uri_if_not_exists: bool = False,
+        external_account_binding: dict[str, t.Any] | None = None,
+    ) -> tuple[bool, dict[str, t.Any] | None]: ...
+
     def setup_account(
         self,
         contact: list[str] | None = None,

@@ -114,7 +114,7 @@ class Order:
         replaces_cert_id: str | None = None,
         profile: str | None = None,
         message_callback: t.Callable[[str], None] | None = None,
-    ):
+    ) -> _Order:
         """
         error_strategy can be one of the following strings:
 

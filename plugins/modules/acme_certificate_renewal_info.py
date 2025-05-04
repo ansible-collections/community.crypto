@@ -160,6 +160,7 @@ cert_id:
 
 import os
 import random
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEClient,
@@ -175,7 +176,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_account=False)
     argument_spec.update_argspec(
         certificate_path=dict(type="path"),
@@ -203,7 +204,7 @@ def main():
         supports_ari=False,
     )
 
-    def complete(should_renew, **kwargs):
+    def complete(should_renew: bool, **kwargs) -> t.NoReturn:
         result["should_renew"] = should_renew
         result.update(kwargs)
         module.exit_json(**result)

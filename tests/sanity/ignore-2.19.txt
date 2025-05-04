@@ -1,2 +1,3 @@
+plugins/modules/acme_certificate.py no-assert
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang
