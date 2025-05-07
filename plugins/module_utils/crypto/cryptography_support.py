@@ -41,6 +41,7 @@ except ImportError:
     pass
 
 try:
+    import cryptography.hazmat.primitives.asymmetric.dh
     import cryptography.hazmat.primitives.asymmetric.ed448
     import cryptography.hazmat.primitives.asymmetric.ed25519
     import cryptography.hazmat.primitives.asymmetric.rsa
@@ -93,6 +94,9 @@ if t.TYPE_CHECKING:
         RSAPublicKey,
     )
     from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+        CertificateIssuerPublicKeyTypes,
+        CertificatePublicKeyTypes,
         PrivateKeyTypes,
         PublicKeyTypes,
     )
@@ -100,6 +104,11 @@ if t.TYPE_CHECKING:
         PKCS12KeyAndCertificates,
     )
 
+    CertificatePrivateKeyTypes = (
+        CertificateIssuerPrivateKeyTypes
+        | cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey
+        | cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
+    )
     PublicKeyTypesWOEdwards = (
         DHPublicKey | DSAPublicKey | EllipticCurvePublicKey | RSAPublicKey
     )
@@ -682,7 +691,9 @@ def cryptography_get_basic_constraints(
     return ca, path_length
 
 
-def cryptography_key_needs_digest_for_signing(key: PrivateKeyTypes) -> bool:
+def cryptography_key_needs_digest_for_signing(
+    key: CertificateIssuerPrivateKeyTypes,
+) -> bool:
     """Tests whether the given private key requires a digest algorithm for signing.
 
     Ed25519 and Ed448 keys do not; they need None to be passed as the digest algorithm.
@@ -729,7 +740,19 @@ def cryptography_compare_public_keys(
     if res is not None:
         return res
     res = _compare_public_keys(
+        key1,
+        key2,
+        cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
+    )
+    if res is not None:
+        return res
+    res = _compare_public_keys(
         key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
+    )
+    if res is not None:
+        return res
+    res = _compare_public_keys(
+        key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey
     )
     if res is not None:
         return res
@@ -1001,3 +1024,43 @@ def set_not_valid_before(
     builder: x509.CertificateBuilder, value: datetime.datetime
 ) -> x509.CertificateBuilder:
     return builder.not_valid_before(value)
+
+
+def is_potential_certificate_private_key(
+    key: PrivateKeyTypes,
+) -> t.TypeGuard[CertificatePrivateKeyTypes]:
+    return not isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey
+    )
+
+
+def is_potential_certificate_issuer_private_key(
+    key: PrivateKeyTypes,
+) -> t.TypeGuard[CertificateIssuerPrivateKeyTypes]:
+    return not isinstance(
+        key,
+        (
+            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+            cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+            cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey,
+        ),
+    )
+
+
+def is_potential_certificate_public_key(
+    key: PublicKeyTypes,
+) -> t.TypeGuard[CertificatePublicKeyTypes]:
+    return not isinstance(key, DHPublicKey)
+
+
+def is_potential_certificate_issuer_public_key(
+    key: PublicKeyTypes,
+) -> t.TypeGuard[CertificateIssuerPublicKeyTypes]:
+    return not isinstance(
+        key,
+        (
+            cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
+            cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey,
+            cryptography.hazmat.primitives.asymmetric.dh.DHPublicKey,
+        ),
+    )

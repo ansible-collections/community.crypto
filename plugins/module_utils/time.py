@@ -107,7 +107,7 @@ def get_relative_time_option(
     input_name: str,
     with_timezone: bool = False,
     now: datetime.datetime | None = None,
-) -> datetime.datetime | None:
+) -> datetime.datetime:
     """
     Return an absolute timespec if a relative timespec or an ASN1 formatted
     string is provided.
@@ -121,9 +121,12 @@ def get_relative_time_option(
         )
     # Relative time
     if result.startswith("+") or result.startswith("-"):
-        return convert_relative_to_datetime(
-            result, with_timezone=with_timezone, now=now
-        )
+        res = convert_relative_to_datetime(result, with_timezone=with_timezone, now=now)
+        if res is None:
+            raise OpenSSLObjectError(
+                f'The timespec "{input_string}" for {input_name} is invalid'
+            )
+        return res
     # Absolute time
     for date_fmt, length in [
         (

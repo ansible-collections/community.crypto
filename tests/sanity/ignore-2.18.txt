@@ -3,6 +3,11 @@ plugins/module_utils/acme/acme.py pep8:E704
 plugins/module_utils/acme/backend_openssl_cli.py pep8:E704
 plugins/module_utils/acme/certificate.py pep8:E704
 plugins/module_utils/crypto/cryptography_support.py pep8:E704
+plugins/module_utils/crypto/module_backends/certificate.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_entrust.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_ownca.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_selfsigned.py no-assert
+plugins/module_utils/crypto/support.py pep8:E704
 plugins/module_utils/openssh/certificate.py pep8:E704
 plugins/modules/acme_certificate.py no-assert
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang

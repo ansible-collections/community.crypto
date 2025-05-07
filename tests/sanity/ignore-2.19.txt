@@ -1,3 +1,7 @@
+plugins/module_utils/crypto/module_backends/certificate.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_entrust.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_ownca.py no-assert
+plugins/module_utils/crypto/module_backends/certificate_selfsigned.py no-assert
 plugins/modules/acme_certificate.py no-assert
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang

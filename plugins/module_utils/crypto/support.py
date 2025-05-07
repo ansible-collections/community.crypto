@@ -11,6 +11,10 @@ import os
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
+from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+    is_potential_certificate_issuer_private_key,
+    is_potential_certificate_private_key,
+)
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     identify_pem_format,
 )
@@ -38,9 +42,12 @@ from .basic import OpenSSLBadPassphraseError, OpenSSLObjectError
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
     from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
         PublicKeyTypes,
     )
+
+    from .cryptography_support import CertificatePrivateKeyTypes
 
 
 # This list of preferred fingerprints is used when prefer_one=True is supplied to the
@@ -113,7 +120,7 @@ def get_fingerprint_of_privatekey(
 
 
 def get_fingerprint(
-    path: os.PathLike | None = None,
+    path: os.PathLike | str | None = None,
     passphrase: str | bytes | None = None,
     content: bytes | None = None,
     prefer_one: bool = False,
@@ -131,7 +138,7 @@ def get_fingerprint(
 
 
 def load_privatekey(
-    path: os.PathLike | None = None,
+    path: os.PathLike | str | None = None,
     passphrase: str | bytes | None = None,
     check_passphrase: bool = True,
     content: bytes | None = None,
@@ -166,8 +173,54 @@ def load_privatekey(
         raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
 
 
+def load_certificate_privatekey(
+    *,
+    path: os.PathLike | str | None = None,
+    content: bytes | None = None,
+    passphrase: str | bytes | None = None,
+    check_passphrase: bool = True,
+) -> CertificatePrivateKeyTypes:
+    """
+    Load the specified OpenSSL private key that can be used as a private key for certificates.
+    """
+    private_key = load_privatekey(
+        path=path,
+        passphrase=passphrase,
+        check_passphrase=check_passphrase,
+        content=content,
+    )
+    if not is_potential_certificate_private_key(private_key):
+        raise OpenSSLObjectError(
+            f"Key of type {type(private_key)} not supported for certificates"
+        )
+    return private_key
+
+
+def load_certificate_issuer_privatekey(
+    *,
+    path: os.PathLike | str | None = None,
+    content: bytes | None = None,
+    passphrase: str | bytes | None = None,
+    check_passphrase: bool = True,
+) -> CertificateIssuerPrivateKeyTypes:
+    """
+    Load the specified OpenSSL private key that can be used for issuing certificates.
+    """
+    private_key = load_privatekey(
+        path=path,
+        passphrase=passphrase,
+        check_passphrase=check_passphrase,
+        content=content,
+    )
+    if not is_potential_certificate_issuer_private_key(private_key):
+        raise OpenSSLObjectError(
+            f"Key of type {type(private_key)} not supported for issuing certificates"
+        )
+    return private_key
+
+
 def load_publickey(
-    path: os.PathLike | None = None, content: bytes | None = None
+    path: os.PathLike | str | None = None, content: bytes | None = None
 ) -> PublicKeyTypes:
     if content is None:
         if path is None:
@@ -185,7 +238,7 @@ def load_publickey(
 
 
 def load_certificate(
-    path: os.PathLike | None = None,
+    path: os.PathLike | str | None = None,
     content: bytes | None = None,
     der_support_enabled: bool = False,
 ) -> x509.Certificate:
@@ -214,7 +267,7 @@ def load_certificate(
 
 
 def load_certificate_request(
-    path: os.PathLike | None = None, content: bytes | None = None
+    path: os.PathLike | str | None = None, content: bytes | None = None
 ) -> x509.CertificateSigningRequest:
     """Load the specified certificate signing request."""
     try:
@@ -288,7 +341,23 @@ def parse_ordered_name_field(
     return result
 
 
-def select_message_digest(digest_string: str) -> hashes.HashAlgorithm | None:
+@t.overload
+def select_message_digest(
+    digest_string: t.Literal["sha256", "sha384", "sha512", "sha1", "md5"],
+) -> hashes.SHA256 | hashes.SHA384 | hashes.SHA512 | hashes.SHA1 | hashes.MD5: ...
+
+
+@t.overload
+def select_message_digest(
+    digest_string: str,
+) -> (
+    hashes.SHA256 | hashes.SHA384 | hashes.SHA512 | hashes.SHA1 | hashes.MD5 | None
+): ...
+
+
+def select_message_digest(
+    digest_string: str,
+) -> hashes.SHA256 | hashes.SHA384 | hashes.SHA512 | hashes.SHA1 | hashes.MD5 | None:
     if digest_string == "sha256":
         return hashes.SHA256()
     if digest_string == "sha384":

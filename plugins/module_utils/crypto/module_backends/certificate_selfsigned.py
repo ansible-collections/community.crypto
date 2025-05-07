@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from random import randrange
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -14,6 +15,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_verify_certificate_signature,
     get_not_valid_after,
     get_not_valid_before,
+    is_potential_certificate_issuer_private_key,
     set_not_valid_after,
     set_not_valid_before,
 )
@@ -30,6 +32,17 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
+if t.TYPE_CHECKING:
+    import datetime
+
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+    )
+
+    from ...argspec import ArgumentSpec
+
+
 try:
     import cryptography
     from cryptography import x509
@@ -39,12 +52,14 @@ except ImportError:
 
 
 class SelfSignedCertificateBackendCryptography(CertificateBackend):
-    def __init__(self, module):
+    privatekey: CertificateIssuerPrivateKeyTypes
+
+    def __init__(self, module: AnsibleModule) -> None:
         super(SelfSignedCertificateBackendCryptography, self).__init__(module)
 
-        self.create_subject_key_identifier = module.params[
-            "selfsigned_create_subject_key_identifier"
-        ]
+        self.create_subject_key_identifier: t.Literal[
+            "create_if_not_provided", "always_create", "never_create"
+        ] = module.params["selfsigned_create_subject_key_identifier"]
         self.notBefore = get_relative_time_option(
             module.params["selfsigned_not_before"],
             "selfsigned_not_before",
@@ -56,14 +71,16 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["selfsigned_digest"])
-        self.version = module.params["selfsigned_version"]
+        self.version: int = module.params["selfsigned_version"]
         self.serial_number = x509.random_serial_number()
 
         if self.csr_path is not None and not os.path.exists(self.csr_path):
             raise CertificateError(
                 f"The certificate signing request file {self.csr_path} does not exist"
             )
-        if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
+        if self.privatekey_path is not None and not os.path.exists(
+            self.privatekey_path
+        ):
             raise CertificateError(
                 f"The private key file {self.privatekey_path} does not exist"
             )
@@ -71,20 +88,10 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         self._module = module
 
         self._ensure_private_key_loaded()
-
-        self._ensure_csr_loaded()
-        if self.csr is None:
-            # Create empty CSR on the fly
-            csr = cryptography.x509.CertificateSigningRequestBuilder()
-            csr = csr.subject_name(cryptography.x509.Name([]))
-            digest = None
-            if cryptography_key_needs_digest_for_signing(self.privatekey):
-                digest = self.digest
-                if digest is None:
-                    self.module.fail_json(
-                        msg=f'Unsupported digest "{module.params["selfsigned_digest"]}"'
-                    )
-            self.csr = csr.sign(self.privatekey, digest)
+        if self.privatekey is None:
+            raise CertificateError("Private key has not been provided")
+        if not is_potential_certificate_issuer_private_key(self.privatekey):
+            raise CertificateError("Private key cannot be used to sign certificates")
 
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             if self.digest is None:
@@ -94,8 +101,21 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         else:
             self.digest = None
 
-    def generate_certificate(self):
+        self._ensure_csr_loaded()
+        if self.csr is None:
+            # Create empty CSR on the fly
+            csr = cryptography.x509.CertificateSigningRequestBuilder()
+            csr = csr.subject_name(cryptography.x509.Name([]))
+            self.csr = csr.sign(self.privatekey, self.digest)
+
+    def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
+        if self.csr is None:
+            raise AssertionError("Contract violation: csr has not been populated")
+        if self.privatekey is None:
+            raise AssertionError(
+                "Contract violation: privatekey has not been populated"
+            )
         try:
             cert_builder = x509.CertificateBuilder()
             cert_builder = cert_builder.subject_name(self.csr.subject)
@@ -130,17 +150,26 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
 
         self.cert = certificate
 
-    def get_certificate_data(self):
+    def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
+        if self.cert is None:
+            raise AssertionError("Contract violation: cert has not been populated")
         return self.cert.public_bytes(Encoding.PEM)
 
-    def needs_regeneration(self):
+    def needs_regeneration(
+        self,
+        not_before: datetime.datetime | None = None,
+        not_after: datetime.datetime | None = None,
+    ) -> bool:
+        assert self.privatekey is not None
+
         if super(SelfSignedCertificateBackendCryptography, self).needs_regeneration(
             not_before=self.notBefore, not_after=self.notAfter
         ):
             return True
 
         self._ensure_existing_certificate_loaded()
+        assert self.existing_certificate is not None
 
         # Check whether certificate is signed by private key
         if not cryptography_verify_certificate_signature(
@@ -150,7 +179,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
 
         return False
 
-    def dump(self, include_certificate):
+    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
         result = super(SelfSignedCertificateBackendCryptography, self).dump(
             include_certificate
         )
@@ -166,6 +195,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         else:
             if self.cert is None:
                 self.cert = self.existing_certificate
+            assert self.cert is not None
             result.update(
                 {
                     "notBefore": get_not_valid_before(self.cert).strftime(
@@ -181,7 +211,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         return result
 
 
-def generate_serial_number():
+def generate_serial_number() -> int:
     """Generate a serial number for a certificate"""
     while True:
         result = randrange(0, 1 << 160)
@@ -190,7 +220,7 @@ def generate_serial_number():
 
 
 class SelfSignedCertificateProvider(CertificateProvider):
-    def validate_module_args(self, module):
+    def validate_module_args(self, module: AnsibleModule) -> None:
         if (
             module.params["privatekey_path"] is None
             and module.params["privatekey_content"] is None
@@ -199,14 +229,16 @@ class SelfSignedCertificateProvider(CertificateProvider):
                 msg="One of privatekey_path and privatekey_content must be specified for the selfsigned provider."
             )
 
-    def needs_version_two_certs(self, module):
+    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
         return module.params["selfsigned_version"] == 2
 
-    def create_backend(self, module):
+    def create_backend(
+        self, module: AnsibleModule
+    ) -> SelfSignedCertificateBackendCryptography:
         return SelfSignedCertificateBackendCryptography(module)
 
 
-def add_selfsigned_provider_to_argument_spec(argument_spec):
+def add_selfsigned_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("selfsigned")
     argument_spec.argument_spec.update(
         dict(
