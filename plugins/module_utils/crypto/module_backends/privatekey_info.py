@@ -36,6 +36,11 @@ if t.TYPE_CHECKING:
         PrivateKeyTypes,
     )
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -196,7 +201,7 @@ class PrivateKeyParseError(OpenSSLObjectError):
 class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
         self,
-        module: AnsibleModule,
+        module: GeneralAnsibleModule,
         content: bytes,
         passphrase: str | None = None,
         return_private_key_data: bool = False,
@@ -277,7 +282,7 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
 class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
     """Validate the supplied private key, using the cryptography backend"""
 
-    def __init__(self, module: AnsibleModule, content: bytes, **kwargs):
+    def __init__(self, module: GeneralAnsibleModule, content: bytes, **kwargs):
         super(PrivateKeyInfoRetrievalCryptography, self).__init__(
             module, content, **kwargs
         )
@@ -304,7 +309,7 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
 
 
 def get_privatekey_info(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     content: bytes,
     passphrase: str | None = None,
     return_private_key_data: bool = False,
@@ -320,7 +325,7 @@ def get_privatekey_info(
 
 
 def select_backend(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     content: bytes,
     passphrase: str | None = None,
     return_private_key_data: bool = False,

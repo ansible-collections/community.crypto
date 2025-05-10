@@ -9,6 +9,10 @@ from __future__ import annotations
 import typing as t
 
 from ansible.errors import AnsibleFilterError
+from ansible.utils.display import Display
+
+
+_display = Display()
 
 
 class FilterModuleMock:
@@ -19,3 +23,6 @@ class FilterModuleMock:
 
     def fail_json(self, msg: str, **kwargs) -> t.NoReturn:
         raise AnsibleFilterError(msg)
+
+    def warn(self, warning: str) -> None:
+        _display.warning(warning)

@@ -26,6 +26,11 @@ if t.TYPE_CHECKING:
         PublicKeyTypes,
     )
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -95,7 +100,7 @@ class PublicKeyParseError(OpenSSLObjectError):
 class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
         self,
-        module: AnsibleModule,
+        module: GeneralAnsibleModule,
         content: bytes | None = None,
         key: PublicKeyTypes | None = None,
     ) -> None:
@@ -138,7 +143,7 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 
     def __init__(
         self,
-        module: AnsibleModule,
+        module: GeneralAnsibleModule,
         content: bytes | None = None,
         key: PublicKeyTypes | None = None,
     ) -> None:
@@ -159,7 +164,7 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 
 
 def get_publickey_info(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     content: bytes | None = None,
     key: PublicKeyTypes | None = None,
     prefer_one_fingerprint: bool = False,
@@ -169,7 +174,7 @@ def get_publickey_info(
 
 
 def select_backend(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     content: bytes | None = None,
     key: PublicKeyTypes | None = None,
 ) -> PublicKeyInfoRetrieval:

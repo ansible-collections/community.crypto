@@ -123,6 +123,8 @@ _value:
           returned: When RV(_value.type=DSA) or RV(_value.type=ECC)
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -137,7 +139,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 )
 
 
-def openssl_publickey_info_filter(data):
+def openssl_publickey_info_filter(data: str | bytes) -> dict[str, t.Any]:
     """Extract information from OpenSSL PEM public key."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
@@ -156,7 +158,7 @@ def openssl_publickey_info_filter(data):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "openssl_publickey_info": openssl_publickey_info_filter,
         }

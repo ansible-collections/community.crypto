@@ -35,6 +35,11 @@ if t.TYPE_CHECKING:
         PrivateKeyTypes,
     )
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -51,7 +56,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 class CSRInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
-        self, module: AnsibleModule, content: bytes, validate_signature: bool
+        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
         self.module = module
         self.content = content
@@ -185,7 +190,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     """Validate the supplied CSR, using the cryptography backend"""
 
     def __init__(
-        self, module: AnsibleModule, content: bytes, validate_signature: bool
+        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
         super(CSRInfoRetrievalCryptography, self).__init__(
             module, content, validate_signature
@@ -361,7 +366,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
 
 def get_csr_info(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     content: bytes,
     validate_signature: bool = True,
     prefer_one_fingerprint: bool = False,
@@ -373,7 +378,7 @@ def get_csr_info(
 
 
 def select_backend(
-    module: AnsibleModule, content: bytes, validate_signature: bool = True
+    module: GeneralAnsibleModule, content: bytes, validate_signature: bool = True
 ) -> CSRInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION

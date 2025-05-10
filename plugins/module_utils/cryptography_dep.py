@@ -22,6 +22,11 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
+    from ..plugin_utils.action_module import AnsibleActionModule
+    from ..plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
 
 _CRYPTOGRAPHY_IMP_ERR: str | None = None
 _CRYPTOGRAPHY_FILE: str | None = None
@@ -44,7 +49,7 @@ COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION = "3.3"
 
 
 def assert_required_cryptography_version(
-    module: AnsibleModule,
+    module: GeneralAnsibleModule,
     *,
     minimum_cryptography_version: str = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
 ) -> None:

@@ -41,7 +41,11 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
     from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
     from ...argspec import ArgumentSpec
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -58,7 +62,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule, content: bytes) -> None:
+    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
         # content must be a bytes string
         self.module = module
         self.content = content
@@ -237,7 +241,7 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
 class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
-    def __init__(self, module: AnsibleModule, content: bytes) -> None:
+    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
         super(CertificateInfoRetrievalCryptography, self).__init__(module, content)
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
@@ -453,13 +457,15 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
 
 
 def get_certificate_info(
-    module: AnsibleModule, content: bytes, prefer_one_fingerprint: bool = False
+    module: GeneralAnsibleModule, content: bytes, prefer_one_fingerprint: bool = False
 ) -> dict[str, t.Any]:
     info = CertificateInfoRetrievalCryptography(module, content)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module: AnsibleModule, content: bytes) -> CertificateInfoRetrieval:
+def select_backend(
+    module: GeneralAnsibleModule, content: bytes
+) -> CertificateInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

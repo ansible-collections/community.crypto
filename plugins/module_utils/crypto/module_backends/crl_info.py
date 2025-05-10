@@ -30,6 +30,11 @@ if t.TYPE_CHECKING:
         PrivateKeyTypes,
     )
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
 
 # crypto_utils
 
@@ -44,7 +49,7 @@ except ImportError:
 class CRLInfoRetrieval:
     def __init__(
         self,
-        module: AnsibleModule,
+        module: GeneralAnsibleModule,
         content: bytes,
         list_revoked_certificates: bool = True,
     ) -> None:
@@ -102,7 +107,7 @@ class CRLInfoRetrieval:
 
 
 def get_crl_info(
-    module: AnsibleModule, content: bytes, list_revoked_certificates: bool = True
+    module: GeneralAnsibleModule, content: bytes, list_revoked_certificates: bool = True
 ) -> dict[str, t.Any]:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION

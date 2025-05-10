@@ -274,6 +274,8 @@ _value:
       sample: 12345
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -287,7 +289,9 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 )
 
 
-def openssl_csr_info_filter(data, name_encoding="ignore"):
+def openssl_csr_info_filter(
+    data: str | bytes, name_encoding: t.Literal["ignore", "idna", "unicode"] = "ignore"
+) -> dict[str, t.Any]:
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
@@ -313,7 +317,7 @@ def openssl_csr_info_filter(data, name_encoding="ignore"):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "openssl_csr_info": openssl_csr_info_filter,
         }

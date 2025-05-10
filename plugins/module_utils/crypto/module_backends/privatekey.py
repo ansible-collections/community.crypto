@@ -40,6 +40,10 @@ if t.TYPE_CHECKING:
         PrivateKeyTypes,
     )
 
+    from ....plugin_utils.action_module import AnsibleActionModule
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule]
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -72,7 +76,7 @@ class PrivateKeyError(OpenSSLObjectError):
 
 
 class PrivateKeyBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, module: GeneralAnsibleModule) -> None:
         self.module = module
         self.type: t.Literal[
             "DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"
@@ -277,7 +281,7 @@ class _Curve:
         self.deprecated = deprecated
 
     def _get_ec_class(
-        self, module: AnsibleModule
+        self, module: GeneralAnsibleModule
     ) -> type[cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve]:
         ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(self.ectype)  # type: ignore
         if ecclass is None:
@@ -287,7 +291,7 @@ class _Curve:
         return ecclass
 
     def create(
-        self, size: int, module: AnsibleModule
+        self, size: int, module: GeneralAnsibleModule
     ) -> cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve:
         ecclass = self._get_ec_class(module)
         return ecclass()
@@ -295,7 +299,7 @@ class _Curve:
     def verify(
         self,
         privatekey: cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
-        module: AnsibleModule,
+        module: GeneralAnsibleModule,
     ) -> bool:
         ecclass = self._get_ec_class(module)
         return isinstance(privatekey.private_numbers().public_numbers.curve, ecclass)
@@ -312,7 +316,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
     ) -> None:
         self.curves[name] = _Curve(name=name, ectype=ectype, deprecated=deprecated)
 
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, module: GeneralAnsibleModule) -> None:
         super(PrivateKeyCryptographyBackend, self).__init__(module=module)
 
         self.curves: dict[str, _Curve] = {}
@@ -584,7 +588,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return False
 
 
-def select_backend(module: AnsibleModule) -> PrivateKeyBackend:
+def select_backend(module: GeneralAnsibleModule) -> PrivateKeyBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
