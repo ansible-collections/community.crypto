@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     OpensshParser,
@@ -40,7 +42,7 @@ INVALID_UINT64 = [
 VALID_STRING = [
     b"test string",
 ]
-INVALID_STRING = [
+INVALID_STRING: list[t.Any] = [
     [],
 ]
 # See https://datatracker.ietf.org/doc/html/rfc4251#section-5 for examples source
@@ -53,7 +55,7 @@ VALID_MPINT = [
     # Additional large int test
     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,
 ]
-INVALID_MPINT = [
+INVALID_MPINT: list[t.Any] = [
     [],
 ]
 
@@ -96,7 +98,7 @@ def test_invalid_uint64(uint64):
 
 
 @pytest.mark.parametrize("ssh_string", VALID_STRING)
-def test_valid_string(ssh_string):
+def test_valid_string(ssh_string: bytes) -> None:
     assert (
         OpensshParser(_OpensshWriter().string(ssh_string).bytes()).string()
         == ssh_string
@@ -104,18 +106,18 @@ def test_valid_string(ssh_string):
 
 
 @pytest.mark.parametrize("ssh_string", INVALID_STRING)
-def test_invalid_string(ssh_string):
+def test_invalid_string(ssh_string: t.Any) -> None:
     with pytest.raises(TypeError):
         _OpensshWriter().string(ssh_string)
 
 
 @pytest.mark.parametrize("mpint", VALID_MPINT)
-def test_valid_mpint(mpint):
+def test_valid_mpint(mpint: int) -> None:
     assert OpensshParser(_OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
 
 
 @pytest.mark.parametrize("mpint", INVALID_MPINT)
-def test_invalid_mpint(mpint):
+def test_invalid_mpint(mpint: t.Any) -> None:
     with pytest.raises(TypeError):
         _OpensshWriter().mpint(mpint)
 

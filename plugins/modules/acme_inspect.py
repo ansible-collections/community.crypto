@@ -223,6 +223,8 @@ output_json:
         - '...'
 """
 
+import typing as t
+
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEClient,
@@ -235,7 +237,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
         url=dict(type="str"),
@@ -256,7 +258,7 @@ def main():
     module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)
 
-    result = dict()
+    result: dict[str, t.Any] = {}
     changed = False
     try:
         # Get hold of ACMEClient and ACMEAccount objects (includes directory)

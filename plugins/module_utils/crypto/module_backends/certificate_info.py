@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import abc
 import binascii
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -34,6 +35,19 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
+if t.TYPE_CHECKING:
+    import datetime
+
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes
+
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+    from ...argspec import ArgumentSpec
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
+
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 try:
@@ -48,93 +62,97 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
-    def __init__(self, module, content):
+    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
         # content must be a bytes string
         self.module = module
         self.content = content
 
     @abc.abstractmethod
-    def _get_der_bytes(self):
+    def _get_der_bytes(self) -> bytes:
         pass
 
     @abc.abstractmethod
-    def _get_signature_algorithm(self):
+    def _get_signature_algorithm(self) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_subject_ordered(self):
+    def _get_subject_ordered(self) -> list[list[str]]:
         pass
 
     @abc.abstractmethod
-    def _get_issuer_ordered(self):
+    def _get_issuer_ordered(self) -> list[list[str]]:
         pass
 
     @abc.abstractmethod
-    def _get_version(self):
+    def _get_version(self) -> int | str:
         pass
 
     @abc.abstractmethod
-    def _get_key_usage(self):
+    def _get_key_usage(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_extended_key_usage(self):
+    def _get_extended_key_usage(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_basic_constraints(self):
+    def _get_basic_constraints(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_ocsp_must_staple(self):
+    def _get_ocsp_must_staple(self) -> tuple[bool | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_subject_alt_name(self):
+    def _get_subject_alt_name(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def get_not_before(self):
+    def get_not_before(self) -> datetime.datetime:
         pass
 
     @abc.abstractmethod
-    def get_not_after(self):
+    def get_not_after(self) -> datetime.datetime:
         pass
 
     @abc.abstractmethod
-    def _get_public_key_pem(self):
+    def _get_public_key_pem(self) -> bytes:
         pass
 
     @abc.abstractmethod
-    def _get_public_key_object(self):
+    def _get_public_key_object(self) -> PublicKeyTypes:
         pass
 
     @abc.abstractmethod
-    def _get_subject_key_identifier(self):
+    def _get_subject_key_identifier(self) -> bytes | None:
         pass
 
     @abc.abstractmethod
-    def _get_authority_key_identifier(self):
+    def _get_authority_key_identifier(
+        self,
+    ) -> tuple[bytes | None, list[str] | None, int | None]:
         pass
 
     @abc.abstractmethod
-    def _get_serial_number(self):
+    def _get_serial_number(self) -> int:
         pass
 
     @abc.abstractmethod
-    def _get_all_extensions(self):
+    def _get_all_extensions(self) -> dict[str, dict[str, bool | str]]:
         pass
 
     @abc.abstractmethod
-    def _get_ocsp_uri(self):
+    def _get_ocsp_uri(self) -> str | None:
         pass
 
     @abc.abstractmethod
-    def _get_issuer_uri(self):
+    def _get_issuer_uri(self) -> str | None:
         pass
 
-    def get_info(self, prefer_one_fingerprint=False, der_support_enabled=False):
-        result = dict()
+    def get_info(
+        self, prefer_one_fingerprint: bool = False, der_support_enabled: bool = False
+    ) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {}
         self.cert = load_certificate(
             None,
             content=self.content,
@@ -194,16 +212,20 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
             self._get_der_bytes(), prefer_one=prefer_one_fingerprint
         )
 
-        ski = self._get_subject_key_identifier()
-        if ski is not None:
-            ski = binascii.hexlify(ski).decode("ascii")
+        ski_bytes = self._get_subject_key_identifier()
+        if ski_bytes is not None:
+            ski = binascii.hexlify(ski_bytes).decode("ascii")
             ski = ":".join([ski[i : i + 2] for i in range(0, len(ski), 2)])
+        else:
+            ski = None
         result["subject_key_identifier"] = ski
 
-        aki, aci, acsn = self._get_authority_key_identifier()
-        if aki is not None:
-            aki = binascii.hexlify(aki).decode("ascii")
+        aki_bytes, aci, acsn = self._get_authority_key_identifier()
+        if aki_bytes is not None:
+            aki = binascii.hexlify(aki_bytes).decode("ascii")
             aki = ":".join([aki[i : i + 2] for i in range(0, len(aki), 2)])
+        else:
+            aki = None
         result["authority_key_identifier"] = aki
         result["authority_cert_issuer"] = aci
         result["authority_cert_serial_number"] = acsn
@@ -219,36 +241,40 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
 class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
-    def __init__(self, module, content):
+    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
         super(CertificateInfoRetrievalCryptography, self).__init__(module, content)
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
-    def _get_der_bytes(self):
+    def _get_der_bytes(self) -> bytes:
         return self.cert.public_bytes(serialization.Encoding.DER)
 
-    def _get_signature_algorithm(self):
+    def _get_signature_algorithm(self) -> str:
         return cryptography_oid_to_name(self.cert.signature_algorithm_oid)
 
-    def _get_subject_ordered(self):
-        result = []
+    def _get_subject_ordered(self) -> list[list[str]]:
+        result: list[list[str]] = []
         for attribute in self.cert.subject:
-            result.append([cryptography_oid_to_name(attribute.oid), attribute.value])
+            result.append(
+                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+            )
         return result
 
-    def _get_issuer_ordered(self):
+    def _get_issuer_ordered(self) -> list[list[str]]:
         result = []
         for attribute in self.cert.issuer:
-            result.append([cryptography_oid_to_name(attribute.oid), attribute.value])
+            result.append(
+                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+            )
         return result
 
-    def _get_version(self):
+    def _get_version(self) -> int | str:
         if self.cert.version == x509.Version.v1:
             return 1
         if self.cert.version == x509.Version.v3:
             return 3
         return "unknown"
 
-    def _get_key_usage(self):
+    def _get_key_usage(self) -> tuple[list[str] | None, bool]:
         try:
             current_key_ext = self.cert.extensions.get_extension_for_class(
                 x509.KeyUsage
@@ -297,7 +323,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_extended_key_usage(self):
+    def _get_extended_key_usage(self) -> tuple[list[str] | None, bool]:
         try:
             ext_keyusage_ext = self.cert.extensions.get_extension_for_class(
                 x509.ExtendedKeyUsage
@@ -311,7 +337,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_basic_constraints(self):
+    def _get_basic_constraints(self) -> tuple[list[str] | None, bool]:
         try:
             ext_keyusage_ext = self.cert.extensions.get_extension_for_class(
                 x509.BasicConstraints
@@ -324,7 +350,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_ocsp_must_staple(self):
+    def _get_ocsp_must_staple(self) -> tuple[bool | None, bool]:
         try:
             tlsfeature_ext = self.cert.extensions.get_extension_for_class(
                 x509.TLSFeature
@@ -336,7 +362,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_subject_alt_name(self):
+    def _get_subject_alt_name(self) -> tuple[list[str] | None, bool]:
         try:
             san_ext = self.cert.extensions.get_extension_for_class(
                 x509.SubjectAlternativeName
@@ -349,22 +375,22 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def get_not_before(self):
+    def get_not_before(self) -> datetime.datetime:
         return get_not_valid_before(self.cert)
 
-    def get_not_after(self):
+    def get_not_after(self) -> datetime.datetime:
         return get_not_valid_after(self.cert)
 
-    def _get_public_key_pem(self):
+    def _get_public_key_pem(self) -> bytes:
         return self.cert.public_key().public_bytes(
             serialization.Encoding.PEM,
             serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
-    def _get_public_key_object(self):
+    def _get_public_key_object(self) -> PublicKeyTypes:
         return self.cert.public_key()
 
-    def _get_subject_key_identifier(self):
+    def _get_subject_key_identifier(self) -> bytes | None:
         try:
             ext = self.cert.extensions.get_extension_for_class(
                 x509.SubjectKeyIdentifier
@@ -373,7 +399,9 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None
 
-    def _get_authority_key_identifier(self):
+    def _get_authority_key_identifier(
+        self,
+    ) -> tuple[bytes | None, list[str] | None, int | None]:
         try:
             ext = self.cert.extensions.get_extension_for_class(
                 x509.AuthorityKeyIdentifier
@@ -392,13 +420,13 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, None, None
 
-    def _get_serial_number(self):
+    def _get_serial_number(self) -> int:
         return self.cert.serial_number
 
-    def _get_all_extensions(self):
+    def _get_all_extensions(self) -> dict[str, dict[str, bool | str]]:
         return cryptography_get_extensions_from_cert(self.cert)
 
-    def _get_ocsp_uri(self):
+    def _get_ocsp_uri(self) -> str | None:
         try:
             ext = self.cert.extensions.get_extension_for_class(
                 x509.AuthorityInformationAccess
@@ -411,7 +439,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             pass
         return None
 
-    def _get_issuer_uri(self):
+    def _get_issuer_uri(self) -> str | None:
         try:
             ext = self.cert.extensions.get_extension_for_class(
                 x509.AuthorityInformationAccess
@@ -428,12 +456,16 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         return None
 
 
-def get_certificate_info(module, content, prefer_one_fingerprint=False):
+def get_certificate_info(
+    module: GeneralAnsibleModule, content: bytes, prefer_one_fingerprint: bool = False
+) -> dict[str, t.Any]:
     info = CertificateInfoRetrievalCryptography(module, content)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, content):
+def select_backend(
+    module: GeneralAnsibleModule, content: bytes
+) -> CertificateInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import re
+import typing as t
 from contextlib import contextmanager
 from struct import Struct
 
@@ -38,17 +39,20 @@ _UINT64 = Struct(b"!Q")
 _UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 
 
-def any_in(sequence, *elements):
+_T = t.TypeVar("_T")
+
+
+def any_in(sequence: t.Iterable[_T], *elements: _T) -> bool:
     return any(e in sequence for e in elements)
 
 
-def file_mode(path):
+def file_mode(path: str | os.PathLike) -> int:
     if not os.path.exists(path):
         return 0o000
     return os.stat(path).st_mode & 0o777
 
 
-def parse_openssh_version(version_string):
+def parse_openssh_version(version_string: str) -> str | None:
     """Parse the version output of ssh -V and return version numbers that can be compared"""
 
     parsed_result = re.match(
@@ -63,7 +67,7 @@ def parse_openssh_version(version_string):
 
 
 @contextmanager
-def secure_open(path, mode):
+def secure_open(path: str | os.PathLike, mode: int) -> t.Iterator[int]:
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
     try:
         yield fd
@@ -71,7 +75,7 @@ def secure_open(path, mode):
         os.close(fd)
 
 
-def secure_write(path, mode, content):
+def secure_write(path: str | os.PathLike, mode: int, content: bytes) -> None:
     with secure_open(path, mode) as fd:
         os.write(fd, content)
 
@@ -84,35 +88,35 @@ class OpensshParser:
     UINT32_OFFSET = 4
     UINT64_OFFSET = 8
 
-    def __init__(self, data):
+    def __init__(self, data: bytes | bytearray) -> None:
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError(f"Data must be bytes-like not {type(data)}")
 
         self._data = memoryview(data)
         self._pos = 0
 
-    def boolean(self):
+    def boolean(self) -> bool:
         next_pos = self._check_position(self.BOOLEAN_OFFSET)
 
         value = _BOOLEAN.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
-    def uint32(self):
+    def uint32(self) -> int:
         next_pos = self._check_position(self.UINT32_OFFSET)
 
         value = _UINT32.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
-    def uint64(self):
+    def uint64(self) -> int:
         next_pos = self._check_position(self.UINT64_OFFSET)
 
         value = _UINT64.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
-    def string(self):
+    def string(self) -> bytes:
         length = self.uint32()
 
         next_pos = self._check_position(length)
@@ -122,15 +126,15 @@ class OpensshParser:
         # Cast to bytes is required as a memoryview slice is itself a memoryview
         return bytes(value)
 
-    def mpint(self):
+    def mpint(self) -> int:
         return self._big_int(self.string(), "big", signed=True)
 
-    def name_list(self):
+    def name_list(self) -> list[str]:
         raw_string = self.string()
         return raw_string.decode("ASCII").split(",")
 
     # Convenience function, but not an official data type from SSH
-    def string_list(self):
+    def string_list(self) -> list[bytes]:
         result = []
         raw_string = self.string()
 
@@ -142,7 +146,7 @@ class OpensshParser:
         return result
 
     # Convenience function, but not an official data type from SSH
-    def option_list(self):
+    def option_list(self) -> list[tuple[bytes, bytes]]:
         result = []
         raw_string = self.string()
 
@@ -159,15 +163,15 @@ class OpensshParser:
 
         return result
 
-    def seek(self, offset):
+    def seek(self, offset: int) -> int:
         self._pos = self._check_position(offset)
 
         return self._pos
 
-    def remaining_bytes(self):
+    def remaining_bytes(self) -> int:
         return len(self._data) - self._pos
 
-    def _check_position(self, offset):
+    def _check_position(self, offset: int) -> int:
         if self._pos + offset > len(self._data):
             raise ValueError(f"Insufficient data remaining at position: {self._pos}")
         elif self._pos + offset < 0:
@@ -176,8 +180,8 @@ class OpensshParser:
             return self._pos + offset
 
     @classmethod
-    def signature_data(cls, signature_string):
-        signature_data = {}
+    def signature_data(cls, signature_string: bytes) -> dict[str, bytes | int]:
+        signature_data: dict[str, bytes | int] = {}
 
         parser = cls(signature_string)
         signature_type = parser.string()
@@ -205,14 +209,19 @@ class OpensshParser:
             signature_data["R"] = cls._big_int(signature_blob[:32], "little")
             signature_data["S"] = cls._big_int(signature_blob[32:], "little")
         else:
-            raise ValueError(f"{signature_type} is not a valid signature type")
+            raise ValueError(f"{signature_type!r} is not a valid signature type")
 
         signature_data["signature_type"] = signature_type
 
         return signature_data
 
     @classmethod
-    def _big_int(cls, raw_string, byte_order, signed=False):
+    def _big_int(
+        cls,
+        raw_string: bytes,
+        byte_order: t.Literal["big", "little"],
+        signed: bool = False,
+    ) -> int:
         if byte_order not in ("big", "little"):
             raise ValueError(
                 f"Byte_order must be one of (big, little) not {byte_order}"
@@ -230,18 +239,16 @@ class _OpensshWriter:
         in validating parsed material.
     """
 
-    def __init__(self, buffer=None):
+    def __init__(self, buffer: bytearray | None = None):
         if buffer is not None:
-            if not isinstance(buffer, (bytes, bytearray)):
-                raise TypeError(
-                    f"Buffer must be a bytes-like object not {type(buffer)}"
-                )
+            if not isinstance(buffer, bytearray):
+                raise TypeError(f"Buffer must be a bytearray, not {type(buffer)}")
         else:
             buffer = bytearray()
 
-        self._buff = buffer
+        self._buff: bytearray = buffer
 
-    def boolean(self, value):
+    def boolean(self, value: bool) -> t.Self:
         if not isinstance(value, bool):
             raise TypeError(f"Value must be of type bool not {type(value)}")
 
@@ -249,7 +256,7 @@ class _OpensshWriter:
 
         return self
 
-    def uint32(self, value):
+    def uint32(self, value: int) -> t.Self:
         if not isinstance(value, int):
             raise TypeError(f"Value must be of type int not {type(value)}")
         if value < 0 or value > _UINT32_MAX:
@@ -261,7 +268,7 @@ class _OpensshWriter:
 
         return self
 
-    def uint64(self, value):
+    def uint64(self, value: int) -> t.Self:
         if not isinstance(value, int):
             raise TypeError(f"Value must be of type int not {type(value)}")
         if value < 0 or value > _UINT64_MAX:
@@ -273,7 +280,7 @@ class _OpensshWriter:
 
         return self
 
-    def string(self, value):
+    def string(self, value: bytes | bytearray) -> t.Self:
         if not isinstance(value, (bytes, bytearray)):
             raise TypeError(f"Value must be bytes-like not {type(value)}")
         self.uint32(len(value))
@@ -281,7 +288,7 @@ class _OpensshWriter:
 
         return self
 
-    def mpint(self, value):
+    def mpint(self, value: int) -> t.Self:
         if not isinstance(value, int):
             raise TypeError(f"Value must be of type int not {type(value)}")
 
@@ -289,7 +296,7 @@ class _OpensshWriter:
 
         return self
 
-    def name_list(self, value):
+    def name_list(self, value: list[str]) -> t.Self:
         if not isinstance(value, list):
             raise TypeError(f"Value must be a list of byte strings not {type(value)}")
 
@@ -300,7 +307,7 @@ class _OpensshWriter:
 
         return self
 
-    def string_list(self, value):
+    def string_list(self, value: list[bytes]) -> t.Self:
         if not isinstance(value, list):
             raise TypeError(f"Value must be a list of byte string not {type(value)}")
 
@@ -312,7 +319,7 @@ class _OpensshWriter:
 
         return self
 
-    def option_list(self, value):
+    def option_list(self, value: list[tuple[bytes, bytes]]) -> t.Self:
         if not isinstance(value, list) or (value and not isinstance(value[0], tuple)):
             raise TypeError("Value must be a list of tuples")
 
@@ -327,7 +334,7 @@ class _OpensshWriter:
         return self
 
     @staticmethod
-    def _int_to_mpint(num):
+    def _int_to_mpint(num: int) -> bytes:
         byte_length = (num.bit_length() + 7) // 8
         try:
             return num.to_bytes(byte_length, "big", signed=True)
@@ -335,5 +342,5 @@ class _OpensshWriter:
         except OverflowError:
             return num.to_bytes(byte_length + 1, "big", signed=True)
 
-    def bytes(self):
+    def bytes(self) -> bytes:
         return bytes(self._buff)

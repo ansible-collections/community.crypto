@@ -1,0 +1,5 @@
+breaking_changes:
+  - "The validation for relative timestamps is now more strict. A string starting with ``+`` or ``-`` must be valid,
+     otherwise validation will fail. In the past such strings were often silently ignored, and in many cases the code
+     which triggered the validation was not able to handle no result
+     (https://github.com/ansible-collections/community.crypto/pull/885)."

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import abc
 import traceback
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
@@ -25,6 +26,13 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
     assert_required_cryptography_version,
 )
 from ansible_collections.community.crypto.plugins.module_utils.io import load_file
+
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+    )
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -58,42 +66,48 @@ class PrivateKeyError(OpenSSLObjectError):
 
 
 class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.src_path = module.params["src_path"]
-        self.src_content = module.params["src_content"]
-        self.src_passphrase = module.params["src_passphrase"]
-        self.format = module.params["format"]
-        self.dest_passphrase = module.params["dest_passphrase"]
+        self.src_path: str | None = module.params["src_path"]
+        self.src_content: str | None = module.params["src_content"]
+        self.src_passphrase: str | None = module.params["src_passphrase"]
+        self.format: t.Literal["pkcs1", "pkcs8", "raw"] = module.params["format"]
+        self.dest_passphrase: str | None = module.params["dest_passphrase"]
 
-        self.src_private_key = None
+        self.src_private_key: PrivateKeyTypes | None = None
         if self.src_path is not None:
             self.src_private_key_bytes = load_file(self.src_path, module)
         else:
+            if self.src_content is None:
+                raise AssertionError("src_content is None")
             self.src_private_key_bytes = self.src_content.encode("utf-8")
 
-        self.dest_private_key = None
-        self.dest_private_key_bytes = None
+        self.dest_private_key: PrivateKeyTypes | None = None
+        self.dest_private_key_bytes: bytes | None = None
 
     @abc.abstractmethod
-    def get_private_key_data(self):
+    def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format."""
         pass
 
-    def set_existing_destination(self, privatekey_bytes):
+    def set_existing_destination(self, privatekey_bytes: bytes) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.dest_private_key_bytes = privatekey_bytes
 
-    def has_existing_destination(self):
+    def has_existing_destination(self) -> bool:
         """Query whether an existing private key is/has been there."""
         return self.dest_private_key_bytes is not None
 
     @abc.abstractmethod
-    def _load_private_key(self, data, passphrase, current_hint=None):
+    def _load_private_key(
+        self,
+        data: bytes,
+        passphrase: str | None,
+        current_hint: PrivateKeyTypes | None = None,
+    ) -> tuple[str, PrivateKeyTypes]:
         """Check whether data can be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
-        pass
 
-    def needs_conversion(self):
+    def needs_conversion(self) -> bool:
         """Check whether a conversion is necessary. Must only be called if needs_regeneration() returned False."""
         dummy, self.src_private_key = self._load_private_key(
             self.src_private_key_bytes, self.src_passphrase
@@ -101,6 +115,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 
         if not self.has_existing_destination():
             return True
+        assert self.dest_private_key_bytes is not None
 
         try:
             format, self.dest_private_key = self._load_private_key(
@@ -115,18 +130,20 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
             self.dest_private_key, self.src_private_key
         )
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
         return {}
 
 
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
 
-    def get_private_key_data(self):
+    def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format"""
+        if self.src_private_key is None:
+            raise AssertionError("src_private_key not set")
         # Select export format and encoding
         try:
             export_encoding = cryptography.hazmat.primitives.serialization.Encoding.PEM
@@ -152,9 +169,9 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
             )
 
         # Select key encryption
-        encryption_algorithm = (
-            cryptography.hazmat.primitives.serialization.NoEncryption()
-        )
+        encryption_algorithm: (
+            cryptography.hazmat.primitives.serialization.KeySerializationEncryption
+        ) = cryptography.hazmat.primitives.serialization.NoEncryption()
         if self.dest_passphrase:
             encryption_algorithm = (
                 cryptography.hazmat.primitives.serialization.BestAvailableEncryption(
@@ -179,7 +196,12 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 exception=traceback.format_exc(),
             )
 
-    def _load_private_key(self, data, passphrase, current_hint=None):
+    def _load_private_key(
+        self,
+        data: bytes,
+        passphrase: str | None,
+        current_hint: PrivateKeyTypes | None = None,
+    ) -> tuple[str, PrivateKeyTypes]:
         try:
             # Interpret bytes depending on format.
             format = identify_private_key_format(data)
@@ -247,14 +269,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
             raise PrivateKeyError(e)
 
 
-def select_backend(module):
+def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return PrivateKeyConvertCryptographyBackend(module)
 
 
-def get_privatekey_argument_spec():
+def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
         argument_spec=dict(
             src_path=dict(type="path"),

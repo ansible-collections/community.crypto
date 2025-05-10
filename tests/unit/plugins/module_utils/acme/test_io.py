@@ -21,8 +21,7 @@ TEST_TEXT = r"""1234
 def test_read_file(tmpdir):
     fn = tmpdir / "test.txt"
     fn.write(TEST_TEXT)
-    assert read_file(str(fn), "t") == TEST_TEXT
-    assert read_file(str(fn), "b") == TEST_TEXT.encode("utf-8")
+    assert read_file(str(fn)) == TEST_TEXT.encode("utf-8")
 
 
 def test_write_file(tmpdir):

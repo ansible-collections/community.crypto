@@ -14,6 +14,7 @@ import json
 import os
 import re
 import traceback
+import typing as t
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 
@@ -34,7 +35,7 @@ else:
 valid_file_format = re.compile(r".*(\.)(yml|yaml|json)$")
 
 
-def ecs_client_argument_spec():
+def ecs_client_argument_spec() -> dict[str, t.Any]:
     return dict(
         entrust_api_user=dict(type="str", required=True),
         entrust_api_key=dict(type="str", required=True, no_log=True),
@@ -50,19 +51,17 @@ def ecs_client_argument_spec():
 class SessionConfigurationException(Exception):
     """Raised if we cannot configure a session with the API"""
 
-    pass
-
 
 class RestOperationException(Exception):
     """Encapsulate a REST API error"""
 
-    def __init__(self, error):
+    def __init__(self, error: dict[str, t.Any]) -> None:
         self.status = to_native(error.get("status", None))
         self.errors = [to_native(err.get("message")) for err in error.get("errors", {})]
         self.message = " ".join(self.errors)
 
 
-def generate_docstring(operation_spec):
+def generate_docstring(operation_spec: dict[str, t.Any]) -> str:
     """Generate a docstring for an operation defined in operation_spec (swagger)"""
     # Description of the operation
     docs = operation_spec.get("description", "No Description")

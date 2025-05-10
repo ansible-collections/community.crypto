@@ -317,6 +317,8 @@ selected_chain:
       returned: always
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
     create_default_argspec,
@@ -329,7 +331,13 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+        CertificateChain,
+    )
+
+
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
         order_uri=dict(type="str", required=True),
@@ -375,6 +383,7 @@ def main():
                 or module.params["retrieve_all_alternates"]
             )
             changed = False
+            alternate_chains: list[CertificateChain] | None
             if order.status == "valid":
                 # Step 2 and 3: download certificate(s) and chain(s)
                 cert, alternate_chains = client.download_certificate(

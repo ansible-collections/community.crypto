@@ -155,6 +155,7 @@ _value:
 
 import base64
 import binascii
+import typing as t
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
@@ -172,7 +173,11 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 )
 
 
-def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates=True):
+def x509_crl_info_filter(
+    data: str | bytes,
+    name_encoding: t.Literal["ignore", "idna", "unicode"] = "ignore",
+    list_revoked_certificates: bool = True,
+) -> dict[str, t.Any]:
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
@@ -192,17 +197,19 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
             f'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "{name_encoding}"'
         )
 
-    data = to_bytes(data)
-    if not identify_pem_format(data):
+    data_bytes = to_bytes(data)
+    if not identify_pem_format(data_bytes):
         try:
-            data = base64.b64decode(to_native(data))
+            data_bytes = base64.b64decode(to_native(data_bytes))
         except (binascii.Error, TypeError, ValueError, UnicodeEncodeError):
             pass
 
     module = FilterModuleMock({"name_encoding": name_encoding})
     try:
         return get_crl_info(
-            module, content=data, list_revoked_certificates=list_revoked_certificates
+            module,
+            content=data_bytes,
+            list_revoked_certificates=list_revoked_certificates,
         )
     except OpenSSLObjectError as exc:
         raise AnsibleFilterError(str(exc))
@@ -211,7 +218,7 @@ def x509_crl_info_filter(data, name_encoding="ignore", list_revoked_certificates
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "x509_crl_info": x509_crl_info_filter,
         }

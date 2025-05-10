@@ -39,11 +39,13 @@ _value:
   type: string
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible_collections.community.crypto.plugins.module_utils.serial import to_serial
 
 
-def to_serial_filter(input):
+def to_serial_filter(input: int) -> str:
     if not isinstance(input, int):
         raise AnsibleFilterError(
             f"The input for the community.crypto.to_serial filter must be an integer; got {type(input)} instead"
@@ -61,7 +63,7 @@ def to_serial_filter(input):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "to_serial": to_serial_filter,
         }

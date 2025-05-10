@@ -204,6 +204,8 @@ order_uris:
   version_added: 1.5.0
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
@@ -220,48 +222,55 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-def get_orders_list(module, client, orders_url):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+def get_orders_list(
+    module: AnsibleModule, client: ACMEClient, orders_url: str
+) -> list[str]:
     """
-    Retrieves orders list (handles pagination).
+    Retrieves order URL list (handles pagination).
     """
-    orders = []
-    while orders_url:
+    orders: list[str] = []
+    next_orders_url: str | None = orders_url
+    while next_orders_url:
         # Get part of orders list
         res, info = client.get_request(
-            orders_url, parse_json_result=True, fail_on_error=True
+            next_orders_url, parse_json_result=True, fail_on_error=True
         )
         if not res.get("orders"):
             if orders:
                 module.warn(
-                    f"When retrieving orders list part {orders_url}, got empty result list"
+                    f"When retrieving orders list part {next_orders_url}, got empty result list"
                 )
             break
         # Add order URLs to result list
         orders.extend(res["orders"])
         # Extract URL of next part of results list
-        new_orders_url = []
+        new_orders_url: list[str | None] = []
 
-        def f(link, relation):
+        def f(link: str, relation: str) -> None:
             if relation == "next":
                 new_orders_url.append(link)
 
         process_links(info, f)
         new_orders_url.append(None)
-        previous_orders_url, orders_url = orders_url, new_orders_url.pop(0)
-        if orders_url == previous_orders_url:
+        previous_orders_url, next_orders_url = next_orders_url, new_orders_url.pop(0)
+        if next_orders_url == previous_orders_url:
             # Prevent infinite loop
-            orders_url = None
+            next_orders_url = None
     return orders
 
 
-def get_order(client, order_url):
+def get_order(client: ACMEClient, order_url: str) -> dict[str, t.Any]:
     """
     Retrieve order data.
     """
     return client.get_request(order_url, parse_json_result=True, fail_on_error=True)[0]
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
         retrieve_orders=dict(
@@ -282,16 +291,19 @@ def main():
         )
         if created:
             raise AssertionError("Unwanted account creation")
-        result = {
+        result: dict[str, t.Any] = {
             "changed": False,
-            "exists": client.account_uri is not None,
-            "account_uri": client.account_uri,
+            "exists": False,
+            "account_uri": None,
         }
-        if client.account_uri is not None:
+        if client.account_uri is not None and account_data:
+            result["account_uri"] = client.account_uri
+            result["exists"] = True
             # Make sure promised data is there
             if "contact" not in account_data:
                 account_data["contact"] = []
-            account_data["public_account_key"] = client.account_key_data["jwk"]
+            if client.account_key_data:
+                account_data["public_account_key"] = client.account_key_data["jwk"]
             result["account"] = account_data
             # Retrieve orders list
             if (

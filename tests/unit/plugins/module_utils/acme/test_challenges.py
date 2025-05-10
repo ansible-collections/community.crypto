@@ -27,9 +27,9 @@ def test_combine_identifier():
 
 
 def test_split_identifier():
-    assert split_identifier(":") == ["", ""]
-    assert split_identifier("a:b") == ["a", "b"]
-    assert split_identifier("a:b:c") == ["a", "b:c"]
+    assert split_identifier(":") == ("", "")
+    assert split_identifier("a:b") == ("a", "b")
+    assert split_identifier("a:b:c") == ("a", "b:c")
     with pytest.raises(ModuleFailException) as exc:
         split_identifier("a")
     assert exc.value.msg == 'Identifier "a" is not of the form <type>:<identifier>'

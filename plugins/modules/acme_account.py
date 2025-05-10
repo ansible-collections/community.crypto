@@ -165,6 +165,7 @@ account_uri:
 """
 
 import base64
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
@@ -180,7 +181,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
         terms_agreed=dict(type="bool", default=False),
@@ -221,7 +222,7 @@ def main():
 
     if module.params["external_account_binding"]:
         # Make sure padding is there
-        key = module.params["external_account_binding"]["key"]
+        key: str = module.params["external_account_binding"]["key"]
         if len(key) % 4 != 0:
             key = key + ("=" * (4 - (len(key) % 4)))
         # Make sure key is Base64 encoded
@@ -237,24 +238,25 @@ def main():
         client = ACMEClient(module, backend)
         account = ACMEAccount(client)
         changed = False
-        state = module.params.get("state")
-        diff_before = {}
-        diff_after = {}
+        state: t.Literal["present", "absent", "changed_key"] = module.params["state"]
+        diff_before: dict[str, t.Any] = {}
+        diff_after: dict[str, t.Any] = {}
         if state == "absent":
             created, account_data = account.setup_account(allow_creation=False)
             if account_data:
                 diff_before = dict(account_data)
-                diff_before["public_account_key"] = client.account_key_data["jwk"]
+                if client.account_key_data:
+                    diff_before["public_account_key"] = client.account_key_data["jwk"]
             if created:
                 raise AssertionError("Unwanted account creation")
             if account_data is not None:
                 # Account is not yet deactivated
                 if not module.check_mode:
                     # Deactivate it
-                    payload = {"status": "deactivated"}
+                    deactivate_payload = {"status": "deactivated"}
                     result, info = client.send_signed_request(
-                        client.account_uri,
-                        payload,
+                        t.cast(str, client.account_uri),
+                        deactivate_payload,
                         error_msg="Failed to deactivate account",
                         expected_status_codes=[200],
                     )
@@ -278,13 +280,15 @@ def main():
                 diff_before = {}
             else:
                 diff_before = dict(account_data)
-                diff_before["public_account_key"] = client.account_key_data["jwk"]
+                if client.account_key_data:
+                    diff_before["public_account_key"] = client.account_key_data["jwk"]
             updated = False
             if not created:
                 updated, account_data = account.update_account(account_data, contact)
             changed = created or updated
             diff_after = dict(account_data)
-            diff_after["public_account_key"] = client.account_key_data["jwk"]
+            if client.account_key_data:
+                diff_after["public_account_key"] = client.account_key_data["jwk"]
         elif state == "changed_key":
             # Parse new account key
             try:
@@ -306,7 +310,8 @@ def main():
                     msg="Account does not exist or is deactivated."
                 )
             diff_before = dict(account_data)
-            diff_before["public_account_key"] = client.account_key_data["jwk"]
+            if client.account_key_data:
+                diff_before["public_account_key"] = client.account_key_data["jwk"]
             # Now we can start the account key rollover
             if not module.check_mode:
                 # Compose inner signed message
@@ -317,12 +322,12 @@ def main():
                     "jwk": new_key_data["jwk"],
                     "url": url,
                 }
-                payload = {
+                change_key_payload = {
                     "account": client.account_uri,
                     "newKey": new_key_data["jwk"],  # specified in draft 12 and older
                     "oldKey": client.account_jwk,  # specified in draft 13 and newer
                 }
-                data = client.sign_request(protected, payload, new_key_data)
+                data = client.sign_request(protected, change_key_payload, new_key_data)
                 # Send request and verify result
                 result, info = client.send_signed_request(
                     url,
@@ -332,8 +337,9 @@ def main():
                 )
                 if module._diff:
                     client.account_key_data = new_key_data
-                    client.account_jws_header["alg"] = new_key_data["alg"]
-                    diff_after = account.get_account_data()
+                    if client.account_jws_header:
+                        client.account_jws_header["alg"] = new_key_data["alg"]
+                    diff_after = account.get_account_data() or {}
             elif module._diff:
                 # Kind of fake diff_after
                 diff_after = dict(diff_before)

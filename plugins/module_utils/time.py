@@ -13,37 +13,16 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.basic impo
 )
 
 
-try:
-    UTC = datetime.timezone.utc
-except AttributeError:
-    _DURATION_ZERO = datetime.timedelta(0)
-
-    class _UTCClass(datetime.tzinfo):
-        def utcoffset(self, dt):
-            return _DURATION_ZERO
-
-        def dst(self, dt):
-            return _DURATION_ZERO
-
-        def tzname(self, dt):
-            return "UTC"
-
-        def fromutc(self, dt):
-            return dt
-
-        def __repr__(self):
-            return "UTC"
-
-    UTC = _UTCClass()
+UTC = datetime.timezone.utc
 
 
-def get_now_datetime(with_timezone):
+def get_now_datetime(with_timezone: bool) -> datetime.datetime:
     if with_timezone:
         return datetime.datetime.now(tz=UTC)
     return datetime.datetime.utcnow()
 
 
-def ensure_utc_timezone(timestamp):
+def ensure_utc_timezone(timestamp: datetime.datetime) -> datetime.datetime:
     if timestamp.tzinfo is UTC:
         return timestamp
     if timestamp.tzinfo is None:
@@ -52,7 +31,7 @@ def ensure_utc_timezone(timestamp):
     return timestamp.astimezone(UTC)
 
 
-def remove_timezone(timestamp):
+def remove_timezone(timestamp: datetime.datetime) -> datetime.datetime:
     # Convert to native datetime object
     if timestamp.tzinfo is None:
         return timestamp
@@ -61,26 +40,34 @@ def remove_timezone(timestamp):
     return timestamp.replace(tzinfo=None)
 
 
-def add_or_remove_timezone(timestamp, with_timezone):
+def add_or_remove_timezone(
+    timestamp: datetime.datetime, with_timezone: bool
+) -> datetime.datetime:
     return (
         ensure_utc_timezone(timestamp) if with_timezone else remove_timezone(timestamp)
     )
 
 
-def get_epoch_seconds(timestamp):
+def get_epoch_seconds(timestamp: datetime.datetime) -> float:
     if timestamp.tzinfo is None:
         # timestamp.timestamp() is offset by the local timezone if timestamp has no timezone
         timestamp = ensure_utc_timezone(timestamp)
     return timestamp.timestamp()
 
 
-def from_epoch_seconds(timestamp, with_timezone):
+def from_epoch_seconds(
+    timestamp: int | float, with_timezone: bool
+) -> datetime.datetime:
     if with_timezone:
         return datetime.datetime.fromtimestamp(timestamp, UTC)
     return datetime.datetime.utcfromtimestamp(timestamp)
 
 
-def convert_relative_to_datetime(relative_time_string, with_timezone=False, now=None):
+def convert_relative_to_datetime(
+    relative_time_string: str,
+    with_timezone: bool = False,
+    now: datetime.datetime | None = None,
+) -> datetime.datetime | None:
     """Get a datetime.datetime or None from a string in the time format described in sshd_config(5)"""
 
     parsed_result = re.match(
@@ -115,7 +102,12 @@ def convert_relative_to_datetime(relative_time_string, with_timezone=False, now=
         return now - offset
 
 
-def get_relative_time_option(input_string, input_name, with_timezone=False, now=None):
+def get_relative_time_option(
+    input_string: str,
+    input_name: str,
+    with_timezone: bool = False,
+    now: datetime.datetime | None = None,
+) -> datetime.datetime:
     """
     Return an absolute timespec if a relative timespec or an ASN1 formatted
     string is provided.
@@ -129,9 +121,12 @@ def get_relative_time_option(input_string, input_name, with_timezone=False, now=
         )
     # Relative time
     if result.startswith("+") or result.startswith("-"):
-        return convert_relative_to_datetime(
-            result, with_timezone=with_timezone, now=now
-        )
+        res = convert_relative_to_datetime(result, with_timezone=with_timezone, now=now)
+        if res is None:
+            raise OpenSSLObjectError(
+                f'The timespec "{input_string}" for {input_name} is invalid'
+            )
+        return res
     # Absolute time
     for date_fmt, length in [
         (

@@ -19,8 +19,10 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ..test_time import TIMEZONES, cartesian_product
 
 
-def load_fixture(name):
-    with open(os.path.join(os.path.dirname(__file__), "fixtures", name)) as f:
+def load_fixture(name: str) -> str:
+    with open(
+        os.path.join(os.path.dirname(__file__), "fixtures", name), encoding="utf-8"
+    ) as f:
         return f.read()
 
 
@@ -97,7 +99,7 @@ TEST_CERT_DAYS = cartesian_product(
 )
 
 
-TEST_CERT_INFO = CertificateInformation(
+TEST_CERT_INFO_1 = CertificateInformation(
     not_valid_after=datetime.datetime(2018, 11, 26, 15, 28, 24),
     not_valid_before=datetime.datetime(2018, 11, 25, 15, 28, 23),
     serial_number=1,
@@ -115,8 +117,8 @@ TEST_CERT_INFO_2 = CertificateInformation(
 )
 
 
-TEST_CERT_INFO = [
-    (TEST_CERT, TEST_CERT_INFO, TEST_CERT_OPENSSL_OUTPUT),
+TEST_CERT_INFO: list[tuple[str, CertificateInformation, str]] = [
+    (TEST_CERT, TEST_CERT_INFO_1, TEST_CERT_OPENSSL_OUTPUT),
     (TEST_CERT_2, TEST_CERT_INFO_2, TEST_CERT_OPENSSL_OUTPUT_2),
     (TEST_CERT_2, TEST_CERT_INFO_2, TEST_CERT_OPENSSL_OUTPUT_2B),
 ]

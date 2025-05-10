@@ -38,6 +38,8 @@ _value:
   elements: string
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
@@ -45,21 +47,20 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 
-def split_pem_filter(data):
+def split_pem_filter(data: str | bytes) -> list[str]:
     """Split PEM file."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
             f"The community.crypto.split_pem input must be a text type, not {type(data)}"
         )
 
-    data = to_text(data)
-    return split_pem_list(data)
+    return split_pem_list(to_text(data))
 
 
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "split_pem": split_pem_filter,
         }

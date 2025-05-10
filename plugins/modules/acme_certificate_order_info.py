@@ -357,6 +357,8 @@ authorizations_by_status:
       returned: always
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     create_backend,
     create_default_argspec,
@@ -369,7 +371,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=False)
     argument_spec.update_argspec(
         order_uri=dict(type="str", required=True),
@@ -381,8 +383,8 @@ def main():
     try:
         client = ACMECertificateClient(module, backend)
         order = client.load_order()
-        authorizations_by_identifier = dict()
-        authorizations_by_status = {
+        authorizations_by_identifier: dict[str, dict[str, t.Any]] = {}
+        authorizations_by_status: dict[str, list[str]] = {
             "pending": [],
             "invalid": [],
             "valid": [],
@@ -392,7 +394,8 @@ def main():
         }
         for identifier, authz in order.authorizations.items():
             authorizations_by_identifier[identifier] = authz.to_json()
-            authorizations_by_status[authz.status].append(identifier)
+            if authz.status is not None:
+                authorizations_by_status[authz.status].append(identifier)
         module.exit_json(
             changed=False,
             account_uri=client.client.account_uri,

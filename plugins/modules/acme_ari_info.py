@@ -94,6 +94,8 @@ renewal_info:
       sample: '2024-04-29T01:17:10.236921+00:00'
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
     ACMEClient,
     create_backend,
@@ -104,7 +106,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_account=False)
     argument_spec.update_argspec(
         certificate_path=dict(type="path"),

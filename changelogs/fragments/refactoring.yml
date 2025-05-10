@@ -5,3 +5,4 @@ minor_changes:
   - "Python code modernization: remove Python 3 specific code (https://github.com/ansible-collections/community.crypto/pull/877)."
   - "Python code modernization: avoid unnecessary string conversion (https://github.com/ansible-collections/community.crypto/pull/880)."
   - "Python code modernization: avoid using ``six`` (https://github.com/ansible-collections/community.crypto/pull/884)."
+  - "Python code modernization: add type hints and type checking (https://github.com/ansible-collections/community.crypto/pull/885)."

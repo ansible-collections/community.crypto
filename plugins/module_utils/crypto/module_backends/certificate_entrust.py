@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -32,6 +33,12 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+    from ...argspec import ArgumentSpec
+
+
 try:
     from cryptography.x509.oid import NameOID
 except ImportError:
@@ -39,7 +46,7 @@ except ImportError:
 
 
 class EntrustCertificateBackend(CertificateBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(EntrustCertificateBackend, self).__init__(module)
         self.trackingId = None
         self.notAfter = get_relative_time_option(
@@ -48,16 +55,19 @@ class EntrustCertificateBackend(CertificateBackend):
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
 
-        if self.csr_content is None and self.csr_path is None:
-            raise CertificateError(
-                "csr_path or csr_content is required for entrust provider"
-            )
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                f"The certificate signing request file {self.csr_path} does not exist"
-            )
+        if self.csr_content is None:
+            if self.csr_path is None:
+                raise CertificateError(
+                    "csr_path or csr_content is required for entrust provider"
+                )
+            if not os.path.exists(self.csr_path):
+                raise CertificateError(
+                    f"The certificate signing request file {self.csr_path} does not exist"
+                )
 
         self._ensure_csr_loaded()
+        if self.csr is None:
+            raise CertificateError("CSR not provided")
 
         # ECS API defaults to using the validated organization tied to the account.
         # We want to always force behavior of trying to use the organization provided in the CSR.
@@ -93,9 +103,9 @@ class EntrustCertificateBackend(CertificateBackend):
                 ],
             )
         except SessionConfigurationException as e:
-            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e.message}")
+            module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
 
-    def generate_certificate(self):
+    def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
         body = {}
 
@@ -104,6 +114,7 @@ class EntrustCertificateBackend(CertificateBackend):
             # csr_content contains bytes
             body["csr"] = to_native(self.csr_content)
         else:
+            assert self.csr_path is not None
             with open(self.csr_path, "r") as csr_file:
                 body["csr"] = csr_file.read()
 
@@ -138,11 +149,15 @@ class EntrustCertificateBackend(CertificateBackend):
             content=self.cert_bytes,
         )
 
-    def get_certificate_data(self):
+    def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
         return self.cert_bytes
 
-    def needs_regeneration(self):
+    def needs_regeneration(
+        self,
+        not_before: datetime.datetime | None = None,
+        not_after: datetime.datetime | None = None,
+    ) -> bool:
         parent_check = super(EntrustCertificateBackend, self).needs_regeneration()
 
         try:
@@ -167,12 +182,12 @@ class EntrustCertificateBackend(CertificateBackend):
 
         return parent_check
 
-    def _get_cert_details(self):
-        cert_details = {}
+    def _get_cert_details(self) -> dict[str, t.Any]:
+        cert_details: dict[str, t.Any] = {}
         try:
             self._ensure_existing_certificate_loaded()
         except Exception:
-            return
+            return cert_details
         if self.existing_certificate:
             serial_number = f"{self.existing_certificate.serial_number:X}"
             expiry = get_not_valid_after(self.existing_certificate)
@@ -203,17 +218,17 @@ class EntrustCertificateBackend(CertificateBackend):
 
 
 class EntrustCertificateProvider(CertificateProvider):
-    def validate_module_args(self, module):
+    def validate_module_args(self, module: AnsibleModule) -> None:
         pass
 
-    def needs_version_two_certs(self, module):
+    def needs_version_two_certs(self, module: AnsibleModule) -> t.Literal[False]:
         return False
 
-    def create_backend(self, module):
+    def create_backend(self, module: AnsibleModule) -> EntrustCertificateBackend:
         return EntrustCertificateBackend(module)
 
 
-def add_entrust_provider_to_argument_spec(argument_spec):
+def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("entrust")
     argument_spec.argument_spec.update(
         dict(
@@ -248,7 +263,7 @@ def add_entrust_provider_to_argument_spec(argument_spec):
         )
     )
     argument_spec.required_if.append(
-        [
+        (
             "provider",
             "entrust",
             [
@@ -260,5 +275,5 @@ def add_entrust_provider_to_argument_spec(argument_spec):
                 "entrust_api_client_cert_path",
                 "entrust_api_client_cert_key_path",
             ],
-        ]
+        )
     )

@@ -8,14 +8,31 @@ import abc
 import os
 import stat
 import traceback
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.openssh.utils import (
     parse_openssh_version,
 )
 
 
-def restore_on_failure(f):
-    def backup_and_restore(module, path, *args, **kwargs):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+        PrivateKeyTypes,
+    )
+
+    from ..certificate import OpensshCertificateTimeParameters
+
+    Param = t.ParamSpec("Param")
+
+
+def restore_on_failure(
+    f: t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None],
+) -> t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None]:
+    def backup_and_restore(
+        module: AnsibleModule, path: str | os.PathLike, *args, **kwargs
+    ) -> None:
         backup_file = module.backup_local(path) if os.path.exists(path) else None
 
         try:
@@ -31,12 +48,31 @@ def restore_on_failure(f):
 
 
 @restore_on_failure
-def safe_atomic_move(module, path, destination):
+def safe_atomic_move(
+    module: AnsibleModule, path: str | os.PathLike, destination: str | os.PathLike
+):
     module.atomic_move(os.path.abspath(path), os.path.abspath(destination))
 
 
-def _restore_all_on_failure(f):
-    def backup_and_restore(self, sources_and_destinations, *args, **kwargs):
+def _restore_all_on_failure(
+    f: t.Callable[
+        t.Concatenate[
+            OpensshModule, list[tuple[str | os.PathLike, str | os.PathLike]], Param
+        ],
+        None,
+    ],
+) -> t.Callable[
+    t.Concatenate[
+        OpensshModule, list[tuple[str | os.PathLike, str | os.PathLike]], Param
+    ],
+    None,
+]:
+    def backup_and_restore(
+        self: OpensshModule,
+        sources_and_destinations: list[tuple[str | os.PathLike, str | os.PathLike]],
+        *args,
+        **kwargs,
+    ) -> None:
         backups = [
             (d, self.module.backup_local(d))
             for s, d in sources_and_destinations
@@ -59,13 +95,13 @@ def _restore_all_on_failure(f):
 
 
 class OpensshModule(metaclass=abc.ABCMeta):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
 
-        self.changed = False
-        self.check_mode = self.module.check_mode
+        self.changed: bool = False
+        self.check_mode: bool = self.module.check_mode
 
-    def execute(self):
+    def execute(self) -> t.NoReturn:
         try:
             self._execute()
         except Exception as e:
@@ -77,11 +113,11 @@ class OpensshModule(metaclass=abc.ABCMeta):
         self.module.exit_json(**self.result)
 
     @abc.abstractmethod
-    def _execute(self):
+    def _execute(self) -> None:
         pass
 
     @property
-    def result(self):
+    def result(self) -> dict[str, t.Any]:
         result = self._result
 
         result["changed"] = self.changed
@@ -93,12 +129,12 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
     @property
     @abc.abstractmethod
-    def _result(self):
+    def _result(self) -> dict[str, t.Any]:
         pass
 
     @property
     @abc.abstractmethod
-    def diff(self):
+    def diff(self) -> dict[str, t.Any]:
         pass
 
     @staticmethod
@@ -117,7 +153,7 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
         return wrapper
 
-    def _check_if_base_dir(self, path):
+    def _check_if_base_dir(self, path: str | os.PathLike) -> None:
         base_dir = os.path.dirname(path) or "."
         if not os.path.isdir(base_dir):
             self.module.fail_json(
@@ -125,16 +161,19 @@ class OpensshModule(metaclass=abc.ABCMeta):
                 msg=f"The directory {base_dir} does not exist or the file is not a directory",
             )
 
-    def _get_ssh_version(self):
+    def _get_ssh_version(self) -> str | None:
         ssh_bin = self.module.get_bin_path("ssh")
         if not ssh_bin:
-            return ""
+            return None
         return parse_openssh_version(
             self.module.run_command([ssh_bin, "-V", "-q"], check_rc=True)[2].strip()
         )
 
     @_restore_all_on_failure
-    def _safe_secure_move(self, sources_and_destinations):
+    def _safe_secure_move(
+        self,
+        sources_and_destinations: list[tuple[str | os.PathLike, str | os.PathLike]],
+    ) -> None:
         """Moves a list of files from 'source' to 'destination' and restores 'destination' from backup upon failure.
         If 'destination' does not already exist, then 'source' permissions are preserved to prevent
         exposing protected data ('atomic_move' uses the 'destination' base directory mask for
@@ -148,7 +187,7 @@ class OpensshModule(metaclass=abc.ABCMeta):
             else:
                 self.module.preserved_copy(source, destination)
 
-    def _update_permissions(self, path):
+    def _update_permissions(self, path: str | os.PathLike) -> None:
         file_args = self.module.load_file_common_arguments(self.module.params)
         file_args["path"] = path
 
@@ -161,25 +200,25 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
 
 class KeygenCommand:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self._bin_path = module.get_bin_path("ssh-keygen", True)
         self._run_command = module.run_command
 
     def generate_certificate(
         self,
-        certificate_path,
-        identifier,
-        options,
-        pkcs11_provider,
-        principals,
-        serial_number,
-        signature_algorithm,
-        signing_key_path,
-        type,
-        time_parameters,
-        use_agent,
+        certificate_path: str,
+        identifier: str,
+        options: list[str] | None,
+        pkcs11_provider: str | None,
+        principals: list[str] | None,
+        serial_number: int | None,
+        signature_algorithm: str | None,
+        signing_key_path: str,
+        type: t.Literal["host"] | None,
+        time_parameters: OpensshCertificateTimeParameters,
+        use_agent: bool,
         **kwargs,
-    ):
+    ) -> tuple[int, str, str]:
         args = [self._bin_path, "-s", signing_key_path, "-P", "", "-I", identifier]
 
         if options:
@@ -203,7 +242,9 @@ class KeygenCommand:
 
         return self._run_command(args, **kwargs)
 
-    def generate_keypair(self, private_key_path, size, type, comment, **kwargs):
+    def generate_keypair(
+        self, private_key_path: str, size: int, type: str, comment: str | None, **kwargs
+    ) -> tuple[int, str, str]:
         args = [
             self._bin_path,
             "-q",
@@ -224,32 +265,40 @@ class KeygenCommand:
 
         return self._run_command(args, data=data, **kwargs)
 
-    def get_certificate_info(self, certificate_path, **kwargs):
+    def get_certificate_info(
+        self, certificate_path: str, **kwargs
+    ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-L", "-f", certificate_path], **kwargs
         )
 
-    def get_matching_public_key(self, private_key_path, **kwargs):
+    def get_matching_public_key(
+        self, private_key_path: str, **kwargs
+    ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-P", "", "-y", "-f", private_key_path], **kwargs
         )
 
-    def get_private_key(self, private_key_path, **kwargs):
+    def get_private_key(self, private_key_path: str, **kwargs) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-l", "-f", private_key_path], **kwargs
         )
 
     def update_comment(
-        self, private_key_path, comment, force_new_format=True, **kwargs
-    ):
+        self,
+        private_key_path: str,
+        comment: str,
+        force_new_format: bool = True,
+        **kwargs,
+    ) -> tuple[int, str, str]:
         if os.path.exists(private_key_path) and not os.access(
             private_key_path, os.W_OK
         ):
             try:
                 os.chmod(private_key_path, stat.S_IWUSR + stat.S_IRUSR)
             except (IOError, OSError) as e:
-                raise e(
-                    f"The private key at {private_key_path} is not writeable preventing a comment update"
+                raise ValueError(
+                    f"The private key at {private_key_path} is not writeable preventing a comment update ({e})"
                 )
 
         command = [self._bin_path, "-q"]
@@ -259,31 +308,36 @@ class KeygenCommand:
         return self._run_command(command, **kwargs)
 
 
+_PrivateKey = t.TypeVar("_PrivateKey", bound="PrivateKey")
+
+
 class PrivateKey:
-    def __init__(self, size, key_type, fingerprint, format=""):
+    def __init__(
+        self, size: int, key_type: str, fingerprint: str, format: str = ""
+    ) -> None:
         self._size = size
         self._type = key_type
         self._fingerprint = fingerprint
         self._format = format
 
     @property
-    def size(self):
+    def size(self) -> int:
         return self._size
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._type
 
     @property
-    def fingerprint(self):
+    def fingerprint(self) -> str:
         return self._fingerprint
 
     @property
-    def format(self):
+    def format(self) -> str:
         return self._format
 
     @classmethod
-    def from_string(cls, string):
+    def from_string(cls: t.Type[_PrivateKey], string: str) -> _PrivateKey:
         properties = string.split()
 
         return cls(
@@ -292,7 +346,7 @@ class PrivateKey:
             fingerprint=properties[1],
         )
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, t.Any]:
         return {
             "size": self._size,
             "type": self._type,
@@ -301,13 +355,16 @@ class PrivateKey:
         }
 
 
+_PublicKey = t.TypeVar("_PublicKey", bound="PublicKey")
+
+
 class PublicKey:
-    def __init__(self, type_string, data, comment):
+    def __init__(self, type_string: str, data: str, comment: str | None) -> None:
         self._type_string = type_string
         self._data = data
         self._comment = comment
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
 
@@ -323,30 +380,30 @@ class PublicKey:
             ]
         )
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self._type_string} {self._data}"
 
     @property
-    def comment(self):
+    def comment(self) -> str | None:
         return self._comment
 
     @comment.setter
-    def comment(self, value):
+    def comment(self, value: str | None) -> None:
         self._comment = value
 
     @property
-    def data(self):
+    def data(self) -> str:
         return self._data
 
     @property
-    def type_string(self):
+    def type_string(self) -> str:
         return self._type_string
 
     @classmethod
-    def from_string(cls, string):
+    def from_string(cls: t.Type[_PublicKey], string: str) -> _PublicKey:
         properties = string.strip("\n").split(" ", 2)
 
         return cls(
@@ -356,7 +413,7 @@ class PublicKey:
         )
 
     @classmethod
-    def load(cls, path):
+    def load(cls: t.Type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
         try:
             with open(path, "r") as f:
                 properties = f.read().strip(" \n").split(" ", 2)
@@ -372,14 +429,16 @@ class PublicKey:
             comment="" if len(properties) <= 2 else properties[2],
         )
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, t.Any]:
         return {
             "comment": self._comment,
             "public_key": self._data,
         }
 
 
-def parse_private_key_format(path):
+def parse_private_key_format(
+    path: str | os.PathLike,
+) -> t.Literal["SSH", "PKCS8", "PKCS1", ""]:
     with open(path, "r") as file:
         header = file.readline().strip()
 

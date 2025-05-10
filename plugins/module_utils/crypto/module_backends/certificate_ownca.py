@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from random import randrange
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -18,6 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_verify_certificate_signature,
     get_not_valid_after,
     get_not_valid_before,
+    is_potential_certificate_issuer_public_key,
     set_not_valid_after,
     set_not_valid_before,
 )
@@ -28,12 +30,23 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     load_certificate,
-    load_privatekey,
+    load_certificate_issuer_privatekey,
     select_message_digest,
 )
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
 )
+
+
+if t.TYPE_CHECKING:
+    import datetime
+
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+    )
+
+    from ...argspec import ArgumentSpec
 
 
 try:
@@ -45,13 +58,13 @@ except ImportError:
 
 
 class OwnCACertificateBackendCryptography(CertificateBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(OwnCACertificateBackendCryptography, self).__init__(module)
 
-        self.create_subject_key_identifier = module.params[
-            "ownca_create_subject_key_identifier"
-        ]
-        self.create_authority_key_identifier = module.params[
+        self.create_subject_key_identifier: t.Literal[
+            "create_if_not_provided", "always_create", "never_create"
+        ] = module.params["ownca_create_subject_key_identifier"]
+        self.create_authority_key_identifier: bool = module.params[
             "ownca_create_authority_key_identifier"
         ]
         self.notBefore = get_relative_time_option(
@@ -65,31 +78,40 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["ownca_digest"])
-        self.version = module.params["ownca_version"]
+        self.version: int = module.params["ownca_version"]
         self.serial_number = x509.random_serial_number()
-        self.ca_cert_path = module.params["ownca_path"]
-        self.ca_cert_content = module.params["ownca_content"]
-        if self.ca_cert_content is not None:
-            self.ca_cert_content = self.ca_cert_content.encode("utf-8")
-        self.ca_privatekey_path = module.params["ownca_privatekey_path"]
-        self.ca_privatekey_content = module.params["ownca_privatekey_content"]
-        if self.ca_privatekey_content is not None:
-            self.ca_privatekey_content = self.ca_privatekey_content.encode("utf-8")
-        self.ca_privatekey_passphrase = module.params["ownca_privatekey_passphrase"]
+        self.ca_cert_path: str | None = module.params["ownca_path"]
+        ca_cert_content: str | None = module.params["ownca_content"]
+        if ca_cert_content is not None:
+            self.ca_cert_content: bytes | None = ca_cert_content.encode("utf-8")
+        else:
+            self.ca_cert_content = None
+        self.ca_privatekey_path: str | None = module.params["ownca_privatekey_path"]
+        ca_privatekey_content: str | None = module.params["ownca_privatekey_content"]
+        if ca_privatekey_content is not None:
+            self.ca_privatekey_content: bytes | None = ca_privatekey_content.encode(
+                "utf-8"
+            )
+        else:
+            self.ca_privatekey_content = None
+        self.ca_privatekey_passphrase: str | None = module.params[
+            "ownca_privatekey_passphrase"
+        ]
 
-        if self.csr_content is None and self.csr_path is None:
-            raise CertificateError(
-                "csr_path or csr_content is required for ownca provider"
-            )
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                f"The certificate signing request file {self.csr_path} does not exist"
-            )
-        if self.ca_cert_content is None and not os.path.exists(self.ca_cert_path):
+        if self.csr_content is None:
+            if self.csr_path is None:
+                raise CertificateError(
+                    "csr_path or csr_content is required for ownca provider"
+                )
+            if not os.path.exists(self.csr_path):
+                raise CertificateError(
+                    f"The certificate signing request file {self.csr_path} does not exist"
+                )
+        if self.ca_cert_path is not None and not os.path.exists(self.ca_cert_path):
             raise CertificateError(
                 f"The CA certificate file {self.ca_cert_path} does not exist"
             )
-        if self.ca_privatekey_content is None and not os.path.exists(
+        if self.ca_privatekey_path is not None and not os.path.exists(
             self.ca_privatekey_path
         ):
             raise CertificateError(
@@ -101,8 +123,12 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             path=self.ca_cert_path,
             content=self.ca_cert_content,
         )
+        if not is_potential_certificate_issuer_public_key(self.ca_cert.public_key()):
+            raise CertificateError(
+                "CA certificate's public key cannot be used to sign certificates"
+            )
         try:
-            self.ca_private_key = load_privatekey(
+            self.ca_private_key = load_certificate_issuer_privatekey(
                 path=self.ca_privatekey_path,
                 content=self.ca_privatekey_content,
                 passphrase=self.ca_privatekey_passphrase,
@@ -125,8 +151,10 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         else:
             self.digest = None
 
-    def generate_certificate(self):
+    def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
+        if self.csr is None:
+            raise AssertionError("Contract violation: csr has not been populated")
         cert_builder = x509.CertificateBuilder()
         cert_builder = cert_builder.subject_name(self.csr.subject)
         cert_builder = cert_builder.issuer_name(self.ca_cert.subject)
@@ -166,10 +194,10 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
                     critical=False,
                 )
             except cryptography.x509.ExtensionNotFound:
+                public_key = self.ca_cert.public_key()
+                assert is_potential_certificate_issuer_public_key(public_key)
                 cert_builder = cert_builder.add_extension(
-                    x509.AuthorityKeyIdentifier.from_issuer_public_key(
-                        self.ca_cert.public_key()
-                    ),
+                    x509.AuthorityKeyIdentifier.from_issuer_public_key(public_key),
                     critical=False,
                 )
 
@@ -180,17 +208,24 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         self.cert = certificate
 
-    def get_certificate_data(self):
+    def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
+        if self.cert is None:
+            raise AssertionError("Contract violation: cert has not been populated")
         return self.cert.public_bytes(Encoding.PEM)
 
-    def needs_regeneration(self):
+    def needs_regeneration(
+        self,
+        not_before: datetime.datetime | None = None,
+        not_after: datetime.datetime | None = None,
+    ) -> bool:
         if super(OwnCACertificateBackendCryptography, self).needs_regeneration(
             not_before=self.notBefore, not_after=self.notAfter
         ):
             return True
 
         self._ensure_existing_certificate_loaded()
+        assert self.existing_certificate is not None
 
         # Check whether certificate is signed by CA certificate
         if not cryptography_verify_certificate_signature(
@@ -205,31 +240,33 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         # Check AuthorityKeyIdentifier
         if self.create_authority_key_identifier:
             try:
-                ext = self.ca_cert.extensions.get_extension_for_class(
+                ext_ski = self.ca_cert.extensions.get_extension_for_class(
                     x509.SubjectKeyIdentifier
                 )
                 expected_ext = (
                     x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                        ext.value
+                        ext_ski.value
                     )
                 )
             except cryptography.x509.ExtensionNotFound:
+                public_key = self.ca_cert.public_key()
+                assert is_potential_certificate_issuer_public_key(public_key)
                 expected_ext = x509.AuthorityKeyIdentifier.from_issuer_public_key(
-                    self.ca_cert.public_key()
+                    public_key
                 )
 
             try:
-                ext = self.existing_certificate.extensions.get_extension_for_class(
+                ext_aki = self.existing_certificate.extensions.get_extension_for_class(
                     x509.AuthorityKeyIdentifier
                 )
-                if ext.value != expected_ext:
+                if ext_aki.value != expected_ext:
                     return True
             except cryptography.x509.ExtensionNotFound:
                 return True
 
         return False
 
-    def dump(self, include_certificate):
+    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
         result = super(OwnCACertificateBackendCryptography, self).dump(
             include_certificate
         )
@@ -251,6 +288,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         else:
             if self.cert is None:
                 self.cert = self.existing_certificate
+            assert self.cert is not None
             result.update(
                 {
                     "notBefore": get_not_valid_before(self.cert).strftime(
@@ -266,7 +304,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         return result
 
 
-def generate_serial_number():
+def generate_serial_number() -> int:
     """Generate a serial number for a certificate"""
     while True:
         result = randrange(0, 1 << 160)
@@ -275,7 +313,7 @@ def generate_serial_number():
 
 
 class OwnCACertificateProvider(CertificateProvider):
-    def validate_module_args(self, module):
+    def validate_module_args(self, module: AnsibleModule) -> None:
         if (
             module.params["ownca_path"] is None
             and module.params["ownca_content"] is None
@@ -291,14 +329,16 @@ class OwnCACertificateProvider(CertificateProvider):
                 msg="One of ownca_privatekey_path and ownca_privatekey_content must be specified for the ownca provider."
             )
 
-    def needs_version_two_certs(self, module):
+    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
         return module.params["ownca_version"] == 2
 
-    def create_backend(self, module):
+    def create_backend(
+        self, module: AnsibleModule
+    ) -> OwnCACertificateBackendCryptography:
         return OwnCACertificateBackendCryptography(module)
 
 
-def add_ownca_provider_to_argument_spec(argument_spec):
+def add_ownca_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("ownca")
     argument_spec.argument_spec.update(
         dict(

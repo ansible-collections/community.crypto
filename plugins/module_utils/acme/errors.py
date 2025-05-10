@@ -5,19 +5,24 @@
 
 from __future__ import annotations
 
+import typing as t
 from http.client import responses as http_responses
 
 from ansible.module_utils.common.text.converters import to_text
 
 
-def format_http_status(status_code):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+def format_http_status(status_code: int) -> str:
     expl = http_responses.get(status_code)
     if not expl:
         return str(status_code)
     return f"{status_code} {expl}"
 
 
-def format_error_problem(problem, subproblem_prefix=""):
+def format_error_problem(problem: dict[str, t.Any], subproblem_prefix: str = "") -> str:
     error_type = problem.get(
         "type", "about:blank"
     )  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
@@ -32,8 +37,10 @@ def format_error_problem(problem, subproblem_prefix=""):
         msg = f"{msg} Subproblems:"
         for index, problem in enumerate(subproblems):
             index_str = f"{subproblem_prefix}{index}"
-            problem = format_error_problem(problem, subproblem_prefix=f"{index_str}.")
-            msg = f"{msg}\n({index_str}) {problem}"
+            problem_str = format_error_problem(
+                problem, subproblem_prefix=f"{index_str}."
+            )
+            msg = f"{msg}\n({index_str}) {problem_str}"
     return msg
 
 
@@ -42,25 +49,25 @@ class ModuleFailException(Exception):
     If raised, module.fail_json() will be called with the given parameters after cleanup.
     """
 
-    def __init__(self, msg, **args):
+    def __init__(self, msg: str, **args: t.Any) -> None:
         super(ModuleFailException, self).__init__(self, msg)
         self.msg = msg
         self.module_fail_args = args
 
-    def do_fail(self, module, **arguments):
+    def do_fail(self, module: AnsibleModule, **arguments) -> t.NoReturn:
         module.fail_json(msg=self.msg, other=self.module_fail_args, **arguments)
 
 
 class ACMEProtocolException(ModuleFailException):
     def __init__(
         self,
-        module,
-        msg=None,
-        info=None,
+        module: AnsibleModule,
+        msg: str | None = None,
+        info: dict[str, t.Any] | None = None,
         response=None,
-        content=None,
-        content_json=None,
-        extras=None,
+        content: bytes | None = None,
+        content_json: dict[str, t.Any] | None = None,
+        extras: dict[str, t.Any] | None = None,
     ):
         # Try to get hold of content, if response is given and content is not provided
         if content is None and content_json is None and response is not None:
@@ -71,7 +78,8 @@ class ACMEProtocolException(ModuleFailException):
                     raise TypeError
                 content = response.read()
             except (AttributeError, TypeError):
-                content = info.pop("body", None)
+                if info is not None:
+                    content = info.pop("body", None)
 
         # Make sure that content_json is None or a dictionary
         if content_json is not None and not isinstance(content_json, dict):
@@ -139,8 +147,8 @@ class ACMEProtocolException(ModuleFailException):
             add_msg = f" The raw result: {to_text(content)}"
 
         super(ACMEProtocolException, self).__init__(f"{msg}.{add_msg}", **extras)
-        self.problem = {}
-        self.subproblems = []
+        self.problem: dict[str, t.Any] = {}
+        self.subproblems: list[dict[str, t.Any]] = []
         self.error_code = error_code
         self.error_type = error_type
         for k, v in extras.items():

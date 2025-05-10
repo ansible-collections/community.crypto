@@ -9,6 +9,7 @@ import binascii
 import ipaddress
 import re
 import traceback
+import typing as t
 from urllib.parse import (
     ParseResult,
     urlparse,
@@ -40,6 +41,7 @@ except ImportError:
     pass
 
 try:
+    import cryptography.hazmat.primitives.asymmetric.dh
     import cryptography.hazmat.primitives.asymmetric.ed448
     import cryptography.hazmat.primitives.asymmetric.ed25519
     import cryptography.hazmat.primitives.asymmetric.rsa
@@ -55,7 +57,7 @@ try:
     )
 except ImportError:
     # Error handled in the calling module.
-    _load_pkcs12 = None
+    _load_pkcs12 = None  # type: ignore
 
 try:
     import idna
@@ -74,6 +76,50 @@ from .basic import (
 )
 
 
+if t.TYPE_CHECKING:
+    import datetime
+
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.asymmetric.dh import DHPrivateKey, DHPublicKey
+    from cryptography.hazmat.primitives.asymmetric.dsa import (
+        DSAPrivateKey,
+        DSAPublicKey,
+    )
+    from cryptography.hazmat.primitives.asymmetric.ec import (
+        EllipticCurvePrivateKey,
+        EllipticCurvePublicKey,
+    )
+    from cryptography.hazmat.primitives.asymmetric.rsa import (
+        RSAPrivateKey,
+        RSAPublicKey,
+    )
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+        CertificateIssuerPublicKeyTypes,
+        CertificatePublicKeyTypes,
+        PrivateKeyTypes,
+        PublicKeyTypes,
+    )
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        PKCS12KeyAndCertificates,
+    )
+
+    CertificatePrivateKeyTypes = (
+        CertificateIssuerPrivateKeyTypes
+        | cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey
+        | cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
+    )
+    PublicKeyTypesWOEdwards = (
+        DHPublicKey | DSAPublicKey | EllipticCurvePublicKey | RSAPublicKey
+    )
+    PrivateKeyTypesWOEdwards = (
+        DHPrivateKey | DSAPrivateKey | EllipticCurvePrivateKey | RSAPrivateKey
+    )
+else:
+    PublicKeyTypesWOEdwards = None
+    PrivateKeyTypesWOEdwards = None
+
+
 CRYPTOGRAPHY_TIMEZONE = False
 _CRYPTOGRAPHY_36_0_OR_NEWER = False
 if _HAS_CRYPTOGRAPHY:
@@ -88,7 +134,9 @@ if _HAS_CRYPTOGRAPHY:
 DOTTED_OID = re.compile(r"^\d+(?:\.\d+)+$")
 
 
-def cryptography_get_extensions_from_cert(cert):
+def cryptography_get_extensions_from_cert(
+    cert: x509.Certificate,
+) -> dict[str, dict[str, bool | str]]:
     result = dict()
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
@@ -105,7 +153,7 @@ def cryptography_get_extensions_from_cert(cert):
 
         backend = default_backend()
 
-        x509_obj = cert._x509
+        x509_obj = cert._x509  # type: ignore
         # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
         # not allow to get the raw value of an extension, so we have to use this ugly hack:
         exts = list(cert.extensions)
@@ -135,7 +183,9 @@ def cryptography_get_extensions_from_cert(cert):
     return result
 
 
-def cryptography_get_extensions_from_csr(csr):
+def cryptography_get_extensions_from_csr(
+    csr: x509.CertificateSigningRequest,
+) -> dict[str, dict[str, bool | str]]:
     result = dict()
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
@@ -153,7 +203,7 @@ def cryptography_get_extensions_from_csr(csr):
 
         backend = default_backend()
 
-        extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
+        extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)  # type: ignore
         extensions = backend._ffi.gc(
             extensions,
             lambda ext: backend._lib.sk_X509_EXTENSION_pop_free(
@@ -175,7 +225,7 @@ def cryptography_get_extensions_from_csr(csr):
             crit = backend._lib.X509_EXTENSION_get_critical(ext)
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
-            der = backend._ffi.buffer(data.data, data.length)[:]
+            der: bytes = backend._ffi.buffer(data.data, data.length)[:]  # type: ignore
             entry = dict(
                 critical=(crit == 1),
                 value=base64.b64encode(der).decode("ascii"),
@@ -193,7 +243,7 @@ def cryptography_get_extensions_from_csr(csr):
     return result
 
 
-def cryptography_name_to_oid(name):
+def cryptography_name_to_oid(name: str) -> x509.oid.ObjectIdentifier:
     dotted = OID_LOOKUP.get(name)
     if dotted is None:
         if DOTTED_OID.match(name):
@@ -202,7 +252,9 @@ def cryptography_name_to_oid(name):
     return x509.oid.ObjectIdentifier(dotted)
 
 
-def cryptography_oid_to_name(oid, short=False):
+def cryptography_oid_to_name(
+    oid: x509.oid.ObjectIdentifier, short: bool = False
+) -> str:
     dotted_string = oid.dotted_string
     names = OID_MAP.get(dotted_string)
     if names:
@@ -217,15 +269,22 @@ def cryptography_oid_to_name(oid, short=False):
         return NORMALIZE_NAMES.get(name, name)
 
 
-def _get_hex(bytesstr):
+def _get_hex(bytesstr: bytes) -> str:
     if bytesstr is None:
         return bytesstr
     data = binascii.hexlify(bytesstr)
-    data = to_text(b":".join(data[i : i + 2] for i in range(0, len(data), 2)))
-    return data
+    return to_text(b":".join(data[i : i + 2] for i in range(0, len(data), 2)))
 
 
-def _parse_hex(bytesstr):
+@t.overload
+def _parse_hex(bytesstr: bytes | str) -> bytes: ...
+
+
+@t.overload
+def _parse_hex(bytesstr: bytes | str | None) -> bytes | None: ...
+
+
+def _parse_hex(bytesstr: bytes | str | None) -> bytes | None:
     if bytesstr is None:
         return bytesstr
     data = "".join(
@@ -234,19 +293,20 @@ def _parse_hex(bytesstr):
             for p in to_text(bytesstr).split(":")
         ]
     )
-    data = binascii.unhexlify(data)
-    return data
+    return binascii.unhexlify(data)
 
 
 DN_COMPONENT_START_RE = re.compile(b"^ *([a-zA-z0-9.]+) *= *")
 DN_HEX_LETTER = b"0123456789abcdef"
 
 
-def _int_to_byte(value):
+def _int_to_byte(value: int) -> bytes:
     return bytes((value,))
 
 
-def _parse_dn_component(name, sep=b",", decode_remainder=True):
+def _parse_dn_component(
+    name: bytes, sep: bytes = b",", decode_remainder: bool = True
+) -> tuple[x509.NameAttribute, bytes]:
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
         raise OpenSSLObjectError(f'cannot start part in "{to_text(name)}"')
@@ -305,7 +365,7 @@ def _parse_dn_component(name, sep=b",", decode_remainder=True):
     return x509.NameAttribute(oid, to_text(b"".join(decoded_name))), name[idx:]
 
 
-def _parse_dn(name):
+def _parse_dn(name: bytes) -> list[x509.NameAttribute]:
     """
     Parse a Distinguished Name.
 
@@ -323,31 +383,33 @@ def _parse_dn(name):
             attribute, name = _parse_dn_component(name, sep=sep)
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                f'Error while parsing distinguished name "{to_text(original_name)}": {e}'
+                f"Error while parsing distinguished name {to_text(original_name)!r}: {e}"
             )
         result.append(attribute)
         if name:
             if name[0:1] != sep or len(name) < 2:
                 raise OpenSSLObjectError(
-                    f'Error while parsing distinguished name "{to_text(original_name)}": unexpected end of string'
+                    f"Error while parsing distinguished name {to_text(original_name)!r}: unexpected end of string"
                 )
             name = name[1:]
     return result
 
 
-def cryptography_parse_relative_distinguished_name(rdn):
+def cryptography_parse_relative_distinguished_name(
+    rdn: list[str | bytes],
+) -> cryptography.x509.RelativeDistinguishedName:
     names = []
     for part in rdn:
         try:
             names.append(_parse_dn_component(to_bytes(part), decode_remainder=False)[0])
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
-                f'Error while parsing relative distinguished name "{part}": {e}'
+                f"Error while parsing relative distinguished name {to_text(part)!r}: {e}"
             )
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
-def _is_ascii(value):
+def _is_ascii(value: str) -> bool:
     """Check whether the Unicode string `value` contains only ASCII characters."""
     try:
         value.encode("ascii")
@@ -356,7 +418,7 @@ def _is_ascii(value):
         return False
 
 
-def _adjust_idn(value, idn_rewrite):
+def _adjust_idn(value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]) -> str:
     if idn_rewrite == "ignore" or not value:
         return value
     if idn_rewrite == "idna" and _is_ascii(value):
@@ -399,16 +461,20 @@ def _adjust_idn(value, idn_rewrite):
     return ".".join(parts)
 
 
-def _adjust_idn_email(value, idn_rewrite):
+def _adjust_idn_email(
+    value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
+) -> str:
     idx = value.find("@")
     if idx < 0:
         return value
     return f"{value[:idx]}@{_adjust_idn(value[idx + 1:], idn_rewrite)}"
 
 
-def _adjust_idn_url(value, idn_rewrite):
+def _adjust_idn_url(
+    value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
+) -> str:
     url = urlparse(value)
-    host = _adjust_idn(url.hostname, idn_rewrite)
+    host = _adjust_idn(url.hostname, idn_rewrite) if url.hostname else None
     if url.username is not None and url.password is not None:
         host = f"{url.username}:{url.password}@{host}"
     elif url.username is not None:
@@ -418,7 +484,7 @@ def _adjust_idn_url(value, idn_rewrite):
     return urlunparse(
         ParseResult(
             scheme=url.scheme,
-            netloc=host,
+            netloc=host or "",
             path=url.path,
             params=url.params,
             query=url.query,
@@ -427,7 +493,9 @@ def _adjust_idn_url(value, idn_rewrite):
     )
 
 
-def cryptography_get_name(name, what="Subject Alternative Name"):
+def cryptography_get_name(
+    name: str, what: str = "Subject Alternative Name"
+) -> x509.GeneralName:
     """
     Given a name string, returns a cryptography x509.GeneralName object.
     Raises an OpenSSLObjectError if the name is unknown or cannot be parsed.
@@ -490,7 +558,7 @@ def cryptography_get_name(name, what="Subject Alternative Name"):
     )
 
 
-def _dn_escape_value(value):
+def _dn_escape_value(value: str) -> str:
     """
     Escape Distinguished Name's attribute value.
     """
@@ -505,7 +573,10 @@ def _dn_escape_value(value):
     return value
 
 
-def cryptography_decode_name(name, idn_rewrite="ignore"):
+def cryptography_decode_name(
+    name: x509.GeneralName,
+    idn_rewrite: t.Literal["ignore", "idna", "unicode"] = "ignore",
+) -> str:
     """
     Given a cryptography x509.GeneralName object, returns a string.
     Raises an OpenSSLObjectError if the name is not supported.
@@ -529,7 +600,7 @@ def cryptography_decode_name(name, idn_rewrite="ignore"):
         # list needs to be reversed, and joined by commas
         return "dirName:" + ",".join(
             [
-                f"{to_text(cryptography_oid_to_name(attribute.oid, short=True))}={_dn_escape_value(attribute.value)}"
+                f"{to_text(cryptography_oid_to_name(attribute.oid, short=True))}={_dn_escape_value(to_text(attribute.value))}"
                 for attribute in reversed(list(name.value))
             ]
         )
@@ -540,7 +611,7 @@ def cryptography_decode_name(name, idn_rewrite="ignore"):
     raise OpenSSLObjectError(f'Cannot decode name "{name}"')
 
 
-def _cryptography_get_keyusage(usage):
+def _cryptography_get_keyusage(usage: str) -> str:
     """
     Given a key usage identifier string, returns the parameter name used by cryptography's x509.KeyUsage().
     Raises an OpenSSLObjectError if the identifier is unknown.
@@ -566,7 +637,7 @@ def _cryptography_get_keyusage(usage):
     raise OpenSSLObjectError(f'Unknown key usage "{usage}"')
 
 
-def cryptography_parse_key_usage_params(usages):
+def cryptography_parse_key_usage_params(usages: t.Iterable[str]) -> dict[str, bool]:
     """
     Given a list of key usage identifier strings, returns the parameters for cryptography's x509.KeyUsage().
     Raises an OpenSSLObjectError if an identifier is unknown.
@@ -587,13 +658,15 @@ def cryptography_parse_key_usage_params(usages):
     return params
 
 
-def cryptography_get_basic_constraints(constraints):
+def cryptography_get_basic_constraints(
+    constraints: t.Iterable[str] | None,
+) -> tuple[bool, int | None]:
     """
     Given a list of constraints, returns a tuple (ca, path_length).
     Raises an OpenSSLObjectError if a constraint is unknown or cannot be parsed.
     """
     ca = False
-    path_length = None
+    path_length: int | None = None
     if constraints:
         for constraint in constraints:
             if constraint.startswith("CA:"):
@@ -618,7 +691,9 @@ def cryptography_get_basic_constraints(constraints):
     return ca, path_length
 
 
-def cryptography_key_needs_digest_for_signing(key):
+def cryptography_key_needs_digest_for_signing(
+    key: CertificateIssuerPrivateKeyTypes,
+) -> bool:
     """Tests whether the given private key requires a digest algorithm for signing.
 
     Ed25519 and Ed448 keys do not; they need None to be passed as the digest algorithm.
@@ -632,19 +707,27 @@ def cryptography_key_needs_digest_for_signing(key):
     return True
 
 
-def _compare_public_keys(key1, key2, clazz):
+def _compare_public_keys(
+    key1: PublicKeyTypes, key2: PublicKeyTypes, clazz: type[PublicKeyTypes]
+) -> bool | None:
     a = isinstance(key1, clazz)
     b = isinstance(key2, clazz)
     if not (a or b):
         return None
     if not a or not b:
         return False
-    a = key1.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-    b = key2.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-    return a == b
+    a_bytes = key1.public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw
+    )
+    b_bytes = key2.public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw
+    )
+    return a_bytes == b_bytes
 
 
-def cryptography_compare_public_keys(key1, key2):
+def cryptography_compare_public_keys(
+    key1: PublicKeyTypes, key2: PublicKeyTypes
+) -> bool:
     """Tests whether two public keys are the same.
 
     Needs special logic for Ed25519 and Ed448 keys, since they do not have public_numbers().
@@ -657,14 +740,31 @@ def cryptography_compare_public_keys(key1, key2):
     if res is not None:
         return res
     res = _compare_public_keys(
+        key1,
+        key2,
+        cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
+    )
+    if res is not None:
+        return res
+    res = _compare_public_keys(
         key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
     )
     if res is not None:
         return res
-    return key1.public_numbers() == key2.public_numbers()
+    res = _compare_public_keys(
+        key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey
+    )
+    if res is not None:
+        return res
+    return (
+        t.cast(PublicKeyTypesWOEdwards, key1).public_numbers()
+        == t.cast(PublicKeyTypesWOEdwards, key2).public_numbers()
+    )
 
 
-def _compare_private_keys(key1, key2, clazz):
+def _compare_private_keys(
+    key1: PrivateKeyTypes, key2: PrivateKeyTypes, clazz: type[PrivateKeyTypes]
+) -> bool | None:
     a = isinstance(key1, clazz)
     b = isinstance(key2, clazz)
     if not (a or b):
@@ -672,20 +772,22 @@ def _compare_private_keys(key1, key2, clazz):
     if not a or not b:
         return False
     encryption_algorithm = cryptography.hazmat.primitives.serialization.NoEncryption()
-    a = key1.private_bytes(
+    a_bytes = key1.private_bytes(
         serialization.Encoding.Raw,
         serialization.PrivateFormat.Raw,
         encryption_algorithm=encryption_algorithm,
     )
-    b = key2.private_bytes(
+    b_bytes = key2.private_bytes(
         serialization.Encoding.Raw,
         serialization.PrivateFormat.Raw,
         encryption_algorithm=encryption_algorithm,
     )
-    return a == b
+    return a_bytes == b_bytes
 
 
-def cryptography_compare_private_keys(key1, key2):
+def cryptography_compare_private_keys(
+    key1: PrivateKeyTypes, key2: PrivateKeyTypes
+) -> bool:
     """Tests whether two private keys are the same.
 
     Needs special logic for Ed25519, X25519, and Ed448 keys, since they do not have private_numbers().
@@ -714,25 +816,39 @@ def cryptography_compare_private_keys(key1, key2):
     )
     if res is not None:
         return res
-    return key1.private_numbers() == key2.private_numbers()
+    return (
+        t.cast(PrivateKeyTypesWOEdwards, key1).private_numbers()
+        == t.cast(PrivateKeyTypesWOEdwards, key2).private_numbers()
+    )
 
 
-def parse_pkcs12(pkcs12_bytes, passphrase=None):
+def parse_pkcs12(pkcs12_bytes: bytes, passphrase: bytes | str | None = None) -> tuple[
+    PrivateKeyTypes | None,
+    x509.Certificate | None,
+    list[x509.Certificate],
+    bytes | None,
+]:
     """Returns a tuple (private_key, certificate, additional_certificates, friendly_name)."""
+    passphrase_bytes = None
     if passphrase is not None:
-        passphrase = to_bytes(passphrase)
+        passphrase_bytes = to_bytes(passphrase)
 
     # Main code for cryptography 36.0.0 and forward
     if _load_pkcs12 is not None:
-        return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase)
+        return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase_bytes)
 
     if LooseVersion(cryptography.__version__) >= LooseVersion("35.0"):
-        return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase)
+        return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase_bytes)
 
-    return _parse_pkcs12_legacy(pkcs12_bytes, passphrase)
+    return _parse_pkcs12_legacy(pkcs12_bytes, passphrase_bytes)
 
 
-def _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase=None):
+def _parse_pkcs12_36_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+    PrivateKeyTypes | None,
+    x509.Certificate | None,
+    list[x509.Certificate],
+    bytes | None,
+]:
     # Requires cryptography 36.0.0 or newer
     pkcs12 = _load_pkcs12(pkcs12_bytes, passphrase)
     additional_certificates = [cert.certificate for cert in pkcs12.additional_certs]
@@ -745,7 +861,12 @@ def _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase=None):
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=None):
+def _parse_pkcs12_35_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+    PrivateKeyTypes | None,
+    x509.Certificate | None,
+    list[x509.Certificate],
+    bytes | None,
+]:
     # Backwards compatibility code for cryptography 35.x
     private_key, certificate, additional_certificates = _load_key_and_certificates(
         pkcs12_bytes, passphrase
@@ -787,7 +908,12 @@ def _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=None):
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def _parse_pkcs12_legacy(pkcs12_bytes, passphrase=None):
+def _parse_pkcs12_legacy(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+    PrivateKeyTypes | None,
+    x509.Certificate | None,
+    list[x509.Certificate],
+    bytes | None,
+]:
     # Backwards compatibility code for cryptography < 35.0.0
     private_key, certificate, additional_certificates = _load_key_and_certificates(
         pkcs12_bytes, passphrase
@@ -796,14 +922,19 @@ def _parse_pkcs12_legacy(pkcs12_bytes, passphrase=None):
     friendly_name = None
     if certificate:
         # See https://github.com/pyca/cryptography/issues/5760#issuecomment-842687238
-        backend = certificate._backend
-        maybe_name = backend._lib.X509_alias_get0(certificate._x509, backend._ffi.NULL)
+        backend = certificate._backend  # type: ignore
+        maybe_name = backend._lib.X509_alias_get0(certificate._x509, backend._ffi.NULL)  # type: ignore
         if maybe_name != backend._ffi.NULL:
             friendly_name = backend._ffi.string(maybe_name)
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def cryptography_verify_signature(signature, data, hash_algorithm, signer_public_key):
+def cryptography_verify_signature(
+    signature: bytes,
+    data: bytes,
+    hash_algorithm: hashes.HashAlgorithm | None,
+    signer_public_key: PublicKeyTypes,
+) -> bool:
     """
     Check whether the given signature of the given data was signed by the given public key object.
     """
@@ -812,6 +943,8 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey,
         ):
+            if hash_algorithm is None:
+                raise OpenSSLObjectError("Need hash_algorithm for RSA keys")
             signer_public_key.verify(
                 signature, data, padding.PKCS1v15(), hash_algorithm
             )
@@ -820,6 +953,8 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
         ):
+            if hash_algorithm is None:
+                raise OpenSSLObjectError("Need hash_algorithm for ECC keys")
             signer_public_key.verify(
                 signature,
                 data,
@@ -830,6 +965,8 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
             signer_public_key,
             cryptography.hazmat.primitives.asymmetric.dsa.DSAPublicKey,
         ):
+            if hash_algorithm is None:
+                raise OpenSSLObjectError("Need hash_algorithm for DSA keys")
             signer_public_key.verify(signature, data, hash_algorithm)
             return True
         if isinstance(
@@ -851,7 +988,9 @@ def cryptography_verify_signature(signature, data, hash_algorithm, signer_public
         return False
 
 
-def cryptography_verify_certificate_signature(certificate, signer_public_key):
+def cryptography_verify_certificate_signature(
+    certificate: x509.Certificate, signer_public_key: PublicKeyTypes
+) -> bool:
     """
     Check whether the given X509 certificate object was signed by the given public key object.
     """
@@ -863,21 +1002,65 @@ def cryptography_verify_certificate_signature(certificate, signer_public_key):
     )
 
 
-def get_not_valid_after(obj):
+def get_not_valid_after(obj: x509.Certificate) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.not_valid_after_utc
     return obj.not_valid_after
 
 
-def get_not_valid_before(obj):
+def get_not_valid_before(obj: x509.Certificate) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.not_valid_before_utc
     return obj.not_valid_before
 
 
-def set_not_valid_after(builder, value):
+def set_not_valid_after(
+    builder: x509.CertificateBuilder, value: datetime.datetime
+) -> x509.CertificateBuilder:
     return builder.not_valid_after(value)
 
 
-def set_not_valid_before(builder, value):
+def set_not_valid_before(
+    builder: x509.CertificateBuilder, value: datetime.datetime
+) -> x509.CertificateBuilder:
     return builder.not_valid_before(value)
+
+
+def is_potential_certificate_private_key(
+    key: PrivateKeyTypes,
+) -> t.TypeGuard[CertificatePrivateKeyTypes]:
+    return not isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey
+    )
+
+
+def is_potential_certificate_issuer_private_key(
+    key: PrivateKeyTypes,
+) -> t.TypeGuard[CertificateIssuerPrivateKeyTypes]:
+    return not isinstance(
+        key,
+        (
+            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+            cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+            cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey,
+        ),
+    )
+
+
+def is_potential_certificate_public_key(
+    key: PublicKeyTypes,
+) -> t.TypeGuard[CertificatePublicKeyTypes]:
+    return not isinstance(key, DHPublicKey)
+
+
+def is_potential_certificate_issuer_public_key(
+    key: PublicKeyTypes,
+) -> t.TypeGuard[CertificateIssuerPublicKeyTypes]:
+    return not isinstance(
+        key,
+        (
+            cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
+            cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey,
+            cryptography.hazmat.primitives.asymmetric.dh.DHPublicKey,
+        ),
+    )
