@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import abc
 import os
+import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
@@ -39,31 +40,43 @@ from ansible_collections.community.crypto.plugins.module_utils.version import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+        PrivateKeyTypes,
+    )
+
+
 class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(KeypairBackend, self).__init__(module)
 
-        self.comment = self.module.params["comment"]
-        self.private_key_path = self.module.params["path"]
+        self.comment: str | None = self.module.params["comment"]
+        self.private_key_path: str = self.module.params["path"]
         self.public_key_path = self.private_key_path + ".pub"
-        self.regenerate = (
+        self.regenerate: t.Literal[
+            "never", "fail", "partial_idempotence", "full_idempotence", "always"
+        ] = (
             self.module.params["regenerate"]
             if not self.module.params["force"]
             else "always"
         )
-        self.state = self.module.params["state"]
-        self.type = self.module.params["type"]
+        self.state: t.Literal["present", "absent"] = self.module.params["state"]
+        self.type: t.Literal["rsa", "dsa", "rsa1", "ecdsa", "ed25519"] = (
+            self.module.params["type"]
+        )
 
-        self.size = self._get_size(self.module.params["size"])
+        self.size: int = self._get_size(self.module.params["size"])
         self._validate_path()
 
-        self.original_private_key = None
-        self.original_public_key = None
-        self.private_key = None
-        self.public_key = None
+        self.original_private_key: PrivateKey | None = None
+        self.original_public_key: PublicKey | None = None
+        self.private_key: PrivateKey | None = None
+        self.public_key: PublicKey | None = None
 
-    def _get_size(self, size):
+    def _get_size(self, size: int | None) -> int:
         if self.type in ("rsa", "rsa1"):
             result = 4096 if size is None else size
             if result < 1024:
@@ -96,7 +109,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
         return result
 
-    def _validate_path(self):
+    def _validate_path(self) -> None:
         self._check_if_base_dir(self.private_key_path)
 
         if os.path.isdir(self.private_key_path):
@@ -104,7 +117,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
                 msg=f"{self.private_key_path} is a directory. Please specify a path to a file."
             )
 
-    def _execute(self):
+    def _execute(self) -> None:
         self.original_private_key = self._load_private_key()
         self.original_public_key = self._load_public_key()
 
@@ -125,7 +138,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             if self._should_remove():
                 self._remove()
 
-    def _load_private_key(self):
+    def _load_private_key(self) -> PrivateKey | None:
         result = None
         if self._private_key_exists():
             try:
@@ -135,14 +148,14 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
         return result
 
-    def _private_key_exists(self):
+    def _private_key_exists(self) -> bool:
         return os.path.exists(self.private_key_path)
 
     @abc.abstractmethod
-    def _get_private_key(self):
+    def _get_private_key(self) -> PrivateKey:
         pass
 
-    def _load_public_key(self):
+    def _load_public_key(self) -> PublicKey | None:
         result = None
         if self._public_key_exists():
             try:
@@ -151,10 +164,10 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
                 pass
         return result
 
-    def _public_key_exists(self):
+    def _public_key_exists(self) -> bool:
         return os.path.exists(self.public_key_path)
 
-    def _validate_key_load(self):
+    def _validate_key_load(self) -> None:
         if (
             self._private_key_exists()
             and self.regenerate in ("never", "fail", "partial_idempotence")
@@ -167,10 +180,10 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             )
 
     @abc.abstractmethod
-    def _private_key_readable(self):
+    def _private_key_readable(self) -> bool:
         pass
 
-    def _should_generate(self):
+    def _should_generate(self) -> bool:
         if self.original_private_key is None:
             return True
         elif self.regenerate == "never":
@@ -188,7 +201,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         else:
             return True
 
-    def _private_key_valid(self):
+    def _private_key_valid(self) -> bool:
         if self.original_private_key is None:
             return False
 
@@ -196,17 +209,17 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             [
                 self.size == self.original_private_key.size,
                 self.type == self.original_private_key.type,
-                self._private_key_valid_backend(),
+                self._private_key_valid_backend(self.original_private_key),
             ]
         )
 
     @abc.abstractmethod
-    def _private_key_valid_backend(self):
+    def _private_key_valid_backend(self, original_private_key: PrivateKey) -> bool:
         pass
 
     @OpensshModule.trigger_change
     @OpensshModule.skip_if_check_mode
-    def _generate(self):
+    def _generate(self) -> None:
         temp_private_key, temp_public_key = self._generate_temp_keypair()
 
         try:
@@ -219,7 +232,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         except OSError as e:
             self.module.fail_json(msg=str(e))
 
-    def _generate_temp_keypair(self):
+    def _generate_temp_keypair(self) -> tuple[str, str]:
         temp_private_key = os.path.join(
             self.module.tmpdir, os.path.basename(self.private_key_path)
         )
@@ -236,25 +249,26 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         return temp_private_key, temp_public_key
 
     @abc.abstractmethod
-    def _generate_keypair(self, private_key_path):
+    def _generate_keypair(self, private_key_path: str) -> None:
         pass
 
-    def _public_key_valid(self):
+    def _public_key_valid(self) -> bool:
         if self.original_public_key is None:
             return False
 
         valid_public_key = self._get_public_key()
-        valid_public_key.comment = self.comment
+        if valid_public_key:
+            valid_public_key.comment = self.comment
 
         return self.original_public_key == valid_public_key
 
     @abc.abstractmethod
-    def _get_public_key(self):
+    def _get_public_key(self) -> PublicKey | t.Literal[""]:
         pass
 
     @OpensshModule.trigger_change
     @OpensshModule.skip_if_check_mode
-    def _restore_public_key(self):
+    def _restore_public_key(self) -> None:
         try:
             temp_public_key = self._create_temp_public_key(
                 str(self._get_public_key()) + "\n"
@@ -269,7 +283,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         if self.comment:
             self._update_comment()
 
-    def _create_temp_public_key(self, content):
+    def _create_temp_public_key(self, content: str | bytes) -> str:
         temp_public_key = os.path.join(
             self.module.tmpdir, os.path.basename(self.public_key_path)
         )
@@ -290,15 +304,15 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         return temp_public_key
 
     @abc.abstractmethod
-    def _update_comment(self):
+    def _update_comment(self) -> None:
         pass
 
-    def _should_remove(self):
+    def _should_remove(self) -> bool:
         return self._private_key_exists() or self._public_key_exists()
 
     @OpensshModule.trigger_change
     @OpensshModule.skip_if_check_mode
-    def _remove(self):
+    def _remove(self) -> None:
         try:
             if self._private_key_exists():
                 os.remove(self.private_key_path)
@@ -308,7 +322,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             self.module.fail_json(msg=str(e))
 
     @property
-    def _result(self):
+    def _result(self) -> dict[str, t.Any]:
         private_key = self.private_key or self.original_private_key
         public_key = self.public_key or self.original_public_key
 
@@ -322,7 +336,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         }
 
     @property
-    def diff(self):
+    def diff(self) -> dict[str, t.Any]:
         before = (
             self.original_private_key.to_dict() if self.original_private_key else {}
         )
@@ -350,12 +364,12 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
         self.ssh_keygen = KeygenCommand(self.module)
 
-    def _generate_keypair(self, private_key_path):
+    def _generate_keypair(self, private_key_path: str) -> None:
         self.ssh_keygen.generate_keypair(
             private_key_path, self.size, self.type, self.comment, check_rc=True
         )
 
-    def _get_private_key(self):
+    def _get_private_key(self) -> PrivateKey:
         rc, private_key_content, err = self.ssh_keygen.get_private_key(
             self.private_key_path, check_rc=False
         )
@@ -363,13 +377,13 @@ class KeypairBackendOpensshBin(KeypairBackend):
             raise ValueError(err)
         return PrivateKey.from_string(private_key_content)
 
-    def _get_public_key(self):
+    def _get_public_key(self) -> PublicKey | t.Literal[""]:
         public_key_content = self.ssh_keygen.get_matching_public_key(
             self.private_key_path, check_rc=True
         )[1]
         return PublicKey.from_string(public_key_content)
 
-    def _private_key_readable(self):
+    def _private_key_readable(self) -> bool:
         rc, stdout, stderr = self.ssh_keygen.get_matching_public_key(
             self.private_key_path, check_rc=False
         )
@@ -383,7 +397,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
             )
         )
 
-    def _update_comment(self):
+    def _update_comment(self) -> None:
         try:
             ssh_version = self._get_ssh_version() or "7.8"
             force_new_format = (
@@ -398,12 +412,12 @@ class KeypairBackendOpensshBin(KeypairBackend):
         except (IOError, OSError) as e:
             self.module.fail_json(msg=str(e))
 
-    def _private_key_valid_backend(self):
+    def _private_key_valid_backend(self, original_private_key: PrivateKey) -> bool:
         return True
 
 
 class KeypairBackendCryptography(KeypairBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(KeypairBackendCryptography, self).__init__(module)
 
         if self.type == "rsa1":
@@ -416,12 +430,15 @@ class KeypairBackendCryptography(KeypairBackend):
             if module.params["passphrase"]
             else None
         )
-        self.private_key_format = self._get_key_format(
-            module.params["private_key_format"]
-        )
+        key_format: t.Literal["auto", "pkcs1", "pkcs8", "ssh"] = module.params[
+            "private_key_format"
+        ]
+        self.private_key_format = self._get_key_format(key_format)
 
-    def _get_key_format(self, key_format):
-        result = "SSH"
+    def _get_key_format(
+        self, key_format: t.Literal["auto", "pkcs1", "pkcs8", "ssh"]
+    ) -> t.Literal["SSH", "PKCS1", "PKCS8"]:
+        result: t.Literal["SSH", "PKCS1", "PKCS8"] = "SSH"
 
         if key_format == "auto":
             # Default to OpenSSH 7.8 compatibility when OpenSSH is not installed
@@ -435,11 +452,12 @@ class KeypairBackendCryptography(KeypairBackend):
                 # but still defaulted to PKCS1 format with the exception of ed25519 keys
                 result = "PKCS1"
         else:
-            result = key_format.upper()
+            result = key_format.upper()  # type: ignore
 
         return result
 
-    def _generate_keypair(self, private_key_path):
+    def _generate_keypair(self, private_key_path: str) -> None:
+        assert self.type != "rsa1"
         keypair = OpensshKeypair.generate(
             keytype=self.type,
             size=self.size,
@@ -455,7 +473,7 @@ class KeypairBackendCryptography(KeypairBackend):
         public_key_path = private_key_path + ".pub"
         secure_write(public_key_path, 0o644, keypair.public_key)
 
-    def _get_private_key(self):
+    def _get_private_key(self) -> PrivateKey:
         keypair = OpensshKeypair.load(
             path=self.private_key_path, passphrase=self.passphrase, no_public_key=True
         )
@@ -467,7 +485,7 @@ class KeypairBackendCryptography(KeypairBackend):
             format=parse_private_key_format(self.private_key_path),
         )
 
-    def _get_public_key(self):
+    def _get_public_key(self) -> PublicKey | t.Literal[""]:
         try:
             keypair = OpensshKeypair.load(
                 path=self.private_key_path,
@@ -480,7 +498,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
         return PublicKey.from_string(to_text(keypair.public_key))
 
-    def _private_key_readable(self):
+    def _private_key_readable(self) -> bool:
         try:
             OpensshKeypair.load(
                 path=self.private_key_path,
@@ -504,7 +522,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
         return True
 
-    def _update_comment(self):
+    def _update_comment(self) -> None:
         keypair = OpensshKeypair.load(
             path=self.private_key_path, passphrase=self.passphrase, no_public_key=True
         )
@@ -519,13 +537,13 @@ class KeypairBackendCryptography(KeypairBackend):
         except (IOError, OSError) as e:
             self.module.fail_json(msg=str(e))
 
-    def _private_key_valid_backend(self):
+    def _private_key_valid_backend(self, original_private_key: PrivateKey) -> bool:
         # avoids breaking behavior and prevents
         # automatic conversions with OpenSSH upgrades
         if self.module.params["private_key_format"] == "auto":
             return True
 
-        return self.private_key_format == self.original_private_key.format
+        return self.private_key_format == original_private_key.format
 
 
 def select_backend(module, backend):

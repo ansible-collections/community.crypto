@@ -100,7 +100,9 @@ last_update:
   type: str
   sample: '20190413202428Z'
 next_update:
-  description: The point in time from which a new CRL will be issued and the client has to check for it as ASN.1 TIME.
+  description:
+    - The point in time from which a new CRL will be issued and the client has to check for it as ASN.1 TIME.
+    - Will be C(none) if no such timestamp is present.
   returned: success
   type: str
   sample: '20190413202428Z'

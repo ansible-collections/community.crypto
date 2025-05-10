@@ -8,7 +8,10 @@ plugins/module_utils/crypto/module_backends/certificate.py no-assert
 plugins/module_utils/crypto/module_backends/certificate_entrust.py no-assert
 plugins/module_utils/crypto/module_backends/certificate_ownca.py no-assert
 plugins/module_utils/crypto/module_backends/certificate_selfsigned.py no-assert
+plugins/module_utils/crypto/module_backends/csr.py no-assert
+plugins/module_utils/crypto/module_backends/privatekey_convert.py no-assert
 plugins/module_utils/crypto/support.py pep8:E704
+plugins/module_utils/openssh/backends/keypair_backend.py no-assert
 plugins/module_utils/openssh/certificate.py pep8:E704
 plugins/modules/acme_account.py pylint:unpacking-non-sequence
 plugins/modules/acme_account_info.py pylint:unpacking-non-sequence
