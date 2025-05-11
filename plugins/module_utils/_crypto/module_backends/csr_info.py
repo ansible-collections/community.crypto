@@ -33,13 +33,16 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+        AnsibleActionModule,
+    )
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
+        FilterModuleMock,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificatePublicKeyTypes,
         PrivateKeyTypes,
     )
-
-    from ....plugin_utils._action_module import AnsibleActionModule
-    from ....plugin_utils._filter_module import FilterModuleMock
 
     GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
 

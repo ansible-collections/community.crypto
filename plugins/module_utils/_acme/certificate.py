@@ -38,10 +38,15 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-
-    from .backends import CryptoBackend
-    from .certificates import ChainMatcher
-    from .challenges import Challenge
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+        CryptoBackend,
+    )
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+        ChainMatcher,
+    )
+    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
+        Challenge,
+    )
 
 
 class ACMECertificateClient:

@@ -42,11 +42,16 @@ if t.TYPE_CHECKING:
     import datetime
 
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+        ArgumentSpec,
+    )
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+        AnsibleActionModule,
+    )
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
+        FilterModuleMock,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes
-
-    from ....plugin_utils._action_module import AnsibleActionModule
-    from ....plugin_utils._filter_module import FilterModuleMock
-    from ..._argspec import ArgumentSpec
 
     GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
 

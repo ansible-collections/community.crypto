@@ -29,7 +29,10 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    from .backends import CertificateInformation, CryptoBackend
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+        CertificateInformation,
+        CryptoBackend,
+    )
 
 
 def nopad_b64(data: bytes) -> str:

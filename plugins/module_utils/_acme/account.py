@@ -18,7 +18,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 
 
 if t.TYPE_CHECKING:
-    from .acme import ACMEClient
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
+        ACMEClient,
+    )
 
 
 class ACMEAccount:

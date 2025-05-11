@@ -39,11 +39,12 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+        AnsibleActionModule,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         PrivateKeyTypes,
     )
-
-    from ....plugin_utils._action_module import AnsibleActionModule
 
     GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule]
 

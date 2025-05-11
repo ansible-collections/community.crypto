@@ -45,11 +45,12 @@ if t.TYPE_CHECKING:
     import datetime
 
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+        ArgumentSpec,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
     )
-
-    from ..._argspec import ArgumentSpec
 
 
 try:

@@ -336,7 +336,7 @@ else:
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
 if t.TYPE_CHECKING:
-    from ..module_utils._crypto.cryptography_support import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
         CertificateIssuerPrivateKeyTypes,
     )
 

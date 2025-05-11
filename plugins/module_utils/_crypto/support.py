@@ -39,18 +39,22 @@ except ImportError:
     # Error handled in the calling module.
     pass
 
-from .basic import OpenSSLBadPassphraseError, OpenSSLObjectError
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
+    OpenSSLBadPassphraseError,
+    OpenSSLObjectError,
+)
 
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+        CertificatePrivateKeyTypes,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
         PublicKeyTypes,
     )
-
-    from .cryptography_support import CertificatePrivateKeyTypes
 
 
 # This list of preferred fingerprints is used when prefer_one=True is supplied to the

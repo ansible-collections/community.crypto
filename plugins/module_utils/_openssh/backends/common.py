@@ -20,12 +20,13 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.utils im
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (
+        OpensshCertificateTimeParameters,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
     )
-
-    from ..certificate import OpensshCertificateTimeParameters
 
     Param = t.ParamSpec("Param")
 

@@ -29,8 +29,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-
-    from .acme import ACMEClient
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
+        ACMEClient,
+    )
 
 
 def create_key_authorization(client: ACMEClient, token: str) -> str:

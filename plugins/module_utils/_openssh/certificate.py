@@ -31,7 +31,9 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    from .cryptography import KeyType
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (
+        KeyType,
+    )
 
     DateFormat = t.Literal["human_readable", "openssh", "timestamp"]
     DateFormatStr = t.Literal["human_readable", "openssh"]

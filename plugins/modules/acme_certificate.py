@@ -585,7 +585,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.challenges 
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ModuleFailException,
 )
-from ansible_collections.community.crypto.plugins.module_utils._acme.io import write_file
+from ansible_collections.community.crypto.plugins.module_utils._acme.io import (
+    write_file,
+)
 from ansible_collections.community.crypto.plugins.module_utils._acme.orders import Order
 from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     compute_cert_id,

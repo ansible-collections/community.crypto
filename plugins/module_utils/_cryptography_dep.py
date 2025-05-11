@@ -24,9 +24,12 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-
-    from ..plugin_utils._action_module import AnsibleActionModule
-    from ..plugin_utils._filter_module import FilterModuleMock
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+        AnsibleActionModule,
+    )
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
+        FilterModuleMock,
+    )
 
     GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
 

@@ -41,11 +41,12 @@ if t.TYPE_CHECKING:
     import datetime
 
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+        CertificatePrivateKeyTypes,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
     )
-
-    from ..cryptography_support import CertificatePrivateKeyTypes
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION

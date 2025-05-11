@@ -25,7 +25,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 
 if t.TYPE_CHECKING:
-    from .acme import ACMEClient
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
+        ACMEClient,
+    )
 
 
 _Order = t.TypeVar("_Order", bound="Order")

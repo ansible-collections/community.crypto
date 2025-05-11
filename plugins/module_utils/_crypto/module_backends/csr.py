@@ -50,12 +50,13 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+        CertificatePrivateKeyTypes,
+    )
     from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
     )
-
-    from ..cryptography_support import CertificatePrivateKeyTypes
 
     _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")
 

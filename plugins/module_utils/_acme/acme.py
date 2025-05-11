@@ -49,9 +49,13 @@ if t.TYPE_CHECKING:
     import os
 
     from ansible.module_utils.basic import AnsibleModule
-
-    from .account import ACMEAccount
-    from .backends import CertificateInformation, CryptoBackend
+    from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
+        ACMEAccount,
+    )
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+        CertificateInformation,
+        CryptoBackend,
+    )
 
 
 # -1 usually means connection problems

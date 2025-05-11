@@ -83,8 +83,10 @@ if t.TYPE_CHECKING:
     import datetime
 
     from ansible.module_utils.basic import AnsibleModule
-
-    from .certificates import CertificateChain, Criterium
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+        CertificateChain,
+        Criterium,
+    )
 
 
 class CryptographyChainMatcher(ChainMatcher):

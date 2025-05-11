@@ -34,8 +34,10 @@ if t.TYPE_CHECKING:
     import os
 
     from ansible.module_utils.basic import AnsibleModule
-
-    from .certificates import ChainMatcher, Criterium
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+        ChainMatcher,
+        Criterium,
+    )
 
 
 class CertificateInformation(t.NamedTuple):

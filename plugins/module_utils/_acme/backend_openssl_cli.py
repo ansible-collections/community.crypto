@@ -40,8 +40,9 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-
-    from .certificates import Criterium
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+        Criterium,
+    )
 
 
 _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")

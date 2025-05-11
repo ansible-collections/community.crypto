@@ -21,9 +21,16 @@ except ImportError:
     # Error handled in the calling module.
     pass
 
-from ._obj2txt import obj2txt
-from .basic import HAS_CRYPTOGRAPHY
-from .cryptography_support import CRYPTOGRAPHY_TIMEZONE, cryptography_decode_name
+from ansible_collections.community.crypto.plugins.module_utils._crypto._obj2txt import (
+    obj2txt,
+)
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
+    HAS_CRYPTOGRAPHY,
+)
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    CRYPTOGRAPHY_TIMEZONE,
+    cryptography_decode_name,
+)
 
 
 if t.TYPE_CHECKING:

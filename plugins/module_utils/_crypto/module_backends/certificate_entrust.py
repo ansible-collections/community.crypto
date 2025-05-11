@@ -38,8 +38,9 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-
-    from ..._argspec import ArgumentSpec
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+        ArgumentSpec,
+    )
 
 
 try:

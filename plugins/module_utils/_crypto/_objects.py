@@ -7,7 +7,9 @@
 
 from __future__ import annotations
 
-from ._objects_data import OID_MAP
+from ansible_collections.community.crypto.plugins.module_utils._crypto._objects_data import (
+    OID_MAP,
+)
 
 
 OID_LOOKUP: dict[str, str] = dict()

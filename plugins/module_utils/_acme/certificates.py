@@ -24,7 +24,9 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
 
 
 if t.TYPE_CHECKING:
-    from .acme import ACMEClient
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
+        ACMEClient,
+    )
 
 
 _CertificateChain = t.TypeVar("_CertificateChain", bound="CertificateChain")
