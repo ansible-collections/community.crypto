@@ -137,7 +137,6 @@ from ansible_collections.community.crypto.plugins.module_utils._io import (
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 try:
-    import cryptography  # noqa: F401, pylint: disable=unused-import
     from cryptography.x509 import load_der_x509_certificate
 except ImportError:
     pass

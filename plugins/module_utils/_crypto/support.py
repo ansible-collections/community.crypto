@@ -22,14 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
     identify_pem_format,
 )
 
-# These imports are for backwards compatibility:
-from ansible_collections.community.crypto.plugins.module_utils._time import (  # noqa: F401, pylint: disable=unused-import
-    convert_relative_to_datetime,
-    ensure_utc_timezone,
-    get_now_datetime,
-    get_relative_time_option,
-)
-
 
 try:
     from cryptography import x509
