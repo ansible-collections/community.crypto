@@ -284,26 +284,26 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     parse_pkcs12,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.pem import (
     split_pem_list,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     OpenSSLObject,
     load_certificate,
     load_certificate_issuer_privatekey,
 )
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import (
+from ansible_collections.community.crypto.plugins.module_utils._io import (
     load_file_if_exists,
     write_file,
 )
@@ -336,7 +336,7 @@ else:
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
 if t.TYPE_CHECKING:
-    from ..module_utils.crypto.cryptography_support import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
         CertificateIssuerPrivateKeyTypes,
     )
 

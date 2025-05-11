@@ -43,7 +43,7 @@ import typing as t
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.crypto.plugins.module_utils.serial import (
+from ansible_collections.community.crypto.plugins.module_utils._serial import (
     parse_serial,
 )
 

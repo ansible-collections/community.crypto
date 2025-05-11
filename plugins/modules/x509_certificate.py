@@ -226,33 +226,33 @@ certificate:
 import os
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate import (
     get_certificate_argument_spec,
     select_backend,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_acme import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_acme import (
     AcmeCertificateProvider,
     add_acme_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_entrust import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_entrust import (
     EntrustCertificateProvider,
     add_entrust_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_ownca import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_ownca import (
     OwnCACertificateProvider,
     add_ownca_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_selfsigned import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_selfsigned import (
     SelfSignedCertificateProvider,
     add_selfsigned_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     OpenSSLObject,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import (
+from ansible_collections.community.crypto.plugins.module_utils._io import (
     load_file_if_exists,
     write_file,
 )
@@ -260,7 +260,7 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate import (
         CertificateBackend,
     )
 

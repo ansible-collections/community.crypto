@@ -136,18 +136,18 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.crypto.plugins.module_utils.crypto.math import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.math import (
     count_bits,
 )
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import (
+from ansible_collections.community.crypto.plugins.module_utils._io import (
     load_file_if_exists,
     write_file,
 )
-from ansible_collections.community.crypto.plugins.module_utils.version import (
+from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
 

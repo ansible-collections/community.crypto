@@ -129,10 +129,10 @@ csr:
 
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr import (
     get_csr_argument_spec,
     select_backend,
 )
@@ -140,7 +140,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr import (
         CertificateSigningRequestBackend,
     )
 

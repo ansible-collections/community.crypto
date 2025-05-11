@@ -101,11 +101,11 @@ import base64
 import os
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.version import (
+from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
 
@@ -122,10 +122,10 @@ except ImportError:
     CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     OpenSSLObject,
     load_privatekey,
 )

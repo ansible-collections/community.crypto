@@ -48,11 +48,11 @@ import typing as t
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
-from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
+from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
     get_fingerprint_from_file,
 )
-from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
+from ansible_collections.community.crypto.plugins.plugin_utils._gnupg import (
     PluginGPGRunner,
 )
 

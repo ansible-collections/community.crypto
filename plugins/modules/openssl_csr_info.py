@@ -311,10 +311,10 @@ authority_cert_serial_number:
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr_info import (
     select_backend,
 )
 

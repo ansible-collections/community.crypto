@@ -162,16 +162,16 @@ import os
 import random
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     ACMEClient,
     create_backend,
     create_default_argspec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ModuleFailException,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.io import read_file
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.io import read_file
+from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     compute_cert_id,
 )
 

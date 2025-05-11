@@ -287,17 +287,17 @@ import os
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.common import (
+from ansible_collections.community.crypto.plugins.module_utils._openssh.backends.common import (
     KeygenCommand,
     OpensshModule,
     PrivateKey,
 )
-from ansible_collections.community.crypto.plugins.module_utils.openssh.certificate import (
+from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateTimeParameters,
     parse_option_list,
 )
-from ansible_collections.community.crypto.plugins.module_utils.version import (
+from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
 

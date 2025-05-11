@@ -319,20 +319,20 @@ selected_chain:
 
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     create_backend,
     create_default_argspec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.certificate import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.certificate import (
     ACMECertificateClient,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ModuleFailException,
 )
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
         CertificateChain,
     )
 

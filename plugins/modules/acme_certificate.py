@@ -564,30 +564,32 @@ all_chains:
 import os
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
     ACMEAccount,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     ACMEClient,
     create_backend,
     create_default_argspec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.certificates import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
     CertificateChain,
     Criterium,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
     combine_identifier,
     normalize_combined_identifier,
     split_identifier,
     wait_for_validation,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ModuleFailException,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.io import write_file
-from ansible_collections.community.crypto.plugins.module_utils.acme.orders import Order
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.io import (
+    write_file,
+)
+from ansible_collections.community.crypto.plugins.module_utils._acme.orders import Order
+from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     compute_cert_id,
     pem_to_der,
 )
@@ -595,11 +597,11 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         CertificateInformation,
         CryptoBackend,
     )
-    from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
         Authorization,
     )
 
