@@ -121,6 +121,7 @@ complete_chain:
 """
 
 import os
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
@@ -153,14 +154,18 @@ class Certificate:
     Stores PEM with parsed certificate.
     """
 
-    def __init__(self, pem, cert):
+    def __init__(self, pem: str, cert: cryptography.x509.Certificate) -> None:
         if not (pem.endswith("\n") or pem.endswith("\r")):
             pem = pem + "\n"
         self.pem = pem
         self.cert = cert
 
 
-def is_parent(module, cert, potential_parent):
+def is_parent(
+    module: AnsibleModule,
+    cert: Certificate,
+    potential_parent: Certificate,
+) -> bool:
     """
     Tests whether the given certificate has been issued by the potential parent certificate.
     """
@@ -173,6 +178,10 @@ def is_parent(module, cert, potential_parent):
         if isinstance(
             public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey
         ):
+            if cert.cert.signature_hash_algorithm is None:
+                raise AssertionError(
+                    "signature_hash_algorithm should be present for RSA certificates"
+                )
             public_key.verify(
                 cert.cert.signature,
                 cert.cert.tbs_certificate_bytes,
@@ -183,6 +192,10 @@ def is_parent(module, cert, potential_parent):
             public_key,
             cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
         ):
+            if cert.cert.signature_hash_algorithm is None:
+                raise AssertionError(
+                    "signature_hash_algorithm should be present for EC certificates"
+                )
             public_key.verify(
                 cert.cert.signature,
                 cert.cert.tbs_certificate_bytes,
@@ -213,11 +226,16 @@ def is_parent(module, cert, potential_parent):
         module.fail_json(msg=f"Unknown error on signature validation: {e}")
 
 
-def parse_PEM_list(module, text, source, fail_on_error=True):
+def parse_PEM_list(
+    module: AnsibleModule,
+    text: str,
+    source: str | os.PathLike,
+    fail_on_error: bool = True,
+) -> list[Certificate]:
     """
     Parse concatenated PEM certificates. Return list of ``Certificate`` objects.
     """
-    result = []
+    result: list[Certificate] = []
     for cert_pem in split_pem_list(text):
         # Try to load PEM certificate
         try:
@@ -232,7 +250,9 @@ def parse_PEM_list(module, text, source, fail_on_error=True):
     return result
 
 
-def load_PEM_list(module, path, fail_on_error=True):
+def load_PEM_list(
+    module: AnsibleModule, path: str | os.PathLike, fail_on_error: bool = True
+) -> list[Certificate]:
     """
     Load concatenated PEM certificates from file. Return list of ``Certificate`` objects.
     """
@@ -258,13 +278,15 @@ class CertificateSet:
     Stores a set of certificates. Allows to search for parent (issuer of a certificate).
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.certificates = set()
-        self.certificates_by_issuer = dict()
-        self.certificate_by_cert = dict()
+        self.certificates: set[Certificate] = set()
+        self.certificates_by_issuer: dict[cryptography.x509.Name, list[Certificate]] = (
+            {}
+        )
+        self.certificate_by_cert: dict[cryptography.x509.Certificate, Certificate] = {}
 
-    def _load_file(self, path):
+    def _load_file(self, path: str | os.PathLike) -> None:
         certs = load_PEM_list(self.module, path, fail_on_error=False)
         for cert in certs:
             self.certificates.add(cert)
@@ -273,7 +295,7 @@ class CertificateSet:
             self.certificates_by_issuer[cert.cert.subject].append(cert)
             self.certificate_by_cert[cert.cert] = cert
 
-    def load(self, path):
+    def load(self, path: str | os.PathLike) -> None:
         """
         Load lists of PEM certificates from a file or a directory.
         """
@@ -285,7 +307,7 @@ class CertificateSet:
         else:
             self._load_file(b_path)
 
-    def find_parent(self, cert):
+    def find_parent(self, cert: Certificate) -> Certificate | None:
         """
         Search for the parent (issuer) of a certificate. Return ``None`` if none was found.
         """
@@ -296,14 +318,18 @@ class CertificateSet:
         return None
 
 
-def format_cert(cert):
+def format_cert(cert: Certificate) -> str:
     """
     Return human readable representation of certificate for error messages.
     """
     return str(cert.cert)
 
 
-def check_cycle(module, occured_certificates, next):
+def check_cycle(
+    module: AnsibleModule,
+    occured_certificates: set[cryptography.x509.Certificate],
+    next: Certificate,
+) -> None:
     """
     Make sure that next is not in occured_certificates so far, and add it.
     """
@@ -313,7 +339,7 @@ def check_cycle(module, occured_certificates, next):
     occured_certificates.add(next_cert)
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             input_chain=dict(type="str", required=True),
@@ -354,10 +380,10 @@ def main():
         roots.load(path)
 
     # Try to complete chain
-    current = chain[-1]
+    current: Certificate | None = chain[-1]
     completed = []
     occured_certificates = set([cert.cert for cert in chain])
-    if current.cert in roots.certificate_by_cert:
+    if current and current.cert in roots.certificate_by_cert:
         # Do not try to complete the chain when it is already ending with a root certificate
         current = None
     while current:

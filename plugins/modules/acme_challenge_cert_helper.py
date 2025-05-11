@@ -149,6 +149,7 @@ regular_certificate:
 import base64
 import datetime
 import ipaddress
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
@@ -173,10 +174,13 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 try:
     import cryptography
     import cryptography.hazmat.backends
+    import cryptography.hazmat.primitives.asymmetric.dh
     import cryptography.hazmat.primitives.asymmetric.ec
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
+    import cryptography.hazmat.primitives.asymmetric.x448
+    import cryptography.hazmat.primitives.asymmetric.x25519
     import cryptography.hazmat.primitives.hashes
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
@@ -186,7 +190,7 @@ except ImportError:
 
 
 # Convert byte string to ASN1 encoded octet string
-def encode_octet_string(octet_string):
+def encode_octet_string(octet_string: bytes) -> bytes:
     if len(octet_string) >= 128:
         raise ModuleFailException(
             "Cannot handle octet strings with more than 128 bytes"
@@ -194,7 +198,7 @@ def encode_octet_string(octet_string):
     return bytes([0x4, len(octet_string)]) + octet_string
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             challenge=dict(type="str", required=True, choices=["tls-alpn-01"]),
@@ -213,16 +217,16 @@ def main():
 
     try:
         # Get parameters
-        challenge = module.params["challenge"]
-        challenge_data = module.params["challenge_data"]
+        challenge: t.Literal["tls-alpn-01"] = module.params["challenge"]
+        challenge_data: dict[str, t.Any] = module.params["challenge_data"]
 
         # Get hold of private key
-        private_key_content = module.params.get("private_key_content")
-        private_key_passphrase = module.params.get("private_key_passphrase")
-        if private_key_content is None:
+        private_key_content_str: str | None = module.params["private_key_content"]
+        private_key_passphrase: str | None = module.params["private_key_passphrase"]
+        if private_key_content_str is None:
             private_key_content = read_file(module.params["private_key_src"])
         else:
-            private_key_content = to_bytes(private_key_content)
+            private_key_content = to_bytes(private_key_content_str)
         try:
             private_key = (
                 cryptography.hazmat.primitives.serialization.load_pem_private_key(
@@ -236,6 +240,17 @@ def main():
             )
         except Exception as e:
             raise ModuleFailException(f"Error while loading private key: {e}")
+        if isinstance(
+            private_key,
+            (
+                cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey,
+                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+                cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+            ),
+        ):
+            raise ModuleFailException(
+                f"Cannot use private key type {type(private_key)}"
+            )
 
         # Some common attributes
         domain = to_text(challenge_data["resource"])
@@ -246,6 +261,7 @@ def main():
         now = get_now_datetime(with_timezone=CRYPTOGRAPHY_TIMEZONE)
         not_valid_before = now
         not_valid_after = now + datetime.timedelta(days=10)
+        san: cryptography.x509.GeneralName
         if identifier_type == "dns":
             san = cryptography.x509.DNSName(identifier)
         elif identifier_type == "ip":

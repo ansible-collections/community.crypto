@@ -39,6 +39,8 @@ _value:
   type: string
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import (
@@ -50,7 +52,7 @@ from ansible_collections.community.crypto.plugins.plugin_utils.gnupg import (
 )
 
 
-def gpg_fingerprint(input):
+def gpg_fingerprint(input: str | bytes) -> str:
     if not isinstance(input, (str, bytes)):
         raise AnsibleFilterError(
             f"The input for the community.crypto.gpg_fingerprint filter must be a string; got {type(input)} instead"
@@ -65,7 +67,7 @@ def gpg_fingerprint(input):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "gpg_fingerprint": gpg_fingerprint,
         }

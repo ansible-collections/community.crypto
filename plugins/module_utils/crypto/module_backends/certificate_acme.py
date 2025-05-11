@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 import tempfile
 import traceback
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
@@ -17,22 +18,30 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-class AcmeCertificateBackend(CertificateBackend):
-    def __init__(self, module):
-        super(AcmeCertificateBackend, self).__init__(module)
-        self.accountkey_path = module.params["acme_accountkey_path"]
-        self.challenge_path = module.params["acme_challenge_path"]
-        self.use_chain = module.params["acme_chain"]
-        self.acme_directory = module.params["acme_directory"]
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-        if self.csr_content is None and self.csr_path is None:
-            raise CertificateError(
-                "csr_path or csr_content is required for ownca provider"
-            )
-        if self.csr_content is None and not os.path.exists(self.csr_path):
-            raise CertificateError(
-                f"The certificate signing request file {self.csr_path} does not exist"
-            )
+    from ...argspec import ArgumentSpec
+
+
+class AcmeCertificateBackend(CertificateBackend):
+    def __init__(self, module: AnsibleModule) -> None:
+        super(AcmeCertificateBackend, self).__init__(module)
+        self.accountkey_path: str = module.params["acme_accountkey_path"]
+        self.challenge_path: str = module.params["acme_challenge_path"]
+        self.use_chain: bool = module.params["acme_chain"]
+        self.acme_directory: str = module.params["acme_directory"]
+        self.cert_bytes: bytes | None = None
+
+        if self.csr_content is None:
+            if self.csr_path is None:
+                raise CertificateError(
+                    "csr_path or csr_content is required for ownca provider"
+                )
+            if not os.path.exists(self.csr_path):
+                raise CertificateError(
+                    f"The certificate signing request file {self.csr_path} does not exist"
+                )
 
         if not os.path.exists(self.accountkey_path):
             raise CertificateError(
@@ -46,7 +55,7 @@ class AcmeCertificateBackend(CertificateBackend):
 
         self.acme_tiny_path = self.module.get_bin_path("acme-tiny", required=True)
 
-    def generate_certificate(self):
+    def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
 
         command = [self.acme_tiny_path]
@@ -77,22 +86,26 @@ class AcmeCertificateBackend(CertificateBackend):
         command.extend(["--directory-url", self.acme_directory])
 
         try:
-            self.cert = to_bytes(self.module.run_command(command, check_rc=True)[1])
+            self.cert_bytes = to_bytes(
+                self.module.run_command(command, check_rc=True)[1]
+            )
         except OSError as exc:
             raise CertificateError(exc)
 
-    def get_certificate_data(self):
+    def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
-        return self.cert
+        if self.cert_bytes is None:
+            raise AssertionError("Contract violation: cert_bytes is None")
+        return self.cert_bytes
 
-    def dump(self, include_certificate):
+    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
         result = super(AcmeCertificateBackend, self).dump(include_certificate)
         result["accountkey"] = self.accountkey_path
         return result
 
 
 class AcmeCertificateProvider(CertificateProvider):
-    def validate_module_args(self, module):
+    def validate_module_args(self, module: AnsibleModule) -> None:
         if module.params["acme_accountkey_path"] is None:
             module.fail_json(
                 msg="The acme_accountkey_path option must be specified for the acme provider."
@@ -102,14 +115,14 @@ class AcmeCertificateProvider(CertificateProvider):
                 msg="The acme_challenge_path option must be specified for the acme provider."
             )
 
-    def needs_version_two_certs(self, module):
+    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
         return False
 
-    def create_backend(self, module):
+    def create_backend(self, module: AnsibleModule) -> AcmeCertificateBackend:
         return AcmeCertificateBackend(module)
 
 
-def add_acme_provider_to_argument_spec(argument_spec):
+def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("acme")
     argument_spec.argument_spec.update(
         dict(

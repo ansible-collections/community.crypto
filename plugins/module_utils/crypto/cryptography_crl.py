@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion as _LooseVersion,
 )
@@ -19,6 +21,10 @@ except ImportError:
 from ._obj2txt import obj2txt
 from .basic import HAS_CRYPTOGRAPHY
 from .cryptography_support import CRYPTOGRAPHY_TIMEZONE, cryptography_decode_name
+
+
+if t.TYPE_CHECKING:
+    import datetime
 
 
 # TODO: once cryptography has a _utc variant of InvalidityDate.invalidity_date, set this
@@ -55,7 +61,9 @@ else:
     REVOCATION_REASON_MAP_INVERSE = dict()
 
 
-def cryptography_decode_revoked_certificate(cert):
+def cryptography_decode_revoked_certificate(
+    cert: x509.RevokedCertificate,
+) -> dict[str, t.Any]:
     result = {
         "serial_number": cert.serial_number,
         "revocation_date": get_revocation_date(cert),
@@ -67,27 +75,30 @@ def cryptography_decode_revoked_certificate(cert):
         "invalidity_date_critical": False,
     }
     try:
-        ext = cert.extensions.get_extension_for_class(x509.CertificateIssuer)
-        result["issuer"] = list(ext.value)
-        result["issuer_critical"] = ext.critical
+        ext_ci = cert.extensions.get_extension_for_class(x509.CertificateIssuer)
+        result["issuer"] = list(ext_ci.value)
+        result["issuer_critical"] = ext_ci.critical
     except x509.ExtensionNotFound:
         pass
     try:
-        ext = cert.extensions.get_extension_for_class(x509.CRLReason)
-        result["reason"] = ext.value.reason
-        result["reason_critical"] = ext.critical
+        ext_cr = cert.extensions.get_extension_for_class(x509.CRLReason)
+        result["reason"] = ext_cr.value.reason
+        result["reason_critical"] = ext_cr.critical
     except x509.ExtensionNotFound:
         pass
     try:
-        ext = cert.extensions.get_extension_for_class(x509.InvalidityDate)
-        result["invalidity_date"] = get_invalidity_date(ext.value)
-        result["invalidity_date_critical"] = ext.critical
+        ext_id = cert.extensions.get_extension_for_class(x509.InvalidityDate)
+        result["invalidity_date"] = get_invalidity_date(ext_id.value)
+        result["invalidity_date_critical"] = ext_id.critical
     except x509.ExtensionNotFound:
         pass
     return result
 
 
-def cryptography_dump_revoked(entry, idn_rewrite="ignore"):
+def cryptography_dump_revoked(
+    entry: dict[str, t.Any],
+    idn_rewrite: t.Literal["ignore", "idna", "unicode"] = "ignore",
+) -> dict[str, t.Any]:
     return {
         "serial_number": entry["serial_number"],
         "revocation_date": entry["revocation_date"].strftime(TIMESTAMP_FORMAT),
@@ -115,48 +126,56 @@ def cryptography_dump_revoked(entry, idn_rewrite="ignore"):
     }
 
 
-def cryptography_get_signature_algorithm_oid_from_crl(crl):
+def cryptography_get_signature_algorithm_oid_from_crl(
+    crl: x509.CertificateRevocationList,
+) -> x509.oid.ObjectIdentifier:
     try:
         return crl.signature_algorithm_oid
     except AttributeError:
         # Older cryptography versions do not have signature_algorithm_oid yet
         dotted = obj2txt(
-            crl._backend._lib, crl._backend._ffi, crl._x509_crl.sig_alg.algorithm
+            crl._backend._lib, crl._backend._ffi, crl._x509_crl.sig_alg.algorithm  # type: ignore
         )
         return x509.oid.ObjectIdentifier(dotted)
 
 
-def get_next_update(obj):
+def get_next_update(obj: x509.CertificateRevocationList) -> datetime.datetime | None:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.next_update_utc
     return obj.next_update
 
 
-def get_last_update(obj):
+def get_last_update(obj: x509.CertificateRevocationList) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.last_update_utc
     return obj.last_update
 
 
-def get_revocation_date(obj):
+def get_revocation_date(obj: x509.RevokedCertificate) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.revocation_date_utc
     return obj.revocation_date
 
 
-def get_invalidity_date(obj):
+def get_invalidity_date(obj: x509.InvalidityDate) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE:
         return obj.invalidity_date_utc
     return obj.invalidity_date
 
 
-def set_next_update(builder, value):
+def set_next_update(
+    builder: x509.CertificateRevocationListBuilder, value: datetime.datetime
+) -> x509.CertificateRevocationListBuilder:
     return builder.next_update(value)
 
 
-def set_last_update(builder, value):
+def set_last_update(
+    builder: x509.CertificateRevocationListBuilder, value: datetime.datetime
+) -> x509.CertificateRevocationListBuilder:
     return builder.last_update(value)
 
 
-def set_revocation_date(builder, value):
+def set_revocation_date(
+    builder: x509.RevokedCertificateBuilder, value: datetime.datetime
+) -> x509.RevokedCertificateBuilder:
     return builder.revocation_date(value)

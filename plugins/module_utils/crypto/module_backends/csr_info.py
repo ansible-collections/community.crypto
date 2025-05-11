@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import abc
 import binascii
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
@@ -27,6 +28,19 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificatePublicKeyTypes,
+        PrivateKeyTypes,
+    )
+
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
+
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 try:
@@ -41,66 +55,69 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CSRInfoRetrieval(metaclass=abc.ABCMeta):
-    def __init__(self, module, content, validate_signature):
-        # content must be a bytes string
+    def __init__(
+        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
+    ) -> None:
         self.module = module
         self.content = content
         self.validate_signature = validate_signature
 
     @abc.abstractmethod
-    def _get_subject_ordered(self):
+    def _get_subject_ordered(self) -> list[list[str]]:
         pass
 
     @abc.abstractmethod
-    def _get_key_usage(self):
+    def _get_key_usage(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_extended_key_usage(self):
+    def _get_extended_key_usage(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_basic_constraints(self):
+    def _get_basic_constraints(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_ocsp_must_staple(self):
+    def _get_ocsp_must_staple(self) -> tuple[bool | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_subject_alt_name(self):
+    def _get_subject_alt_name(self) -> tuple[list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_name_constraints(self):
+    def _get_name_constraints(self) -> tuple[list[str] | None, list[str] | None, bool]:
         pass
 
     @abc.abstractmethod
-    def _get_public_key_pem(self):
+    def _get_public_key_pem(self) -> bytes:
         pass
 
     @abc.abstractmethod
-    def _get_public_key_object(self):
+    def _get_public_key_object(self) -> CertificatePublicKeyTypes:
         pass
 
     @abc.abstractmethod
-    def _get_subject_key_identifier(self):
+    def _get_subject_key_identifier(self) -> bytes | None:
         pass
 
     @abc.abstractmethod
-    def _get_authority_key_identifier(self):
+    def _get_authority_key_identifier(
+        self,
+    ) -> tuple[bytes | None, list[str] | None, int | None]:
         pass
 
     @abc.abstractmethod
-    def _get_all_extensions(self):
+    def _get_all_extensions(self) -> dict[str, dict[str, bool | str]]:
         pass
 
     @abc.abstractmethod
-    def _is_signature_valid(self):
+    def _is_signature_valid(self) -> bool:
         pass
 
-    def get_info(self, prefer_one_fingerprint=False):
-        result = dict()
+    def get_info(self, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {}
         self.csr = load_certificate_request(
             None,
             content=self.content,
@@ -145,15 +162,17 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
             }
         )
 
-        ski = self._get_subject_key_identifier()
-        if ski is not None:
-            ski = binascii.hexlify(ski).decode("ascii")
+        ski_bytes = self._get_subject_key_identifier()
+        ski = None
+        if ski_bytes is not None:
+            ski = binascii.hexlify(ski_bytes).decode("ascii")
             ski = ":".join([ski[i : i + 2] for i in range(0, len(ski), 2)])
         result["subject_key_identifier"] = ski
 
-        aki, aci, acsn = self._get_authority_key_identifier()
-        if aki is not None:
-            aki = binascii.hexlify(aki).decode("ascii")
+        aki_bytes, aci, acsn = self._get_authority_key_identifier()
+        aki = None
+        if aki_bytes is not None:
+            aki = binascii.hexlify(aki_bytes).decode("ascii")
             aki = ":".join([aki[i : i + 2] for i in range(0, len(aki), 2)])
         result["authority_key_identifier"] = aki
         result["authority_cert_issuer"] = aci
@@ -170,19 +189,25 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
 class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     """Validate the supplied CSR, using the cryptography backend"""
 
-    def __init__(self, module, content, validate_signature):
+    def __init__(
+        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
+    ) -> None:
         super(CSRInfoRetrievalCryptography, self).__init__(
             module, content, validate_signature
         )
-        self.name_encoding = module.params.get("name_encoding", "ignore")
+        self.name_encoding: t.Literal["ignore", "idna", "unicode"] = module.params.get(
+            "name_encoding", "ignore"
+        )
 
-    def _get_subject_ordered(self):
-        result = []
+    def _get_subject_ordered(self) -> list[list[str]]:
+        result: list[list[str]] = []
         for attribute in self.csr.subject:
-            result.append([cryptography_oid_to_name(attribute.oid), attribute.value])
+            result.append(
+                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+            )
         return result
 
-    def _get_key_usage(self):
+    def _get_key_usage(self) -> tuple[list[str] | None, bool]:
         try:
             current_key_ext = self.csr.extensions.get_extension_for_class(x509.KeyUsage)
             current_key_usage = current_key_ext.value
@@ -229,7 +254,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_extended_key_usage(self):
+    def _get_extended_key_usage(self) -> tuple[list[str] | None, bool]:
         try:
             ext_keyusage_ext = self.csr.extensions.get_extension_for_class(
                 x509.ExtendedKeyUsage
@@ -243,7 +268,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_basic_constraints(self):
+    def _get_basic_constraints(self) -> tuple[list[str] | None, bool]:
         try:
             ext_keyusage_ext = self.csr.extensions.get_extension_for_class(
                 x509.BasicConstraints
@@ -255,7 +280,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_ocsp_must_staple(self):
+    def _get_ocsp_must_staple(self) -> tuple[bool | None, bool]:
         try:
             # This only works with cryptography >= 2.1
             tlsfeature_ext = self.csr.extensions.get_extension_for_class(
@@ -268,7 +293,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_subject_alt_name(self):
+    def _get_subject_alt_name(self) -> tuple[list[str] | None, bool]:
         try:
             san_ext = self.csr.extensions.get_extension_for_class(
                 x509.SubjectAlternativeName
@@ -281,7 +306,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, False
 
-    def _get_name_constraints(self):
+    def _get_name_constraints(self) -> tuple[list[str] | None, list[str] | None, bool]:
         try:
             nc_ext = self.csr.extensions.get_extension_for_class(x509.NameConstraints)
             permitted = [
@@ -296,23 +321,25 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, None, False
 
-    def _get_public_key_pem(self):
+    def _get_public_key_pem(self) -> bytes:
         return self.csr.public_key().public_bytes(
             serialization.Encoding.PEM,
             serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
-    def _get_public_key_object(self):
+    def _get_public_key_object(self) -> CertificatePublicKeyTypes:
         return self.csr.public_key()
 
-    def _get_subject_key_identifier(self):
+    def _get_subject_key_identifier(self) -> bytes | None:
         try:
             ext = self.csr.extensions.get_extension_for_class(x509.SubjectKeyIdentifier)
             return ext.value.digest
         except cryptography.x509.ExtensionNotFound:
             return None
 
-    def _get_authority_key_identifier(self):
+    def _get_authority_key_identifier(
+        self,
+    ) -> tuple[bytes | None, list[str] | None, int | None]:
         try:
             ext = self.csr.extensions.get_extension_for_class(
                 x509.AuthorityKeyIdentifier
@@ -331,23 +358,28 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         except cryptography.x509.ExtensionNotFound:
             return None, None, None
 
-    def _get_all_extensions(self):
+    def _get_all_extensions(self) -> dict[str, dict[str, bool | str]]:
         return cryptography_get_extensions_from_csr(self.csr)
 
-    def _is_signature_valid(self):
+    def _is_signature_valid(self) -> bool:
         return self.csr.is_signature_valid
 
 
 def get_csr_info(
-    module, content, validate_signature=True, prefer_one_fingerprint=False
-):
+    module: GeneralAnsibleModule,
+    content: bytes,
+    validate_signature: bool = True,
+    prefer_one_fingerprint: bool = False,
+) -> dict[str, t.Any]:
     info = CSRInfoRetrievalCryptography(
         module, content, validate_signature=validate_signature
     )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
-def select_backend(module, content, validate_signature=True):
+def select_backend(
+    module: GeneralAnsibleModule, content: bytes, validate_signature: bool = True
+) -> CSRInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

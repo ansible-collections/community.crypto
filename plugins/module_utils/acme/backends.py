@@ -8,7 +8,7 @@ from __future__ import annotations
 import abc
 import datetime
 import re
-from collections import namedtuple
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     BackendException,
@@ -27,16 +27,20 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
-CertificateInformation = namedtuple(
-    "CertificateInformation",
-    (
-        "not_valid_after",
-        "not_valid_before",
-        "serial_number",
-        "subject_key_identifier",
-        "authority_key_identifier",
-    ),
-)
+if t.TYPE_CHECKING:
+    import os
+
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .certificates import ChainMatcher, Criterium
+
+
+class CertificateInformation(t.NamedTuple):
+    not_valid_after: datetime.datetime
+    not_valid_before: datetime.datetime
+    serial_number: int
+    subject_key_identifier: bytes | None
+    authority_key_identifier: bytes | None
 
 
 _FRACTIONAL_MATCHER = re.compile(
@@ -44,7 +48,7 @@ _FRACTIONAL_MATCHER = re.compile(
 )
 
 
-def _reduce_fractional_digits(timestamp_str):
+def _reduce_fractional_digits(timestamp_str: str) -> str:
     """
     Given a RFC 3339 timestamp that includes too many digits for the fractional seconds part, reduces these to at most 6.
     """
@@ -60,7 +64,7 @@ def _reduce_fractional_digits(timestamp_str):
     return f"{timestamp}{fractional}{timezone}"
 
 
-def _parse_acme_timestamp(timestamp_str, with_timezone):
+def _parse_acme_timestamp(timestamp_str: str, with_timezone: bool) -> datetime.datetime:
     """
     Parses a RFC 3339 timestamp.
     """
@@ -86,34 +90,42 @@ def _parse_acme_timestamp(timestamp_str, with_timezone):
 
 
 class CryptoBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module, with_timezone=False):
+    def __init__(self, module: AnsibleModule, with_timezone: bool = False) -> None:
         self.module = module
         self._with_timezone = with_timezone
 
-    def get_now(self):
+    def get_now(self) -> datetime.datetime:
         return get_now_datetime(with_timezone=self._with_timezone)
 
-    def parse_acme_timestamp(self, timestamp_str):
+    def parse_acme_timestamp(self, timestamp_str: str) -> datetime.datetime:
         # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
         return _parse_acme_timestamp(timestamp_str, with_timezone=self._with_timezone)
 
-    def parse_module_parameter(self, value, name):
+    def parse_module_parameter(self, value: str, name: str) -> datetime.datetime:
         try:
-            return get_relative_time_option(
+            result = get_relative_time_option(
                 value, name, with_timezone=self._with_timezone
             )
+            if result is None:
+                raise BackendException(f"Invalid value for {name}: {value!r}")
+            return result
         except OpenSSLObjectError as exc:
             raise BackendException(str(exc))
 
-    def interpolate_timestamp(self, timestamp_start, timestamp_end, percentage):
+    def interpolate_timestamp(
+        self,
+        timestamp_start: datetime.datetime,
+        timestamp_end: datetime.datetime,
+        percentage: float,
+    ) -> datetime.datetime:
         start = get_epoch_seconds(timestamp_start)
         end = get_epoch_seconds(timestamp_end)
         return from_epoch_seconds(
             start + percentage * (end - start), with_timezone=self._with_timezone
         )
 
-    def get_utc_datetime(self, *args, **kwargs):
-        kwargs_ext = dict(kwargs)
+    def get_utc_datetime(self, *args, **kwargs) -> datetime.datetime:
+        kwargs_ext: dict[str, t.Any] = dict(kwargs)
         if self._with_timezone and ("tzinfo" not in kwargs_ext and len(args) < 8):
             kwargs_ext["tzinfo"] = UTC
         result = datetime.datetime(*args, **kwargs_ext)
@@ -122,22 +134,33 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         return result
 
     @abc.abstractmethod
-    def parse_key(self, key_file=None, key_content=None, passphrase=None):
+    def parse_key(
+        self,
+        key_file: str | os.PathLike | None = None,
+        key_content: str | None = None,
+        passphrase: str | None = None,
+    ) -> dict[str, t.Any]:
         """
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         Raises KeyParsingError in case of errors.
         """
 
     @abc.abstractmethod
-    def sign(self, payload64, protected64, key_data):
+    def sign(
+        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+    ) -> dict[str, t.Any]:
         pass
 
     @abc.abstractmethod
-    def create_mac_key(self, alg, key):
+    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
 
     @abc.abstractmethod
-    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_ordered_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | None = None,
+    ) -> list[tuple[str, str]]:
         """
         Return a list of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -148,7 +171,11 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | None = None,
+    ) -> set[tuple[str, str]]:
         """
         Return a set of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -156,7 +183,12 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
+    def get_cert_days(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+        now: datetime.datetime | None = None,
+    ) -> int:
         """
         Return the days the certificate in cert_filename remains valid and -1
         if the file was not found. If cert_filename contains more than one
@@ -166,13 +198,17 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def create_chain_matcher(self, criterium):
+    def create_chain_matcher(self, criterium: Criterium) -> ChainMatcher:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
 
     @abc.abstractmethod
-    def get_cert_information(self, cert_filename=None, cert_content=None):
+    def get_cert_information(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+    ) -> CertificateInformation:
         """
         Return some information on a X.509 certificate as a CertificateInformation object.
         """

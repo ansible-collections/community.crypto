@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import abc
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -29,6 +30,18 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+    )
+
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
+
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 try:
@@ -40,38 +53,49 @@ except ImportError:
 SIGNATURE_TEST_DATA = b"1234"
 
 
-def _get_cryptography_private_key_info(key, need_private_key_data=False):
+def _get_cryptography_private_key_info(
+    key: PrivateKeyTypes, need_private_key_data: bool = False
+) -> tuple[str, dict[str, t.Any], dict[str, t.Any]]:
     key_type, key_public_data = _get_cryptography_public_key_info(key.public_key())
-    key_private_data = dict()
+    key_private_data: dict[str, t.Any] = {}
     if need_private_key_data:
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
-            private_numbers = key.private_numbers()
-            key_private_data["p"] = private_numbers.p
-            key_private_data["q"] = private_numbers.q
-            key_private_data["exponent"] = private_numbers.d
+            rsa_private_numbers = key.private_numbers()
+            key_private_data["p"] = rsa_private_numbers.p
+            key_private_data["q"] = rsa_private_numbers.q
+            key_private_data["exponent"] = rsa_private_numbers.d
         elif isinstance(
             key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey
         ):
-            private_numbers = key.private_numbers()
-            key_private_data["x"] = private_numbers.x
+            dsa_private_numbers = key.private_numbers()
+            key_private_data["x"] = dsa_private_numbers.x
         elif isinstance(
             key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
         ):
-            private_numbers = key.private_numbers()
-            key_private_data["multiplier"] = private_numbers.private_value
+            ecc_private_numbers = key.private_numbers()
+            key_private_data["multiplier"] = ecc_private_numbers.private_value
     return key_type, key_public_data, key_private_data
 
 
-def _check_dsa_consistency(key_public_data, key_private_data):
+def _check_dsa_consistency(
+    key_public_data: dict[str, t.Any], key_private_data: dict[str, t.Any]
+) -> bool | None:
     # Get parameters
-    p = key_public_data.get("p")
-    q = key_public_data.get("q")
-    g = key_public_data.get("g")
-    y = key_public_data.get("y")
-    x = key_private_data.get("x")
-    for v in (p, q, g, y, x):
-        if v is None:
-            return None
+    p: int | None = key_public_data.get("p")
+    if p is None:
+        return None
+    q: int | None = key_public_data.get("q")
+    if q is None:
+        return None
+    g: int | None = key_public_data.get("g")
+    if g is None:
+        return None
+    y: int | None = key_public_data.get("y")
+    if y is None:
+        return None
+    x: int | None = key_private_data.get("x")
+    if x is None:
+        return None
     # Make sure that g is not 0, 1 or -1 in Z/pZ
     if g < 2 or g >= p - 1:
         return False
@@ -94,13 +118,16 @@ def _check_dsa_consistency(key_public_data, key_private_data):
 
 
 def _is_cryptography_key_consistent(
-    key, key_public_data, key_private_data, warn_func=None
-):
+    key: PrivateKeyTypes,
+    key_public_data: dict[str, t.Any],
+    key_private_data: dict[str, t.Any],
+    warn_func: t.Callable[[str], None] | None = None,
+) -> bool | None:
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
         # key._backend was removed in cryptography 42.0.0
         backend = getattr(key, "_backend", None)
         if backend is not None:
-            return bool(backend._lib.RSA_check_key(key._rsa_cdata))
+            return bool(backend._lib.RSA_check_key(key._rsa_cdata))  # type: ignore
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
         result = _check_dsa_consistency(key_public_data, key_private_data)
         if result is not None:
@@ -145,9 +172,9 @@ def _is_cryptography_key_consistent(
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
         has_simple_sign_function = True
     if has_simple_sign_function:
-        signature = key.sign(SIGNATURE_TEST_DATA)
+        signature = key.sign(SIGNATURE_TEST_DATA)  # type: ignore
         try:
-            key.public_key().verify(signature, SIGNATURE_TEST_DATA)
+            key.public_key().verify(signature, SIGNATURE_TEST_DATA)  # type: ignore
             return True
         except cryptography.exceptions.InvalidSignature:
             return False
@@ -158,14 +185,14 @@ def _is_cryptography_key_consistent(
 
 
 class PrivateKeyConsistencyError(OpenSSLObjectError):
-    def __init__(self, msg, result):
+    def __init__(self, msg: str, result: dict[str, t.Any]) -> None:
         super(PrivateKeyConsistencyError, self).__init__(msg)
         self.error_message = msg
         self.result = result
 
 
 class PrivateKeyParseError(OpenSSLObjectError):
-    def __init__(self, msg, result):
+    def __init__(self, msg: str, result: dict[str, t.Any]) -> None:
         super(PrivateKeyParseError, self).__init__(msg)
         self.error_message = msg
         self.result = result
@@ -174,13 +201,12 @@ class PrivateKeyParseError(OpenSSLObjectError):
 class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
         self,
-        module,
-        content,
-        passphrase=None,
-        return_private_key_data=False,
-        check_consistency=False,
+        module: GeneralAnsibleModule,
+        content: bytes,
+        passphrase: str | None = None,
+        return_private_key_data: bool = False,
+        check_consistency: bool = False,
     ):
-        # content must be a bytes string
         self.module = module
         self.content = content
         self.passphrase = passphrase
@@ -188,22 +214,26 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
         self.check_consistency = check_consistency
 
     @abc.abstractmethod
-    def _get_public_key(self, binary):
+    def _get_public_key(self, binary: bool) -> bytes:
         pass
 
     @abc.abstractmethod
-    def _get_key_info(self, need_private_key_data=False):
+    def _get_key_info(
+        self, need_private_key_data: bool = False
+    ) -> tuple[str, dict[str, t.Any], dict[str, t.Any]]:
         pass
 
     @abc.abstractmethod
-    def _is_key_consistent(self, key_public_data, key_private_data):
+    def _is_key_consistent(
+        self, key_public_data: dict[str, t.Any], key_private_data: dict[str, t.Any]
+    ) -> bool | None:
         pass
 
-    def get_info(self, prefer_one_fingerprint=False):
-        result = dict(
-            can_parse_key=False,
-            key_is_consistent=None,
-        )
+    def get_info(self, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {
+            "can_parse_key": False,
+            "key_is_consistent": None,
+        }
         priv_key_detail = self.content
         try:
             self.key = load_privatekey(
@@ -252,35 +282,39 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
 class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
     """Validate the supplied private key, using the cryptography backend"""
 
-    def __init__(self, module, content, **kwargs):
+    def __init__(self, module: GeneralAnsibleModule, content: bytes, **kwargs) -> None:
         super(PrivateKeyInfoRetrievalCryptography, self).__init__(
             module, content, **kwargs
         )
 
-    def _get_public_key(self, binary):
+    def _get_public_key(self, binary: bool) -> bytes:
         return self.key.public_key().public_bytes(
             serialization.Encoding.DER if binary else serialization.Encoding.PEM,
             serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
-    def _get_key_info(self, need_private_key_data=False):
+    def _get_key_info(
+        self, need_private_key_data: bool = False
+    ) -> tuple[str, dict[str, t.Any], dict[str, t.Any]]:
         return _get_cryptography_private_key_info(
             self.key, need_private_key_data=need_private_key_data
         )
 
-    def _is_key_consistent(self, key_public_data, key_private_data):
+    def _is_key_consistent(
+        self, key_public_data: dict[str, t.Any], key_private_data: dict[str, t.Any]
+    ) -> bool | None:
         return _is_cryptography_key_consistent(
             self.key, key_public_data, key_private_data, warn_func=self.module.warn
         )
 
 
 def get_privatekey_info(
-    module,
-    content,
-    passphrase=None,
-    return_private_key_data=False,
-    prefer_one_fingerprint=False,
-):
+    module: GeneralAnsibleModule,
+    content: bytes,
+    passphrase: str | None = None,
+    return_private_key_data: bool = False,
+    prefer_one_fingerprint: bool = False,
+) -> dict[str, t.Any]:
     info = PrivateKeyInfoRetrievalCryptography(
         module,
         content,
@@ -291,12 +325,12 @@ def get_privatekey_info(
 
 
 def select_backend(
-    module,
-    content,
-    passphrase=None,
-    return_private_key_data=False,
-    check_consistency=False,
-):
+    module: GeneralAnsibleModule,
+    content: bytes,
+    passphrase: str | None = None,
+    return_private_key_data: bool = False,
+    check_consistency: bool = False,
+) -> PrivateKeyInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

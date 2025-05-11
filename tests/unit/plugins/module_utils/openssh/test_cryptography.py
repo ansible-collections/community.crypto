@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import os.path
+import typing as t
 from getpass import getuser
 from os import remove, rmdir
 from socket import gethostname
@@ -23,7 +24,13 @@ from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptogra
 )
 
 
-DEFAULT_KEY_PARAMS = [
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.openssh.cryptography import (
+        KeyType,
+    )
+
+
+DEFAULT_KEY_PARAMS: list[tuple[KeyType, int | None, bytes | None, str | None]] = [
     (
         "rsa",
         None,
@@ -50,7 +57,7 @@ DEFAULT_KEY_PARAMS = [
     ),
 ]
 
-VALID_USER_KEY_PARAMS = [
+VALID_USER_KEY_PARAMS: list[tuple[KeyType, int | None, bytes | None, str | None]] = [
     (
         "rsa",
         8192,
@@ -77,9 +84,9 @@ VALID_USER_KEY_PARAMS = [
     ),
 ]
 
-INVALID_USER_KEY_PARAMS = [
+INVALID_USER_KEY_PARAMS: list[tuple[KeyType, int | None, bytes | None, str | None]] = [
     (
-        "dne",
+        "dne",  # type: ignore
         None,
         None,
         None,
@@ -87,18 +94,18 @@ INVALID_USER_KEY_PARAMS = [
     (
         "rsa",
         None,
-        [1, 2, 3],
+        [1, 2, 3],  # type: ignore
         "comment",
     ),
     (
         "ecdsa",
         None,
         None,
-        [1, 2, 3],
+        [1, 2, 3],  # type: ignore
     ),
 ]
 
-INVALID_KEY_SIZES = [
+INVALID_KEY_SIZES: list[tuple[KeyType, int | None, bytes | None, str | None]] = [
     (
         "rsa",
         1023,
@@ -134,7 +141,9 @@ INVALID_KEY_SIZES = [
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", DEFAULT_KEY_PARAMS)
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_default_key_params(keytype, size, passphrase, comment):
+def test_default_key_params(
+    keytype: KeyType, size: int | None, passphrase: bytes | None, comment: str | None
+) -> None:
     result = True
 
     default_sizes = {
@@ -163,7 +172,9 @@ def test_default_key_params(keytype, size, passphrase, comment):
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", VALID_USER_KEY_PARAMS)
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_valid_user_key_params(keytype, size, passphrase, comment):
+def test_valid_user_key_params(
+    keytype: KeyType, size: int | None, passphrase: bytes | None, comment: str | None
+) -> None:
     result = True
 
     try:
@@ -181,7 +192,9 @@ def test_valid_user_key_params(keytype, size, passphrase, comment):
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", INVALID_USER_KEY_PARAMS)
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_invalid_user_key_params(keytype, size, passphrase, comment):
+def test_invalid_user_key_params(
+    keytype: KeyType, size: int | None, passphrase: bytes | None, comment: str | None
+) -> None:
     result = False
 
     try:
@@ -199,7 +212,9 @@ def test_invalid_user_key_params(keytype, size, passphrase, comment):
 
 @pytest.mark.parametrize("keytype,size,passphrase,comment", INVALID_KEY_SIZES)
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_invalid_key_sizes(keytype, size, passphrase, comment):
+def test_invalid_key_sizes(
+    keytype: KeyType, size: int | None, passphrase: bytes | None, comment: str | None
+) -> None:
     result = False
 
     try:
@@ -216,7 +231,7 @@ def test_invalid_key_sizes(keytype, size, passphrase, comment):
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_valid_comment_update():
+def test_valid_comment_update() -> None:
 
     pair = OpensshKeypair.generate()
     new_comment = "comment"
@@ -233,13 +248,13 @@ def test_valid_comment_update():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_invalid_comment_update():
+def test_invalid_comment_update() -> None:
     result = False
 
     pair = OpensshKeypair.generate()
     new_comment = [1, 2, 3]
     try:
-        pair.comment = new_comment
+        pair.comment = new_comment  # type: ignore
     except InvalidCommentError:
         result = True
 
@@ -247,7 +262,7 @@ def test_invalid_comment_update():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_valid_passphrase_update():
+def test_valid_passphrase_update() -> None:
     result = False
 
     passphrase = "change_me".encode("UTF-8")
@@ -281,13 +296,13 @@ def test_valid_passphrase_update():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_invalid_passphrase_update():
+def test_invalid_passphrase_update() -> None:
     result = False
 
     passphrase = [1, 2, 3]
     pair = OpensshKeypair.generate()
     try:
-        pair.update_passphrase(passphrase)
+        pair.update_passphrase(passphrase)  # type: ignore
     except InvalidPassphraseError:
         result = True
 
@@ -295,7 +310,7 @@ def test_invalid_passphrase_update():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_invalid_privatekey():
+def test_invalid_privatekey() -> None:
     result = False
 
     try:
@@ -325,7 +340,7 @@ def test_invalid_privatekey():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_mismatched_keypair():
+def test_mismatched_keypair() -> None:
     result = False
 
     try:
@@ -356,7 +371,7 @@ def test_mismatched_keypair():
 
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
-def test_keypair_comparison():
+def test_keypair_comparison() -> None:
     assert OpensshKeypair.generate() != OpensshKeypair.generate()
     assert OpensshKeypair.generate() != OpensshKeypair.generate(keytype="dsa")
     assert OpensshKeypair.generate() != OpensshKeypair.generate(keytype="ed25519")
@@ -366,7 +381,7 @@ def test_keypair_comparison():
     try:
         tmpdir = mkdtemp()
 
-        keys = {
+        keys: dict[str, dict[str, t.Any]] = {
             "rsa": {
                 "pair": OpensshKeypair.generate(),
                 "filename": os.path.join(tmpdir, "id_rsa"),

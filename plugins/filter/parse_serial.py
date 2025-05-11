@@ -39,6 +39,8 @@ _value:
   type: int
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.crypto.plugins.module_utils.serial import (
@@ -46,7 +48,7 @@ from ansible_collections.community.crypto.plugins.module_utils.serial import (
 )
 
 
-def parse_serial_filter(input):
+def parse_serial_filter(input: str | bytes) -> int:
     if not isinstance(input, (str, bytes)):
         raise AnsibleFilterError(
             f"The input for the community.crypto.parse_serial filter must be a string; got {type(input)} instead"
@@ -60,7 +62,7 @@ def parse_serial_filter(input):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "parse_serial": parse_serial_filter,
         }

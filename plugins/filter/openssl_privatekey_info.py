@@ -146,8 +146,10 @@ _value:
       type: dict
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -161,8 +163,10 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 
 
 def openssl_privatekey_info_filter(
-    data, passphrase=None, return_private_key_data=False
-):
+    data: str | bytes,
+    passphrase: str | bytes | None = None,
+    return_private_key_data: bool = False,
+) -> dict[str, t.Any]:
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
@@ -182,7 +186,7 @@ def openssl_privatekey_info_filter(
         result = get_privatekey_info(
             module,
             content=to_bytes(data),
-            passphrase=passphrase,
+            passphrase=to_text(passphrase) if passphrase is not None else None,
             return_private_key_data=return_private_key_data,
         )
         result.pop("can_parse_key", None)
@@ -197,7 +201,7 @@ def openssl_privatekey_info_filter(
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "openssl_privatekey_info": openssl_privatekey_info_filter,
         }

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from subprocess import PIPE, Popen
 
 from ansible.module_utils.common.process import get_bin_path
@@ -15,7 +16,7 @@ from ansible_collections.community.crypto.plugins.module_utils.gnupg.cli import 
 
 
 class PluginGPGRunner(GPGRunner):
-    def __init__(self, executable=None, cwd=None):
+    def __init__(self, executable: str | None = None, cwd: str | None = None) -> None:
         if executable is None:
             try:
                 executable = get_bin_path("gpg")
@@ -24,7 +25,9 @@ class PluginGPGRunner(GPGRunner):
         self.executable = executable
         self.cwd = cwd
 
-    def run_command(self, command, check_rc=True, data=None):
+    def run_command(
+        self, command: list[str], check_rc: bool = True, data: bytes | None = None
+    ) -> tuple[int, str, str]:
         """
         Run ``[gpg] + command`` and return ``(rc, stdout, stderr)``.
 
@@ -41,12 +44,10 @@ class PluginGPGRunner(GPGRunner):
             command, shell=False, cwd=self.cwd, stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
         stdout, stderr = p.communicate(input=data)
-        stdout = to_native(stdout, errors="surrogate_or_replace")
-        stderr = to_native(stderr, errors="surrogate_or_replace")
+        stdout_n = to_native(stdout, errors="surrogate_or_replace")
+        stderr_n = to_native(stderr, errors="surrogate_or_replace")
         if check_rc and p.returncode != 0:
-            stdout_n = (to_native(stdout, errors="surrogate_or_replace"),)
-            stderr_n = (to_native(stderr, errors="surrogate_or_replace"),)
             raise GPGError(
                 f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'
             )
-        return p.returncode, stdout, stderr
+        return t.cast(int, p.returncode), stdout_n, stderr_n

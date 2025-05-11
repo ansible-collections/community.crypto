@@ -100,7 +100,9 @@ last_update:
   type: str
   sample: '20190413202428Z'
 next_update:
-  description: The point in time from which a new CRL will be issued and the client has to check for it as ASN.1 TIME.
+  description:
+    - The point in time from which a new CRL will be issued and the client has to check for it as ASN.1 TIME.
+    - Will be C(none) if no such timestamp is present.
   returned: success
   type: str
   sample: '20190413202428Z'
@@ -172,6 +174,7 @@ revoked_certificates:
 
 import base64
 import binascii
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -185,7 +188,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path"),
@@ -200,25 +203,30 @@ def main():
         supports_check_mode=True,
     )
 
-    if module.params["content"] is None:
+    content: str | None = module.params["content"]
+    path: str | None = module.params["path"]
+    if content is None:
+        if path is None:
+            module.fail_json(msg="One of content and path must be provided")
         try:
-            with open(module.params["path"], "rb") as f:
+            with open(path, "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading CRL file from disk: {e}")
     else:
-        data = module.params["content"].encode("utf-8")
+        data = content.encode("utf-8")
         if not identify_pem_format(data):
             try:
-                data = base64.b64decode(module.params["content"])
+                data = base64.b64decode(content)
             except (binascii.Error, TypeError) as e:
                 module.fail_json(msg=f"Error while Base64 decoding content: {e}")
 
+    list_revoked_certificates: bool = module.params["list_revoked_certificates"]
     try:
         result = get_crl_info(
             module,
             data,
-            list_revoked_certificates=module.params["list_revoked_certificates"],
+            list_revoked_certificates=list_revoked_certificates,
         )
         module.exit_json(**result)
     except OpenSSLObjectError as e:

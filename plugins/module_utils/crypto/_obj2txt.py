@@ -34,7 +34,7 @@ from __future__ import annotations
 #          cryptography versions!
 
 
-def obj2txt(openssl_lib, openssl_ffi, obj):
+def obj2txt(openssl_lib, openssl_ffi, obj) -> str:
     # Set to 80 on the recommendation of
     # https://www.openssl.org/docs/crypto/OBJ_nid2ln.html#return_values
     #

@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
     TIMESTAMP_FORMAT,
     cryptography_decode_revoked_certificate,
@@ -22,6 +24,18 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+    )
+
+    from ....plugin_utils.action_module import AnsibleActionModule
+    from ....plugin_utils.filter_module import FilterModuleMock
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+
+
 # crypto_utils
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -33,14 +47,19 @@ except ImportError:
 
 
 class CRLInfoRetrieval:
-    def __init__(self, module, content, list_revoked_certificates=True):
+    def __init__(
+        self,
+        module: GeneralAnsibleModule,
+        content: bytes,
+        list_revoked_certificates: bool = True,
+    ) -> None:
         # content must be a bytes string
         self.module = module
         self.content = content
         self.list_revoked_certificates = list_revoked_certificates
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
-    def get_info(self):
+    def get_info(self) -> dict[str, t.Any]:
         self.crl_pem = identify_pem_format(self.content)
         try:
             if self.crl_pem:
@@ -50,7 +69,7 @@ class CRLInfoRetrieval:
         except ValueError as e:
             self.module.fail_json(msg=f"Error while decoding CRL: {e}")
 
-        result = {
+        result: dict[str, t.Any] = {
             "changed": False,
             "format": "pem" if self.crl_pem else "der",
             "last_update": None,
@@ -61,7 +80,11 @@ class CRLInfoRetrieval:
         }
 
         result["last_update"] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
-        result["next_update"] = self.crl.next_update.strftime(TIMESTAMP_FORMAT)
+        result["next_update"] = (
+            self.crl.next_update.strftime(TIMESTAMP_FORMAT)
+            if self.crl.next_update
+            else None
+        )
         result["digest"] = cryptography_oid_to_name(
             cryptography_get_signature_algorithm_oid_from_crl(self.crl)
         )
@@ -83,7 +106,9 @@ class CRLInfoRetrieval:
         return result
 
 
-def get_crl_info(module, content, list_revoked_certificates=True):
+def get_crl_info(
+    module: GeneralAnsibleModule, content: bytes, list_revoked_certificates: bool = True
+) -> dict[str, t.Any]:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

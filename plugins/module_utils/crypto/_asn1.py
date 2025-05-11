@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import enum
 import re
 
 from ansible.module_utils.common.text.converters import to_bytes
@@ -32,7 +33,7 @@ ASN1_STRING_REGEX = re.compile(
 )
 
 
-class TagClass:
+class TagClass(enum.Enum):
     universal = 0
     application = 1
     context_specific = 2
@@ -40,11 +41,11 @@ class TagClass:
 
 
 # Universal tag numbers that can be encoded.
-class TagNumber:
+class TagNumber(enum.Enum):
     utf8_string = 12
 
 
-def _pack_octet_integer(value):
+def _pack_octet_integer(value: int) -> bytes:
     """Packs an integer value into 1 or multiple octets."""
     # NOTE: This is *NOT* the same as packing an ASN.1 INTEGER like value.
     octets = bytearray()
@@ -66,7 +67,7 @@ def _pack_octet_integer(value):
     return bytes(octets)
 
 
-def serialize_asn1_string_as_der(value):
+def serialize_asn1_string_as_der(value: str) -> bytes:
     """Deserializes an ASN.1 string to a DER encoded byte string."""
     asn1_match = ASN1_STRING_REGEX.match(value)
     if not asn1_match:
@@ -92,7 +93,7 @@ def serialize_asn1_string_as_der(value):
         b_value = pack_asn1(TagClass.universal, False, TagNumber.utf8_string, b_value)
 
     if tag_type:
-        tag_class = {
+        tag_class_enum = {
             "U": TagClass.universal,
             "A": TagClass.application,
             "P": TagClass.private,
@@ -100,13 +101,15 @@ def serialize_asn1_string_as_der(value):
         }[tag_class]
 
         # When adding support for more types this should be looked into further. For now it works with UTF8Strings.
-        constructed = tag_type == "EXPLICIT" and tag_class != TagClass.universal
-        b_value = pack_asn1(tag_class, constructed, int(tag_number), b_value)
+        constructed = tag_type == "EXPLICIT" and tag_class_enum != TagClass.universal
+        b_value = pack_asn1(tag_class_enum, constructed, int(tag_number), b_value)
 
     return b_value
 
 
-def pack_asn1(tag_class, constructed, tag_number, b_data):
+def pack_asn1(
+    tag_class: TagClass, constructed: bool, tag_number: TagNumber | int, b_data: bytes
+) -> bytes:
     """Pack the value into an ASN.1 data structure.
 
     The structure for an ASN.1 element is
@@ -115,16 +118,15 @@ def pack_asn1(tag_class, constructed, tag_number, b_data):
     """
     b_asn1_data = bytearray()
 
-    if tag_class < 0 or tag_class > 3:
-        raise ValueError(f"tag_class must be between 0 and 3 not {tag_class}")
-
     # Bit 8 and 7 denotes the class.
-    identifier_octets = tag_class << 6
+    identifier_octets = tag_class.value << 6
     # Bit 6 denotes whether the value is primitive or constructed.
     identifier_octets |= (1 if constructed else 0) << 5
 
     # Bits 5-1 contain the tag number, if it cannot be encoded in these 5 bits
     # then they are set and another octet(s) is used to denote the tag number.
+    if isinstance(tag_number, TagNumber):
+        tag_number = tag_number.value
     if tag_number < 31:
         identifier_octets |= tag_number
         b_asn1_data.append(identifier_octets)

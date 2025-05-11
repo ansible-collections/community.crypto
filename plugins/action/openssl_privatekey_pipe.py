@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import base64
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -19,25 +20,41 @@ from ansible_collections.community.crypto.plugins.plugin_utils.action_module imp
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+        ArgumentSpec,
+    )
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+        PrivateKeyBackend,
+    )
+    from ansible_collections.community.crypto.plugins.plugin_utils.action_module import (
+        AnsibleActionModule,
+    )
+
+
 class PrivateKeyModule:
-    def __init__(self, module, module_backend):
+    def __init__(
+        self, module: AnsibleActionModule, module_backend: PrivateKeyBackend
+    ) -> None:
         self.module = module
         self.module_backend = module_backend
         self.check_mode = module.check_mode
         self.changed = False
-        self.return_current_key = module.params["return_current_key"]
+        self.return_current_key: bool = module.params["return_current_key"]
 
-        if module.params["content"] is not None:
-            if module.params["content_base64"]:
+        content: str | None = module.params["content"]
+        content_base64: bool = module.params["content_base64"]
+        if content is not None:
+            if content_base64:
                 try:
-                    data = base64.b64decode(module.params["content"])
+                    data = base64.b64decode(content)
                 except Exception as e:
                     module.fail_json(msg=f"Cannot decode Base64 encoded data: {e}")
             else:
-                data = to_bytes(module.params["content"])
+                data = to_bytes(content)
             module_backend.set_existing(data)
 
-    def generate(self, module):
+    def generate(self, module: AnsibleActionModule) -> None:
         """Generate a keypair."""
 
         if self.module_backend.needs_regeneration():
@@ -53,7 +70,7 @@ class PrivateKeyModule:
             self.privatekey_bytes = privatekey_data
             self.changed = True
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
         result = self.module_backend.dump(
             include_key=self.changed or self.return_current_key
@@ -64,7 +81,7 @@ class PrivateKeyModule:
 
 class ActionModule(ActionModuleBase):
     @staticmethod
-    def setup_module():
+    def setup_module() -> tuple[ArgumentSpec, dict[str, t.Any]]:
         argument_spec = get_privatekey_argument_spec()
         argument_spec.argument_spec.update(
             dict(
@@ -78,7 +95,7 @@ class ActionModule(ActionModuleBase):
         )
 
     @staticmethod
-    def run_module(module):
+    def run_module(module: AnsibleActionModule) -> None:
         module_backend = select_backend(module=module)
 
         try:

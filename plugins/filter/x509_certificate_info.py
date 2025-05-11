@@ -308,6 +308,8 @@ _value:
       type: str
 """
 
+import typing as t
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -321,7 +323,9 @@ from ansible_collections.community.crypto.plugins.plugin_utils.filter_module imp
 )
 
 
-def x509_certificate_info_filter(data, name_encoding="ignore"):
+def x509_certificate_info_filter(
+    data: str | bytes, name_encoding: t.Literal["ignore", "idna", "unicode"] = "ignore"
+) -> dict[str, t.Any]:
     """Extract information from X.509 PEM certificate."""
     if not isinstance(data, (str, bytes)):
         raise AnsibleFilterError(
@@ -347,7 +351,7 @@ def x509_certificate_info_filter(data, name_encoding="ignore"):
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self):
+    def filters(self) -> dict[str, t.Callable]:
         return {
             "x509_certificate_info": x509_certificate_info_filter,
         }

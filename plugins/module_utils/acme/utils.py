@@ -7,9 +7,11 @@ from __future__ import annotations
 
 import base64
 import datetime
+import os
 import re
 import textwrap
 import traceback
+import typing as t
 from urllib.parse import unquote
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
@@ -23,11 +25,15 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
-def nopad_b64(data):
+if t.TYPE_CHECKING:
+    from .backends import CertificateInformation, CryptoBackend
+
+
+def nopad_b64(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode("utf8").replace("=", "")
 
 
-def der_to_pem(der_cert):
+def der_to_pem(der_cert: bytes) -> str:
     """
     Convert the DER format certificate in der_cert to a PEM format certificate and return it.
     """
@@ -35,7 +41,9 @@ def der_to_pem(der_cert):
     return f"-----BEGIN CERTIFICATE-----\n{content}\n-----END CERTIFICATE-----\n"
 
 
-def pem_to_der(pem_filename=None, pem_content=None):
+def pem_to_der(
+    pem_filename: str | os.PathLike | None = None, pem_content: str | None = None
+) -> bytes:
     """
     Load PEM file, or use PEM file's content, and convert to DER.
 
@@ -70,7 +78,9 @@ def pem_to_der(pem_filename=None, pem_content=None):
     return base64.b64decode("".join(certificate_lines))
 
 
-def process_links(info, callback):
+def process_links(
+    info: dict[str, t.Any], callback: t.Callable[[str, str], None]
+) -> None:
     """
     Process link header, calls callback for every link header with the URL and relation as options.
 
@@ -82,7 +92,11 @@ def process_links(info, callback):
             callback(unquote(url), relation)
 
 
-def parse_retry_after(value, relative_with_timezone=True, now=None):
+def parse_retry_after(
+    value: str,
+    relative_with_timezone: bool = True,
+    now: datetime.datetime | None = None,
+) -> datetime.datetime:
     """
     Parse the value of a Retry-After header and return a timestamp.
 
@@ -106,12 +120,12 @@ def parse_retry_after(value, relative_with_timezone=True, now=None):
 
 
 def compute_cert_id(
-    backend,
-    cert_info=None,
-    cert_filename=None,
-    cert_content=None,
-    none_if_required_information_is_missing=False,
-):
+    backend: CryptoBackend,
+    cert_info: CertificateInformation | None = None,
+    cert_filename: str | os.PathLike | None = None,
+    cert_content: str | bytes | None = None,
+    none_if_required_information_is_missing: bool = False,
+) -> str | None:
     # Obtain certificate info if not provided
     if cert_info is None:
         cert_info = backend.get_cert_information(

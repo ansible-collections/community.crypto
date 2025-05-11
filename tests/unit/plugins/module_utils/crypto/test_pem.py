@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
     extract_first_pem,
@@ -13,7 +15,9 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 
-PEM_TEST_CASES = [
+PEM_TEST_CASES: list[
+    tuple[bytes, list[str], bool, t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"]]
+] = [
     (b"", [], False, "raw"),
     (b"random stuff\nblabla", [], False, "raw"),
     (b"-----BEGIN PRIVATE KEY-----", [], False, "raw"),
@@ -51,7 +55,12 @@ PEM_TEST_CASES = [
 
 
 @pytest.mark.parametrize("data, pems, is_pem, private_key_type", PEM_TEST_CASES)
-def test_pem_handling(data, pems, is_pem, private_key_type):
+def test_pem_handling(
+    data: bytes,
+    pems: list[str],
+    is_pem: bool,
+    private_key_type: t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"],
+):
     assert identify_pem_format(data) == is_pem
     assert identify_private_key_format(data) == private_key_type
     try:

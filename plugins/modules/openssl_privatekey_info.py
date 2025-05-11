@@ -200,6 +200,7 @@ private_data:
   type: dict
 """
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -212,7 +213,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path"),
@@ -243,7 +244,7 @@ def main():
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(
-                msg=f"Error while reading private key file from disk: {e}", **result
+                msg=f"Error while reading private key file from disk: {e}", **result  # type: ignore
             )
 
     result["can_load_key"] = True
@@ -261,10 +262,10 @@ def main():
         module.exit_json(**result)
     except PrivateKeyParseError as exc:
         result.update(exc.result)
-        module.fail_json(msg=exc.error_message, **result)
+        module.fail_json(msg=exc.error_message, **result)  # type: ignore
     except PrivateKeyConsistencyError as exc:
         result.update(exc.result)
-        module.fail_json(msg=exc.error_message, **result)
+        module.fail_json(msg=exc.error_message, **result)  # type: ignore
     except OpenSSLObjectError as exc:
         module.fail_json(msg=str(exc))
 

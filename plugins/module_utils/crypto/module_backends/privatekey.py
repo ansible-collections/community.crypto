@@ -8,6 +8,7 @@ from __future__ import annotations
 import abc
 import base64
 import traceback
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
@@ -31,6 +32,17 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
+
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+    )
+
+    from ....plugin_utils.action_module import AnsibleActionModule
+
+    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule]
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -64,29 +76,37 @@ class PrivateKeyError(OpenSSLObjectError):
 
 
 class PrivateKeyBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module):
+    def __init__(self, module: GeneralAnsibleModule) -> None:
         self.module = module
-        self.type = module.params["type"]
-        self.size = module.params["size"]
-        self.curve = module.params["curve"]
-        self.passphrase = module.params["passphrase"]
-        self.cipher = module.params["cipher"]
-        self.format = module.params["format"]
-        self.format_mismatch = module.params.get("format_mismatch", "regenerate")
-        self.regenerate = module.params.get("regenerate", "full_idempotence")
+        self.type: t.Literal[
+            "DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"
+        ] = module.params["type"]
+        self.size: int = module.params["size"]
+        self.curve: str | None = module.params["curve"]
+        self.passphrase: str | None = module.params["passphrase"]
+        self.cipher: str = module.params["cipher"]
+        self.format: t.Literal["pkcs1", "pkcs8", "raw", "auto", "auto_ignore"] = (
+            module.params["format"]
+        )
+        self.format_mismatch: t.Literal["regenerate", "convert"] = module.params.get(
+            "format_mismatch", "regenerate"
+        )
+        self.regenerate: t.Literal[
+            "never", "fail", "partial_idempotence", "full_idempotence", "always"
+        ] = module.params.get("regenerate", "full_idempotence")
 
-        self.private_key = None
+        self.private_key: PrivateKeyTypes | None = None
 
-        self.existing_private_key = None
-        self.existing_private_key_bytes = None
+        self.existing_private_key: PrivateKeyTypes | None = None
+        self.existing_private_key_bytes: bytes | None = None
 
         self.diff_before = self._get_info(None)
         self.diff_after = self._get_info(None)
 
-    def _get_info(self, data):
+    def _get_info(self, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
-            return dict()
-        result = dict(can_parse_key=False)
+            return {}
+        result: dict[str, t.Any] = {"can_parse_key": False}
         try:
             result.update(
                 get_privatekey_info(
@@ -106,11 +126,11 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
         return result
 
     @abc.abstractmethod
-    def generate_private_key(self):
+    def generate_private_key(self) -> None:
         """(Re-)Generate private key."""
         pass
 
-    def convert_private_key(self):
+    def convert_private_key(self) -> None:
         """Convert existing private key (self.existing_private_key) to new private key (self.private_key).
 
         This is effectively a copy without active conversion. The conversion is done
@@ -121,42 +141,37 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
         self.private_key = self.existing_private_key
 
     @abc.abstractmethod
-    def get_private_key_data(self):
+    def get_private_key_data(self) -> bytes:
         """Return bytes for self.private_key."""
-        pass
 
-    def set_existing(self, privatekey_bytes):
+    def set_existing(self, privatekey_bytes: bytes | None) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.existing_private_key_bytes = privatekey_bytes
         self.diff_after = self.diff_before = self._get_info(
             self.existing_private_key_bytes
         )
 
-    def has_existing(self):
+    def has_existing(self) -> bool:
         """Query whether an existing private key is/has been there."""
         return self.existing_private_key_bytes is not None
 
     @abc.abstractmethod
-    def _check_passphrase(self):
+    def _check_passphrase(self) -> bool:
         """Check whether provided passphrase matches, assuming self.existing_private_key_bytes has been populated."""
-        pass
 
     @abc.abstractmethod
-    def _ensure_existing_private_key_loaded(self):
+    def _ensure_existing_private_key_loaded(self) -> None:
         """Make sure that self.existing_private_key is populated from self.existing_private_key_bytes."""
-        pass
 
     @abc.abstractmethod
-    def _check_size_and_type(self):
+    def _check_size_and_type(self) -> bool:
         """Check whether provided size and type matches, assuming self.existing_private_key has been populated."""
-        pass
 
     @abc.abstractmethod
-    def _check_format(self):
+    def _check_format(self) -> bool:
         """Check whether the key file format, assuming self.existing_private_key and self.existing_private_key_bytes has been populated."""
-        pass
 
-    def needs_regeneration(self):
+    def needs_regeneration(self) -> bool:
         """Check whether a regeneration is necessary."""
         if self.regenerate == "always":
             return True
@@ -194,7 +209,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
                 )
         return False
 
-    def needs_conversion(self):
+    def needs_conversion(self) -> bool:
         """Check whether a conversion is necessary. Must only be called if needs_regeneration() returned False."""
         # During conversion step, convert if format does not match and format_mismatch == 'convert'
         self._ensure_existing_private_key_loaded()
@@ -204,7 +219,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             and not self._check_format()
         )
 
-    def _get_fingerprint(self):
+    def _get_fingerprint(self) -> dict[str, str] | None:
         if self.private_key:
             return get_fingerprint_of_privatekey(self.private_key)
         try:
@@ -214,8 +229,9 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             pass
         if self.existing_private_key:
             return get_fingerprint_of_privatekey(self.existing_private_key)
+        return None
 
-    def dump(self, include_key):
+    def dump(self, include_key: bool) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
         if not self.private_key:
@@ -224,7 +240,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             except Exception:
                 # Ignore errors
                 pass
-        result = {
+        result: dict[str, t.Any] = {
             "type": self.type,
             "size": self.size,
             "fingerprint": self._get_fingerprint(),
@@ -253,38 +269,57 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
         return result
 
 
-# Implementation with using cryptography
-class PrivateKeyCryptographyBackend(PrivateKeyBackend):
+class _Curve:
+    def __init__(
+        self,
+        name: str,
+        ectype: str,
+        deprecated: bool,
+    ) -> None:
+        self.name = name
+        self.ectype = ectype
+        self.deprecated = deprecated
 
-    def _get_ec_class(self, ectype):
-        ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(ectype)
+    def _get_ec_class(
+        self, module: GeneralAnsibleModule
+    ) -> type[cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve]:
+        ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(self.ectype)  # type: ignore
         if ecclass is None:
-            self.module.fail_json(
-                msg=f"Your cryptography version does not support {ectype}"
+            module.fail_json(
+                msg=f"Your cryptography version does not support {self.ectype}"
             )
         return ecclass
 
-    def _add_curve(self, name, ectype, deprecated=False):
-        def create(size):
-            ecclass = self._get_ec_class(ectype)
-            return ecclass()
+    def create(
+        self, size: int, module: GeneralAnsibleModule
+    ) -> cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve:
+        ecclass = self._get_ec_class(module)
+        return ecclass()
 
-        def verify(privatekey):
-            ecclass = self._get_ec_class(ectype)
-            return isinstance(
-                privatekey.private_numbers().public_numbers.curve, ecclass
-            )
+    def verify(
+        self,
+        privatekey: cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
+        module: GeneralAnsibleModule,
+    ) -> bool:
+        ecclass = self._get_ec_class(module)
+        return isinstance(privatekey.private_numbers().public_numbers.curve, ecclass)
 
-        self.curves[name] = {
-            "create": create,
-            "verify": verify,
-            "deprecated": deprecated,
-        }
 
-    def __init__(self, module):
+# Implementation with using cryptography
+class PrivateKeyCryptographyBackend(PrivateKeyBackend):
+
+    def _add_curve(
+        self,
+        name: str,
+        ectype: str,
+        deprecated: bool = False,
+    ) -> None:
+        self.curves[name] = _Curve(name=name, ectype=ectype, deprecated=deprecated)
+
+    def __init__(self, module: GeneralAnsibleModule) -> None:
         super(PrivateKeyCryptographyBackend, self).__init__(module=module)
 
-        self.curves = dict()
+        self.curves: dict[str, _Curve] = {}
         self._add_curve("secp224r1", "SECP224R1")
         self._add_curve("secp256k1", "SECP256K1")
         self._add_curve("secp256r1", "SECP256R1")
@@ -305,15 +340,15 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self._add_curve("brainpoolP384r1", "BrainpoolP384R1", deprecated=True)
         self._add_curve("brainpoolP512r1", "BrainpoolP512R1", deprecated=True)
 
-    def _get_wanted_format(self):
+    def _get_wanted_format(self) -> t.Literal["pkcs1", "pkcs8", "raw"]:
         if self.format not in ("auto", "auto_ignore"):
-            return self.format
+            return self.format  # type: ignore
         if self.type in ("X25519", "X448", "Ed25519", "Ed448"):
             return "pkcs8"
         else:
             return "pkcs1"
 
-    def generate_private_key(self):
+    def generate_private_key(self) -> None:
         """(Re-)Generate private key."""
         try:
             if self.type == "RSA":
@@ -346,13 +381,15 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                     cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.generate()
                 )
             if self.type == "ECC" and self.curve in self.curves:
-                if self.curves[self.curve]["deprecated"]:
+                if self.curves[self.curve].deprecated:
                     self.module.warn(
                         f"Elliptic curves of type {self.curve} should not be used for new keys!"
                     )
                 self.private_key = (
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
-                        curve=self.curves[self.curve]["create"](self.size),
+                        curve=self.curves[self.curve].create(
+                            size=self.size, module=self.module
+                        ),
                     )
                 )
         except cryptography.exceptions.UnsupportedAlgorithm:
@@ -360,22 +397,24 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 msg=f"Cryptography backend does not support the algorithm required for {self.type}"
             )
 
-    def get_private_key_data(self):
+    def get_private_key_data(self) -> bytes:
         """Return bytes for self.private_key"""
+        if self.private_key is None:
+            raise AssertionError("private_key not set")
         # Select export format and encoding
         try:
-            export_format = self._get_wanted_format()
+            export_format_txt = self._get_wanted_format()
             export_encoding = cryptography.hazmat.primitives.serialization.Encoding.PEM
-            if export_format == "pkcs1":
+            if export_format_txt == "pkcs1":
                 # "TraditionalOpenSSL" format is PKCS1
                 export_format = (
                     cryptography.hazmat.primitives.serialization.PrivateFormat.TraditionalOpenSSL
                 )
-            elif export_format == "pkcs8":
+            elif export_format_txt == "pkcs8":
                 export_format = (
                     cryptography.hazmat.primitives.serialization.PrivateFormat.PKCS8
                 )
-            elif export_format == "raw":
+            elif export_format_txt == "raw":
                 export_format = (
                     cryptography.hazmat.primitives.serialization.PrivateFormat.Raw
                 )
@@ -388,9 +427,9 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             )
 
         # Select key encryption
-        encryption_algorithm = (
-            cryptography.hazmat.primitives.serialization.NoEncryption()
-        )
+        encryption_algorithm: (
+            cryptography.hazmat.primitives.serialization.KeySerializationEncryption
+        ) = cryptography.hazmat.primitives.serialization.NoEncryption()
         if self.cipher and self.passphrase:
             if self.cipher == "auto":
                 encryption_algorithm = cryptography.hazmat.primitives.serialization.BestAvailableEncryption(
@@ -418,8 +457,10 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 exception=traceback.format_exc(),
             )
 
-    def _load_privatekey(self):
+    def _load_privatekey(self) -> PrivateKeyTypes:
         data = self.existing_private_key_bytes
+        if data is None:
+            raise AssertionError("existing_private_key_bytes not set")
         try:
             # Interpret bytes depending on format.
             format = identify_private_key_format(data)
@@ -460,11 +501,13 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         except Exception as e:
             raise PrivateKeyError(e)
 
-    def _ensure_existing_private_key_loaded(self):
+    def _ensure_existing_private_key_loaded(self) -> None:
         if self.existing_private_key is None and self.has_existing():
             self.existing_private_key = self._load_privatekey()
 
-    def _check_passphrase(self):
+    def _check_passphrase(self) -> bool:
+        if self.existing_private_key_bytes is None:
+            raise AssertionError("existing_private_key_bytes not set")
         try:
             format = identify_private_key_format(self.existing_private_key_bytes)
             if format == "raw":
@@ -475,7 +518,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 # provided.
                 return self.passphrase is None
             else:
-                return (
+                return bool(
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         self.existing_private_key_bytes,
                         None if self.passphrase is None else to_bytes(self.passphrase),
@@ -484,7 +527,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         except Exception:
             return False
 
-    def _check_size_and_type(self):
+    def _check_size_and_type(self) -> bool:
         if isinstance(
             self.existing_private_key,
             cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey,
@@ -527,11 +570,15 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 return False
             if self.curve not in self.curves:
                 return False
-            return self.curves[self.curve]["verify"](self.existing_private_key)
+            return self.curves[self.curve].verify(
+                self.existing_private_key, module=self.module
+            )
 
         return False
 
-    def _check_format(self):
+    def _check_format(self) -> bool:
+        if self.existing_private_key_bytes is None:
+            raise AssertionError("existing_private_key_bytes not set")
         if self.format == "auto_ignore":
             return True
         try:
@@ -541,14 +588,14 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return False
 
 
-def select_backend(module):
+def select_backend(module: GeneralAnsibleModule) -> PrivateKeyBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return PrivateKeyCryptographyBackend(module)
 
 
-def get_privatekey_argument_spec():
+def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
         argument_spec=dict(
             size=dict(type="int", default=4096),
@@ -607,6 +654,6 @@ def get_privatekey_argument_spec():
             ),
         ),
         required_if=[
-            ["type", "ECC", ["curve"]],
+            ("type", "ECC", ["curve"]),
         ],
     )

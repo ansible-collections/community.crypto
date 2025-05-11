@@ -110,6 +110,8 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
@@ -129,7 +131,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
         private_key_src=dict(type="path"),
@@ -139,22 +141,22 @@ def main():
         revoke_reason=dict(type="int"),
     )
     argument_spec.update(
-        required_one_of=(
-            [
+        required_one_of=[
+            (
                 "account_key_src",
                 "account_key_content",
                 "private_key_src",
                 "private_key_content",
-            ],
-        ),
-        mutually_exclusive=(
-            [
+            ),
+        ],
+        mutually_exclusive=[
+            (
                 "account_key_src",
                 "account_key_content",
                 "private_key_src",
                 "private_key_content",
-            ],
-        ),
+            ),
+        ],
     )
     module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)
@@ -164,9 +166,9 @@ def main():
         account = ACMEAccount(client)
         # Load certificate
         certificate = pem_to_der(module.params.get("certificate"))
-        certificate = nopad_b64(certificate)
+        certificate_b64 = nopad_b64(certificate)
         # Construct payload
-        payload = {"certificate": certificate}
+        payload = {"certificate": certificate_b64}
         if module.params.get("revoke_reason") is not None:
             payload["reason"] = module.params.get("revoke_reason")
         endpoint = client.directory["revokeCert"]

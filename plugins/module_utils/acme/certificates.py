@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import abc
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
     ModuleFailException,
@@ -19,20 +20,29 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 )
 
 
+if t.TYPE_CHECKING:
+    from .acme import ACMEClient
+
+
+_CertificateChain = t.TypeVar("_CertificateChain", bound="CertificateChain")
+
+
 class CertificateChain:
     """
     Download and parse the certificate chain.
     https://tools.ietf.org/html/rfc8555#section-7.4.2
     """
 
-    def __init__(self, url):
+    def __init__(self, url: str):
         self.url = url
-        self.cert = None
-        self.chain = []
-        self.alternates = []
+        self.cert: str | None = None
+        self.chain: list[str] = []
+        self.alternates: list[str] = []
 
     @classmethod
-    def download(cls, client, url):
+    def download(
+        cls: t.Type[_CertificateChain], client: ACMEClient, url: str
+    ) -> _CertificateChain:
         content, info = client.get_request(
             url,
             parse_json_result=False,
@@ -43,7 +53,7 @@ class CertificateChain:
             "application/pem-certificate-chain"
         ):
             raise ModuleFailException(
-                f"Cannot download certificate chain from {url}, as content type is not application/pem-certificate-chain: {content} (headers: {info})"
+                f"Cannot download certificate chain from {url}, as content type is not application/pem-certificate-chain: {content!r} (headers: {info})"
             )
 
         result = cls(url)
@@ -60,12 +70,12 @@ class CertificateChain:
 
         if result.cert is None:
             raise ModuleFailException(
-                f"Failed to parse certificate chain download from {url}: {content} (headers: {info})"
+                f"Failed to parse certificate chain download from {url}: {content!r} (headers: {info})"
             )
 
         return result
 
-    def _process_links(self, client, link, relation):
+    def _process_links(self, client: ACMEClient, link: str, relation: str) -> None:
         if relation == "up":
             # Process link-up headers if there was no chain in reply
             if not self.chain:
@@ -77,7 +87,9 @@ class CertificateChain:
         elif relation == "alternate":
             self.alternates.append(link)
 
-    def to_json(self):
+    def to_json(self) -> dict[str, bytes]:
+        if self.cert is None:
+            raise ValueError("Has no certificate")
         cert = self.cert.encode("utf8")
         chain = ("\n".join(self.chain)).encode("utf8")
         return {
@@ -88,18 +100,22 @@ class CertificateChain:
 
 
 class Criterium:
-    def __init__(self, criterium, index=None):
+    def __init__(self, criterium: dict[str, t.Any], index: int):
         self.index = index
-        self.test_certificates = criterium["test_certificates"]
-        self.subject = criterium["subject"]
-        self.issuer = criterium["issuer"]
-        self.subject_key_identifier = criterium["subject_key_identifier"]
-        self.authority_key_identifier = criterium["authority_key_identifier"]
+        self.test_certificates: t.Literal["first", "last", "all"] = criterium[
+            "test_certificates"
+        ]
+        self.subject: dict[str, t.Any] | None = criterium["subject"]
+        self.issuer: dict[str, t.Any] | None = criterium["issuer"]
+        self.subject_key_identifier: str | None = criterium["subject_key_identifier"]
+        self.authority_key_identifier: str | None = criterium[
+            "authority_key_identifier"
+        ]
 
 
 class ChainMatcher(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def match(self, certificate):
+    def match(self, certificate: CertificateChain) -> bool:
         """
         Check whether a certificate chain (CertificateChain instance) matches.
         """

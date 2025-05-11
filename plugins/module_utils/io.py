@@ -7,9 +7,14 @@ from __future__ import annotations
 import errno
 import os
 import tempfile
+import typing as t
 
 
-def load_file(path, module=None):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+def load_file(path: str | os.PathLike, module: AnsibleModule | None = None) -> bytes:
     """
     Load the file as a bytes string.
     """
@@ -22,7 +27,11 @@ def load_file(path, module=None):
         module.fail_json(f"Error while loading {path} - {exc}")
 
 
-def load_file_if_exists(path, module=None, ignore_errors=False):
+def load_file_if_exists(
+    path: str | os.PathLike,
+    module: AnsibleModule | None = None,
+    ignore_errors: bool = False,
+) -> bytes | None:
     """
     Load the file as a bytes string. If the file does not exist, ``None`` is returned.
 
@@ -49,7 +58,12 @@ def load_file_if_exists(path, module=None, ignore_errors=False):
         module.fail_json(f"Error while loading {path} - {exc}")
 
 
-def write_file(module, content, default_mode=None, path=None):
+def write_file(
+    module: AnsibleModule,
+    content: bytes,
+    default_mode: str | int | None = None,
+    path: str | os.PathLike | None = None,
+) -> None:
     """
     Writes content into destination file as securely as possible.
     Uses file arguments from module.

@@ -18,14 +18,13 @@ TEST_TEXT = r"""1234
 5678"""
 
 
-def test_read_file(tmpdir):
+def test_read_file(tmpdir) -> None:
     fn = tmpdir / "test.txt"
     fn.write(TEST_TEXT)
-    assert read_file(str(fn), "t") == TEST_TEXT
-    assert read_file(str(fn), "b") == TEST_TEXT.encode("utf-8")
+    assert read_file(str(fn)) == TEST_TEXT.encode("utf-8")
 
 
-def test_write_file(tmpdir):
+def test_write_file(tmpdir) -> None:
     fn = tmpdir / "test.txt"
     module = MagicMock()
     write_file(module, str(fn), TEST_TEXT.encode("utf-8"))

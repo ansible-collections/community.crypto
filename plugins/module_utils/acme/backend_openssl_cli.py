@@ -13,6 +13,7 @@ import os
 import re
 import tempfile
 import traceback
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
@@ -34,12 +35,23 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+    from .certificates import Criterium
+
+
 _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
 
-def _extract_date(out_text, name, cert_filename_suffix=""):
+def _extract_date(
+    out_text: str, name: str, cert_filename_suffix: str = ""
+) -> datetime.datetime:
+    matcher = re.search(rf"\s+{name}\s*:\s+(.*)", out_text)
+    if matcher is None:
+        raise BackendException(f"No '{name}' date found{cert_filename_suffix}")
+    date_str = matcher.group(1)
     try:
-        date_str = re.search(rf"\s+{name}\s*:\s+(.*)", out_text).group(1)
         # For some reason Python's strptime() does not return any timezone information,
         # even though the information is there and a supported timezone for all supported
         # Python implementations (GMT). So we have to modify the datetime object by
@@ -47,19 +59,40 @@ def _extract_date(out_text, name, cert_filename_suffix=""):
         return ensure_utc_timezone(
             datetime.datetime.strptime(date_str, "%b %d %H:%M:%S %Y %Z")
         )
-    except AttributeError:
-        raise BackendException(f"No '{name}' date found{cert_filename_suffix}")
     except ValueError as exc:
         raise BackendException(
             f"Failed to parse '{name}' date{cert_filename_suffix}: {exc}"
         )
 
 
-def _decode_octets(octets_text):
+def _decode_octets(octets_text: str) -> bytes:
     return binascii.unhexlify(re.sub(r"(\s|:)", "", octets_text).encode("utf-8"))
 
 
-def _extract_octets(out_text, name, required=True, potential_prefixes=None):
+@t.overload
+def _extract_octets(
+    out_text: str,
+    name: str,
+    required: t.Literal[False],
+    potential_prefixes: t.Iterable[str] | None = None,
+) -> bytes | None: ...
+
+
+@t.overload
+def _extract_octets(
+    out_text: str,
+    name: str,
+    required: t.Literal[True],
+    potential_prefixes: t.Iterable[str] | None = None,
+) -> bytes: ...
+
+
+def _extract_octets(
+    out_text: str,
+    name: str,
+    required: bool = True,
+    potential_prefixes: t.Iterable[str] | None = None,
+) -> bytes | None:
     part = (
         f"(?:{'|'.join(re.escape(pp) for pp in potential_prefixes)})"
         if potential_prefixes
@@ -75,13 +108,20 @@ def _extract_octets(out_text, name, required=True, potential_prefixes=None):
 
 
 class OpenSSLCLIBackend(CryptoBackend):
-    def __init__(self, module, openssl_binary=None):
+    def __init__(
+        self, module: AnsibleModule, openssl_binary: str | None = None
+    ) -> None:
         super(OpenSSLCLIBackend, self).__init__(module, with_timezone=True)
         if openssl_binary is None:
             openssl_binary = module.get_bin_path("openssl", True)
         self.openssl_binary = openssl_binary
 
-    def parse_key(self, key_file=None, key_content=None, passphrase=None):
+    def parse_key(
+        self,
+        key_file: str | os.PathLike | None = None,
+        key_content: str | None = None,
+        passphrase: str | None = None,
+    ) -> dict[str, t.Any]:
         """
         Parses an RSA or Elliptic Curve key file in PEM format and returns key_data.
         Raises KeyParsingError in case of errors.
@@ -90,6 +130,10 @@ class OpenSSLCLIBackend(CryptoBackend):
             raise KeyParsingError("openssl backend does not support key passphrases")
         # If key_file is not given, but key_content, write that to a temporary file
         if key_file is None:
+            if key_content is None:
+                raise KeyParsingError(
+                    "one of key_file and key_content must be specified"
+                )
             fd, tmpsrc = tempfile.mkstemp()
             self.module.add_cleanup_file(tmpsrc)  # Ansible will delete the file on exit
             f = os.fdopen(fd, "wb")
@@ -108,8 +152,8 @@ class OpenSSLCLIBackend(CryptoBackend):
             f.close()
         # Parse key
         account_key_type = None
-        with open(key_file, "rt") as f:
-            for line in f:
+        with open(key_file, "rt") as fi:
+            for line in fi:
                 m = re.match(
                     r"^\s*-{5,}BEGIN\s+(EC|RSA)\s+PRIVATE\s+KEY-{5,}\s*$", line
                 )
@@ -129,38 +173,44 @@ class OpenSSLCLIBackend(CryptoBackend):
             self.openssl_binary,
             account_key_type,
             "-in",
-            key_file,
+            str(key_file),
             "-noout",
             "-text",
         ]
-        rc, out, err = self.module.run_command(
+        rc, out, stderr = self.module.run_command(
             openssl_keydump_cmd,
             check_rc=False,
             environ_update=_OPENSSL_ENVIRONMENT_UPDATE,
         )
         if rc != 0:
             raise BackendException(
-                f"Error while running {' '.join(openssl_keydump_cmd)}: {err}"
+                f"Error while running {' '.join(openssl_keydump_cmd)}: {stderr}"
             )
 
         out_text = to_text(out, errors="surrogate_or_strict")
 
         if account_key_type == "rsa":
-            pub_hex = re.search(
+            matcher = re.search(
                 r"modulus:\n\s+00:([a-f0-9\:\s]+?)\npublicExponent",
                 out_text,
                 re.MULTILINE | re.DOTALL,
-            ).group(1)
+            )
+            if matcher is None:
+                raise KeyParsingError("cannot parse RSA key: modulus not found")
+            pub_hex = matcher.group(1)
 
-            pub_exp = re.search(
+            matcher = re.search(
                 r"\npublicExponent: ([0-9]+)", out_text, re.MULTILINE | re.DOTALL
-            ).group(1)
+            )
+            if matcher is None:
+                raise KeyParsingError("cannot parse RSA key: public exponent not found")
+            pub_exp = matcher.group(1)
             pub_exp = f"{int(pub_exp):x}"
             if len(pub_exp) % 2:
                 pub_exp = f"0{pub_exp}"
 
             return {
-                "key_file": key_file,
+                "key_file": str(key_file),
                 "type": "rsa",
                 "alg": "RS256",
                 "jwk": {
@@ -223,8 +273,13 @@ class OpenSSLCLIBackend(CryptoBackend):
                 "hash": hashalg,
                 "point_size": point_size,
             }
+        raise KeyParsingError(
+            f"Internal error: unexpected account_key_type = {account_key_type!r}"
+        )
 
-    def sign(self, payload64, protected64, key_data):
+    def sign(
+        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+    ) -> dict[str, t.Any]:
         sign_payload = f"{protected64}.{payload64}".encode("utf8")
         if key_data["type"] == "hmac":
             hex_key = (
@@ -284,7 +339,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             "signature": nopad_b64(to_bytes(out)),
         }
 
-    def create_mac_key(self, alg, key):
+    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
         if alg == "HS256":
             hashalg = "sha256"
@@ -315,14 +370,18 @@ class OpenSSLCLIBackend(CryptoBackend):
         }
 
     @staticmethod
-    def _normalize_ip(ip):
+    def _normalize_ip(ip: str) -> str:
         try:
-            return ipaddress.ip_address(to_text(ip)).compressed
+            return ipaddress.ip_address(ip).compressed
         except ValueError:
             # We do not want to error out on something IPAddress() cannot parse
             return ip
 
-    def get_ordered_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_ordered_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | None = None,
+    ) -> list[tuple[str, str]]:
         """
         Return a list of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -335,13 +394,13 @@ class OpenSSLCLIBackend(CryptoBackend):
         data = None
         if csr_content is not None:
             filename = "/dev/stdin"
-            data = csr_content.encode("utf-8")
+            data = to_bytes(csr_content)
 
         openssl_csr_cmd = [
             self.openssl_binary,
             "req",
             "-in",
-            filename,
+            str(filename),
             "-noout",
             "-text",
         ]
@@ -360,7 +419,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         identifiers = set()
         result = []
 
-        def add_identifier(identifier):
+        def add_identifier(identifier: tuple[str, str]) -> None:
             if identifier in identifiers:
                 return
             identifiers.add(identifier)
@@ -389,7 +448,11 @@ class OpenSSLCLIBackend(CryptoBackend):
                     raise BackendException(f'Found unsupported SAN identifier "{san}"')
         return result
 
-    def get_csr_identifiers(self, csr_filename=None, csr_content=None):
+    def get_csr_identifiers(
+        self,
+        csr_filename: str | os.PathLike | None = None,
+        csr_content: str | bytes | None = None,
+    ) -> set[tuple[str, str]]:
         """
         Return a set of requested identifiers (CN and SANs) for the CSR.
         Each identifier is a pair (type, identifier), where type is either
@@ -401,7 +464,12 @@ class OpenSSLCLIBackend(CryptoBackend):
             )
         )
 
-    def get_cert_days(self, cert_filename=None, cert_content=None, now=None):
+    def get_cert_days(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+        now: datetime.datetime | None = None,
+    ) -> int:
         """
         Return the days the certificate in cert_filename remains valid and -1
         if the file was not found. If cert_filename contains more than one
@@ -413,7 +481,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         data = None
         if cert_content is not None:
             filename = "/dev/stdin"
-            data = cert_content.encode("utf-8")
+            data = to_bytes(cert_content)
             cert_filename_suffix = ""
         elif cert_filename is not None:
             if not os.path.exists(cert_filename):
@@ -426,7 +494,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             self.openssl_binary,
             "x509",
             "-in",
-            filename,
+            str(filename),
             "-noout",
             "-text",
         ]
@@ -452,7 +520,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             now = ensure_utc_timezone(now)
         return (not_after - now).days
 
-    def create_chain_matcher(self, criterium):
+    def create_chain_matcher(self, criterium: Criterium) -> t.NoReturn:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
@@ -460,7 +528,11 @@ class OpenSSLCLIBackend(CryptoBackend):
             'Alternate chain matching can only be used with the "cryptography" backend.'
         )
 
-    def get_cert_information(self, cert_filename=None, cert_content=None):
+    def get_cert_information(
+        self,
+        cert_filename: str | os.PathLike | None = None,
+        cert_content: str | bytes | None = None,
+    ) -> CertificateInformation:
         """
         Return some information on a X.509 certificate as a CertificateInformation object.
         """
@@ -477,7 +549,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             self.openssl_binary,
             "x509",
             "-in",
-            filename,
+            str(filename),
             "-noout",
             "-text",
         ]

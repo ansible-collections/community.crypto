@@ -390,8 +390,10 @@ issuer_uri:
   version_added: 2.9.0
 """
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -406,7 +408,7 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path"),
@@ -424,18 +426,22 @@ def main():
         supports_check_mode=True,
     )
 
-    if module.params["content"] is not None:
-        data = module.params["content"].encode("utf-8")
+    content: str | None = module.params["content"]
+    path: str | None = module.params["path"]
+    if content is not None:
+        data = content.encode("utf-8")
     else:
+        if path is None:
+            module.fail_json(msg="One of path and content must be provided")
         try:
-            with open(module.params["path"], "rb") as f:
+            with open(path, "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading certificate file from disk: {e}")
 
     module_backend = select_backend(module, data)
 
-    valid_at = module.params["valid_at"]
+    valid_at: dict[str, t.Any] = module.params["valid_at"]
     if valid_at:
         for k, v in valid_at.items():
             if not isinstance(v, (str, bytes)):
@@ -443,13 +449,11 @@ def main():
                     msg=f"The value for valid_at.{k} must be of type string (got {type(v)})"
                 )
             valid_at[k] = get_relative_time_option(
-                v, f"valid_at.{k}", with_timezone=CRYPTOGRAPHY_TIMEZONE
+                to_text(v), f"valid_at.{k}", with_timezone=CRYPTOGRAPHY_TIMEZONE
             )
 
     try:
-        result = module_backend.get_info(
-            der_support_enabled=module.params["content"] is None
-        )
+        result = module_backend.get_info(der_support_enabled=content is None)
 
         not_before = module_backend.get_not_before()
         not_after = module_backend.get_not_after()

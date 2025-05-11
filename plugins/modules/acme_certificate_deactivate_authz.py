@@ -51,6 +51,8 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
     ACMEAccount,
 )
@@ -65,7 +67,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.orders import Order
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
         order_uri=dict(type="str", required=True),

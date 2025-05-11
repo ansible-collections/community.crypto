@@ -60,6 +60,7 @@ backup_file:
 """
 
 import os
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -77,8 +78,17 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey_convert import (
+        PrivateKeyConvertBackend,
+    )
+
+
 class PrivateKeyConvertModule(OpenSSLObject):
-    def __init__(self, module, module_backend):
+    def __init__(
+        self, module: AnsibleModule, module_backend: PrivateKeyConvertBackend
+    ) -> None:
         super(PrivateKeyConvertModule, self).__init__(
             module.params["dest_path"],
             "present",
@@ -87,8 +97,8 @@ class PrivateKeyConvertModule(OpenSSLObject):
         )
         self.module_backend = module_backend
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
         module.params["path"] = module.params["dest_path"]
         if module.params["mode"] is None:
@@ -96,12 +106,14 @@ class PrivateKeyConvertModule(OpenSSLObject):
 
         module_backend.set_existing_destination(load_file_if_exists(self.path, module))
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Do conversion."""
 
         if self.module_backend.needs_conversion():
             # Convert
             privatekey_data = self.module_backend.get_private_key_data()
+            if privatekey_data is None:
+                raise AssertionError("Contract violation: privatekey_data is None")
             if not self.check_mode:
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
@@ -116,7 +128,7 @@ class PrivateKeyConvertModule(OpenSSLObject):
                 file_args, self.changed
             )
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
         result = self.module_backend.dump()
@@ -127,7 +139,7 @@ class PrivateKeyConvertModule(OpenSSLObject):
         return result
 
 
-def main():
+def main() -> t.NoReturn:
 
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(

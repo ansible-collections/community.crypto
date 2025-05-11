@@ -118,6 +118,8 @@ certificate:
   type: str
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -139,23 +141,31 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+        CertificateBackend,
+    )
+
+
 class GenericCertificate:
     """Retrieve a certificate using the given module backend."""
 
-    def __init__(self, module, module_backend):
+    def __init__(self, module: AnsibleModule, module_backend: CertificateBackend):
         self.check_mode = module.check_mode
         self.module = module
         self.module_backend = module_backend
         self.changed = False
-        if module.params["content"] is not None:
-            self.module_backend.set_existing(module.params["content"].encode("utf-8"))
+        content: str | None = module.params["content"]
+        if content is not None:
+            self.module_backend.set_existing(content.encode("utf-8"))
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         if self.module_backend.needs_regeneration():
             self.module_backend.generate_certificate()
             self.changed = True
 
-    def dump(self, check_mode=False):
+    def dump(self, check_mode: bool = False) -> dict[str, t.Any]:
         result = self.module_backend.dump(include_certificate=True)
         result.update(
             {
@@ -165,7 +175,7 @@ class GenericCertificate:
         return result
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = get_certificate_argument_spec()
     argument_spec.argument_spec["provider"]["required"] = True
     add_entrust_provider_to_argument_spec(argument_spec)
@@ -182,7 +192,12 @@ def main():
 
     try:
         provider = module.params["provider"]
-        provider_map = {
+        provider_map: dict[
+            str,
+            type[EntrustCertificateProvider]
+            | type[OwnCACertificateProvider]
+            | type[SelfSignedCertificateProvider],
+        ] = {
             "entrust": EntrustCertificateProvider,
             "ownca": OwnCACertificateProvider,
             "selfsigned": SelfSignedCertificateProvider,

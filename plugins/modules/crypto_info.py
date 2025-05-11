@@ -152,10 +152,13 @@ openssl:
 """
 
 import traceback
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
 
+CRYPTOGRAPHY_VERSION: str | None
+CRYPTOGRAPHY_IMP_ERR: str | None
 try:
     import cryptography
     from cryptography.exceptions import UnsupportedAlgorithm
@@ -165,10 +168,10 @@ try:
         # only got added in 0.2, so let's guard the import
         from cryptography.exceptions import InternalError as CryptographyInternalError
     except ImportError:
-        CryptographyInternalError = Exception
+        CryptographyInternalError = Exception  # type: ignore
 except ImportError:
-    UnsupportedAlgorithm = Exception
-    CryptographyInternalError = Exception
+    UnsupportedAlgorithm = Exception  # type: ignore
+    CryptographyInternalError = Exception  # type: ignore
     HAS_CRYPTOGRAPHY = False
     CRYPTOGRAPHY_VERSION = None
     CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
@@ -201,8 +204,8 @@ CURVES = (
 )
 
 
-def add_crypto_information(module):
-    result = {}
+def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
+    result: dict[str, t.Any] = {}
     result["python_cryptography_installed"] = HAS_CRYPTOGRAPHY
     if not HAS_CRYPTOGRAPHY:
         result["python_cryptography_import_error"] = CRYPTOGRAPHY_IMP_ERR
@@ -397,9 +400,9 @@ def add_crypto_information(module):
     return result
 
 
-def add_openssl_information(module):
+def add_openssl_information(module: AnsibleModule) -> dict[str, t.Any]:
     openssl_binary = module.get_bin_path("openssl")
-    result = {
+    result: dict[str, t.Any] = {
         "openssl_present": openssl_binary is not None,
     }
     if openssl_binary is None:
@@ -426,9 +429,9 @@ INFO_FUNCTIONS = (
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(argument_spec={}, supports_check_mode=True)
-    result = {}
+    result: dict[str, t.Any] = {}
     for fn in INFO_FUNCTIONS:
         result.update(fn(module))
     module.exit_json(**result)

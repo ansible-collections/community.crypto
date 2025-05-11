@@ -15,20 +15,24 @@ from __future__ import annotations
 import abc
 import copy
 import traceback
+import typing as t
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.basic import SEQUENCETYPE, remove_values
 from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.common.arg_spec import ArgumentSpecValidator
-from ansible.module_utils.common.validation import (
-    safe_eval,
-)
 from ansible.module_utils.errors import UnsupportedError
 from ansible.plugins.action import ActionBase
 
 
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+        ArgumentSpec,
+    )
+
+
 class _ModuleExitException(Exception):
-    def __init__(self, result):
+    def __init__(self, result: dict[str, t.Any]) -> None:
         super(_ModuleExitException, self).__init__()
         self.result = result
 
@@ -36,20 +40,21 @@ class _ModuleExitException(Exception):
 class AnsibleActionModule:
     def __init__(
         self,
-        action_plugin,
-        argument_spec,
-        bypass_checks=False,
-        mutually_exclusive=None,
-        required_together=None,
-        required_one_of=None,
-        supports_check_mode=False,
-        required_if=None,
-        required_by=None,
-    ):
+        action_plugin: ActionModuleBase,
+        argument_spec: dict[str, t.Any],
+        *,
+        bypass_checks: bool = False,
+        supports_check_mode: bool = False,
+        mutually_exclusive: list[list[str] | tuple[str, ...]] | None = None,
+        required_together: list[list[str] | tuple[str, ...]] | None = None,
+        required_one_of: list[list[str] | tuple[str, ...]] | None = None,
+        required_if: list[tuple[str, t.Any, list[str] | tuple[str, ...]]] | None = None,
+        required_by: dict[str, tuple[str, ...] | list[str]] | None = None,
+    ) -> None:
         # Internal data
         self.__action_plugin = action_plugin
-        self.__warnings = []
-        self.__deprecations = []
+        self.__warnings: list[str] = []
+        self.__deprecations: list[dict[str, str | None]] = []
 
         # AnsibleModule data
         self._name = self.__action_plugin._task.action
@@ -66,10 +71,6 @@ class AnsibleActionModule:
         self.required_by = required_by
         self._diff = self.__action_plugin._play_context.diff
         self._verbosity = self.__action_plugin._display.verbosity
-
-        self.aliases = {}
-        self._legal_inputs = []
-        self._options_context = list()
 
         self.params = copy.deepcopy(self.__action_plugin._task.args)
         self.no_log_values = set()
@@ -122,38 +123,41 @@ class AnsibleActionModule:
 
             self.fail_json(msg=msg)
 
-    def safe_eval(self, value, locals=None, include_exceptions=False):
-        return safe_eval(value, locals, include_exceptions)
-
-    def warn(self, warning):
+    def warn(self, warning: str) -> None:
         # Copied from ansible.module_utils.common.warnings:
-        if isinstance(warning, (str, bytes)):
+        if isinstance(warning, str):
             self.__warnings.append(warning)
         else:
             raise TypeError(f"warn requires a string not a {type(warning)}")
 
-    def deprecate(self, msg, version=None, date=None, collection_name=None):
+    def deprecate(
+        self,
+        msg: str,
+        version: str | None = None,
+        date: str | None = None,
+        collection_name: str | None = None,
+    ) -> None:
         if version is not None and date is not None:
             raise AssertionError(
                 "implementation error -- version and date must not both be set"
             )
 
         # Copied from ansible.module_utils.common.warnings:
-        if isinstance(msg, (str, bytes)):
-            # For compatibility, we accept that neither version nor date is set,
-            # and treat that the same as if version would haven been set
-            if date is not None:
-                self.__deprecations.append(
-                    {"msg": msg, "date": date, "collection_name": collection_name}
-                )
-            else:
-                self.__deprecations.append(
-                    {"msg": msg, "version": version, "collection_name": collection_name}
-                )
-        else:
+        if not isinstance(msg, str):
             raise TypeError(f"deprecate requires a string not a {type(msg)}")
 
-    def _return_formatted(self, kwargs):
+        # For compatibility, we accept that neither version nor date is set,
+        # and treat that the same as if version would haven been set
+        if date is not None:
+            self.__deprecations.append(
+                {"msg": msg, "date": date, "collection_name": collection_name}
+            )
+        else:
+            self.__deprecations.append(
+                {"msg": msg, "version": version, "collection_name": collection_name}
+            )
+
+    def _return_formatted(self, kwargs: dict[str, t.Any]) -> t.NoReturn:
         if "invocation" not in kwargs:
             kwargs["invocation"] = {"module_args": self.params}
 
@@ -194,13 +198,13 @@ class AnsibleActionModule:
         kwargs = remove_values(kwargs, self.no_log_values)
         raise _ModuleExitException(kwargs)
 
-    def exit_json(self, **kwargs):
+    def exit_json(self, **kwargs) -> t.NoReturn:
         result = dict(kwargs)
         if "failed" not in result:
             result["failed"] = False
         self._return_formatted(result)
 
-    def fail_json(self, msg, **kwargs):
+    def fail_json(self, msg: str, **kwargs) -> t.NoReturn:
         result = dict(kwargs)
         result["failed"] = True
         result["msg"] = msg
@@ -209,16 +213,15 @@ class AnsibleActionModule:
 
 class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def setup_module(self):
+    def setup_module(self) -> tuple[ArgumentSpec, dict[str, t.Any]]:
         """Return pair (ArgumentSpec, kwargs)."""
-        pass
 
     @abc.abstractmethod
-    def run_module(self, module):
+    def run_module(self, module: AnsibleActionModule) -> None:
         """Run module code"""
         module.fail_json(msg="Not implemented.")
 
-    def run(self, tmp=None, task_vars=None):
+    def run(self, tmp=None, task_vars=None) -> dict[str, t.Any]:
         if task_vars is None:
             task_vars = dict()
 

@@ -7,9 +7,9 @@ from __future__ import annotations
 from ._objects_data import OID_MAP
 
 
-OID_LOOKUP = dict()
-NORMALIZE_NAMES = dict()
-NORMALIZE_NAMES_SHORT = dict()
+OID_LOOKUP: dict[str, str] = dict()
+NORMALIZE_NAMES: dict[str, str] = dict()
+NORMALIZE_NAMES_SHORT: dict[str, str] = dict()
 
 for dotted, names in OID_MAP.items():
     for name in names:

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import abc
 import binascii
+import typing as t
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils.argspec import (
@@ -26,13 +27,14 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
     cryptography_parse_key_usage_params,
     cryptography_parse_relative_distinguished_name,
+    is_potential_certificate_issuer_public_key,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
     get_csr_info,
 )
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+    load_certificate_issuer_privatekey,
     load_certificate_request,
-    load_privatekey,
     parse_name_field,
     parse_ordered_name_field,
     select_message_digest,
@@ -41,6 +43,18 @@ from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep 
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
+
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        CertificateIssuerPrivateKeyTypes,
+        PrivateKeyTypes,
+    )
+
+    from ..cryptography_support import CertificatePrivateKeyTypes
+
+    _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -69,49 +83,58 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 
 
 class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.digest = module.params["digest"]
-        self.privatekey_path = module.params["privatekey_path"]
-        self.privatekey_content = module.params["privatekey_content"]
-        if self.privatekey_content is not None:
-            self.privatekey_content = self.privatekey_content.encode("utf-8")
-        self.privatekey_passphrase = module.params["privatekey_passphrase"]
-        self.version = module.params["version"]
-        self.subjectAltName = module.params["subject_alt_name"]
-        self.subjectAltName_critical = module.params["subject_alt_name_critical"]
-        self.keyUsage = module.params["key_usage"]
-        self.keyUsage_critical = module.params["key_usage_critical"]
-        self.extendedKeyUsage = module.params["extended_key_usage"]
-        self.extendedKeyUsage_critical = module.params["extended_key_usage_critical"]
-        self.basicConstraints = module.params["basic_constraints"]
-        self.basicConstraints_critical = module.params["basic_constraints_critical"]
-        self.ocspMustStaple = module.params["ocsp_must_staple"]
-        self.ocspMustStaple_critical = module.params["ocsp_must_staple_critical"]
-        self.name_constraints_permitted = (
+        self.digest: str = module.params["digest"]
+        self.privatekey_path: str | None = module.params["privatekey_path"]
+        privatekey_content: str | None = module.params["privatekey_content"]
+        if privatekey_content is not None:
+            self.privatekey_content: bytes | None = privatekey_content.encode("utf-8")
+        else:
+            self.privatekey_content = None
+        self.privatekey_passphrase: str | None = module.params["privatekey_passphrase"]
+        self.version: t.Literal[1] = module.params["version"]
+        self.subjectAltName: list[str] | None = module.params["subject_alt_name"]
+        self.subjectAltName_critical: bool = module.params["subject_alt_name_critical"]
+        self.keyUsage: list[str] | None = module.params["key_usage"]
+        self.keyUsage_critical: bool = module.params["key_usage_critical"]
+        self.extendedKeyUsage: list[str] | None = module.params["extended_key_usage"]
+        self.extendedKeyUsage_critical: bool = module.params[
+            "extended_key_usage_critical"
+        ]
+        self.basicConstraints: list[str] | None = module.params["basic_constraints"]
+        self.basicConstraints_critical: bool = module.params[
+            "basic_constraints_critical"
+        ]
+        self.ocspMustStaple: bool = module.params["ocsp_must_staple"]
+        self.ocspMustStaple_critical: bool = module.params["ocsp_must_staple_critical"]
+        self.name_constraints_permitted: list[str] = (
             module.params["name_constraints_permitted"] or []
         )
-        self.name_constraints_excluded = (
+        self.name_constraints_excluded: list[str] = (
             module.params["name_constraints_excluded"] or []
         )
-        self.name_constraints_critical = module.params["name_constraints_critical"]
-        self.create_subject_key_identifier = module.params[
+        self.name_constraints_critical: bool = module.params[
+            "name_constraints_critical"
+        ]
+        self.create_subject_key_identifier: bool = module.params[
             "create_subject_key_identifier"
         ]
-        self.subject_key_identifier = module.params["subject_key_identifier"]
-        self.authority_key_identifier = module.params["authority_key_identifier"]
-        self.authority_cert_issuer = module.params["authority_cert_issuer"]
-        self.authority_cert_serial_number = module.params[
+        subject_key_identifier: str | None = module.params["subject_key_identifier"]
+        authority_key_identifier: str | None = module.params["authority_key_identifier"]
+        self.authority_cert_issuer: list[str] | None = module.params[
+            "authority_cert_issuer"
+        ]
+        self.authority_cert_serial_number: int = module.params[
             "authority_cert_serial_number"
         ]
-        self.crl_distribution_points = module.params["crl_distribution_points"]
-        self.csr = None
-        self.privatekey = None
+        self.crl_distribution_points: (
+            list[cryptography.x509.DistributionPoint] | None
+        ) = None
+        self.csr: cryptography.x509.CertificateSigningRequest | None = None
+        self.privatekey: CertificateIssuerPrivateKeyTypes | None = None
 
-        if (
-            self.create_subject_key_identifier
-            and self.subject_key_identifier is not None
-        ):
+        if self.create_subject_key_identifier and subject_key_identifier is not None:
             module.fail_json(
                 msg="subject_key_identifier cannot be specified if create_subject_key_identifier is true"
             )
@@ -153,35 +176,37 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
                     self.using_common_name_for_san = True
                     break
 
-        if self.subject_key_identifier is not None:
+        self.subject_key_identifier: bytes | None = None
+        if subject_key_identifier is not None:
             try:
                 self.subject_key_identifier = binascii.unhexlify(
-                    self.subject_key_identifier.replace(":", "")
+                    subject_key_identifier.replace(":", "")
                 )
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse subject_key_identifier: {e}"
                 )
 
-        if self.authority_key_identifier is not None:
+        self.authority_key_identifier: bytes | None = None
+        if authority_key_identifier is not None:
             try:
                 self.authority_key_identifier = binascii.unhexlify(
-                    self.authority_key_identifier.replace(":", "")
+                    authority_key_identifier.replace(":", "")
                 )
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse authority_key_identifier: {e}"
                 )
 
-        self.existing_csr = None
-        self.existing_csr_bytes = None
+        self.existing_csr: cryptography.x509.CertificateSigningRequest | None = None
+        self.existing_csr_bytes: bytes | None = None
 
         self.diff_before = self._get_info(None)
         self.diff_after = self._get_info(None)
 
-    def _get_info(self, data):
+    def _get_info(self, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
-            return dict()
+            return {}
         try:
             result = get_csr_info(
                 self.module,
@@ -195,30 +220,28 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             return dict(can_parse_csr=False)
 
     @abc.abstractmethod
-    def generate_csr(self):
+    def generate_csr(self) -> None:
         """(Re-)Generate CSR."""
-        pass
 
     @abc.abstractmethod
-    def get_csr_data(self):
+    def get_csr_data(self) -> bytes:
         """Return bytes for self.csr."""
-        pass
 
-    def set_existing(self, csr_bytes):
+    def set_existing(self, csr_bytes: bytes | None) -> None:
         """Set existing CSR bytes. None indicates that the CSR does not exist."""
         self.existing_csr_bytes = csr_bytes
         self.diff_after = self.diff_before = self._get_info(self.existing_csr_bytes)
 
-    def has_existing(self):
+    def has_existing(self) -> bool:
         """Query whether an existing CSR is/has been there."""
         return self.existing_csr_bytes is not None
 
-    def _ensure_private_key_loaded(self):
+    def _ensure_private_key_loaded(self) -> None:
         """Load the provided private key into self.privatekey."""
         if self.privatekey is not None:
             return
         try:
-            self.privatekey = load_privatekey(
+            self.privatekey = load_certificate_issuer_privatekey(
                 path=self.privatekey_path,
                 content=self.privatekey_content,
                 passphrase=self.privatekey_passphrase,
@@ -227,11 +250,10 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             raise CertificateSigningRequestError(exc)
 
     @abc.abstractmethod
-    def _check_csr(self):
+    def _check_csr(self) -> bool:
         """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
-        pass
 
-    def needs_regeneration(self):
+    def needs_regeneration(self) -> bool:
         """Check whether a regeneration is necessary."""
         if self.existing_csr_bytes is None:
             return True
@@ -245,9 +267,9 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         self._ensure_private_key_loaded()
         return not self._check_csr()
 
-    def dump(self, include_csr):
+    def dump(self, include_csr: bool) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
-        result = {
+        result: dict[str, t.Any] = {
             "privatekey": self.privatekey_path,
             "subject": self.subject,
             "subjectAltName": self.subjectAltName,
@@ -274,44 +296,49 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         return result
 
 
-def parse_crl_distribution_points(module, crl_distribution_points):
+def parse_crl_distribution_points(
+    module: AnsibleModule, crl_distribution_points: list[dict[str, t.Any]]
+) -> list[cryptography.x509.DistributionPoint]:
     result = []
     for index, parse_crl_distribution_point in enumerate(crl_distribution_points):
         try:
-            params = dict(
-                full_name=None,
-                relative_name=None,
-                crl_issuer=None,
-                reasons=None,
-            )
+            full_name = None
+            relative_name = None
+            crl_issuer = None
+            reasons = None
             if parse_crl_distribution_point["full_name"] is not None:
                 if not parse_crl_distribution_point["full_name"]:
                     raise OpenSSLObjectError("full_name must not be empty")
-                params["full_name"] = [
+                full_name = [
                     cryptography_get_name(name, "full name")
                     for name in parse_crl_distribution_point["full_name"]
                 ]
             if parse_crl_distribution_point["relative_name"] is not None:
                 if not parse_crl_distribution_point["relative_name"]:
                     raise OpenSSLObjectError("relative_name must not be empty")
-                params["relative_name"] = (
-                    cryptography_parse_relative_distinguished_name(
-                        parse_crl_distribution_point["relative_name"]
-                    )
+                relative_name = cryptography_parse_relative_distinguished_name(
+                    parse_crl_distribution_point["relative_name"]
                 )
             if parse_crl_distribution_point["crl_issuer"] is not None:
                 if not parse_crl_distribution_point["crl_issuer"]:
                     raise OpenSSLObjectError("crl_issuer must not be empty")
-                params["crl_issuer"] = [
+                crl_issuer = [
                     cryptography_get_name(name, "CRL issuer")
                     for name in parse_crl_distribution_point["crl_issuer"]
                 ]
             if parse_crl_distribution_point["reasons"] is not None:
-                reasons = []
+                reasons_list = []
                 for reason in parse_crl_distribution_point["reasons"]:
-                    reasons.append(REVOCATION_REASON_MAP[reason])
-                params["reasons"] = frozenset(reasons)
-            result.append(cryptography.x509.DistributionPoint(**params))
+                    reasons_list.append(REVOCATION_REASON_MAP[reason])
+                reasons = frozenset(reasons_list)
+            result.append(
+                cryptography.x509.DistributionPoint(
+                    full_name=full_name,
+                    relative_name=relative_name,
+                    crl_issuer=crl_issuer,
+                    reasons=reasons,
+                )
+            )
         except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError(
                 f"Error while parsing CRL distribution point #{index}: {e}"
@@ -321,21 +348,25 @@ def parse_crl_distribution_points(module, crl_distribution_points):
 
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(CertificateSigningRequestCryptographyBackend, self).__init__(module)
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
             )
 
-        if self.crl_distribution_points:
+        crl_distribution_points: list[dict[str, t.Any]] | None = module.params[
+            "crl_distribution_points"
+        ]
+        if crl_distribution_points:
             self.crl_distribution_points = parse_crl_distribution_points(
-                module, self.crl_distribution_points
+                module, crl_distribution_points
             )
 
-    def generate_csr(self):
+    def generate_csr(self) -> None:
         """(Re-)Generate CSR."""
         self._ensure_private_key_loaded()
+        assert self.privatekey is not None
 
         csr = cryptography.x509.CertificateSigningRequestBuilder()
         try:
@@ -412,6 +443,12 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 raise OpenSSLObjectError(f"Error while parsing name constraint: {e}")
 
         if self.create_subject_key_identifier:
+            if not is_potential_certificate_issuer_public_key(
+                self.privatekey.public_key()
+            ):
+                raise OpenSSLObjectError(
+                    "Private key can not be used to create subject key identifier"
+                )
             csr = csr.add_extension(
                 cryptography.x509.SubjectKeyIdentifier.from_public_key(
                     self.privatekey.public_key()
@@ -450,7 +487,10 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 critical=False,
             )
 
-        digest = None
+        # csr.sign() does not accept some digests we theoretically could have in digest.
+        # For that reason we use type t.Any here. csr.sign() will complain if
+        # the digest is not acceptable.
+        digest: t.Any | None = None
         if cryptography_key_needs_digest_for_signing(self.privatekey):
             digest = select_message_digest(self.digest)
             if digest is None:
@@ -482,16 +522,22 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 + "This is probably caused by an invalid Subject Alternative DNS Name."
             )
 
-    def get_csr_data(self):
+    def get_csr_data(self) -> bytes:
         """Return bytes for self.csr."""
+        if self.csr is None:
+            raise AssertionError("Violated contract: csr is not populated")
         return self.csr.public_bytes(
             cryptography.hazmat.primitives.serialization.Encoding.PEM
         )
 
-    def _check_csr(self):
+    def _check_csr(self) -> bool:
         """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
+        if self.existing_csr is None:
+            raise AssertionError("Violated contract: existing_csr is not populated")
+        if self.privatekey is None:
+            raise AssertionError("Violated contract: privatekey is not populated")
 
-        def _check_subject(csr):
+        def _check_subject(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             subject = [
                 (cryptography_name_to_oid(entry[0]), to_text(entry[1]))
                 for entry in self.subject
@@ -502,12 +548,14 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return set(subject) == set(current_subject)
 
-        def _find_extension(extensions, exttype):
+        def _find_extension(
+            extensions: cryptography.x509.Extensions, exttype: type[_ET]
+        ) -> cryptography.x509.Extension[_ET] | None:
             return next(
                 (ext for ext in extensions if isinstance(ext.value, exttype)), None
             )
 
-        def _check_subjectAltName(extensions):
+        def _check_subjectAltName(extensions: cryptography.x509.Extensions) -> bool:
             current_altnames_ext = _find_extension(
                 extensions, cryptography.x509.SubjectAlternativeName
             )
@@ -526,12 +574,12 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if set(altnames) != set(current_altnames):
                 return False
-            if altnames:
+            if altnames and current_altnames_ext:
                 if current_altnames_ext.critical != self.subjectAltName_critical:
                     return False
             return True
 
-        def _check_keyUsage(extensions):
+        def _check_keyUsage(extensions: cryptography.x509.Extensions) -> bool:
             current_keyusage_ext = _find_extension(
                 extensions, cryptography.x509.KeyUsage
             )
@@ -547,7 +595,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 return False
             return True
 
-        def _check_extenededKeyUsage(extensions):
+        def _check_extenededKeyUsage(extensions: cryptography.x509.Extensions) -> bool:
             current_usages_ext = _find_extension(
                 extensions, cryptography.x509.ExtendedKeyUsage
             )
@@ -566,12 +614,12 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if set(current_usages) != set(usages):
                 return False
-            if usages:
+            if usages and current_usages_ext:
                 if current_usages_ext.critical != self.extendedKeyUsage_critical:
                     return False
             return True
 
-        def _check_basicConstraints(extensions):
+        def _check_basicConstraints(extensions: cryptography.x509.Extensions) -> bool:
             bc_ext = _find_extension(extensions, cryptography.x509.BasicConstraints)
             current_ca = bc_ext.value.ca if bc_ext else False
             current_path_length = bc_ext.value.path_length if bc_ext else None
@@ -591,7 +639,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return bc_ext is None
 
-        def _check_ocspMustStaple(extensions):
+        def _check_ocspMustStaple(extensions: cryptography.x509.Extensions) -> bool:
             tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
             if self.ocspMustStaple:
                 if (
@@ -606,7 +654,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return tlsfeature_ext is None
 
-        def _check_nameConstraints(extensions):
+        def _check_nameConstraints(extensions: cryptography.x509.Extensions) -> bool:
             current_nc_ext = _find_extension(
                 extensions, cryptography.x509.NameConstraints
             )
@@ -638,12 +686,14 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 current_nc_excl
             ):
                 return False
-            if nc_perm or nc_excl:
+            if (nc_perm or nc_excl) and current_nc_ext:
                 if current_nc_ext.critical != self.name_constraints_critical:
                     return False
             return True
 
-        def _check_subject_key_identifier(extensions):
+        def _check_subject_key_identifier(
+            extensions: cryptography.x509.Extensions,
+        ) -> bool:
             ext = _find_extension(extensions, cryptography.x509.SubjectKeyIdentifier)
             if (
                 self.create_subject_key_identifier
@@ -652,6 +702,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 if not ext or ext.critical:
                     return False
                 if self.create_subject_key_identifier:
+                    assert self.privatekey is not None
                     digest = cryptography.x509.SubjectKeyIdentifier.from_public_key(
                         self.privatekey.public_key()
                     ).digest
@@ -661,7 +712,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return ext is None
 
-        def _check_authority_key_identifier(extensions):
+        def _check_authority_key_identifier(
+            extensions: cryptography.x509.Extensions,
+        ) -> bool:
             ext = _find_extension(extensions, cryptography.x509.AuthorityKeyIdentifier)
             if (
                 self.authority_key_identifier is not None
@@ -688,7 +741,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return ext is None
 
-        def _check_crl_distribution_points(extensions):
+        def _check_crl_distribution_points(
+            extensions: cryptography.x509.Extensions,
+        ) -> bool:
             ext = _find_extension(extensions, cryptography.x509.CRLDistributionPoints)
             if self.crl_distribution_points is None:
                 return ext is None
@@ -696,7 +751,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 return False
             return list(ext.value) == self.crl_distribution_points
 
-        def _check_extensions(csr):
+        def _check_extensions(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             extensions = csr.extensions
             return (
                 _check_subjectAltName(extensions)
@@ -710,7 +765,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 and _check_crl_distribution_points(extensions)
             )
 
-        def _check_signature(csr):
+        def _check_signature(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             if not csr.is_signature_valid:
                 return False
             # To check whether public key of CSR belongs to private key,
@@ -719,6 +774,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 cryptography.hazmat.primitives.serialization.Encoding.PEM,
                 cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo,
             )
+            assert self.privatekey is not None
             key_b = self.privatekey.public_key().public_bytes(
                 cryptography.hazmat.primitives.serialization.Encoding.PEM,
                 cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo,
@@ -732,14 +788,16 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         )
 
 
-def select_backend(module):
+def select_backend(
+    module: AnsibleModule,
+) -> CertificateSigningRequestCryptographyBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return CertificateSigningRequestCryptographyBackend(module)
 
 
-def get_csr_argument_spec():
+def get_csr_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
         argument_spec=dict(
             digest=dict(type="str", default="sha256"),

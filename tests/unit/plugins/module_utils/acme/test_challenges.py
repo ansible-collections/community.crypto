@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from unittest.mock import (
     MagicMock,
 )
@@ -21,21 +22,21 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-def test_combine_identifier():
+def test_combine_identifier() -> None:
     assert combine_identifier("", "") == ":"
     assert combine_identifier("a", "b") == "a:b"
 
 
-def test_split_identifier():
-    assert split_identifier(":") == ["", ""]
-    assert split_identifier("a:b") == ["a", "b"]
-    assert split_identifier("a:b:c") == ["a", "b:c"]
+def test_split_identifier() -> None:
+    assert split_identifier(":") == ("", "")
+    assert split_identifier("a:b") == ("a", "b")
+    assert split_identifier("a:b:c") == ("a", "b:c")
     with pytest.raises(ModuleFailException) as exc:
         split_identifier("a")
     assert exc.value.msg == 'Identifier "a" is not of the form <type>:<identifier>'
 
 
-def test_challenge_from_to_json():
+def test_challenge_from_to_json() -> None:
     client = MagicMock()
 
     data = {
@@ -57,7 +58,7 @@ def test_challenge_from_to_json():
         "status": "valid",
         "token": "foo",
     }
-    challenge = Challenge.from_json(None, data, url="xxx")
+    challenge = Challenge.from_json(None, data, url="xxx")  # type: ignore
     assert challenge.data == data
     assert challenge.type == "type"
     assert challenge.url == "xxx"
@@ -66,9 +67,11 @@ def test_challenge_from_to_json():
     assert challenge.to_json() == data
 
 
-def test_authorization_from_to_json():
+def test_authorization_from_to_json() -> None:
     client = MagicMock()
     client.version = 2
+
+    data: dict[str, t.Any]
 
     data = {
         "challenges": [],
@@ -138,7 +141,7 @@ def test_authorization_from_to_json():
     }
 
 
-def test_authorization_create_error():
+def test_authorization_create_error() -> None:
     client = MagicMock()
     client.version = 2
     client.directory.directory = {}
@@ -148,7 +151,7 @@ def test_authorization_create_error():
     assert exc.value.msg == "ACME endpoint does not support pre-authorization."
 
 
-def test_wait_for_validation_error():
+def test_wait_for_validation_error() -> None:
     client = MagicMock()
     client.version = 2
     data = {
