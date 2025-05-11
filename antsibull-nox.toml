@@ -19,7 +19,7 @@ yamllint_config = ".yamllint"
 yamllint_config_plugins = ".yamllint-docs"
 yamllint_config_plugins_examples = ".yamllint-examples"
 run_mypy = true
-mypy_ansible_core_package = "ansible-core>=2.19.0b2"
+mypy_ansible_core_package = "ansible-core>=2.19.0b3"
 mypy_config = "tests/nox-config-mypy.ini"
 mypy_extra_deps = [
     "cryptography",
