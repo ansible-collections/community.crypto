@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from unittest.mock import (
     MagicMock,
 )
@@ -15,7 +16,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 )
 
 
-TEST_FORMAT_ERROR_PROBLEM = [
+TEST_FORMAT_ERROR_PROBLEM: list[tuple[dict[str, t.Any], str, str]] = [
     (
         {
             "type": "foo",
@@ -90,33 +91,37 @@ TEST_FORMAT_ERROR_PROBLEM = [
 @pytest.mark.parametrize(
     "problem, subproblem_prefix, result", TEST_FORMAT_ERROR_PROBLEM
 )
-def test_format_error_problem(problem, subproblem_prefix, result):
+def test_format_error_problem(
+    problem: dict[str, t.Any], subproblem_prefix: str, result: str
+) -> None:
     res = format_error_problem(problem, subproblem_prefix)
     assert res == result
 
 
-def create_regular_response(response_text):
+def create_regular_response(response_text: str) -> MagicMock:
     response = MagicMock()
     response.read = MagicMock(return_value=response_text.encode("utf-8"))
     response.closed = False
     return response
 
 
-def create_error_response():
+def create_error_response() -> MagicMock:
     response = MagicMock()
     response.read = MagicMock(side_effect=AttributeError("read"))
     response.closed = True
     return response
 
 
-def create_decode_error(msg):
-    def f(content):
+def create_decode_error(msg: str) -> t.Callable[[t.Any], t.Any]:
+    def f(content: t.Any) -> t.NoReturn:
         raise Exception(msg)
 
     return f
 
 
-TEST_ACME_PROTOCOL_EXCEPTION = [
+TEST_ACME_PROTOCOL_EXCEPTION: list[
+    tuple[dict[str, t.Any], t.Callable[[t.Any], t.Any] | None, str, dict[str, t.Any]]
+] = [
     (
         {},
         None,
@@ -341,14 +346,19 @@ TEST_ACME_PROTOCOL_EXCEPTION = [
 
 
 @pytest.mark.parametrize("input, from_json, msg, args", TEST_ACME_PROTOCOL_EXCEPTION)
-def test_acme_protocol_exception(input, from_json, msg, args):
+def test_acme_protocol_exception(
+    input: dict[str, t.Any],
+    from_json: t.Callable[[t.Any], t.NoReturn] | None,
+    msg: str,
+    args: dict[str, t.Any],
+) -> None:
     if from_json is None:
         module = None
     else:
         module = MagicMock()
         module.from_json = from_json
     with pytest.raises(ACMEProtocolException) as exc:
-        raise ACMEProtocolException(module, **input)
+        raise ACMEProtocolException(module, **input)  # type: ignore
 
     print(exc.value.msg)
     print(exc.value.module_fail_args)

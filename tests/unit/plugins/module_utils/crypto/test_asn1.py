@@ -14,7 +14,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto._asn1 impo
 )
 
 
-TEST_CASES = [
+TEST_CASES: list[tuple[str, bytes]] = [
     ("UTF8:Hello World", b"\x0c\x0b\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64"),
     (
         "EXPLICIT:10,UTF8:Hello World",
@@ -75,7 +75,7 @@ TEST_CASES = [
 
 
 @pytest.mark.parametrize("value, expected", TEST_CASES)
-def test_serialize_asn1_string_as_der(value, expected):
+def test_serialize_asn1_string_as_der(value: str, expected: bytes) -> None:
     actual = serialize_asn1_string_as_der(value)
     print(f"{value} | {base64.b16encode(actual).decode()}")
     assert actual == expected
@@ -88,7 +88,7 @@ def test_serialize_asn1_string_as_der(value, expected):
         "EXPLICIT,UTF:value",
     ],
 )
-def test_serialize_asn1_string_as_der_invalid_format(value):
+def test_serialize_asn1_string_as_der_invalid_format(value: str) -> None:
     expected = (
         "The ASN.1 serialized string must be in the format [modifier,]type[:value]"
     )
@@ -96,7 +96,7 @@ def test_serialize_asn1_string_as_der_invalid_format(value):
         serialize_asn1_string_as_der(value)
 
 
-def test_serialize_asn1_string_as_der_invalid_type():
+def test_serialize_asn1_string_as_der_invalid_type() -> None:
     expected = 'The ASN.1 serialized string is not a known type "OID", only UTF8 types are supported'
     with pytest.raises(ValueError, match=re.escape(expected)):
         serialize_asn1_string_as_der("OID:1.2.3.4")
@@ -104,7 +104,7 @@ def test_serialize_asn1_string_as_der_invalid_type():
 
 @pytest.mark.skip()  # This is to just to build the test case assertions and shouldn't run normally.
 @pytest.mark.parametrize("value, expected", TEST_CASES)
-def test_test_cases(value, expected, tmp_path):
+def test_test_cases(value: str, expected: bytes, tmp_path) -> None:
     test_file = tmp_path / "test.der"
     subprocess.run(
         ["openssl", "asn1parse", "-genstr", value, "-noout", "-out", test_file],

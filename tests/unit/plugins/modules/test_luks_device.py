@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 from ansible_collections.community.crypto.plugins.modules import luks_device
 
@@ -23,17 +25,17 @@ class DummyModule:
 # ===== Handler & CryptHandler methods tests =====
 
 
-def test_generate_luks_name(monkeypatch):
+def test_generate_luks_name(monkeypatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
         luks_device.Handler, "_run_command", lambda x, y: [0, "UUID", ""]
     )
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     assert crypt.generate_luks_name("/dev/dummy") == "luks-UUID"
 
 
-def test_get_container_name_by_device(monkeypatch):
+def test_get_container_name_by_device(monkeypatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
@@ -41,11 +43,11 @@ def test_get_container_name_by_device(monkeypatch):
         "_run_command",
         lambda x, y: [0, "crypt container_name", ""],
     )
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     assert crypt.get_container_name_by_device("/dev/dummy") == "container_name"
 
 
-def test_get_container_device_by_name(monkeypatch):
+def test_get_container_device_by_name(monkeypatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
@@ -53,15 +55,15 @@ def test_get_container_device_by_name(monkeypatch):
         "_run_command",
         lambda x, y: [0, "device:  /dev/luksdevice", ""],
     )
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     assert crypt.get_container_device_by_name("dummy") == "/dev/luksdevice"
 
 
-def test_run_luks_remove(monkeypatch):
-    def run_command_check(self, command):
+def test_run_luks_remove(monkeypatch) -> None:
+    def run_command_check(self, command: list[str]) -> tuple[int, str, str]:
         # check that wipefs command is actually called
         assert command[0] == "wipefs"
-        return [0, "", ""]
+        return 0, "", ""
 
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
@@ -70,14 +72,26 @@ def test_run_luks_remove(monkeypatch):
     )
     monkeypatch.setattr(luks_device.Handler, "_run_command", run_command_check)
     monkeypatch.setattr(luks_device, "wipe_luks_headers", lambda device: True)
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     crypt.run_luks_remove("dummy")
 
 
 # ===== ConditionsHandler methods data and tests =====
 
 # device, key, passphrase, state, is_luks, label, cipher, hash, expected
-LUKS_CREATE_DATA = (
+LUKS_CREATE_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        bool,
+        str | None,
+        str | None,
+        str | None,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "key", None, "present", False, None, "dummy", "dummy", True),
     (None, "key", None, "present", False, None, "dummy", "dummy", False),
     (None, "key", None, "present", False, "labelName", "dummy", "dummy", True),
@@ -97,18 +111,35 @@ LUKS_CREATE_DATA = (
     ("dummy", "key", None, "present", False, None, None, None, True),
     ("dummy", "key", None, "present", False, None, None, "dummy", True),
     ("dummy", "key", None, "present", False, None, "dummy", None, True),
-)
+]
 
 # device, state, is_luks, expected
-LUKS_REMOVE_DATA = (
+LUKS_REMOVE_DATA: list[
+    tuple[
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        bool,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "absent", True, True),
     (None, "absent", True, False),
     ("dummy", "present", True, False),
     ("dummy", "absent", False, False),
-)
+]
 
 # device, key, passphrase, state, name, name_by_dev, expected
-LUKS_OPEN_DATA = (
+LUKS_OPEN_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        str | None,
+        str | None,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "key", None, "present", "name", None, False),
     ("dummy", "key", None, "absent", "name", None, False),
     ("dummy", "key", None, "closed", "name", None, False),
@@ -125,10 +156,20 @@ LUKS_OPEN_DATA = (
     ("dummy", None, None, "opened", "name", None, False),
     ("dummy", None, "quuz", "opened", "name", "name", False),
     ("dummy", None, "corge", "opened", "beer", "name", "exception"),
-)
+]
 
 # device, dev_by_name, name, name_by_dev, state, label, expected
-LUKS_CLOSE_DATA = (
+LUKS_CLOSE_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        str | None,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "dummy", "name", "name", "present", None, False),
     ("dummy", "dummy", "name", "name", "absent", None, False),
     ("dummy", "dummy", "name", "name", "opened", None, False),
@@ -136,10 +177,21 @@ LUKS_CLOSE_DATA = (
     (None, "dummy", "name", "name", "closed", None, True),
     ("dummy", "dummy", None, "name", "closed", None, True),
     (None, "dummy", None, "name", "closed", None, False),
-)
+]
 
 # device, key, passphrase, new_key, new_passphrase, state, label, expected
-LUKS_ADD_KEY_DATA = (
+LUKS_ADD_KEY_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        str | None,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "key", None, "new_key", None, "present", None, True),
     (None, "key", None, "new_key", None, "present", "labelName", True),
     (None, "key", None, "new_key", None, "present", None, False),
@@ -156,10 +208,20 @@ LUKS_ADD_KEY_DATA = (
     ("dummy", "key", None, None, "new_pass", "absent", None, "exception"),
     ("dummy", None, "pass", None, "new_pass", "present", None, True),
     (None, None, "pass", None, "new_pass", "present", "labelName", True),
-)
+]
 
-# device, remove_key, remove_passphrase, state, label, expected
-LUKS_REMOVE_KEY_DATA = (
+# device, remove_key, remove_passphrase, remove_keyslot, state, label, expected
+LUKS_REMOVE_KEY_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        t.Literal["present", "absent", "opened", "closed"],
+        str | None,
+        bool | t.Literal["exception"],
+    ]
+] = [
     ("dummy", "key", None, None, "present", None, True),
     (None, "key", None, None, "present", None, False),
     (None, "key", None, None, "present", "labelName", True),
@@ -170,7 +232,7 @@ LUKS_REMOVE_KEY_DATA = (
     (None, None, "foo", None, "present", "labelName", True),
     ("dummy", None, None, None, "present", None, False),
     ("dummy", None, "foo", None, "absent", None, "exception"),
-)
+]
 
 
 @pytest.mark.parametrize(
@@ -178,17 +240,17 @@ LUKS_REMOVE_KEY_DATA = (
     ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8]) for d in LUKS_CREATE_DATA),
 )
 def test_luks_create(
-    device,
-    keyfile,
-    passphrase,
-    state,
-    is_luks,
-    label,
-    cipher,
-    hash_,
-    expected,
+    device: str | None,
+    keyfile: str | None,
+    passphrase: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    is_luks: bool,
+    label: str | None,
+    cipher: str | None,
+    hash_: str | None,
+    expected: bool | t.Literal["exception"],
     monkeypatch,
-):
+) -> None:
     module = DummyModule()
 
     module.params["device"] = device
@@ -201,7 +263,7 @@ def test_luks_create(
     module.params["hash"] = hash_
 
     monkeypatch.setattr(luks_device.CryptHandler, "is_luks", lambda x, y: is_luks)
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     if device is None:
         monkeypatch.setattr(
             luks_device.Handler,
@@ -209,7 +271,7 @@ def test_luks_create(
             lambda x, y: [0, "/dev/dummy", ""],
         )
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_create() == expected
     except ValueError:
         assert expected == "exception"
@@ -219,7 +281,13 @@ def test_luks_create(
     "device, state, is_luks, expected",
     ((d[0], d[1], d[2], d[3]) for d in LUKS_REMOVE_DATA),
 )
-def test_luks_remove(device, state, is_luks, expected, monkeypatch):
+def test_luks_remove(
+    device: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    is_luks: bool,
+    expected: bool | t.Literal["exception"],
+    monkeypatch,
+) -> None:
     module = DummyModule()
 
     module.params["device"] = device
@@ -227,9 +295,9 @@ def test_luks_remove(device, state, is_luks, expected, monkeypatch):
     module.params["state"] = state
 
     monkeypatch.setattr(luks_device.CryptHandler, "is_luks", lambda x, y: is_luks)
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_remove() == expected
     except ValueError:
         assert expected == "exception"
@@ -240,8 +308,15 @@ def test_luks_remove(device, state, is_luks, expected, monkeypatch):
     ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_OPEN_DATA),
 )
 def test_luks_open(
-    device, keyfile, passphrase, state, name, name_by_dev, expected, monkeypatch
-):
+    device: str | None,
+    keyfile: str | None,
+    passphrase: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    name: str | None,
+    name_by_dev: str | None,
+    expected: bool | t.Literal["exception"],
+    monkeypatch,
+) -> None:
     module = DummyModule()
     module.params["device"] = device
     module.params["keyfile"] = keyfile
@@ -261,9 +336,9 @@ def test_luks_open(
     monkeypatch.setattr(
         luks_device.Handler, "_run_command", lambda x, y: [0, device, ""]
     )
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_open() == expected
     except ValueError:
         assert expected == "exception"
@@ -274,8 +349,15 @@ def test_luks_open(
     ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_CLOSE_DATA),
 )
 def test_luks_close(
-    device, dev_by_name, name, name_by_dev, state, label, expected, monkeypatch
-):
+    device: str | None,
+    dev_by_name: str | None,
+    name: str | None,
+    name_by_dev: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    label: str | None,
+    expected: bool | t.Literal["exception"],
+    monkeypatch,
+) -> None:
     module = DummyModule()
     module.params["device"] = device
     module.params["name"] = name
@@ -293,9 +375,9 @@ def test_luks_close(
         "get_container_device_by_name",
         lambda x, y: dev_by_name,
     )
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_close() == expected
     except ValueError:
         assert expected == "exception"
@@ -307,16 +389,16 @@ def test_luks_close(
     ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]) for d in LUKS_ADD_KEY_DATA),
 )
 def test_luks_add_key(
-    device,
-    keyfile,
-    passphrase,
-    new_keyfile,
-    new_passphrase,
-    state,
-    label,
-    expected,
+    device: str | None,
+    keyfile: str | None,
+    passphrase: str | None,
+    new_keyfile: str | None,
+    new_passphrase: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    label: str | None,
+    expected: bool | t.Literal["exception"],
     monkeypatch,
-):
+) -> None:
     module = DummyModule()
     module.params["device"] = device
     module.params["keyfile"] = keyfile
@@ -335,9 +417,9 @@ def test_luks_add_key(
         luks_device.CryptHandler, "luks_test_key", lambda x, y, z, w: False
     )
 
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_add_key() == expected
     except ValueError:
         assert expected == "exception"
@@ -349,15 +431,15 @@ def test_luks_add_key(
     ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_REMOVE_KEY_DATA),
 )
 def test_luks_remove_key(
-    device,
-    remove_keyfile,
-    remove_passphrase,
-    remove_keyslot,
-    state,
-    label,
-    expected,
+    device: str | None,
+    remove_keyfile: str | None,
+    remove_passphrase: str | None,
+    remove_keyslot: str | None,
+    state: t.Literal["present", "absent", "opened", "closed"],
+    label: str | None,
+    expected: bool | t.Literal["exception"],
     monkeypatch,
-):
+) -> None:
 
     module = DummyModule()
     module.params["device"] = device
@@ -378,9 +460,9 @@ def test_luks_remove_key(
         luks_device.CryptHandler, "luks_test_key", lambda x, y, z, w: True
     )
 
-    crypt = luks_device.CryptHandler(module)
+    crypt = luks_device.CryptHandler(module)  # type: ignore
     try:
-        conditions = luks_device.ConditionsHandler(module, crypt)
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_remove_key() == expected
     except ValueError:
         assert expected == "exception"

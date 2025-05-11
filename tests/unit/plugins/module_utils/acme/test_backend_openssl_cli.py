@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import datetime
+import typing as t
 from unittest.mock import (
     MagicMock,
 )
@@ -31,6 +32,12 @@ from .backend_data import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
+        CertificateInformation,
+    )
+
+
 # from ..test_time import TIMEZONES
 
 
@@ -47,7 +54,9 @@ TEST_IPS = [
 
 
 @pytest.mark.parametrize("pem, result, openssl_output", TEST_KEYS)
-def test_eckeyparse_openssl(pem, result, openssl_output, tmpdir):
+def test_eckeyparse_openssl(
+    pem: str, result: dict[str, t.Any], openssl_output: str, tmpdir
+) -> None:
     fn = tmpdir / "test.key"
     fn.write(pem)
     module = MagicMock()
@@ -59,7 +68,9 @@ def test_eckeyparse_openssl(pem, result, openssl_output, tmpdir):
 
 
 @pytest.mark.parametrize("csr, result, openssl_output", TEST_CSRS)
-def test_csridentifiers_openssl(csr, result, openssl_output, tmpdir):
+def test_csridentifiers_openssl(
+    csr: str, result: set[tuple[str, str]], openssl_output: str, tmpdir
+) -> None:
     fn = tmpdir / "test.csr"
     fn.write(csr)
     module = MagicMock()
@@ -70,14 +81,16 @@ def test_csridentifiers_openssl(csr, result, openssl_output, tmpdir):
 
 
 @pytest.mark.parametrize("ip, result", TEST_IPS)
-def test_normalize_ip(ip, result):
+def test_normalize_ip(ip: str, result: str) -> None:
     module = MagicMock()
     backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
     assert backend._normalize_ip(ip) == result
 
 
 @pytest.mark.parametrize("timezone, now, expected_days", TEST_CERT_DAYS)
-def test_certdays_cryptography(timezone, now, expected_days, tmpdir):
+def test_certdays_cryptography(
+    timezone: datetime.timedelta, now: datetime.datetime, expected_days: int, tmpdir
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         fn = tmpdir / "test-cert.pem"
         fn.write(TEST_CERT)
@@ -93,7 +106,12 @@ def test_certdays_cryptography(timezone, now, expected_days, tmpdir):
 @pytest.mark.parametrize(
     "cert_content, expected_cert_info, openssl_output", TEST_CERT_INFO
 )
-def test_get_cert_information(cert_content, expected_cert_info, openssl_output, tmpdir):
+def test_get_cert_information(
+    cert_content: str,
+    expected_cert_info: CertificateInformation,
+    openssl_output: str,
+    tmpdir,
+) -> None:
     fn = tmpdir / "test-cert.pem"
     fn.write(cert_content)
     module = MagicMock()
@@ -115,7 +133,7 @@ def test_get_cert_information(cert_content, expected_cert_info, openssl_output, 
 # Due to a bug in freezegun (https://github.com/spulec/freezegun/issues/348, https://github.com/spulec/freezegun/issues/553)
 # this only works with timezone = UTC if CRYPTOGRAPHY_TIMEZONE is truish
 @pytest.mark.parametrize("timezone", [datetime.timedelta(hours=0)])
-def test_now(timezone):
+def test_now(timezone: datetime.timedelta) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
         backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
@@ -125,7 +143,9 @@ def test_now(timezone):
 
 
 @pytest.mark.parametrize("timezone, input, expected", TEST_PARSE_ACME_TIMESTAMP)
-def test_parse_acme_timestamp(timezone, input, expected):
+def test_parse_acme_timestamp(
+    timezone: datetime.timedelta, input: str, expected: dict[str, int]
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
         backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
@@ -137,7 +157,13 @@ def test_parse_acme_timestamp(timezone, input, expected):
 @pytest.mark.parametrize(
     "timezone, start, end, percentage, expected", TEST_INTERPOLATE_TIMESTAMP
 )
-def test_interpolate_timestamp(timezone, start, end, percentage, expected):
+def test_interpolate_timestamp(
+    timezone: datetime.timedelta,
+    start: dict[str, int],
+    end: dict[str, int],
+    percentage: float,
+    expected: dict[str, int],
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
         backend = OpenSSLCLIBackend(module, openssl_binary="openssl")

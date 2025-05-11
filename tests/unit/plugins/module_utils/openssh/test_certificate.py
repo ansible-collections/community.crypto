@@ -132,7 +132,9 @@ VALID_EXTENSIONS = [
 ]
 INVALID_EXTENSIONS = [OpensshCertificateOption("extension", "test", "")]
 
-VALID_TIME_PARAMETERS = [
+VALID_TIME_PARAMETERS: list[
+    tuple[int | str, int | str, str, int, int | str, str, str, int, str]
+] = [
     (
         0,
         "always",
@@ -223,28 +225,28 @@ VALID_TIME_PARAMETERS = [
     ),
 ]
 
-INVALID_TIME_PARAMETERS = [
+INVALID_TIME_PARAMETERS: list[tuple[int | str, int | str]] = [
     (-1, 0xFFFFFFFFFFFFFFFFFF),
     ("never", "ever"),
     ("01-01-1980", "01-01-1990"),
     (1, 0),
 ]
 
-VALID_VALIDITY_TEST = [
+VALID_VALIDITY_TEST: list[tuple[str, str, str]] = [
     ("always", "forever", "2000-01-01"),
     ("1999-12-31", "2000-01-02", "2000-01-01"),
     ("1999-12-31 23:59:00", "2000-01-01 00:01:00", "2000-01-01 00:00:00"),
     ("1999-12-31 23:59:59", "2000-01-01 00:00:01", "2000-01-01 00:00:00"),
 ]
 
-INVALID_VALIDITY_TEST = [
+INVALID_VALIDITY_TEST: list[tuple[str, str, str]] = [
     ("always", "forever", "1969-12-31"),
     ("always", "2000-01-01", "2000-01-02"),
     ("2000-01-01", "forever", "1999-12-31"),
     ("2000-01-01 00:00:00", "2000-01-01 00:00:01", "2000-01-01 00:00:02"),
 ]
 
-VALID_OPTIONS = [
+VALID_OPTIONS: list[tuple[str, OpensshCertificateOption]] = [
     (
         "force-command=/usr/bin/csh",
         OpensshCertificateOption("critical", "force-command", "/usr/bin/csh"),
@@ -265,7 +267,7 @@ VALID_OPTIONS = [
     ("extension:foo", OpensshCertificateOption("extension", "foo", "")),
 ]
 
-INVALID_OPTIONS = [
+INVALID_OPTIONS: list[str | list] = [
     "foobar",
     "foo=bar",
     "foo:bar=baz",
@@ -273,7 +275,7 @@ INVALID_OPTIONS = [
 ]
 
 
-def test_rsa_certificate(tmpdir):
+def test_rsa_certificate(tmpdir) -> None:
     cert_file = tmpdir / "id_rsa-cert.pub"
     cert_file.write(RSA_CERT_SIGNED_BY_DSA, mode="wb")
 
@@ -285,7 +287,7 @@ def test_rsa_certificate(tmpdir):
     assert cert.signing_key == DSA_FINGERPRINT
 
 
-def test_dsa_certificate(tmpdir):
+def test_dsa_certificate(tmpdir) -> None:
     cert_file = tmpdir / "id_dsa-cert.pub"
     cert_file.write(DSA_CERT_SIGNED_BY_ECDSA_NO_OPTS)
 
@@ -298,7 +300,7 @@ def test_dsa_certificate(tmpdir):
     assert cert.extensions == []
 
 
-def test_ecdsa_certificate(tmpdir):
+def test_ecdsa_certificate(tmpdir) -> None:
     cert_file = tmpdir / "id_ecdsa-cert.pub"
     cert_file.write(ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS)
 
@@ -310,7 +312,7 @@ def test_ecdsa_certificate(tmpdir):
     assert cert.extensions == VALID_EXTENSIONS
 
 
-def test_ed25519_certificate(tmpdir):
+def test_ed25519_certificate(tmpdir) -> None:
     cert_file = tmpdir / "id_ed25519-cert.pub"
     cert_file.write(ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS)
 
@@ -322,7 +324,7 @@ def test_ed25519_certificate(tmpdir):
     assert cert.extensions == INVALID_EXTENSIONS
 
 
-def test_invalid_data(tmpdir):
+def test_invalid_data(tmpdir) -> None:
     result = False
     cert_file = tmpdir / "invalid-cert.pub"
     cert_file.write(INVALID_DATA)
@@ -341,16 +343,16 @@ def test_invalid_data(tmpdir):
     VALID_TIME_PARAMETERS,
 )
 def test_valid_time_parameters(
-    valid_from,
-    valid_from_hr,
-    valid_from_openssh,
-    valid_from_timestamp,
-    valid_to,
-    valid_to_hr,
-    valid_to_openssh,
-    valid_to_timestamp,
-    validity_string,
-):
+    valid_from: int | str,
+    valid_from_hr: int | str,
+    valid_from_openssh: str,
+    valid_from_timestamp: int,
+    valid_to: int | str,
+    valid_to_hr: str,
+    valid_to_openssh: str,
+    valid_to_timestamp: int,
+    validity_string: str,
+) -> None:
     time_parameters = OpensshCertificateTimeParameters(
         valid_from=valid_from, valid_to=valid_to
     )
@@ -364,35 +366,37 @@ def test_valid_time_parameters(
 
 
 @pytest.mark.parametrize("valid_from,valid_to", INVALID_TIME_PARAMETERS)
-def test_invalid_time_parameters(valid_from, valid_to):
+def test_invalid_time_parameters(valid_from: int | str, valid_to: int | str) -> None:
     with pytest.raises(ValueError):
         OpensshCertificateTimeParameters(valid_from, valid_to)
 
 
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", VALID_VALIDITY_TEST)
-def test_valid_validity_test(valid_from, valid_to, valid_at):
+def test_valid_validity_test(valid_from: str, valid_to: str, valid_at: str) -> None:
     assert OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)
 
 
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", INVALID_VALIDITY_TEST)
-def test_invalid_validity_test(valid_from, valid_to, valid_at):
+def test_invalid_validity_test(valid_from: str, valid_to: str, valid_at: str) -> None:
     assert not OpensshCertificateTimeParameters(valid_from, valid_to).within_range(
         valid_at
     )
 
 
 @pytest.mark.parametrize("option_string,option_object", VALID_OPTIONS)
-def test_valid_options(option_string, option_object):
+def test_valid_options(
+    option_string: str, option_object: OpensshCertificateOption
+) -> None:
     assert OpensshCertificateOption.from_string(option_string) == option_object
 
 
 @pytest.mark.parametrize("option_string", INVALID_OPTIONS)
-def test_invalid_options(option_string):
+def test_invalid_options(option_string: str) -> None:
     with pytest.raises(ValueError):
         OpensshCertificateOption.from_string(option_string)
 
 
-def test_parse_option_list():
+def test_parse_option_list() -> None:
     critical_options, extensions = parse_option_list(["force-command=/usr/bin/csh"])
 
     critical_option_objects = [
@@ -411,7 +415,7 @@ def test_parse_option_list():
     assert set(extensions) == set(extension_objects)
 
 
-def test_parse_option_list_with_directives():
+def test_parse_option_list_with_directives() -> None:
     critical_options, extensions = parse_option_list(
         ["clear", "no-pty", "permit-pty", "permit-user-rc"]
     )
@@ -425,7 +429,7 @@ def test_parse_option_list_with_directives():
     assert set(extensions) == set(extension_objects)
 
 
-def test_parse_option_list_case_sensitivity():
+def test_parse_option_list_case_sensitivity() -> None:
     critical_options, extensions = parse_option_list(
         ["CLEAR", "no-X11-forwarding", "permit-X11-forwarding"]
     )

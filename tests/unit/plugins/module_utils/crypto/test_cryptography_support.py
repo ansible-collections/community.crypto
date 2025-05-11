@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import re
+import typing as t
 
 import cryptography
 import pytest
@@ -20,7 +21,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
-from cryptography.x509 import NameAttribute, oid
+from cryptography.x509 import NameAttribute, OtherName, oid
 
 
 @pytest.mark.parametrize(
@@ -35,7 +36,7 @@ from cryptography.x509 import NameAttribute, oid
         ("*.☺.", "*.xn--74h.", None),
     ],
 )
-def test_adjust_idn(unicode, idna, cycled_unicode):
+def test_adjust_idn(unicode: str, idna: str, cycled_unicode: str | None) -> None:
     if cycled_unicode is None:
         cycled_unicode = unicode
 
@@ -70,9 +71,10 @@ def test_adjust_idn(unicode, idna, cycled_unicode):
         ("bar", "foo", re.escape('Invalid value for idn_rewrite: "foo"')),
     ],
 )
-def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
+def test_adjust_idn_fail_valueerror(value: str, idn_rewrite: str, message: str) -> None:
     with pytest.raises(ValueError, match=message):
-        _adjust_idn(value, idn_rewrite)
+        idn_rewrite_: t.Literal["ignore", "idna", "unicode"] = idn_rewrite  # type: ignore
+        _adjust_idn(value, idn_rewrite_)
 
 
 @pytest.mark.parametrize(
@@ -88,27 +90,29 @@ def test_adjust_idn_fail_valueerror(value, idn_rewrite, message):
         ),
     ],
 )
-def test_adjust_idn_fail_user_error(value, idn_rewrite, message):
+def test_adjust_idn_fail_user_error(value: str, idn_rewrite: str, message: str) -> None:
     with pytest.raises(OpenSSLObjectError, match=message):
-        _adjust_idn(value, idn_rewrite)
+        idn_rewrite_: t.Literal["ignore", "idna", "unicode"] = idn_rewrite  # type: ignore
+        _adjust_idn(value, idn_rewrite_)
 
 
-def test_cryptography_get_name_invalid_prefix():
+def test_cryptography_get_name_invalid_prefix() -> None:
     with pytest.raises(
         OpenSSLObjectError, match="^Cannot parse Subject Alternative Name"
     ):
         cryptography_get_name("fake:value")
 
 
-def test_cryptography_get_name_other_name_no_oid():
+def test_cryptography_get_name_other_name_no_oid() -> None:
     with pytest.raises(
         OpenSSLObjectError, match="Cannot parse Subject Alternative Name otherName"
     ):
         cryptography_get_name("otherName:value")
 
 
-def test_cryptography_get_name_other_name_utfstring():
+def test_cryptography_get_name_other_name_utfstring() -> None:
     actual = cryptography_get_name("otherName:1.3.6.1.4.1.311.20.2.3;UTF8:Hello World")
+    assert isinstance(actual, OtherName)
     assert actual.type_id.dotted_string == "1.3.6.1.4.1.311.20.2.3"
     assert actual.value == b"\x0c\x0bHello World"
 
@@ -164,7 +168,9 @@ def test_cryptography_get_name_other_name_utfstring():
         ),
     ],
 )
-def test_parse_dn_component(name, options, expected):
+def test_parse_dn_component(
+    name: bytes, options: dict[str, t.Any], expected: tuple[NameAttribute, bytes]
+) -> None:
     result = _parse_dn_component(name, **options)
     print(result, expected)
     assert result == expected
@@ -186,7 +192,9 @@ if (
             (b"CN= ", {}, (NameAttribute(oid.NameOID.COMMON_NAME, ""), b"")),
         ],
     )
-    def test_parse_dn_component_not_py26(name, options, expected):
+    def test_parse_dn_component_not_py26(
+        name: bytes, options: dict[str, t.Any], expected: tuple[NameAttribute, bytes]
+    ) -> None:
         result = _parse_dn_component(name, **options)
         print(result, expected)
         assert result == expected
@@ -200,7 +208,9 @@ if (
         (b"CN=#0,", {}, 'Invalid hex sequence entry "0,"'),
     ],
 )
-def test_parse_dn_component_failure(name, options, message):
+def test_parse_dn_component_failure(
+    name: bytes, options: dict[str, t.Any], message: str
+) -> None:
     with pytest.raises(OpenSSLObjectError, match=f"^{re.escape(message)}$"):
         _parse_dn_component(name, **options)
 
@@ -225,7 +235,7 @@ def test_parse_dn_component_failure(name, options, message):
         ),
     ],
 )
-def test_parse_dn(name, expected):
+def test_parse_dn(name: bytes, expected: list[NameAttribute]) -> None:
     result = _parse_dn(name)
     print(result, expected)
     assert result == expected
@@ -244,6 +254,6 @@ def test_parse_dn(name, expected):
         ),
     ],
 )
-def test_parse_dn_failure(name, message):
+def test_parse_dn_failure(name: bytes, message: str):
     with pytest.raises(OpenSSLObjectError, match=f"^{re.escape(message)}$"):
         _parse_dn(name)

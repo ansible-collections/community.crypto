@@ -5,10 +5,12 @@
 from __future__ import annotations
 
 import datetime
+import typing as t
 
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
+    CryptoBackend,
 )
 from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
     compute_cert_id,
@@ -21,7 +23,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 from .backend_data import TEST_PEM_DERS
 
 
-NOPAD_B64 = [
+NOPAD_B64: list[tuple[str, str]] = [
     ("", ""),
     ("\n", "Cg"),
     ("123", "MTIz"),
@@ -29,7 +31,7 @@ NOPAD_B64 = [
 ]
 
 
-TEST_LINKS_HEADER = [
+TEST_LINKS_HEADER: list[tuple[dict[str, t.Any], list[tuple[str, str]]]] = [
     (
         {},
         [],
@@ -60,13 +62,13 @@ TEST_LINKS_HEADER = [
 ]
 
 
-TEST_RETRY_AFTER_HEADER = [
+TEST_RETRY_AFTER_HEADER: list[tuple[str, datetime.datetime]] = [
     ("120", datetime.datetime(2024, 4, 29, 0, 2, 0)),
     ("Wed, 21 Oct 2015 07:28:00 GMT", datetime.datetime(2015, 10, 21, 7, 28, 0)),
 ]
 
 
-TEST_COMPUTE_CERT_ID = [
+TEST_COMPUTE_CERT_ID: list[tuple[CertificateInformation, str]] = [
     (
         CertificateInformation(
             not_valid_after=datetime.datetime(2018, 11, 26, 15, 28, 24),
@@ -93,19 +95,21 @@ TEST_COMPUTE_CERT_ID = [
 
 
 @pytest.mark.parametrize("value, result", NOPAD_B64)
-def test_nopad_b64(value, result):
+def test_nopad_b64(value: str, result: str) -> None:
     assert nopad_b64(value.encode("utf-8")) == result
 
 
 @pytest.mark.parametrize("pem, der", TEST_PEM_DERS)
-def test_pem_to_der(pem, der, tmpdir):
+def test_pem_to_der(pem: str, der: bytes, tmpdir):
     fn = tmpdir / "test.pem"
     fn.write(pem)
     assert pem_to_der(str(fn)) == der
 
 
 @pytest.mark.parametrize("value, expected_result", TEST_LINKS_HEADER)
-def test_process_links(value, expected_result):
+def test_process_links(
+    value: dict[str, t.Any], expected_result: list[tuple[str, str]]
+) -> None:
     data = []
 
     def callback(url, rel):
@@ -117,12 +121,15 @@ def test_process_links(value, expected_result):
 
 
 @pytest.mark.parametrize("value, expected_result", TEST_RETRY_AFTER_HEADER)
-def test_parse_retry_after(value, expected_result):
+def test_parse_retry_after(value: str, expected_result: datetime.datetime) -> None:
     assert expected_result == parse_retry_after(
         value, now=datetime.datetime(2024, 4, 29, 0, 0, 0)
     )
 
 
 @pytest.mark.parametrize("cert_info, expected_result", TEST_COMPUTE_CERT_ID)
-def test_compute_cert_id(cert_info, expected_result):
-    assert expected_result == compute_cert_id(backend=None, cert_info=cert_info)
+def test_compute_cert_id(
+    cert_info: CertificateInformation, expected_result: str
+) -> None:
+    backend: CryptoBackend = None  # type: ignore
+    assert expected_result == compute_cert_id(backend=backend, cert_info=cert_info)

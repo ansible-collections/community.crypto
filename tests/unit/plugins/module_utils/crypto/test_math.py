@@ -26,7 +26,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.math impor
         (2, 10, 5, 4),
     ],
 )
-def test_binary_exp_mod(f, e, m, result):
+def test_binary_exp_mod(f: int, e: int, m: int, result: int) -> None:
     value = binary_exp_mod(f, e, m)
     print(value)
     assert value == result
@@ -46,7 +46,7 @@ def test_binary_exp_mod(f, e, m, result):
         (1024, 10, 2),
     ],
 )
-def test_simple_gcd(a, b, result):
+def test_simple_gcd(a: int, b: int, result: int) -> None:
     value = simple_gcd(a, b)
     print(value)
     assert value == result
@@ -70,7 +70,7 @@ def test_simple_gcd(a, b, result):
         (211, False),  # the smallest prime number >= 200
     ],
 )
-def test_quick_is_not_prime(n, result):
+def test_quick_is_not_prime(n: int, result: bool) -> None:
     value = quick_is_not_prime(n)
     print(value)
     assert value == result
@@ -88,7 +88,7 @@ def test_quick_is_not_prime(n, result):
         (256, None, b"\x01\x00"),
     ],
 )
-def test_convert_int_to_bytes(no, count, result):
+def test_convert_int_to_bytes(no: int, count: int | None, result: bytes) -> None:
     value = convert_int_to_bytes(no, count=count)
     print(value)
     assert value == result
@@ -108,7 +108,7 @@ def test_convert_int_to_bytes(no, count, result):
         (256, 4, "0100"),
     ],
 )
-def test_convert_int_to_hex(no, digits, result):
+def test_convert_int_to_hex(no: int, digits: int | None, result: str) -> None:
     value = convert_int_to_hex(no, digits=digits)
     print(value)
     assert value == result
@@ -125,7 +125,7 @@ def test_convert_int_to_hex(no, digits, result):
         (b"\x01\x00", 256),
     ],
 )
-def test_convert_bytes_to_int(data, result):
+def test_convert_bytes_to_int(data: bytes, result: int) -> None:
     value = convert_bytes_to_int(data)
     print(value)
     assert value == result
