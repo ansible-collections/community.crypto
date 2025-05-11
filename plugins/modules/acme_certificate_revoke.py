@@ -112,20 +112,20 @@ RETURN = """#"""
 
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.acme.account import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
     ACMEAccount,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     ACMEClient,
     create_backend,
     create_default_argspec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ACMEProtocolException,
     KeyParsingError,
     ModuleFailException,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.utils import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     nopad_b64,
     pem_to_der,
 )

@@ -430,11 +430,11 @@ import typing as t
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.validation import check_type_int, check_type_str
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_crl import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_crl import (
     CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
     REVOCATION_REASON_MAP,
     TIMESTAMP_FORMAT,
@@ -447,7 +447,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     set_next_update,
     set_revocation_date,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
     cryptography_get_name,
@@ -455,13 +455,13 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
     cryptography_name_to_oid,
     cryptography_oid_to_name,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.crl_info import (
     get_crl_info,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.pem import (
     identify_pem_format,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     OpenSSLObject,
     load_certificate,
     load_certificate_issuer_privatekey,
@@ -469,15 +469,15 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
     parse_ordered_name_field,
     select_message_digest,
 )
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import write_file
-from ansible_collections.community.crypto.plugins.module_utils.serial import (
+from ansible_collections.community.crypto.plugins.module_utils._io import write_file
+from ansible_collections.community.crypto.plugins.module_utils._serial import (
     parse_serial,
 )
-from ansible_collections.community.crypto.plugins.module_utils.time import (
+from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_relative_time_option,
 )
 

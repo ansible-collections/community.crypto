@@ -177,13 +177,13 @@ import binascii
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.crl_info import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.crl_info import (
     get_crl_info,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.pem import (
     identify_pem_format,
 )
 

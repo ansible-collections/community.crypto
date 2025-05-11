@@ -278,13 +278,13 @@ import typing as t
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr_info import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr_info import (
     get_csr_info,
 )
-from ansible_collections.community.crypto.plugins.plugin_utils.filter_module import (
+from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
     FilterModuleMock,
 )
 

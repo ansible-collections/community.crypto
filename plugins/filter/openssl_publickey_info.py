@@ -127,14 +127,14 @@ import typing as t
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.publickey_info import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.publickey_info import (
     PublicKeyParseError,
     get_publickey_info,
 )
-from ansible_collections.community.crypto.plugins.plugin_utils.filter_module import (
+from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
     FilterModuleMock,
 )
 

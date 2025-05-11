@@ -120,22 +120,22 @@ certificate:
 
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate import (
     get_certificate_argument_spec,
     select_backend,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_entrust import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_entrust import (
     EntrustCertificateProvider,
     add_entrust_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_ownca import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_ownca import (
     OwnCACertificateProvider,
     add_ownca_provider_to_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate_selfsigned import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_selfsigned import (
     SelfSignedCertificateProvider,
     add_selfsigned_provider_to_argument_spec,
 )
@@ -143,7 +143,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate import (
         CertificateBackend,
     )
 

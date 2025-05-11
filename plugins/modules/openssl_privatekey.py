@@ -157,17 +157,17 @@ privatekey:
 import os
 import typing as t
 
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (
     get_privatekey_argument_spec,
     select_backend,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     OpenSSLObject,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import (
+from ansible_collections.community.crypto.plugins.module_utils._io import (
     load_file_if_exists,
     write_file,
 )
@@ -175,7 +175,7 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (
         PrivateKeyBackend,
     )
 

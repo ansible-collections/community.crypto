@@ -8,26 +8,26 @@ import base64
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
-from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (
     get_privatekey_argument_spec,
     select_backend,
 )
-from ansible_collections.community.crypto.plugins.plugin_utils.action_module import (
+from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
     ActionModuleBase,
 )
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils.argspec import (
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
         ArgumentSpec,
     )
-    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (
         PrivateKeyBackend,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils.action_module import (
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
         AnsibleActionModule,
     )
 

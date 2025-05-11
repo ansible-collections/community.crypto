@@ -554,20 +554,20 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     load_certificate,
 )
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
+from ansible_collections.community.crypto.plugins.module_utils._ecs.api import (
     ECSClient,
     RestOperationException,
     SessionConfigurationException,
     ecs_client_argument_spec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.io import write_file
+from ansible_collections.community.crypto.plugins.module_utils._io import write_file
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION

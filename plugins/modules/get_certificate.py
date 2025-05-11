@@ -280,18 +280,18 @@ from ssl import (
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptography_support import (
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_get_extensions_from_cert,
     cryptography_oid_to_name,
     get_not_valid_after,
     get_not_valid_before,
 )
-from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
+from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-from ansible_collections.community.crypto.plugins.module_utils.time import (
+from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 

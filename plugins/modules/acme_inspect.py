@@ -226,12 +226,12 @@ output_json:
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible_collections.community.crypto.plugins.module_utils.acme.acme import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     ACMEClient,
     create_backend,
     create_default_argspec,
 )
-from ansible_collections.community.crypto.plugins.module_utils.acme.errors import (
+from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
 )

@@ -9,10 +9,10 @@ class ModuleDocFragment:
     """
     Doc fragments for cryptography requirements.
 
-    Must be kept in sync with plugins/module_utils/cryptography_dep.py.
+    Must be kept in sync with plugins/module_utils/_cryptography_dep.py.
     """
 
-    # Corresponds to the plugins.module_utils.cryptography_dep.COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION constant
+    # Corresponds to the plugins.module_utils._cryptography_dep.COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION constant
     MINIMUM = r"""
 requirements:
   - cryptography >= 3.3

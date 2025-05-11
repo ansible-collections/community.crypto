@@ -221,7 +221,7 @@ import time
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
+from ansible_collections.community.crypto.plugins.module_utils._ecs.api import (
     ECSClient,
     RestOperationException,
     SessionConfigurationException,
