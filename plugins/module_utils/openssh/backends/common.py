@@ -50,7 +50,7 @@ def restore_on_failure(
 @restore_on_failure
 def safe_atomic_move(
     module: AnsibleModule, path: str | os.PathLike, destination: str | os.PathLike
-):
+) -> None:
     module.atomic_move(os.path.abspath(path), os.path.abspath(destination))
 
 
@@ -138,20 +138,20 @@ class OpensshModule(metaclass=abc.ABCMeta):
         pass
 
     @staticmethod
-    def skip_if_check_mode(f):
-        def wrapper(self, *args, **kwargs):
+    def skip_if_check_mode(f: t.Callable[Param, None]) -> t.Callable[Param, None]:
+        def wrapper(self, *args, **kwargs) -> None:
             if not self.check_mode:
                 f(self, *args, **kwargs)
 
-        return wrapper
+        return wrapper  # type: ignore
 
     @staticmethod
-    def trigger_change(f):
-        def wrapper(self, *args, **kwargs):
+    def trigger_change(f: t.Callable[Param, None]) -> t.Callable[Param, None]:
+        def wrapper(self, *args, **kwargs) -> None:
             f(self, *args, **kwargs)
             self.changed = True
 
-        return wrapper
+        return wrapper  # type: ignore
 
     def _check_if_base_dir(self, path: str | os.PathLike) -> None:
         base_dir = os.path.dirname(path) or "."
@@ -214,7 +214,7 @@ class KeygenCommand:
         serial_number: int | None,
         signature_algorithm: str | None,
         signing_key_path: str,
-        type: t.Literal["host"] | None,
+        type: t.Literal["host", "user"] | None,
         time_parameters: OpensshCertificateTimeParameters,
         use_agent: bool,
         **kwargs,

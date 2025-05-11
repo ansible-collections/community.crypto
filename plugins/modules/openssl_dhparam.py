@@ -132,6 +132,7 @@ import abc
 import os
 import re
 import tempfile
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
@@ -173,23 +174,23 @@ class DHParameterError(Exception):
 
 class DHParameterBase:
 
-    def __init__(self, module):
-        self.state = module.params["state"]
-        self.path = module.params["path"]
-        self.size = module.params["size"]
-        self.force = module.params["force"]
+    def __init__(self, module: AnsibleModule) -> None:
+        self.state: t.Literal["absent", "present"] = module.params["state"]
+        self.path: str = module.params["path"]
+        self.size: int = module.params["size"]
+        self.force: bool = module.params["force"]
         self.changed = False
-        self.return_content = module.params["return_content"]
+        self.return_content: bool = module.params["return_content"]
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
     @abc.abstractmethod
-    def _do_generate(self, module):
+    def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
         pass
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Generate DH params."""
         changed = False
 
@@ -206,7 +207,7 @@ class DHParameterBase:
 
         self.changed = changed
 
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         try:
@@ -215,28 +216,27 @@ class DHParameterBase:
         except OSError as exc:
             module.fail_json(msg=str(exc))
 
-    def check(self, module):
+    def check(self, module: AnsibleModule) -> bool:
         """Ensure the resource is in its desired state."""
         if self.force:
             return False
         return self._check_params_valid(module) and self._check_fs_attributes(module)
 
     @abc.abstractmethod
-    def _check_params_valid(self, module):
+    def _check_params_valid(self, module: AnsibleModule) -> bool:
         """Check if the params are in the correct state"""
-        pass
 
-    def _check_fs_attributes(self, module):
+    def _check_fs_attributes(self, module: AnsibleModule) -> bool:
         """Checks (and changes if not in check mode!) fs attributes"""
         file_args = module.load_file_common_arguments(module.params)
         if module.check_file_absent_if_check_mode(file_args["path"]):
             return False
         return not module.set_fs_attributes_if_different(file_args, False)
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
-        result = {
+        result: dict[str, t.Any] = {
             "size": self.size,
             "filename": self.path,
             "changed": self.changed,
@@ -252,25 +252,24 @@ class DHParameterBase:
 
 class DHParameterAbsent(DHParameterBase):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(DHParameterAbsent, self).__init__(module)
 
-    def _do_generate(self, module):
+    def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
-        pass
 
-    def _check_params_valid(self, module):
+    def _check_params_valid(self, module: AnsibleModule) -> bool:
         """Check if the params are in the correct state"""
-        pass
+        return False
 
 
 class DHParameterOpenSSL(DHParameterBase):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(DHParameterOpenSSL, self).__init__(module)
         self.openssl_bin = module.get_bin_path("openssl", True)
 
-    def _do_generate(self, module):
+    def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
         # create a tempfile
         fd, tmpsrc = tempfile.mkstemp()
@@ -288,7 +287,7 @@ class DHParameterOpenSSL(DHParameterBase):
         except Exception as e:
             module.fail_json(msg=f"Failed to write to file {self.path}: {str(e)}")
 
-    def _check_params_valid(self, module):
+    def _check_params_valid(self, module: AnsibleModule) -> bool:
         """Check if the params are in the correct state"""
         command = [
             self.openssl_bin,
@@ -321,10 +320,10 @@ class DHParameterOpenSSL(DHParameterBase):
 
 class DHParameterCryptography(DHParameterBase):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(DHParameterCryptography, self).__init__(module)
 
-    def _do_generate(self, module):
+    def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
         # Generate parameters
         params = cryptography.hazmat.primitives.asymmetric.dh.generate_parameters(
@@ -341,7 +340,7 @@ class DHParameterCryptography(DHParameterBase):
             self.backup_file = module.backup_local(self.path)
         write_file(module, result)
 
-    def _check_params_valid(self, module):
+    def _check_params_valid(self, module: AnsibleModule) -> bool:
         """Check if the params are in the correct state"""
         # Load parameters
         try:
@@ -357,7 +356,7 @@ class DHParameterCryptography(DHParameterBase):
         return bits == self.size
 
 
-def main():
+def main() -> t.NoReturn:
     """Main function"""
 
     module = AnsibleModule(
@@ -383,6 +382,7 @@ def main():
             msg=f"The directory '{base_dir}' does not exist or the file is not a directory",
         )
 
+    dhparam: DHParameterOpenSSL | DHParameterCryptography | DHParameterAbsent
     if module.params["state"] == "present":
         backend = module.params["select_crypto_backend"]
         if backend == "auto":

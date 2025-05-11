@@ -113,8 +113,8 @@ def main() -> t.NoReturn:
         certificate_content=dict(type="str"),
     )
     argument_spec.update(
-        required_one_of=(["certificate_path", "certificate_content"],),
-        mutually_exclusive=(["certificate_path", "certificate_content"],),
+        required_one_of=[("certificate_path", "certificate_content")],
+        mutually_exclusive=[("certificate_path", "certificate_content")],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)

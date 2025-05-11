@@ -54,6 +54,8 @@ if t.TYPE_CHECKING:
 
     from ..cryptography_support import CertificatePrivateKeyTypes
 
+    _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")
+
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
@@ -202,7 +204,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         self.diff_before = self._get_info(None)
         self.diff_after = self._get_info(None)
 
-    def _get_info(self, data) -> dict[str, t.Any]:
+    def _get_info(self, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
             return {}
         try:
@@ -225,7 +227,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
     def get_csr_data(self) -> bytes:
         """Return bytes for self.csr."""
 
-    def set_existing(self, csr_bytes: bytes) -> None:
+    def set_existing(self, csr_bytes: bytes | None) -> None:
         """Set existing CSR bytes. None indicates that the CSR does not exist."""
         self.existing_csr_bytes = csr_bytes
         self.diff_after = self.diff_before = self._get_info(self.existing_csr_bytes)
@@ -546,7 +548,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             else:
                 return set(subject) == set(current_subject)
 
-        def _find_extension(extensions: cryptography.x509.Extensions, exttype):
+        def _find_extension(
+            extensions: cryptography.x509.Extensions, exttype: type[_ET]
+        ) -> cryptography.x509.Extension[_ET] | None:
             return next(
                 (ext for ext in extensions if isinstance(ext.value, exttype)), None
             )
@@ -570,7 +574,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if set(altnames) != set(current_altnames):
                 return False
-            if altnames:
+            if altnames and current_altnames_ext:
                 if current_altnames_ext.critical != self.subjectAltName_critical:
                     return False
             return True
@@ -610,7 +614,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if set(current_usages) != set(usages):
                 return False
-            if usages:
+            if usages and current_usages_ext:
                 if current_usages_ext.critical != self.extendedKeyUsage_critical:
                     return False
             return True
@@ -682,7 +686,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 current_nc_excl
             ):
                 return False
-            if nc_perm or nc_excl:
+            if (nc_perm or nc_excl) and current_nc_ext:
                 if current_nc_ext.critical != self.name_constraints_critical:
                     return False
             return True
@@ -761,7 +765,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 and _check_crl_distribution_points(extensions)
             )
 
-        def _check_signature(csr) -> bool:
+        def _check_signature(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             if not csr.is_signature_valid:
                 return False
             # To check whether public key of CSR belongs to private key,

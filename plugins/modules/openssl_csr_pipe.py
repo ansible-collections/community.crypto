@@ -127,6 +127,8 @@ csr:
   type: str
 """
 
+import typing as t
+
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -136,8 +138,17 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.csr import (
+        CertificateSigningRequestBackend,
+    )
+
+
 class CertificateSigningRequestModule:
-    def __init__(self, module, module_backend):
+    def __init__(
+        self, module: AnsibleModule, module_backend: CertificateSigningRequestBackend
+    ) -> None:
         self.check_mode = module.check_mode
         self.module = module
         self.module_backend = module_backend
@@ -145,13 +156,13 @@ class CertificateSigningRequestModule:
         if module.params["content"] is not None:
             self.module_backend.set_existing(module.params["content"].encode("utf-8"))
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Generate the certificate signing request."""
         if self.module_backend.needs_regeneration():
             self.module_backend.generate_csr()
             self.changed = True
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
         result = self.module_backend.dump(include_csr=True)
         result.update(
@@ -162,7 +173,7 @@ class CertificateSigningRequestModule:
         return result
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = get_csr_argument_spec()
     argument_spec.argument_spec.update(
         dict(

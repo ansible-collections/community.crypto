@@ -61,7 +61,7 @@ def load_file_if_exists(
 def write_file(
     module: AnsibleModule,
     content: bytes,
-    default_mode: str | None = None,
+    default_mode: str | int | None = None,
     path: str | os.PathLike | None = None,
 ) -> None:
     """

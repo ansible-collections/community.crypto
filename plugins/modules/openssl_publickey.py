@@ -186,6 +186,7 @@ publickey:
 """
 
 import os
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -218,6 +219,12 @@ try:
 except ImportError:
     pass
 
+if t.TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PrivateKeyTypes,
+        PublicKeyTypes,
+    )
+
 
 class PublicKeyError(OpenSSLObjectError):
     pass
@@ -225,7 +232,7 @@ class PublicKeyError(OpenSSLObjectError):
 
 class PublicKey(OpenSSLObject):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(PublicKey, self).__init__(
             module.params["path"],
             module.params["state"],
@@ -233,27 +240,29 @@ class PublicKey(OpenSSLObject):
             module.check_mode,
         )
         self.module = module
-        self.format = module.params["format"]
-        self.privatekey_path = module.params["privatekey_path"]
-        self.privatekey_content = module.params["privatekey_content"]
-        if self.privatekey_content is not None:
-            self.privatekey_content = self.privatekey_content.encode("utf-8")
-        self.privatekey_passphrase = module.params["privatekey_passphrase"]
-        self.privatekey = None
-        self.publickey_bytes = None
-        self.return_content = module.params["return_content"]
-        self.fingerprint = {}
+        self.format: t.Literal["OpenSSH", "PEM"] = module.params["format"]
+        self.privatekey_path: str | None = module.params["privatekey_path"]
+        privatekey_content: str | None = module.params["privatekey_content"]
+        if privatekey_content is not None:
+            self.privatekey_content: bytes | None = privatekey_content.encode("utf-8")
+        else:
+            self.privatekey_content = None
+        self.privatekey_passphrase: str | None = module.params["privatekey_passphrase"]
+        self.privatekey: PrivateKeyTypes | None = None
+        self.publickey_bytes: bytes | None = None
+        self.return_content: bool = module.params["return_content"]
+        self.fingerprint: dict[str, str] = {}
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
         self.diff_before = self._get_info(None)
         self.diff_after = self._get_info(None)
 
-    def _get_info(self, data):
+    def _get_info(self, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
-            return dict()
-        result = dict(can_parse_key=False)
+            return {}
+        result = {"can_parse_key": False}
         try:
             result.update(
                 get_publickey_info(
@@ -267,7 +276,7 @@ class PublicKey(OpenSSLObject):
             pass
         return result
 
-    def _create_publickey(self, module):
+    def _create_publickey(self, module: AnsibleModule) -> bytes:
         self.privatekey = load_privatekey(
             path=self.privatekey_path,
             content=self.privatekey_content,
@@ -284,10 +293,12 @@ class PublicKey(OpenSSLObject):
                 crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
             )
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Generate the public key."""
 
-        if self.privatekey_content is None and not os.path.exists(self.privatekey_path):
+        if self.privatekey_path is not None and not os.path.exists(
+            self.privatekey_path
+        ):
             raise PublicKeyError(
                 f"The private key {self.privatekey_path} does not exist"
             )
@@ -320,17 +331,18 @@ class PublicKey(OpenSSLObject):
         elif module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
-    def check(self, module, perms_required=True):
+    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
         state_and_perms = super(PublicKey, self).check(module, perms_required)
 
-        def _check_privatekey():
-            if self.privatekey_content is None and not os.path.exists(
+        def _check_privatekey() -> bool:
+            if self.privatekey_path is not None and not os.path.exists(
                 self.privatekey_path
             ):
                 return False
 
+            current_publickey: PublicKeyTypes
             try:
                 with open(self.path, "rb") as public_key_fh:
                     publickey_content = public_key_fh.read()
@@ -369,15 +381,15 @@ class PublicKey(OpenSSLObject):
 
         return _check_privatekey()
 
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         super(PublicKey, self).remove(module)
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
-        result = {
+        result: dict[str, t.Any] = {
             "privatekey": self.privatekey_path,
             "filename": self.path,
             "format": self.format,
@@ -403,7 +415,7 @@ class PublicKey(OpenSSLObject):
         return result
 
 
-def main():
+def main() -> t.NoReturn:
 
     module = AnsibleModule(
         argument_spec=dict(

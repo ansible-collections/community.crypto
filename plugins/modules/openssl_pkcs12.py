@@ -280,6 +280,7 @@ import itertools
 import os
 import stat
 import traceback
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
@@ -296,7 +297,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.pem import
 from ansible_collections.community.crypto.plugins.module_utils.crypto.support import (
     OpenSSLObject,
     load_certificate,
-    load_privatekey,
+    load_certificate_issuer_privatekey,
 )
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
@@ -320,6 +321,7 @@ except ImportError:
 
 CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None
 try:
+    import cryptography.x509
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.serialization.pkcs12 import PBES
 
@@ -333,8 +335,22 @@ except Exception:
 else:
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
+if t.TYPE_CHECKING:
+    from ..module_utils.crypto.cryptography_support import (
+        CertificateIssuerPrivateKeyTypes,
+    )
 
-def load_certificate_set(filename):
+    PKCS12 = tuple[
+        t.Union[CertificateIssuerPrivateKeyTypes, None],
+        t.Union[cryptography.x509.Certificate, None],
+        list[cryptography.x509.Certificate],
+        t.Union[bytes, None],
+    ]
+
+
+def load_certificate_set(
+    filename: str | os.PathLike,
+) -> list[cryptography.x509.Certificate]:
     """
     Load list of concatenated PEM files, and return a list of parsed certificates.
     """
@@ -351,70 +367,80 @@ class PkcsError(OpenSSLObjectError):
 
 
 class Pkcs(OpenSSLObject):
-    def __init__(self, module, iter_size_default=2048):
+    path: str
+
+    def __init__(self, module: AnsibleModule, iter_size_default: int = 2048) -> None:
         super(Pkcs, self).__init__(
             module.params["path"],
             module.params["state"],
             module.params["force"],
             module.check_mode,
         )
-        self.action = module.params["action"]
-        self.other_certificates = module.params["other_certificates"]
-        self.other_certificates_parse_all = module.params[
+        self.action: t.Literal["export", "parse"] = module.params["action"]
+        self.other_certificates: list[cryptography.x509.Certificate] = []
+        self.other_certificates_str: list[str] | None = module.params[
+            "other_certificates"
+        ]
+        self.other_certificates_parse_all: bool = module.params[
             "other_certificates_parse_all"
         ]
-        self.other_certificates_content = module.params["other_certificates_content"]
-        self.certificate_path = module.params["certificate_path"]
-        self.certificate_content = module.params["certificate_content"]
-        self.friendly_name = module.params["friendly_name"]
-        self.iter_size = module.params["iter_size"] or iter_size_default
-        self.maciter_size = module.params["maciter_size"] or 1
-        self.encryption_level = module.params["encryption_level"]
+        self.other_certificates_content: list[str] | None = module.params[
+            "other_certificates_content"
+        ]
+        self.certificate_path: str | None = module.params["certificate_path"]
+        certificate_content: str | None = module.params["certificate_content"]
+        self.friendly_name: str | None = module.params["friendly_name"]
+        self.iter_size: int = module.params["iter_size"] or iter_size_default
+        self.maciter_size: int = module.params["maciter_size"] or 1
+        self.encryption_level: t.Literal["auto", "compatibility2022"] = module.params[
+            "encryption_level"
+        ]
         self.passphrase = module.params["passphrase"]
-        self.pkcs12 = None
-        self.privatekey_passphrase = module.params["privatekey_passphrase"]
-        self.privatekey_path = module.params["privatekey_path"]
-        self.privatekey_content = module.params["privatekey_content"]
-        self.pkcs12_bytes = None
-        self.return_content = module.params["return_content"]
-        self.src = module.params["src"]
+        self.pkcs12: PKCS12 | None = None
+        self.privatekey_passphrase: str | None = module.params["privatekey_passphrase"]
+        self.privatekey_path: str | None = module.params["privatekey_path"]
+        privatekey_content: str | None = module.params["privatekey_content"]
+        self.pkcs12_bytes: bytes | None = None
+        self.return_content: bool = module.params["return_content"]
+        self.src: str | None = module.params["src"]
 
         if module.params["mode"] is None:
             module.params["mode"] = "0400"
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
+        self.certificate_content: bytes | None = None
         if self.certificate_path is not None:
             try:
                 with open(self.certificate_path, "rb") as fh:
                     self.certificate_content = fh.read()
             except (IOError, OSError) as exc:
                 raise PkcsError(exc)
-        elif self.certificate_content is not None:
-            self.certificate_content = to_bytes(self.certificate_content)
+        elif certificate_content is not None:
+            self.certificate_content = to_bytes(certificate_content)
 
+        self.privatekey_content: bytes | None = None
         if self.privatekey_path is not None:
             try:
                 with open(self.privatekey_path, "rb") as fh:
                     self.privatekey_content = fh.read()
             except (IOError, OSError) as exc:
                 raise PkcsError(exc)
-        elif self.privatekey_content is not None:
-            self.privatekey_content = to_bytes(self.privatekey_content)
+        elif privatekey_content is not None:
+            self.privatekey_content = to_bytes(privatekey_content)
 
-        if self.other_certificates:
+        if self.other_certificates_str:
             if self.other_certificates_parse_all:
-                filenames = list(self.other_certificates)
                 self.other_certificates = []
-                for other_cert_bundle in filenames:
+                for other_cert_bundle in self.other_certificates_str:
                     self.other_certificates.extend(
                         load_certificate_set(other_cert_bundle)
                     )
             else:
                 self.other_certificates = [
                     load_certificate(other_cert)
-                    for other_cert in self.other_certificates
+                    for other_cert in self.other_certificates_str
                 ]
         elif self.other_certificates_content:
             certs = self.other_certificates_content
@@ -430,40 +456,42 @@ class Pkcs(OpenSSLObject):
             ]
 
     @abc.abstractmethod
-    def generate_bytes(self, module):
+    def generate_bytes(self, module: AnsibleModule) -> bytes:
         """Generate PKCS#12 file archive."""
+
+    @abc.abstractmethod
+    def parse_bytes(self, pkcs12_content: bytes) -> tuple[
+        bytes | None,
+        bytes | None,
+        list[bytes],
+        bytes | None,
+    ]:
         pass
 
     @abc.abstractmethod
-    def parse_bytes(self, pkcs12_content):
+    def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
         pass
 
     @abc.abstractmethod
-    def _dump_privatekey(self, pkcs12):
+    def _dump_certificate(self, pkcs12: PKCS12) -> bytes | None:
         pass
 
     @abc.abstractmethod
-    def _dump_certificate(self, pkcs12):
+    def _dump_other_certificates(self, pkcs12: PKCS12) -> list[bytes]:
         pass
 
     @abc.abstractmethod
-    def _dump_other_certificates(self, pkcs12):
+    def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
         pass
 
-    @abc.abstractmethod
-    def _get_friendly_name(self, pkcs12):
-        pass
-
-    def check(self, module, perms_required=True):
+    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
-
         state_and_perms = super(Pkcs, self).check(module, perms_required)
 
-        def _check_pkey_passphrase():
+        def _check_pkey_passphrase() -> bool:
             if self.privatekey_passphrase:
                 try:
-                    load_privatekey(
-                        None,
+                    load_certificate_issuer_privatekey(
                         content=self.privatekey_content,
                         passphrase=self.privatekey_passphrase,
                     )
@@ -476,6 +504,7 @@ class Pkcs(OpenSSLObject):
 
         if os.path.exists(self.path) and module.params["action"] == "export":
             self.generate_bytes(module)  # ignore result
+            assert self.pkcs12 is not None
             self.src = self.path
             try:
                 (
@@ -524,7 +553,7 @@ class Pkcs(OpenSSLObject):
                     return False
         elif (
             module.params["action"] == "parse"
-            and os.path.exists(self.src)
+            and os.path.exists(self.src or "")
             and os.path.exists(self.path)
         ):
             try:
@@ -548,10 +577,10 @@ class Pkcs(OpenSSLObject):
 
         return _check_pkey_passphrase()
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
-        result = {
+        result: dict[str, t.Any] = {
             "filename": self.path,
         }
         if self.privatekey_path:
@@ -567,13 +596,20 @@ class Pkcs(OpenSSLObject):
 
         return result
 
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         super(Pkcs, self).remove(module)
 
-    def parse(self):
+    def parse(self) -> tuple[
+        bytes | None,
+        bytes | None,
+        list[bytes],
+        bytes | None,
+    ]:
         """Read PKCS#12 file."""
+        if self.src is None:
+            raise AssertionError("Contract violation: src is None")
 
         try:
             with open(self.src, "rb") as pkcs12_fh:
@@ -582,10 +618,13 @@ class Pkcs(OpenSSLObject):
         except IOError as exc:
             raise PkcsError(exc)
 
-    def generate(self):
+    def generate(self, module: AnsibleModule) -> None:
+        # Empty method because OpenSSLObject wants this
         pass
 
-    def write(self, module, content, mode=None):
+    def write(
+        self, module: AnsibleModule, content: bytes, mode: int | str | None = None
+    ) -> None:
         """Write the PKCS#12 file."""
         if self.backup:
             self.backup_file = module.backup_local(self.path)
@@ -595,7 +634,7 @@ class Pkcs(OpenSSLObject):
 
 
 class PkcsCryptography(Pkcs):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(PkcsCryptography, self).__init__(module, iter_size_default=50000)
         if (
             self.encryption_level == "compatibility2022"
@@ -607,13 +646,12 @@ class PkcsCryptography(Pkcs):
                 exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR,
             )
 
-    def generate_bytes(self, module):
+    def generate_bytes(self, module: AnsibleModule) -> bytes:
         """Generate PKCS#12 file archive."""
         pkey = None
         if self.privatekey_content:
             try:
-                pkey = load_privatekey(
-                    None,
+                pkey = load_certificate_issuer_privatekey(
                     content=self.privatekey_content,
                     passphrase=self.privatekey_passphrase,
                 )
@@ -631,6 +669,7 @@ class PkcsCryptography(Pkcs):
         # Store fake object which can be used to retrieve the components back
         self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
 
+        encryption: serialization.KeySerializationEncryption
         if not self.passphrase:
             encryption = serialization.NoEncryption()
         elif self.encryption_level == "compatibility2022":
@@ -654,7 +693,12 @@ class PkcsCryptography(Pkcs):
             encryption,
         )
 
-    def parse_bytes(self, pkcs12_content):
+    def parse_bytes(self, pkcs12_content: bytes) -> tuple[
+        bytes | None,
+        bytes | None,
+        list[bytes],
+        bytes | None,
+    ]:
         try:
             private_key, certificate, additional_certificates, friendly_name = (
                 parse_pkcs12(pkcs12_content, self.passphrase)
@@ -683,11 +727,7 @@ class PkcsCryptography(Pkcs):
         except ValueError as exc:
             raise PkcsError(exc)
 
-    # The following methods will get self.pkcs12 passed, which is computed as:
-    #
-    #     self.pkcs12 = (pkey, cert, self.other_certificates, self.friendly_name)
-
-    def _dump_privatekey(self, pkcs12):
+    def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
         return (
             pkcs12[0].private_bytes(
                 encoding=serialization.Encoding.PEM,
@@ -698,27 +738,27 @@ class PkcsCryptography(Pkcs):
             else None
         )
 
-    def _dump_certificate(self, pkcs12):
+    def _dump_certificate(self, pkcs12: PKCS12) -> bytes | None:
         return pkcs12[1].public_bytes(serialization.Encoding.PEM) if pkcs12[1] else None
 
-    def _dump_other_certificates(self, pkcs12):
+    def _dump_other_certificates(self, pkcs12: PKCS12) -> list[bytes]:
         return [
             other_cert.public_bytes(serialization.Encoding.PEM)
             for other_cert in pkcs12[2]
         ]
 
-    def _get_friendly_name(self, pkcs12):
+    def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
         return pkcs12[3]
 
 
-def select_backend(module):
+def select_backend(module: AnsibleModule) -> Pkcs:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return PkcsCryptography(module)
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = dict(
         action=dict(type="str", default="export", choices=["export", "parse"]),
         other_certificates=dict(

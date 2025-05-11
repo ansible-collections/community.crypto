@@ -387,7 +387,7 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         def _check_state() -> bool:
             return os.path.exists(self.path)
 
-        def _check_perms(module) -> bool:
+        def _check_perms(module: AnsibleModule) -> bool:
             file_args = module.load_file_common_arguments(module.params)
             if module.check_file_absent_if_check_mode(file_args["path"]):
                 return False
@@ -403,7 +403,7 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         """Serialize the object into a dictionary."""
 
     @abc.abstractmethod
-    def generate(self) -> None:
+    def generate(self, module: AnsibleModule) -> None:
         """Generate the resource."""
 
     def remove(self, module: AnsibleModule) -> None:

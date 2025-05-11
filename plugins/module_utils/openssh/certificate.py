@@ -381,7 +381,7 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
             return ""
 
     @cert_type.setter
-    def cert_type(self, cert_type: t.Literal["user", "host"] | int):
+    def cert_type(self, cert_type: t.Literal["user", "host"] | int) -> None:
         if cert_type == "user" or cert_type == _USER_TYPE:
             self._cert_type = _USER_TYPE
         elif cert_type == "host" or cert_type == _HOST_TYPE:
@@ -404,7 +404,7 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
 
 
 class OpensshRSACertificateInfo(OpensshCertificateInfo):
-    def __init__(self, e: int | None = None, n: int | None = None, **kwargs):
+    def __init__(self, e: int | None = None, n: int | None = None, **kwargs) -> None:
         super(OpensshRSACertificateInfo, self).__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["rsa"] + _CERT_SUFFIX_V01
         self.e = e
@@ -435,7 +435,7 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         g: int | None = None,
         y: int | None = None,
         **kwargs,
-    ):
+    ) -> None:
         super(OpensshDSACertificateInfo, self).__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["dsa"] + _CERT_SUFFIX_V01
         self.p = p
@@ -510,7 +510,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
 
 class OpensshED25519CertificateInfo(OpensshCertificateInfo):
-    def __init__(self, pk: bytes | None = None, **kwargs):
+    def __init__(self, pk: bytes | None = None, **kwargs) -> None:
         super(OpensshED25519CertificateInfo, self).__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["ed25519"] + _CERT_SUFFIX_V01
         self.pk = pk

@@ -198,13 +198,15 @@ comment:
   sample: test@comment
 """
 
+import typing as t
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.openssh.backends.keypair_backend import (
     select_backend,
 )
 
 
-def main():
+def main() -> t.NoReturn:
 
     module = AnsibleModule(
         argument_spec=dict(

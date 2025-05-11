@@ -282,7 +282,7 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
 class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
     """Validate the supplied private key, using the cryptography backend"""
 
-    def __init__(self, module: GeneralAnsibleModule, content: bytes, **kwargs):
+    def __init__(self, module: GeneralAnsibleModule, content: bytes, **kwargs) -> None:
         super(PrivateKeyInfoRetrievalCryptography, self).__init__(
             module, content, **kwargs
         )
@@ -330,7 +330,7 @@ def select_backend(
     passphrase: str | None = None,
     return_private_key_data: bool = False,
     check_consistency: bool = False,
-):
+) -> PrivateKeyInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )

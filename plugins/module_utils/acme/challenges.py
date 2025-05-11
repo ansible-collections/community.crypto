@@ -76,7 +76,10 @@ class Challenge:
 
     @classmethod
     def from_json(
-        cls: t.Type[_Challenge], client: ACMEClient, data: dict[str, t.Any], url=None
+        cls: t.Type[_Challenge],
+        client: ACMEClient,
+        data: dict[str, t.Any],
+        url: str | None = None,
     ) -> _Challenge:
         return cls(data, url or data["url"])
 
@@ -242,7 +245,7 @@ class Authorization:
         self._setup(client, result)
         return changed
 
-    def get_challenge_data(self, client) -> dict[str, t.Any]:
+    def get_challenge_data(self, client: ACMEClient) -> dict[str, t.Any]:
         """
         Returns a dict with the data for all proposed (and supported) challenges
         of the given authorization.
@@ -258,7 +261,7 @@ class Authorization:
                 data[challenge.type] = validation_data
         return data
 
-    def raise_error(self, error_msg: str, module: AnsibleModule):
+    def raise_error(self, error_msg: str, module: AnsibleModule) -> t.NoReturn:
         """
         Aborts with a specific error for a challenge.
         """

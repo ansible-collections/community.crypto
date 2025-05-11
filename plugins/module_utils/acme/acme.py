@@ -58,7 +58,7 @@ RETRY_COUNT = 10
 
 
 def _decode_retry(
-    module: AnsibleModule, response, info: dict[str, t.Any], retry_count: int
+    module: AnsibleModule, response: t.Any, info: dict[str, t.Any], retry_count: int
 ) -> bool:
     if info["status"] not in RETRY_STATUS_CODES:
         return False
@@ -87,7 +87,7 @@ def _decode_retry(
 
 def _assert_fetch_url_success(
     module: AnsibleModule,
-    response,
+    response: t.Any,
     info: dict[str, t.Any],
     allow_redirect: bool = False,
     allow_client_error: bool = True,
@@ -264,7 +264,7 @@ class ACMEClient:
         self,
         protected: dict[str, t.Any],
         payload: str | dict[str, t.Any] | None,
-        key_data,
+        key_data: dict[str, t.Any],
         encode_payload: bool = True,
     ) -> dict[str, t.Any]:
         """
@@ -355,6 +355,8 @@ class ACMEClient:
         (https://tools.ietf.org/html/rfc8555#section-6.3)
         """
         key_data = key_data or self.account_key_data
+        if key_data is None:
+            raise ModuleFailException("Missing key data")
         jws_header = jws_header or self.account_jws_header
         if jws_header is None:
             raise ModuleFailException("Missing JWS header")

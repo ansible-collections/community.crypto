@@ -145,7 +145,7 @@ def get_next_update(obj: x509.CertificateRevocationList) -> datetime.datetime | 
     return obj.next_update
 
 
-def get_last_update(obj: x509.CertificateRevocationList) -> datetime.datetime | None:
+def get_last_update(obj: x509.CertificateRevocationList) -> datetime.datetime:
     if CRYPTOGRAPHY_TIMEZONE:
         return obj.last_update_utc
     return obj.last_update

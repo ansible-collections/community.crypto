@@ -370,9 +370,9 @@ class OpenSSLCLIBackend(CryptoBackend):
         }
 
     @staticmethod
-    def _normalize_ip(ip):
+    def _normalize_ip(ip: str) -> str:
         try:
-            return ipaddress.ip_address(to_text(ip)).compressed
+            return ipaddress.ip_address(ip).compressed
         except ValueError:
             # We do not want to error out on something IPAddress() cannot parse
             return ip

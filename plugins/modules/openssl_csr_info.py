@@ -308,6 +308,7 @@ authority_cert_serial_number:
   sample: 12345
 """
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -318,7 +319,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path"),
@@ -335,11 +336,15 @@ def main():
         supports_check_mode=True,
     )
 
-    if module.params["content"] is not None:
-        data = module.params["content"].encode("utf-8")
+    content: str | None = module.params["content"]
+    path: str | None = module.params["path"]
+    if content is not None:
+        data = content.encode("utf-8")
     else:
+        if path is None:
+            module.fail_json(msg="One of content and path must be provided")
         try:
-            with open(module.params["path"], "rb") as f:
+            with open(path, "rb") as f:
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading CSR file from disk: {e}")

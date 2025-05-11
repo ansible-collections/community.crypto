@@ -125,7 +125,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         )
 
     def get_utc_datetime(self, *args, **kwargs) -> datetime.datetime:
-        kwargs_ext = dict(kwargs)
+        kwargs_ext: dict[str, t.Any] = dict(kwargs)
         if self._with_timezone and ("tzinfo" not in kwargs_ext and len(args) < 8):
             kwargs_ext["tzinfo"] = UTC
         result = datetime.datetime(*args, **kwargs_ext)

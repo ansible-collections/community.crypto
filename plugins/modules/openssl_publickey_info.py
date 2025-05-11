@@ -152,6 +152,7 @@ public_data:
       returned: When RV(type=DSA) or RV(type=ECC)
 """
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
@@ -163,7 +164,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.module_bac
 )
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path"),
@@ -191,7 +192,7 @@ def main():
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(
-                msg=f"Error while reading public key file from disk: {e}", **result
+                msg=f"Error while reading public key file from disk: {e}", **result  # type: ignore
             )
 
     module_backend = select_backend(module, data)
@@ -201,7 +202,7 @@ def main():
         module.exit_json(**result)
     except PublicKeyParseError as exc:
         result.update(exc.result)
-        module.fail_json(msg=exc.error_message, **result)
+        module.fail_json(msg=exc.error_message, **result)  # type: ignore
     except OpenSSLObjectError as exc:
         module.fail_json(msg=str(exc))
 

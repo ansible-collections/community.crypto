@@ -144,7 +144,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.private_key."""
 
-    def set_existing(self, privatekey_bytes: bytes) -> None:
+    def set_existing(self, privatekey_bytes: bytes | None) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.existing_private_key_bytes = privatekey_bytes
         self.diff_after = self.diff_before = self._get_info(

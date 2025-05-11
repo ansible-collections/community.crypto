@@ -15,7 +15,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.errors impor
 from ansible_collections.community.crypto.plugins.module_utils.acme.orders import Order
 
 
-def test_order_from_json():
+def test_order_from_json() -> None:
     client = MagicMock()
 
     data = {
@@ -35,7 +35,7 @@ def test_order_from_json():
     assert order.authorizations == {}
 
 
-def test_wait_for_finalization_error():
+def test_wait_for_finalization_error() -> None:
     client = MagicMock()
     client.version = 2
 

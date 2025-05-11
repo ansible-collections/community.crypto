@@ -745,7 +745,7 @@ class ACMECertificateClient:
         self.changed = True
 
     def get_challenges_data(
-        self, first_step
+        self, first_step: bool
     ) -> tuple[dict[str, t.Any], dict[str, list[str]]]:
         """
         Get challenge details for the chosen challenge type.

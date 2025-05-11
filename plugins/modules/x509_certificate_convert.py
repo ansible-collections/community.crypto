@@ -106,6 +106,7 @@ backup_file:
 
 import base64
 import os
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
@@ -142,8 +143,12 @@ except ImportError:
     pass
 
 
-def parse_certificate(input, strict=False):
-    input_format = "pem" if identify_pem_format(input) else "der"
+def parse_certificate(
+    input: bytes, strict: bool = False
+) -> tuple[bytes, t.Literal["pem", "der"], str | None]:
+    input_format: t.Literal["pem", "der"] = (
+        "pem" if identify_pem_format(input) else "der"
+    )
     if input_format == "pem":
         pems = split_pem_list(to_text(input))
         if len(pems) > 1 and strict:
@@ -162,7 +167,7 @@ def parse_certificate(input, strict=False):
 
 
 class X509CertificateConvertModule(OpenSSLObject):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(X509CertificateConvertModule, self).__init__(
             module.params["dest_path"],
             "present",
@@ -170,9 +175,9 @@ class X509CertificateConvertModule(OpenSSLObject):
             module.check_mode,
         )
 
-        self.src_path = module.params["src_path"]
-        self.src_content = module.params["src_content"]
-        self.src_content_base64 = module.params["src_content_base64"]
+        self.src_path: str | None = module.params["src_path"]
+        self.src_content: str | None = module.params["src_content"]
+        self.src_content_base64: bool = module.params["src_content_base64"]
         if self.src_content is not None:
             self.input = to_bytes(self.src_content)
             if self.src_content_base64:
@@ -181,6 +186,8 @@ class X509CertificateConvertModule(OpenSSLObject):
                 except Exception as exc:
                     module.fail_json(msg=f"Cannot Base64 decode src_content: {exc}")
         else:
+            if self.src_path is None:
+                module.fail_json(msg="One of src_path and src_content must be provided")
             try:
                 with open(self.src_path, "rb") as f:
                     self.input = f.read()
@@ -189,8 +196,8 @@ class X509CertificateConvertModule(OpenSSLObject):
                     msg=f"Failure while reading file {self.src_path}: {exc}"
                 )
 
-        self.format = module.params["format"]
-        self.strict = module.params["strict"]
+        self.format: t.Literal["pem", "der"] = module.params["format"]
+        self.strict: bool = module.params["strict"]
         self.wanted_pem_type = "CERTIFICATE"
 
         try:
@@ -203,8 +210,8 @@ class X509CertificateConvertModule(OpenSSLObject):
         if module.params["verify_cert_parsable"]:
             self.verify_cert_parsable(module)
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
         module.params["path"] = self.path
 
@@ -221,7 +228,7 @@ class X509CertificateConvertModule(OpenSSLObject):
             except Exception:
                 pass
 
-    def verify_cert_parsable(self, module):
+    def verify_cert_parsable(self, module: AnsibleModule) -> None:
         assert_required_cryptography_version(
             module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
         )
@@ -230,7 +237,7 @@ class X509CertificateConvertModule(OpenSSLObject):
         except Exception as exc:
             module.fail_json(msg=f"Error while parsing certificate: {exc}")
 
-    def needs_conversion(self):
+    def needs_conversion(self) -> bool:
         if self.dest_content is None or self.dest_content_format is None:
             return True
         if self.dest_content_format != self.format:
@@ -241,7 +248,7 @@ class X509CertificateConvertModule(OpenSSLObject):
             return True
         return False
 
-    def get_dest_certificate(self):
+    def get_dest_certificate(self) -> bytes:
         if self.format == "der":
             return self.input
         data = to_bytes(base64.b64encode(self.input))
@@ -250,7 +257,7 @@ class X509CertificateConvertModule(OpenSSLObject):
         lines.append(to_bytes(f"{PEM_END_START}{self.wanted_pem_type}{PEM_END}\n"))
         return b"\n".join(lines)
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Do conversion."""
         if self.needs_conversion():
             # Convert
@@ -269,18 +276,18 @@ class X509CertificateConvertModule(OpenSSLObject):
                 file_args, self.changed
             )
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
-        result = dict(
-            changed=self.changed,
-        )
+        result: dict[str, t.Any] = {
+            "changed": self.changed,
+        }
         if self.backup_file:
             result["backup_file"] = self.backup_file
 
         return result
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = dict(
         src_path=dict(type="path"),
         src_content=dict(type="str"),

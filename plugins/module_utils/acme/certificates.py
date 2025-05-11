@@ -75,7 +75,7 @@ class CertificateChain:
 
         return result
 
-    def _process_links(self, client: ACMEClient, link: str, relation: str):
+    def _process_links(self, client: ACMEClient, link: str, relation: str) -> None:
         if relation == "up":
             # Process link-up headers if there was no chain in reply
             if not self.chain:

@@ -88,6 +88,7 @@ valid:
 
 import base64
 import os
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
@@ -121,7 +122,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.support im
 
 class SignatureInfoBase(OpenSSLObject):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(SignatureInfoBase, self).__init__(
             path=module.params["path"],
             state="present",
@@ -129,32 +130,35 @@ class SignatureInfoBase(OpenSSLObject):
             check_mode=module.check_mode,
         )
 
-        self.signature = module.params["signature"]
-        self.certificate_path = module.params["certificate_path"]
-        self.certificate_content = module.params["certificate_content"]
-        if self.certificate_content is not None:
-            self.certificate_content = self.certificate_content.encode("utf-8")
+        self.module = module
+        self.signature: str = module.params["signature"]
+        self.certificate_path: str | None = module.params["certificate_path"]
+        certificate_content: str | None = module.params["certificate_content"]
+        if certificate_content is not None:
+            self.certificate_content: bytes | None = certificate_content.encode("utf-8")
+        else:
+            self.certificate_content = None
 
-    def generate(self):
+    def generate(self, module: AnsibleModule) -> None:
         # Empty method because OpenSSLObject wants this
         pass
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         # Empty method because OpenSSLObject wants this
-        pass
+        return {}
 
 
 # Implementation with using cryptography
 class SignatureInfoCryptography(SignatureInfoBase):
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(SignatureInfoCryptography, self).__init__(module)
 
-    def run(self):
+    def run(self) -> dict[str, t.Any]:
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
         _hash = cryptography.hazmat.primitives.hashes.SHA256()
 
-        result = dict()
+        result: dict[str, t.Any] = {}
 
         try:
             with open(self.path, "rb") as f:
@@ -228,7 +232,7 @@ class SignatureInfoCryptography(SignatureInfoBase):
             raise OpenSSLObjectError(e)
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             certificate_path=dict(type="path"),

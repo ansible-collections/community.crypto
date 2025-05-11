@@ -550,6 +550,7 @@ import datetime
 import os
 import re
 import time
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
@@ -572,7 +573,7 @@ from ansible_collections.community.crypto.plugins.module_utils.io import write_f
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 
 
-def validate_cert_expiry(cert_expiry):
+def validate_cert_expiry(cert_expiry: str) -> bool:
     search_string_partial = re.compile(
         r"^([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\Z"
     )
@@ -587,7 +588,7 @@ def validate_cert_expiry(cert_expiry):
     return False
 
 
-def calculate_cert_days(expires_after):
+def calculate_cert_days(expires_after: str | None) -> int:
     cert_days = 0
     if expires_after:
         expires_after_datetime = datetime.datetime.strptime(
@@ -600,7 +601,9 @@ def calculate_cert_days(expires_after):
 # Populate the value of body[dict_param_name] with the JSON equivalent of
 # module parameter of param_name if that parameter is present, otherwise leave field
 # out of resulting dict
-def convert_module_param_to_json_bool(module, dict_param_name, param_name):
+def convert_module_param_to_json_bool(
+    module: AnsibleModule, dict_param_name: str, param_name: str
+) -> dict[str, str]:
     body = {}
     if module.params[param_name] is not None:
         if module.params[param_name]:
@@ -886,7 +889,7 @@ class EcsCertificate:
         return result
 
 
-def custom_fields_spec():
+def custom_fields_spec() -> dict[str, dict[str, str]]:
     return dict(
         text1=dict(type="str"),
         text2=dict(type="str"),
@@ -926,7 +929,7 @@ def custom_fields_spec():
     )
 
 
-def ecs_certificate_argument_spec():
+def ecs_certificate_argument_spec() -> dict[str, dict[str, t.Any]]:
     return dict(
         backup=dict(type="bool", default=False),
         force=dict(type="bool", default=False),
@@ -979,7 +982,7 @@ def ecs_certificate_argument_spec():
     )
 
 
-def main():
+def main() -> t.NoReturn:
     ecs_argument_spec = ecs_client_argument_spec()
     ecs_argument_spec.update(ecs_certificate_argument_spec())
     module = AnsibleModule(

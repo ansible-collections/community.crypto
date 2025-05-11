@@ -248,12 +248,12 @@ def main() -> t.NoReturn:
         fail_on_acme_error=dict(type="bool", default=True),
     )
     argument_spec.update(
-        required_if=(
-            ["method", "get", ["url"]],
-            ["method", "post", ["url", "content"]],
-            ["method", "get", ["account_key_src", "account_key_content"], True],
-            ["method", "post", ["account_key_src", "account_key_content"], True],
-        ),
+        required_if=[
+            ("method", "get", ["url"]),
+            ("method", "post", ["url", "content"]),
+            ("method", "get", ["account_key_src", "account_key_content"], True),
+            ("method", "post", ["account_key_src", "account_key_content"], True),
+        ],
     )
     module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)

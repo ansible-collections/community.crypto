@@ -68,6 +68,7 @@ except ImportError:
 
 if t.TYPE_CHECKING:
     KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]
+    KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]
     KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]
 
     PrivateKeyTypes = t.Union[
@@ -204,11 +205,11 @@ class AsymmetricKeypair:
     @classmethod
     def load(
         cls: t.Type[_AsymmetricKeypair],
-        path,
-        passphrase=None,
-        private_key_format="PEM",
-        public_key_format="PEM",
-        no_public_key=False,
+        path: str | os.PathLike,
+        passphrase: bytes | None = None,
+        private_key_format: KeySerializationFormat = "PEM",
+        public_key_format: KeySerializationFormat = "PEM",
+        no_public_key: bool = False,
     ) -> _AsymmetricKeypair:
         """Returns an Asymmetric_Keypair object loaded from the supplied file path
 
@@ -604,7 +605,9 @@ class OpensshKeypair:
 
 
 def load_privatekey(
-    path: str | os.PathLike, passphrase: bytes | None, key_format: KeyFormat
+    path: str | os.PathLike,
+    passphrase: bytes | None,
+    key_format: KeySerializationFormat,
 ) -> PrivateKeyTypes:
     privatekey_loaders = {
         "PEM": serialization.load_pem_private_key,
@@ -655,7 +658,9 @@ def load_privatekey(
     return privatekey
 
 
-def load_publickey(path: str | os.PathLike, key_format: KeyFormat) -> AllPublicKeyTypes:
+def load_publickey(
+    path: str | os.PathLike, key_format: KeySerializationFormat
+) -> AllPublicKeyTypes:
     publickey_loaders = {
         "PEM": serialization.load_pem_public_key,
         "DER": serialization.load_der_public_key,

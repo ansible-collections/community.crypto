@@ -218,6 +218,7 @@ ev_days_remaining:
 
 import datetime
 import time
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
@@ -228,7 +229,7 @@ from ansible_collections.community.crypto.plugins.module_utils.ecs.api import (
 )
 
 
-def calculate_days_remaining(expiry_date):
+def calculate_days_remaining(expiry_date: str | None) -> int | None:
     days_remaining = None
     if expiry_date:
         expiry_datetime = datetime.datetime.strptime(expiry_date, "%Y-%m-%dT%H:%M:%SZ")
@@ -403,8 +404,8 @@ class EcsDomain:
                     msg=f"Failed to request domain validation from Entrust (ECS) {e.message}"
                 )
 
-    def dump(self):
-        result = {
+    def dump(self) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {
             "changed": self.changed,
             "client_id": self.client_id,
             "domain_status": self.domain_status,
@@ -436,7 +437,7 @@ class EcsDomain:
         return result
 
 
-def ecs_domain_argument_spec():
+def ecs_domain_argument_spec() -> dict[str, dict[str, t.Any]]:
     return dict(
         client_id=dict(type="int", default=1),
         domain_name=dict(type="str", required=True),
@@ -447,7 +448,7 @@ def ecs_domain_argument_spec():
     )
 
 
-def main():
+def main() -> t.NoReturn:
     ecs_argument_spec = ecs_client_argument_spec()
     ecs_argument_spec.update(ecs_domain_argument_spec())
     module = AnsibleModule(

@@ -45,7 +45,9 @@ except ImportError:
     pass
 
 
-def _get_cryptography_public_key_info(key) -> tuple[str, dict[str, t.Any]]:
+def _get_cryptography_public_key_info(
+    key: PublicKeyTypes,
+) -> tuple[str, dict[str, t.Any]]:
     key_public_data: dict[str, t.Any] = {}
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey):
         key_type = "RSA"
@@ -160,6 +162,8 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
         )
 
     def _get_key_info(self) -> tuple[str, dict[str, t.Any]]:
+        if self.key is None:
+            raise AssertionError("key must be set")
         return _get_cryptography_public_key_info(self.key)
 
 

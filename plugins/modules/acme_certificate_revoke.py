@@ -141,22 +141,22 @@ def main() -> t.NoReturn:
         revoke_reason=dict(type="int"),
     )
     argument_spec.update(
-        required_one_of=(
-            [
+        required_one_of=[
+            (
                 "account_key_src",
                 "account_key_content",
                 "private_key_src",
                 "private_key_content",
-            ],
-        ),
-        mutually_exclusive=(
-            [
+            ),
+        ],
+        mutually_exclusive=[
+            (
                 "account_key_src",
                 "account_key_content",
                 "private_key_src",
                 "private_key_content",
-            ],
-        ),
+            ),
+        ],
     )
     module = argument_spec.create_ansible_module()
     backend = create_backend(module, False)

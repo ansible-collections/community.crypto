@@ -155,6 +155,7 @@ privatekey:
 """
 
 import os
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -172,9 +173,18 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.privatekey import (
+        PrivateKeyBackend,
+    )
+
+
 class PrivateKeyModule(OpenSSLObject):
 
-    def __init__(self, module, module_backend):
+    def __init__(
+        self, module: AnsibleModule, module_backend: PrivateKeyBackend
+    ) -> None:
         super(PrivateKeyModule, self).__init__(
             module.params["path"],
             module.params["state"],
@@ -182,19 +192,19 @@ class PrivateKeyModule(OpenSSLObject):
             module.check_mode,
         )
         self.module_backend = module_backend
-        self.return_content = module.params["return_content"]
+        self.return_content: bool = module.params["return_content"]
         if self.force:
             module_backend.regenerate = "always"
 
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup: str | None = module.params["backup"]
+        self.backup_file: str | None = None
 
         if module.params["mode"] is None:
             module.params["mode"] = "0600"
 
         module_backend.set_existing(load_file_if_exists(self.path, module))
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         """Generate a keypair."""
 
         if self.module_backend.needs_regeneration():
@@ -228,13 +238,13 @@ class PrivateKeyModule(OpenSSLObject):
                 file_args, self.changed
             )
 
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         self.module_backend.set_existing(None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
         super(PrivateKeyModule, self).remove(module)
 
-    def dump(self):
+    def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
         result = self.module_backend.dump(include_key=self.return_content)
@@ -246,7 +256,7 @@ class PrivateKeyModule(OpenSSLObject):
         return result
 
 
-def main():
+def main() -> t.NoReturn:
 
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(

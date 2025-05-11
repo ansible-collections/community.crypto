@@ -25,7 +25,13 @@ class ArgumentSpec:
         mutually_exclusive: list[list[str] | tuple[str, ...]] | None = None,
         required_together: list[list[str] | tuple[str, ...]] | None = None,
         required_one_of: list[list[str] | tuple[str, ...]] | None = None,
-        required_if: list[tuple[str, t.Any, list[str] | tuple[str, ...]]] | None = None,
+        required_if: (
+            list[
+                tuple[str, t.Any, list[str] | tuple[str, ...]]
+                | tuple[str, t.Any, list[str] | tuple[str, ...], bool]
+            ]
+            | None
+        ) = None,
         required_by: dict[str, tuple[str, ...] | list[str]] | None = None,
     ) -> None:
         self.argument_spec = argument_spec or {}
@@ -41,11 +47,17 @@ class ArgumentSpec:
 
     def update(
         self,
-        mutually_exclusive=None,
-        required_together=None,
-        required_one_of=None,
-        required_if=None,
-        required_by=None,
+        mutually_exclusive: list[list[str] | tuple[str, ...]] | None = None,
+        required_together: list[list[str] | tuple[str, ...]] | None = None,
+        required_one_of: list[list[str] | tuple[str, ...]] | None = None,
+        required_if: (
+            list[
+                tuple[str, t.Any, list[str] | tuple[str, ...]]
+                | tuple[str, t.Any, list[str] | tuple[str, ...], bool]
+            ]
+            | None
+        ) = None,
+        required_by: dict[str, tuple[str, ...] | list[str]] | None = None,
     ):
         if mutually_exclusive:
             self.mutually_exclusive.extend(mutually_exclusive)

@@ -268,6 +268,7 @@ import atexit
 import base64
 import ssl
 import sys
+import typing as t
 from os.path import isfile
 from socket import create_connection, setdefaulttimeout, socket
 from ssl import (
@@ -305,7 +306,7 @@ except ImportError:
     pass
 
 
-def send_starttls_packet(sock, server_type):
+def send_starttls_packet(sock: socket, server_type: t.Literal["mysql"]) -> None:
     if server_type == "mysql":
         ssl_request_packet = (
             b"\x20\x00\x00\x01\x85\xae\x7f\x00"
@@ -321,7 +322,7 @@ def send_starttls_packet(sock, server_type):
         sock.send(ssl_request_packet)
 
 
-def main():
+def main() -> t.NoReturn:
     module = AnsibleModule(
         argument_spec=dict(
             ca_cert=dict(type="path"),
@@ -342,18 +343,18 @@ def main():
         ),
     )
 
-    ca_cert = module.params.get("ca_cert")
-    host = module.params.get("host")
-    port = module.params.get("port")
-    proxy_host = module.params.get("proxy_host")
-    proxy_port = module.params.get("proxy_port")
-    timeout = module.params.get("timeout")
-    server_name = module.params.get("server_name")
-    start_tls_server_type = module.params.get("starttls")
-    ciphers = module.params.get("ciphers")
-    asn1_base64 = module.params["asn1_base64"]
-    tls_ctx_options = module.params["tls_ctx_options"]
-    get_certificate_chain = module.params["get_certificate_chain"]
+    ca_cert: str | None = module.params.get("ca_cert")
+    host: str = module.params.get("host")
+    port: int = module.params.get("port")
+    proxy_host: str | None = module.params.get("proxy_host")
+    proxy_port: int | None = module.params.get("proxy_port")
+    timeout: int = module.params.get("timeout")
+    server_name: str | None = module.params.get("server_name")
+    start_tls_server_type: t.Literal["mysql"] | None = module.params.get("starttls")
+    ciphers: list[str] | None = module.params.get("ciphers")
+    asn1_base64: bool = module.params["asn1_base64"]
+    tls_ctx_options: list[str | bytes | int] | None = module.params["tls_ctx_options"]
+    get_certificate_chain: bool = module.params["get_certificate_chain"]
 
     if get_certificate_chain and sys.version_info < (3, 10):
         module.fail_json(
@@ -365,9 +366,9 @@ def main():
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
 
-    result = dict(
-        changed=False,
-    )
+    result: dict[str, t.Any] = {
+        "changed": False,
+    }
 
     if timeout:
         setdefaulttimeout(timeout)
@@ -409,7 +410,7 @@ def main():
 
         if tls_ctx_options is not None:
             # Clear default ctx options
-            ctx.options = 0
+            ctx.options = 0  # type: ignore
 
             # For each item in the tls_ctx_options list
             for tls_ctx_option in tls_ctx_options:
@@ -450,8 +451,10 @@ def main():
                     )
 
         tls_sock = ctx.wrap_socket(sock, server_hostname=server_name or host)
-        cert = tls_sock.getpeercert(True)
-        cert = DER_cert_to_PEM_cert(cert)
+        cert_der = tls_sock.getpeercert(True)
+        if cert_der is None:
+            raise Exception("Unexpected error: no peer certificate has been returned")
+        cert: str = DER_cert_to_PEM_cert(cert_der)
 
         if get_certificate_chain:
             if sys.version_info < (3, 13):
@@ -474,7 +477,7 @@ def main():
                 # Python 3.13 do not return lists of byte strings, but lists of _ssl.Certificate objects. This is going to
                 # be fixed by https://github.com/python/cpython/pull/118669. For now we convert the certificates ourselves
                 # if they are not byte strings to work around this.
-                def _convert_chain(chain):
+                def _convert_chain(chain: list[bytes]) -> list[bytes]:
                     return [
                         (
                             c
@@ -514,13 +517,13 @@ def main():
     result["extensions"] = []
     for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
         oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
-        ext = {
+        ext: dict[str, t.Any] = {
             "critical": entry["critical"],
             "asn1_data": entry["value"],
             "name": cryptography_oid_to_name(oid, short=True),
         }
         if not asn1_base64:
-            ext["asn1_data"] = base64.b64decode(ext["asn1_data"])
+            ext["asn1_data"] = base64.b64decode(entry["value"])  # type: ignore
         result["extensions"].append(ext)
 
     result["issuer"] = {}

@@ -5,9 +5,9 @@
 from __future__ import annotations
 
 import datetime
+import typing as t
 
 import pytest
-from ansible.module_utils.common.collections import is_sequence
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     UTC,
     add_or_remove_timezone,
@@ -30,25 +30,27 @@ TIMEZONES = [
 ]
 
 
-def cartesian_product(list1, list2):
-    result = []
+if t.TYPE_CHECKING:
+    _S = t.TypeVar("_S")
+    _Ts = t.TypeVarTuple("_Ts")
+
+
+def cartesian_product(
+    list1: list[_S], list2: "list[tuple[*_Ts]]"
+) -> "list[tuple[_S, *_Ts]]":
+    result: "list[tuple[_S, *_Ts]]" = []
     for item1 in list1:
-        if not is_sequence(item1):
-            item1 = (item1,)
-        elif not isinstance(item1, tuple):
-            item1 = tuple(item1)
+        item1_tuple = (item1,)
         for item2 in list2:
-            if not is_sequence(item2):
-                item2 = (item2,)
-            elif not isinstance(item2, tuple):
-                item2 = tuple(item2)
-            result.append(item1 + item2)
+            result.append(item1_tuple + item2)
     return result
 
 
 ONE_HOUR_PLUS = datetime.timezone(datetime.timedelta(hours=1))
 
-TEST_REMOVE_TIMEZONE = cartesian_product(
+TEST_REMOVE_TIMEZONE: list[
+    tuple[datetime.timedelta, datetime.datetime, datetime.datetime]
+] = cartesian_product(
     TIMEZONES,
     [
         (
@@ -66,7 +68,9 @@ TEST_REMOVE_TIMEZONE = cartesian_product(
     ],
 )
 
-TEST_UTC_TIMEZONE = cartesian_product(
+TEST_UTC_TIMEZONE: list[
+    tuple[datetime.timedelta, datetime.datetime, datetime.datetime]
+] = cartesian_product(
     TIMEZONES,
     [
         (
@@ -84,48 +88,67 @@ TEST_UTC_TIMEZONE = cartesian_product(
     ],
 )
 
-TEST_EPOCH_SECONDS = cartesian_product(
-    TIMEZONES,
-    [
-        (0, dict(year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=0)),
-        (
-            1e-6,
-            dict(year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1),
-        ),
-        (
-            1e-3,
-            dict(
-                year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1000
+TEST_EPOCH_SECONDS: list[tuple[datetime.timedelta, float, dict[str, int]]] = (
+    cartesian_product(
+        TIMEZONES,
+        [
+            (
+                0,
+                dict(
+                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=0
+                ),
             ),
-        ),
-        (
-            3691.2,
-            dict(
-                year=1970,
-                day=1,
-                month=1,
-                hour=1,
-                minute=1,
-                second=31,
-                microsecond=200000,
+            (
+                1e-6,
+                dict(
+                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1
+                ),
             ),
-        ),
-    ],
+            (
+                1e-3,
+                dict(
+                    year=1970,
+                    day=1,
+                    month=1,
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=1000,
+                ),
+            ),
+            (
+                3691.2,
+                dict(
+                    year=1970,
+                    day=1,
+                    month=1,
+                    hour=1,
+                    minute=1,
+                    second=31,
+                    microsecond=200000,
+                ),
+            ),
+        ],
+    )
 )
 
-TEST_EPOCH_TO_SECONDS = cartesian_product(
-    TIMEZONES,
-    [
-        (datetime.datetime(1970, 1, 1, 0, 1, 2, 0), 62),
-        (datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=UTC), 62),
-        (
-            datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=ONE_HOUR_PLUS),
-            62 - 3600,
-        ),
-    ],
+TEST_EPOCH_TO_SECONDS: list[tuple[datetime.timedelta, datetime.datetime, int]] = (
+    cartesian_product(
+        TIMEZONES,
+        [
+            (datetime.datetime(1970, 1, 1, 0, 1, 2, 0), 62),
+            (datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=UTC), 62),
+            (
+                datetime.datetime(1970, 1, 1, 0, 1, 2, 0, tzinfo=ONE_HOUR_PLUS),
+                62 - 3600,
+            ),
+        ],
+    )
 )
 
-TEST_CONVERT_RELATIVE_TO_DATETIME = cartesian_product(
+TEST_CONVERT_RELATIVE_TO_DATETIME: list[
+    tuple[datetime.timedelta, str, bool, datetime.datetime, datetime.datetime]
+] = cartesian_product(
     TIMEZONES,
     [
         (
@@ -167,7 +190,9 @@ TEST_CONVERT_RELATIVE_TO_DATETIME = cartesian_product(
     ],
 )
 
-TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
+TEST_GET_RELATIVE_TIME_OPTION: list[
+    tuple[datetime.timedelta, str, str, bool, datetime.datetime, datetime.datetime]
+] = cartesian_product(
     TIMEZONES,
     [
         (
@@ -259,7 +284,9 @@ TEST_GET_RELATIVE_TIME_OPTION = cartesian_product(
 
 
 @pytest.mark.parametrize("timezone, input, expected", TEST_REMOVE_TIMEZONE)
-def test_remove_timezone(timezone, input, expected):
+def test_remove_timezone(
+    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output_1 = remove_timezone(input)
         assert expected == output_1
@@ -268,7 +295,9 @@ def test_remove_timezone(timezone, input, expected):
 
 
 @pytest.mark.parametrize("timezone, input, expected", TEST_UTC_TIMEZONE)
-def test_utc_timezone(timezone, input, expected):
+def test_utc_timezone(
+    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output_1 = ensure_utc_timezone(input)
         assert expected == output_1
@@ -280,7 +309,7 @@ def test_utc_timezone(timezone, input, expected):
 # Due to a bug in freezegun (https://github.com/spulec/freezegun/issues/348, https://github.com/spulec/freezegun/issues/553)
 # this only works with timezone = UTC
 @pytest.mark.parametrize("timezone", [datetime.timedelta(hours=0)])
-def test_get_now_datetime_w_timezone(timezone):
+def test_get_now_datetime_w_timezone(timezone: datetime.timedelta) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output_2 = get_now_datetime(with_timezone=True)
         assert output_2.tzinfo is not None
@@ -289,7 +318,7 @@ def test_get_now_datetime_w_timezone(timezone):
 
 
 @pytest.mark.parametrize("timezone", TIMEZONES)
-def test_get_now_datetime_wo_timezone(timezone):
+def test_get_now_datetime_wo_timezone(timezone: datetime.timedelta) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output_1 = get_now_datetime(with_timezone=False)
         assert output_1.tzinfo is None
@@ -297,13 +326,15 @@ def test_get_now_datetime_wo_timezone(timezone):
 
 
 @pytest.mark.parametrize("timezone, seconds, timestamp", TEST_EPOCH_SECONDS)
-def test_epoch_seconds(timezone, seconds, timestamp):
+def test_epoch_seconds(
+    timezone: datetime.timedelta, seconds: float, timestamp: dict[str, int]
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        ts_wo_tz = datetime.datetime(**timestamp)
+        ts_wo_tz: datetime.datetime = datetime.datetime(**timestamp)  # type: ignore
         assert seconds == get_epoch_seconds(ts_wo_tz)
-        timestamp_w_tz = dict(timestamp)
+        timestamp_w_tz: dict[str, t.Any] = dict(timestamp)
         timestamp_w_tz["tzinfo"] = UTC
-        ts_w_tz = datetime.datetime(**timestamp_w_tz)
+        ts_w_tz: datetime.datetime = datetime.datetime(**timestamp_w_tz)  # type: ignore
         assert seconds == get_epoch_seconds(ts_w_tz)
         output_1 = from_epoch_seconds(seconds, with_timezone=False)
         assert ts_wo_tz == output_1
@@ -312,7 +343,9 @@ def test_epoch_seconds(timezone, seconds, timestamp):
 
 
 @pytest.mark.parametrize("timezone, timestamp, expected_seconds", TEST_EPOCH_TO_SECONDS)
-def test_epoch_to_seconds(timezone, timestamp, expected_seconds):
+def test_epoch_to_seconds(
+    timezone: datetime.timedelta, timestamp: datetime.datetime, expected_seconds: int
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         assert expected_seconds == get_epoch_seconds(timestamp)
 
@@ -322,8 +355,12 @@ def test_epoch_to_seconds(timezone, timestamp, expected_seconds):
     TEST_CONVERT_RELATIVE_TO_DATETIME,
 )
 def test_convert_relative_to_datetime(
-    timezone, relative_time_string, with_timezone, now, expected
-):
+    timezone: datetime.timedelta,
+    relative_time_string: str,
+    with_timezone: bool,
+    now: datetime.datetime,
+    expected: datetime.datetime,
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output = convert_relative_to_datetime(
             relative_time_string, with_timezone=with_timezone, now=now
@@ -336,8 +373,13 @@ def test_convert_relative_to_datetime(
     TEST_GET_RELATIVE_TIME_OPTION,
 )
 def test_get_relative_time_option(
-    timezone, input_string, input_name, with_timezone, now, expected
-):
+    timezone: datetime.timedelta,
+    input_string: str,
+    input_name: str,
+    with_timezone: bool,
+    now: datetime.datetime,
+    expected: datetime.datetime,
+) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output = get_relative_time_option(
             input_string,

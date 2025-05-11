@@ -117,7 +117,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
         """Return bytes for self.cert."""
         pass
 
-    def set_existing(self, certificate_bytes: bytes) -> None:
+    def set_existing(self, certificate_bytes: bytes | None) -> None:
         """Set existing certificate bytes. None indicates that the key does not exist."""
         self.existing_certificate_bytes = certificate_bytes
         self.diff_after = self.diff_before = self._get_info(

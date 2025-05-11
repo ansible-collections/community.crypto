@@ -354,7 +354,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
 
 class KeypairBackendOpensshBin(KeypairBackend):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(KeypairBackendOpensshBin, self).__init__(module)
 
         if self.module.params["private_key_format"] != "auto":
@@ -405,7 +405,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
             )
             self.ssh_keygen.update_comment(
                 self.private_key_path,
-                self.comment,
+                self.comment or "",
                 force_new_format=force_new_format,
                 check_rc=True,
             )
@@ -546,7 +546,9 @@ class KeypairBackendCryptography(KeypairBackend):
         return self.private_key_format == original_private_key.format
 
 
-def select_backend(module, backend):
+def select_backend(
+    module: AnsibleModule, backend: t.Literal["auto", "opensshbin", "cryptography"]
+) -> KeypairBackend:
     can_use_cryptography = HAS_OPENSSH_SUPPORT and LooseVersion(
         CRYPTOGRAPHY_VERSION
     ) >= LooseVersion(COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION)

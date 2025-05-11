@@ -224,6 +224,7 @@ certificate:
 
 
 import os
+import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
@@ -257,8 +258,15 @@ from ansible_collections.community.crypto.plugins.module_utils.io import (
 )
 
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.crypto.plugins.module_utils.crypto.module_backends.certificate import (
+        CertificateBackend,
+    )
+
+
 class CertificateAbsent(OpenSSLObject):
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         super(CertificateAbsent, self).__init__(
             module.params["path"],
             module.params["state"],
@@ -266,19 +274,19 @@ class CertificateAbsent(OpenSSLObject):
             module.check_mode,
         )
         self.module = module
-        self.return_content = module.params["return_content"]
-        self.backup = module.params["backup"]
-        self.backup_file = None
+        self.return_content: bool = module.params["return_content"]
+        self.backup: bool = module.params["backup"]
+        self.backup_file: str | None = None
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         pass
 
-    def remove(self, module):
+    def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
         super(CertificateAbsent, self).remove(module)
 
-    def dump(self, check_mode=False):
+    def dump(self, check_mode: bool = False) -> dict[str, t.Any]:
         result = {
             "changed": self.changed,
             "filename": self.path,
@@ -296,7 +304,7 @@ class CertificateAbsent(OpenSSLObject):
 class GenericCertificate(OpenSSLObject):
     """Retrieve a certificate using the given module backend."""
 
-    def __init__(self, module, module_backend):
+    def __init__(self, module: AnsibleModule, module_backend: CertificateBackend):
         super(GenericCertificate, self).__init__(
             module.params["path"],
             module.params["state"],
@@ -311,7 +319,7 @@ class GenericCertificate(OpenSSLObject):
         self.module_backend = module_backend
         self.module_backend.set_existing(load_file_if_exists(self.path, module))
 
-    def generate(self, module):
+    def generate(self, module: AnsibleModule) -> None:
         if self.module_backend.needs_regeneration():
             if not self.check_mode:
                 self.module_backend.generate_certificate()
@@ -329,14 +337,14 @@ class GenericCertificate(OpenSSLObject):
                 file_args, self.changed
             )
 
-    def check(self, module, perms_required=True):
+    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
         return (
             super(GenericCertificate, self).check(module, perms_required)
             and not self.module_backend.needs_regeneration()
         )
 
-    def dump(self, check_mode=False):
+    def dump(self, check_mode: bool = False) -> dict[str, t.Any]:
         result = self.module_backend.dump(include_certificate=self.return_content)
         result.update(
             {
@@ -349,7 +357,7 @@ class GenericCertificate(OpenSSLObject):
         return result
 
 
-def main():
+def main() -> t.NoReturn:
     argument_spec = get_certificate_argument_spec()
     add_acme_provider_to_argument_spec(argument_spec)
     add_entrust_provider_to_argument_spec(argument_spec)
@@ -363,13 +371,14 @@ def main():
             return_content=dict(type="bool", default=False),
         )
     )
-    argument_spec.required_if.append(["state", "present", ["provider"]])
+    argument_spec.required_if.append(("state", "present", ["provider"]))
     module = argument_spec.create_ansible_module(
         add_file_common_args=True,
         supports_check_mode=True,
     )
 
     try:
+        certificate: GenericCertificate | CertificateAbsent
         if module.params["state"] == "absent":
             certificate = CertificateAbsent(module)
 
@@ -389,7 +398,13 @@ def main():
                 )
 
             provider = module.params["provider"]
-            provider_map = {
+            provider_map: dict[
+                str,
+                type[AcmeCertificateProvider]
+                | type[EntrustCertificateProvider]
+                | type[OwnCACertificateProvider]
+                | type[SelfSignedCertificateProvider],
+            ] = {
                 "acme": AcmeCertificateProvider,
                 "entrust": EntrustCertificateProvider,
                 "ownca": OwnCACertificateProvider,

@@ -205,17 +205,17 @@ def main() -> t.NoReturn:
         ),
     )
     argument_spec.update(
-        mutually_exclusive=(["new_account_key_src", "new_account_key_content"],),
-        required_if=(
+        mutually_exclusive=[("new_account_key_src", "new_account_key_content")],
+        required_if=[
             # Make sure that for state == changed_key, one of
             # new_account_key_src and new_account_key_content are specified
-            [
+            (
                 "state",
                 "changed_key",
                 ["new_account_key_src", "new_account_key_content"],
                 True,
-            ],
-        ),
+            ),
+        ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)

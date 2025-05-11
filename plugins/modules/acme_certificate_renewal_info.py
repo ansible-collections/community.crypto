@@ -191,7 +191,7 @@ def main() -> t.NoReturn:
         treat_parsing_error_as_non_existing=dict(type="bool", default=False),
     )
     argument_spec.update(
-        mutually_exclusive=(["certificate_path", "certificate_content"],),
+        mutually_exclusive=[("certificate_path", "certificate_content")],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, True)
