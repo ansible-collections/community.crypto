@@ -122,3 +122,6 @@ def get_crl_info(
         module, content, list_revoked_certificates=list_revoked_certificates
     )
     return info.get_info()
+
+
+__all__ = ("CRLInfoRetrieval", "get_crl_info")

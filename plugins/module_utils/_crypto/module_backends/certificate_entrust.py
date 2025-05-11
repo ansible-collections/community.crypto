@@ -281,3 +281,10 @@ def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ],
         )
     )
+
+
+__all__ = (
+    "EntrustCertificateBackend",
+    "EntrustCertificateProvider",
+    "add_entrust_provider_to_argument_spec",
+)

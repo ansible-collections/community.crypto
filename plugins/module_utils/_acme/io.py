@@ -95,3 +95,6 @@ def write_file(module: AnsibleModule, dest: str | os.PathLike, content: bytes) -
             )
     os.remove(tmpsrc)
     return changed
+
+
+__all__ = ("read_file", "write_file")

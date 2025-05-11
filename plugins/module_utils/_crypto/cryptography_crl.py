@@ -189,3 +189,19 @@ def set_revocation_date(
     builder: x509.RevokedCertificateBuilder, value: datetime.datetime
 ) -> x509.RevokedCertificateBuilder:
     return builder.revocation_date(value)
+
+
+__all__ = (
+    "REVOCATION_REASON_MAP",
+    "REVOCATION_REASON_MAP_INVERSE",
+    "cryptography_decode_revoked_certificate",
+    "cryptography_dump_revoked",
+    "cryptography_get_signature_algorithm_oid_from_crl",
+    "get_next_update",
+    "get_last_update",
+    "get_revocation_date",
+    "get_invalidity_date",
+    "set_next_update",
+    "set_last_update",
+    "set_revocation_date",
+)

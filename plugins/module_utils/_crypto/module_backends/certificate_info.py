@@ -478,3 +478,6 @@ def select_backend(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return CertificateInfoRetrievalCryptography(module, content)
+
+
+__all__ = ("CertificateInfoRetrieval", "get_certificate_info", "select_backend")

@@ -691,3 +691,11 @@ def create_backend(module: AnsibleModule, needs_acme_v2: bool = True) -> CryptoB
     locale.setlocale(locale.LC_ALL, "C")
 
     return module_backend
+
+
+__all__ = (
+    "ACMEDirectory",
+    "ACMEClient",
+    "create_default_argspec",
+    "create_backend",
+)

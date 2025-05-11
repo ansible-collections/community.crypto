@@ -369,3 +369,10 @@ def add_ownca_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ["ownca_privatekey_path", "ownca_privatekey_content"],
         ]
     )
+
+
+__all__ = (
+    "OwnCACertificateBackendCryptography",
+    "OwnCACertificateProvider",
+    "add_ownca_provider_to_argument_spec",
+)

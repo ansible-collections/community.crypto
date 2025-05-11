@@ -261,3 +261,10 @@ def add_selfsigned_provider_to_argument_spec(argument_spec: ArgumentSpec) -> Non
             ),
         )
     )
+
+
+__all__ = (
+    "SelfSignedCertificateBackendCryptography",
+    "SelfSignedCertificateProvider",
+    "add_selfsigned_provider_to_argument_spec",
+)

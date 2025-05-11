@@ -767,3 +767,30 @@ def calculate_fingerprint(openssh_publickey: bytes) -> str:
 
     value = b64encode(digest.finalize()).decode(encoding=_TEXT_ENCODING).rstrip("=")
     return f"SHA256:{value}"
+
+
+__all__ = (
+    "HAS_OPENSSH_SUPPORT",
+    "CRYPTOGRAPHY_VERSION",
+    "OpenSSHError",
+    "InvalidAlgorithmError",
+    "InvalidCommentError",
+    "InvalidDataError",
+    "InvalidPrivateKeyFileError",
+    "InvalidPublicKeyFileError",
+    "InvalidKeyFormatError",
+    "InvalidKeySizeError",
+    "InvalidKeyTypeError",
+    "InvalidPassphraseError",
+    "InvalidSignatureError",
+    "AsymmetricKeypair",
+    "OpensshKeypair",
+    "load_privatekey",
+    "load_publickey",
+    "compare_publickeys",
+    "compare_encryption_algorithms",
+    "get_encryption_algorithm",
+    "validate_comment",
+    "extract_comment",
+    "calculate_fingerprint",
+)

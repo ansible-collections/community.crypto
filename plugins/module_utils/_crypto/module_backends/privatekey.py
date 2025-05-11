@@ -661,3 +661,11 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
             ("type", "ECC", ["curve"]),
         ],
     )
+
+
+__all__ = (
+    "PrivateKeyError",
+    "PrivateKeyBackend",
+    "select_backend",
+    "get_privatekey_argument_spec",
+)

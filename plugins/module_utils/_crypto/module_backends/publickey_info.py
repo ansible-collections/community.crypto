@@ -192,3 +192,11 @@ def select_backend(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
+
+
+__all__ = (
+    "PublicKeyParseError",
+    "PublicKeyInfoRetrieval",
+    "get_publickey_info",
+    "select_backend",
+)

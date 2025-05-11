@@ -605,3 +605,6 @@ class OpenSSLCLIBackend(CryptoBackend):
             subject_key_identifier=ski,
             authority_key_identifier=aki,
         )
+
+
+__all__ = ("OpenSSLCLIBackend",)

@@ -803,3 +803,22 @@ def parse_option_list(
                 extensions.append(option_object)
 
     return critical_options, list(set(extensions + apply_directives(directives)))
+
+
+__all__ = (
+    "OpensshCertificateTimeParameters",
+    "OpensshCertificateOption",
+    "OpensshCertificateInfo",
+    "OpensshRSACertificateInfo",
+    "OpensshDSACertificateInfo",
+    "OpensshECDSACertificateInfo",
+    "OpensshED25519CertificateInfo",
+    "OpensshCertificate",
+    "apply_directives",
+    "default_options",
+    "fingerprint",
+    "get_cert_info_object",
+    "get_option_type",
+    "is_relative_time_string",
+    "parse_option_list",
+)

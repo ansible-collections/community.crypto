@@ -159,3 +159,6 @@ def pack_asn1(
         b_asn1_data.extend(length_octets)
 
     return bytes(b_asn1_data) + b_data
+
+
+__all__ = ("TagClass", "TagNumber", "serialize_asn1_string_as_der", "pack_asn1")

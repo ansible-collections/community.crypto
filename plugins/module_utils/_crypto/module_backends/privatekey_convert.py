@@ -295,3 +295,11 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
             ["src_path", "src_content"],
         ],
     )
+
+
+__all__ = (
+    "PrivateKeyError",
+    "PrivateKeyConvertBackend",
+    "select_backend",
+    "get_privatekey_argument_spec",
+)

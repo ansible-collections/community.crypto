@@ -415,3 +415,11 @@ def get_certificate_argument_spec() -> ArgumentSpec:
             ["privatekey_path", "privatekey_content"],
         ],
     )
+
+
+__all__ = (
+    "CertificateError",
+    "CertificateBackend",
+    "CertificateProvider",
+    "get_certificate_argument_spec",
+)

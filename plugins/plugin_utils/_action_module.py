@@ -248,3 +248,6 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
             result["msg"] = "MODULE FAILURE"
             result["exception"] = traceback.format_exc()
             return result
+
+
+__all__ = ("AnsibleActionModule", "ActionModuleBase")

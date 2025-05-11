@@ -347,3 +347,12 @@ def select_backend(
         return_private_key_data=return_private_key_data,
         check_consistency=check_consistency,
     )
+
+
+__all__ = (
+    "PrivateKeyConsistencyError",
+    "PrivateKeyParseError",
+    "PrivateKeyInfoRetrieval",
+    "get_privatekey_info",
+    "select_backend",
+)

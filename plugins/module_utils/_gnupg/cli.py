@@ -78,3 +78,12 @@ def get_fingerprint_from_bytes(gpg_runner: GPGRunner, content: bytes) -> str:
         check_rc=True,
     )[1]
     return get_fingerprint_from_stdout(stdout)
+
+
+__all__ = (
+    "GPGError",
+    "GPGRunner",
+    "get_fingerprint_from_stdout",
+    "get_fingerprint_from_file",
+    "get_fingerprint_from_bytes",
+)

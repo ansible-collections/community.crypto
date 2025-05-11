@@ -117,3 +117,6 @@ def write_file(
         except Exception:
             pass
         module.fail_json(msg=f"Error while writing result: {e}")
+
+
+__all__ = ("load_file", "load_file_if_exists", "write_file")

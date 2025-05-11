@@ -393,3 +393,6 @@ class ACMECertificateClient:
                     self.module.warn(
                         warning=f"Could not deactivate authz object {authz.url}."
                     )
+
+
+__all__ = ("ACMECertificateClient",)

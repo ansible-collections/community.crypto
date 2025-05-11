@@ -454,3 +454,14 @@ def parse_private_key_format(
         return "PKCS1"
 
     return ""
+
+
+__all__ = (
+    "restore_on_failure",
+    "safe_atomic_move",
+    "OpensshModule",
+    "KeygenCommand",
+    "PrivateKey",
+    "PublicKey",
+    "parse_private_key_format",
+)

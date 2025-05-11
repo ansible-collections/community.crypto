@@ -583,3 +583,6 @@ def select_backend(
             )
         return KeypairBackendCryptography(module)
     raise ValueError(f"Unsupported value for backend: {backend}")
+
+
+__all__ = ("KeypairBackend", "select_backend")

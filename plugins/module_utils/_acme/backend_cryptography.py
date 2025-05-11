@@ -520,3 +520,12 @@ class CryptographyBackend(CryptoBackend):
             subject_key_identifier=ski,
             authority_key_identifier=aki,
         )
+
+
+__all__ = (
+    "CRYPTOGRAPHY_MINIMAL_VERSION",
+    "CRYPTOGRAPHY_ERROR",
+    "CRYPTOGRAPHY_VERSION",
+    "CRYPTOGRAPHY_ERROR",
+    "CryptographyBackend",
+)

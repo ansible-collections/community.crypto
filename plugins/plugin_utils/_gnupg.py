@@ -54,3 +54,6 @@ class PluginGPGRunner(GPGRunner):
                 f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'
             )
         return t.cast(int, p.returncode), stdout_n, stderr_n
+
+
+__all__ = ("PluginGPGRunner",)

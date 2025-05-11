@@ -125,3 +125,17 @@ def extract_pem(content: str, strict: bool = False) -> tuple[str, str]:
                 f"Last line has length {len(lines[-2])}, should be in (0, 64]"
             )
     return header_type, "".join(lines[1:-1])
+
+
+__all__ = (
+    "PEM_START",
+    "PEM_END_START",
+    "PEM_END",
+    "PKCS8_PRIVATEKEY_NAMES",
+    "PKCS1_PRIVATEKEY_SUFFIX",
+    "identify_pem_format",
+    "identify_private_key_format",
+    "split_pem_list",
+    "extract_first_pem",
+    "extract_pem",
+)

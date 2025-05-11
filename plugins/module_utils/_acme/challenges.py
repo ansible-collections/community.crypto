@@ -387,3 +387,14 @@ def wait_for_validation(authzs: t.Iterable[Authorization], client: ACMEClient) -
         if authzs_next:
             time.sleep(2)
         authzs = authzs_next
+
+
+__all__ = (
+    "create_key_authorization",
+    "combine_identifier",
+    "normalize_combined_identifier",
+    "split_identifier",
+    "Challenge",
+    "Authorization",
+    "wait_for_validation",
+)

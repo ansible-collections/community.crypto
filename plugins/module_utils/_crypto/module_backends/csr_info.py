@@ -392,3 +392,6 @@ def select_backend(
     return CSRInfoRetrievalCryptography(
         module, content, validate_signature=validate_signature
     )
+
+
+__all__ = ("CSRInfoRetrieval", "get_csr_info", "select_backend")

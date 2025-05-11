@@ -347,3 +347,13 @@ class _OpensshWriter:
 
     def bytes(self) -> bytes:
         return bytes(self._buff)
+
+
+__all__ = (
+    "any_in",
+    "file_mode",
+    "parse_openssh_version",
+    "secure_open",
+    "secure_write",
+    "OpensshParser",
+)

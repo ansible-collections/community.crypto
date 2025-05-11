@@ -420,3 +420,20 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
                 raise OpenSSLObjectError(exc)
             else:
                 pass
+
+
+__all__ = (
+    "get_fingerprint_of_bytes",
+    "get_fingerprint_of_privatekey",
+    "get_fingerprint",
+    "load_privatekey",
+    "load_certificate_privatekey",
+    "load_certificate_issuer_privatekey",
+    "load_publickey",
+    "load_certificate",
+    "load_certificate_request",
+    "parse_name_field",
+    "parse_ordered_name_field",
+    "select_message_digest",
+    "OpenSSLObject",
+)

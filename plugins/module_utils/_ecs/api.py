@@ -385,3 +385,11 @@ def ECSClient(
         entrust_api_cert_key=entrust_api_cert_key,
         entrust_api_specification_path=entrust_api_specification_path,
     ).client()
+
+
+__all__ = (
+    "ecs_client_argument_spec",
+    "SessionConfigurationException",
+    "RestOperationException",
+    "ECSClient",
+)

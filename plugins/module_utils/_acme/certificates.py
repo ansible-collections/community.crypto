@@ -124,3 +124,6 @@ class ChainMatcher(metaclass=abc.ABCMeta):
         """
         Check whether a certificate chain (CertificateChain instance) matches.
         """
+
+
+__all__ = ("CertificateChain", "Criterium", "ChainMatcher")

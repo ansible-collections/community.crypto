@@ -138,3 +138,10 @@ def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ),
         )
     )
+
+
+__all__ = (
+    "AcmeCertificateBackend",
+    "AcmeCertificateProvider",
+    "add_acme_provider_to_argument_spec",
+)

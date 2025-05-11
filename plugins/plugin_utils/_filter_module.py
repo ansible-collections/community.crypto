@@ -29,3 +29,6 @@ class FilterModuleMock:
 
     def warn(self, warning: str) -> None:
         _display.warning(warning)
+
+
+__all__ = ("FilterModuleMock",)
