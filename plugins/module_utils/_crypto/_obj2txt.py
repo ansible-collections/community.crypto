@@ -4,6 +4,9 @@
 # dynamically by Ansible, still belong to the author of the module, and may assign
 # their own license to the complete work.
 
+# Note that this module util is **PRIVATE** to the collection. It can have breaking changes at any time.
+# Do not use this from other collections or standalone plugins/modules!
+
 # This excerpt is dual licensed under the terms of the Apache License, Version
 # 2.0, and the BSD License. See the LICENSE file at
 # https://github.com/pyca/cryptography/blob/master/LICENSE for complete details.

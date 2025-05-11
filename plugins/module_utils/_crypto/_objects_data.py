@@ -14,6 +14,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # https://github.com/openssl/openssl/blob/master/LICENSE.txt or LICENSES/Apache-2.0.txt
 
+# Note that this module util is **PRIVATE** to the collection. It can have breaking changes at any time.
+# Do not use this from other collections or standalone plugins/modules!
+
 from __future__ import annotations
 
 
