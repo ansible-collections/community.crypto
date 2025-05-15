@@ -316,7 +316,6 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
 
     def _add_curve(
         self,
-        /,
         name: str,
         ectype: str,
         *,
