@@ -366,10 +366,10 @@ def main() -> t.NoReturn:
     )
     module = argument_spec.create_ansible_module()
 
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMECertificateClient(module, backend)
+        client = ACMECertificateClient(module=module, backend=backend)
         select_chain_matcher = client.parse_select_chain(module.params["select_chain"])
         other = dict()
         done = False
@@ -416,7 +416,8 @@ def main() -> t.NoReturn:
                 # Try to select alternate chain depending on criteria
                 if select_chain_matcher:
                     matching_chain = client.find_matching_chain(
-                        [cert] + alternate_chains, select_chain_matcher
+                        chains=[cert] + alternate_chains,
+                        select_chain_matcher=select_chain_matcher,
                     )
                     if matching_chain:
                         cert = matching_chain
@@ -424,7 +425,7 @@ def main() -> t.NoReturn:
                         module.debug("Found no matching alternative chain")
 
             if client.write_cert_chain(
-                cert,
+                cert=cert,
                 cert_dest=module.params["cert_dest"],
                 fullchain_dest=module.params["fullchain_dest"],
                 chain_dest=module.params["chain_dest"],
@@ -447,7 +448,7 @@ def main() -> t.NoReturn:
             **other,
         )
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

@@ -194,7 +194,7 @@ def main() -> t.NoReturn:
         mutually_exclusive=[("certificate_path", "certificate_content")],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    backend = create_backend(module, True)
+    backend = create_backend(module, needs_acme_v2=True)
 
     result = dict(
         changed=False,
@@ -222,7 +222,7 @@ def main() -> t.NoReturn:
             try:
                 read_file(module.params["certificate_path"])
             except ModuleFailException as e:
-                e.do_fail(module)
+                e.do_fail(module=module)
 
     result["exists"] = True
     try:
@@ -233,25 +233,27 @@ def main() -> t.NoReturn:
     except ModuleFailException as e:
         if module.params["treat_parsing_error_as_non_existing"]:
             complete(True, msg=f"Certificate cannot be parsed: {e.msg}")
-        e.do_fail(module)
+        e.do_fail(module=module)
 
     result["parsable"] = True
     try:
         cert_id = compute_cert_id(
-            backend, cert_info=cert_info, none_if_required_information_is_missing=True
+            backend=backend,
+            cert_info=cert_info,
+            none_if_required_information_is_missing=True,
         )
         if cert_id is not None:
             result["cert_id"] = cert_id
 
         if module.params["now"]:
-            now = backend.parse_module_parameter(module.params["now"], "now")
+            now = backend.parse_module_parameter(value=module.params["now"], name="now")
         else:
             now = backend.get_now()
 
         if now >= cert_info.not_valid_after:
             complete(True, msg="The certificate has already expired")
 
-        client = ACMEClient(module, backend)
+        client = ACMEClient(module=module, backend=backend)
         if (
             cert_id is not None
             and module.params["use_ari"]
@@ -281,7 +283,7 @@ def main() -> t.NoReturn:
                     )
             else:
                 random_time = backend.interpolate_timestamp(
-                    window_start, window_end, random.random()
+                    window_start, window_end, percentage=random.random()
                 )
                 if now > random_time:
                     complete(
@@ -301,7 +303,7 @@ def main() -> t.NoReturn:
             timestamp = backend.interpolate_timestamp(
                 cert_info.not_valid_before,
                 cert_info.not_valid_after,
-                1 - module.params["remaining_percentage"],
+                percentage=1 - module.params["remaining_percentage"],
             )
             if timestamp < now:
                 complete(
@@ -312,7 +314,7 @@ def main() -> t.NoReturn:
 
         complete(False)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

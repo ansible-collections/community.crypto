@@ -331,7 +331,7 @@ def main() -> t.NoReturn:
             ),
         )
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

@@ -400,10 +400,10 @@ def main() -> t.NoReturn:
     )
     module = argument_spec.create_ansible_module()
 
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMECertificateClient(module, backend)
+        client = ACMECertificateClient(module=module, backend=backend)
 
         profile = module.params["profile"]
         if profile is not None:
@@ -439,7 +439,7 @@ def main() -> t.NoReturn:
             challenge_data_dns=data_dns,
         )
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

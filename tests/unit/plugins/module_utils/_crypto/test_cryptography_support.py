@@ -40,27 +40,27 @@ def test_adjust_idn(unicode: str, idna: str, cycled_unicode: str | None) -> None
     if cycled_unicode is None:
         cycled_unicode = unicode
 
-    result = _adjust_idn(unicode, "ignore")
+    result = _adjust_idn(unicode, idn_rewrite="ignore")
     print(result, unicode)
     assert result == unicode
 
-    result = _adjust_idn(idna, "ignore")
+    result = _adjust_idn(idna, idn_rewrite="ignore")
     print(result, idna)
     assert result == idna
 
-    result = _adjust_idn(unicode, "unicode")
+    result = _adjust_idn(unicode, idn_rewrite="unicode")
     print(result, unicode)
     assert result == unicode
 
-    result = _adjust_idn(idna, "unicode")
+    result = _adjust_idn(idna, idn_rewrite="unicode")
     print(result, cycled_unicode)
     assert result == cycled_unicode
 
-    result = _adjust_idn(unicode, "idna")
+    result = _adjust_idn(unicode, idn_rewrite="idna")
     print(result, idna)
     assert result == idna
 
-    result = _adjust_idn(idna, "idna")
+    result = _adjust_idn(idna, idn_rewrite="idna")
     print(result, idna)
     assert result == idna
 
@@ -74,7 +74,7 @@ def test_adjust_idn(unicode: str, idna: str, cycled_unicode: str | None) -> None
 def test_adjust_idn_fail_valueerror(value: str, idn_rewrite: str, message: str) -> None:
     with pytest.raises(ValueError, match=message):
         idn_rewrite_: t.Literal["ignore", "idna", "unicode"] = idn_rewrite  # type: ignore
-        _adjust_idn(value, idn_rewrite_)
+        _adjust_idn(value, idn_rewrite=idn_rewrite_)
 
 
 @pytest.mark.parametrize(
@@ -93,7 +93,7 @@ def test_adjust_idn_fail_valueerror(value: str, idn_rewrite: str, message: str) 
 def test_adjust_idn_fail_user_error(value: str, idn_rewrite: str, message: str) -> None:
     with pytest.raises(OpenSSLObjectError, match=message):
         idn_rewrite_: t.Literal["ignore", "idna", "unicode"] = idn_rewrite  # type: ignore
-        _adjust_idn(value, idn_rewrite_)
+        _adjust_idn(value, idn_rewrite=idn_rewrite_)
 
 
 def test_cryptography_get_name_invalid_prefix() -> None:

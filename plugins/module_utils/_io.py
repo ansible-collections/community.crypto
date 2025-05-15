@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
-def load_file(path: str | os.PathLike, module: AnsibleModule | None = None) -> bytes:
+def load_file(*, path: str | os.PathLike, module: AnsibleModule | None = None) -> bytes:
     """
     Load the file as a bytes string.
     """
@@ -31,6 +31,7 @@ def load_file(path: str | os.PathLike, module: AnsibleModule | None = None) -> b
 
 
 def load_file_if_exists(
+    *,
     path: str | os.PathLike,
     module: AnsibleModule | None = None,
     ignore_errors: bool = False,
@@ -62,6 +63,7 @@ def load_file_if_exists(
 
 
 def write_file(
+    *,
     module: AnsibleModule,
     content: bytes,
     default_mode: str | int | None = None,

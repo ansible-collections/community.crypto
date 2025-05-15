@@ -186,10 +186,10 @@ class PrivateKeyModule(OpenSSLObject):
         self, module: AnsibleModule, module_backend: PrivateKeyBackend
     ) -> None:
         super(PrivateKeyModule, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.module_backend = module_backend
         self.return_content: bool = module.params["return_content"]
@@ -202,7 +202,9 @@ class PrivateKeyModule(OpenSSLObject):
         if module.params["mode"] is None:
             module.params["mode"] = "0600"
 
-        module_backend.set_existing(load_file_if_exists(self.path, module))
+        module_backend.set_existing(
+            privatekey_bytes=load_file_if_exists(path=self.path, module=module)
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate a keypair."""
@@ -216,7 +218,7 @@ class PrivateKeyModule(OpenSSLObject):
                 privatekey_data = self.module_backend.get_private_key_data()
                 if self.return_content:
                     self.privatekey_bytes = privatekey_data
-                write_file(module, privatekey_data, 0o600)
+                write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
         elif self.module_backend.needs_conversion():
             # Convert
@@ -227,7 +229,7 @@ class PrivateKeyModule(OpenSSLObject):
                 privatekey_data = self.module_backend.get_private_key_data()
                 if self.return_content:
                     self.privatekey_bytes = privatekey_data
-                write_file(module, privatekey_data, 0o600)
+                write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -239,7 +241,7 @@ class PrivateKeyModule(OpenSSLObject):
             )
 
     def remove(self, module: AnsibleModule) -> None:
-        self.module_backend.set_existing(None)
+        self.module_backend.set_existing(privatekey_bytes=None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
         super(PrivateKeyModule, self).remove(module)

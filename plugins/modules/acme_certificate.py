@@ -628,8 +628,8 @@ class ACMECertificateClient:
         self.dest = module.params.get("dest")
         self.fullchain_dest = module.params.get("fullchain_dest")
         self.chain_dest = module.params.get("chain_dest")
-        self.client = ACMEClient(module, backend)
-        self.account = ACMEAccount(self.client)
+        self.client = ACMEClient(module=module, backend=backend)
+        self.account = ACMEAccount(client=self.client)
         self.directory = self.client.directory
         self.data = module.params["data"]
         self.authorizations: dict[str, Authorization] | None = None
@@ -652,7 +652,9 @@ class ACMECertificateClient:
                 try:
                     self.select_chain_matcher.append(
                         self.client.backend.create_chain_matcher(
-                            Criterium(criterium, index=criterium_idx)
+                            criterium=Criterium(
+                                criterium=criterium, index=criterium_idx
+                            )
                         )
                     )
                 except ValueError as exc:
@@ -675,7 +677,7 @@ class ACMECertificateClient:
         if module.params["account_email"]:
             contact.append("mailto:" + module.params["account_email"])
         created, account_data = self.account.setup_account(
-            contact,
+            contact=contact,
             terms_agreed=module.params.get("terms_agreed"),
             allow_creation=modify_account,
         )
@@ -683,7 +685,9 @@ class ACMECertificateClient:
             raise ModuleFailException(msg="Account does not exist or is deactivated.")
         updated = False
         if not created and account_data and modify_account:
-            updated, account_data = self.account.update_account(account_data, contact)
+            updated, account_data = self.account.update_account(
+                account_data=account_data, contact=contact
+            )
         self.changed = created or updated
 
         if self.csr is not None and not os.path.exists(self.csr):
@@ -728,13 +732,13 @@ class ACMECertificateClient:
             cert_info = self._get_cert_info_or_none()
             if cert_info is not None:
                 replaces_cert_id = compute_cert_id(
-                    self.client.backend,
+                    backend=self.client.backend,
                     cert_info=cert_info,
                     none_if_required_information_is_missing=True,
                 )
         self.order = Order.create_with_error_handling(
-            self.client,
-            self.identifiers,
+            client=self.client,
+            identifiers=self.identifiers,
             error_strategy=self.order_creation_error_strategy,
             error_max_retries=self.order_creation_max_retries,
             replaces_cert_id=replaces_cert_id,
@@ -742,7 +746,7 @@ class ACMECertificateClient:
             message_callback=self.module.warn,
         )
         self.order_uri = self.order.url
-        self.order.load_authorizations(self.client)
+        self.order.load_authorizations(client=self.client)
         self.authorizations.update(self.order.authorizations)
         self.changed = True
 
@@ -763,7 +767,7 @@ class ACMECertificateClient:
             if authz.status == "valid":
                 continue
             # We drop the type from the key to preserve backwards compatibility
-            challenges = authz.get_challenge_data(self.client)
+            challenges = authz.get_challenge_data(client=self.client)
             assert authz.identifier is not None
             data[authz.identifier] = challenges
             if (
@@ -793,8 +797,8 @@ class ACMECertificateClient:
         # For ACME v2, we obtain the order object by fetching the
         # order URI, and extract the information from there.
         assert self.order_uri is not None
-        self.order = Order.from_url(self.client, self.order_uri)
-        self.order.load_authorizations(self.client)
+        self.order = Order.from_url(client=self.client, url=self.order_uri)
+        self.order.load_authorizations(client=self.client)
         self.authorizations.update(self.order.authorizations)
 
         # Step 2: validate pending challenges
@@ -802,18 +806,20 @@ class ACMECertificateClient:
         for type_identifier, authz in self.authorizations.items():
             if authz.status == "pending":
                 if self.challenge is not None:
-                    authz.call_validate(self.client, self.challenge, wait=False)
+                    authz.call_validate(
+                        client=self.client, challenge_type=self.challenge, wait=False
+                    )
                     authzs_to_wait_for.append(authz)
                 # If there is no challenge, we must check whether the authz is valid
                 elif authz.status != "valid":
                     authz.raise_error(
-                        'Status is not "valid", even though no challenge should be necessary',
+                        error_msg='Status is not "valid", even though no challenge should be necessary',
                         module=self.client.module,
                     )
                 self.changed = True
 
         # Step 3: wait for authzs to validate
-        wait_for_validation(authzs_to_wait_for, self.client)
+        wait_for_validation(authzs=authzs_to_wait_for, client=self.client)
 
     def download_alternate_chains(
         self, cert: CertificateChain
@@ -821,7 +827,7 @@ class ACMECertificateClient:
         alternate_chains = []
         for alternate in cert.alternates:
             try:
-                alt_cert = CertificateChain.download(self.client, alternate)
+                alt_cert = CertificateChain.download(client=self.client, url=alternate)
             except ModuleFailException as e:
                 self.module.warn(
                     f"Error while downloading alternative certificate {alternate}: {e}"
@@ -835,7 +841,7 @@ class ACMECertificateClient:
     ) -> CertificateChain | None:
         for criterium_idx, matcher in enumerate(self.select_chain_matcher):
             for chain in chains:
-                if matcher.match(chain):
+                if matcher.match(certificate=chain):
                     self.module.debug(
                         f"Found matching chain for criterium {criterium_idx}"
                     )
@@ -852,23 +858,30 @@ class ACMECertificateClient:
         for identifier_type, identifier in self.identifiers:
             authz = self.authorizations.get(
                 normalize_combined_identifier(
-                    combine_identifier(identifier_type, identifier)
+                    combine_identifier(
+                        identifier_type=identifier_type, identifier=identifier
+                    )
                 )
             )
             if authz is None:
                 raise ModuleFailException(
-                    f'Found no authorization information for "{combine_identifier(identifier_type, identifier)}"!'
+                    f'Found no authorization information for "{combine_identifier(identifier_type=identifier_type, identifier=identifier)}"!'
                 )
             if authz.status != "valid":
                 authz.raise_error(
-                    f'Status is "{authz.status}" and not "valid"',
+                    error_msg=f'Status is "{authz.status}" and not "valid"',
                     module=self.module,
                 )
 
         assert self.order is not None
-        self.order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
+        self.order.finalize(
+            client=self.client,
+            csr_der=pem_to_der(pem_filename=self.csr, pem_content=self.csr_content),
+        )
         assert self.order.certificate_uri is not None
-        cert = CertificateChain.download(self.client, self.order.certificate_uri)
+        cert = CertificateChain.download(
+            client=self.client, url=self.order.certificate_uri
+        )
         if self.module.params["retrieve_all_alternates"] or self.select_chain_matcher:
             # Retrieve alternate chains
             alternate_chains = self.download_alternate_chains(cert)
@@ -892,21 +905,27 @@ class ACMECertificateClient:
             chain = cert.chain
 
             if self.dest and write_file(
-                self.module, self.dest, pem_cert.encode("utf8")
+                module=self.module, dest=self.dest, content=pem_cert.encode("utf8")
             ):
-                self.cert_days = self.client.backend.get_cert_days(self.dest)
+                self.cert_days = self.client.backend.get_cert_days(
+                    cert_filename=self.dest
+                )
                 self.changed = True
 
             if self.fullchain_dest and write_file(
-                self.module,
-                self.fullchain_dest,
-                (pem_cert + "\n".join(chain)).encode("utf8"),
+                module=self.module,
+                dest=self.fullchain_dest,
+                content=(pem_cert + "\n".join(chain)).encode("utf8"),
             ):
-                self.cert_days = self.client.backend.get_cert_days(self.fullchain_dest)
+                self.cert_days = self.client.backend.get_cert_days(
+                    cert_filename=self.fullchain_dest
+                )
                 self.changed = True
 
             if self.chain_dest and write_file(
-                self.module, self.chain_dest, ("\n".join(chain)).encode("utf8")
+                module=self.module,
+                dest=self.chain_dest,
+                content=("\n".join(chain)).encode("utf8"),
             ):
                 self.changed = True
 
@@ -919,7 +938,7 @@ class ACMECertificateClient:
         assert self.authorizations is not None
         for authz in self.authorizations.values():
             try:
-                authz.deactivate(self.client)
+                authz.deactivate(client=self.client)
             except Exception:
                 # ignore errors
                 pass
@@ -982,13 +1001,15 @@ def main() -> t.NoReturn:
         ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
         if module.params.get("dest"):
-            cert_days = backend.get_cert_days(module.params["dest"])
+            cert_days = backend.get_cert_days(cert_filename=module.params["dest"])
         else:
-            cert_days = backend.get_cert_days(module.params["fullchain_dest"])
+            cert_days = backend.get_cert_days(
+                cert_filename=module.params["fullchain_dest"]
+            )
 
         if module.params["force"] or cert_days < module.params["remaining_days"]:
             # If checkmode is active, base the changed state solely on the status
@@ -1003,7 +1024,7 @@ def main() -> t.NoReturn:
                     cert_days=cert_days,
                 )
             else:
-                client = ACMECertificateClient(module, backend)
+                client = ACMECertificateClient(module=module, backend=backend)
                 client.cert_days = cert_days
                 other: dict[str, t.Any] = {}
                 is_first_step = client.is_first_step()
@@ -1040,7 +1061,7 @@ def main() -> t.NoReturn:
         else:
             module.exit_json(changed=False, cert_days=cert_days)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

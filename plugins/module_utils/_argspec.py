@@ -25,6 +25,7 @@ class ArgumentSpec:
     def __init__(
         self,
         argument_spec: dict[str, t.Any] | None = None,
+        *,
         mutually_exclusive: list[list[str] | tuple[str, ...]] | None = None,
         required_together: list[list[str] | tuple[str, ...]] | None = None,
         required_one_of: list[list[str] | tuple[str, ...]] | None = None,
@@ -50,6 +51,7 @@ class ArgumentSpec:
 
     def update(
         self,
+        *,
         mutually_exclusive: list[list[str] | tuple[str, ...]] | None = None,
         required_together: list[list[str] | tuple[str, ...]] | None = None,
         required_one_of: list[list[str] | tuple[str, ...]] | None = None,

@@ -58,6 +58,7 @@ class ACMECertificateClient:
 
     def __init__(
         self,
+        *,
         module: AnsibleModule,
         backend: CryptoBackend,
         client: ACMEClient | None = None,
@@ -68,10 +69,10 @@ class ACMECertificateClient:
         self.csr = module.params.get("csr")
         self.csr_content = module.params.get("csr_content")
         if client is None:
-            client = ACMEClient(module, backend)
+            client = ACMEClient(module=module, backend=backend)
         self.client = client
         if account is None:
-            account = ACMEAccount(self.client)
+            account = ACMEAccount(client=self.client)
         self.account = account
         self.order_uri = module.params.get("order_uri")
         self.order_creation_error_strategy = module.params.get(
@@ -108,7 +109,9 @@ class ACMECertificateClient:
                 try:
                     select_chain_matcher.append(
                         self.client.backend.create_chain_matcher(
-                            Criterium(criterium, index=criterium_idx)
+                            criterium=Criterium(
+                                criterium=criterium, index=criterium_idx
+                            )
                         )
                     )
                 except ValueError as exc:
@@ -120,12 +123,12 @@ class ACMECertificateClient:
     def load_order(self) -> Order:
         if not self.order_uri:
             raise ModuleFailException("The order URI has not been provided")
-        order = Order.from_url(self.client, self.order_uri)
-        order.load_authorizations(self.client)
+        order = Order.from_url(client=self.client, url=self.order_uri)
+        order.load_authorizations(client=self.client)
         return order
 
     def create_order(
-        self, replaces_cert_id: str | None = None, profile: str | None = None
+        self, *, replaces_cert_id: str | None = None, profile: str | None = None
     ) -> Order:
         """
         Create a new order.
@@ -133,8 +136,8 @@ class ACMECertificateClient:
         if self.identifiers is None:
             raise ModuleFailException("No identifiers have been provided")
         order = Order.create_with_error_handling(
-            self.client,
-            self.identifiers,
+            client=self.client,
+            identifiers=self.identifiers,
             error_strategy=self.order_creation_error_strategy,
             error_max_retries=self.order_creation_max_retries,
             replaces_cert_id=replaces_cert_id,
@@ -142,7 +145,7 @@ class ACMECertificateClient:
             message_callback=self.module.warn,
         )
         self.order_uri = order.url
-        order.load_authorizations(self.client)
+        order.load_authorizations(client=self.client)
         return order
 
     def get_challenges_data(
@@ -161,7 +164,7 @@ class ACMECertificateClient:
             # and do not need to be returned
             if authz.status == "valid":
                 continue
-            challenge_data = authz.get_challenge_data(self.client)
+            challenge_data = authz.get_challenge_data(client=self.client)
             data.append(
                 dict(
                     identifier=authz.identifier,
@@ -209,20 +212,27 @@ class ACMECertificateClient:
     def call_validate(
         self,
         pending_authzs: list[Authorization],
+        *,
         get_challenge: t.Callable[[Authorization], str],
         wait: bool = True,
     ) -> list[tuple[Authorization, str, Challenge | None]]:
         authzs_with_challenges_to_wait_for = []
         for authz in pending_authzs:
             challenge_type = get_challenge(authz)
-            authz.call_validate(self.client, challenge_type, wait=wait)
+            authz.call_validate(
+                client=self.client, challenge_type=challenge_type, wait=wait
+            )
             authzs_with_challenges_to_wait_for.append(
-                (authz, challenge_type, authz.find_challenge(challenge_type))
+                (
+                    authz,
+                    challenge_type,
+                    authz.find_challenge(challenge_type=challenge_type),
+                )
             )
         return authzs_with_challenges_to_wait_for
 
     def wait_for_validation(self, authzs_to_wait_for: list[Authorization]) -> None:
-        wait_for_validation(authzs_to_wait_for, self.client)
+        wait_for_validation(authzs=authzs_to_wait_for, client=self.client)
 
     def _download_alternate_chains(
         self, cert: CertificateChain
@@ -230,7 +240,7 @@ class ACMECertificateClient:
         alternate_chains = []
         for alternate in cert.alternates:
             try:
-                alt_cert = CertificateChain.download(self.client, alternate)
+                alt_cert = CertificateChain.download(client=self.client, url=alternate)
             except ModuleFailException as e:
                 self.module.warn(
                     f"Error while downloading alternative certificate {alternate}: {e}"
@@ -275,7 +285,7 @@ class ACMECertificateClient:
                 f"Order's crtificate URL {order.certificate_uri!r} is empty!"
             )
 
-        cert = CertificateChain.download(self.client, order.certificate_uri)
+        cert = CertificateChain.download(client=self.client, url=order.certificate_uri)
         if cert.cert is None:
             raise ModuleFailException(
                 f"Certificate at {order.certificate_uri} is empty!"
@@ -314,22 +324,26 @@ class ACMECertificateClient:
         for identifier, authz in order.authorizations.items():
             if authz.status != "valid":
                 authz.raise_error(
-                    f'Status is {authz.status!r} and not "valid"',
+                    error_msg=f'Status is {authz.status!r} and not "valid"',
                     module=self.module,
                 )
 
-        order.finalize(self.client, pem_to_der(self.csr, self.csr_content))
+        order.finalize(
+            client=self.client,
+            csr_der=pem_to_der(pem_filename=self.csr, pem_content=self.csr_content),
+        )
 
         return self.download_certificate(order, download_all_chains=download_all_chains)
 
     def find_matching_chain(
         self,
+        *,
         chains: list[CertificateChain],
         select_chain_matcher: t.Iterable[ChainMatcher],
     ) -> CertificateChain | None:
         for criterium_idx, matcher in enumerate(select_chain_matcher):
             for chain in chains:
-                if matcher.match(chain):
+                if matcher.match(certificate=chain):
                     self.module.debug(
                         f"Found matching chain for criterium {criterium_idx}"
                     )
@@ -338,6 +352,7 @@ class ACMECertificateClient:
 
     def write_cert_chain(
         self,
+        *,
         cert: CertificateChain,
         cert_dest: str | os.PathLike | None = None,
         fullchain_dest: str | os.PathLike | None = None,
@@ -347,18 +362,22 @@ class ACMECertificateClient:
         if cert.cert is None:
             raise ValueError("Certificate is not present")
 
-        if cert_dest and write_file(self.module, cert_dest, cert.cert.encode("utf8")):
+        if cert_dest and write_file(
+            module=self.module, dest=cert_dest, content=cert.cert.encode("utf8")
+        ):
             changed = True
 
         if fullchain_dest and write_file(
-            self.module,
-            fullchain_dest,
-            (cert.cert + "\n".join(cert.chain)).encode("utf8"),
+            module=self.module,
+            dest=fullchain_dest,
+            content=(cert.cert + "\n".join(cert.chain)).encode("utf8"),
         ):
             changed = True
 
         if chain_dest and write_file(
-            self.module, chain_dest, ("\n".join(cert.chain)).encode("utf8")
+            module=self.module,
+            dest=chain_dest,
+            content=("\n".join(cert.chain)).encode("utf8"),
         ):
             changed = True
 
@@ -374,7 +393,9 @@ class ACMECertificateClient:
             for authz_uri in order.authorization_uris:
                 authz = None
                 try:
-                    authz = Authorization.deactivate_url(self.client, authz_uri)
+                    authz = Authorization.deactivate_url(
+                        client=self.client, url=authz_uri
+                    )
                 except Exception:
                     # ignore errors
                     pass
@@ -385,7 +406,7 @@ class ACMECertificateClient:
         else:
             for authz in order.authorizations.values():
                 try:
-                    authz.deactivate(self.client)
+                    authz.deactivate(client=self.client)
                 except Exception:
                     # ignore errors
                     pass

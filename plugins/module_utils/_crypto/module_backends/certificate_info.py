@@ -70,7 +70,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
-    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
+    def __init__(self, *, module: GeneralAnsibleModule, content: bytes) -> None:
         # content must be a bytes string
         self.module = module
         self.content = content
@@ -158,11 +158,10 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
         pass
 
     def get_info(
-        self, prefer_one_fingerprint: bool = False, der_support_enabled: bool = False
+        self, *, prefer_one_fingerprint: bool = False, der_support_enabled: bool = False
     ) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {}
         self.cert = load_certificate(
-            None,
             content=self.content,
             der_support_enabled=der_support_enabled,
         )
@@ -204,7 +203,7 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
         result["public_key"] = to_native(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
-            self.module,
+            module=self.module,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -249,8 +248,10 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
 class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
-    def __init__(self, module: GeneralAnsibleModule, content: bytes) -> None:
-        super(CertificateInfoRetrievalCryptography, self).__init__(module, content)
+    def __init__(self, *, module: GeneralAnsibleModule, content: bytes) -> None:
+        super(CertificateInfoRetrievalCryptography, self).__init__(
+            module=module, content=content
+        )
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
     def _get_der_bytes(self) -> bytes:
@@ -465,19 +466,22 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
 
 
 def get_certificate_info(
-    module: GeneralAnsibleModule, content: bytes, prefer_one_fingerprint: bool = False
+    *,
+    module: GeneralAnsibleModule,
+    content: bytes,
+    prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
-    info = CertificateInfoRetrievalCryptography(module, content)
+    info = CertificateInfoRetrievalCryptography(module=module, content=content)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(
-    module: GeneralAnsibleModule, content: bytes
+    *, module: GeneralAnsibleModule, content: bytes
 ) -> CertificateInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return CertificateInfoRetrievalCryptography(module, content)
+    return CertificateInfoRetrievalCryptography(module=module, content=content)
 
 
 __all__ = ("CertificateInfoRetrieval", "get_certificate_info", "select_backend")

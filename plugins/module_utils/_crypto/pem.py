@@ -17,7 +17,7 @@ PKCS8_PRIVATEKEY_NAMES = ("PRIVATE KEY", "ENCRYPTED PRIVATE KEY")
 PKCS1_PRIVATEKEY_SUFFIX = " PRIVATE KEY"
 
 
-def identify_pem_format(content: bytes, encoding: str = "utf-8") -> bool:
+def identify_pem_format(content: bytes, *, encoding: str = "utf-8") -> bool:
     """Given the contents of a binary file, tests whether this could be a PEM file."""
     try:
         first_pem = extract_first_pem(content.decode(encoding))
@@ -36,7 +36,7 @@ def identify_pem_format(content: bytes, encoding: str = "utf-8") -> bool:
 
 
 def identify_private_key_format(
-    content: bytes, encoding: str = "utf-8"
+    content: bytes, *, encoding: str = "utf-8"
 ) -> t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"]:
     """Given the contents of a private key file, identifies its format."""
     # See https://github.com/openssl/openssl/blob/master/crypto/pem/pem_pkey.c#L40-L85
@@ -66,7 +66,7 @@ def identify_private_key_format(
     return "raw"
 
 
-def split_pem_list(text: str, keep_inbetween: bool = False) -> list[str]:
+def split_pem_list(text: str, *, keep_inbetween: bool = False) -> list[str]:
     """
     Split concatenated PEM objects into a list of strings, where each is one PEM object.
     """
@@ -94,7 +94,7 @@ def extract_first_pem(text: str) -> str | None:
     return all_pems[0]
 
 
-def _extract_type(line: str, start: str = PEM_START) -> str | None:
+def _extract_type(line: str, *, start: str = PEM_START) -> str | None:
     if not line.startswith(start):
         return None
     if not line.endswith(PEM_END):
@@ -102,7 +102,7 @@ def _extract_type(line: str, start: str = PEM_START) -> str | None:
     return line[len(start) : -len(PEM_END)]
 
 
-def extract_pem(content: str, strict: bool = False) -> tuple[str, str]:
+def extract_pem(content: str, *, strict: bool = False) -> tuple[str, str]:
     lines = content.splitlines()
     if len(lines) < 3:
         raise ValueError(f"PEM must have at least 3 lines, have only {len(lines)}")

@@ -304,7 +304,7 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 class Certificate(OpensshModule):
     def __init__(self, module: AnsibleModule) -> None:
-        super(Certificate, self).__init__(module)
+        super(Certificate, self).__init__(module=module)
         self.ssh_keygen = KeygenCommand(self.module)
 
         self.identifier: str = self.module.params["identifier"] or ""
@@ -496,7 +496,9 @@ class Certificate(OpensshModule):
         )
 
     def _get_key_fingerprint(self, path: str) -> str:
-        private_key_content = self.ssh_keygen.get_private_key(path, check_rc=True)[1]
+        private_key_content = self.ssh_keygen.get_private_key(
+            private_key_path=path, check_rc=True
+        )[1]
         return PrivateKey.from_string(private_key_content).fingerprint
 
     @OpensshModule.trigger_change
@@ -532,17 +534,17 @@ class Certificate(OpensshModule):
         self.module.add_cleanup_file(key_copy)
 
         self.ssh_keygen.generate_certificate(
-            key_copy,
-            self.identifier,
-            self.options,
-            self.pkcs11_provider,
-            self.principals,
-            self.serial_number,
-            self.signature_algorithm,
-            self.signing_key,
-            self.type,
-            self.time_parameters,
-            self.use_agent,
+            certificate_path=key_copy,
+            identifier=self.identifier,
+            options=self.options,
+            pkcs11_provider=self.pkcs11_provider,
+            principals=self.principals,
+            serial_number=self.serial_number,
+            signature_algorithm=self.signature_algorithm,
+            signing_key_path=self.signing_key,
+            type=self.type,
+            time_parameters=self.time_parameters,
+            use_agent=self.use_agent,
             environ_update=dict(TZ="UTC"),
             check_rc=True,
         )
@@ -566,7 +568,7 @@ class Certificate(OpensshModule):
             return {}
 
         certificate_info = self.ssh_keygen.get_certificate_info(
-            self.path,
+            certificate_path=self.path,
             check_rc=self.state == "present" and not self.module.check_mode,
         )[1]
 

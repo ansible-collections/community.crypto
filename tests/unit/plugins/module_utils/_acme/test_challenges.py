@@ -23,8 +23,8 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 
 
 def test_combine_identifier() -> None:
-    assert combine_identifier("", "") == ":"
-    assert combine_identifier("a", "b") == "a:b"
+    assert combine_identifier(identifier_type="", identifier="") == ":"
+    assert combine_identifier(identifier_type="a", identifier="b") == "a:b"
 
 
 def test_split_identifier() -> None:
@@ -45,7 +45,7 @@ def test_challenge_from_to_json() -> None:
         "status": "valid",
     }
     client.version = 2
-    challenge = Challenge.from_json(client, data)
+    challenge = Challenge.from_json(client=client, data=data)
     assert challenge.data == data
     assert challenge.type == "type"
     assert challenge.url == "xxx"
@@ -58,7 +58,7 @@ def test_challenge_from_to_json() -> None:
         "status": "valid",
         "token": "foo",
     }
-    challenge = Challenge.from_json(None, data, url="xxx")  # type: ignore
+    challenge = Challenge.from_json(client=None, data=data, url="xxx")  # type: ignore
     assert challenge.data == data
     assert challenge.type == "type"
     assert challenge.url == "xxx"
@@ -81,7 +81,7 @@ def test_authorization_from_to_json() -> None:
             "value": "example.com",
         },
     }
-    authz = Authorization.from_json(client, data, "xxx")
+    authz = Authorization.from_json(client=client, data=data, url="xxx")
     assert authz.url == "xxx"
     assert authz.status == "valid"
     assert authz.identifier == "example.com"
@@ -112,7 +112,7 @@ def test_authorization_from_to_json() -> None:
         },
         "wildcard": True,
     }
-    authz = Authorization.from_json(client, data, "xxx")
+    authz = Authorization.from_json(client=client, data=data, url="xxx")
     assert authz.url == "xxx"
     assert authz.status == "valid"
     assert authz.identifier == "*.example.com"
@@ -146,7 +146,9 @@ def test_authorization_create_error() -> None:
     client.version = 2
     client.directory.directory = {}
     with pytest.raises(ACMEProtocolException) as exc:
-        Authorization.create(client, "dns", "example.com")
+        Authorization.create(
+            client=client, identifier_type="dns", identifier="example.com"
+        )
 
     assert exc.value.msg == "ACME endpoint does not support pre-authorization."
 
@@ -197,9 +199,9 @@ def test_wait_for_validation_error() -> None:
         },
     }
     client.get_request = MagicMock(return_value=(data, {}))
-    authz = Authorization.from_json(client, data, "xxx")
+    authz = Authorization.from_json(client=client, data=data, url="xxx")
     with pytest.raises(ACMEProtocolException) as exc:
-        authz.wait_for_validation(client, "dns")
+        authz.wait_for_validation(client=client)
 
     assert exc.value.msg == (
         'Failed to validate challenge for dns:example.com: Status is "invalid". Challenge dns-01: Error dns-failed Subproblems:\n'

@@ -19,7 +19,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.basic imp
 UTC = datetime.timezone.utc
 
 
-def get_now_datetime(with_timezone: bool) -> datetime.datetime:
+def get_now_datetime(*, with_timezone: bool) -> datetime.datetime:
     if with_timezone:
         return datetime.datetime.now(tz=UTC)
     return datetime.datetime.utcnow()
@@ -44,7 +44,7 @@ def remove_timezone(timestamp: datetime.datetime) -> datetime.datetime:
 
 
 def add_or_remove_timezone(
-    timestamp: datetime.datetime, with_timezone: bool
+    timestamp: datetime.datetime, *, with_timezone: bool
 ) -> datetime.datetime:
     return (
         ensure_utc_timezone(timestamp) if with_timezone else remove_timezone(timestamp)
@@ -59,7 +59,7 @@ def get_epoch_seconds(timestamp: datetime.datetime) -> float:
 
 
 def from_epoch_seconds(
-    timestamp: int | float, with_timezone: bool
+    timestamp: int | float, *, with_timezone: bool
 ) -> datetime.datetime:
     if with_timezone:
         return datetime.datetime.fromtimestamp(timestamp, UTC)
@@ -68,6 +68,7 @@ def from_epoch_seconds(
 
 def convert_relative_to_datetime(
     relative_time_string: str,
+    *,
     with_timezone: bool = False,
     now: datetime.datetime | None = None,
 ) -> datetime.datetime | None:
@@ -107,6 +108,7 @@ def convert_relative_to_datetime(
 
 def get_relative_time_option(
     input_string: str,
+    *,
     input_name: str,
     with_timezone: bool = False,
     now: datetime.datetime | None = None,

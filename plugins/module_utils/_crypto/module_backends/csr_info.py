@@ -62,7 +62,7 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 class CSRInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
-        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
+        self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
         self.module = module
         self.content = content
@@ -122,10 +122,9 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
     def _is_signature_valid(self) -> bool:
         pass
 
-    def get_info(self, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
+    def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {}
         self.csr = load_certificate_request(
-            None,
             content=self.content,
         )
 
@@ -156,7 +155,7 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
         result["public_key"] = to_native(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
-            self.module,
+            module=self.module,
             key=self._get_public_key_object(),
             prefer_one_fingerprint=prefer_one_fingerprint,
         )
@@ -196,10 +195,10 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     """Validate the supplied CSR, using the cryptography backend"""
 
     def __init__(
-        self, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
+        self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
         super(CSRInfoRetrievalCryptography, self).__init__(
-            module, content, validate_signature
+            module=module, content=content, validate_signature=validate_signature
         )
         self.name_encoding: t.Literal["ignore", "idna", "unicode"] = module.params.get(
             "name_encoding", "ignore"
@@ -372,25 +371,26 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
 
 
 def get_csr_info(
+    *,
     module: GeneralAnsibleModule,
     content: bytes,
     validate_signature: bool = True,
     prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
     info = CSRInfoRetrievalCryptography(
-        module, content, validate_signature=validate_signature
+        module=module, content=content, validate_signature=validate_signature
     )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(
-    module: GeneralAnsibleModule, content: bytes, validate_signature: bool = True
+    *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool = True
 ) -> CSRInfoRetrieval:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     return CSRInfoRetrievalCryptography(
-        module, content, validate_signature=validate_signature
+        module=module, content=content, validate_signature=validate_signature
     )
 
 

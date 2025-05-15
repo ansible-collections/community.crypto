@@ -65,14 +65,14 @@ RETRY_COUNT = 10
 
 
 def _decode_retry(
-    module: AnsibleModule, response: t.Any, info: dict[str, t.Any], retry_count: int
+    *, module: AnsibleModule, response: t.Any, info: dict[str, t.Any], retry_count: int
 ) -> bool:
     if info["status"] not in RETRY_STATUS_CODES:
         return False
 
     if retry_count >= RETRY_COUNT:
         raise ACMEProtocolException(
-            module,
+            module=module,
             msg=f"Giving up after {RETRY_COUNT} retries",
             info=info,
             response=response,
@@ -93,6 +93,7 @@ def _decode_retry(
 
 
 def _assert_fetch_url_success(
+    *,
     module: AnsibleModule,
     response: t.Any,
     info: dict[str, t.Any],
@@ -108,11 +109,11 @@ def _assert_fetch_url_success(
         or (400 <= info["status"] < 500 and not allow_client_error)
         or (info["status"] >= 500 and not allow_server_error)
     ):
-        raise ACMEProtocolException(module, info=info, response=response)
+        raise ACMEProtocolException(module=module, info=info, response=response)
 
 
 def _is_failed(
-    info: dict[str, t.Any], expected_status_codes: t.Iterable[int] | None = None
+    *, info: dict[str, t.Any], expected_status_codes: t.Iterable[int] | None = None
 ) -> bool:
     if info["status"] < 200 or info["status"] >= 400:
         return True
@@ -133,7 +134,7 @@ class ACMEDirectory:
     https://tools.ietf.org/html/rfc8555#section-7.1.1
     """
 
-    def __init__(self, module: AnsibleModule, client: ACMEClient) -> None:
+    def __init__(self, *, module: AnsibleModule, client: ACMEClient) -> None:
         self.module = module
         self.directory_root = module.params["acme_directory"]
         self.version = module.params["acme_version"]
@@ -171,7 +172,12 @@ class ACMEDirectory:
             response, info = fetch_url(
                 self.module, url, method="HEAD", timeout=self.request_timeout
             )
-            if _decode_retry(self.module, response, info, retry_count):
+            if _decode_retry(
+                module=self.module,
+                response=response,
+                info=info,
+                retry_count=retry_count,
+            ):
                 retry_count += 1
                 continue
             if info["status"] not in (200, 204):
@@ -185,7 +191,7 @@ class ACMEDirectory:
             )
             if retry_count >= 5:
                 raise ACMEProtocolException(
-                    self.module,
+                    module=self.module,
                     msg="Was not able to obtain nonce, giving up after 5 retries",
                     info=info,
                     response=response,
@@ -202,7 +208,7 @@ class ACMEClient:
     ACME server.
     """
 
-    def __init__(self, module: AnsibleModule, backend: CryptoBackend) -> None:
+    def __init__(self, *, module: AnsibleModule, backend: CryptoBackend) -> None:
         # Set to true to enable logging of all signed requests
         self._debug = False
 
@@ -241,7 +247,7 @@ class ACMEClient:
                 # Make sure self.account_jws_header is updated
                 self.set_account_uri(self.account_uri)
 
-        self.directory = ACMEDirectory(module, self)
+        self.directory = ACMEDirectory(module=module, client=self)
 
     def set_account_uri(self, uri: str) -> None:
         """
@@ -255,6 +261,7 @@ class ACMEClient:
 
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase: str | None = None,
@@ -265,10 +272,13 @@ class ACMEClient:
         """
         if key_file is None and key_content is None:
             raise AssertionError("One of key_file and key_content must be specified!")
-        return self.backend.parse_key(key_file, key_content, passphrase=passphrase)
+        return self.backend.parse_key(
+            key_file=key_file, key_content=key_content, passphrase=passphrase
+        )
 
     def sign_request(
         self,
+        *,
         protected: dict[str, t.Any],
         payload: str | dict[str, t.Any] | None,
         key_data: dict[str, t.Any],
@@ -292,9 +302,11 @@ class ACMEClient:
                 f"Failed to encode payload / headers as JSON: {e}"
             )
 
-        return self.backend.sign(payload64, protected64, key_data)
+        return self.backend.sign(
+            payload64=payload64, protected64=protected64, key_data=key_data
+        )
 
-    def _log(self, msg: str, data: t.Any = None) -> None:
+    def _log(self, msg: str, *, data: t.Any = None) -> None:
         """
         Write arguments to acme.log when logging is enabled.
         """
@@ -373,13 +385,16 @@ class ACMEClient:
             protected["nonce"] = self.directory.get_nonce()
             protected["url"] = url
 
-            self._log("URL", url)
-            self._log("protected", protected)
-            self._log("payload", payload)
+            self._log("URL", data=url)
+            self._log("protected", data=protected)
+            self._log("payload", data=payload)
             data = self.sign_request(
-                protected, payload, key_data, encode_payload=encode_payload
+                protected=protected,
+                payload=payload,
+                key_data=key_data,
+                encode_payload=encode_payload,
             )
-            self._log("signed request", data)
+            self._log("signed request", data=data)
             data = self.module.jsonify(data)
 
             headers = {
@@ -393,10 +408,12 @@ class ACMEClient:
                 method="POST",
                 timeout=self.request_timeout,
             )
-            if _decode_retry(self.module, resp, info, failed_tries):
+            if _decode_retry(
+                module=self.module, response=resp, info=info, retry_count=failed_tries
+            ):
                 failed_tries += 1
                 continue
-            _assert_fetch_url_success(self.module, resp, info)
+            _assert_fetch_url_success(module=self.module, response=resp, info=info)
             result = {}
 
             try:
@@ -415,7 +432,7 @@ class ACMEClient:
                 ) or 400 <= info["status"] < 600:
                     try:
                         decoded_result = self.module.from_json(content.decode("utf8"))
-                        self._log("parsed result", decoded_result)
+                        self._log("parsed result", data=decoded_result)
                         # In case of badNonce error, try again (up to 5 times)
                         # (https://tools.ietf.org/html/rfc8555#section-6.7)
                         if all(
@@ -440,10 +457,10 @@ class ACMEClient:
                     result = content
 
             if fail_on_error and _is_failed(
-                info, expected_status_codes=expected_status_codes
+                info=info, expected_status_codes=expected_status_codes
             ):
                 raise ACMEProtocolException(
-                    self.module,
+                    module=self.module,
                     msg=error_msg,
                     info=info,
                     content=content,
@@ -515,11 +532,16 @@ class ACMEClient:
                     headers=headers,
                     timeout=self.request_timeout,
                 )
-                if not _decode_retry(self.module, resp, info, retry_count):
+                if not _decode_retry(
+                    module=self.module,
+                    response=resp,
+                    info=info,
+                    retry_count=retry_count,
+                ):
                     break
                 retry_count += 1
 
-            _assert_fetch_url_success(self.module, resp, info)
+            _assert_fetch_url_success(module=self.module, response=resp, info=info)
 
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
@@ -550,10 +572,10 @@ class ACMEClient:
             result = content
 
         if fail_on_error and _is_failed(
-            info, expected_status_codes=expected_status_codes
+            info=info, expected_status_codes=expected_status_codes
         ):
             raise ACMEProtocolException(
-                self.module,
+                module=self.module,
                 msg=error_msg,
                 info=info,
                 content=content,
@@ -565,6 +587,7 @@ class ACMEClient:
 
     def get_renewal_info(
         self,
+        *,
         cert_id: str | None = None,
         cert_info: CertificateInformation | None = None,
         cert_filename: str | os.PathLike | None = None,
@@ -579,7 +602,7 @@ class ACMEClient:
 
         if cert_id is None:
             cert_id = compute_cert_id(
-                self.backend,
+                backend=self.backend,
                 cert_info=cert_info,
                 cert_filename=cert_filename,
                 cert_content=cert_content,
@@ -603,6 +626,7 @@ class ACMEClient:
 
 
 def create_default_argspec(
+    *,
     with_account: bool = True,
     require_account_key: bool = True,
     with_certificate: bool = False,
@@ -643,7 +667,9 @@ def create_default_argspec(
     return result
 
 
-def create_backend(module: AnsibleModule, needs_acme_v2: bool = True) -> CryptoBackend:
+def create_backend(
+    module: AnsibleModule, *, needs_acme_v2: bool = True
+) -> CryptoBackend:
     backend = module.params["select_crypto_backend"]
 
     # Backend autodetect
@@ -671,10 +697,10 @@ def create_backend(module: AnsibleModule, needs_acme_v2: bool = True) -> CryptoB
         module.debug(
             f"Using cryptography backend (library version {CRYPTOGRAPHY_VERSION})"
         )
-        module_backend = CryptographyBackend(module)
+        module_backend = CryptographyBackend(module=module)
     elif backend == "openssl":
         module.debug("Using OpenSSL binary backend")
-        module_backend = OpenSSLCLIBackend(module)
+        module_backend = OpenSSLCLIBackend(module=module)
     else:
         module.fail_json(msg=f'Unknown crypto backend "{backend}"!')
 

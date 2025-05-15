@@ -263,7 +263,7 @@ def cryptography_name_to_oid(name: str) -> x509.oid.ObjectIdentifier:
 
 
 def cryptography_oid_to_name(
-    oid: x509.oid.ObjectIdentifier, short: bool = False
+    oid: x509.oid.ObjectIdentifier, *, short: bool = False
 ) -> str:
     dotted_string = oid.dotted_string
     names = OID_MAP.get(dotted_string)
@@ -315,7 +315,7 @@ def _int_to_byte(value: int) -> bytes:
 
 
 def _parse_dn_component(
-    name: bytes, sep: bytes = b",", decode_remainder: bool = True
+    name: bytes, *, sep: bytes = b",", decode_remainder: bool = True
 ) -> tuple[x509.NameAttribute, bytes]:
     m = DN_COMPONENT_START_RE.match(name)
     if not m:
@@ -428,7 +428,9 @@ def _is_ascii(value: str) -> bool:
         return False
 
 
-def _adjust_idn(value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]) -> str:
+def _adjust_idn(
+    value: str, *, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
+) -> str:
     if idn_rewrite == "ignore" or not value:
         return value
     if idn_rewrite == "idna" and _is_ascii(value):
@@ -472,19 +474,19 @@ def _adjust_idn(value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"])
 
 
 def _adjust_idn_email(
-    value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
+    value: str, *, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
 ) -> str:
     idx = value.find("@")
     if idx < 0:
         return value
-    return f"{value[:idx]}@{_adjust_idn(value[idx + 1:], idn_rewrite)}"
+    return f"{value[:idx]}@{_adjust_idn(value[idx + 1:], idn_rewrite=idn_rewrite)}"
 
 
 def _adjust_idn_url(
-    value: str, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
+    value: str, *, idn_rewrite: t.Literal["ignore", "idna", "unicode"]
 ) -> str:
     url = urlparse(value)
-    host = _adjust_idn(url.hostname, idn_rewrite) if url.hostname else None
+    host = _adjust_idn(url.hostname, idn_rewrite=idn_rewrite) if url.hostname else None
     if url.username is not None and url.password is not None:
         host = f"{url.username}:{url.password}@{host}"
     elif url.username is not None:
@@ -504,7 +506,7 @@ def _adjust_idn_url(
 
 
 def cryptography_get_name(
-    name: str, what: str = "Subject Alternative Name"
+    name: str, *, what: str = "Subject Alternative Name"
 ) -> x509.GeneralName:
     """
     Given a name string, returns a cryptography x509.GeneralName object.
@@ -512,17 +514,19 @@ def cryptography_get_name(
     """
     try:
         if name.startswith("DNS:"):
-            return x509.DNSName(_adjust_idn(to_text(name[4:]), "idna"))
+            return x509.DNSName(_adjust_idn(to_text(name[4:]), idn_rewrite="idna"))
         if name.startswith("IP:"):
             address = to_text(name[3:])
             if "/" in address:
                 return x509.IPAddress(ipaddress.ip_network(address))
             return x509.IPAddress(ipaddress.ip_address(address))
         if name.startswith("email:"):
-            return x509.RFC822Name(_adjust_idn_email(to_text(name[6:]), "idna"))
+            return x509.RFC822Name(
+                _adjust_idn_email(to_text(name[6:]), idn_rewrite="idna")
+            )
         if name.startswith("URI:"):
             return x509.UniformResourceIdentifier(
-                _adjust_idn_url(to_text(name[4:]), "idna")
+                _adjust_idn_url(to_text(name[4:]), idn_rewrite="idna")
             )
         if name.startswith("RID:"):
             m = re.match(r"^([0-9]+(?:\.[0-9]+)*)$", to_text(name[4:]))
@@ -585,6 +589,7 @@ def _dn_escape_value(value: str) -> str:
 
 def cryptography_decode_name(
     name: x509.GeneralName,
+    *,
     idn_rewrite: t.Literal["ignore", "idna", "unicode"] = "ignore",
 ) -> str:
     """
@@ -596,15 +601,15 @@ def cryptography_decode_name(
             'idn_rewrite must be one of "ignore", "idna", or "unicode"'
         )
     if isinstance(name, x509.DNSName):
-        return f"DNS:{_adjust_idn(name.value, idn_rewrite)}"
+        return f"DNS:{_adjust_idn(name.value, idn_rewrite=idn_rewrite)}"
     if isinstance(name, x509.IPAddress):
         if isinstance(name.value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
             return f"IP:{name.value.network_address.compressed}/{name.value.prefixlen}"
         return f"IP:{name.value.compressed}"
     if isinstance(name, x509.RFC822Name):
-        return f"email:{_adjust_idn_email(name.value, idn_rewrite)}"
+        return f"email:{_adjust_idn_email(name.value, idn_rewrite=idn_rewrite)}"
     if isinstance(name, x509.UniformResourceIdentifier):
-        return f"URI:{_adjust_idn_url(name.value, idn_rewrite)}"
+        return f"URI:{_adjust_idn_url(name.value, idn_rewrite=idn_rewrite)}"
     if isinstance(name, x509.DirectoryName):
         # According to https://datatracker.ietf.org/doc/html/rfc4514.html#section-2.1 the
         # list needs to be reversed, and joined by commas
@@ -718,7 +723,7 @@ def cryptography_key_needs_digest_for_signing(
 
 
 def _compare_public_keys(
-    key1: PublicKeyTypes, key2: PublicKeyTypes, clazz: type[PublicKeyTypes]
+    key1: PublicKeyTypes, key2: PublicKeyTypes, *, clazz: type[PublicKeyTypes]
 ) -> bool | None:
     a = isinstance(key1, clazz)
     b = isinstance(key2, clazz)
@@ -745,24 +750,24 @@ def cryptography_compare_public_keys(
     res = _compare_public_keys(
         key1,
         key2,
-        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+        clazz=cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
     )
     if res is not None:
         return res
     res = _compare_public_keys(
         key1,
         key2,
-        cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
+        clazz=cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey,
     )
     if res is not None:
         return res
     res = _compare_public_keys(
-        key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
+        key1, key2, clazz=cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey
     )
     if res is not None:
         return res
     res = _compare_public_keys(
-        key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey
+        key1, key2, clazz=cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey
     )
     if res is not None:
         return res
@@ -773,7 +778,7 @@ def cryptography_compare_public_keys(
 
 
 def _compare_private_keys(
-    key1: PrivateKeyTypes, key2: PrivateKeyTypes, clazz: type[PrivateKeyTypes]
+    key1: PrivateKeyTypes, key2: PrivateKeyTypes, *, clazz: type[PrivateKeyTypes]
 ) -> bool | None:
     a = isinstance(key1, clazz)
     b = isinstance(key2, clazz)
@@ -805,24 +810,26 @@ def cryptography_compare_private_keys(
     res = _compare_private_keys(
         key1,
         key2,
-        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+        clazz=cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
     )
     if res is not None:
         return res
     res = _compare_private_keys(
         key1,
         key2,
-        cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+        clazz=cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
     )
     if res is not None:
         return res
     res = _compare_private_keys(
-        key1, key2, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
+        key1,
+        key2,
+        clazz=cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
     )
     if res is not None:
         return res
     res = _compare_private_keys(
-        key1, key2, cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
+        key1, key2, clazz=cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
     )
     if res is not None:
         return res
@@ -832,7 +839,9 @@ def cryptography_compare_private_keys(
     )
 
 
-def parse_pkcs12(pkcs12_bytes: bytes, passphrase: bytes | str | None = None) -> tuple[
+def parse_pkcs12(
+    pkcs12_bytes: bytes, *, passphrase: bytes | str | None = None
+) -> tuple[
     PrivateKeyTypes | None,
     x509.Certificate | None,
     list[x509.Certificate],
@@ -845,15 +854,17 @@ def parse_pkcs12(pkcs12_bytes: bytes, passphrase: bytes | str | None = None) -> 
 
     # Main code for cryptography 36.0.0 and forward
     if _load_pkcs12 is not None:
-        return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase_bytes)
+        return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase=passphrase_bytes)
 
     if LooseVersion(cryptography.__version__) >= LooseVersion("35.0"):
-        return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase_bytes)
+        return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=passphrase_bytes)
 
-    return _parse_pkcs12_legacy(pkcs12_bytes, passphrase_bytes)
+    return _parse_pkcs12_legacy(pkcs12_bytes, passphrase=passphrase_bytes)
 
 
-def _parse_pkcs12_36_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+def _parse_pkcs12_36_0_0(
+    pkcs12_bytes: bytes, *, passphrase: bytes | None = None
+) -> tuple[
     PrivateKeyTypes | None,
     x509.Certificate | None,
     list[x509.Certificate],
@@ -871,7 +882,9 @@ def _parse_pkcs12_36_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def _parse_pkcs12_35_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+def _parse_pkcs12_35_0_0(
+    pkcs12_bytes: bytes, *, passphrase: bytes | None = None
+) -> tuple[
     PrivateKeyTypes | None,
     x509.Certificate | None,
     list[x509.Certificate],
@@ -918,7 +931,9 @@ def _parse_pkcs12_35_0_0(pkcs12_bytes: bytes, passphrase: bytes | None = None) -
     return private_key, certificate, additional_certificates, friendly_name
 
 
-def _parse_pkcs12_legacy(pkcs12_bytes: bytes, passphrase: bytes | None = None) -> tuple[
+def _parse_pkcs12_legacy(
+    pkcs12_bytes: bytes, *, passphrase: bytes | None = None
+) -> tuple[
     PrivateKeyTypes | None,
     x509.Certificate | None,
     list[x509.Certificate],
@@ -940,6 +955,7 @@ def _parse_pkcs12_legacy(pkcs12_bytes: bytes, passphrase: bytes | None = None) -
 
 
 def cryptography_verify_signature(
+    *,
     signature: bytes,
     data: bytes,
     hash_algorithm: hashes.HashAlgorithm | None,
@@ -999,16 +1015,16 @@ def cryptography_verify_signature(
 
 
 def cryptography_verify_certificate_signature(
-    certificate: x509.Certificate, signer_public_key: PublicKeyTypes
+    *, certificate: x509.Certificate, signer_public_key: PublicKeyTypes
 ) -> bool:
     """
     Check whether the given X509 certificate object was signed by the given public key object.
     """
     return cryptography_verify_signature(
-        certificate.signature,
-        certificate.tbs_certificate_bytes,
-        certificate.signature_hash_algorithm,
-        signer_public_key,
+        signature=certificate.signature,
+        data=certificate.tbs_certificate_bytes,
+        hash_algorithm=certificate.signature_hash_algorithm,
+        signer_public_key=signer_public_key,
     )
 
 

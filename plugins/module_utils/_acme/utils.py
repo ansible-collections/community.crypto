@@ -48,7 +48,7 @@ def der_to_pem(der_cert: bytes) -> str:
 
 
 def pem_to_der(
-    pem_filename: str | os.PathLike | None = None, pem_content: str | None = None
+    *, pem_filename: str | os.PathLike | None = None, pem_content: str | None = None
 ) -> bytes:
     """
     Load PEM file, or use PEM file's content, and convert to DER.
@@ -85,7 +85,7 @@ def pem_to_der(
 
 
 def process_links(
-    info: dict[str, t.Any], callback: t.Callable[[str, str], None]
+    *, info: dict[str, t.Any], callback: t.Callable[[str, str], None]
 ) -> None:
     """
     Process link header, calls callback for every link header with the URL and relation as options.
@@ -100,6 +100,7 @@ def process_links(
 
 def parse_retry_after(
     value: str,
+    *,
     relative_with_timezone: bool = True,
     now: datetime.datetime | None = None,
 ) -> datetime.datetime:
@@ -112,7 +113,7 @@ def parse_retry_after(
     try:
         delta = datetime.timedelta(seconds=int(value))
         if now is None:
-            now = get_now_datetime(relative_with_timezone)
+            now = get_now_datetime(with_timezone=relative_with_timezone)
         return now + delta
     except ValueError:
         pass
@@ -126,6 +127,7 @@ def parse_retry_after(
 
 
 def compute_cert_id(
+    *,
     backend: CryptoBackend,
     cert_info: CertificateInformation | None = None,
     cert_filename: str | os.PathLike | None = None,

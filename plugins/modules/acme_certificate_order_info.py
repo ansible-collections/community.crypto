@@ -378,10 +378,10 @@ def main() -> t.NoReturn:
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
 
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMECertificateClient(module, backend)
+        client = ACMECertificateClient(module=module, backend=backend)
         order = client.load_order()
         authorizations_by_identifier: dict[str, dict[str, t.Any]] = {}
         authorizations_by_status: dict[str, list[str]] = {
@@ -405,7 +405,7 @@ def main() -> t.NoReturn:
             authorizations_by_status=authorizations_by_status,
         )
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

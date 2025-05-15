@@ -93,7 +93,12 @@ def serialize_asn1_string_as_der(value: str) -> bytes:
 
     # We should only do a universal type tag if not IMPLICITLY tagged or the tag class is not universal.
     if not tag_type or (tag_type == "EXPLICIT" and tag_class != "U"):
-        b_value = pack_asn1(TagClass.universal, False, TagNumber.utf8_string, b_value)
+        b_value = pack_asn1(
+            tag_class=TagClass.universal,
+            constructed=False,
+            tag_number=TagNumber.utf8_string,
+            b_data=b_value,
+        )
 
     if tag_type:
         tag_class_enum = {
@@ -105,13 +110,22 @@ def serialize_asn1_string_as_der(value: str) -> bytes:
 
         # When adding support for more types this should be looked into further. For now it works with UTF8Strings.
         constructed = tag_type == "EXPLICIT" and tag_class_enum != TagClass.universal
-        b_value = pack_asn1(tag_class_enum, constructed, int(tag_number), b_value)
+        b_value = pack_asn1(
+            tag_class=tag_class_enum,
+            constructed=constructed,
+            tag_number=int(tag_number),
+            b_data=b_value,
+        )
 
     return b_value
 
 
 def pack_asn1(
-    tag_class: TagClass, constructed: bool, tag_number: TagNumber | int, b_data: bytes
+    *,
+    tag_class: TagClass,
+    constructed: bool,
+    tag_number: TagNumber | int,
+    b_data: bytes,
 ) -> bytes:
     """Pack the value into an ASN.1 data structure.
 

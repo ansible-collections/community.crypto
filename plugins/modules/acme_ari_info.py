@@ -117,10 +117,10 @@ def main() -> t.NoReturn:
         mutually_exclusive=[("certificate_path", "certificate_content")],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    backend = create_backend(module, True)
+    backend = create_backend(module, needs_acme_v2=True)
 
     try:
-        client = ACMEClient(module, backend)
+        client = ACMEClient(module=module, backend=backend)
         if not client.directory.has_renewal_info_endpoint():
             module.fail_json(
                 msg="The ACME endpoint does not support ACME Renewal Information retrieval"
@@ -132,7 +132,7 @@ def main() -> t.NoReturn:
         )
         module.exit_json(renewal_info=renewal_info)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

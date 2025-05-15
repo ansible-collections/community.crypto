@@ -66,7 +66,10 @@ def test_parse_openssh_version() -> None:
 
 @pytest.mark.parametrize("boolean", VALID_BOOLEAN)
 def test_valid_boolean(boolean: bool) -> None:
-    assert OpensshParser(_OpensshWriter().boolean(boolean).bytes()).boolean() == boolean
+    assert (
+        OpensshParser(data=_OpensshWriter().boolean(boolean).bytes()).boolean()
+        == boolean
+    )
 
 
 @pytest.mark.parametrize("boolean", INVALID_BOOLEAN)
@@ -77,7 +80,9 @@ def test_invalid_boolean(boolean: t.Any) -> None:
 
 @pytest.mark.parametrize("uint32", VALID_UINT32)
 def test_valid_uint32(uint32: int) -> None:
-    assert OpensshParser(_OpensshWriter().uint32(uint32).bytes()).uint32() == uint32
+    assert (
+        OpensshParser(data=_OpensshWriter().uint32(uint32).bytes()).uint32() == uint32
+    )
 
 
 @pytest.mark.parametrize("uint32", INVALID_UINT32)
@@ -88,7 +93,9 @@ def test_invalid_uint32(uint32: int) -> None:
 
 @pytest.mark.parametrize("uint64", VALID_UINT64)
 def test_valid_uint64(uint64: int) -> None:
-    assert OpensshParser(_OpensshWriter().uint64(uint64).bytes()).uint64() == uint64
+    assert (
+        OpensshParser(data=_OpensshWriter().uint64(uint64).bytes()).uint64() == uint64
+    )
 
 
 @pytest.mark.parametrize("uint64", INVALID_UINT64)
@@ -100,7 +107,7 @@ def test_invalid_uint64(uint64: int) -> None:
 @pytest.mark.parametrize("ssh_string", VALID_STRING)
 def test_valid_string(ssh_string: bytes) -> None:
     assert (
-        OpensshParser(_OpensshWriter().string(ssh_string).bytes()).string()
+        OpensshParser(data=_OpensshWriter().string(ssh_string).bytes()).string()
         == ssh_string
     )
 
@@ -113,7 +120,7 @@ def test_invalid_string(ssh_string: t.Any) -> None:
 
 @pytest.mark.parametrize("mpint", VALID_MPINT)
 def test_valid_mpint(mpint: int) -> None:
-    assert OpensshParser(_OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
+    assert OpensshParser(data=_OpensshWriter().mpint(mpint).bytes()).mpint() == mpint
 
 
 @pytest.mark.parametrize("mpint", INVALID_MPINT)
@@ -124,7 +131,7 @@ def test_invalid_mpint(mpint: t.Any) -> None:
 
 def test_valid_seek() -> None:
     buffer = bytearray(b"buffer")
-    parser = OpensshParser(buffer)
+    parser = OpensshParser(data=buffer)
     parser.seek(len(buffer))
     assert parser.remaining_bytes() == 0
     parser.seek(-len(buffer))
@@ -133,7 +140,7 @@ def test_valid_seek() -> None:
 
 def test_invalid_seek() -> None:
     buffer = b"buffer"
-    parser = OpensshParser(buffer)
+    parser = OpensshParser(data=buffer)
 
     with pytest.raises(ValueError):
         parser.seek(len(buffer) + 1)
@@ -144,4 +151,4 @@ def test_invalid_seek() -> None:
 
 def test_writer_bytes() -> None:
     buffer = bytearray(b"buffer")
-    assert _OpensshWriter(buffer).bytes() == buffer
+    assert _OpensshWriter(buffer=buffer).bytes() == buffer

@@ -90,10 +90,10 @@ class PrivateKeyConvertModule(OpenSSLObject):
         self, module: AnsibleModule, module_backend: PrivateKeyConvertBackend
     ) -> None:
         super(PrivateKeyConvertModule, self).__init__(
-            module.params["dest_path"],
-            "present",
-            False,
-            module.check_mode,
+            path=module.params["dest_path"],
+            state="present",
+            force=False,
+            check_mode=module.check_mode,
         )
         self.module_backend = module_backend
 
@@ -104,7 +104,9 @@ class PrivateKeyConvertModule(OpenSSLObject):
         if module.params["mode"] is None:
             module.params["mode"] = "0600"
 
-        module_backend.set_existing_destination(load_file_if_exists(self.path, module))
+        module_backend.set_existing_destination(
+            privatekey_bytes=load_file_if_exists(path=self.path, module=module)
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         """Do conversion."""
@@ -117,7 +119,7 @@ class PrivateKeyConvertModule(OpenSSLObject):
             if not self.check_mode:
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                write_file(module, privatekey_data, 0o600)
+                write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)

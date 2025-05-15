@@ -103,7 +103,8 @@ def test_nopad_b64(value: str, result: str) -> None:
 def test_pem_to_der(pem: str, der: bytes, tmpdir):
     fn = tmpdir / "test.pem"
     fn.write(pem)
-    assert pem_to_der(str(fn)) == der
+    assert pem_to_der(pem_filename=str(fn)) == der
+    assert pem_to_der(pem_content=pem) == der
 
 
 @pytest.mark.parametrize("value, expected_result", TEST_LINKS_HEADER)
@@ -115,7 +116,7 @@ def test_process_links(
     def callback(url, rel):
         data.append((url, rel))
 
-    process_links(value, callback)
+    process_links(info=value, callback=callback)
 
     assert expected_result == data
 

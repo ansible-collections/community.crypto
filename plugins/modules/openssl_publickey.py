@@ -234,10 +234,10 @@ class PublicKey(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
         super(PublicKey, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.module = module
         self.format: t.Literal["OpenSSH", "PEM"] = module.params["format"]
@@ -266,7 +266,7 @@ class PublicKey(OpenSSLObject):
         try:
             result.update(
                 get_publickey_info(
-                    self.module, content=data, prefer_one_fingerprint=True
+                    module=self.module, content=data, prefer_one_fingerprint=True
                 )
             )
             result["can_parse_key"] = True
@@ -312,7 +312,7 @@ class PublicKey(OpenSSLObject):
 
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                write_file(module, publickey_content)
+                write_file(module=module, content=publickey_content)
 
                 self.changed = True
             except OpenSSLBadPassphraseError as exc:
@@ -334,7 +334,9 @@ class PublicKey(OpenSSLObject):
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(PublicKey, self).check(module, perms_required)
+        state_and_perms = super(PublicKey, self).check(
+            module=module, perms_required=perms_required
+        )
 
         def _check_privatekey() -> bool:
             if self.privatekey_path is not None and not os.path.exists(
@@ -401,7 +403,7 @@ class PublicKey(OpenSSLObject):
         if self.return_content:
             if self.publickey_bytes is None:
                 self.publickey_bytes = load_file_if_exists(
-                    self.path, ignore_errors=True
+                    path=self.path, ignore_errors=True
                 )
             result["publickey"] = (
                 self.publickey_bytes.decode("utf-8") if self.publickey_bytes else None

@@ -62,8 +62,8 @@ except ImportError:
 
 
 class OwnCACertificateBackendCryptography(CertificateBackend):
-    def __init__(self, module: AnsibleModule) -> None:
-        super(OwnCACertificateBackendCryptography, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(OwnCACertificateBackendCryptography, self).__init__(module=module)
 
         self.create_subject_key_identifier: t.Literal[
             "create_if_not_provided", "always_create", "never_create"
@@ -73,12 +73,12 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         ]
         self.notBefore = get_relative_time_option(
             module.params["ownca_not_before"],
-            "ownca_not_before",
+            input_name="ownca_not_before",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.notAfter = get_relative_time_option(
             module.params["ownca_not_after"],
-            "ownca_not_after",
+            input_name="ownca_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["ownca_digest"])
@@ -220,6 +220,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
     def needs_regeneration(
         self,
+        *,
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
@@ -233,7 +234,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         # Check whether certificate is signed by CA certificate
         if not cryptography_verify_certificate_signature(
-            self.existing_certificate, self.ca_cert.public_key()
+            certificate=self.existing_certificate,
+            signer_public_key=self.ca_cert.public_key(),
         ):
             return True
 
@@ -270,9 +272,9 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
 
         return False
 
-    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
+    def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
         result = super(OwnCACertificateBackendCryptography, self).dump(
-            include_certificate
+            include_certificate=include_certificate
         )
         result.update(
             {
@@ -339,7 +341,7 @@ class OwnCACertificateProvider(CertificateProvider):
     def create_backend(
         self, module: AnsibleModule
     ) -> OwnCACertificateBackendCryptography:
-        return OwnCACertificateBackendCryptography(module)
+        return OwnCACertificateBackendCryptography(module=module)
 
 
 def add_ownca_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:

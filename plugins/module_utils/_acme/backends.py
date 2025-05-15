@@ -69,7 +69,9 @@ def _reduce_fractional_digits(timestamp_str: str) -> str:
     return f"{timestamp}{fractional}{timezone}"
 
 
-def _parse_acme_timestamp(timestamp_str: str, with_timezone: bool) -> datetime.datetime:
+def _parse_acme_timestamp(
+    timestamp_str: str, *, with_timezone: bool
+) -> datetime.datetime:
     """
     Parses a RFC 3339 timestamp.
     """
@@ -95,7 +97,7 @@ def _parse_acme_timestamp(timestamp_str: str, with_timezone: bool) -> datetime.d
 
 
 class CryptoBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule, with_timezone: bool = False) -> None:
+    def __init__(self, *, module: AnsibleModule, with_timezone: bool = False) -> None:
         self.module = module
         self._with_timezone = with_timezone
 
@@ -106,10 +108,10 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
         return _parse_acme_timestamp(timestamp_str, with_timezone=self._with_timezone)
 
-    def parse_module_parameter(self, value: str, name: str) -> datetime.datetime:
+    def parse_module_parameter(self, *, value: str, name: str) -> datetime.datetime:
         try:
             result = get_relative_time_option(
-                value, name, with_timezone=self._with_timezone
+                value, input_name=name, with_timezone=self._with_timezone
             )
             if result is None:
                 raise BackendException(f"Invalid value for {name}: {value!r}")
@@ -121,6 +123,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         self,
         timestamp_start: datetime.datetime,
         timestamp_end: datetime.datetime,
+        *,
         percentage: float,
     ) -> datetime.datetime:
         start = get_epoch_seconds(timestamp_start)
@@ -141,6 +144,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase: str | None = None,
@@ -152,17 +156,18 @@ class CryptoBackend(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def sign(
-        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+        self, *, payload64: str, protected64: str, key_data: dict[str, t.Any]
     ) -> dict[str, t.Any]:
         pass
 
     @abc.abstractmethod
-    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
+    def create_mac_key(self, *, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
 
     @abc.abstractmethod
     def get_ordered_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> list[tuple[str, str]]:
@@ -178,6 +183,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> set[tuple[str, str]]:
@@ -190,6 +196,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_cert_days(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
@@ -203,7 +210,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def create_chain_matcher(self, criterium: Criterium) -> ChainMatcher:
+    def create_chain_matcher(self, *, criterium: Criterium) -> ChainMatcher:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
@@ -211,6 +218,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_cert_information(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> CertificateInformation:

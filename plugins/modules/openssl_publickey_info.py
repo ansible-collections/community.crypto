@@ -195,7 +195,7 @@ def main() -> t.NoReturn:
                 msg=f"Error while reading public key file from disk: {e}", **result  # type: ignore
             )
 
-    module_backend = select_backend(module, data)
+    module_backend = select_backend(module=module, content=data)
 
     try:
         result.update(module_backend.get_info())

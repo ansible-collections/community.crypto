@@ -168,10 +168,10 @@ def parse_certificate(
 class X509CertificateConvertModule(OpenSSLObject):
     def __init__(self, module: AnsibleModule) -> None:
         super(X509CertificateConvertModule, self).__init__(
-            module.params["dest_path"],
-            "present",
-            False,
-            module.check_mode,
+            path=module.params["dest_path"],
+            state="present",
+            force=False,
+            check_mode=module.check_mode,
         )
 
         self.src_path: str | None = module.params["src_path"]
@@ -214,7 +214,7 @@ class X509CertificateConvertModule(OpenSSLObject):
 
         module.params["path"] = self.path
 
-        self.dest_content = load_file_if_exists(self.path, module)
+        self.dest_content = load_file_if_exists(path=self.path, module=module)
         self.dest_content_format = None
         self.dest_content_pem_type = None
         if self.dest_content is not None:
@@ -264,7 +264,7 @@ class X509CertificateConvertModule(OpenSSLObject):
             if not self.check_mode:
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                write_file(module, cert_data)
+                write_file(module=module, content=cert_data)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)

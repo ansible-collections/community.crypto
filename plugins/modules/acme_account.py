@@ -218,7 +218,7 @@ def main() -> t.NoReturn:
         ],
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    backend = create_backend(module, True)
+    backend = create_backend(module, needs_acme_v2=True)
 
     if module.params["external_account_binding"]:
         # Make sure padding is there
@@ -235,8 +235,8 @@ def main() -> t.NoReturn:
         module.params["external_account_binding"]["key"] = key
 
     try:
-        client = ACMEClient(module, backend)
-        account = ACMEAccount(client)
+        client = ACMEClient(module=module, backend=backend)
+        account = ACMEAccount(client=client)
         changed = False
         state: t.Literal["present", "absent", "changed_key"] = module.params["state"]
         diff_before: dict[str, t.Any] = {}
@@ -267,7 +267,7 @@ def main() -> t.NoReturn:
             terms_agreed = module.params.get("terms_agreed")
             external_account_binding = module.params.get("external_account_binding")
             created, account_data = account.setup_account(
-                contact,
+                contact=contact,
                 terms_agreed=terms_agreed,
                 allow_creation=allow_creation,
                 external_account_binding=external_account_binding,
@@ -284,7 +284,9 @@ def main() -> t.NoReturn:
                     diff_before["public_account_key"] = client.account_key_data["jwk"]
             updated = False
             if not created:
-                updated, account_data = account.update_account(account_data, contact)
+                updated, account_data = account.update_account(
+                    account_data=account_data, contact=contact
+                )
             changed = created or updated
             diff_after = dict(account_data)
             if client.account_key_data:
@@ -293,8 +295,8 @@ def main() -> t.NoReturn:
             # Parse new account key
             try:
                 new_key_data = client.parse_key(
-                    module.params.get("new_account_key_src"),
-                    module.params.get("new_account_key_content"),
+                    key_file=module.params.get("new_account_key_src"),
+                    key_content=module.params.get("new_account_key_content"),
                     passphrase=module.params.get("new_account_key_passphrase"),
                 )
             except KeyParsingError as e:
@@ -327,7 +329,11 @@ def main() -> t.NoReturn:
                     "newKey": new_key_data["jwk"],  # specified in draft 12 and older
                     "oldKey": client.account_jwk,  # specified in draft 13 and newer
                 }
-                data = client.sign_request(protected, change_key_payload, new_key_data)
+                data = client.sign_request(
+                    protected=protected,
+                    payload=change_key_payload,
+                    key_data=new_key_data,
+                )
                 # Send request and verify result
                 result, info = client.send_signed_request(
                     url,
@@ -356,7 +362,7 @@ def main() -> t.NoReturn:
             }
         module.exit_json(**result)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

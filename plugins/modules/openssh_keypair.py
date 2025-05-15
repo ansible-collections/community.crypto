@@ -248,7 +248,7 @@ def main() -> t.NoReturn:
         add_file_common_args=True,
     )
 
-    keypair = select_backend(module, module.params["backend"])
+    keypair = select_backend(module=module, backend=module.params["backend"])
 
     keypair.execute()
 

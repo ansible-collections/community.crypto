@@ -99,7 +99,7 @@ def _restore_all_on_failure(
 
 
 class OpensshModule(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
 
         self.changed: bool = False
@@ -210,6 +210,7 @@ class KeygenCommand:
 
     def generate_certificate(
         self,
+        *,
         certificate_path: str,
         identifier: str,
         options: list[str] | None,
@@ -247,7 +248,13 @@ class KeygenCommand:
         return self._run_command(args, **kwargs)
 
     def generate_keypair(
-        self, private_key_path: str, size: int, type: str, comment: str | None, **kwargs
+        self,
+        *,
+        private_key_path: str,
+        size: int,
+        type: str,
+        comment: str | None,
+        **kwargs,
     ) -> tuple[int, str, str]:
         args = [
             self._bin_path,
@@ -270,26 +277,29 @@ class KeygenCommand:
         return self._run_command(args, data=data, **kwargs)
 
     def get_certificate_info(
-        self, certificate_path: str, **kwargs
+        self, *, certificate_path: str, **kwargs
     ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-L", "-f", certificate_path], **kwargs
         )
 
     def get_matching_public_key(
-        self, private_key_path: str, **kwargs
+        self, *, private_key_path: str, **kwargs
     ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-P", "", "-y", "-f", private_key_path], **kwargs
         )
 
-    def get_private_key(self, private_key_path: str, **kwargs) -> tuple[int, str, str]:
+    def get_private_key(
+        self, *, private_key_path: str, **kwargs
+    ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-l", "-f", private_key_path], **kwargs
         )
 
     def update_comment(
         self,
+        *,
         private_key_path: str,
         comment: str,
         force_new_format: bool = True,
@@ -317,7 +327,7 @@ _PrivateKey = t.TypeVar("_PrivateKey", bound="PrivateKey")
 
 class PrivateKey:
     def __init__(
-        self, size: int, key_type: str, fingerprint: str, format: str = ""
+        self, *, size: int, key_type: str, fingerprint: str, format: str = ""
     ) -> None:
         self._size = size
         self._type = key_type
@@ -363,7 +373,7 @@ _PublicKey = t.TypeVar("_PublicKey", bound="PublicKey")
 
 
 class PublicKey:
-    def __init__(self, type_string: str, data: str, comment: str | None) -> None:
+    def __init__(self, *, type_string: str, data: str, comment: str | None) -> None:
         self._type_string = type_string
         self._data = data
         self._comment = comment
@@ -441,6 +451,7 @@ class PublicKey:
 
 
 def parse_private_key_format(
+    *,
     path: str | os.PathLike,
 ) -> t.Literal["SSH", "PKCS8", "PKCS1", ""]:
     with open(path, "r") as file:

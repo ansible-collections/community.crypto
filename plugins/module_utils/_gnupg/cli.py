@@ -18,7 +18,7 @@ class GPGError(Exception):
 class GPGRunner(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def run_command(
-        self, command: list[str], check_rc: bool = True, data: bytes | None = None
+        self, command: list[str], *, check_rc: bool = True, data: bytes | None = None
     ) -> tuple[int, str, str]:
         """
         Run ``[gpg] + command`` and return ``(rc, stdout, stderr)``.
@@ -34,7 +34,7 @@ class GPGRunner(metaclass=abc.ABCMeta):
         pass
 
 
-def get_fingerprint_from_stdout(stdout: str) -> str:
+def get_fingerprint_from_stdout(*, stdout: str) -> str:
     lines = stdout.splitlines(False)
     for line in lines:
         if line.startswith("fpr:"):
@@ -47,7 +47,7 @@ def get_fingerprint_from_stdout(stdout: str) -> str:
     raise GPGError(f'Cannot extract fingerprint from stdout "{stdout}"')
 
 
-def get_fingerprint_from_file(gpg_runner: GPGRunner, path: str) -> str:
+def get_fingerprint_from_file(*, gpg_runner: GPGRunner, path: str) -> str:
     if not os.path.exists(path):
         raise GPGError(f"{path} does not exist")
     stdout = gpg_runner.run_command(
@@ -61,10 +61,10 @@ def get_fingerprint_from_file(gpg_runner: GPGRunner, path: str) -> str:
         ],
         check_rc=True,
     )[1]
-    return get_fingerprint_from_stdout(stdout)
+    return get_fingerprint_from_stdout(stdout=stdout)
 
 
-def get_fingerprint_from_bytes(gpg_runner: GPGRunner, content: bytes) -> str:
+def get_fingerprint_from_bytes(*, gpg_runner: GPGRunner, content: bytes) -> str:
     stdout = gpg_runner.run_command(
         [
             "--no-keyring",
@@ -77,7 +77,7 @@ def get_fingerprint_from_bytes(gpg_runner: GPGRunner, content: bytes) -> str:
         data=content,
         check_rc=True,
     )[1]
-    return get_fingerprint_from_stdout(stdout)
+    return get_fingerprint_from_stdout(stdout=stdout)
 
 
 __all__ = (

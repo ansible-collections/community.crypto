@@ -53,8 +53,8 @@ if t.TYPE_CHECKING:
 
 class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
-    def __init__(self, module: AnsibleModule) -> None:
-        super(KeypairBackend, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(KeypairBackend, self).__init__(module=module)
 
         self.comment: str | None = self.module.params["comment"]
         self.private_key_path: str = self.module.params["path"]
@@ -296,9 +296,9 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
         try:
             secure_write(
-                temp_public_key,
-                existing_permissions or default_permissions,
-                to_bytes(content),
+                path=temp_public_key,
+                mode=existing_permissions or default_permissions,
+                content=to_bytes(content),
             )
         except (IOError, OSError) as e:
             self.module.fail_json(msg=str(e))
@@ -357,8 +357,8 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
 
 class KeypairBackendOpensshBin(KeypairBackend):
-    def __init__(self, module: AnsibleModule) -> None:
-        super(KeypairBackendOpensshBin, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(KeypairBackendOpensshBin, self).__init__(module=module)
 
         if self.module.params["private_key_format"] != "auto":
             self.module.fail_json(
@@ -369,12 +369,16 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
     def _generate_keypair(self, private_key_path: str) -> None:
         self.ssh_keygen.generate_keypair(
-            private_key_path, self.size, self.type, self.comment, check_rc=True
+            private_key_path=private_key_path,
+            size=self.size,
+            type=self.type,
+            comment=self.comment,
+            check_rc=True,
         )
 
     def _get_private_key(self) -> PrivateKey:
         rc, private_key_content, err = self.ssh_keygen.get_private_key(
-            self.private_key_path, check_rc=False
+            private_key_path=self.private_key_path, check_rc=False
         )
         if rc != 0:
             raise ValueError(err)
@@ -382,13 +386,13 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
     def _get_public_key(self) -> PublicKey | t.Literal[""]:
         public_key_content = self.ssh_keygen.get_matching_public_key(
-            self.private_key_path, check_rc=True
+            private_key_path=self.private_key_path, check_rc=True
         )[1]
         return PublicKey.from_string(public_key_content)
 
     def _private_key_readable(self) -> bool:
         rc, stdout, stderr = self.ssh_keygen.get_matching_public_key(
-            self.private_key_path, check_rc=False
+            private_key_path=self.private_key_path, check_rc=False
         )
         return not (
             rc == 255
@@ -407,8 +411,8 @@ class KeypairBackendOpensshBin(KeypairBackend):
                 LooseVersion("6.5") <= LooseVersion(ssh_version) < LooseVersion("7.8")
             )
             self.ssh_keygen.update_comment(
-                self.private_key_path,
-                self.comment or "",
+                private_key_path=self.private_key_path,
+                comment=self.comment or "",
                 force_new_format=force_new_format,
                 check_rc=True,
             )
@@ -420,8 +424,8 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
 
 class KeypairBackendCryptography(KeypairBackend):
-    def __init__(self, module: AnsibleModule) -> None:
-        super(KeypairBackendCryptography, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(KeypairBackendCryptography, self).__init__(module=module)
 
         if self.type == "rsa1":
             self.module.fail_json(
@@ -469,12 +473,12 @@ class KeypairBackendCryptography(KeypairBackend):
         )
 
         encoded_private_key = OpensshKeypair.encode_openssh_privatekey(
-            keypair.asymmetric_keypair, self.private_key_format
+            asym_keypair=keypair.asymmetric_keypair, key_format=self.private_key_format
         )
-        secure_write(private_key_path, 0o600, encoded_private_key)
+        secure_write(path=private_key_path, mode=0o600, content=encoded_private_key)
 
         public_key_path = private_key_path + ".pub"
-        secure_write(public_key_path, 0o644, keypair.public_key)
+        secure_write(path=public_key_path, mode=0o644, content=keypair.public_key)
 
     def _get_private_key(self) -> PrivateKey:
         keypair = OpensshKeypair.load(
@@ -485,7 +489,7 @@ class KeypairBackendCryptography(KeypairBackend):
             size=keypair.size,
             key_type=keypair.key_type,
             fingerprint=keypair.fingerprint,
-            format=parse_private_key_format(self.private_key_path),
+            format=parse_private_key_format(path=self.private_key_path),
         )
 
     def _get_public_key(self) -> PublicKey | t.Literal[""]:
@@ -550,7 +554,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
 
 def select_backend(
-    module: AnsibleModule, backend: t.Literal["auto", "opensshbin", "cryptography"]
+    *, module: AnsibleModule, backend: t.Literal["auto", "opensshbin", "cryptography"]
 ) -> KeypairBackend:
     can_use_cryptography = HAS_OPENSSH_SUPPORT and LooseVersion(
         CRYPTOGRAPHY_VERSION
@@ -573,7 +577,7 @@ def select_backend(
     if backend == "opensshbin":
         if not can_use_opensshbin:
             module.fail_json(msg="Cannot find the OpenSSH binary in the PATH")
-        return KeypairBackendOpensshBin(module)
+        return KeypairBackendOpensshBin(module=module)
     if backend == "cryptography":
         if not can_use_cryptography:
             module.fail_json(
@@ -581,7 +585,7 @@ def select_backend(
                     f"cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION}"
                 )
             )
-        return KeypairBackendCryptography(module)
+        return KeypairBackendCryptography(module=module)
     raise ValueError(f"Unsupported value for backend: {backend}")
 
 

@@ -107,6 +107,7 @@ def cryptography_decode_revoked_certificate(
 
 def cryptography_dump_revoked(
     entry: dict[str, t.Any],
+    *,
     idn_rewrite: t.Literal["ignore", "idna", "unicode"] = "ignore",
 ) -> dict[str, t.Any]:
     return {
@@ -174,19 +175,19 @@ def get_invalidity_date(obj: x509.InvalidityDate) -> datetime.datetime:
 
 
 def set_next_update(
-    builder: x509.CertificateRevocationListBuilder, value: datetime.datetime
+    builder: x509.CertificateRevocationListBuilder, *, value: datetime.datetime
 ) -> x509.CertificateRevocationListBuilder:
     return builder.next_update(value)
 
 
 def set_last_update(
-    builder: x509.CertificateRevocationListBuilder, value: datetime.datetime
+    builder: x509.CertificateRevocationListBuilder, *, value: datetime.datetime
 ) -> x509.CertificateRevocationListBuilder:
     return builder.last_update(value)
 
 
 def set_revocation_date(
-    builder: x509.RevokedCertificateBuilder, value: datetime.datetime
+    builder: x509.RevokedCertificateBuilder, *, value: datetime.datetime
 ) -> x509.RevokedCertificateBuilder:
     return builder.revocation_date(value)
 

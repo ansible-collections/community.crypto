@@ -270,10 +270,10 @@ class CertificateSigningRequestModule(OpenSSLObject):
         self, module: AnsibleModule, module_backend: CertificateSigningRequestBackend
     ) -> None:
         super(CertificateSigningRequestModule, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.module_backend = module_backend
         self.return_content = module.params["return_content"]
@@ -281,7 +281,9 @@ class CertificateSigningRequestModule(OpenSSLObject):
         self.backup = module.params["backup"]
         self.backup_file: str | None = None
 
-        self.module_backend.set_existing(load_file_if_exists(self.path, module))
+        self.module_backend.set_existing(
+            csr_bytes=load_file_if_exists(path=self.path, module=module)
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate the certificate signing request."""
@@ -291,7 +293,7 @@ class CertificateSigningRequestModule(OpenSSLObject):
                 result = self.module_backend.get_csr_data()
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                write_file(module, result)
+                write_file(module=module, content=result)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -303,7 +305,7 @@ class CertificateSigningRequestModule(OpenSSLObject):
             )
 
     def remove(self, module: AnsibleModule) -> None:
-        self.module_backend.set_existing(None)
+        self.module_backend.set_existing(csr_bytes=None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
         super(CertificateSigningRequestModule, self).remove(module)

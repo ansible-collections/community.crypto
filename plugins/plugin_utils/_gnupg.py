@@ -19,7 +19,9 @@ from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import
 
 
 class PluginGPGRunner(GPGRunner):
-    def __init__(self, executable: str | None = None, cwd: str | None = None) -> None:
+    def __init__(
+        self, *, executable: str | None = None, cwd: str | None = None
+    ) -> None:
         if executable is None:
             try:
                 executable = get_bin_path("gpg")
@@ -29,7 +31,7 @@ class PluginGPGRunner(GPGRunner):
         self.cwd = cwd
 
     def run_command(
-        self, command: list[str], check_rc: bool = True, data: bytes | None = None
+        self, command: list[str], *, check_rc: bool = True, data: bytes | None = None
     ) -> tuple[int, str, str]:
         """
         Run ``[gpg] + command`` and return ``(rc, stdout, stderr)``.

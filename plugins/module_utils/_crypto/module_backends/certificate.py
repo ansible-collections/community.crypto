@@ -63,7 +63,7 @@ class CertificateError(OpenSSLObjectError):
 
 
 class CertificateBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
 
         self.force: bool = module.params["force"]
@@ -104,7 +104,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
             return {}
         try:
             result = get_certificate_info(
-                self.module, data, prefer_one_fingerprint=True
+                module=self.module, content=data, prefer_one_fingerprint=True
             )
             result["can_parse_certificate"] = True
             return result
@@ -289,6 +289,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
 
     def needs_regeneration(
         self,
+        *,
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
@@ -330,7 +331,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
                 return True
         return False
 
-    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
+    def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
         result: dict[str, t.Any] = {
             "privatekey": self.privatekey_path,
@@ -372,7 +373,7 @@ class CertificateProvider(metaclass=abc.ABCMeta):
 
 
 def select_backend(
-    module: AnsibleModule, provider: CertificateProvider
+    *, module: AnsibleModule, provider: CertificateProvider
 ) -> CertificateBackend:
     provider.validate_module_args(module)
 
