@@ -75,7 +75,6 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["selfsigned_digest"])
-        self.version: int = module.params["selfsigned_version"]
         self.serial_number = x509.random_serial_number()
 
         if self.csr_path is not None and not os.path.exists(self.csr_path):
@@ -235,9 +234,6 @@ class SelfSignedCertificateProvider(CertificateProvider):
                 msg="One of privatekey_path and privatekey_content must be specified for the selfsigned provider."
             )
 
-    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
-        return module.params["selfsigned_version"] == 2
-
     def create_backend(
         self, module: AnsibleModule
     ) -> SelfSignedCertificateBackendCryptography:
@@ -248,7 +244,7 @@ def add_selfsigned_provider_to_argument_spec(argument_spec: ArgumentSpec) -> Non
     argument_spec.argument_spec["provider"]["choices"].append("selfsigned")
     argument_spec.argument_spec.update(
         dict(
-            selfsigned_version=dict(type="int", default=3),
+            selfsigned_version=dict(type="int", default=3, choices=[3]),  # not used
             selfsigned_digest=dict(type="str", default="sha256"),
             selfsigned_not_before=dict(
                 type="str", default="+0s", aliases=["selfsigned_notBefore"]

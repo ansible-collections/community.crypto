@@ -43,6 +43,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 from ansible_collections.community.crypto.plugins.module_utils._argspec import (
     ArgumentSpec,
 )
+from ansible_collections.community.crypto.plugins.module_utils._time import (
+    get_now_datetime,
+)
 
 
 if t.TYPE_CHECKING:
@@ -79,9 +82,13 @@ def _decode_retry(
         )
 
     # 429 and 503 should have a Retry-After header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
+    now = get_now_datetime(with_timezone=True)
     try:
-        # TODO: use utils.parse_retry_after()
-        retry_after = min(max(1, int(info.get("retry-after", "10"))), 60)
+        then = parse_retry_after(
+            info.get("retry-after", "10"), relative_with_timezone=True, now=now
+        )
+        retry_after = (then - now).total_seconds()
+        retry_after = min(max(1, retry_after), 60)
     except (TypeError, ValueError):
         retry_after = 10
     module.log(

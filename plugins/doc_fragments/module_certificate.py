@@ -265,6 +265,8 @@ options:
       - This is only used by the V(ownca) provider.
     type: int
     default: 3
+    choices:
+      - 3
 
   ownca_not_before:
     description:
@@ -351,6 +353,8 @@ options:
       - This is only used by the V(selfsigned) provider.
     type: int
     default: 3
+    choices:
+      - 3
 
   selfsigned_digest:
     description:

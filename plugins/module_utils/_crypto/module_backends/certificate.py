@@ -361,10 +361,6 @@ class CertificateProvider(metaclass=abc.ABCMeta):
         """Check module arguments"""
 
     @abc.abstractmethod
-    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
-        """Whether the provider needs to create a version 2 certificate."""
-
-    @abc.abstractmethod
     def create_backend(self, module: AnsibleModule) -> CertificateBackend:
         """Create an implementation for a backend.
 
@@ -380,12 +376,6 @@ def select_backend(
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-
-    if provider.needs_version_two_certs(module):
-        # TODO: remove
-        module.fail_json(
-            msg="The cryptography backend does not support v2 certificates"
-        )
 
     return provider.create_backend(module)
 
