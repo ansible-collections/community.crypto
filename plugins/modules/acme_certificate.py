@@ -97,8 +97,7 @@ options:
     description:
       - URI to a terms of service document you agree to when using the ACME v1 service at O(acme_directory).
       - Default is latest gathered from O(acme_directory) URL.
-      - This option has no longer any effect.
-        # TODO: deprecate!
+      - This option has no longer any effect. It is deprecated and will be removed from community.crypto 4.0.0.
     type: str
   terms_agreed:
     description:
@@ -954,7 +953,11 @@ def main() -> t.NoReturn:
     argument_spec.update_argspec(
         modify_account=dict(type="bool", default=True),
         account_email=dict(type="str"),
-        agreement=dict(type="str"),
+        agreement=dict(
+            type="str",
+            removed_in_version="4.0.0",
+            removed_from_collection="community.crypto",
+        ),
         terms_agreed=dict(type="bool", default=False),
         challenge=dict(
             type="str",
