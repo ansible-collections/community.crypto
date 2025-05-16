@@ -2,3 +2,4 @@ minor_changes:
   - "x509_certificate, x509_certificate_pipe - the ``ownca_version`` and ``selfsigned_version`` parameters explicitly only allow the value ``3``.
      The module already failed for other values in the past, now this is validated as part of the module argument spec
      (https://github.com/ansible-collections/community.crypto/pull/890)."
+  - "acme_* modules - improve parsing of ``Retry-After`` reply headers in regular ACME requests (https://github.com/ansible-collections/community.crypto/pull/890)."
