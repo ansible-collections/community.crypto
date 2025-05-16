@@ -94,9 +94,8 @@ options:
     description:
       - Number of times to repeat the MAC step.
       - This is B(not considered during idempotency checks).
-      - This value is B(not used).
+      - This value is B(not used). It is deprecated and will be removed from community.crypto 4.0.0.
     type: int
-    # TODO: deprecate!
   encryption_level:
     description:
       - Determines the encryption level used.
@@ -390,7 +389,6 @@ class Pkcs(OpenSSLObject):
         certificate_content: str | None = module.params["certificate_content"]
         self.friendly_name: str | None = module.params["friendly_name"]
         self.iter_size: int = module.params["iter_size"] or iter_size_default
-        self.maciter_size: int = module.params["maciter_size"] or 1
         self.encryption_level: t.Literal["auto", "compatibility2022"] = module.params[
             "encryption_level"
         ]
@@ -776,7 +774,11 @@ def main() -> t.NoReturn:
             type="str", choices=["auto", "compatibility2022"], default="auto"
         ),
         iter_size=dict(type="int"),
-        maciter_size=dict(type="int"),
+        maciter_size=dict(
+            type="int",
+            removed_in_version="4.0.0",
+            removed_from_collection="community.crypto",
+        ),
         passphrase=dict(type="str", no_log=True),
         path=dict(type="path", required=True),
         privatekey_passphrase=dict(type="str", no_log=True),
