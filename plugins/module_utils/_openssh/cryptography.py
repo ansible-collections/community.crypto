@@ -233,12 +233,14 @@ class AsymmetricKeypair:
         privatekey = load_privatekey(
             path=path, passphrase=passphrase, key_format=private_key_format
         )
+        publickey: AllPublicKeyTypes
         if no_public_key:
             publickey = privatekey.public_key()
         else:
-            # TODO: BUG: load_publickey() can return unsupported key types
-            # (Also we should check whether the public key fits the private key...)
-            publickey = load_publickey(path=path + ".pub", key_format=public_key_format)  # type: ignore
+            # TODO: Maybe we should check whether the public key actually fits the private key?
+            publickey = load_publickey(
+                path=str(path) + ".pub", key_format=public_key_format
+            )
 
         # Ed25519 keys are always of size 256 and do not have a key_size attribute
         if isinstance(privatekey, Ed25519PrivateKey):
@@ -249,12 +251,28 @@ class AsymmetricKeypair:
         keytype: KeyType
         if isinstance(privatekey, rsa.RSAPrivateKey):
             keytype = "rsa"
+            if not isinstance(publickey, rsa.RSAPublicKey):
+                raise InvalidKeyTypeError(
+                    f"Private key is an RSA key, but public key is of type '{type(publickey)}'"
+                )
         elif isinstance(privatekey, dsa.DSAPrivateKey):
             keytype = "dsa"
+            if not isinstance(publickey, dsa.DSAPublicKey):
+                raise InvalidKeyTypeError(
+                    f"Private key is a DSA key, but public key is of type '{type(publickey)}'"
+                )
         elif isinstance(privatekey, ec.EllipticCurvePrivateKey):
             keytype = "ecdsa"
+            if not isinstance(publickey, ec.EllipticCurvePublicKey):
+                raise InvalidKeyTypeError(
+                    f"Private key is an Elliptic Curve key, but public key is of type '{type(publickey)}'"
+                )
         elif isinstance(privatekey, Ed25519PrivateKey):
             keytype = "ed25519"
+            if not isinstance(publickey, Ed25519PublicKey):
+                raise InvalidKeyTypeError(
+                    f"Private key is an Ed25519 key, but public key is of type '{type(publickey)}'"
+                )
         else:
             raise InvalidKeyTypeError(f"Key type '{type(privatekey)}' is not supported")
 
