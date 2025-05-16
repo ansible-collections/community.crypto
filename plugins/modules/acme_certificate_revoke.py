@@ -159,13 +159,13 @@ def main() -> t.NoReturn:
         ],
     )
     module = argument_spec.create_ansible_module()
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMEClient(module, backend)
-        account = ACMEAccount(client)
+        client = ACMEClient(module=module, backend=backend)
+        account = ACMEAccount(client=client)
         # Load certificate
-        certificate = pem_to_der(module.params.get("certificate"))
+        certificate = pem_to_der(pem_filename=module.params.get("certificate"))
         certificate_b64 = nopad_b64(certificate)
         # Construct payload
         payload = {"certificate": certificate_b64}
@@ -181,7 +181,9 @@ def main() -> t.NoReturn:
             # Step 1: load and parse private key
             try:
                 private_key_data = client.parse_key(
-                    private_key, private_key_content, passphrase=passphrase
+                    key_file=private_key,
+                    key_content=private_key_content,
+                    passphrase=passphrase,
                 )
             except KeyParsingError as e:
                 raise ModuleFailException(f"Error while parsing private key: {e.msg}")
@@ -228,11 +230,14 @@ def main() -> t.NoReturn:
             if already_revoked:
                 module.exit_json(changed=False)
             raise ACMEProtocolException(
-                module, "Failed to revoke certificate", info=info, content_json=result
+                module=module,
+                msg="Failed to revoke certificate",
+                info=info,
+                content_json=result,
             )
         module.exit_json(changed=True)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

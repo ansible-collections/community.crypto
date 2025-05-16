@@ -33,7 +33,9 @@ def read_file(fn: str | os.PathLike) -> bytes:
 
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
-def write_file(module: AnsibleModule, dest: str | os.PathLike, content: bytes) -> bool:
+def write_file(
+    *, module: AnsibleModule, dest: str | os.PathLike, content: bytes
+) -> bool:
     """
     Write content to destination file dest, only if the content
     has changed.
@@ -95,3 +97,6 @@ def write_file(module: AnsibleModule, dest: str | os.PathLike, content: bytes) -
             )
     os.remove(tmpsrc)
     return changed
+
+
+__all__ = ("read_file", "write_file")

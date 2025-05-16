@@ -94,7 +94,7 @@ TEST_FORMAT_ERROR_PROBLEM: list[tuple[dict[str, t.Any], str, str]] = [
 def test_format_error_problem(
     problem: dict[str, t.Any], subproblem_prefix: str, result: str
 ) -> None:
-    res = format_error_problem(problem, subproblem_prefix)
+    res = format_error_problem(problem, subproblem_prefix=subproblem_prefix)
     assert res == result
 
 
@@ -358,7 +358,7 @@ def test_acme_protocol_exception(
         module = MagicMock()
         module.from_json = from_json
     with pytest.raises(ACMEProtocolException) as exc:
-        raise ACMEProtocolException(module, **input)  # type: ignore
+        raise ACMEProtocolException(module=module, **input)  # type: ignore
 
     print(exc.value.msg)
     print(exc.value.module_fail_args)

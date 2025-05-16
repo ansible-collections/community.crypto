@@ -46,7 +46,7 @@ class CertificateChain:
 
     @classmethod
     def download(
-        cls: t.Type[_CertificateChain], client: ACMEClient, url: str
+        cls: t.Type[_CertificateChain], *, client: ACMEClient, url: str
     ) -> _CertificateChain:
         content, info = client.get_request(
             url,
@@ -70,7 +70,10 @@ class CertificateChain:
             result.chain = certs[1:]
 
         process_links(
-            info, lambda link, relation: result._process_links(client, link, relation)
+            info=info,
+            callback=lambda link, relation: result._process_links(
+                client=client, link=link, relation=relation
+            ),
         )
 
         if result.cert is None:
@@ -80,7 +83,7 @@ class CertificateChain:
 
         return result
 
-    def _process_links(self, client: ACMEClient, link: str, relation: str) -> None:
+    def _process_links(self, *, client: ACMEClient, link: str, relation: str) -> None:
         if relation == "up":
             # Process link-up headers if there was no chain in reply
             if not self.chain:
@@ -105,7 +108,7 @@ class CertificateChain:
 
 
 class Criterium:
-    def __init__(self, criterium: dict[str, t.Any], index: int):
+    def __init__(self, *, criterium: dict[str, t.Any], index: int):
         self.index = index
         self.test_certificates: t.Literal["first", "last", "all"] = criterium[
             "test_certificates"
@@ -120,7 +123,10 @@ class Criterium:
 
 class ChainMatcher(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def match(self, certificate: CertificateChain) -> bool:
+    def match(self, *, certificate: CertificateChain) -> bool:
         """
         Check whether a certificate chain (CertificateChain instance) matches.
         """
+
+
+__all__ = ("CertificateChain", "Criterium", "ChainMatcher")

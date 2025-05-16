@@ -1175,3 +1175,6 @@ OID_MAP = {
     "2.23.43.1.4.11": ("wap-wsg-idm-ecid-wtls11",),
     "2.23.43.1.4.12": ("wap-wsg-idm-ecid-wtls12",),
 }
+
+
+__all__ = ("OID_MAP",)

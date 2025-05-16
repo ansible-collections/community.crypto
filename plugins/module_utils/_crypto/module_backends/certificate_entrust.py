@@ -50,12 +50,12 @@ except ImportError:
 
 
 class EntrustCertificateBackend(CertificateBackend):
-    def __init__(self, module: AnsibleModule) -> None:
-        super(EntrustCertificateBackend, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(EntrustCertificateBackend, self).__init__(module=module)
         self.trackingId = None
         self.notAfter = get_relative_time_option(
             module.params["entrust_not_after"],
-            "entrust_not_after",
+            input_name="entrust_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
 
@@ -159,6 +159,7 @@ class EntrustCertificateBackend(CertificateBackend):
 
     def needs_regeneration(
         self,
+        *,
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
@@ -229,7 +230,7 @@ class EntrustCertificateProvider(CertificateProvider):
         return False
 
     def create_backend(self, module: AnsibleModule) -> EntrustCertificateBackend:
-        return EntrustCertificateBackend(module)
+        return EntrustCertificateBackend(module=module)
 
 
 def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
@@ -281,3 +282,10 @@ def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ],
         )
     )
+
+
+__all__ = (
+    "EntrustCertificateBackend",
+    "EntrustCertificateProvider",
+    "add_entrust_provider_to_argument_spec",
+)

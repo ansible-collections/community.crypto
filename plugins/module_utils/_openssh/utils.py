@@ -70,7 +70,7 @@ def parse_openssh_version(version_string: str) -> str | None:
 
 
 @contextmanager
-def secure_open(path: str | os.PathLike, mode: int) -> t.Iterator[int]:
+def secure_open(*, path: str | os.PathLike, mode: int) -> t.Iterator[int]:
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
     try:
         yield fd
@@ -78,8 +78,8 @@ def secure_open(path: str | os.PathLike, mode: int) -> t.Iterator[int]:
         os.close(fd)
 
 
-def secure_write(path: str | os.PathLike, mode: int, content: bytes) -> None:
-    with secure_open(path, mode) as fd:
+def secure_write(*, path: str | os.PathLike, mode: int, content: bytes) -> None:
+    with secure_open(path=path, mode=mode) as fd:
         os.write(fd, content)
 
 
@@ -91,7 +91,7 @@ class OpensshParser:
     UINT32_OFFSET = 4
     UINT64_OFFSET = 8
 
-    def __init__(self, data: bytes | bytearray) -> None:
+    def __init__(self, *, data: bytes | bytearray) -> None:
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError(f"Data must be bytes-like not {type(data)}")
 
@@ -142,7 +142,7 @@ class OpensshParser:
         raw_string = self.string()
 
         if raw_string:
-            parser = OpensshParser(raw_string)
+            parser = OpensshParser(data=raw_string)
             while parser.remaining_bytes():
                 result.append(parser.string())
 
@@ -154,14 +154,14 @@ class OpensshParser:
         raw_string = self.string()
 
         if raw_string:
-            parser = OpensshParser(raw_string)
+            parser = OpensshParser(data=raw_string)
 
             while parser.remaining_bytes():
                 name = parser.string()
                 data = parser.string()
                 if data:
                     # data is doubly-encoded
-                    data = OpensshParser(data).string()
+                    data = OpensshParser(data=data).string()
                 result.append((name, data))
 
         return result
@@ -183,14 +183,14 @@ class OpensshParser:
             return self._pos + offset
 
     @classmethod
-    def signature_data(cls, signature_string: bytes) -> dict[str, bytes | int]:
+    def signature_data(cls, *, signature_string: bytes) -> dict[str, bytes | int]:
         signature_data: dict[str, bytes | int] = {}
 
-        parser = cls(signature_string)
+        parser = cls(data=signature_string)
         signature_type = parser.string()
         signature_blob = parser.string()
 
-        blob_parser = cls(signature_blob)
+        blob_parser = cls(data=signature_blob)
         if signature_type in (b"ssh-rsa", b"rsa-sha2-256", b"rsa-sha2-512"):
             # https://datatracker.ietf.org/doc/html/rfc4253#section-6.6
             # https://datatracker.ietf.org/doc/html/rfc8332#section-3
@@ -242,7 +242,7 @@ class _OpensshWriter:
         in validating parsed material.
     """
 
-    def __init__(self, buffer: bytearray | None = None):
+    def __init__(self, *, buffer: bytearray | None = None):
         if buffer is not None:
             if not isinstance(buffer, bytearray):
                 raise TypeError(f"Buffer must be a bytearray, not {type(buffer)}")
@@ -347,3 +347,13 @@ class _OpensshWriter:
 
     def bytes(self) -> bytes:
         return bytes(self._buff)
+
+
+__all__ = (
+    "any_in",
+    "file_mode",
+    "parse_openssh_version",
+    "secure_open",
+    "secure_write",
+    "OpensshParser",
+)

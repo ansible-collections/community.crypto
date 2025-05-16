@@ -244,7 +244,7 @@ class DHParameterBase:
         if self.backup_file:
             result["backup_file"] = self.backup_file
         if self.return_content:
-            content = load_file_if_exists(self.path, ignore_errors=True)
+            content = load_file_if_exists(path=self.path, ignore_errors=True)
             result["dhparams"] = content.decode("utf-8") if content else None
 
         return result
@@ -338,7 +338,7 @@ class DHParameterCryptography(DHParameterBase):
         # Write result
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        write_file(module, result)
+        write_file(module=module, content=result)
 
     def _check_params_valid(self, module: AnsibleModule) -> bool:
         """Check if the params are in the correct state"""

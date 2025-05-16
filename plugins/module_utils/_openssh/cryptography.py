@@ -145,6 +145,7 @@ class AsymmetricKeypair:
     @classmethod
     def generate(
         cls: t.Type[_AsymmetricKeypair],
+        *,
         keytype: KeyType = "rsa",
         size: int | None = None,
         passphrase: bytes | None = None,
@@ -208,6 +209,7 @@ class AsymmetricKeypair:
     @classmethod
     def load(
         cls: t.Type[_AsymmetricKeypair],
+        *,
         path: str | os.PathLike,
         passphrase: bytes | None = None,
         private_key_format: KeySerializationFormat = "PEM",
@@ -228,13 +230,15 @@ class AsymmetricKeypair:
         else:
             encryption_algorithm = serialization.NoEncryption()
 
-        privatekey = load_privatekey(path, passphrase, private_key_format)
+        privatekey = load_privatekey(
+            path=path, passphrase=passphrase, key_format=private_key_format
+        )
         if no_public_key:
             publickey = privatekey.public_key()
         else:
             # TODO: BUG: load_publickey() can return unsupported key types
             # (Also we should check whether the public key fits the private key...)
-            publickey = load_publickey(path + ".pub", public_key_format)  # type: ignore
+            publickey = load_publickey(path=path + ".pub", key_format=public_key_format)  # type: ignore
 
         # Ed25519 keys are always of size 256 and do not have a key_size attribute
         if isinstance(privatekey, Ed25519PrivateKey):
@@ -264,6 +268,7 @@ class AsymmetricKeypair:
 
     def __init__(
         self,
+        *,
         keytype: KeyType,
         size: int,
         privatekey: PrivateKeyTypes,
@@ -285,7 +290,7 @@ class AsymmetricKeypair:
         self.__encryption_algorithm = encryption_algorithm
 
         try:
-            self.verify(self.sign(b"message"), b"message")
+            self.verify(signature=self.sign(b"message"), data=b"message")
         except InvalidSignatureError:
             raise InvalidPublicKeyFileError(
                 "The private key and public key of this keypair do not match"
@@ -347,7 +352,7 @@ class AsymmetricKeypair:
         except TypeError as e:
             raise InvalidDataError(e)
 
-    def verify(self, signature: bytes, data: bytes) -> None:
+    def verify(self, *, signature: bytes, data: bytes) -> None:
         """Verifies that the signature associated with the provided data was signed
         by the private key of this key pair.
 
@@ -384,6 +389,7 @@ class OpensshKeypair:
     @classmethod
     def generate(
         cls: t.Type[_OpensshKeypair],
+        *,
         keytype: KeyType = "rsa",
         size: int | None = None,
         passphrase: bytes | None = None,
@@ -400,9 +406,15 @@ class OpensshKeypair:
         if comment is None:
             comment = f"{getuser()}@{gethostname()}"
 
-        asym_keypair = AsymmetricKeypair.generate(keytype, size, passphrase)
-        openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, "SSH")
-        openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
+        asym_keypair = AsymmetricKeypair.generate(
+            keytype=keytype, size=size, passphrase=passphrase
+        )
+        openssh_privatekey = cls.encode_openssh_privatekey(
+            asym_keypair=asym_keypair, key_format="SSH"
+        )
+        openssh_publickey = cls.encode_openssh_publickey(
+            asym_keypair=asym_keypair, comment=comment
+        )
         fingerprint = calculate_fingerprint(openssh_publickey)
 
         return cls(
@@ -416,6 +428,7 @@ class OpensshKeypair:
     @classmethod
     def load(
         cls: t.Type[_OpensshKeypair],
+        *,
         path: str | os.PathLike,
         passphrase: bytes | None = None,
         no_public_key: bool = False,
@@ -433,10 +446,18 @@ class OpensshKeypair:
             comment = extract_comment(str(path) + ".pub")
 
         asym_keypair = AsymmetricKeypair.load(
-            path, passphrase, "SSH", "SSH", no_public_key
+            path=path,
+            passphrase=passphrase,
+            private_key_format="SSH",
+            public_key_format="SSH",
+            no_public_key=no_public_key,
         )
-        openssh_privatekey = cls.encode_openssh_privatekey(asym_keypair, "SSH")
-        openssh_publickey = cls.encode_openssh_publickey(asym_keypair, comment)
+        openssh_privatekey = cls.encode_openssh_privatekey(
+            asym_keypair=asym_keypair, key_format="SSH"
+        )
+        openssh_publickey = cls.encode_openssh_publickey(
+            asym_keypair=asym_keypair, comment=comment
+        )
         fingerprint = calculate_fingerprint(openssh_publickey)
 
         return cls(
@@ -449,7 +470,7 @@ class OpensshKeypair:
 
     @staticmethod
     def encode_openssh_privatekey(
-        asym_keypair: AsymmetricKeypair, key_format: KeyFormat
+        *, asym_keypair: AsymmetricKeypair, key_format: KeyFormat
     ) -> bytes:
         """Returns an OpenSSH encoded private key for a given keypair
 
@@ -482,7 +503,7 @@ class OpensshKeypair:
 
     @staticmethod
     def encode_openssh_publickey(
-        asym_keypair: AsymmetricKeypair, comment: str
+        *, asym_keypair: AsymmetricKeypair, comment: str
     ) -> bytes:
         """Returns an OpenSSH encoded public key for a given keypair
 
@@ -504,6 +525,7 @@ class OpensshKeypair:
 
     def __init__(
         self,
+        *,
         asym_keypair: AsymmetricKeypair,
         openssh_privatekey: bytes,
         openssh_publickey: bytes,
@@ -603,11 +625,12 @@ class OpensshKeypair:
 
         self.__asym_keypair.update_passphrase(passphrase)
         self.__openssh_privatekey = OpensshKeypair.encode_openssh_privatekey(
-            self.__asym_keypair, "SSH"
+            asym_keypair=self.__asym_keypair, key_format="SSH"
         )
 
 
 def load_privatekey(
+    *,
     path: str | os.PathLike,
     passphrase: bytes | None,
     key_format: KeySerializationFormat,
@@ -662,7 +685,7 @@ def load_privatekey(
 
 
 def load_publickey(
-    path: str | os.PathLike, key_format: KeySerializationFormat
+    *, path: str | os.PathLike, key_format: KeySerializationFormat
 ) -> AllPublicKeyTypes:
     publickey_loaders = {
         "PEM": serialization.load_pem_public_key,
@@ -767,3 +790,30 @@ def calculate_fingerprint(openssh_publickey: bytes) -> str:
 
     value = b64encode(digest.finalize()).decode(encoding=_TEXT_ENCODING).rstrip("=")
     return f"SHA256:{value}"
+
+
+__all__ = (
+    "HAS_OPENSSH_SUPPORT",
+    "CRYPTOGRAPHY_VERSION",
+    "OpenSSHError",
+    "InvalidAlgorithmError",
+    "InvalidCommentError",
+    "InvalidDataError",
+    "InvalidPrivateKeyFileError",
+    "InvalidPublicKeyFileError",
+    "InvalidKeyFormatError",
+    "InvalidKeySizeError",
+    "InvalidKeyTypeError",
+    "InvalidPassphraseError",
+    "InvalidSignatureError",
+    "AsymmetricKeypair",
+    "OpensshKeypair",
+    "load_privatekey",
+    "load_publickey",
+    "compare_publickeys",
+    "compare_encryption_algorithms",
+    "get_encryption_algorithm",
+    "validate_comment",
+    "extract_comment",
+    "calculate_fingerprint",
+)

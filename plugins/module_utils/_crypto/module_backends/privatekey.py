@@ -80,7 +80,7 @@ class PrivateKeyError(OpenSSLObjectError):
 
 
 class PrivateKeyBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module: GeneralAnsibleModule) -> None:
+    def __init__(self, *, module: GeneralAnsibleModule) -> None:
         self.module = module
         self.type: t.Literal[
             "DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"
@@ -104,18 +104,18 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
         self.existing_private_key: PrivateKeyTypes | None = None
         self.existing_private_key_bytes: bytes | None = None
 
-        self.diff_before = self._get_info(None)
-        self.diff_after = self._get_info(None)
+        self.diff_before = self._get_info(data=None)
+        self.diff_after = self._get_info(data=None)
 
-    def _get_info(self, data: bytes | None) -> dict[str, t.Any]:
+    def _get_info(self, *, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
             return {}
         result: dict[str, t.Any] = {"can_parse_key": False}
         try:
             result.update(
                 get_privatekey_info(
-                    self.module,
-                    data,
+                    module=self.module,
+                    content=data,
                     passphrase=self.passphrase,
                     return_private_key_data=False,
                     prefer_one_fingerprint=True,
@@ -148,11 +148,11 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.private_key."""
 
-    def set_existing(self, privatekey_bytes: bytes | None) -> None:
+    def set_existing(self, *, privatekey_bytes: bytes | None) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.existing_private_key_bytes = privatekey_bytes
         self.diff_after = self.diff_before = self._get_info(
-            self.existing_private_key_bytes
+            data=self.existing_private_key_bytes
         )
 
     def has_existing(self) -> bool:
@@ -235,7 +235,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             return get_fingerprint_of_privatekey(self.existing_private_key)
         return None
 
-    def dump(self, include_key: bool) -> dict[str, t.Any]:
+    def dump(self, *, include_key: bool) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
 
         if not self.private_key:
@@ -255,7 +255,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
         pk_bytes = self.existing_private_key_bytes
         if self.private_key is not None:
             pk_bytes = self.get_private_key_data()
-        self.diff_after = self._get_info(pk_bytes)
+        self.diff_after = self._get_info(data=pk_bytes)
         if include_key:
             # Store result
             if pk_bytes:
@@ -276,6 +276,7 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
 class _Curve:
     def __init__(
         self,
+        *,
         name: str,
         ectype: str,
         deprecated: bool,
@@ -285,7 +286,7 @@ class _Curve:
         self.deprecated = deprecated
 
     def _get_ec_class(
-        self, module: GeneralAnsibleModule
+        self, *, module: GeneralAnsibleModule
     ) -> type[cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve]:
         ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(self.ectype)  # type: ignore
         if ecclass is None:
@@ -295,17 +296,18 @@ class _Curve:
         return ecclass
 
     def create(
-        self, size: int, module: GeneralAnsibleModule
+        self, *, size: int, module: GeneralAnsibleModule
     ) -> cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve:
-        ecclass = self._get_ec_class(module)
+        ecclass = self._get_ec_class(module=module)
         return ecclass()
 
     def verify(
         self,
+        *,
         privatekey: cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
         module: GeneralAnsibleModule,
     ) -> bool:
-        ecclass = self._get_ec_class(module)
+        ecclass = self._get_ec_class(module=module)
         return isinstance(privatekey.private_numbers().public_numbers.curve, ecclass)
 
 
@@ -316,6 +318,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self,
         name: str,
         ectype: str,
+        *,
         deprecated: bool = False,
     ) -> None:
         self.curves[name] = _Curve(name=name, ectype=ectype, deprecated=deprecated)
@@ -575,7 +578,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             if self.curve not in self.curves:
                 return False
             return self.curves[self.curve].verify(
-                self.existing_private_key, module=self.module
+                privatekey=self.existing_private_key, module=self.module
             )
 
         return False
@@ -596,7 +599,7 @@ def select_backend(module: GeneralAnsibleModule) -> PrivateKeyBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PrivateKeyCryptographyBackend(module)
+    return PrivateKeyCryptographyBackend(module=module)
 
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
@@ -661,3 +664,11 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
             ("type", "ECC", ["curve"]),
         ],
     )
+
+
+__all__ = (
+    "PrivateKeyError",
+    "PrivateKeyBackend",
+    "select_backend",
+    "get_privatekey_argument_spec",
+)

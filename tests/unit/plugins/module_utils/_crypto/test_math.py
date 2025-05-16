@@ -27,7 +27,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.math impo
     ],
 )
 def test_binary_exp_mod(f: int, e: int, m: int, result: int) -> None:
-    value = binary_exp_mod(f, e, m)
+    value = binary_exp_mod(f, e, m=m)
     print(value)
     assert value == result
 

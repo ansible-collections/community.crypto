@@ -154,7 +154,9 @@ class CertificateSigningRequestModule:
         self.module_backend = module_backend
         self.changed = False
         if module.params["content"] is not None:
-            self.module_backend.set_existing(module.params["content"].encode("utf-8"))
+            self.module_backend.set_existing(
+                csr_bytes=module.params["content"].encode("utf-8")
+            )
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate the certificate signing request."""

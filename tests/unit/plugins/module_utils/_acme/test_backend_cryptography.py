@@ -53,7 +53,7 @@ def test_eckeyparse_cryptography(
     fn = tmpdir / "test.pem"
     fn.write(pem)
     module = MagicMock()
-    backend = CryptographyBackend(module)
+    backend = CryptographyBackend(module=module)
     key = backend.parse_key(key_file=str(fn))
     key.pop("key_obj")
     assert key == result
@@ -69,7 +69,7 @@ def test_csridentifiers_cryptography(
     fn = tmpdir / "test.csr"
     fn.write(csr)
     module = MagicMock()
-    backend = CryptographyBackend(module)
+    backend = CryptographyBackend(module=module)
     identifiers = backend.get_csr_identifiers(csr_filename=str(fn))
     assert identifiers == result
     identifiers = backend.get_csr_identifiers(csr_content=csr)
@@ -84,7 +84,7 @@ def test_certdays_cryptography(
         fn = tmpdir / "test-cert.pem"
         fn.write(TEST_CERT)
         module = MagicMock()
-        backend = CryptographyBackend(module)
+        backend = CryptographyBackend(module=module)
         days = backend.get_cert_days(cert_filename=str(fn), now=now)
         assert days == expected_days
         days = backend.get_cert_days(cert_content=TEST_CERT, now=now)
@@ -103,7 +103,7 @@ def test_get_cert_information(
     fn = tmpdir / "test-cert.pem"
     fn.write(cert_content)
     module = MagicMock()
-    backend = CryptographyBackend(module)
+    backend = CryptographyBackend(module=module)
 
     if CRYPTOGRAPHY_TIMEZONE:
         expected_cert_info = expected_cert_info._replace(
@@ -126,7 +126,7 @@ def test_get_cert_information(
 def test_now(timezone: datetime.timedelta) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = CryptographyBackend(module)
+        backend = CryptographyBackend(module=module)
         now = backend.get_now()
         if CRYPTOGRAPHY_TIMEZONE:
             assert now.tzinfo is not None
@@ -142,7 +142,7 @@ def test_parse_acme_timestamp(
 ) -> None:
     with freeze_time("2024-02-03 04:05:06 +00:00", tz_offset=timezone):
         module = MagicMock()
-        backend = CryptographyBackend(module)
+        backend = CryptographyBackend(module=module)
         ts_expected = backend.get_utc_datetime(**expected)
         timestamp = backend.parse_acme_timestamp(input)
         assert ts_expected == timestamp
@@ -160,9 +160,11 @@ def test_interpolate_timestamp(
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = CryptographyBackend(module)
+        backend = CryptographyBackend(module=module)
         ts_start = backend.get_utc_datetime(**start)
         ts_end = backend.get_utc_datetime(**end)
         ts_expected = backend.get_utc_datetime(**expected)
-        timestamp = backend.interpolate_timestamp(ts_start, ts_end, percentage)
+        timestamp = backend.interpolate_timestamp(
+            ts_start, ts_end, percentage=percentage
+        )
         assert ts_expected == timestamp

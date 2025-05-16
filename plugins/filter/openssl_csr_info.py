@@ -309,7 +309,9 @@ def openssl_csr_info_filter(
 
     module = FilterModuleMock({"name_encoding": name_encoding})
     try:
-        return get_csr_info(module, content=to_bytes(data), validate_signature=True)
+        return get_csr_info(
+            module=module, content=to_bytes(data), validate_signature=True
+        )
     except OpenSSLObjectError as exc:
         raise AnsibleFilterError(str(exc))
 

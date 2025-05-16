@@ -92,7 +92,11 @@ if t.TYPE_CHECKING:
 class CryptographyChainMatcher(ChainMatcher):
     @staticmethod
     def _parse_key_identifier(
-        key_identifier: str | None, name: str, criterium_idx: int, module: AnsibleModule
+        *,
+        key_identifier: str | None,
+        name: str,
+        criterium_idx: int,
+        module: AnsibleModule,
     ) -> bytes | None:
         if key_identifier:
             try:
@@ -109,7 +113,7 @@ class CryptographyChainMatcher(ChainMatcher):
                     )
         return None
 
-    def __init__(self, criterium: Criterium, module: AnsibleModule) -> None:
+    def __init__(self, *, criterium: Criterium, module: AnsibleModule) -> None:
         self.criterium = criterium
         self.test_certificates = criterium.test_certificates
         self.subject: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]] = []
@@ -117,29 +121,32 @@ class CryptographyChainMatcher(ChainMatcher):
         if criterium.subject:
             self.subject = [
                 (cryptography_name_to_oid(k), to_native(v))
-                for k, v in parse_name_field(criterium.subject, "subject")
+                for k, v in parse_name_field(
+                    criterium.subject, name_field_name="subject"
+                )
             ]
         if criterium.issuer:
             self.issuer = [
                 (cryptography_name_to_oid(k), to_native(v))
-                for k, v in parse_name_field(criterium.issuer, "issuer")
+                for k, v in parse_name_field(criterium.issuer, name_field_name="issuer")
             ]
         self.subject_key_identifier = CryptographyChainMatcher._parse_key_identifier(
-            criterium.subject_key_identifier,
-            "subject_key_identifier",
-            criterium.index,
-            module,
+            key_identifier=criterium.subject_key_identifier,
+            name="subject_key_identifier",
+            criterium_idx=criterium.index,
+            module=module,
         )
         self.authority_key_identifier = CryptographyChainMatcher._parse_key_identifier(
-            criterium.authority_key_identifier,
-            "authority_key_identifier",
-            criterium.index,
-            module,
+            key_identifier=criterium.authority_key_identifier,
+            name="authority_key_identifier",
+            criterium_idx=criterium.index,
+            module=module,
         )
         self.module = module
 
     def _match_subject(
         self,
+        *,
         x509_subject: cryptography.x509.Name,
         match_subject: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]],
     ) -> bool:
@@ -153,7 +160,7 @@ class CryptographyChainMatcher(ChainMatcher):
                 return False
         return True
 
-    def match(self, certificate: CertificateChain) -> bool:
+    def match(self, *, certificate: CertificateChain) -> bool:
         """
         Check whether an alternate chain matches the specified criterium.
         """
@@ -166,9 +173,13 @@ class CryptographyChainMatcher(ChainMatcher):
             try:
                 x509 = cryptography.x509.load_pem_x509_certificate(to_bytes(cert))
                 matches = True
-                if not self._match_subject(x509.subject, self.subject):
+                if not self._match_subject(
+                    x509_subject=x509.subject, match_subject=self.subject
+                ):
                     matches = False
-                if not self._match_subject(x509.issuer, self.issuer):
+                if not self._match_subject(
+                    x509_subject=x509.issuer, match_subject=self.issuer
+                ):
                     matches = False
                 if self.subject_key_identifier:
                     try:
@@ -199,13 +210,14 @@ class CryptographyChainMatcher(ChainMatcher):
 
 
 class CryptographyBackend(CryptoBackend):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, *, module: AnsibleModule) -> None:
         super(CryptographyBackend, self).__init__(
-            module, with_timezone=CRYPTOGRAPHY_TIMEZONE
+            module=module, with_timezone=CRYPTOGRAPHY_TIMEZONE
         )
 
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase: str | None = None,
@@ -288,7 +300,7 @@ class CryptographyBackend(CryptoBackend):
             raise KeyParsingError(f'unknown key type "{type(key)}"')
 
     def sign(
-        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+        self, *, payload64: str, protected64: str, key_data: dict[str, t.Any]
     ) -> dict[str, t.Any]:
         sign_payload = f"{protected64}.{payload64}".encode("utf8")
         hashalg: type[cryptography.hazmat.primitives.hashes.HashAlgorithm]
@@ -317,8 +329,8 @@ class CryptographyBackend(CryptoBackend):
             r, s = cryptography.hazmat.primitives.asymmetric.utils.decode_dss_signature(
                 key_data["key_obj"].sign(sign_payload, ecdsa)
             )
-            rr = convert_int_to_hex(r, 2 * key_data["point_size"])
-            ss = convert_int_to_hex(s, 2 * key_data["point_size"])
+            rr = convert_int_to_hex(r, digits=2 * key_data["point_size"])
+            ss = convert_int_to_hex(s, digits=2 * key_data["point_size"])
             signature = binascii.unhexlify(rr) + binascii.unhexlify(ss)
 
         return {
@@ -327,7 +339,7 @@ class CryptographyBackend(CryptoBackend):
             "signature": nopad_b64(signature),
         }
 
-    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
+    def create_mac_key(self, *, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
         hashalg: type[cryptography.hazmat.primitives.hashes.HashAlgorithm]
         if alg == "HS256":
@@ -362,6 +374,7 @@ class CryptographyBackend(CryptoBackend):
 
     def get_ordered_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> list[tuple[str, str]]:
@@ -413,6 +426,7 @@ class CryptographyBackend(CryptoBackend):
 
     def get_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | bytes | None = None,
     ) -> set[tuple[str, str]]:
@@ -429,6 +443,7 @@ class CryptographyBackend(CryptoBackend):
 
     def get_cert_days(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
@@ -466,14 +481,15 @@ class CryptographyBackend(CryptoBackend):
             now = add_or_remove_timezone(now, with_timezone=CRYPTOGRAPHY_TIMEZONE)
         return (get_not_valid_after(cert) - now).days
 
-    def create_chain_matcher(self, criterium: Criterium) -> ChainMatcher:
+    def create_chain_matcher(self, *, criterium: Criterium) -> ChainMatcher:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
-        return CryptographyChainMatcher(criterium, self.module)
+        return CryptographyChainMatcher(criterium=criterium, module=self.module)
 
     def get_cert_information(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> CertificateInformation:
@@ -520,3 +536,12 @@ class CryptographyBackend(CryptoBackend):
             subject_key_identifier=ski,
             authority_key_identifier=aki,
         )
+
+
+__all__ = (
+    "CRYPTOGRAPHY_MINIMAL_VERSION",
+    "CRYPTOGRAPHY_ERROR",
+    "CRYPTOGRAPHY_VERSION",
+    "CRYPTOGRAPHY_ERROR",
+    "CryptographyBackend",
+)

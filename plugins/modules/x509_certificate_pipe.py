@@ -203,7 +203,9 @@ def main() -> t.NoReturn:
             "selfsigned": SelfSignedCertificateProvider,
         }
 
-        module_backend = select_backend(module, provider_map[provider]())
+        module_backend = select_backend(
+            module=module, provider=provider_map[provider]()
+        )
         certificate = GenericCertificate(module, module_backend)
         certificate.generate(module)
         result = certificate.dump()

@@ -148,7 +148,7 @@ def openssl_publickey_info_filter(data: str | bytes) -> dict[str, t.Any]:
 
     module = FilterModuleMock({})
     try:
-        return get_publickey_info(module, content=to_bytes(data))
+        return get_publickey_info(module=module, content=to_bytes(data))
     except PublicKeyParseError as exc:
         raise AnsibleFilterError(exc.error_message)
     except OpenSSLObjectError as exc:

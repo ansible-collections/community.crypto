@@ -349,7 +349,9 @@ def main() -> t.NoReturn:
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading CSR file from disk: {e}")
 
-    module_backend = select_backend(module, data, validate_signature=True)
+    module_backend = select_backend(
+        module=module, content=data, validate_signature=True
+    )
 
     try:
         result = module_backend.get_info()

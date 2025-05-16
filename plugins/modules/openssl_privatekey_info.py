@@ -250,8 +250,8 @@ def main() -> t.NoReturn:
     result["can_load_key"] = True
 
     module_backend = select_backend(
-        module,
-        data,
+        module=module,
+        content=data,
         passphrase=module.params["passphrase"],
         return_private_key_data=module.params["return_private_key_data"],
         check_consistency=module.params["check_consistency"],

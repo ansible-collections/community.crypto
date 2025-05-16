@@ -439,7 +439,7 @@ def main() -> t.NoReturn:
         except (IOError, OSError) as e:
             module.fail_json(msg=f"Error while reading certificate file from disk: {e}")
 
-    module_backend = select_backend(module, data)
+    module_backend = select_backend(module=module, content=data)
 
     valid_at: dict[str, t.Any] = module.params["valid_at"]
     if valid_at:
@@ -449,7 +449,9 @@ def main() -> t.NoReturn:
                     msg=f"The value for valid_at.{k} must be of type string (got {type(v)})"
                 )
             valid_at[k] = get_relative_time_option(
-                to_text(v), f"valid_at.{k}", with_timezone=CRYPTOGRAPHY_TIMEZONE
+                to_text(v),
+                input_name=f"valid_at.{k}",
+                with_timezone=CRYPTOGRAPHY_TIMEZONE,
             )
 
     try:

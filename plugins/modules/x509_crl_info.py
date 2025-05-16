@@ -224,8 +224,8 @@ def main() -> t.NoReturn:
     list_revoked_certificates: bool = module.params["list_revoked_certificates"]
     try:
         result = get_crl_info(
-            module,
-            data,
+            module=module,
+            content=data,
             list_revoked_certificates=list_revoked_certificates,
         )
         module.exit_json(**result)

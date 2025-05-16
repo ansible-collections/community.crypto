@@ -27,5 +27,5 @@ def test_read_file(tmpdir) -> None:
 def test_write_file(tmpdir) -> None:
     fn = tmpdir / "test.txt"
     module = MagicMock()
-    write_file(module, str(fn), TEST_TEXT.encode("utf-8"))
+    write_file(module=module, dest=str(fn), content=TEST_TEXT.encode("utf-8"))
     assert fn.read() == TEST_TEXT

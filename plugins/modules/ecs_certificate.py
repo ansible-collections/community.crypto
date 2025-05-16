@@ -849,7 +849,10 @@ class EcsCertificate:
                 if self.request_type != "validate_only":
                     if self.backup:
                         self.backup_file = module.backup_local(self.path)
-                    write_file(module, to_bytes(self.cert_details.get("endEntityCert")))
+                    write_file(
+                        module=module,
+                        content=to_bytes(self.cert_details.get("endEntityCert")),
+                    )
                     if self.full_chain_path and self.cert_details.get("chainCerts"):
                         if self.backup:
                             self.backup_full_chain_file = module.backup_local(
@@ -859,17 +862,24 @@ class EcsCertificate:
                             "\n".join(self.cert_details.get("chainCerts")) + "\n"
                         )
                         write_file(
-                            module, to_bytes(chain_string), path=self.full_chain_path
+                            module=module,
+                            content=to_bytes(chain_string),
+                            path=self.full_chain_path,
                         )
                     self.changed = True
         # If there is no certificate present in path but a tracking ID was specified, save it to disk
         elif not os.path.exists(self.path) and self.tracking_id:
             if not module.check_mode:
-                write_file(module, to_bytes(self.cert_details.get("endEntityCert")))
+                write_file(
+                    module=module,
+                    content=to_bytes(self.cert_details.get("endEntityCert")),
+                )
                 if self.full_chain_path and self.cert_details.get("chainCerts"):
                     chain_string = "\n".join(self.cert_details.get("chainCerts")) + "\n"
                     write_file(
-                        module, to_bytes(chain_string), path=self.full_chain_path
+                        module=module,
+                        content=to_bytes(chain_string),
+                        path=self.full_chain_path,
                     )
             self.changed = True
 

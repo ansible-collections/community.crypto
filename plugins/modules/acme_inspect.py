@@ -256,13 +256,13 @@ def main() -> t.NoReturn:
         ],
     )
     module = argument_spec.create_ansible_module()
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     result: dict[str, t.Any] = {}
     changed = False
     try:
         # Get hold of ACMEClient and ACMEAccount objects (includes directory)
-        client = ACMEClient(module, backend)
+        client = ACMEClient(module=module, backend=backend)
         method = module.params["method"]
         result["directory"] = client.directory.directory
         # Do we have to do more requests?
@@ -297,11 +297,11 @@ def main() -> t.NoReturn:
                 pass
             # Fail if error was returned
             if fail_on_acme_error and info["status"] >= 400:
-                raise ACMEProtocolException(module, info=info, content=data)
+                raise ACMEProtocolException(module=module, info=info, content=data)
         # Done!
         module.exit_json(changed=changed, **result)
     except ModuleFailException as e:
-        e.do_fail(module, **result)
+        e.do_fail(module=module, **result)
 
 
 if __name__ == "__main__":

@@ -29,8 +29,8 @@ if t.TYPE_CHECKING:
 
 
 class AcmeCertificateBackend(CertificateBackend):
-    def __init__(self, module: AnsibleModule) -> None:
-        super(AcmeCertificateBackend, self).__init__(module)
+    def __init__(self, *, module: AnsibleModule) -> None:
+        super(AcmeCertificateBackend, self).__init__(module=module)
         self.accountkey_path: str = module.params["acme_accountkey_path"]
         self.challenge_path: str = module.params["acme_challenge_path"]
         self.use_chain: bool = module.params["acme_chain"]
@@ -102,8 +102,10 @@ class AcmeCertificateBackend(CertificateBackend):
             raise AssertionError("Contract violation: cert_bytes is None")
         return self.cert_bytes
 
-    def dump(self, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(AcmeCertificateBackend, self).dump(include_certificate)
+    def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
+        result = super(AcmeCertificateBackend, self).dump(
+            include_certificate=include_certificate
+        )
         result["accountkey"] = self.accountkey_path
         return result
 
@@ -123,7 +125,7 @@ class AcmeCertificateProvider(CertificateProvider):
         return False
 
     def create_backend(self, module: AnsibleModule) -> AcmeCertificateBackend:
-        return AcmeCertificateBackend(module)
+        return AcmeCertificateBackend(module=module)
 
 
 def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
@@ -138,3 +140,10 @@ def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ),
         )
     )
+
+
+__all__ = (
+    "AcmeCertificateBackend",
+    "AcmeCertificateProvider",
+    "add_acme_provider_to_argument_spec",
+)

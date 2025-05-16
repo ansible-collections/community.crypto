@@ -69,7 +69,7 @@ class PrivateKeyError(OpenSSLObjectError):
 
 
 class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
         self.src_path: str | None = module.params["src_path"]
         self.src_content: str | None = module.params["src_content"]
@@ -79,7 +79,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 
         self.src_private_key: PrivateKeyTypes | None = None
         if self.src_path is not None:
-            self.src_private_key_bytes = load_file(self.src_path, module)
+            self.src_private_key_bytes = load_file(path=self.src_path, module=module)
         else:
             if self.src_content is None:
                 raise AssertionError("src_content is None")
@@ -93,7 +93,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
         """Return bytes for self.src_private_key in output format."""
         pass
 
-    def set_existing_destination(self, privatekey_bytes: bytes | None) -> None:
+    def set_existing_destination(self, *, privatekey_bytes: bytes | None) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""
         self.dest_private_key_bytes = privatekey_bytes
 
@@ -104,6 +104,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _load_private_key(
         self,
+        *,
         data: bytes,
         passphrase: str | None,
         current_hint: PrivateKeyTypes | None = None,
@@ -113,7 +114,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
     def needs_conversion(self) -> bool:
         """Check whether a conversion is necessary. Must only be called if needs_regeneration() returned False."""
         dummy, self.src_private_key = self._load_private_key(
-            self.src_private_key_bytes, self.src_passphrase
+            data=self.src_private_key_bytes, passphrase=self.src_passphrase
         )
 
         if not self.has_existing_destination():
@@ -122,8 +123,8 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 
         try:
             format, self.dest_private_key = self._load_private_key(
-                self.dest_private_key_bytes,
-                self.dest_passphrase,
+                data=self.dest_private_key_bytes,
+                passphrase=self.dest_passphrase,
                 current_hint=self.src_private_key,
             )
         except Exception:
@@ -140,7 +141,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, *, module: AnsibleModule) -> None:
         super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
 
     def get_private_key_data(self) -> bytes:
@@ -201,6 +202,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
 
     def _load_private_key(
         self,
+        *,
         data: bytes,
         passphrase: str | None,
         current_hint: PrivateKeyTypes | None = None,
@@ -276,7 +278,7 @@ def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PrivateKeyConvertCryptographyBackend(module)
+    return PrivateKeyConvertCryptographyBackend(module=module)
 
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
@@ -295,3 +297,11 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
             ["src_path", "src_content"],
         ],
     )
+
+
+__all__ = (
+    "PrivateKeyError",
+    "PrivateKeyConvertBackend",
+    "select_backend",
+    "get_privatekey_argument_spec",
+)

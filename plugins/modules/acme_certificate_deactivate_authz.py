@@ -74,18 +74,18 @@ def main() -> t.NoReturn:
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
 
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMEClient(module, backend)
-        account = ACMEAccount(client)
+        client = ACMEClient(module=module, backend=backend)
+        account = ACMEAccount(client=client)
 
         dummy, account_data = account.setup_account(allow_creation=False)
         if account_data is None:
             raise ModuleFailException(msg="Account does not exist or is deactivated.")
 
-        order = Order.from_url(client, module.params["order_uri"])
-        order.load_authorizations(client)
+        order = Order.from_url(client=client, url=module.params["order_uri"])
+        order.load_authorizations(client=client)
 
         changed = False
         for authz in order.authorizations.values():
@@ -95,7 +95,7 @@ def main() -> t.NoReturn:
             if module.check_mode:
                 continue
             try:
-                authz.deactivate(client)
+                authz.deactivate(client=client)
             except Exception:
                 # ignore errors
                 pass
@@ -104,7 +104,7 @@ def main() -> t.NoReturn:
 
         module.exit_json(changed=changed)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

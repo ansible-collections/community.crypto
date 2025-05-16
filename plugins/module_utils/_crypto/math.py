@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 
-def binary_exp_mod(f: int, e: int, m: int) -> int:
+def binary_exp_mod(f: int, e: int, *, m: int) -> int:
     """Computes f^e mod m in O(log e) multiplications modulo m."""
     # Compute len_e = floor(log_2(e))
     len_e = -1
@@ -120,7 +120,7 @@ def count_bits(no: int) -> int:
     return no.bit_length()
 
 
-def convert_int_to_bytes(no: int, count: int | None = None) -> bytes:
+def convert_int_to_bytes(no: int, *, count: int | None = None) -> bytes:
     """
     Convert the absolute value of an integer to a byte string in network byte order.
 
@@ -136,7 +136,7 @@ def convert_int_to_bytes(no: int, count: int | None = None) -> bytes:
     return no.to_bytes(count, byteorder="big")
 
 
-def convert_int_to_hex(no: int, digits: int | None = None) -> str:
+def convert_int_to_hex(no: int, *, digits: int | None = None) -> str:
     """
     Convert the absolute value of an integer to a string of hexadecimal digits.
 
@@ -156,3 +156,15 @@ def convert_bytes_to_int(data: bytes) -> int:
     Convert a byte string to an unsigned integer in network byte order.
     """
     return int.from_bytes(data, byteorder="big", signed=False)
+
+
+__all__ = (
+    "binary_exp_mod",
+    "simple_gcd",
+    "quick_is_not_prime",
+    "count_bytes",
+    "count_bits",
+    "convert_int_to_bytes",
+    "convert_int_to_hex",
+    "convert_bytes_to_int",
+)

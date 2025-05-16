@@ -29,7 +29,7 @@ class ACMEAccount:
     retrieve account data.
     """
 
-    def __init__(self, client: ACMEClient) -> None:
+    def __init__(self, *, client: ACMEClient) -> None:
         # Set to true to enable logging of all signed requests
         self._debug: bool = False
 
@@ -37,6 +37,7 @@ class ACMEAccount:
 
     def _new_reg(
         self,
+        *,
         contact: list[str] | None = None,
         terms_agreed: bool = False,
         allow_creation: bool = True,
@@ -82,14 +83,15 @@ class ACMEAccount:
         url = self.client.directory["newAccount"]
         if external_account_binding is not None:
             new_reg["externalAccountBinding"] = self.client.sign_request(
-                {
+                protected={
                     "alg": external_account_binding["alg"],
                     "kid": external_account_binding["kid"],
                     "url": url,
                 },
-                self.client.account_jwk,
-                self.client.backend.create_mac_key(
-                    external_account_binding["alg"], external_account_binding["key"]
+                payload=self.client.account_jwk,
+                key_data=self.client.backend.create_mac_key(
+                    alg=external_account_binding["alg"],
+                    key=external_account_binding["key"],
                 ),
             )
         elif (
@@ -106,7 +108,7 @@ class ACMEAccount:
         )
         if not isinstance(result, Mapping):
             raise ACMEProtocolException(
-                self.client.module,
+                module=self.client.module,
                 msg="Invalid account creation reply from ACME server",
                 info=info,
                 content_json=result,
@@ -156,7 +158,7 @@ class ACMEAccount:
                 raise ModuleFailException("Account is deactivated")
         else:
             raise ACMEProtocolException(
-                self.client.module,
+                module=self.client.module,
                 msg="Registering ACME account failed",
                 info=info,
                 content_json=result,
@@ -187,7 +189,7 @@ class ACMEAccount:
             )
         if not isinstance(result, Mapping):
             raise ACMEProtocolException(
-                self.client.module,
+                module=self.client.module,
                 msg="Invalid account data retrieved from ACME server",
                 info=info,
                 content_json=result,
@@ -206,7 +208,7 @@ class ACMEAccount:
             return None
         if info["status"] < 200 or info["status"] >= 300:
             raise ACMEProtocolException(
-                self.client.module,
+                module=self.client.module,
                 msg="Error retrieving account data",
                 info=info,
                 content_json=result,
@@ -216,6 +218,7 @@ class ACMEAccount:
     @t.overload
     def setup_account(
         self,
+        *,
         contact: list[str] | None = None,
         terms_agreed: bool = False,
         allow_creation: t.Literal[True] = True,
@@ -226,6 +229,7 @@ class ACMEAccount:
     @t.overload
     def setup_account(
         self,
+        *,
         contact: list[str] | None = None,
         terms_agreed: bool = False,
         allow_creation: bool = True,
@@ -235,6 +239,7 @@ class ACMEAccount:
 
     def setup_account(
         self,
+        *,
         contact: list[str] | None = None,
         terms_agreed: bool = False,
         allow_creation: bool = True,
@@ -281,7 +286,7 @@ class ACMEAccount:
                     )
         else:
             created, account_data = self._new_reg(
-                contact,
+                contact=contact,
                 terms_agreed=terms_agreed,
                 allow_creation=allow_creation and not self.client.module.check_mode,
                 external_account_binding=external_account_binding,
@@ -296,7 +301,7 @@ class ACMEAccount:
         return created, account_data
 
     def update_account(
-        self, account_data: dict[str, t.Any], contact: list[str] | None = None
+        self, *, account_data: dict[str, t.Any], contact: list[str] | None = None
     ) -> tuple[bool, dict[str, t.Any]]:
         """
         Update an account on the ACME server. Check mode is fully respected.
@@ -332,10 +337,13 @@ class ACMEAccount:
             )
             if not isinstance(account_data, Mapping):
                 raise ACMEProtocolException(
-                    self.client.module,
+                    module=self.client.module,
                     msg="Invalid account updating reply from ACME server",
                     info=info,
                     content_json=account_data,
                 )
 
         return True, account_data
+
+
+__all__ = ("ACMEAccount",)

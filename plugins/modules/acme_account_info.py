@@ -254,7 +254,7 @@ def get_orders_list(
             if relation == "next":
                 new_orders_url.append(link)
 
-        process_links(info, f)
+        process_links(info=info, callback=f)
         new_orders_url.append(None)
         previous_orders_url, next_orders_url = next_orders_url, new_orders_url.pop(0)
         if next_orders_url == previous_orders_url:
@@ -278,14 +278,14 @@ def main() -> t.NoReturn:
         ),
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
-    backend = create_backend(module, True)
+    backend = create_backend(module, needs_acme_v2=True)
 
     try:
-        client = ACMEClient(module, backend)
-        account = ACMEAccount(client)
+        client = ACMEClient(module=module, backend=backend)
+        account = ACMEAccount(client=client)
         # Check whether account exists
         created, account_data = account.setup_account(
-            [],
+            contact=[],
             allow_creation=False,
             remove_account_uri_if_not_exists=True,
         )
@@ -316,7 +316,7 @@ def main() -> t.NoReturn:
                     result["orders"] = [get_order(client, order) for order in orders]
         module.exit_json(**result)
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

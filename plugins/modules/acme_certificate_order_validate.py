@@ -258,10 +258,10 @@ def main() -> t.NoReturn:
     )
     module = argument_spec.create_ansible_module()
 
-    backend = create_backend(module, False)
+    backend = create_backend(module, needs_acme_v2=False)
 
     try:
-        client = ACMECertificateClient(module, backend)
+        client = ACMECertificateClient(module=module, backend=backend)
         done = False
         order = None
         try:
@@ -290,7 +290,10 @@ def main() -> t.NoReturn:
             bad_challenge_authzs = [
                 authz.combined_identifier
                 for authz in pending_authzs
-                if authz.find_challenge(challenges[authz.combined_identifier]) is None
+                if authz.find_challenge(
+                    challenge_type=challenges[authz.combined_identifier]
+                )
+                is None
             ]
             if bad_challenge_authzs:
                 authz_challenges_pairs = ", ".join(
@@ -305,7 +308,7 @@ def main() -> t.NoReturn:
 
             def is_pending(authz: Authorization) -> bool:
                 challenge_name = challenges[authz.combined_identifier]
-                challenge_obj = authz.find_challenge(challenge_name)
+                challenge_obj = authz.find_challenge(challenge_type=challenge_name)
                 return challenge_obj is not None and challenge_obj.status == "pending"
 
             really_pending_authzs = [
@@ -338,7 +341,7 @@ def main() -> t.NoReturn:
             ],
         )
     except ModuleFailException as e:
-        e.do_fail(module)
+        e.do_fail(module=module)
 
 
 if __name__ == "__main__":

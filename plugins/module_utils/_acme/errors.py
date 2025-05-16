@@ -25,7 +25,9 @@ def format_http_status(status_code: int) -> str:
     return f"{status_code} {expl}"
 
 
-def format_error_problem(problem: dict[str, t.Any], subproblem_prefix: str = "") -> str:
+def format_error_problem(
+    problem: dict[str, t.Any], *, subproblem_prefix: str = ""
+) -> str:
     error_type = problem.get(
         "type", "about:blank"
     )  # https://www.rfc-editor.org/rfc/rfc7807#section-3.1
@@ -57,13 +59,14 @@ class ModuleFailException(Exception):
         self.msg = msg
         self.module_fail_args = args
 
-    def do_fail(self, module: AnsibleModule, **arguments) -> t.NoReturn:
+    def do_fail(self, *, module: AnsibleModule, **arguments) -> t.NoReturn:
         module.fail_json(msg=self.msg, other=self.module_fail_args, **arguments)
 
 
 class ACMEProtocolException(ModuleFailException):
     def __init__(
         self,
+        *,
         module: AnsibleModule,
         msg: str | None = None,
         info: dict[str, t.Any] | None = None,
@@ -168,3 +171,14 @@ class NetworkException(ModuleFailException):
 
 class KeyParsingError(ModuleFailException):
     pass
+
+
+__all__ = (
+    "format_http_status",
+    "format_error_problem",
+    "ModuleFailException",
+    "ACMEProtocolException",
+    "BackendException",
+    "NetworkException",
+    "KeyParsingError",
+)

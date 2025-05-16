@@ -55,6 +55,7 @@ except ImportError:
 class CRLInfoRetrieval:
     def __init__(
         self,
+        *,
         module: GeneralAnsibleModule,
         content: bytes,
         list_revoked_certificates: bool = True,
@@ -113,12 +114,20 @@ class CRLInfoRetrieval:
 
 
 def get_crl_info(
-    module: GeneralAnsibleModule, content: bytes, list_revoked_certificates: bool = True
+    *,
+    module: GeneralAnsibleModule,
+    content: bytes,
+    list_revoked_certificates: bool = True,
 ) -> dict[str, t.Any]:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
     info = CRLInfoRetrieval(
-        module, content, list_revoked_certificates=list_revoked_certificates
+        module=module,
+        content=content,
+        list_revoked_certificates=list_revoked_certificates,
     )
     return info.get_info()
+
+
+__all__ = ("CRLInfoRetrieval", "get_crl_info")

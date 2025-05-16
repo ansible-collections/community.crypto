@@ -71,7 +71,9 @@ class LookupModule(LookupBase):
                     raise AnsibleLookupError(
                         f"Lookup parameter #{i} should be string or a path object, but got {type(path)}"
                     )
-                result.append(get_fingerprint_from_file(gpg, to_native(path)))
+                result.append(
+                    get_fingerprint_from_file(gpg_runner=gpg, path=to_native(path))
+                )
             return result
         except GPGError as exc:
             raise AnsibleLookupError(str(exc))

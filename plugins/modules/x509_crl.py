@@ -508,10 +508,10 @@ class CRL(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
         super(CRL, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
 
         self.format: t.Literal["pem", "der"] = module.params["format"]
@@ -544,23 +544,27 @@ class CRL(OpenSSLObject):
             ]
             if issuer_ordered:
                 self.issuer_ordered = True
-                self.issuer = parse_ordered_name_field(issuer_ordered, "issuer_ordered")
+                self.issuer = parse_ordered_name_field(
+                    issuer_ordered, name_field_name="issuer_ordered"
+                )
             else:
                 self.issuer_ordered = False
                 self.issuer = (
-                    parse_name_field(issuer, "issuer") if issuer is not None else []
+                    parse_name_field(issuer, name_field_name="issuer")
+                    if issuer is not None
+                    else []
                 )
         except (TypeError, ValueError) as exc:
             module.fail_json(msg=str(exc))
 
         self.last_update: datetime.datetime = get_relative_time_option(
             module.params["last_update"],
-            "last_update",
+            input_name="last_update",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.next_update: datetime.datetime | None = get_relative_time_option(
             module.params["next_update"],
-            "next_update",
+            input_name="next_update",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
 
@@ -596,7 +600,7 @@ class CRL(OpenSSLObject):
                     if content_str is not None:
                         content = content_str.encode("utf-8")
                         rc["content"] = content
-                    cert = load_certificate(path, content=content)
+                    cert = load_certificate(path=path, content=content)
                     result["serial_number"] = cert.serial_number
                 except OpenSSLObjectError as e:
                     if content_str is not None:
@@ -615,12 +619,13 @@ class CRL(OpenSSLObject):
             # All other options
             if rc["issuer"]:
                 result["issuer"] = [
-                    cryptography_get_name(issuer, "issuer") for issuer in rc["issuer"]
+                    cryptography_get_name(issuer, what="issuer")
+                    for issuer in rc["issuer"]
                 ]
                 result["issuer_critical"] = rc["issuer_critical"]
             result["revocation_date"] = get_relative_time_option(
                 rc["revocation_date"],
-                path_prefix + "revocation_date",
+                input_name=path_prefix + "revocation_date",
                 with_timezone=CRYPTOGRAPHY_TIMEZONE,
             )
             if rc["reason"]:
@@ -629,7 +634,7 @@ class CRL(OpenSSLObject):
             if rc["invalidity_date"]:
                 result["invalidity_date"] = get_relative_time_option(
                     rc["invalidity_date"],
-                    path_prefix + "invalidity_date",
+                    input_name=path_prefix + "invalidity_date",
                     with_timezone=CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE,
                 )
                 result["invalidity_date_critical"] = rc["invalidity_date_critical"]
@@ -690,7 +695,7 @@ class CRL(OpenSSLObject):
         if data is None:
             return {}
         try:
-            result = get_crl_info(self.module, data)
+            result = get_crl_info(module=self.module, content=data)
             result["can_parse_crl"] = True
             return result
         except Exception:
@@ -765,7 +770,9 @@ class CRL(OpenSSLObject):
     ) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(CRL, self).check(self.module, perms_required)
+        state_and_perms = super(CRL, self).check(
+            module=self.module, perms_required=perms_required
+        )
 
         if not state_and_perms:
             return False
@@ -838,9 +845,9 @@ class CRL(OpenSSLObject):
         except ValueError as e:
             raise CRLError(e)
 
-        crl = set_last_update(crl, self.last_update)
+        crl = set_last_update(crl, value=self.last_update)
         if self.next_update is not None:
-            crl = set_next_update(crl, self.next_update)
+            crl = set_next_update(crl, value=self.next_update)
 
         if self.update and self.crl:
             new_entries = set(
@@ -856,7 +863,7 @@ class CRL(OpenSSLObject):
             revoked_cert = RevokedCertificateBuilder()
             revoked_cert = revoked_cert.serial_number(revoked_entry["serial_number"])
             revoked_cert = set_revocation_date(
-                revoked_cert, revoked_entry["revocation_date"]
+                revoked_cert, value=revoked_entry["revocation_date"]
             )
             if revoked_entry["issuer"] is not None:
                 revoked_cert = revoked_cert.add_extension(
@@ -909,7 +916,7 @@ class CRL(OpenSSLObject):
                     self.crl_content = base64.b64encode(result)
             if self.backup:
                 self.backup_file = self.module.backup_local(self.path)
-            write_file(self.module, result)
+            write_file(module=self.module, content=result)
             self.changed = True
 
         file_args = self.module.load_file_common_arguments(self.module.params)

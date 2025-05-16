@@ -184,7 +184,7 @@ def openssl_privatekey_info_filter(
     module = FilterModuleMock({})
     try:
         result = get_privatekey_info(
-            module,
+            module=module,
             content=to_bytes(data),
             passphrase=to_text(passphrase) if passphrase is not None else None,
             return_private_key_data=return_private_key_data,

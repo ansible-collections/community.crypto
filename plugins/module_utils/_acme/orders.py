@@ -34,7 +34,7 @@ _Order = t.TypeVar("_Order", bound="Order")
 
 
 class Order:
-    def __init__(self, url: str) -> None:
+    def __init__(self, *, url: str) -> None:
         self.url = url
 
         self.data: dict[str, t.Any] | None = None
@@ -47,7 +47,7 @@ class Order:
         self.authorization_uris: list[str] = []
         self.authorizations: dict[str, Authorization] = {}
 
-    def _setup(self, client: ACMEClient, data: dict[str, t.Any]) -> None:
+    def _setup(self, *, client: ACMEClient, data: dict[str, t.Any]) -> None:
         self.data = data
 
         self.status = data["status"]
@@ -62,21 +62,22 @@ class Order:
 
     @classmethod
     def from_json(
-        cls: t.Type[_Order], client: ACMEClient, data: dict[str, t.Any], url: str
+        cls: t.Type[_Order], *, client: ACMEClient, data: dict[str, t.Any], url: str
     ) -> _Order:
-        result = cls(url)
-        result._setup(client, data)
+        result = cls(url=url)
+        result._setup(client=client, data=data)
         return result
 
     @classmethod
-    def from_url(cls: t.Type[_Order], client: ACMEClient, url: str) -> _Order:
-        result = cls(url)
-        result.refresh(client)
+    def from_url(cls: t.Type[_Order], *, client: ACMEClient, url: str) -> _Order:
+        result = cls(url=url)
+        result.refresh(client=client)
         return result
 
     @classmethod
     def create(
         cls: t.Type[_Order],
+        *,
         client: ACMEClient,
         identifiers: list[tuple[str, str]],
         replaces_cert_id: str | None = None,
@@ -105,11 +106,12 @@ class Order:
             error_msg="Failed to start new order",
             expected_status_codes=[201],
         )
-        return cls.from_json(client, result, info["location"])
+        return cls.from_json(client=client, data=result, url=info["location"])
 
     @classmethod
     def create_with_error_handling(
         cls: t.Type[_Order],
+        *,
         client: ACMEClient,
         identifiers: list[tuple[str, str]],
         error_strategy: t.Literal[
@@ -136,8 +138,8 @@ class Order:
             tries += 1
             try:
                 return cls.create(
-                    client,
-                    identifiers,
+                    client=client,
+                    identifiers=identifiers,
                     replaces_cert_id=replaces_cert_id,
                     profile=profile,
                 )
@@ -164,34 +166,36 @@ class Order:
 
                 raise
 
-    def refresh(self, client: ACMEClient) -> bool:
+    def refresh(self, *, client: ACMEClient) -> bool:
         result, dummy = client.get_request(self.url)
         changed = self.data != result
-        self._setup(client, result)
+        self._setup(client=client, data=result)
         return changed
 
-    def load_authorizations(self, client: ACMEClient) -> None:
+    def load_authorizations(self, *, client: ACMEClient) -> None:
         for auth_uri in self.authorization_uris:
-            authz = Authorization.from_url(client, auth_uri)
+            authz = Authorization.from_url(client=client, url=auth_uri)
             self.authorizations[
                 normalize_combined_identifier(authz.combined_identifier)
             ] = authz
 
-    def wait_for_finalization(self, client: ACMEClient) -> None:
+    def wait_for_finalization(self, *, client: ACMEClient) -> None:
         while True:
-            self.refresh(client)
+            self.refresh(client=client)
             if self.status in ["valid", "invalid", "pending", "ready"]:
                 break
             time.sleep(2)
 
         if self.status != "valid":
             raise ACMEProtocolException(
-                client.module,
-                f'Failed to wait for order to complete; got status "{self.status}"',
+                module=client.module,
+                msg=f'Failed to wait for order to complete; got status "{self.status}"',
                 content_json=self.data,
             )
 
-    def finalize(self, client: ACMEClient, csr_der: bytes, wait: bool = True) -> None:
+    def finalize(
+        self, *, client: ACMEClient, csr_der: bytes, wait: bool = True
+    ) -> None:
         """
         Create a new certificate based on the csr.
         Return the certificate object as dict
@@ -212,13 +216,16 @@ class Order:
         # Instead of using the result, we call self.refresh(client) below.
 
         if wait:
-            self.wait_for_finalization(client)
+            self.wait_for_finalization(client=client)
         else:
-            self.refresh(client)
+            self.refresh(client=client)
             if self.status not in ["procesing", "valid", "invalid"]:
                 raise ACMEProtocolException(
-                    client.module,
-                    f'Failed to finalize order; got status "{self.status}"',
+                    module=client.module,
+                    msg=f'Failed to finalize order; got status "{self.status}"',
                     info=info,
                     content_json=result,
                 )
+
+
+__all__ = ("Order",)

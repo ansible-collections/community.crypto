@@ -24,3 +24,6 @@ class OpenSSLObjectError(Exception):
 
 class OpenSSLBadPassphraseError(OpenSSLObjectError):
     pass
+
+
+__all__ = ("HAS_CRYPTOGRAPHY", "OpenSSLObjectError", "OpenSSLBadPassphraseError")

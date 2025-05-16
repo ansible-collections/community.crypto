@@ -357,8 +357,7 @@ def load_certificate_set(
     with open(filename, "rb") as f:
         data = f.read().decode("utf-8")
     return [
-        load_certificate(None, content=cert.encode("utf-8"))
-        for cert in split_pem_list(data)
+        load_certificate(content=cert.encode("utf-8")) for cert in split_pem_list(data)
     ]
 
 
@@ -371,10 +370,10 @@ class Pkcs(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule, iter_size_default: int = 2048) -> None:
         super(Pkcs, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.action: t.Literal["export", "parse"] = module.params["action"]
         self.other_certificates: list[cryptography.x509.Certificate] = []
@@ -439,7 +438,7 @@ class Pkcs(OpenSSLObject):
                     )
             else:
                 self.other_certificates = [
-                    load_certificate(other_cert)
+                    load_certificate(path=other_cert)
                     for other_cert in self.other_certificates_str
                 ]
         elif self.other_certificates_content:
@@ -451,8 +450,7 @@ class Pkcs(OpenSSLObject):
                     )
                 )
             self.other_certificates = [
-                load_certificate(None, content=to_bytes(other_cert))
-                for other_cert in certs
+                load_certificate(content=to_bytes(other_cert)) for other_cert in certs
             ]
 
     @abc.abstractmethod
@@ -486,7 +484,9 @@ class Pkcs(OpenSSLObject):
 
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
-        state_and_perms = super(Pkcs, self).check(module, perms_required)
+        state_and_perms = super(Pkcs, self).check(
+            module=module, perms_required=perms_required
+        )
 
         def _check_pkey_passphrase() -> bool:
             if self.privatekey_passphrase:
@@ -569,7 +569,7 @@ class Pkcs(OpenSSLObject):
                     ]
                 )
             )
-            dumped_content = load_file_if_exists(self.path, ignore_errors=True)
+            dumped_content = load_file_if_exists(path=self.path, ignore_errors=True)
             if expected_content != dumped_content:
                 return False
         else:
@@ -589,7 +589,9 @@ class Pkcs(OpenSSLObject):
             result["backup_file"] = self.backup_file
         if self.return_content:
             if self.pkcs12_bytes is None:
-                self.pkcs12_bytes = load_file_if_exists(self.path, ignore_errors=True)
+                self.pkcs12_bytes = load_file_if_exists(
+                    path=self.path, ignore_errors=True
+                )
             result["pkcs12"] = (
                 base64.b64encode(self.pkcs12_bytes) if self.pkcs12_bytes else None
             )
@@ -628,7 +630,7 @@ class Pkcs(OpenSSLObject):
         """Write the PKCS#12 file."""
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        write_file(module, content, mode)
+        write_file(module=module, content=content, default_mode=mode)
         if self.return_content:
             self.pkcs12_bytes = content
 
@@ -660,7 +662,7 @@ class PkcsCryptography(Pkcs):
 
         cert = None
         if self.certificate_content:
-            cert = load_certificate(None, content=self.certificate_content)
+            cert = load_certificate(content=self.certificate_content)
 
         friendly_name = (
             to_bytes(self.friendly_name) if self.friendly_name is not None else None
@@ -701,7 +703,7 @@ class PkcsCryptography(Pkcs):
     ]:
         try:
             private_key, certificate, additional_certificates, friendly_name = (
-                parse_pkcs12(pkcs12_content, self.passphrase)
+                parse_pkcs12(pkcs12_content, passphrase=self.passphrase)
             )
 
             pkey = None

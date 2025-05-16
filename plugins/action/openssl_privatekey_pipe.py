@@ -52,7 +52,7 @@ class PrivateKeyModule:
                     module.fail_json(msg=f"Cannot decode Base64 encoded data: {e}")
             else:
                 data = to_bytes(content)
-            module_backend.set_existing(data)
+            module_backend.set_existing(privatekey_bytes=data)
 
     def generate(self, module: AnsibleActionModule) -> None:
         """Generate a keypair."""

@@ -61,7 +61,7 @@ def test_eckeyparse_openssl(
     fn.write(pem)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+    backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
     key = backend.parse_key(key_file=str(fn))
     key.pop("key_file")
     assert key == result
@@ -75,15 +75,15 @@ def test_csridentifiers_openssl(
     fn.write(csr)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
-    identifiers = backend.get_csr_identifiers(str(fn))
+    backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
+    identifiers = backend.get_csr_identifiers(csr_filename=str(fn))
     assert identifiers == result
 
 
 @pytest.mark.parametrize("ip, result", TEST_IPS)
 def test_normalize_ip(ip: str, result: str) -> None:
     module = MagicMock()
-    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+    backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
     assert backend._normalize_ip(ip) == result
 
 
@@ -96,7 +96,7 @@ def test_certdays_cryptography(
         fn.write(TEST_CERT)
         module = MagicMock()
         module.run_command = MagicMock(return_value=(0, TEST_CERT_OPENSSL_OUTPUT, 0))
-        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+        backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
         days = backend.get_cert_days(cert_filename=str(fn), now=now)
         assert days == expected_days
         days = backend.get_cert_days(cert_content=TEST_CERT, now=now)
@@ -116,7 +116,7 @@ def test_get_cert_information(
     fn.write(cert_content)
     module = MagicMock()
     module.run_command = MagicMock(return_value=(0, openssl_output, 0))
-    backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+    backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
 
     expected_cert_info = expected_cert_info._replace(
         not_valid_after=ensure_utc_timezone(expected_cert_info.not_valid_after),
@@ -136,7 +136,7 @@ def test_get_cert_information(
 def test_now(timezone: datetime.timedelta) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+        backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
         now = backend.get_now()
         assert now.tzinfo is not None
         assert now == datetime.datetime(2024, 2, 3, 4, 5, 6, tzinfo=UTC)
@@ -148,7 +148,7 @@ def test_parse_acme_timestamp(
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+        backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
         ts_expected = backend.get_utc_datetime(**expected)
         timestamp = backend.parse_acme_timestamp(input)
         assert ts_expected == timestamp
@@ -166,9 +166,11 @@ def test_interpolate_timestamp(
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
-        backend = OpenSSLCLIBackend(module, openssl_binary="openssl")
+        backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
         ts_start = backend.get_utc_datetime(**start)
         ts_end = backend.get_utc_datetime(**end)
         ts_expected = backend.get_utc_datetime(**expected)
-        timestamp = backend.interpolate_timestamp(ts_start, ts_end, percentage)
+        timestamp = backend.interpolate_timestamp(
+            ts_start, ts_end, percentage=percentage
+        )
         assert ts_expected == timestamp

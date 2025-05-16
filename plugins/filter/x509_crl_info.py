@@ -207,7 +207,7 @@ def x509_crl_info_filter(
     module = FilterModuleMock({"name_encoding": name_encoding})
     try:
         return get_crl_info(
-            module,
+            module=module,
             content=data_bytes,
             list_revoked_certificates=list_revoked_certificates,
         )

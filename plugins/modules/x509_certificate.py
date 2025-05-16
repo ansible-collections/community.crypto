@@ -268,10 +268,10 @@ if t.TYPE_CHECKING:
 class CertificateAbsent(OpenSSLObject):
     def __init__(self, module: AnsibleModule) -> None:
         super(CertificateAbsent, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.module = module
         self.return_content: bool = module.params["return_content"]
@@ -306,10 +306,10 @@ class GenericCertificate(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule, module_backend: CertificateBackend):
         super(GenericCertificate, self).__init__(
-            module.params["path"],
-            module.params["state"],
-            module.params["force"],
-            module.check_mode,
+            path=module.params["path"],
+            state=module.params["state"],
+            force=module.params["force"],
+            check_mode=module.check_mode,
         )
         self.module = module
         self.return_content = module.params["return_content"]
@@ -317,7 +317,9 @@ class GenericCertificate(OpenSSLObject):
         self.backup_file = None
 
         self.module_backend = module_backend
-        self.module_backend.set_existing(load_file_if_exists(self.path, module))
+        self.module_backend.set_existing(
+            certificate_bytes=load_file_if_exists(path=self.path, module=module)
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         if self.module_backend.needs_regeneration():
@@ -326,7 +328,7 @@ class GenericCertificate(OpenSSLObject):
                 result = self.module_backend.get_certificate_data()
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)
-                write_file(module, result)
+                write_file(module=module, content=result)
             self.changed = True
 
         file_args = module.load_file_common_arguments(module.params)
@@ -340,7 +342,9 @@ class GenericCertificate(OpenSSLObject):
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
         return (
-            super(GenericCertificate, self).check(module, perms_required)
+            super(GenericCertificate, self).check(
+                module=module, perms_required=perms_required
+            )
             and not self.module_backend.needs_regeneration()
         )
 
@@ -411,7 +415,9 @@ def main() -> t.NoReturn:
                 "selfsigned": SelfSignedCertificateProvider,
             }
 
-            module_backend = select_backend(module, provider_map[provider]())
+            module_backend = select_backend(
+                module=module, provider=provider_map[provider]()
+            )
             certificate = GenericCertificate(module, module_backend)
             certificate.generate(module)
 

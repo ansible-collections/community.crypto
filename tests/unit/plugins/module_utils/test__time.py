@@ -383,7 +383,7 @@ def test_get_relative_time_option(
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         output = get_relative_time_option(
             input_string,
-            input_name,
+            input_name=input_name,
             with_timezone=with_timezone,
             now=now,
         )

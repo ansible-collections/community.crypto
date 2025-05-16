@@ -24,7 +24,7 @@ def test_order_from_json() -> None:
         "authorizations": [],
     }
     client.version = 2
-    order = Order.from_json(client, data, "xxx")
+    order = Order.from_json(client=client, data=data, url="xxx")
     assert order.data == data
     assert order.url == "xxx"
     assert order.status == "valid"
@@ -44,11 +44,11 @@ def test_wait_for_finalization_error() -> None:
         "identifiers": [],
         "authorizations": [],
     }
-    order = Order.from_json(client, data, "xxx")
+    order = Order.from_json(client=client, data=data, url="xxx")
 
     client.get_request = MagicMock(return_value=(data, {}))
     with pytest.raises(ACMEProtocolException) as exc:
-        order.wait_for_finalization(client)
+        order.wait_for_finalization(client=client)
 
     assert exc.value.msg.startswith(
         'Failed to wait for order to complete; got status "invalid". The JSON result: '

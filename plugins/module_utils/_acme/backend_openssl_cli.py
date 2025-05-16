@@ -49,7 +49,7 @@ _OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTY
 
 
 def _extract_date(
-    out_text: str, name: str, cert_filename_suffix: str = ""
+    out_text: str, *, name: str, cert_filename_suffix: str = ""
 ) -> datetime.datetime:
     matcher = re.search(rf"\s+{name}\s*:\s+(.*)", out_text)
     if matcher is None:
@@ -76,6 +76,7 @@ def _decode_octets(octets_text: str) -> bytes:
 @t.overload
 def _extract_octets(
     out_text: str,
+    *,
     name: str,
     required: t.Literal[False],
     potential_prefixes: t.Iterable[str] | None = None,
@@ -85,6 +86,7 @@ def _extract_octets(
 @t.overload
 def _extract_octets(
     out_text: str,
+    *,
     name: str,
     required: t.Literal[True],
     potential_prefixes: t.Iterable[str] | None = None,
@@ -93,6 +95,7 @@ def _extract_octets(
 
 def _extract_octets(
     out_text: str,
+    *,
     name: str,
     required: bool = True,
     potential_prefixes: t.Iterable[str] | None = None,
@@ -113,15 +116,16 @@ def _extract_octets(
 
 class OpenSSLCLIBackend(CryptoBackend):
     def __init__(
-        self, module: AnsibleModule, openssl_binary: str | None = None
+        self, *, module: AnsibleModule, openssl_binary: str | None = None
     ) -> None:
-        super(OpenSSLCLIBackend, self).__init__(module, with_timezone=True)
+        super(OpenSSLCLIBackend, self).__init__(module=module, with_timezone=True)
         if openssl_binary is None:
             openssl_binary = module.get_bin_path("openssl", True)
         self.openssl_binary = openssl_binary
 
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase: str | None = None,
@@ -282,7 +286,7 @@ class OpenSSLCLIBackend(CryptoBackend):
         )
 
     def sign(
-        self, payload64: str, protected64: str, key_data: dict[str, t.Any]
+        self, *, payload64: str, protected64: str, key_data: dict[str, t.Any]
     ) -> dict[str, t.Any]:
         sign_payload = f"{protected64}.{payload64}".encode("utf8")
         if key_data["type"] == "hmac":
@@ -343,7 +347,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             "signature": nopad_b64(to_bytes(out)),
         }
 
-    def create_mac_key(self, alg: str, key: str) -> dict[str, t.Any]:
+    def create_mac_key(self, *, alg: str, key: str) -> dict[str, t.Any]:
         """Create a MAC key."""
         if alg == "HS256":
             hashalg = "sha256"
@@ -383,6 +387,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
     def get_ordered_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> list[tuple[str, str]]:
@@ -454,6 +459,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
     def get_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> set[tuple[str, str]]:
@@ -470,6 +476,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
     def get_cert_days(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
@@ -516,7 +523,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
         out_text = to_text(out, errors="surrogate_or_strict")
         not_after = _extract_date(
-            out_text, "Not After", cert_filename_suffix=cert_filename_suffix
+            out_text, name="Not After", cert_filename_suffix=cert_filename_suffix
         )
         if now is None:
             now = self.get_now()
@@ -524,7 +531,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             now = ensure_utc_timezone(now)
         return (not_after - now).days
 
-    def create_chain_matcher(self, criterium: Criterium) -> t.NoReturn:
+    def create_chain_matcher(self, *, criterium: Criterium) -> t.NoReturn:
         """
         Given a Criterium object, creates a ChainMatcher object.
         """
@@ -534,6 +541,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
     def get_cert_information(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> CertificateInformation:
@@ -572,10 +580,10 @@ class OpenSSLCLIBackend(CryptoBackend):
         out_text = to_text(out, errors="surrogate_or_strict")
 
         not_after = _extract_date(
-            out_text, "Not After", cert_filename_suffix=cert_filename_suffix
+            out_text, name="Not After", cert_filename_suffix=cert_filename_suffix
         )
         not_before = _extract_date(
-            out_text, "Not Before", cert_filename_suffix=cert_filename_suffix
+            out_text, name="Not Before", cert_filename_suffix=cert_filename_suffix
         )
 
         sn = re.search(
@@ -587,13 +595,15 @@ class OpenSSLCLIBackend(CryptoBackend):
             serial = int(sn.group(1))
         else:
             serial = convert_bytes_to_int(
-                _extract_octets(out_text, "Serial Number", required=True)
+                _extract_octets(out_text, name="Serial Number", required=True)
             )
 
-        ski = _extract_octets(out_text, "X509v3 Subject Key Identifier", required=False)
+        ski = _extract_octets(
+            out_text, name="X509v3 Subject Key Identifier", required=False
+        )
         aki = _extract_octets(
             out_text,
-            "X509v3 Authority Key Identifier",
+            name="X509v3 Authority Key Identifier",
             required=False,
             potential_prefixes=["keyid:", ""],
         )
@@ -605,3 +615,6 @@ class OpenSSLCLIBackend(CryptoBackend):
             subject_key_identifier=ski,
             authority_key_identifier=aki,
         )
+
+
+__all__ = ("OpenSSLCLIBackend",)

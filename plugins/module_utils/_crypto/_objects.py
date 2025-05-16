@@ -33,3 +33,6 @@ for alias, original in [("userID", "userId")]:
     NORMALIZE_NAMES[alias] = original
     NORMALIZE_NAMES_SHORT[alias] = NORMALIZE_NAMES_SHORT[original]
     OID_LOOKUP[alias] = OID_LOOKUP[original]
+
+
+__all__ = ("OID_LOOKUP", "NORMALIZE_NAMES", "NORMALIZE_NAMES_SHORT")

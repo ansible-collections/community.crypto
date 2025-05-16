@@ -63,7 +63,9 @@ PREFERRED_FINGERPRINTS = (
 )
 
 
-def get_fingerprint_of_bytes(source: bytes, prefer_one: bool = False) -> dict[str, str]:
+def get_fingerprint_of_bytes(
+    source: bytes, *, prefer_one: bool = False
+) -> dict[str, str]:
     """Generate the fingerprint of the given bytes."""
 
     fingerprint = {}
@@ -107,7 +109,7 @@ def get_fingerprint_of_bytes(source: bytes, prefer_one: bool = False) -> dict[st
 
 
 def get_fingerprint_of_privatekey(
-    privatekey: PrivateKeyTypes, prefer_one: bool = False
+    privatekey: PrivateKeyTypes, *, prefer_one: bool = False
 ) -> dict[str, str]:
     """Generate the fingerprint of the public key."""
 
@@ -119,6 +121,7 @@ def get_fingerprint_of_privatekey(
 
 
 def get_fingerprint(
+    *,
     path: os.PathLike | str | None = None,
     passphrase: str | bytes | None = None,
     content: bytes | None = None,
@@ -137,6 +140,7 @@ def get_fingerprint(
 
 
 def load_privatekey(
+    *,
     path: os.PathLike | str | None = None,
     passphrase: str | bytes | None = None,
     check_passphrase: bool = True,
@@ -219,7 +223,7 @@ def load_certificate_issuer_privatekey(
 
 
 def load_publickey(
-    path: os.PathLike | str | None = None, content: bytes | None = None
+    *, path: os.PathLike | str | None = None, content: bytes | None = None
 ) -> PublicKeyTypes:
     if content is None:
         if path is None:
@@ -237,6 +241,7 @@ def load_publickey(
 
 
 def load_certificate(
+    *,
     path: os.PathLike | str | None = None,
     content: bytes | None = None,
     der_support_enabled: bool = False,
@@ -266,7 +271,7 @@ def load_certificate(
 
 
 def load_certificate_request(
-    path: os.PathLike | str | None = None, content: bytes | None = None
+    *, path: os.PathLike | str | None = None, content: bytes | None = None
 ) -> x509.CertificateSigningRequest:
     """Load the specified certificate signing request."""
     try:
@@ -287,6 +292,7 @@ def load_certificate_request(
 
 def parse_name_field(
     input_dict: dict[str, list[str | bytes] | str | bytes],
+    *,
     name_field_name: str | None = None,
 ) -> list[tuple[str, str | bytes]]:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
@@ -321,7 +327,9 @@ def parse_name_field(
 
 
 def parse_ordered_name_field(
-    input_list: list[dict[str, list[str | bytes] | str | bytes]], name_field_name: str
+    input_list: list[dict[str, list[str | bytes] | str | bytes]],
+    *,
+    name_field_name: str,
 ) -> list[tuple[str, str | bytes]]:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
@@ -372,7 +380,7 @@ def select_message_digest(
 
 class OpenSSLObject(metaclass=abc.ABCMeta):
 
-    def __init__(self, path: str, state: str, force: bool, check_mode: bool) -> None:
+    def __init__(self, *, path: str, state: str, force: bool, check_mode: bool) -> None:
         self.path = path
         self.state = state
         self.force = force
@@ -380,7 +388,7 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         self.changed = False
         self.check_mode = check_mode
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
         def _check_state() -> bool:
@@ -420,3 +428,20 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
                 raise OpenSSLObjectError(exc)
             else:
                 pass
+
+
+__all__ = (
+    "get_fingerprint_of_bytes",
+    "get_fingerprint_of_privatekey",
+    "get_fingerprint",
+    "load_privatekey",
+    "load_certificate_privatekey",
+    "load_certificate_issuer_privatekey",
+    "load_publickey",
+    "load_certificate",
+    "load_certificate_request",
+    "parse_name_field",
+    "parse_ordered_name_field",
+    "select_message_digest",
+    "OpenSSLObject",
+)

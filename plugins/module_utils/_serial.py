@@ -54,3 +54,6 @@ def to_serial(value: int) -> str:
     if len(value_str) % 2 != 0:
         value_str = f"0{value_str}"
     return ":".join(value_str[i : i + 2] for i in range(0, len(value_str), 2))
+
+
+__all__ = ("parse_serial", "to_serial")

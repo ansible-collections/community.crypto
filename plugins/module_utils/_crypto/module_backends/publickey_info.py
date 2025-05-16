@@ -99,7 +99,7 @@ def _get_cryptography_public_key_info(
 
 
 class PublicKeyParseError(OpenSSLObjectError):
-    def __init__(self, msg: str, result: dict[str, t.Any]) -> None:
+    def __init__(self, msg: str, *, result: dict[str, t.Any]) -> None:
         super(PublicKeyParseError, self).__init__(msg)
         self.error_message = msg
         self.result = result
@@ -108,6 +108,7 @@ class PublicKeyParseError(OpenSSLObjectError):
 class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def __init__(
         self,
+        *,
         module: GeneralAnsibleModule,
         content: bytes | None = None,
         key: PublicKeyTypes | None = None,
@@ -125,13 +126,13 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
     def _get_key_info(self) -> tuple[str, dict[str, t.Any]]:
         pass
 
-    def get_info(self, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
+    def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {}
         if self.key is None:
             try:
                 self.key = load_publickey(content=self.content)
             except OpenSSLObjectError as e:
-                raise PublicKeyParseError(str(e), {})
+                raise PublicKeyParseError(str(e), result={})
 
         pk = self._get_public_key(binary=True)
         result["fingerprints"] = (
@@ -151,12 +152,13 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 
     def __init__(
         self,
+        *,
         module: GeneralAnsibleModule,
         content: bytes | None = None,
         key: PublicKeyTypes | None = None,
     ) -> None:
         super(PublicKeyInfoRetrievalCryptography, self).__init__(
-            module, content=content, key=key
+            module=module, content=content, key=key
         )
 
     def _get_public_key(self, binary: bool) -> bytes:
@@ -174,16 +176,18 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
 
 
 def get_publickey_info(
+    *,
     module: GeneralAnsibleModule,
     content: bytes | None = None,
     key: PublicKeyTypes | None = None,
     prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
-    info = PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
+    info = PublicKeyInfoRetrievalCryptography(module=module, content=content, key=key)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
 def select_backend(
+    *,
     module: GeneralAnsibleModule,
     content: bytes | None = None,
     key: PublicKeyTypes | None = None,
@@ -191,4 +195,12 @@ def select_backend(
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PublicKeyInfoRetrievalCryptography(module, content=content, key=key)
+    return PublicKeyInfoRetrievalCryptography(module=module, content=content, key=key)
+
+
+__all__ = (
+    "PublicKeyParseError",
+    "PublicKeyInfoRetrieval",
+    "get_publickey_info",
+    "select_backend",
+)

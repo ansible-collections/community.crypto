@@ -121,16 +121,30 @@ INVALID_DATA = (
     b"yDspTN+BJzvIK2Q+CRD3qBDVSi+YqSxwyz432VEaHKlXbuLURirY0QpuBCqgR6tCtWW5vEGkXKZ3"
 )
 
-VALID_OPTS = [OpensshCertificateOption("critical", "force-command", "/usr/bin/csh")]
-INVALID_OPTS = [OpensshCertificateOption("critical", "test", "undefined")]
-VALID_EXTENSIONS = [
-    OpensshCertificateOption("extension", "permit-x11-forwarding", ""),
-    OpensshCertificateOption("extension", "permit-agent-forwarding", ""),
-    OpensshCertificateOption("extension", "permit-port-forwarding", ""),
-    OpensshCertificateOption("extension", "permit-pty", ""),
-    OpensshCertificateOption("extension", "permit-user-rc", ""),
+VALID_OPTS = [
+    OpensshCertificateOption(
+        option_type="critical", name="force-command", data="/usr/bin/csh"
+    )
 ]
-INVALID_EXTENSIONS = [OpensshCertificateOption("extension", "test", "")]
+INVALID_OPTS = [
+    OpensshCertificateOption(option_type="critical", name="test", data="undefined")
+]
+VALID_EXTENSIONS = [
+    OpensshCertificateOption(
+        option_type="extension", name="permit-x11-forwarding", data=""
+    ),
+    OpensshCertificateOption(
+        option_type="extension", name="permit-agent-forwarding", data=""
+    ),
+    OpensshCertificateOption(
+        option_type="extension", name="permit-port-forwarding", data=""
+    ),
+    OpensshCertificateOption(option_type="extension", name="permit-pty", data=""),
+    OpensshCertificateOption(option_type="extension", name="permit-user-rc", data=""),
+]
+INVALID_EXTENSIONS = [
+    OpensshCertificateOption(option_type="extension", name="test", data="")
+]
 
 VALID_TIME_PARAMETERS: list[
     tuple[int | str, int | str, str, int, int | str, str, str, int, str]
@@ -249,22 +263,36 @@ INVALID_VALIDITY_TEST: list[tuple[str, str, str]] = [
 VALID_OPTIONS: list[tuple[str, OpensshCertificateOption]] = [
     (
         "force-command=/usr/bin/csh",
-        OpensshCertificateOption("critical", "force-command", "/usr/bin/csh"),
+        OpensshCertificateOption(
+            option_type="critical", name="force-command", data="/usr/bin/csh"
+        ),
     ),
     (
         "Force-Command=/Usr/Bin/Csh",
-        OpensshCertificateOption("critical", "force-command", "/Usr/Bin/Csh"),
+        OpensshCertificateOption(
+            option_type="critical", name="force-command", data="/Usr/Bin/Csh"
+        ),
     ),
     (
         "permit-x11-forwarding",
-        OpensshCertificateOption("extension", "permit-x11-forwarding", ""),
+        OpensshCertificateOption(
+            option_type="extension", name="permit-x11-forwarding", data=""
+        ),
     ),
     (
         "permit-X11-forwarding",
-        OpensshCertificateOption("extension", "permit-x11-forwarding", ""),
+        OpensshCertificateOption(
+            option_type="extension", name="permit-x11-forwarding", data=""
+        ),
     ),
-    ("critical:foo=bar", OpensshCertificateOption("critical", "foo", "bar")),
-    ("extension:foo", OpensshCertificateOption("extension", "foo", "")),
+    (
+        "critical:foo=bar",
+        OpensshCertificateOption(option_type="critical", name="foo", data="bar"),
+    ),
+    (
+        "extension:foo",
+        OpensshCertificateOption(option_type="extension", name="foo", data=""),
+    ),
 ]
 
 INVALID_OPTIONS: list[str | list] = [
@@ -368,19 +396,21 @@ def test_valid_time_parameters(
 @pytest.mark.parametrize("valid_from,valid_to", INVALID_TIME_PARAMETERS)
 def test_invalid_time_parameters(valid_from: int | str, valid_to: int | str) -> None:
     with pytest.raises(ValueError):
-        OpensshCertificateTimeParameters(valid_from, valid_to)
+        OpensshCertificateTimeParameters(valid_from=valid_from, valid_to=valid_to)
 
 
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", VALID_VALIDITY_TEST)
 def test_valid_validity_test(valid_from: str, valid_to: str, valid_at: str) -> None:
-    assert OpensshCertificateTimeParameters(valid_from, valid_to).within_range(valid_at)
+    assert OpensshCertificateTimeParameters(
+        valid_from=valid_from, valid_to=valid_to
+    ).within_range(valid_at)
 
 
 @pytest.mark.parametrize("valid_from,valid_to,valid_at", INVALID_VALIDITY_TEST)
 def test_invalid_validity_test(valid_from: str, valid_to: str, valid_at: str) -> None:
-    assert not OpensshCertificateTimeParameters(valid_from, valid_to).within_range(
-        valid_at
-    )
+    assert not OpensshCertificateTimeParameters(
+        valid_from=valid_from, valid_to=valid_to
+    ).within_range(valid_at)
 
 
 @pytest.mark.parametrize("option_string,option_object", VALID_OPTIONS)

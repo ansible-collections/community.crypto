@@ -59,7 +59,7 @@ def gpg_fingerprint(input: str | bytes) -> str:
         )
     try:
         gpg = PluginGPGRunner()
-        return get_fingerprint_from_bytes(gpg, to_bytes(input))
+        return get_fingerprint_from_bytes(gpg_runner=gpg, content=to_bytes(input))
     except GPGError as exc:
         raise AnsibleFilterError(str(exc))
 
