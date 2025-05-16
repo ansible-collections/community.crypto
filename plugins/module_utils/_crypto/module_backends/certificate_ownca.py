@@ -82,7 +82,6 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
         self.digest = select_message_digest(module.params["ownca_digest"])
-        self.version: int = module.params["ownca_version"]
         self.serial_number = x509.random_serial_number()
         self.ca_cert_path: str | None = module.params["ownca_path"]
         ca_cert_content: str | None = module.params["ownca_content"]
@@ -335,9 +334,6 @@ class OwnCACertificateProvider(CertificateProvider):
                 msg="One of ownca_privatekey_path and ownca_privatekey_content must be specified for the ownca provider."
             )
 
-    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
-        return module.params["ownca_version"] == 2
-
     def create_backend(
         self, module: AnsibleModule
     ) -> OwnCACertificateBackendCryptography:
@@ -354,7 +350,7 @@ def add_ownca_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
             ownca_privatekey_content=dict(type="str", no_log=True),
             ownca_privatekey_passphrase=dict(type="str", no_log=True),
             ownca_digest=dict(type="str", default="sha256"),
-            ownca_version=dict(type="int", default=3),
+            ownca_version=dict(type="int", default=3, choices=[3]),  # not used
             ownca_not_before=dict(type="str", default="+0s"),
             ownca_not_after=dict(type="str", default="+3650d"),
             ownca_create_subject_key_identifier=dict(

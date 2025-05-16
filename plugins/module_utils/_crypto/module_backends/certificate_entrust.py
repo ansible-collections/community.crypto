@@ -226,9 +226,6 @@ class EntrustCertificateProvider(CertificateProvider):
     def validate_module_args(self, module: AnsibleModule) -> None:
         pass
 
-    def needs_version_two_certs(self, module: AnsibleModule) -> t.Literal[False]:
-        return False
-
     def create_backend(self, module: AnsibleModule) -> EntrustCertificateBackend:
         return EntrustCertificateBackend(module=module)
 

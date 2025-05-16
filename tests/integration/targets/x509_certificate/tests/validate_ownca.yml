@@ -67,7 +67,6 @@
   assert:
     that:
       - ownca_v2_certificate is failed
-      - "'The cryptography backend does not support v2 certificates' in ownca_v2_certificate.msg"
   when: "select_crypto_backend == 'cryptography'"
 
 

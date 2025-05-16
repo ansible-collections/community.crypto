@@ -121,9 +121,6 @@ class AcmeCertificateProvider(CertificateProvider):
                 msg="The acme_challenge_path option must be specified for the acme provider."
             )
 
-    def needs_version_two_certs(self, module: AnsibleModule) -> bool:
-        return False
-
     def create_backend(self, module: AnsibleModule) -> AcmeCertificateBackend:
         return AcmeCertificateBackend(module=module)
 

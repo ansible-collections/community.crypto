@@ -105,7 +105,6 @@
       assert:
         that:
           - selfsigned_v2_cert is failed
-          - "'The cryptography backend does not support v2 certificates' in selfsigned_v2_cert.msg"
   when: select_crypto_backend == 'cryptography'
 
 - name: (Selfsigned validation, {{select_crypto_backend}}) Validate certificate2 (test - privatekey modulus)
