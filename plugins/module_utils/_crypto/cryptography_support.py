@@ -113,17 +113,17 @@ if t.TYPE_CHECKING:
         PKCS12KeyAndCertificates,
     )
 
-    CertificatePrivateKeyTypes = (
-        CertificateIssuerPrivateKeyTypes
-        | cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey
-        | cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
-    )
-    PublicKeyTypesWOEdwards = (
-        DHPublicKey | DSAPublicKey | EllipticCurvePublicKey | RSAPublicKey
-    )
-    PrivateKeyTypesWOEdwards = (
-        DHPrivateKey | DSAPrivateKey | EllipticCurvePrivateKey | RSAPrivateKey
-    )
+    CertificatePrivateKeyTypes = t.Union[
+        CertificateIssuerPrivateKeyTypes,
+        cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+        cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+    ]
+    PublicKeyTypesWOEdwards = t.Union[
+        DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
+    ]
+    PrivateKeyTypesWOEdwards = t.Union[
+        DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
+    ]
 else:
     PublicKeyTypesWOEdwards = None
     PrivateKeyTypesWOEdwards = None

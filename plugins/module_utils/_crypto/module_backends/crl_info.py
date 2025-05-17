@@ -99,9 +99,10 @@ class CRLInfoRetrieval:
         for attribute in self.crl.issuer:
             issuer.append([cryptography_oid_to_name(attribute.oid), attribute.value])
         result["issuer_ordered"] = issuer
-        result["issuer"] = {}
+        issuer_dict = {}
         for k, v in issuer:
-            result["issuer"][k] = v
+            issuer_dict[k] = v
+        result["issuer"] = issuer_dict
         if self.list_revoked_certificates:
             result["revoked_certificates"] = []
             for cert in self.crl:
