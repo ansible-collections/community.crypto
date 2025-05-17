@@ -187,10 +187,12 @@ class AnsibleActionModule:
                             collection_name=d.get("collection_name"),
                         )
                     else:
+                        # pylint: disable-next=unknown-option-value
                         self.deprecate(  # pylint: disable=ansible-deprecated-no-version
                             d
                         )
             else:
+                # pylint: disable-next=unknown-option-value
                 self.deprecate(  # pylint: disable=ansible-deprecated-no-version
                     kwargs["deprecations"]
                 )
