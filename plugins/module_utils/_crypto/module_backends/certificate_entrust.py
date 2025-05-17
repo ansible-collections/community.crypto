@@ -119,7 +119,7 @@ class EntrustCertificateBackend(CertificateBackend):
             body["csr"] = to_native(self.csr_content)
         else:
             assert self.csr_path is not None
-            with open(self.csr_path, "r") as csr_file:
+            with open(self.csr_path, "r", encoding="utf-8") as csr_file:
                 body["csr"] = csr_file.read()
 
         body["certType"] = self.module.params["entrust_cert_type"]

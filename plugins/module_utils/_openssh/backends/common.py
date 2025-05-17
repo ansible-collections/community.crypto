@@ -429,7 +429,7 @@ class PublicKey:
     @classmethod
     def load(cls: t.Type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
         try:
-            with open(path, "r") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 properties = f.read().strip(" \n").split(" ", 2)
         except (IOError, OSError):
             raise
@@ -454,7 +454,7 @@ def parse_private_key_format(
     *,
     path: str | os.PathLike,
 ) -> t.Literal["SSH", "PKCS8", "PKCS1", ""]:
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         header = file.readline().strip()
 
     if header == "-----BEGIN OPENSSH PRIVATE KEY-----":

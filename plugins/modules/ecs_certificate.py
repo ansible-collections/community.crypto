@@ -803,7 +803,7 @@ class EcsCertificate:
 
             # Read the CSR contents
             if self.csr and os.path.exists(self.csr):
-                with open(self.csr, "r") as csr_file:
+                with open(self.csr, "r", encoding="utf-8") as csr_file:
                     body["csr"] = csr_file.read()
 
             # Check if the path is already a cert

@@ -325,7 +325,7 @@ class ECSSession:
                     f"Error downloading specification from address '{entrust_api_specification_path}', received error code '{e.getcode()}'"
                 )
         else:
-            with open(entrust_api_specification_path) as f:
+            with open(entrust_api_specification_path, "rb") as f:
                 if ".json" in entrust_api_specification_path:
                     self._spec = json.load(f)
                 elif (

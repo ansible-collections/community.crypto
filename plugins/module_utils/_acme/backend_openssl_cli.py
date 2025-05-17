@@ -160,7 +160,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             f.close()
         # Parse key
         account_key_type = None
-        with open(key_file, "rt") as fi:
+        with open(key_file, "r", encoding="utf-8") as fi:
             for line in fi:
                 m = re.match(
                     r"^\s*-{5,}BEGIN\s+(EC|RSA)\s+PRIVATE\s+KEY-{5,}\s*$", line
