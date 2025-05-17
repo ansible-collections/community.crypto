@@ -18,12 +18,12 @@ notes:
   - The M(community.crypto.acme_account) module allows to modify, create and delete ACME accounts.
   - This module was called C(acme_account_facts) before Ansible 2.8. The usage did not change.
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
-  - community.crypto.attributes
-  - community.crypto.attributes.actiongroup_acme
-  - community.crypto.attributes.info_module
-  - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto._acme.basic
+  - community.crypto._acme.account
+  - community.crypto._attributes
+  - community.crypto._attributes.actiongroup_acme
+  - community.crypto._attributes.info_module
+  - community.crypto._attributes.idempotent_not_modify_state
 options:
   retrieve_orders:
     description:

@@ -18,8 +18,8 @@ author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.module_csr
+  - community.crypto._attributes
+  - community.crypto._module_csr
 attributes:
   check_mode:
     support: full

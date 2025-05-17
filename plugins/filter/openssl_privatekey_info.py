@@ -32,7 +32,7 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - community.crypto.name_encoding
+  - community.crypto._name_encoding
 seealso:
   - module: community.crypto.openssl_privatekey_info
 """

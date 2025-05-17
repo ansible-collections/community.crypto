@@ -19,11 +19,11 @@ author:
   - Markus Teufelberger (@MarkusTeufelberger)
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.module_certificate
-  - community.crypto.module_certificate.backend_entrust_documentation
-  - community.crypto.module_certificate.backend_ownca_documentation
-  - community.crypto.module_certificate.backend_selfsigned_documentation
+  - community.crypto._attributes
+  - community.crypto._module_certificate
+  - community.crypto._module_certificate.backend_entrust_documentation
+  - community.crypto._module_certificate.backend_ownca_documentation
+  - community.crypto._module_certificate.backend_selfsigned_documentation
 attributes:
   check_mode:
     support: full

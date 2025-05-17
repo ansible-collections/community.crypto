@@ -18,11 +18,11 @@ author:
   - Felix Fontein (@felixfontein)
   - Yanis Guenane (@Spredzy)
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.info_module
-  - community.crypto.attributes.idempotent_not_modify_state
-  - community.crypto.cryptography_dep.minimum
-  - community.crypto.name_encoding
+  - community.crypto._attributes
+  - community.crypto._attributes.info_module
+  - community.crypto._attributes.idempotent_not_modify_state
+  - community.crypto._cryptography_dep.minimum
+  - community.crypto._name_encoding
 options:
   path:
     description:

@@ -17,8 +17,8 @@ author:
   - Patrick Pichler (@aveexy)
   - Markus Teufelberger (@MarkusTeufelberger)
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.cryptography_dep.minimum
+  - community.crypto._attributes
+  - community.crypto._cryptography_dep.minimum
 attributes:
   check_mode:
     support: full

@@ -20,10 +20,10 @@ description:
 notes:
   - O(path) must be specified as the output location of the certificate.
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.files
-  - community.crypto.cryptography_dep.minimum
-  - community.crypto.ecs_credential
+  - community.crypto._attributes
+  - community.crypto._attributes.files
+  - community.crypto._cryptography_dep.minimum
+  - community.crypto._ecs_credential
 attributes:
   check_mode:
     support: partial

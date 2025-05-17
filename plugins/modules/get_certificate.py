@@ -14,9 +14,9 @@ description:
   - Makes a secure connection and returns information about the presented certificate.
   - The module uses the cryptography Python library.
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.idempotent_not_modify_state
-  - community.crypto.cryptography_dep.minimum
+  - community.crypto._attributes
+  - community.crypto._attributes.idempotent_not_modify_state
+  - community.crypto._cryptography_dep.minimum
 attributes:
   check_mode:
     support: none

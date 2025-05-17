@@ -29,7 +29,7 @@ options:
     default: true
     version_added: 1.7.0
 extends_documentation_fragment:
-  - community.crypto.name_encoding
+  - community.crypto._name_encoding
 seealso:
   - module: community.crypto.x509_crl_info
   - plugin: community.crypto.to_serial

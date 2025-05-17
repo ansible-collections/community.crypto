@@ -21,7 +21,7 @@ options:
     type: string
     required: true
 extends_documentation_fragment:
-  - community.crypto.name_encoding
+  - community.crypto._name_encoding
 seealso:
   - module: community.crypto.openssl_csr_info
   - plugin: community.crypto.to_serial

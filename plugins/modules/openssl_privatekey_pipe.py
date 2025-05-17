@@ -21,9 +21,9 @@ author:
   - Yanis Guenane (@Spredzy)
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.flow
-  - community.crypto.module_privatekey
+  - community.crypto._attributes
+  - community.crypto._attributes.flow
+  - community.crypto._module_privatekey
 attributes:
   action:
     support: full
