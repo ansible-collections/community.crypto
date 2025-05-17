@@ -25,13 +25,13 @@ author:
   - Markus Teufelberger (@MarkusTeufelberger)
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.crypto.attributes
-  - community.crypto.attributes.files
-  - community.crypto.module_certificate
-  - community.crypto.module_certificate.backend_acme_documentation
-  - community.crypto.module_certificate.backend_entrust_documentation
-  - community.crypto.module_certificate.backend_ownca_documentation
-  - community.crypto.module_certificate.backend_selfsigned_documentation
+  - community.crypto._attributes
+  - community.crypto._attributes.files
+  - community.crypto._module_certificate
+  - community.crypto._module_certificate.backend_acme_documentation
+  - community.crypto._module_certificate.backend_entrust_documentation
+  - community.crypto._module_certificate.backend_ownca_documentation
+  - community.crypto._module_certificate.backend_selfsigned_documentation
 attributes:
   check_mode:
     support: full

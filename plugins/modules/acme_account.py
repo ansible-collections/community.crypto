@@ -31,10 +31,10 @@ seealso:
   - module: community.crypto.acme_inspect
     description: Allows to debug problems.
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.account
-  - community.crypto.attributes
-  - community.crypto.attributes.actiongroup_acme
+  - community.crypto._acme.basic
+  - community.crypto._acme.account
+  - community.crypto._attributes
+  - community.crypto._attributes.actiongroup_acme
 attributes:
   check_mode:
     support: full

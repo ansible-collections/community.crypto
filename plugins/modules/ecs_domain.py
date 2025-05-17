@@ -34,8 +34,8 @@ notes:
     when requesting a validation while O(verification_method=dns) or O(verification_method=web_server). Be aware of that if
     doing many domain validation requests.
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.ecs_credential
+  - community.crypto._attributes
+  - community.crypto._ecs_credential
 attributes:
   check_mode:
     support: none

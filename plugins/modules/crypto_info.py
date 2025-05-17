@@ -16,9 +16,9 @@ description:
   - The current version retrieves information on the L(Python cryptography library, https://cryptography.io/) available to
     Ansible modules, and on the OpenSSL binary C(openssl) found in the path.
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.info_module
-  - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto._attributes
+  - community.crypto._attributes.info_module
+  - community.crypto._attributes.idempotent_not_modify_state
 options: {}
 """
 

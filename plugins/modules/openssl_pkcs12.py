@@ -16,9 +16,9 @@ description:
   - The module uses the cryptography Python library.
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.crypto.attributes
-  - community.crypto.attributes.files
-  - community.crypto.cryptography_dep.minimum
+  - community.crypto._attributes
+  - community.crypto._attributes.files
+  - community.crypto._cryptography_dep.minimum
 attributes:
   check_mode:
     support: full

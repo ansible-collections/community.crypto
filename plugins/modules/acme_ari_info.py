@@ -17,11 +17,11 @@ description:
     (U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)).
     This module implements version 3 of the ARI draft.
 extends_documentation_fragment:
-  - community.crypto.acme.basic
-  - community.crypto.acme.no_account
-  - community.crypto.attributes
-  - community.crypto.attributes.info_module
-  - community.crypto.attributes.idempotent_not_modify_state
+  - community.crypto._acme.basic
+  - community.crypto._acme.no_account
+  - community.crypto._attributes
+  - community.crypto._attributes.info_module
+  - community.crypto._attributes.idempotent_not_modify_state
 options:
   certificate_path:
     description:

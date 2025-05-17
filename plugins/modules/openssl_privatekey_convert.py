@@ -17,9 +17,9 @@ author:
   - Felix Fontein (@felixfontein)
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.crypto.attributes
-  - community.crypto.attributes.files
-  - community.crypto.module_privatekey_convert
+  - community.crypto._attributes
+  - community.crypto._attributes.files
+  - community.crypto._module_privatekey_convert
 attributes:
   check_mode:
     support: full

@@ -18,9 +18,9 @@ description:
     that the signature is correct. It ignores validity dates and key usage completely. If you need to verify that a generated
     chain is valid, please use C(openssl verify ...).
 extends_documentation_fragment:
-  - community.crypto.attributes
-  - community.crypto.attributes.idempotent_not_modify_state
-  - community.crypto.cryptography_dep.minimum
+  - community.crypto._attributes
+  - community.crypto._attributes.idempotent_not_modify_state
+  - community.crypto._cryptography_dep.minimum
 attributes:
   check_mode:
     support: full
