@@ -208,6 +208,8 @@ class PrivateKeyParseError(OpenSSLObjectError):
 
 
 class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
+    key: PrivateKeyTypes
+
     def __init__(
         self,
         *,

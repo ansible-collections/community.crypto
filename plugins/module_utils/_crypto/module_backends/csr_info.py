@@ -61,6 +61,8 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CSRInfoRetrieval(metaclass=abc.ABCMeta):
+    csr: x509.CertificateSigningRequest
+
     def __init__(
         self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:

@@ -60,14 +60,14 @@ class PrivateKeyModule:
         if self.module_backend.needs_regeneration():
             # Regenerate
             self.module_backend.generate_private_key()
-            privatekey_data = self.module_backend.get_private_key_data()
-            self.privatekey_bytes = privatekey_data
+            # Call get_private_key_data() to make sure that exceptions are raised now:
+            self.module_backend.get_private_key_data()
             self.changed = True
         elif self.module_backend.needs_conversion():
             # Convert
             self.module_backend.convert_private_key()
-            privatekey_data = self.module_backend.get_private_key_data()
-            self.privatekey_bytes = privatekey_data
+            # Call get_private_key_data() to make sure that exceptions are raised now:
+            self.module_backend.get_private_key_data()
             self.changed = True
 
     def dump(self) -> dict[str, t.Any]:

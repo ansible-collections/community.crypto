@@ -216,8 +216,6 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.generate_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
-                if self.return_content:
-                    self.privatekey_bytes = privatekey_data
                 write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
         elif self.module_backend.needs_conversion():
@@ -227,8 +225,6 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.convert_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
-                if self.return_content:
-                    self.privatekey_bytes = privatekey_data
                 write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
 

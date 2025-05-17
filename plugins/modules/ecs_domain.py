@@ -268,6 +268,7 @@ class EcsDomain:
         # method of the domain, we'll use module.params when requesting a new
         # one, in case the verification method has changed.
         self.verification_method = None
+        self.client_id: str | None = None
 
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
         try:

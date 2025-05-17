@@ -70,6 +70,8 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
+    cert: x509.Certificate
+
     def __init__(self, *, module: GeneralAnsibleModule, content: bytes) -> None:
         # content must be a bytes string
         self.module = module

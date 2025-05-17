@@ -500,21 +500,21 @@ class Handler:
 
     def get_device_by_uuid(self, uuid: str | None) -> str | None:
         """Returns the device that holds UUID passed by user"""
-        self._blkid_bin = self._module.get_bin_path("blkid", True)
+        blkid_bin = self._module.get_bin_path("blkid", True)
         if uuid is None:
             return None
-        rc, stdout, dummy = self._run_command([self._blkid_bin, "--uuid", uuid])
+        rc, stdout, dummy = self._run_command([blkid_bin, "--uuid", uuid])
         if rc != 0:
             return None
         return stdout.strip()
 
     def get_device_by_label(self, label: str) -> str | None:
         """Returns the device that holds label passed by user"""
-        self._blkid_bin = self._module.get_bin_path("blkid", True)
+        blkid_bin = self._module.get_bin_path("blkid", True)
         label = self._module.params["label"]
         if label is None:
             return None
-        rc, stdout, dummy = self._run_command([self._blkid_bin, "--label", label])
+        rc, stdout, dummy = self._run_command([blkid_bin, "--label", label])
         if rc != 0:
             return None
         return stdout.strip()

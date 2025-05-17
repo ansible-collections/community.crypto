@@ -67,18 +67,18 @@ class CRLInfoRetrieval:
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
     def get_info(self) -> dict[str, t.Any]:
-        self.crl_pem = identify_pem_format(self.content)
+        crl_pem = identify_pem_format(self.content)
         try:
-            if self.crl_pem:
-                self.crl = x509.load_pem_x509_crl(self.content)
+            if crl_pem:
+                crl = x509.load_pem_x509_crl(self.content)
             else:
-                self.crl = x509.load_der_x509_crl(self.content)
+                crl = x509.load_der_x509_crl(self.content)
         except ValueError as e:
             self.module.fail_json(msg=f"Error while decoding CRL: {e}")
 
         result: dict[str, t.Any] = {
             "changed": False,
-            "format": "pem" if self.crl_pem else "der",
+            "format": "pem" if crl_pem else "der",
             "last_update": None,
             "next_update": None,
             "digest": None,
@@ -86,17 +86,15 @@ class CRLInfoRetrieval:
             "issuer": None,
         }
 
-        result["last_update"] = self.crl.last_update.strftime(TIMESTAMP_FORMAT)
+        result["last_update"] = crl.last_update.strftime(TIMESTAMP_FORMAT)
         result["next_update"] = (
-            self.crl.next_update.strftime(TIMESTAMP_FORMAT)
-            if self.crl.next_update
-            else None
+            crl.next_update.strftime(TIMESTAMP_FORMAT) if crl.next_update else None
         )
         result["digest"] = cryptography_oid_to_name(
-            cryptography_get_signature_algorithm_oid_from_crl(self.crl)
+            cryptography_get_signature_algorithm_oid_from_crl(crl)
         )
         issuer = []
-        for attribute in self.crl.issuer:
+        for attribute in crl.issuer:
             issuer.append([cryptography_oid_to_name(attribute.oid), attribute.value])
         result["issuer_ordered"] = issuer
         issuer_dict = {}
@@ -105,7 +103,7 @@ class CRLInfoRetrieval:
         result["issuer"] = issuer_dict
         if self.list_revoked_certificates:
             result["revoked_certificates"] = []
-            for cert in self.crl:
+            for cert in crl:
                 entry = cryptography_decode_revoked_certificate(cert)
                 result["revoked_certificates"].append(
                     cryptography_dump_revoked(entry, idn_rewrite=self.name_encoding)

@@ -380,7 +380,6 @@ disable=raw-checker-failed,
         wrong-import-position,
         # To clean up:
         arguments-differ,
-        attribute-defined-outside-init,
         broad-exception-caught,
         broad-exception-raised,
         consider-using-dict-items,

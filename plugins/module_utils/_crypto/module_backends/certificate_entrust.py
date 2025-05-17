@@ -58,6 +58,7 @@ class EntrustCertificateBackend(CertificateBackend):
             input_name="entrust_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
+        self.cert_bytes: bytes | None = None
 
         if self.csr_content is None:
             if self.csr_path is None:
@@ -157,6 +158,8 @@ class EntrustCertificateBackend(CertificateBackend):
 
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
+        if self.cert_bytes is None:
+            raise AssertionError("Contract violation: cert_bytes not set")
         return self.cert_bytes
 
     def needs_regeneration(
