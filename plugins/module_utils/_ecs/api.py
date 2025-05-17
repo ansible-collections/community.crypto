@@ -26,6 +26,10 @@ from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.urls import Request
 
 
+if t.TYPE_CHECKING:
+    _P = t.ParamSpec("_P")
+
+
 YAML_IMP_ERR = None
 try:
     import yaml
@@ -81,13 +85,21 @@ def generate_docstring(operation_spec: dict[str, t.Any]) -> str:
     return docs
 
 
-def bind(instance, method, operation_spec):
-    def binding_scope_fn(*args, **kwargs):
+_T = t.TypeVar("_T")
+_R = t.TypeVar("_R")
+
+
+def bind(
+    instance: _T,
+    method: t.Callable[t.Concatenate[_T, _P], _R],
+    operation_spec: dict[str, str],
+) -> t.Callable[_P, _R]:
+    def binding_scope_fn(*args, **kwargs) -> _R:
         return method(instance, *args, **kwargs)
 
     # Make sure we do not confuse users; add the proper name and documentation to the function.
     # Users can use !help(<function>) to get help on the function from interactive python or pdb
-    operation_name = operation_spec.get("operationId").split("Using")[0]
+    operation_name = operation_spec["operationId"].split("Using")[0]
     binding_scope_fn.__name__ = str(operation_name)
     binding_scope_fn.__doc__ = generate_docstring(operation_spec)
 
@@ -95,7 +107,13 @@ def bind(instance, method, operation_spec):
 
 
 class RestOperation:
-    def __init__(self, session, uri, method, parameters=None):
+    def __init__(
+        self,
+        session: "ECSSession",
+        uri: str,
+        method: str,
+        parameters: dict | None = None,
+    ) -> None:
         self.session = session
         self.method = method
         if parameters is None:
@@ -106,10 +124,11 @@ class RestOperation:
             f"https://{session._spec.get('host')}{session._spec.get('basePath')}{uri}"
         )
 
-    def restmethod(self, *args, **kwargs):
+    def restmethod(self, *args, **kwargs) -> t.Any:
         """Do the hard work of making the request here"""
 
         # gather named path parameters and do substitution on the URL
+        body_parameters: dict[str, t.Any] | None
         if self.parameters:
             path_parameters = {}
             body_parameters = {}
@@ -175,9 +194,9 @@ class RestOperation:
 class Resource:
     """Implement basic CRUD operations against a path."""
 
-    def __init__(self, session):
+    def __init__(self, session: "ECSSession") -> None:
         self.session = session
-        self.parameters = {}
+        self.parameters: dict[str, t.Any] = {}
 
         for url in session._spec.get("paths").keys():
             methods = session._spec.get("paths").get(url)
@@ -220,18 +239,18 @@ class Resource:
 
 # Session to encapsulate the connection parameters of the module_utils Request object, the api spec, etc
 class ECSSession:
-    def __init__(self, name, **kwargs):
+    def __init__(self, name: str, **kwargs) -> None:
         """
         Initialize our session
         """
 
         self._set_config(name, **kwargs)
 
-    def client(self):
+    def client(self) -> Resource:
         resource = Resource(self)
         return resource
 
-    def _set_config(self, name, **kwargs):
+    def _set_config(self, name: str, **kwargs) -> None:
         headers = {
             "Content-Type": "application/json",
             "Connection": "keep-alive",
@@ -247,8 +266,8 @@ class ECSSession:
             raise SessionConfigurationException("No Configuration Found.")
 
         # set up auth if passed
-        entrust_api_user = self.get_config("entrust_api_user")
-        entrust_api_key = self.get_config("entrust_api_key")
+        entrust_api_user: str | None = self.get_config("entrust_api_user")
+        entrust_api_key: str | None = self.get_config("entrust_api_key")
         if entrust_api_user and entrust_api_key:
             self.request.url_username = entrust_api_user
             self.request.url_password = entrust_api_key
@@ -256,8 +275,8 @@ class ECSSession:
             raise SessionConfigurationException("User and key must be provided.")
 
         # set up client certificate if passed (support all-in one or cert + key)
-        entrust_api_cert = self.get_config("entrust_api_cert")
-        entrust_api_cert_key = self.get_config("entrust_api_cert_key")
+        entrust_api_cert: str | None = self.get_config("entrust_api_cert")
+        entrust_api_cert_key: str | None = self.get_config("entrust_api_cert_key")
         if entrust_api_cert:
             self.request.client_cert = entrust_api_cert
             if entrust_api_cert_key:
@@ -271,6 +290,10 @@ class ECSSession:
         entrust_api_specification_path = self.get_config(
             "entrust_api_specification_path"
         )
+        if not isinstance(entrust_api_specification_path, str):
+            raise SessionConfigurationException(
+                "entrust_api_specification_path must be a string."
+            )
 
         if not entrust_api_specification_path.startswith("http") and not os.path.isfile(
             entrust_api_specification_path
@@ -311,10 +334,10 @@ class ECSSession:
                 ):
                     self._spec = yaml.safe_load(f)
 
-    def get_config(self, item):
+    def get_config(self, item: str) -> t.Any | None:
         return self._config.get(item, None)
 
-    def _read_config_vars(self, name, **kwargs):
+    def _read_config_vars(self, name: str, **kwargs) -> dict[str, t.Any]:
         """Read configuration from variables passed to the module."""
         config = {}
 
@@ -353,17 +376,17 @@ class ECSSession:
 
 
 def ECSClient(
-    entrust_api_user=None,
-    entrust_api_key=None,
-    entrust_api_cert=None,
-    entrust_api_cert_key=None,
-    entrust_api_specification_path=None,
-):
+    entrust_api_user: str | None = None,
+    entrust_api_key: str | None = None,
+    entrust_api_cert: str | None = None,
+    entrust_api_cert_key: str | None = None,
+    entrust_api_specification_path: str | None = None,
+) -> Resource:
     """Create an ECS client"""
 
     if not YAML_FOUND:
         raise SessionConfigurationException(
-            missing_required_lib("PyYAML"), exception=YAML_IMP_ERR
+            missing_required_lib("PyYAML")  # TODO: pass `exception=YAML_IMP_ERR`
         )
 
     if entrust_api_specification_path is None:

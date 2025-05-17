@@ -229,9 +229,17 @@ from ansible_collections.community.crypto.plugins.module_utils._ecs.api import (
 )
 
 
+@t.overload
+def calculate_days_remaining(expiry_date: str) -> int: ...
+
+
+@t.overload
+def calculate_days_remaining(expiry_date: str | None) -> int | None: ...
+
+
 def calculate_days_remaining(expiry_date: str | None) -> int | None:
     days_remaining = None
-    if expiry_date:
+    if expiry_date is not None:
         expiry_datetime = datetime.datetime.strptime(expiry_date, "%Y-%m-%dT%H:%M:%SZ")
         days_remaining = (expiry_datetime - datetime.datetime.now()).days
     return days_remaining
@@ -242,7 +250,7 @@ class EcsDomain:
     Entrust Certificate Services domain class.
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.changed = False
         self.domain_status = None
         self.verification_method = None
@@ -252,16 +260,15 @@ class EcsDomain:
         self.dns_contents = None
         self.dns_resource_type = None
         self.emails = None
-        self.ov_eligible = None
-        self.ov_days_remaining = None
-        self.ev_eligble = None
-        self.ev_days_remaining = None
+        self.ov_eligible: bool | None = None
+        self.ov_days_remaining: int | None = None
+        self.ev_eligible: bool | None = None
+        self.ev_days_remaining: int | None = None
         # Note that verification_method is the 'current' verification
         # method of the domain, we'll use module.params when requesting a new
         # one, in case the verification method has changed.
         self.verification_method = None
 
-        self.ecs_client = None
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
         try:
             self.ecs_client = ECSClient(
@@ -276,13 +283,13 @@ class EcsDomain:
         except SessionConfigurationException as e:
             module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
-            self.ecs_client.GetAppVersion()  # pylint: disable=no-member
+            self.ecs_client.GetAppVersion()  # type: ignore[attr-defined]  # pylint: disable=no-member
         except RestOperationException as e:
             module.fail_json(
                 msg=f"Please verify credential information. Received exception when testing ECS connection: {e.message}"
             )
 
-    def set_domain_details(self, domain_details):
+    def set_domain_details(self, domain_details: dict[str, t.Any]) -> None:
         if domain_details.get("verificationMethod"):
             self.verification_method = domain_details["verificationMethod"].lower()
         self.domain_status = domain_details["verificationStatus"]
@@ -308,9 +315,9 @@ class EcsDomain:
         elif self.verification_method == "email" and domain_details.get("emailMethod"):
             self.emails = domain_details["emailMethod"]
 
-    def check(self, module):
+    def check(self, module: AnsibleModule) -> bool:
         try:
-            domain_details = self.ecs_client.GetDomain(  # pylint: disable=no-member
+            domain_details = self.ecs_client.GetDomain(  # type: ignore[attr-defined]  # pylint: disable=no-member
                 clientId=module.params["client_id"], domain=module.params["domain_name"]
             )
             self.set_domain_details(domain_details)
@@ -337,7 +344,7 @@ class EcsDomain:
         except RestOperationException:
             return False
 
-    def request_domain(self, module):
+    def request_domain(self, module: AnsibleModule) -> None:
         if not self.check(module):
             body = {}
 
@@ -355,18 +362,18 @@ class EcsDomain:
                 body["domainName"] = module.params["domain_name"]
             try:
                 if not self.domain_status:
-                    self.ecs_client.AddDomain(  # pylint: disable=no-member
+                    self.ecs_client.AddDomain(  # type: ignore[attr-defined]  # pylint: disable=no-member
                         clientId=module.params["client_id"], Body=body
                     )
                 else:
-                    self.ecs_client.ReverifyDomain(  # pylint: disable=no-member
+                    self.ecs_client.ReverifyDomain(  # type: ignore[attr-defined]  # pylint: disable=no-member
                         clientId=module.params["client_id"],
                         domain=module.params["domain_name"],
                         Body=body,
                     )
 
                 time.sleep(5)
-                result = self.ecs_client.GetDomain(  # pylint: disable=no-member
+                result = self.ecs_client.GetDomain(  # type: ignore[attr-defined]  # pylint: disable=no-member
                     clientId=module.params["client_id"],
                     domain=module.params["domain_name"],
                 )
@@ -393,7 +400,7 @@ class EcsDomain:
                             ):
                                 break
                     time.sleep(10)
-                    result = self.ecs_client.GetDomain(  # pylint: disable=no-member
+                    result = self.ecs_client.GetDomain(  # type: ignore[attr-defined]  # pylint: disable=no-member
                         clientId=module.params["client_id"],
                         domain=module.params["domain_name"],
                     )
