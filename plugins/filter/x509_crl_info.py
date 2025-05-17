@@ -158,7 +158,7 @@ import binascii
 import typing as t
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -191,7 +191,7 @@ def x509_crl_info_filter(
         raise AnsibleFilterError(
             f"The list_revoked_certificates option must be a boolean, not {type(list_revoked_certificates)}"
         )
-    name_encoding = to_native(name_encoding)
+    name_encoding = to_text(name_encoding)
     if name_encoding not in ("ignore", "idna", "unicode"):
         raise AnsibleFilterError(
             f'The name_encoding option must be one of the values "ignore", "idna", or "unicode", not "{name_encoding}"'
@@ -200,7 +200,7 @@ def x509_crl_info_filter(
     data_bytes = to_bytes(data)
     if not identify_pem_format(data_bytes):
         try:
-            data_bytes = base64.b64decode(to_native(data_bytes))
+            data_bytes = base64.b64decode(to_text(data_bytes))
         except (binascii.Error, TypeError, ValueError, UnicodeEncodeError):
             pass
 

@@ -225,7 +225,7 @@ output_json:
 
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
     ACMEClient,
     create_backend,
@@ -291,7 +291,7 @@ def main() -> t.NoReturn:
             result.update(
                 {
                     "headers": info,
-                    "output_text": to_native(data),
+                    "output_text": to_text(data),
                 }
             )
             # See if we can parse the result as JSON

@@ -13,7 +13,7 @@ import abc
 import binascii
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     cryptography_decode_name,
     cryptography_get_extensions_from_csr,
@@ -154,7 +154,7 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
             result["name_constraints_critical"],
         ) = self._get_name_constraints()
 
-        result["public_key"] = to_native(self._get_public_key_pem())
+        result["public_key"] = to_text(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
             module=self.module,
@@ -210,7 +210,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         result: list[list[str]] = []
         for attribute in self.csr.subject:
             result.append(
-                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+                [cryptography_oid_to_name(attribute.oid), to_text(attribute.value)]
             )
         return result
 

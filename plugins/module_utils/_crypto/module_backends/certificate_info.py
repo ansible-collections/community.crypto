@@ -13,7 +13,7 @@ import abc
 import binascii
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
@@ -202,7 +202,7 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
             with_timezone=CRYPTOGRAPHY_TIMEZONE
         )
 
-        result["public_key"] = to_native(self._get_public_key_pem())
+        result["public_key"] = to_text(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
             module=self.module,
@@ -264,7 +264,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         result: list[list[str]] = []
         for attribute in self.cert.subject:
             result.append(
-                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+                [cryptography_oid_to_name(attribute.oid), to_text(attribute.value)]
             )
         return result
 
@@ -272,7 +272,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
         result = []
         for attribute in self.cert.issuer:
             result.append(
-                [cryptography_oid_to_name(attribute.oid), to_native(attribute.value)]
+                [cryptography_oid_to_name(attribute.oid), to_text(attribute.value)]
             )
         return result
 

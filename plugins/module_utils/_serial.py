@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.math import (
     convert_int_to_hex,
 )
@@ -31,7 +31,7 @@ def parse_serial(value: str | bytes) -> int:
     """
     Given a colon-separated string of hexadecimal byte values, converts it to an integer.
     """
-    value_str = to_native(value)
+    value_str = to_text(value)
     result = 0
     for i, part in enumerate(value_str.split(":")):
         try:

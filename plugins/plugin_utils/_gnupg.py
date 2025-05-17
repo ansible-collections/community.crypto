@@ -11,7 +11,7 @@ import typing as t
 from subprocess import PIPE, Popen
 
 from ansible.module_utils.common.process import get_bin_path
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
     GPGRunner,
@@ -51,8 +51,8 @@ class PluginGPGRunner(GPGRunner):
             command, shell=False, cwd=self.cwd, stdin=PIPE, stdout=PIPE, stderr=PIPE
         ) as p:
             stdout, stderr = p.communicate(input=data)
-            stdout_n = to_native(stdout, errors="surrogate_or_replace")
-            stderr_n = to_native(stderr, errors="surrogate_or_replace")
+            stdout_n = to_text(stdout, errors="surrogate_or_replace")
+            stderr_n = to_text(stderr, errors="surrogate_or_replace")
             if check_rc and p.returncode != 0:
                 raise GPGError(
                     f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'

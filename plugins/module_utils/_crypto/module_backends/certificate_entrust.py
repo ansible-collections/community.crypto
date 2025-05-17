@@ -12,7 +12,7 @@ import datetime
 import os
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     get_not_valid_after,
@@ -117,7 +117,7 @@ class EntrustCertificateBackend(CertificateBackend):
         # Read the CSR that was generated for us
         if self.csr_content is not None:
             # csr_content contains bytes
-            body["csr"] = to_native(self.csr_content)
+            body["csr"] = to_text(self.csr_content)
         else:
             assert self.csr_path is not None
             with open(self.csr_path, "r", encoding="utf-8") as csr_file:
