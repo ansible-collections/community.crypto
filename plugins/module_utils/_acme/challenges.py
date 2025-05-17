@@ -374,7 +374,7 @@ class Authorization:
         """
         authz = cls(url=url)
         authz_deactivate = {"status": "deactivated"}
-        result, info = client.send_signed_request(
+        result, _info = client.send_signed_request(
             url, authz_deactivate, fail_on_error=True
         )
         authz._setup(client=client, data=result)

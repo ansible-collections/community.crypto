@@ -390,7 +390,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
         return PublicKey.from_string(public_key_content)
 
     def _private_key_readable(self) -> bool:
-        rc, stdout, stderr = self.ssh_keygen.get_matching_public_key(
+        rc, _stdout, stderr = self.ssh_keygen.get_matching_public_key(
             private_key_path=self.private_key_path, check_rc=False
         )
         return not (

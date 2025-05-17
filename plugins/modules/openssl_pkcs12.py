@@ -835,7 +835,7 @@ def main() -> t.NoReturn:
                     pkcs12.write(module, pkcs12_content, 0o600)
                     changed = True
                 else:
-                    pkey, cert, other_certs, friendly_name = pkcs12.parse()
+                    pkey, cert, other_certs, _friendly_name = pkcs12.parse()
                     dump_content = "".join(
                         [
                             to_native(pem)

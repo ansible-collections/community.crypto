@@ -321,7 +321,7 @@ class ACMECertificateClient:
         """
         if self.csr is None and self.csr_content is None:
             raise ModuleFailException("No CSR has been provided")
-        for identifier, authz in order.authorizations.items():
+        for authz in order.authorizations.values():
             if authz.status != "valid":
                 authz.raise_error(
                     error_msg=f'Status is {authz.status!r} and not "valid"',

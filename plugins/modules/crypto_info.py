@@ -402,7 +402,7 @@ def add_openssl_information(module: AnsibleModule) -> dict[str, t.Any]:
     }
     result["openssl"] = openssl_result
 
-    rc, out, err = module.run_command([openssl_binary, "version"])
+    rc, out, _err = module.run_command([openssl_binary, "version"])
     if rc == 0:
         openssl_result["version_output"] = out
         parts = out.split(None, 2)

@@ -254,7 +254,7 @@ def main() -> t.NoReturn:
                 if not module.check_mode:
                     # Deactivate it
                     deactivate_payload = {"status": "deactivated"}
-                    result, info = client.send_signed_request(
+                    result, _info = client.send_signed_request(
                         t.cast(str, client.account_uri),
                         deactivate_payload,
                         error_msg="Failed to deactivate account",
@@ -335,7 +335,7 @@ def main() -> t.NoReturn:
                     key_data=new_key_data,
                 )
                 # Send request and verify result
-                result, info = client.send_signed_request(
+                result, _info = client.send_signed_request(
                     url,
                     data,
                     error_msg="Failed to rollover account key",

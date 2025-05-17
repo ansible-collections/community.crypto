@@ -578,7 +578,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.certificate
 from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
     combine_identifier,
     normalize_combined_identifier,
-    split_identifier,
     wait_for_validation,
 )
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
@@ -760,7 +759,6 @@ class ACMECertificateClient:
         data: dict[str, t.Any] = {}
         data_dns: dict[str, list[str]] = {}
         for type_identifier, authz in self.authorizations.items():
-            identifier_type, identifier = split_identifier(type_identifier)
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
             if authz.status == "valid":
@@ -802,7 +800,7 @@ class ACMECertificateClient:
 
         # Step 2: validate pending challenges
         authzs_to_wait_for = []
-        for type_identifier, authz in self.authorizations.items():
+        for authz in self.authorizations.values():
             if authz.status == "pending":
                 if self.challenge is not None:
                     authz.call_validate(
@@ -1047,7 +1045,7 @@ def main() -> t.NoReturn:
                 data, data_dns = client.get_challenges_data(first_step=is_first_step)
                 auths = dict()
                 assert client.authorizations is not None
-                for k, v in client.authorizations.items():
+                for v in client.authorizations.values():
                     # Remove "type:" from key
                     auths[v.identifier] = v.to_json()
                 module.exit_json(

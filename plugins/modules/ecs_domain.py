@@ -384,7 +384,7 @@ class EcsDomain:
                     module.params["verification_method"] == "dns"
                     or module.params["verification_method"] == "web_server"
                 ):
-                    for i in range(4):
+                    for _i in range(4):
                         # Check both that random values are now available, and that they're different than were populated by previous 'check'
                         if module.params["verification_method"] == "dns":
                             if (
