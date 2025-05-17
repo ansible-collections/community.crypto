@@ -388,7 +388,6 @@ disable=raw-checker-failed,
         consider-using-set-comprehension,
         consider-using-with,
         fixme,
-        inconsistent-return-statements,
         invalid-name,
         protected-access,
         raise-missing-from,
@@ -397,6 +396,8 @@ disable=raw-checker-failed,
         unused-argument,
         unused-variable,
         use-dict-literal,
+        # Cannot remove yet due to inadequacy of rules
+        inconsistent-return-statements,  # doesn't notice that fail_json() does not return
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
