@@ -19,6 +19,7 @@ try:
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, padding, rsa
+    from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
         Ed25519PrivateKey,
         Ed25519PublicKey,
@@ -67,6 +68,10 @@ except ImportError:
     HAS_OPENSSH_SUPPORT = False
     CRYPTOGRAPHY_VERSION = "0.0"
     _ALGORITHM_PARAMETERS = {}
+
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    is_potential_certificate_issuer_private_key,
+)
 
 
 if t.TYPE_CHECKING:
@@ -673,32 +678,33 @@ def load_privatekey(
         with open(path, "rb") as f:
             content = f.read()
 
-            privatekey = privatekey_loader(  # type: ignore
+        try:
+            privatekey = privatekey_loader(
                 data=content,
                 password=passphrase,
             )
-
-    except ValueError as exc:
-        # Revert to PEM if key could not be loaded in SSH format
-        if key_format == "SSH":
-            try:
-                privatekey = privatekey_loaders["PEM"](  # type: ignore
+        except ValueError as exc:
+            # Revert to PEM if key could not be loaded in SSH format
+            if key_format == "SSH":
+                privatekey = privatekey_loaders["PEM"](
                     data=content,
                     password=passphrase,
                 )
-            except ValueError as e:
-                raise InvalidPrivateKeyFileError(e)
-            except TypeError as e:
-                raise InvalidPassphraseError(e)
-            except UnsupportedAlgorithm as e:
-                raise InvalidAlgorithmError(e)
-        else:
-            raise InvalidPrivateKeyFileError(exc)
+            else:
+                raise InvalidPrivateKeyFileError(exc)
+    except ValueError as e:
+        raise InvalidPrivateKeyFileError(e)
     except TypeError as e:
         raise InvalidPassphraseError(e)
     except UnsupportedAlgorithm as e:
         raise InvalidAlgorithmError(e)
 
+    if not is_potential_certificate_issuer_private_key(privatekey) or isinstance(
+        privatekey, Ed448PrivateKey
+    ):
+        raise InvalidPrivateKeyFileError(
+            f"{privatekey} is not a supported private key type"
+        )
     return privatekey
 
 
