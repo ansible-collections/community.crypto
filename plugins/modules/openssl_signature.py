@@ -229,15 +229,17 @@ class SignatureCryptography(SignatureBase):
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            path=dict(type="path", required=True),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-        ),
+        argument_spec={
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "path": {"type": "path", "required": True},
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+        },
         mutually_exclusive=(["privatekey_path", "privatekey_content"],),
         required_one_of=(["privatekey_path", "privatekey_content"],),
         supports_check_mode=True,

@@ -45,7 +45,12 @@ if t.TYPE_CHECKING:
     )
 
 
-_OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+_OPENSSL_ENVIRONMENT_UPDATE = {
+    "LANG": "C",
+    "LC_ALL": "C",
+    "LC_MESSAGES": "C",
+    "LC_CTYPE": "C",
+}
 
 
 def _extract_date(

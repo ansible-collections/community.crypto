@@ -145,10 +145,10 @@ def main() -> t.NoReturn:
 
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            dest_path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-        )
+        {
+            "dest_path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+        }
     )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,

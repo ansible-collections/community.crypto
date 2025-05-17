@@ -544,7 +544,7 @@ class Certificate(OpensshModule):
             cert_type=self.type,
             time_parameters=self.time_parameters,
             use_agent=self.use_agent,
-            environ_update=dict(TZ="UTC"),
+            environ_update={"TZ": "UTC"},
             check_rc=True,
         )
 
@@ -624,38 +624,43 @@ def get_cert_dict(data: OpensshCertificate | None) -> dict[str, t.Any]:
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            force=dict(type="bool", default=False),
-            identifier=dict(type="str"),
-            options=dict(type="list", elements="str"),
-            path=dict(type="path", required=True),
-            pkcs11_provider=dict(type="str"),
-            principals=dict(type="list", elements="str"),
-            public_key=dict(type="path"),
-            regenerate=dict(
-                type="str",
-                default="partial_idempotence",
-                choices=[
+        argument_spec={
+            "force": {"type": "bool", "default": False},
+            "identifier": {"type": "str"},
+            "options": {"type": "list", "elements": "str"},
+            "path": {"type": "path", "required": True},
+            "pkcs11_provider": {"type": "str"},
+            "principals": {"type": "list", "elements": "str"},
+            "public_key": {"type": "path"},
+            "regenerate": {
+                "type": "str",
+                "default": "partial_idempotence",
+                "choices": [
                     "never",
                     "fail",
                     "partial_idempotence",
                     "full_idempotence",
                     "always",
                 ],
-            ),
-            signature_algorithm=dict(
-                type="str", choices=["ssh-rsa", "rsa-sha2-256", "rsa-sha2-512"]
-            ),
-            signing_key=dict(type="path"),
-            serial_number=dict(type="int"),
-            state=dict(type="str", default="present", choices=["absent", "present"]),
-            type=dict(type="str", choices=["host", "user"]),
-            use_agent=dict(type="bool", default=False),
-            valid_at=dict(type="str"),
-            valid_from=dict(type="str"),
-            valid_to=dict(type="str"),
-            ignore_timestamps=dict(type="bool", default=False),
-        ),
+            },
+            "signature_algorithm": {
+                "type": "str",
+                "choices": ["ssh-rsa", "rsa-sha2-256", "rsa-sha2-512"],
+            },
+            "signing_key": {"type": "path"},
+            "serial_number": {"type": "int"},
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["absent", "present"],
+            },
+            "type": {"type": "str", "choices": ["host", "user"]},
+            "use_agent": {"type": "bool", "default": False},
+            "valid_at": {"type": "str"},
+            "valid_from": {"type": "str"},
+            "valid_to": {"type": "str"},
+            "ignore_timestamps": {"type": "bool", "default": False},
+        },
         supports_check_mode=True,
         add_file_common_args=True,
         required_if=[

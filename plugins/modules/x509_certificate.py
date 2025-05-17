@@ -366,12 +366,16 @@ def main() -> t.NoReturn:
     add_ownca_provider_to_argument_spec(argument_spec)
     add_selfsigned_provider_to_argument_spec(argument_spec)
     argument_spec.argument_spec.update(
-        dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-        )
+        {
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+        }
     )
     argument_spec.required_if.append(("state", "present", ["provider"]))
     module = argument_spec.create_ansible_module(

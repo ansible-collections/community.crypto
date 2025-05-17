@@ -138,7 +138,7 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
         result["fingerprints"] = (
             get_fingerprint_of_bytes(pk, prefer_one=prefer_one_fingerprint)
             if pk is not None
-            else dict()
+            else {}
         )
 
         key_type, key_public_data = self._get_key_info()

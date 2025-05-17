@@ -200,13 +200,13 @@ def encode_octet_string(octet_string: bytes) -> bytes:
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            challenge=dict(type="str", required=True, choices=["tls-alpn-01"]),
-            challenge_data=dict(type="dict", required=True),
-            private_key_src=dict(type="path"),
-            private_key_content=dict(type="str", no_log=True),
-            private_key_passphrase=dict(type="str", no_log=True),
-        ),
+        argument_spec={
+            "challenge": {"type": "str", "required": True, "choices": ["tls-alpn-01"]},
+            "challenge_data": {"type": "dict", "required": True},
+            "private_key_src": {"type": "path"},
+            "private_key_content": {"type": "str", "no_log": True},
+            "private_key_passphrase": {"type": "str", "no_log": True},
+        },
         required_one_of=(["private_key_src", "private_key_content"],),
         mutually_exclusive=(["private_key_src", "private_key_content"],),
     )

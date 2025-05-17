@@ -166,11 +166,11 @@ class ACMECertificateClient:
                 continue
             challenge_data = authz.get_challenge_data(client=self.client)
             data.append(
-                dict(
-                    identifier=authz.identifier,
-                    identifier_type=authz.identifier_type,
-                    challenges=challenge_data,
-                )
+                {
+                    "identifier": authz.identifier,
+                    "identifier_type": authz.identifier_type,
+                    "challenges": challenge_data,
+                }
             )
             dns_challenge = challenge_data.get(dns_challenge_type)
             if dns_challenge:

@@ -406,10 +406,10 @@ class PublicKey(OpenSSLObject):
                 self.publickey_bytes.decode("utf-8") if self.publickey_bytes else None
             )
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
 
         return result
 
@@ -417,20 +417,26 @@ class PublicKey(OpenSSLObject):
 def main() -> t.NoReturn:
 
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            format=dict(type="str", default="PEM", choices=["OpenSSH", "PEM"]),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            backup=dict(type="bool", default=False),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            return_content=dict(type="bool", default=False),
-        ),
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "format": {"type": "str", "default": "PEM", "choices": ["OpenSSH", "PEM"]},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "backup": {"type": "bool", "default": False},
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+            "return_content": {"type": "bool", "default": False},
+        },
         supports_check_mode=True,
         add_file_common_args=True,
         required_if=[

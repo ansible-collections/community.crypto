@@ -327,13 +327,17 @@ class CertificateSigningRequestModule(OpenSSLObject):
 def main() -> t.NoReturn:
     argument_spec = get_csr_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            state=dict(type="str", default="present", choices=["absent", "present"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-        )
+        {
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["absent", "present"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+        }
     )
     argument_spec.required_if.extend(
         [("state", "present", rof, True) for rof in argument_spec.required_one_of]

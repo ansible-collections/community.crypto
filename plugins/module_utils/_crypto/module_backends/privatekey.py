@@ -265,10 +265,10 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             else:
                 result["privatekey"] = None
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
@@ -602,16 +602,16 @@ def select_backend(module: GeneralAnsibleModule) -> PrivateKeyBackend:
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            size=dict(type="int", default=4096),
-            type=dict(
-                type="str",
-                default="RSA",
-                choices=["DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"],
-            ),
-            curve=dict(
-                type="str",
-                choices=[
+        argument_spec={
+            "size": {"type": "int", "default": 4096},
+            "type": {
+                "type": "str",
+                "default": "RSA",
+                "choices": ["DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"],
+            },
+            "curve": {
+                "type": "str",
+                "choices": [
                     "secp224r1",
                     "secp256k1",
                     "secp256r1",
@@ -632,32 +632,36 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
                     "sect571k1",
                     "sect571r1",
                 ],
-            ),
-            passphrase=dict(type="str", no_log=True),
-            cipher=dict(type="str", default="auto"),
-            format=dict(
-                type="str",
-                default="auto_ignore",
-                choices=["pkcs1", "pkcs8", "raw", "auto", "auto_ignore"],
-            ),
-            format_mismatch=dict(
-                type="str", default="regenerate", choices=["regenerate", "convert"]
-            ),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            regenerate=dict(
-                type="str",
-                default="full_idempotence",
-                choices=[
+            },
+            "passphrase": {"type": "str", "no_log": True},
+            "cipher": {"type": "str", "default": "auto"},
+            "format": {
+                "type": "str",
+                "default": "auto_ignore",
+                "choices": ["pkcs1", "pkcs8", "raw", "auto", "auto_ignore"],
+            },
+            "format_mismatch": {
+                "type": "str",
+                "default": "regenerate",
+                "choices": ["regenerate", "convert"],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+            "regenerate": {
+                "type": "str",
+                "default": "full_idempotence",
+                "choices": [
                     "never",
                     "fail",
                     "partial_idempotence",
                     "full_idempotence",
                     "always",
                 ],
-            ),
-        ),
+            },
+        },
         required_if=[
             ("type", "ECC", ["curve"]),
         ],

@@ -443,14 +443,16 @@ class EcsDomain:
 
 
 def ecs_domain_argument_spec() -> dict[str, dict[str, t.Any]]:
-    return dict(
-        client_id=dict(type="int", default=1),
-        domain_name=dict(type="str", required=True),
-        verification_method=dict(
-            type="str", required=True, choices=["dns", "email", "manual", "web_server"]
-        ),
-        verification_email=dict(type="str"),
-    )
+    return {
+        "client_id": {"type": "int", "default": 1},
+        "domain_name": {"type": "str", "required": True},
+        "verification_method": {
+            "type": "str",
+            "required": True,
+            "choices": ["dns", "email", "manual", "web_server"],
+        },
+        "verification_email": {"type": "str"},
+    }
 
 
 def main() -> t.NoReturn:

@@ -340,29 +340,31 @@ if t.TYPE_CHECKING:
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
-        order_uri=dict(type="str", required=True),
-        cert_dest=dict(type="path"),
-        fullchain_dest=dict(type="path"),
-        chain_dest=dict(type="path"),
-        deactivate_authzs=dict(
-            type="str",
-            default="always",
-            choices=["never", "always", "on_error", "on_success"],
-        ),
-        retrieve_all_alternates=dict(type="bool", default=False),
-        select_chain=dict(
-            type="list",
-            elements="dict",
-            options=dict(
-                test_certificates=dict(
-                    type="str", default="all", choices=["first", "last", "all"]
-                ),
-                issuer=dict(type="dict"),
-                subject=dict(type="dict"),
-                subject_key_identifier=dict(type="str"),
-                authority_key_identifier=dict(type="str"),
-            ),
-        ),
+        order_uri={"type": "str", "required": True},
+        cert_dest={"type": "path"},
+        fullchain_dest={"type": "path"},
+        chain_dest={"type": "path"},
+        deactivate_authzs={
+            "type": "str",
+            "default": "always",
+            "choices": ["never", "always", "on_error", "on_success"],
+        },
+        retrieve_all_alternates={"type": "bool", "default": False},
+        select_chain={
+            "type": "list",
+            "elements": "dict",
+            "options": {
+                "test_certificates": {
+                    "type": "str",
+                    "default": "all",
+                    "choices": ["first", "last", "all"],
+                },
+                "issuer": {"type": "dict"},
+                "subject": {"type": "dict"},
+                "subject_key_identifier": {"type": "str"},
+                "authority_key_identifier": {"type": "str"},
+            },
+        },
     )
     module = argument_spec.create_ansible_module()
 
@@ -371,7 +373,7 @@ def main() -> t.NoReturn:
     try:
         client = ACMECertificateClient(module=module, backend=backend)
         select_chain_matcher = client.parse_select_chain(module.params["select_chain"])
-        other = dict()
+        other = {}
         done = False
         order = None
         try:

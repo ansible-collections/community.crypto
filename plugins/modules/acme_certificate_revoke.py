@@ -134,11 +134,11 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
-        private_key_src=dict(type="path"),
-        private_key_content=dict(type="str", no_log=True),
-        private_key_passphrase=dict(type="str", no_log=True),
-        certificate=dict(type="path", required=True),
-        revoke_reason=dict(type="int"),
+        private_key_src={"type": "path"},
+        private_key_content={"type": "str", "no_log": True},
+        private_key_passphrase={"type": "str", "no_log": True},
+        certificate={"type": "path", "required": True},
+        revoke_reason={"type": "int"},
     )
     argument_spec.update(
         required_one_of=[

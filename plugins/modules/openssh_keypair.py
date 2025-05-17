@@ -209,41 +209,45 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.backends
 def main() -> t.NoReturn:
 
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            size=dict(type="int"),
-            type=dict(
-                type="str",
-                default="rsa",
-                choices=["rsa", "dsa", "rsa1", "ecdsa", "ed25519"],
-            ),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            comment=dict(type="str"),
-            regenerate=dict(
-                type="str",
-                default="partial_idempotence",
-                choices=[
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "size": {"type": "int"},
+            "type": {
+                "type": "str",
+                "default": "rsa",
+                "choices": ["rsa", "dsa", "rsa1", "ecdsa", "ed25519"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "comment": {"type": "str"},
+            "regenerate": {
+                "type": "str",
+                "default": "partial_idempotence",
+                "choices": [
                     "never",
                     "fail",
                     "partial_idempotence",
                     "full_idempotence",
                     "always",
                 ],
-            ),
-            passphrase=dict(type="str", no_log=True),
-            private_key_format=dict(
-                type="str",
-                default="auto",
-                no_log=False,
-                choices=["auto", "pkcs1", "pkcs8", "ssh"],
-            ),
-            backend=dict(
-                type="str",
-                default="auto",
-                choices=["auto", "cryptography", "opensshbin"],
-            ),
-        ),
+            },
+            "passphrase": {"type": "str", "no_log": True},
+            "private_key_format": {
+                "type": "str",
+                "default": "auto",
+                "no_log": False,
+                "choices": ["auto", "pkcs1", "pkcs8", "ssh"],
+            },
+            "backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography", "opensshbin"],
+            },
+        },
         supports_check_mode=True,
         add_file_common_args=True,
     )

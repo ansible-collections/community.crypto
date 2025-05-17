@@ -221,7 +221,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             result["can_parse_csr"] = True
             return result
         except Exception:
-            return dict(can_parse_csr=False)
+            return {"can_parse_csr": False}
 
     @abc.abstractmethod
     def generate_csr(self) -> None:
@@ -294,10 +294,10 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             # Store result
             result["csr"] = csr_bytes.decode("utf-8") if csr_bytes else None
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
@@ -807,77 +807,97 @@ def select_backend(
 
 def get_csr_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            digest=dict(type="str", default="sha256"),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            version=dict(type="int", default=1, choices=[1]),
-            subject=dict(type="dict"),
-            subject_ordered=dict(type="list", elements="dict"),
-            country_name=dict(type="str", aliases=["C", "countryName"]),
-            state_or_province_name=dict(
-                type="str", aliases=["ST", "stateOrProvinceName"]
-            ),
-            locality_name=dict(type="str", aliases=["L", "localityName"]),
-            organization_name=dict(type="str", aliases=["O", "organizationName"]),
-            organizational_unit_name=dict(
-                type="str", aliases=["OU", "organizationalUnitName"]
-            ),
-            common_name=dict(type="str", aliases=["CN", "commonName"]),
-            email_address=dict(type="str", aliases=["E", "emailAddress"]),
-            subject_alt_name=dict(
-                type="list", elements="str", aliases=["subjectAltName"]
-            ),
-            subject_alt_name_critical=dict(
-                type="bool", default=False, aliases=["subjectAltName_critical"]
-            ),
-            use_common_name_for_san=dict(
-                type="bool", default=True, aliases=["useCommonNameForSAN"]
-            ),
-            key_usage=dict(type="list", elements="str", aliases=["keyUsage"]),
-            key_usage_critical=dict(
-                type="bool", default=False, aliases=["keyUsage_critical"]
-            ),
-            extended_key_usage=dict(
-                type="list", elements="str", aliases=["extKeyUsage", "extendedKeyUsage"]
-            ),
-            extended_key_usage_critical=dict(
-                type="bool",
-                default=False,
-                aliases=["extKeyUsage_critical", "extendedKeyUsage_critical"],
-            ),
-            basic_constraints=dict(
-                type="list", elements="str", aliases=["basicConstraints"]
-            ),
-            basic_constraints_critical=dict(
-                type="bool", default=False, aliases=["basicConstraints_critical"]
-            ),
-            ocsp_must_staple=dict(
-                type="bool", default=False, aliases=["ocspMustStaple"]
-            ),
-            ocsp_must_staple_critical=dict(
-                type="bool", default=False, aliases=["ocspMustStaple_critical"]
-            ),
-            name_constraints_permitted=dict(type="list", elements="str"),
-            name_constraints_excluded=dict(type="list", elements="str"),
-            name_constraints_critical=dict(type="bool", default=False),
-            create_subject_key_identifier=dict(type="bool", default=False),
-            subject_key_identifier=dict(type="str"),
-            authority_key_identifier=dict(type="str"),
-            authority_cert_issuer=dict(type="list", elements="str"),
-            authority_cert_serial_number=dict(type="int"),
-            crl_distribution_points=dict(
-                type="list",
-                elements="dict",
-                options=dict(
-                    full_name=dict(type="list", elements="str"),
-                    relative_name=dict(type="list", elements="str"),
-                    crl_issuer=dict(type="list", elements="str"),
-                    reasons=dict(
-                        type="list",
-                        elements="str",
-                        choices=[
+        argument_spec={
+            "digest": {"type": "str", "default": "sha256"},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "version": {"type": "int", "default": 1, "choices": [1]},
+            "subject": {"type": "dict"},
+            "subject_ordered": {"type": "list", "elements": "dict"},
+            "country_name": {"type": "str", "aliases": ["C", "countryName"]},
+            "state_or_province_name": {
+                "type": "str",
+                "aliases": ["ST", "stateOrProvinceName"],
+            },
+            "locality_name": {"type": "str", "aliases": ["L", "localityName"]},
+            "organization_name": {"type": "str", "aliases": ["O", "organizationName"]},
+            "organizational_unit_name": {
+                "type": "str",
+                "aliases": ["OU", "organizationalUnitName"],
+            },
+            "common_name": {"type": "str", "aliases": ["CN", "commonName"]},
+            "email_address": {"type": "str", "aliases": ["E", "emailAddress"]},
+            "subject_alt_name": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["subjectAltName"],
+            },
+            "subject_alt_name_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["subjectAltName_critical"],
+            },
+            "use_common_name_for_san": {
+                "type": "bool",
+                "default": True,
+                "aliases": ["useCommonNameForSAN"],
+            },
+            "key_usage": {"type": "list", "elements": "str", "aliases": ["keyUsage"]},
+            "key_usage_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["keyUsage_critical"],
+            },
+            "extended_key_usage": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["extKeyUsage", "extendedKeyUsage"],
+            },
+            "extended_key_usage_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["extKeyUsage_critical", "extendedKeyUsage_critical"],
+            },
+            "basic_constraints": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["basicConstraints"],
+            },
+            "basic_constraints_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["basicConstraints_critical"],
+            },
+            "ocsp_must_staple": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["ocspMustStaple"],
+            },
+            "ocsp_must_staple_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["ocspMustStaple_critical"],
+            },
+            "name_constraints_permitted": {"type": "list", "elements": "str"},
+            "name_constraints_excluded": {"type": "list", "elements": "str"},
+            "name_constraints_critical": {"type": "bool", "default": False},
+            "create_subject_key_identifier": {"type": "bool", "default": False},
+            "subject_key_identifier": {"type": "str"},
+            "authority_key_identifier": {"type": "str"},
+            "authority_cert_issuer": {"type": "list", "elements": "str"},
+            "authority_cert_serial_number": {"type": "int"},
+            "crl_distribution_points": {
+                "type": "list",
+                "elements": "dict",
+                "options": {
+                    "full_name": {"type": "list", "elements": "str"},
+                    "relative_name": {"type": "list", "elements": "str"},
+                    "crl_issuer": {"type": "list", "elements": "str"},
+                    "reasons": {
+                        "type": "list",
+                        "elements": "str",
+                        "choices": [
                             "key_compromise",
                             "ca_compromise",
                             "affiliation_changed",
@@ -887,15 +907,17 @@ def get_csr_argument_spec() -> ArgumentSpec:
                             "privilege_withdrawn",
                             "aa_compromise",
                         ],
-                    ),
-                ),
-                mutually_exclusive=[("full_name", "relative_name")],
-                required_one_of=[("full_name", "relative_name", "crl_issuer")],
-            ),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
-        ),
+                    },
+                },
+                "mutually_exclusive": [("full_name", "relative_name")],
+                "required_one_of": [("full_name", "relative_name", "crl_issuer")],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+        },
         required_together=[
             ["authority_cert_issuer", "authority_cert_serial_number"],
         ],

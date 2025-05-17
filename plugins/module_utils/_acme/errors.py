@@ -100,7 +100,7 @@ class ACMEProtocolException(ModuleFailException):
             except Exception:
                 pass
 
-        extras = extras or dict()
+        extras = extras or {}
         error_code = None
         error_type = None
 

@@ -126,14 +126,15 @@ class AcmeCertificateProvider(CertificateProvider):
 def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("acme")
     argument_spec.argument_spec.update(
-        dict(
-            acme_accountkey_path=dict(type="path"),
-            acme_challenge_path=dict(type="path"),
-            acme_chain=dict(type="bool", default=False),
-            acme_directory=dict(
-                type="str", default="https://acme-v02.api.letsencrypt.org/directory"
-            ),
-        )
+        {
+            "acme_accountkey_path": {"type": "path"},
+            "acme_challenge_path": {"type": "path"},
+            "acme_chain": {"type": "bool", "default": False},
+            "acme_directory": {
+                "type": "str",
+                "default": "https://acme-v02.api.letsencrypt.org/directory",
+            },
+        }
     )
 
 

@@ -341,11 +341,15 @@ def check_cycle(
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            input_chain=dict(type="str", required=True),
-            root_certificates=dict(type="list", required=True, elements="path"),
-            intermediate_certificates=dict(type="list", default=[], elements="path"),
-        ),
+        argument_spec={
+            "input_chain": {"type": "str", "required": True},
+            "root_certificates": {"type": "list", "required": True, "elements": "path"},
+            "intermediate_certificates": {
+                "type": "list",
+                "default": [],
+                "elements": "path",
+            },
+        },
         supports_check_mode=True,
     )
 

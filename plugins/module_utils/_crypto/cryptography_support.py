@@ -146,14 +146,14 @@ DOTTED_OID = re.compile(r"^\d+(?:\.\d+)+$")
 def cryptography_get_extensions_from_cert(
     cert: x509.Certificate,
 ) -> dict[str, dict[str, bool | str]]:
-    result = dict()
+    result = {}
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
         for ext in cert.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
-            )
+            result[ext.oid.dotted_string] = {
+                "critical": ext.critical,
+                "value": base64.b64encode(ext.value.public_bytes()).decode("ascii"),
+            }
     else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
@@ -178,10 +178,10 @@ def cryptography_get_extensions_from_cert(
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
             der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der).decode("ascii"),
-            )
+            entry = {
+                "critical": (crit == 1),
+                "value": base64.b64encode(der).decode("ascii"),
+            }
             try:
                 oid = obj2txt(
                     backend._lib,
@@ -198,14 +198,14 @@ def cryptography_get_extensions_from_cert(
 def cryptography_get_extensions_from_csr(
     csr: x509.CertificateSigningRequest,
 ) -> dict[str, dict[str, bool | str]]:
-    result = dict()
+    result = {}
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
         for ext in csr.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
-            )
+            result[ext.oid.dotted_string] = {
+                "critical": ext.critical,
+                "value": base64.b64encode(ext.value.public_bytes()).decode("ascii"),
+            }
 
     else:
         # Since cryptography will not give us the DER value for an extension
@@ -241,10 +241,10 @@ def cryptography_get_extensions_from_csr(
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
             der: bytes = backend._ffi.buffer(data.data, data.length)[:]  # type: ignore
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der).decode("ascii"),
-            )
+            entry = {
+                "critical": (crit == 1),
+                "value": base64.b64encode(der).decode("ascii"),
+            }
             try:
                 oid = obj2txt(
                     backend._lib,
@@ -664,17 +664,17 @@ def cryptography_parse_key_usage_params(usages: t.Iterable[str]) -> dict[str, bo
     Given a list of key usage identifier strings, returns the parameters for cryptography's x509.KeyUsage().
     Raises an OpenSSLObjectError if an identifier is unknown.
     """
-    params = dict(
-        digital_signature=False,
-        content_commitment=False,
-        key_encipherment=False,
-        data_encipherment=False,
-        key_agreement=False,
-        key_cert_sign=False,
-        crl_sign=False,
-        encipher_only=False,
-        decipher_only=False,
-    )
+    params = {
+        "digital_signature": False,
+        "content_commitment": False,
+        "key_encipherment": False,
+        "data_encipherment": False,
+        "key_agreement": False,
+        "key_cert_sign": False,
+        "crl_sign": False,
+        "encipher_only": False,
+        "decipher_only": False,
+    }
     for usage in usages:
         params[_cryptography_get_keyusage(usage)] = True
     return params

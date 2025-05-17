@@ -171,11 +171,11 @@ class CertificateInfoRetrieval(metaclass=abc.ABCMeta):
         result["signature_algorithm"] = self._get_signature_algorithm()
         subject = self._get_subject_ordered()
         issuer = self._get_issuer_ordered()
-        result["subject"] = dict()
+        result["subject"] = {}
         for k, v in subject:
             result["subject"][k] = v
         result["subject_ordered"] = subject
-        result["issuer"] = dict()
+        result["issuer"] = {}
         for k, v in issuer:
             result["issuer"][k] = v
         result["issuer_ordered"] = issuer
@@ -289,36 +289,36 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
                 x509.KeyUsage
             )
             current_key_usage = current_key_ext.value
-            key_usage = dict(
-                digital_signature=current_key_usage.digital_signature,
-                content_commitment=current_key_usage.content_commitment,
-                key_encipherment=current_key_usage.key_encipherment,
-                data_encipherment=current_key_usage.data_encipherment,
-                key_agreement=current_key_usage.key_agreement,
-                key_cert_sign=current_key_usage.key_cert_sign,
-                crl_sign=current_key_usage.crl_sign,
-                encipher_only=False,
-                decipher_only=False,
-            )
+            key_usage = {
+                "digital_signature": current_key_usage.digital_signature,
+                "content_commitment": current_key_usage.content_commitment,
+                "key_encipherment": current_key_usage.key_encipherment,
+                "data_encipherment": current_key_usage.data_encipherment,
+                "key_agreement": current_key_usage.key_agreement,
+                "key_cert_sign": current_key_usage.key_cert_sign,
+                "crl_sign": current_key_usage.crl_sign,
+                "encipher_only": False,
+                "decipher_only": False,
+            }
             if key_usage["key_agreement"]:
                 key_usage.update(
-                    dict(
-                        encipher_only=current_key_usage.encipher_only,
-                        decipher_only=current_key_usage.decipher_only,
-                    )
+                    {
+                        "encipher_only": current_key_usage.encipher_only,
+                        "decipher_only": current_key_usage.decipher_only,
+                    }
                 )
 
-            key_usage_names = dict(
-                digital_signature="Digital Signature",
-                content_commitment="Non Repudiation",
-                key_encipherment="Key Encipherment",
-                data_encipherment="Data Encipherment",
-                key_agreement="Key Agreement",
-                key_cert_sign="Certificate Sign",
-                crl_sign="CRL Sign",
-                encipher_only="Encipher Only",
-                decipher_only="Decipher Only",
-            )
+            key_usage_names = {
+                "digital_signature": "Digital Signature",
+                "content_commitment": "Non Repudiation",
+                "key_encipherment": "Key Encipherment",
+                "data_encipherment": "Data Encipherment",
+                "key_agreement": "Key Agreement",
+                "key_cert_sign": "Certificate Sign",
+                "crl_sign": "CRL Sign",
+                "encipher_only": "Encipher Only",
+                "decipher_only": "Decipher Only",
+            }
             return (
                 sorted(
                     [

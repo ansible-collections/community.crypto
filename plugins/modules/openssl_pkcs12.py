@@ -757,39 +757,49 @@ def select_backend(module: AnsibleModule) -> Pkcs:
 
 
 def main() -> t.NoReturn:
-    argument_spec = dict(
-        action=dict(type="str", default="export", choices=["export", "parse"]),
-        other_certificates=dict(
-            type="list", elements="path", aliases=["ca_certificates"]
-        ),
-        other_certificates_parse_all=dict(type="bool", default=False),
-        other_certificates_content=dict(type="list", elements="str"),
-        certificate_path=dict(type="path"),
-        certificate_content=dict(type="str"),
-        force=dict(type="bool", default=False),
-        friendly_name=dict(type="str", aliases=["name"]),
-        encryption_level=dict(
-            type="str", choices=["auto", "compatibility2022"], default="auto"
-        ),
-        iter_size=dict(type="int"),
-        maciter_size=dict(
-            type="int",
-            removed_in_version="4.0.0",
-            removed_from_collection="community.crypto",
-        ),
-        passphrase=dict(type="str", no_log=True),
-        path=dict(type="path", required=True),
-        privatekey_passphrase=dict(type="str", no_log=True),
-        privatekey_path=dict(type="path"),
-        privatekey_content=dict(type="str", no_log=True),
-        state=dict(type="str", default="present", choices=["absent", "present"]),
-        src=dict(type="path"),
-        backup=dict(type="bool", default=False),
-        return_content=dict(type="bool", default=False),
-        select_crypto_backend=dict(
-            type="str", default="auto", choices=["auto", "cryptography"]
-        ),
-    )
+    argument_spec = {
+        "action": {"type": "str", "default": "export", "choices": ["export", "parse"]},
+        "other_certificates": {
+            "type": "list",
+            "elements": "path",
+            "aliases": ["ca_certificates"],
+        },
+        "other_certificates_parse_all": {"type": "bool", "default": False},
+        "other_certificates_content": {"type": "list", "elements": "str"},
+        "certificate_path": {"type": "path"},
+        "certificate_content": {"type": "str"},
+        "force": {"type": "bool", "default": False},
+        "friendly_name": {"type": "str", "aliases": ["name"]},
+        "encryption_level": {
+            "type": "str",
+            "choices": ["auto", "compatibility2022"],
+            "default": "auto",
+        },
+        "iter_size": {"type": "int"},
+        "maciter_size": {
+            "type": "int",
+            "removed_in_version": "4.0.0",
+            "removed_from_collection": "community.crypto",
+        },
+        "passphrase": {"type": "str", "no_log": True},
+        "path": {"type": "path", "required": True},
+        "privatekey_passphrase": {"type": "str", "no_log": True},
+        "privatekey_path": {"type": "path"},
+        "privatekey_content": {"type": "str", "no_log": True},
+        "state": {
+            "type": "str",
+            "default": "present",
+            "choices": ["absent", "present"],
+        },
+        "src": {"type": "path"},
+        "backup": {"type": "bool", "default": False},
+        "return_content": {"type": "bool", "default": False},
+        "select_crypto_backend": {
+            "type": "str",
+            "default": "auto",
+            "choices": ["auto", "cryptography"],
+        },
+    }
 
     required_if = [
         ["action", "parse", ["src"]],

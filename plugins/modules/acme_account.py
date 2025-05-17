@@ -184,25 +184,29 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
-        terms_agreed=dict(type="bool", default=False),
-        state=dict(
-            type="str", required=True, choices=["absent", "present", "changed_key"]
-        ),
-        allow_creation=dict(type="bool", default=True),
-        contact=dict(type="list", elements="str", default=[]),
-        new_account_key_src=dict(type="path"),
-        new_account_key_content=dict(type="str", no_log=True),
-        new_account_key_passphrase=dict(type="str", no_log=True),
-        external_account_binding=dict(
-            type="dict",
-            options=dict(
-                kid=dict(type="str", required=True),
-                alg=dict(
-                    type="str", required=True, choices=["HS256", "HS384", "HS512"]
-                ),
-                key=dict(type="str", required=True, no_log=True),
-            ),
-        ),
+        terms_agreed={"type": "bool", "default": False},
+        state={
+            "type": "str",
+            "required": True,
+            "choices": ["absent", "present", "changed_key"],
+        },
+        allow_creation={"type": "bool", "default": True},
+        contact={"type": "list", "elements": "str", "default": []},
+        new_account_key_src={"type": "path"},
+        new_account_key_content={"type": "str", "no_log": True},
+        new_account_key_passphrase={"type": "str", "no_log": True},
+        external_account_binding={
+            "type": "dict",
+            "options": {
+                "kid": {"type": "str", "required": True},
+                "alg": {
+                    "type": "str",
+                    "required": True,
+                    "choices": ["HS256", "HS384", "HS512"],
+                },
+                "key": {"type": "str", "required": True, "no_log": True},
+            },
+        },
     )
     argument_spec.update(
         mutually_exclusive=[("new_account_key_src", "new_account_key_content")],

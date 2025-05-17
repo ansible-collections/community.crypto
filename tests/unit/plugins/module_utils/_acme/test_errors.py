@@ -193,7 +193,7 @@ TEST_ACME_PROTOCOL_EXCEPTION: list[
             },
             "response": create_regular_response("xxx"),
         },
-        lambda content: dict(foo="bar"),
+        lambda content: {"foo": "bar"},
         "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
         {
             "http_url": "https://ca.example.com/foo",
@@ -224,7 +224,7 @@ TEST_ACME_PROTOCOL_EXCEPTION: list[
             },
             "response": create_error_response(),
         },
-        lambda content: dict(foo="bar"),
+        lambda content: {"foo": "bar"},
         "ACME request failed for https://ca.example.com/foo with HTTP status 201 Created. The JSON error result: {'foo': 'bar'}",
         {
             "http_url": "https://ca.example.com/foo",

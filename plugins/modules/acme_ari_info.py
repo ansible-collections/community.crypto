@@ -109,8 +109,8 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_account=False)
     argument_spec.update_argspec(
-        certificate_path=dict(type="path"),
-        certificate_content=dict(type="str"),
+        certificate_path={"type": "path"},
+        certificate_content={"type": "str"},
     )
     argument_spec.update(
         required_one_of=[("certificate_path", "certificate_content")],

@@ -995,49 +995,53 @@ class CRL(OpenSSLObject):
         if self.return_content:
             result["crl"] = self.crl_content
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            crl_mode=dict(
-                type="str",
-                default="generate",
-                choices=["generate", "update"],
-            ),
-            force=dict(type="bool", default=False),
-            backup=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            format=dict(type="str", default="pem", choices=["pem", "der"]),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            issuer=dict(type="dict"),
-            issuer_ordered=dict(type="list", elements="dict"),
-            last_update=dict(type="str", default="+0s"),
-            next_update=dict(type="str"),
-            digest=dict(type="str", default="sha256"),
-            ignore_timestamps=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-            revoked_certificates=dict(
-                type="list",
-                elements="dict",
-                options=dict(
-                    path=dict(type="path"),
-                    content=dict(type="str"),
-                    serial_number=dict(type="raw"),
-                    revocation_date=dict(type="str", default="+0s"),
-                    issuer=dict(type="list", elements="str"),
-                    issuer_critical=dict(type="bool", default=False),
-                    reason=dict(
-                        type="str",
-                        choices=[
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "crl_mode": {
+                "type": "str",
+                "default": "generate",
+                "choices": ["generate", "update"],
+            },
+            "force": {"type": "bool", "default": False},
+            "backup": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "format": {"type": "str", "default": "pem", "choices": ["pem", "der"]},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "issuer": {"type": "dict"},
+            "issuer_ordered": {"type": "list", "elements": "dict"},
+            "last_update": {"type": "str", "default": "+0s"},
+            "next_update": {"type": "str"},
+            "digest": {"type": "str", "default": "sha256"},
+            "ignore_timestamps": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+            "revoked_certificates": {
+                "type": "list",
+                "elements": "dict",
+                "options": {
+                    "path": {"type": "path"},
+                    "content": {"type": "str"},
+                    "serial_number": {"type": "raw"},
+                    "revocation_date": {"type": "str", "default": "+0s"},
+                    "issuer": {"type": "list", "elements": "str"},
+                    "issuer_critical": {"type": "bool", "default": False},
+                    "reason": {
+                        "type": "str",
+                        "choices": [
                             "unspecified",
                             "key_compromise",
                             "ca_compromise",
@@ -1049,21 +1053,25 @@ def main() -> t.NoReturn:
                             "aa_compromise",
                             "remove_from_crl",
                         ],
-                    ),
-                    reason_critical=dict(type="bool", default=False),
-                    invalidity_date=dict(type="str"),
-                    invalidity_date_critical=dict(type="bool", default=False),
-                ),
-                required_one_of=[["path", "content", "serial_number"]],
-                mutually_exclusive=[["path", "content", "serial_number"]],
-            ),
-            name_encoding=dict(
-                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
-            ),
-            serial_numbers=dict(
-                type="str", default="integer", choices=["integer", "hex-octets"]
-            ),
-        ),
+                    },
+                    "reason_critical": {"type": "bool", "default": False},
+                    "invalidity_date": {"type": "str"},
+                    "invalidity_date_critical": {"type": "bool", "default": False},
+                },
+                "required_one_of": [["path", "content", "serial_number"]],
+                "mutually_exclusive": [["path", "content", "serial_number"]],
+            },
+            "name_encoding": {
+                "type": "str",
+                "default": "ignore",
+                "choices": ["ignore", "idna", "unicode"],
+            },
+            "serial_numbers": {
+                "type": "str",
+                "default": "integer",
+                "choices": ["integer", "hex-octets"],
+            },
+        },
         required_if=[
             ("state", "present", ["privatekey_path", "privatekey_content"], True),
             ("state", "present", ["issuer", "issuer_ordered"], True),

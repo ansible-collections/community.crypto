@@ -258,13 +258,17 @@ def main() -> t.NoReturn:
 
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-        )
+        {
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+        }
     )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,

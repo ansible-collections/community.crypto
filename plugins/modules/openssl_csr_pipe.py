@@ -178,9 +178,9 @@ class CertificateSigningRequestModule:
 def main() -> t.NoReturn:
     argument_spec = get_csr_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            content=dict(type="str"),
-        )
+        {
+            "content": {"type": "str"},
+        }
     )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,

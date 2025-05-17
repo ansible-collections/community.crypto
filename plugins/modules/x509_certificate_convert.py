@@ -287,16 +287,16 @@ class X509CertificateConvertModule(OpenSSLObject):
 
 
 def main() -> t.NoReturn:
-    argument_spec = dict(
-        src_path=dict(type="path"),
-        src_content=dict(type="str"),
-        src_content_base64=dict(type="bool", default=False),
-        format=dict(type="str", required=True, choices=["pem", "der"]),
-        strict=dict(type="bool", default=False),
-        dest_path=dict(type="path", required=True),
-        backup=dict(type="bool", default=False),
-        verify_cert_parsable=dict(type="bool", default=False),
-    )
+    argument_spec = {
+        "src_path": {"type": "path"},
+        "src_content": {"type": "str"},
+        "src_content_base64": {"type": "bool", "default": False},
+        "format": {"type": "str", "required": True, "choices": ["pem", "der"]},
+        "strict": {"type": "bool", "default": False},
+        "dest_path": {"type": "path", "required": True},
+        "backup": {"type": "bool", "default": False},
+        "verify_cert_parsable": {"type": "bool", "default": False},
+    }
     module = AnsibleModule(
         argument_spec,
         supports_check_mode=True,

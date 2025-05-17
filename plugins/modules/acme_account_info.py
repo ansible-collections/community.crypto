@@ -273,9 +273,11 @@ def get_order(client: ACMEClient, order_url: str) -> dict[str, t.Any]:
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
-        retrieve_orders=dict(
-            type="str", default="ignore", choices=["ignore", "url_list", "object_list"]
-        ),
+        retrieve_orders={
+            "type": "str",
+            "default": "ignore",
+            "choices": ["ignore", "url_list", "object_list"],
+        },
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, needs_acme_v2=True)

@@ -382,7 +382,6 @@ disable=raw-checker-failed,
         fixme,
         invalid-name,
         unused-argument,
-        use-dict-literal,
         # Cannot remove yet due to inadequacy of rules
         inconsistent-return-statements,  # doesn't notice that fail_json() does not return
 

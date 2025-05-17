@@ -94,39 +94,51 @@ TEST_EPOCH_SECONDS: list[tuple[datetime.timedelta, float, dict[str, int]]] = (
         [
             (
                 0,
-                dict(
-                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=0
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0,
+                },
             ),
             (
                 1e-6,
-                dict(
-                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 1,
+                },
             ),
             (
                 1e-3,
-                dict(
-                    year=1970,
-                    day=1,
-                    month=1,
-                    hour=0,
-                    minute=0,
-                    second=0,
-                    microsecond=1000,
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 1000,
+                },
             ),
             (
                 3691.2,
-                dict(
-                    year=1970,
-                    day=1,
-                    month=1,
-                    hour=1,
-                    minute=1,
-                    second=31,
-                    microsecond=200000,
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 1,
+                    "minute": 1,
+                    "second": 31,
+                    "microsecond": 200000,
+                },
             ),
         ],
     )

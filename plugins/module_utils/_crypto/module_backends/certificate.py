@@ -109,7 +109,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
             result["can_parse_certificate"] = True
             return result
         except Exception:
-            return dict(can_parse_certificate=False)
+            return {"can_parse_certificate": False}
 
     @abc.abstractmethod
     def generate_certificate(self) -> None:
@@ -380,25 +380,28 @@ def select_backend(
 
 def get_certificate_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            provider=dict(
-                type="str", choices=[]
-            ),  # choices will be filled by add_XXX_provider_to_argument_spec() in certificate_xxx.py
-            force=dict(
-                type="bool",
-                default=False,
-            ),
-            csr_path=dict(type="path"),
-            csr_content=dict(type="str"),
-            ignore_timestamps=dict(type="bool", default=True),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
+        argument_spec={
+            "provider": {
+                "type": "str",
+                "choices": [],
+            },  # choices will be filled by add_XXX_provider_to_argument_spec() in certificate_xxx.py
+            "force": {
+                "type": "bool",
+                "default": False,
+            },
+            "csr_path": {"type": "path"},
+            "csr_content": {"type": "str"},
+            "ignore_timestamps": {"type": "bool", "default": True},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
             # General properties of a certificate
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-        ),
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+        },
         mutually_exclusive=[
             ["csr_path", "csr_content"],
             ["privatekey_path", "privatekey_content"],

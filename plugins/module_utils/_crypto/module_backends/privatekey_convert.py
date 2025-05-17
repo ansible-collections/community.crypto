@@ -285,13 +285,17 @@ def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            src_path=dict(type="path"),
-            src_content=dict(type="str"),
-            src_passphrase=dict(type="str", no_log=True),
-            dest_passphrase=dict(type="str", no_log=True),
-            format=dict(type="str", required=True, choices=["pkcs1", "pkcs8", "raw"]),
-        ),
+        argument_spec={
+            "src_path": {"type": "path"},
+            "src_content": {"type": "str"},
+            "src_passphrase": {"type": "str", "no_log": True},
+            "dest_passphrase": {"type": "str", "no_log": True},
+            "format": {
+                "type": "str",
+                "required": True,
+                "choices": ["pkcs1", "pkcs8", "raw"],
+            },
+        },
         mutually_exclusive=[
             ["src_path", "src_content"],
         ],

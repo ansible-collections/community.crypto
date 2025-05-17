@@ -12,9 +12,9 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto._objects_
 )
 
 
-OID_LOOKUP: dict[str, str] = dict()
-NORMALIZE_NAMES: dict[str, str] = dict()
-NORMALIZE_NAMES_SHORT: dict[str, str] = dict()
+OID_LOOKUP: dict[str, str] = {}
+NORMALIZE_NAMES: dict[str, str] = {}
+NORMALIZE_NAMES_SHORT: dict[str, str] = {}
 
 for dotted, names in OID_MAP.items():
     for name in names:

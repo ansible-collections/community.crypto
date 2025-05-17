@@ -70,7 +70,7 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.orders impo
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec()
     argument_spec.update_argspec(
-        order_uri=dict(type="str", required=True),
+        order_uri={"type": "str", "required": True},
     )
     module = argument_spec.create_ansible_module(supports_check_mode=True)
 

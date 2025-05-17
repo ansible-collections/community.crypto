@@ -83,15 +83,15 @@ class ActionModule(ActionModuleBase):
     def setup_module(self) -> tuple[ArgumentSpec, dict[str, t.Any]]:
         argument_spec = get_privatekey_argument_spec()
         argument_spec.argument_spec.update(
-            dict(
-                content=dict(type="str", no_log=True),
-                content_base64=dict(type="bool", default=False),
-                return_current_key=dict(type="bool", default=False),
-            )
+            {
+                "content": {"type": "str", "no_log": True},
+                "content_base64": {"type": "bool", "default": False},
+                "return_current_key": {"type": "bool", "default": False},
+            }
         )
-        return argument_spec, dict(
-            supports_check_mode=True,
-        )
+        return argument_spec, {
+            "supports_check_mode": True,
+        }
 
     def run_module(self, module: AnsibleActionModule) -> None:
         module_backend = select_backend(module=module)

@@ -228,7 +228,7 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
 
     def run(self, tmp=None, task_vars=None) -> dict[str, t.Any]:
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect

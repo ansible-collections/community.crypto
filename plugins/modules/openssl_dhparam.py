@@ -359,17 +359,23 @@ def main() -> t.NoReturn:
     """Main function"""
 
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["absent", "present"]),
-            size=dict(type="int", default=4096),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography", "openssl"]
-            ),
-            return_content=dict(type="bool", default=False),
-        ),
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["absent", "present"],
+            },
+            "size": {"type": "int", "default": 4096},
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography", "openssl"],
+            },
+            "return_content": {"type": "bool", "default": False},
+        },
         supports_check_mode=True,
         add_file_common_args=True,
     )

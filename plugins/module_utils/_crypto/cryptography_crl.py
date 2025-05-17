@@ -62,13 +62,13 @@ if HAS_CRYPTOGRAPHY:
         "aa_compromise": x509.ReasonFlags.aa_compromise,
         "remove_from_crl": x509.ReasonFlags.remove_from_crl,
     }
-    REVOCATION_REASON_MAP_INVERSE = dict()
+    REVOCATION_REASON_MAP_INVERSE = {}
     for k, v in REVOCATION_REASON_MAP.items():
         REVOCATION_REASON_MAP_INVERSE[v] = k
 
 else:
-    REVOCATION_REASON_MAP = dict()
-    REVOCATION_REASON_MAP_INVERSE = dict()
+    REVOCATION_REASON_MAP = {}
+    REVOCATION_REASON_MAP_INVERSE = {}
 
 
 def cryptography_decode_revoked_certificate(

@@ -182,9 +182,9 @@ def main() -> t.NoReturn:
     add_ownca_provider_to_argument_spec(argument_spec)
     add_selfsigned_provider_to_argument_spec(argument_spec)
     argument_spec.argument_spec.update(
-        dict(
-            content=dict(type="str"),
-        )
+        {
+            "content": {"type": "str"},
+        }
     )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,

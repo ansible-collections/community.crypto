@@ -324,23 +324,25 @@ def send_starttls_packet(sock: socket, server_type: t.Literal["mysql"]) -> None:
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            ca_cert=dict(type="path"),
-            host=dict(type="str", required=True),
-            port=dict(type="int", required=True),
-            proxy_host=dict(type="str"),
-            proxy_port=dict(type="int", default=8080),
-            server_name=dict(type="str"),
-            timeout=dict(type="int", default=10),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            starttls=dict(type="str", choices=["mysql"]),
-            ciphers=dict(type="list", elements="str"),
-            asn1_base64=dict(type="bool", default=True),
-            tls_ctx_options=dict(type="list", elements="raw"),
-            get_certificate_chain=dict(type="bool", default=False),
-        ),
+        argument_spec={
+            "ca_cert": {"type": "path"},
+            "host": {"type": "str", "required": True},
+            "port": {"type": "int", "required": True},
+            "proxy_host": {"type": "str"},
+            "proxy_port": {"type": "int", "default": 8080},
+            "server_name": {"type": "str"},
+            "timeout": {"type": "int", "default": 10},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+            "starttls": {"type": "str", "choices": ["mysql"]},
+            "ciphers": {"type": "list", "elements": "str"},
+            "asn1_base64": {"type": "bool", "default": True},
+            "tls_ctx_options": {"type": "list", "elements": "raw"},
+            "get_certificate_chain": {"type": "bool", "default": False},
+        },
     )
 
     ca_cert: str | None = module.params.get("ca_cert")
