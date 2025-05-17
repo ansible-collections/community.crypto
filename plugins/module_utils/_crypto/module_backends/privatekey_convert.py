@@ -264,14 +264,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                                 ),
                             )
                 raise PrivateKeyError("Cannot load raw key")
-            else:
-                return (
-                    key_format,
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        data,
-                        None if passphrase is None else to_bytes(passphrase),
-                    ),
-                )
+
+            return (
+                key_format,
+                cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    data,
+                    None if passphrase is None else to_bytes(passphrase),
+                ),
+            )
         except Exception as e:
             raise PrivateKeyError(e)
 

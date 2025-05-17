@@ -45,8 +45,7 @@ def restore_on_failure(
             if backup_file is not None:
                 module.atomic_move(os.path.abspath(backup_file), os.path.abspath(path))
             raise
-        else:
-            module.add_cleanup_file(backup_file)
+        module.add_cleanup_file(backup_file)
 
     return backup_and_restore
 
@@ -91,9 +90,8 @@ def _restore_all_on_failure(
                     os.path.abspath(backup), os.path.abspath(destination)
                 )
             raise
-        else:
-            for destination, backup in backups:
-                self.module.add_cleanup_file(backup)
+        for destination, backup in backups:
+            self.module.add_cleanup_file(backup)
 
     return backup_and_restore
 
@@ -459,9 +457,9 @@ def parse_private_key_format(
 
     if header == "-----BEGIN OPENSSH PRIVATE KEY-----":
         return "SSH"
-    elif header == "-----BEGIN PRIVATE KEY-----":
+    if header == "-----BEGIN PRIVATE KEY-----":
         return "PKCS8"
-    elif header == "-----BEGIN RSA PRIVATE KEY-----":
+    if header == "-----BEGIN RSA PRIVATE KEY-----":
         return "PKCS1"
 
     return ""

@@ -102,8 +102,7 @@ def convert_relative_to_datetime(
 
     if parsed_result.group("prefix") == "+":
         return now + offset
-    else:
-        return now - offset
+    return now - offset
 
 
 def get_relative_time_option(

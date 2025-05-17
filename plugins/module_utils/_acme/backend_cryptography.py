@@ -254,7 +254,7 @@ class CryptographyBackend(CryptoBackend):
                 },
                 "hash": "sha256",
             }
-        elif isinstance(
+        if isinstance(
             key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
         ):
             ec_pk = key.public_key().public_numbers()
@@ -294,8 +294,7 @@ class CryptographyBackend(CryptoBackend):
                 "hash": hashalg,
                 "point_size": point_size,
             }
-        else:
-            raise KeyParsingError(f'unknown key type "{type(key)}"')
+        raise KeyParsingError(f'unknown key type "{type(key)}"')
 
     def sign(
         self, *, payload64: str, protected64: str, key_data: dict[str, t.Any]

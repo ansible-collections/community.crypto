@@ -406,19 +406,18 @@ class Certificate(OpensshModule):
     def _should_generate(self) -> bool:
         if self.regenerate == "never":
             return self.original_data is None
-        elif self.regenerate == "fail":
+        if self.regenerate == "fail":
             if self.original_data and not self._is_fully_valid():
                 self.module.fail_json(
                     msg="Certificate does not match the provided options.",
                     cert=get_cert_dict(self.original_data),
                 )
             return self.original_data is None
-        elif self.regenerate == "partial_idempotence":
+        if self.regenerate == "partial_idempotence":
             return self.original_data is None or not self._is_partially_valid()
-        elif self.regenerate == "full_idempotence":
+        if self.regenerate == "full_idempotence":
             return self.original_data is None or not self._is_fully_valid()
-        else:
-            return True
+        return True
 
     def _is_fully_valid(self) -> bool:
         if self.original_data is None:

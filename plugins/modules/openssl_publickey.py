@@ -287,11 +287,10 @@ class PublicKey(OpenSSLObject):
                 crypto_serialization.Encoding.OpenSSH,
                 crypto_serialization.PublicFormat.OpenSSH,
             )
-        else:
-            return self.privatekey.public_key().public_bytes(
-                crypto_serialization.Encoding.PEM,
-                crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
-            )
+        return self.privatekey.public_key().public_bytes(
+            crypto_serialization.Encoding.PEM,
+            crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate the public key."""

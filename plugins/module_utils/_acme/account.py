@@ -119,7 +119,7 @@ class ACMEAccount:
             if "location" in info:
                 self.client.set_account_uri(info["location"])
             return True, result
-        elif info["status"] == 200:
+        if info["status"] == 200:
             # Account did exist
             if result.get("status") == "deactivated":
                 # A bug in Pebble (https://github.com/letsencrypt/pebble/issues/179) and
@@ -130,12 +130,11 @@ class ACMEAccount:
                 #      requests authorized by that account's key."
                 if not allow_creation:
                     return False, None
-                else:
-                    raise ModuleFailException("Account is deactivated")
+                raise ModuleFailException("Account is deactivated")
             if "location" in info:
                 self.client.set_account_uri(info["location"])
             return False, result
-        elif (
+        if (
             info["status"] in (400, 404)
             and result["type"] == "urn:ietf:params:acme:error:accountDoesNotExist"
             and not allow_creation
@@ -144,7 +143,7 @@ class ACMEAccount:
             # (According to RFC 8555, Section 7.3.1, the HTTP status code MUST be 400.
             # Unfortunately Digicert does not care and sends 404 instead.)
             return False, None
-        elif (
+        if (
             info["status"] == 403
             and result["type"] == "urn:ietf:params:acme:error:unauthorized"
             and "deactivated" in (result.get("detail") or "")
@@ -154,15 +153,13 @@ class ACMEAccount:
             # might need adjustment in error detection.
             if not allow_creation:
                 return False, None
-            else:
-                raise ModuleFailException("Account is deactivated")
-        else:
-            raise ACMEProtocolException(
-                module=self.client.module,
-                msg="Registering ACME account failed",
-                info=info,
-                content_json=result,
-            )
+            raise ModuleFailException("Account is deactivated")
+        raise ACMEProtocolException(
+            module=self.client.module,
+            msg="Registering ACME account failed",
+            info=info,
+            content_json=result,
+        )
 
     def get_account_data(self) -> dict[str, t.Any] | None:
         """

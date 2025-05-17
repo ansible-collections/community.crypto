@@ -182,8 +182,7 @@ class RestOperation:
         if result or result == {}:
             if result_code and result_code < 400:
                 return result
-            else:
-                raise RestOperationException(result)
+            raise RestOperationException(result)
 
         # Raise a generic RestOperationException if this fails
         raise RestOperationException(

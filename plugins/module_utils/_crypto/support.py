@@ -426,8 +426,6 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
         except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise OpenSSLObjectError(exc)
-            else:
-                pass
 
 
 __all__ = (

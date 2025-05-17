@@ -177,10 +177,9 @@ class OpensshParser:
     def _check_position(self, offset: int) -> int:
         if self._pos + offset > len(self._data):
             raise ValueError(f"Insufficient data remaining at position: {self._pos}")
-        elif self._pos + offset < 0:
+        if self._pos + offset < 0:
             raise ValueError("Position cannot be less than zero.")
-        else:
-            return self._pos + offset
+        return self._pos + offset
 
     @classmethod
     def signature_data(cls, *, signature_string: bytes) -> dict[str, bytes | int]:

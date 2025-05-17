@@ -554,8 +554,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             current_subject = [(sub.oid, sub.value) for sub in csr.subject]
             if self.ordered_subject:
                 return subject == current_subject
-            else:
-                return set(subject) == set(current_subject)
+            return set(subject) == set(current_subject)
 
         def _find_extension(
             extensions: cryptography.x509.Extensions, exttype: type[_ET]
@@ -594,15 +593,13 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if not self.keyUsage:
                 return current_keyusage_ext is None
-            elif current_keyusage_ext is None:
+            if current_keyusage_ext is None:
                 return False
             params = cryptography_parse_key_usage_params(self.keyUsage)
             for param in params:
                 if getattr(current_keyusage_ext.value, "_" + param) != params[param]:
                     return False
-            if current_keyusage_ext.critical != self.keyUsage_critical:
-                return False
-            return True
+            return current_keyusage_ext.critical == self.keyUsage_critical
 
         def _check_extenededKeyUsage(extensions: cryptography.x509.Extensions) -> bool:
             current_usages_ext = _find_extension(
@@ -645,8 +642,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     bc_ext is not None
                     and bc_ext.critical == self.basicConstraints_critical
                 )
-            else:
-                return bc_ext is None
+            return bc_ext is None
 
         def _check_ocspMustStaple(extensions: cryptography.x509.Extensions) -> bool:
             tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
@@ -660,8 +656,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     cryptography.x509.TLSFeatureType.status_request
                     in tlsfeature_ext.value
                 )
-            else:
-                return tlsfeature_ext is None
+            return tlsfeature_ext is None
 
         def _check_nameConstraints(extensions: cryptography.x509.Extensions) -> bool:
             current_nc_ext = _find_extension(
@@ -720,10 +715,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                         self.privatekey.public_key()
                     ).digest
                     return ext.value.digest == digest
-                else:
-                    return ext.value.digest == self.subject_key_identifier
-            else:
-                return ext is None
+                return ext.value.digest == self.subject_key_identifier
+            return ext is None
 
         def _check_authority_key_identifier(
             extensions: cryptography.x509.Extensions,
@@ -751,8 +744,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     and ext.value.authority_cert_serial_number
                     == self.authority_cert_serial_number
                 )
-            else:
-                return ext is None
+            return ext is None
 
         def _check_crl_distribution_points(
             extensions: cryptography.x509.Extensions,

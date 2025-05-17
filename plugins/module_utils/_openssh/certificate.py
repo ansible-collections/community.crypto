@@ -124,11 +124,9 @@ class OpensshCertificateTimeParameters:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        else:
-            return (
-                self._valid_from == other._valid_from
-                and self._valid_to == other._valid_to
-            )
+        return (
+            self._valid_from == other._valid_from and self._valid_to == other._valid_to
+        )
 
     def __ne__(self, other: object) -> bool:
         return not self == other
@@ -188,12 +186,11 @@ class OpensshCertificateTimeParameters:
                 return "always"
             if dt == _FOREVER:
                 return "forever"
-            else:
-                return (
-                    dt.isoformat().replace("+00:00", "")
-                    if date_format == "human_readable"
-                    else dt.strftime("%Y%m%d%H%M%S")
-                )
+            return (
+                dt.isoformat().replace("+00:00", "")
+                if date_format == "human_readable"
+                else dt.strftime("%Y%m%d%H%M%S")
+            )
         if date_format == "timestamp":
             td = dt - _ALWAYS
             return int(
@@ -382,10 +379,9 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
     def cert_type(self) -> t.Literal["user", "host", ""]:
         if self._cert_type == _USER_TYPE:
             return "user"
-        elif self._cert_type == _HOST_TYPE:
+        if self._cert_type == _HOST_TYPE:
             return "host"
-        else:
-            return ""
+        return ""
 
     @cert_type.setter
     def cert_type(self, cert_type: t.Literal["user", "host"] | int) -> None:
@@ -751,10 +747,9 @@ def apply_directives(directives: t.Iterable[str]) -> list[OpensshCertificateOpti
 
     if "clear" in directives:
         return []
-    else:
-        return list(
-            set(default_options()) - set(directive_to_option[d] for d in directives)
-        )
+    return list(
+        set(default_options()) - set(directive_to_option[d] for d in directives)
+    )
 
 
 def default_options() -> list[OpensshCertificateOption]:

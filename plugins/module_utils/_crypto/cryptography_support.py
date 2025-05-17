@@ -274,8 +274,7 @@ def cryptography_oid_to_name(
             name = dotted_string
     if short:
         return NORMALIZE_NAMES_SHORT.get(name, name)
-    else:
-        return NORMALIZE_NAMES.get(name, name)
+    return NORMALIZE_NAMES.get(name, name)
 
 
 def _get_hex(bytesstr: bytes) -> str:

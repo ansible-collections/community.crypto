@@ -228,7 +228,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 },
                 "hash": "sha256",
             }
-        elif account_key_type == "ec":
+        if account_key_type == "ec":
             pub_data = re.search(
                 r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
                 out_text,

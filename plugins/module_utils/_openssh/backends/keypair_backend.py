@@ -189,9 +189,9 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
     def _should_generate(self) -> bool:
         if self.original_private_key is None:
             return True
-        elif self.regenerate == "never":
+        if self.regenerate == "never":
             return False
-        elif self.regenerate == "fail":
+        if self.regenerate == "fail":
             if not self._private_key_valid():
                 self.module.fail_json(
                     msg="Key has wrong type and/or size. Will not proceed. "
@@ -199,10 +199,9 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
                     + "`partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
                 )
             return False
-        elif self.regenerate in ("partial_idempotence", "full_idempotence"):
+        if self.regenerate in ("partial_idempotence", "full_idempotence"):
             return not self._private_key_valid()
-        else:
-            return True
+        return True
 
     def _private_key_valid(self) -> bool:
         if self.original_private_key is None:
@@ -522,10 +521,9 @@ class KeypairBackendCryptography(KeypairBackend):
                 OpensshKeypair.load(
                     path=self.private_key_path, passphrase=None, no_public_key=True
                 )
+                return False
             except (InvalidPrivateKeyFileError, InvalidPassphraseError):
                 return True
-            else:
-                return False
 
         return True
 

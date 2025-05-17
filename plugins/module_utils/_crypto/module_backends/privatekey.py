@@ -351,8 +351,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return self.format  # type: ignore
         if self.type in ("X25519", "X448", "Ed25519", "Ed448"):
             return "pkcs8"
-        else:
-            return "pkcs1"
+        return "pkcs1"
 
     def generate_private_key(self) -> None:
         """(Re-)Generate private key."""
@@ -500,13 +499,11 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                             data
                         )
                 raise PrivateKeyError("Cannot load raw key")
-            else:
-                return (
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        data,
-                        None if self.passphrase is None else to_bytes(self.passphrase),
-                    )
-                )
+
+            return cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                data,
+                None if self.passphrase is None else to_bytes(self.passphrase),
+            )
         except Exception as e:
             raise PrivateKeyError(e)
 
@@ -526,13 +523,12 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 # Loading the key succeeded. Only return True when no passphrase was
                 # provided.
                 return self.passphrase is None
-            else:
-                return bool(
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        self.existing_private_key_bytes,
-                        None if self.passphrase is None else to_bytes(self.passphrase),
-                    )
+            return bool(
+                cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    self.existing_private_key_bytes,
+                    None if self.passphrase is None else to_bytes(self.passphrase),
                 )
+            )
         except Exception:
             return False
 

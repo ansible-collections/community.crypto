@@ -750,17 +750,16 @@ class CRL(OpenSSLObject):
                 entry["invalidity_date"],
                 entry["invalidity_date_critical"],
             )
-        else:
-            return (
-                entry["serial_number"],
-                entry["revocation_date"],
-                issuer,
-                entry["issuer_critical"],
-                entry["reason"],
-                entry["reason_critical"],
-                entry["invalidity_date"],
-                entry["invalidity_date_critical"],
-            )
+        return (
+            entry["serial_number"],
+            entry["revocation_date"],
+            issuer,
+            entry["issuer_critical"],
+            entry["reason"],
+            entry["reason_critical"],
+            entry["invalidity_date"],
+            entry["invalidity_date_critical"],
+        )
 
     def check(
         self,
@@ -888,8 +887,7 @@ class CRL(OpenSSLObject):
         self.crl = crl.sign(self.privatekey, digest)
         if self.format == "pem":
             return self.crl.public_bytes(Encoding.PEM)
-        else:
-            return self.crl.public_bytes(Encoding.DER)
+        return self.crl.public_bytes(Encoding.DER)
 
     def generate(self, module: AnsibleModule) -> None:
         result = None

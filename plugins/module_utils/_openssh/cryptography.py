@@ -755,8 +755,7 @@ def compare_publickeys(pk1: PublicKeyTypes, pk2: PublicKeyTypes) -> bool:
             serialization.Encoding.Raw, serialization.PublicFormat.Raw
         )
         return a_bytes == b_bytes
-    else:
-        return pk1.public_numbers() == pk2.public_numbers()  # type: ignore
+    return pk1.public_numbers() == pk2.public_numbers()  # type: ignore
 
 
 def compare_encryption_algorithms(
@@ -767,12 +766,11 @@ def compare_encryption_algorithms(
         ea2, serialization.NoEncryption
     ):
         return True
-    elif isinstance(ea1, serialization.BestAvailableEncryption) and isinstance(
+    if isinstance(ea1, serialization.BestAvailableEncryption) and isinstance(
         ea2, serialization.BestAvailableEncryption
     ):
         return ea1.password == ea2.password
-    else:
-        return False
+    return False
 
 
 def get_encryption_algorithm(
