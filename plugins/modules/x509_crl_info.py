@@ -190,14 +190,16 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path"),
-            content=dict(type="str"),
-            list_revoked_certificates=dict(type="bool", default=True),
-            name_encoding=dict(
-                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
-            ),
-        ),
+        argument_spec={
+            "path": {"type": "path"},
+            "content": {"type": "str"},
+            "list_revoked_certificates": {"type": "bool", "default": True},
+            "name_encoding": {
+                "type": "str",
+                "default": "ignore",
+                "choices": ["ignore", "idna", "unicode"],
+            },
+        },
         required_one_of=(["path", "content"],),
         mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,

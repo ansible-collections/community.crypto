@@ -134,7 +134,7 @@ def _is_cryptography_key_consistent(
         # key._backend was removed in cryptography 42.0.0
         backend = getattr(key, "_backend", None)
         if backend is not None:
-            return bool(backend._lib.RSA_check_key(key._rsa_cdata))  # type: ignore
+            return bool(backend._lib.RSA_check_key(key._rsa_cdata))  # type: ignore  # pylint: disable=protected-access
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
         result = _check_dsa_consistency(
             key_public_data=key_public_data, key_private_data=key_private_data
@@ -195,19 +195,21 @@ def _is_cryptography_key_consistent(
 
 class PrivateKeyConsistencyError(OpenSSLObjectError):
     def __init__(self, msg: str, *, result: dict[str, t.Any]) -> None:
-        super(PrivateKeyConsistencyError, self).__init__(msg)
+        super().__init__(msg)
         self.error_message = msg
         self.result = result
 
 
 class PrivateKeyParseError(OpenSSLObjectError):
     def __init__(self, msg: str, *, result: dict[str, t.Any]) -> None:
-        super(PrivateKeyParseError, self).__init__(msg)
+        super().__init__(msg)
         self.error_message = msg
         self.result = result
 
 
 class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
+    key: PrivateKeyTypes
+
     def __init__(
         self,
         *,
@@ -257,14 +259,14 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
             )
             result["can_parse_key"] = True
         except OpenSSLObjectError as exc:
-            raise PrivateKeyParseError(str(exc), result=result)
+            raise PrivateKeyParseError(str(exc), result=result) from exc
 
         result["public_key"] = to_native(self._get_public_key(binary=False))
         pk = self._get_public_key(binary=True)
         result["public_key_fingerprints"] = (
             get_fingerprint_of_bytes(pk, prefer_one=prefer_one_fingerprint)
             if pk is not None
-            else dict()
+            else {}
         )
 
         key_type, key_public_data, key_private_data = self._get_key_info(
@@ -295,9 +297,7 @@ class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
     def __init__(
         self, *, module: GeneralAnsibleModule, content: bytes, **kwargs
     ) -> None:
-        super(PrivateKeyInfoRetrievalCryptography, self).__init__(
-            module=module, content=content, **kwargs
-        )
+        super().__init__(module=module, content=content, **kwargs)
 
     def _get_public_key(self, *, binary: bool) -> bytes:
         return self.key.public_key().public_bytes(

@@ -265,10 +265,10 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
             else:
                 result["privatekey"] = None
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
@@ -323,7 +323,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self.curves[name] = _Curve(name=name, ectype=ectype, deprecated=deprecated)
 
     def __init__(self, module: GeneralAnsibleModule) -> None:
-        super(PrivateKeyCryptographyBackend, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.curves: dict[str, _Curve] = {}
         self._add_curve("secp224r1", "SECP224R1")
@@ -351,8 +351,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             return self.format  # type: ignore
         if self.type in ("X25519", "X448", "Ed25519", "Ed448"):
             return "pkcs8"
-        else:
-            return "pkcs1"
+        return "pkcs1"
 
     def generate_private_key(self) -> None:
         """(Re-)Generate private key."""
@@ -427,6 +426,9 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 export_encoding = (
                     cryptography.hazmat.primitives.serialization.Encoding.Raw
                 )
+            else:
+                # pylint does not notice that all possible values for export_format_txt have been covered.
+                raise AssertionError("Can never be reached")  # pragma: no cover
         except AttributeError:
             self.module.fail_json(
                 msg=f'Cryptography backend does not support the selected output format "{self.format}"'
@@ -469,8 +471,8 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             raise AssertionError("existing_private_key_bytes not set")
         try:
             # Interpret bytes depending on format.
-            format = identify_private_key_format(data)
-            if format == "raw":
+            key_format = identify_private_key_format(data)
+            if key_format == "raw":
                 if len(data) == 56:
                     return cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                         data
@@ -497,15 +499,13 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                             data
                         )
                 raise PrivateKeyError("Cannot load raw key")
-            else:
-                return (
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        data,
-                        None if self.passphrase is None else to_bytes(self.passphrase),
-                    )
-                )
+
+            return cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                data,
+                None if self.passphrase is None else to_bytes(self.passphrase),
+            )
         except Exception as e:
-            raise PrivateKeyError(e)
+            raise PrivateKeyError(e) from e
 
     def _ensure_existing_private_key_loaded(self) -> None:
         if self.existing_private_key is None and self.has_existing():
@@ -515,21 +515,20 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         if self.existing_private_key_bytes is None:
             raise AssertionError("existing_private_key_bytes not set")
         try:
-            format = identify_private_key_format(self.existing_private_key_bytes)
-            if format == "raw":
+            key_format = identify_private_key_format(self.existing_private_key_bytes)
+            if key_format == "raw":
                 # Raw keys cannot be encrypted. To avoid incompatibilities, we try to
                 # actually load the key (and return False when this fails).
                 self._load_privatekey()
                 # Loading the key succeeded. Only return True when no passphrase was
                 # provided.
                 return self.passphrase is None
-            else:
-                return bool(
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        self.existing_private_key_bytes,
-                        None if self.passphrase is None else to_bytes(self.passphrase),
-                    )
+            return bool(
+                cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    self.existing_private_key_bytes,
+                    None if self.passphrase is None else to_bytes(self.passphrase),
                 )
+            )
         except Exception:
             return False
 
@@ -588,8 +587,8 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         if self.format == "auto_ignore":
             return True
         try:
-            format = identify_private_key_format(self.existing_private_key_bytes)
-            return format == self._get_wanted_format()
+            key_format = identify_private_key_format(self.existing_private_key_bytes)
+            return key_format == self._get_wanted_format()
         except Exception:
             return False
 
@@ -603,16 +602,16 @@ def select_backend(module: GeneralAnsibleModule) -> PrivateKeyBackend:
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            size=dict(type="int", default=4096),
-            type=dict(
-                type="str",
-                default="RSA",
-                choices=["DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"],
-            ),
-            curve=dict(
-                type="str",
-                choices=[
+        argument_spec={
+            "size": {"type": "int", "default": 4096},
+            "type": {
+                "type": "str",
+                "default": "RSA",
+                "choices": ["DSA", "ECC", "Ed25519", "Ed448", "RSA", "X25519", "X448"],
+            },
+            "curve": {
+                "type": "str",
+                "choices": [
                     "secp224r1",
                     "secp256k1",
                     "secp256r1",
@@ -633,32 +632,36 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
                     "sect571k1",
                     "sect571r1",
                 ],
-            ),
-            passphrase=dict(type="str", no_log=True),
-            cipher=dict(type="str", default="auto"),
-            format=dict(
-                type="str",
-                default="auto_ignore",
-                choices=["pkcs1", "pkcs8", "raw", "auto", "auto_ignore"],
-            ),
-            format_mismatch=dict(
-                type="str", default="regenerate", choices=["regenerate", "convert"]
-            ),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            regenerate=dict(
-                type="str",
-                default="full_idempotence",
-                choices=[
+            },
+            "passphrase": {"type": "str", "no_log": True},
+            "cipher": {"type": "str", "default": "auto"},
+            "format": {
+                "type": "str",
+                "default": "auto_ignore",
+                "choices": ["pkcs1", "pkcs8", "raw", "auto", "auto_ignore"],
+            },
+            "format_mismatch": {
+                "type": "str",
+                "default": "regenerate",
+                "choices": ["regenerate", "convert"],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+            "regenerate": {
+                "type": "str",
+                "default": "full_idempotence",
+                "choices": [
                     "never",
                     "fail",
                     "partial_idempotence",
                     "full_idempotence",
                     "always",
                 ],
-            ),
-        ),
+            },
+        },
         required_if=[
             ("type", "ECC", ["curve"]),
         ],

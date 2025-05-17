@@ -61,6 +61,8 @@ TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
 class CSRInfoRetrieval(metaclass=abc.ABCMeta):
+    csr: x509.CertificateSigningRequest
+
     def __init__(
         self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
@@ -129,7 +131,7 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
         )
 
         subject = self._get_subject_ordered()
-        result["subject"] = dict()
+        result["subject"] = {}
         for k, v in subject:
             result["subject"][k] = v
         result["subject_ordered"] = subject
@@ -197,7 +199,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def __init__(
         self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
-        super(CSRInfoRetrievalCryptography, self).__init__(
+        super().__init__(
             module=module, content=content, validate_signature=validate_signature
         )
         self.name_encoding: t.Literal["ignore", "idna", "unicode"] = module.params.get(
@@ -216,36 +218,36 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
         try:
             current_key_ext = self.csr.extensions.get_extension_for_class(x509.KeyUsage)
             current_key_usage = current_key_ext.value
-            key_usage = dict(
-                digital_signature=current_key_usage.digital_signature,
-                content_commitment=current_key_usage.content_commitment,
-                key_encipherment=current_key_usage.key_encipherment,
-                data_encipherment=current_key_usage.data_encipherment,
-                key_agreement=current_key_usage.key_agreement,
-                key_cert_sign=current_key_usage.key_cert_sign,
-                crl_sign=current_key_usage.crl_sign,
-                encipher_only=False,
-                decipher_only=False,
-            )
+            key_usage = {
+                "digital_signature": current_key_usage.digital_signature,
+                "content_commitment": current_key_usage.content_commitment,
+                "key_encipherment": current_key_usage.key_encipherment,
+                "data_encipherment": current_key_usage.data_encipherment,
+                "key_agreement": current_key_usage.key_agreement,
+                "key_cert_sign": current_key_usage.key_cert_sign,
+                "crl_sign": current_key_usage.crl_sign,
+                "encipher_only": False,
+                "decipher_only": False,
+            }
             if key_usage["key_agreement"]:
                 key_usage.update(
-                    dict(
-                        encipher_only=current_key_usage.encipher_only,
-                        decipher_only=current_key_usage.decipher_only,
-                    )
+                    {
+                        "encipher_only": current_key_usage.encipher_only,
+                        "decipher_only": current_key_usage.decipher_only,
+                    }
                 )
 
-            key_usage_names = dict(
-                digital_signature="Digital Signature",
-                content_commitment="Non Repudiation",
-                key_encipherment="Key Encipherment",
-                data_encipherment="Data Encipherment",
-                key_agreement="Key Agreement",
-                key_cert_sign="Certificate Sign",
-                crl_sign="CRL Sign",
-                encipher_only="Encipher Only",
-                decipher_only="Decipher Only",
-            )
+            key_usage_names = {
+                "digital_signature": "Digital Signature",
+                "content_commitment": "Non Repudiation",
+                "key_encipherment": "Key Encipherment",
+                "data_encipherment": "Data Encipherment",
+                "key_agreement": "Key Agreement",
+                "key_cert_sign": "Certificate Sign",
+                "crl_sign": "CRL Sign",
+                "encipher_only": "Encipher Only",
+                "decipher_only": "Decipher Only",
+            }
             return (
                 sorted(
                     [

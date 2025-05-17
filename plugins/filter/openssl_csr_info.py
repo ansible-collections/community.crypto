@@ -313,7 +313,7 @@ def openssl_csr_info_filter(
             module=module, content=to_bytes(data), validate_signature=True
         )
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

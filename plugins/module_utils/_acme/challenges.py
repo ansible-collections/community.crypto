@@ -295,10 +295,10 @@ class Authorization:
         raise ACMEProtocolException(
             module=module,
             msg=f"Failed to validate challenge for {self.combined_identifier}: {error_msg}. {'; '.join(error_details)}",
-            extras=dict(
-                identifier=self.combined_identifier,
-                authorization=self.data,
-            ),
+            extras={
+                "identifier": self.combined_identifier,
+                "authorization": self.data,
+            },
         )
 
     def find_challenge(self, *, challenge_type: str) -> Challenge | None:
@@ -374,7 +374,7 @@ class Authorization:
         """
         authz = cls(url=url)
         authz_deactivate = {"status": "deactivated"}
-        result, info = client.send_signed_request(
+        result, _info = client.send_signed_request(
             url, authz_deactivate, fail_on_error=True
         )
         authz._setup(client=client, data=result)

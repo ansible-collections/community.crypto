@@ -121,7 +121,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
         assert self.dest_private_key_bytes is not None
 
         try:
-            format, self.dest_private_key = self._load_private_key(
+            key_format, self.dest_private_key = self._load_private_key(
                 data=self.dest_private_key_bytes,
                 passphrase=self.dest_passphrase,
                 current_hint=self.src_private_key,
@@ -129,7 +129,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
         except Exception:
             return True
 
-        return format != self.format or not cryptography_compare_private_keys(
+        return key_format != self.format or not cryptography_compare_private_keys(
             self.dest_private_key, self.src_private_key
         )
 
@@ -141,7 +141,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
+        super().__init__(module=module)
 
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format"""
@@ -166,6 +166,9 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 export_encoding = (
                     cryptography.hazmat.primitives.serialization.Encoding.Raw
                 )
+            else:
+                # pylint does not notice that all possible values for self.format have been covered.
+                raise AssertionError("Can never be reached")  # pragma: no cover
         except AttributeError:
             self.module.fail_json(
                 msg=f'Cryptography backend does not support the selected output format "{self.format}"'
@@ -208,20 +211,20 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     ) -> tuple[str, PrivateKeyTypes]:
         try:
             # Interpret bytes depending on format.
-            format = identify_private_key_format(data)
-            if format == "raw":
+            key_format = identify_private_key_format(data)
+            if key_format == "raw":
                 if passphrase is not None:
                     raise PrivateKeyError("Cannot load raw key with passphrase")
                 if len(data) == 56:
                     return (
-                        format,
+                        key_format,
                         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                             data
                         ),
                     )
                 if len(data) == 57:
                     return (
-                        format,
+                        key_format,
                         cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.from_private_bytes(
                             data
                         ),
@@ -233,14 +236,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                     ):
                         try:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
                                     data
                                 ),
                             )
                         except Exception:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
                                     data
                                 ),
@@ -248,29 +251,29 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                     else:
                         try:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
                                     data
                                 ),
                             )
                         except Exception:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
                                     data
                                 ),
                             )
                 raise PrivateKeyError("Cannot load raw key")
-            else:
-                return (
-                    format,
-                    cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                        data,
-                        None if passphrase is None else to_bytes(passphrase),
-                    ),
-                )
+
+            return (
+                key_format,
+                cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    data,
+                    None if passphrase is None else to_bytes(passphrase),
+                ),
+            )
         except Exception as e:
-            raise PrivateKeyError(e)
+            raise PrivateKeyError(e) from e
 
 
 def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
@@ -282,13 +285,17 @@ def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            src_path=dict(type="path"),
-            src_content=dict(type="str"),
-            src_passphrase=dict(type="str", no_log=True),
-            dest_passphrase=dict(type="str", no_log=True),
-            format=dict(type="str", required=True, choices=["pkcs1", "pkcs8", "raw"]),
-        ),
+        argument_spec={
+            "src_path": {"type": "path"},
+            "src_content": {"type": "str"},
+            "src_passphrase": {"type": "str", "no_log": True},
+            "dest_passphrase": {"type": "str", "no_log": True},
+            "format": {
+                "type": "str",
+                "required": True,
+                "choices": ["pkcs1", "pkcs8", "raw"],
+            },
+        },
         mutually_exclusive=[
             ["src_path", "src_content"],
         ],

@@ -268,6 +268,7 @@ class EcsDomain:
         # method of the domain, we'll use module.params when requesting a new
         # one, in case the verification method has changed.
         self.verification_method = None
+        self.client_id: str | None = None
 
         # Instantiate the ECS client and then try a no-op connection to verify credentials are valid
         try:
@@ -321,18 +322,15 @@ class EcsDomain:
                 clientId=module.params["client_id"], domain=module.params["domain_name"]
             )
             self.set_domain_details(domain_details)
-            if (
-                self.domain_status != "APPROVED"
-                and self.domain_status != "INITIAL_VERIFICATION"
-                and self.domain_status != "RE_VERIFICATION"
+            if self.domain_status not in (
+                "APPROVED",
+                "INITIAL_VERIFICATION",
+                "RE_VERIFICATION",
             ):
                 return False
 
             # If domain verification is in process, we want to return the random values and treat it as a valid.
-            if (
-                self.domain_status == "INITIAL_VERIFICATION"
-                or self.domain_status == "RE_VERIFICATION"
-            ):
+            if self.domain_status in ("INITIAL_VERIFICATION", "RE_VERIFICATION"):
                 # Unless the verification method has changed, in which case we need to do a reverify request.
                 if self.verification_method != module.params["verification_method"]:
                     return False
@@ -383,7 +381,7 @@ class EcsDomain:
                     module.params["verification_method"] == "dns"
                     or module.params["verification_method"] == "web_server"
                 ):
-                    for i in range(4):
+                    for _i in range(4):
                         # Check both that random values are now available, and that they're different than were populated by previous 'check'
                         if module.params["verification_method"] == "dns":
                             if (
@@ -445,14 +443,16 @@ class EcsDomain:
 
 
 def ecs_domain_argument_spec() -> dict[str, dict[str, t.Any]]:
-    return dict(
-        client_id=dict(type="int", default=1),
-        domain_name=dict(type="str", required=True),
-        verification_method=dict(
-            type="str", required=True, choices=["dns", "email", "manual", "web_server"]
-        ),
-        verification_email=dict(type="str"),
-    )
+    return {
+        "client_id": {"type": "int", "default": 1},
+        "domain_name": {"type": "str", "required": True},
+        "verification_method": {
+            "type": "str",
+            "required": True,
+            "choices": ["dns", "email", "manual", "web_server"],
+        },
+        "verification_email": {"type": "str"},
+    }
 
 
 def main() -> t.NoReturn:

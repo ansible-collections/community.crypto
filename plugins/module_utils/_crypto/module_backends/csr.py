@@ -170,7 +170,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
                 )
                 self.ordered_subject = True
         except ValueError as exc:
-            raise CertificateSigningRequestError(str(exc))
+            raise CertificateSigningRequestError(str(exc)) from exc
 
         self.using_common_name_for_san = False
         if not self.subjectAltName and module.params["use_common_name_for_san"]:
@@ -189,7 +189,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse subject_key_identifier: {e}"
-                )
+                ) from e
 
         self.authority_key_identifier: bytes | None = None
         if authority_key_identifier is not None:
@@ -200,7 +200,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse authority_key_identifier: {e}"
-                )
+                ) from e
 
         self.existing_csr: cryptography.x509.CertificateSigningRequest | None = None
         self.existing_csr_bytes: bytes | None = None
@@ -221,7 +221,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             result["can_parse_csr"] = True
             return result
         except Exception:
-            return dict(can_parse_csr=False)
+            return {"can_parse_csr": False}
 
     @abc.abstractmethod
     def generate_csr(self) -> None:
@@ -253,7 +253,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
                 passphrase=self.privatekey_passphrase,
             )
         except OpenSSLBadPassphraseError as exc:
-            raise CertificateSigningRequestError(exc)
+            raise CertificateSigningRequestError(exc) from exc
 
     @abc.abstractmethod
     def _check_csr(self) -> bool:
@@ -294,10 +294,10 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             # Store result
             result["csr"] = csr_bytes.decode("utf-8") if csr_bytes else None
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
@@ -347,16 +347,14 @@ def parse_crl_distribution_points(
         except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError(
                 f"Error while parsing CRL distribution point #{index}: {e}"
-            )
+            ) from e
     return result
 
 
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(CertificateSigningRequestCryptographyBackend, self).__init__(
-            module=module
-        )
+        super().__init__(module=module)
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
@@ -388,7 +386,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 )
             )
         except ValueError as e:
-            raise CertificateSigningRequestError(e)
+            raise CertificateSigningRequestError(e) from e
 
         if self.subjectAltName:
             csr = csr.add_extension(
@@ -451,7 +449,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     critical=self.name_constraints_critical,
                 )
             except TypeError as e:
-                raise OpenSSLObjectError(f"Error while parsing name constraint: {e}")
+                raise OpenSSLObjectError(
+                    f"Error while parsing name constraint: {e}"
+                ) from e
 
         if self.create_subject_key_identifier:
             if not is_potential_certificate_issuer_public_key(
@@ -556,8 +556,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             current_subject = [(sub.oid, sub.value) for sub in csr.subject]
             if self.ordered_subject:
                 return subject == current_subject
-            else:
-                return set(subject) == set(current_subject)
+            return set(subject) == set(current_subject)
 
         def _find_extension(
             extensions: cryptography.x509.Extensions, exttype: type[_ET]
@@ -596,15 +595,14 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             )
             if not self.keyUsage:
                 return current_keyusage_ext is None
-            elif current_keyusage_ext is None:
+            if current_keyusage_ext is None:
                 return False
             params = cryptography_parse_key_usage_params(self.keyUsage)
-            for param in params:
-                if getattr(current_keyusage_ext.value, "_" + param) != params[param]:
+            for param, value in params.items():
+                # TODO: check whether getattr() with '_' prepended is really needed
+                if getattr(current_keyusage_ext.value, "_" + param) != value:
                     return False
-            if current_keyusage_ext.critical != self.keyUsage_critical:
-                return False
-            return True
+            return current_keyusage_ext.critical == self.keyUsage_critical
 
         def _check_extenededKeyUsage(extensions: cryptography.x509.Extensions) -> bool:
             current_usages_ext = _find_extension(
@@ -647,8 +645,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     bc_ext is not None
                     and bc_ext.critical == self.basicConstraints_critical
                 )
-            else:
-                return bc_ext is None
+            return bc_ext is None
 
         def _check_ocspMustStaple(extensions: cryptography.x509.Extensions) -> bool:
             tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
@@ -662,8 +659,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     cryptography.x509.TLSFeatureType.status_request
                     in tlsfeature_ext.value
                 )
-            else:
-                return tlsfeature_ext is None
+            return tlsfeature_ext is None
 
         def _check_nameConstraints(extensions: cryptography.x509.Extensions) -> bool:
             current_nc_ext = _find_extension(
@@ -722,10 +718,8 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                         self.privatekey.public_key()
                     ).digest
                     return ext.value.digest == digest
-                else:
-                    return ext.value.digest == self.subject_key_identifier
-            else:
-                return ext is None
+                return ext.value.digest == self.subject_key_identifier
+            return ext is None
 
         def _check_authority_key_identifier(
             extensions: cryptography.x509.Extensions,
@@ -753,8 +747,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     and ext.value.authority_cert_serial_number
                     == self.authority_cert_serial_number
                 )
-            else:
-                return ext is None
+            return ext is None
 
         def _check_crl_distribution_points(
             extensions: cryptography.x509.Extensions,
@@ -814,77 +807,97 @@ def select_backend(
 
 def get_csr_argument_spec() -> ArgumentSpec:
     return ArgumentSpec(
-        argument_spec=dict(
-            digest=dict(type="str", default="sha256"),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            version=dict(type="int", default=1, choices=[1]),
-            subject=dict(type="dict"),
-            subject_ordered=dict(type="list", elements="dict"),
-            country_name=dict(type="str", aliases=["C", "countryName"]),
-            state_or_province_name=dict(
-                type="str", aliases=["ST", "stateOrProvinceName"]
-            ),
-            locality_name=dict(type="str", aliases=["L", "localityName"]),
-            organization_name=dict(type="str", aliases=["O", "organizationName"]),
-            organizational_unit_name=dict(
-                type="str", aliases=["OU", "organizationalUnitName"]
-            ),
-            common_name=dict(type="str", aliases=["CN", "commonName"]),
-            email_address=dict(type="str", aliases=["E", "emailAddress"]),
-            subject_alt_name=dict(
-                type="list", elements="str", aliases=["subjectAltName"]
-            ),
-            subject_alt_name_critical=dict(
-                type="bool", default=False, aliases=["subjectAltName_critical"]
-            ),
-            use_common_name_for_san=dict(
-                type="bool", default=True, aliases=["useCommonNameForSAN"]
-            ),
-            key_usage=dict(type="list", elements="str", aliases=["keyUsage"]),
-            key_usage_critical=dict(
-                type="bool", default=False, aliases=["keyUsage_critical"]
-            ),
-            extended_key_usage=dict(
-                type="list", elements="str", aliases=["extKeyUsage", "extendedKeyUsage"]
-            ),
-            extended_key_usage_critical=dict(
-                type="bool",
-                default=False,
-                aliases=["extKeyUsage_critical", "extendedKeyUsage_critical"],
-            ),
-            basic_constraints=dict(
-                type="list", elements="str", aliases=["basicConstraints"]
-            ),
-            basic_constraints_critical=dict(
-                type="bool", default=False, aliases=["basicConstraints_critical"]
-            ),
-            ocsp_must_staple=dict(
-                type="bool", default=False, aliases=["ocspMustStaple"]
-            ),
-            ocsp_must_staple_critical=dict(
-                type="bool", default=False, aliases=["ocspMustStaple_critical"]
-            ),
-            name_constraints_permitted=dict(type="list", elements="str"),
-            name_constraints_excluded=dict(type="list", elements="str"),
-            name_constraints_critical=dict(type="bool", default=False),
-            create_subject_key_identifier=dict(type="bool", default=False),
-            subject_key_identifier=dict(type="str"),
-            authority_key_identifier=dict(type="str"),
-            authority_cert_issuer=dict(type="list", elements="str"),
-            authority_cert_serial_number=dict(type="int"),
-            crl_distribution_points=dict(
-                type="list",
-                elements="dict",
-                options=dict(
-                    full_name=dict(type="list", elements="str"),
-                    relative_name=dict(type="list", elements="str"),
-                    crl_issuer=dict(type="list", elements="str"),
-                    reasons=dict(
-                        type="list",
-                        elements="str",
-                        choices=[
+        argument_spec={
+            "digest": {"type": "str", "default": "sha256"},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "version": {"type": "int", "default": 1, "choices": [1]},
+            "subject": {"type": "dict"},
+            "subject_ordered": {"type": "list", "elements": "dict"},
+            "country_name": {"type": "str", "aliases": ["C", "countryName"]},
+            "state_or_province_name": {
+                "type": "str",
+                "aliases": ["ST", "stateOrProvinceName"],
+            },
+            "locality_name": {"type": "str", "aliases": ["L", "localityName"]},
+            "organization_name": {"type": "str", "aliases": ["O", "organizationName"]},
+            "organizational_unit_name": {
+                "type": "str",
+                "aliases": ["OU", "organizationalUnitName"],
+            },
+            "common_name": {"type": "str", "aliases": ["CN", "commonName"]},
+            "email_address": {"type": "str", "aliases": ["E", "emailAddress"]},
+            "subject_alt_name": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["subjectAltName"],
+            },
+            "subject_alt_name_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["subjectAltName_critical"],
+            },
+            "use_common_name_for_san": {
+                "type": "bool",
+                "default": True,
+                "aliases": ["useCommonNameForSAN"],
+            },
+            "key_usage": {"type": "list", "elements": "str", "aliases": ["keyUsage"]},
+            "key_usage_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["keyUsage_critical"],
+            },
+            "extended_key_usage": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["extKeyUsage", "extendedKeyUsage"],
+            },
+            "extended_key_usage_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["extKeyUsage_critical", "extendedKeyUsage_critical"],
+            },
+            "basic_constraints": {
+                "type": "list",
+                "elements": "str",
+                "aliases": ["basicConstraints"],
+            },
+            "basic_constraints_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["basicConstraints_critical"],
+            },
+            "ocsp_must_staple": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["ocspMustStaple"],
+            },
+            "ocsp_must_staple_critical": {
+                "type": "bool",
+                "default": False,
+                "aliases": ["ocspMustStaple_critical"],
+            },
+            "name_constraints_permitted": {"type": "list", "elements": "str"},
+            "name_constraints_excluded": {"type": "list", "elements": "str"},
+            "name_constraints_critical": {"type": "bool", "default": False},
+            "create_subject_key_identifier": {"type": "bool", "default": False},
+            "subject_key_identifier": {"type": "str"},
+            "authority_key_identifier": {"type": "str"},
+            "authority_cert_issuer": {"type": "list", "elements": "str"},
+            "authority_cert_serial_number": {"type": "int"},
+            "crl_distribution_points": {
+                "type": "list",
+                "elements": "dict",
+                "options": {
+                    "full_name": {"type": "list", "elements": "str"},
+                    "relative_name": {"type": "list", "elements": "str"},
+                    "crl_issuer": {"type": "list", "elements": "str"},
+                    "reasons": {
+                        "type": "list",
+                        "elements": "str",
+                        "choices": [
                             "key_compromise",
                             "ca_compromise",
                             "affiliation_changed",
@@ -894,15 +907,17 @@ def get_csr_argument_spec() -> ArgumentSpec:
                             "privilege_withdrawn",
                             "aa_compromise",
                         ],
-                    ),
-                ),
-                mutually_exclusive=[("full_name", "relative_name")],
-                required_one_of=[("full_name", "relative_name", "crl_issuer")],
-            ),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
-        ),
+                    },
+                },
+                "mutually_exclusive": [("full_name", "relative_name")],
+                "required_one_of": [("full_name", "relative_name", "crl_issuer")],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+        },
         required_together=[
             ["authority_cert_issuer", "authority_cert_serial_number"],
         ],

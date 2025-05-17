@@ -77,14 +77,14 @@ def _parse_acme_timestamp(
     """
     # RFC 3339 (https://www.rfc-editor.org/info/rfc3339)
     timestamp_str = _reduce_fractional_digits(timestamp_str)
-    for format in (
+    for time_format in (
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%dT%H:%M:%S.%fZ",
         "%Y-%m-%dT%H:%M:%S%z",
         "%Y-%m-%dT%H:%M:%S.%f%z",
     ):
         try:
-            result = datetime.datetime.strptime(timestamp_str, format)
+            result = datetime.datetime.strptime(timestamp_str, time_format)
         except ValueError:
             pass
         else:
@@ -117,7 +117,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
                 raise BackendException(f"Invalid value for {name}: {value!r}")
             return result
         except OpenSSLObjectError as exc:
-            raise BackendException(str(exc))
+            raise BackendException(str(exc)) from exc
 
     def interpolate_timestamp(
         self,

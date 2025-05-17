@@ -304,7 +304,7 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 class Certificate(OpensshModule):
     def __init__(self, module: AnsibleModule) -> None:
-        super(Certificate, self).__init__(module=module)
+        super().__init__(module=module)
         self.ssh_keygen = KeygenCommand(self.module)
 
         self.identifier: str = self.module.params["identifier"] or ""
@@ -406,19 +406,18 @@ class Certificate(OpensshModule):
     def _should_generate(self) -> bool:
         if self.regenerate == "never":
             return self.original_data is None
-        elif self.regenerate == "fail":
+        if self.regenerate == "fail":
             if self.original_data and not self._is_fully_valid():
                 self.module.fail_json(
                     msg="Certificate does not match the provided options.",
                     cert=get_cert_dict(self.original_data),
                 )
             return self.original_data is None
-        elif self.regenerate == "partial_idempotence":
+        if self.regenerate == "partial_idempotence":
             return self.original_data is None or not self._is_partially_valid()
-        elif self.regenerate == "full_idempotence":
+        if self.regenerate == "full_idempotence":
             return self.original_data is None or not self._is_fully_valid()
-        else:
-            return True
+        return True
 
     def _is_fully_valid(self) -> bool:
         if self.original_data is None:
@@ -542,10 +541,10 @@ class Certificate(OpensshModule):
             serial_number=self.serial_number,
             signature_algorithm=self.signature_algorithm,
             signing_key_path=self.signing_key,
-            type=self.type,
+            cert_type=self.type,
             time_parameters=self.time_parameters,
             use_agent=self.use_agent,
-            environ_update=dict(TZ="UTC"),
+            environ_update={"TZ": "UTC"},
             check_rc=True,
         )
 
@@ -625,38 +624,43 @@ def get_cert_dict(data: OpensshCertificate | None) -> dict[str, t.Any]:
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            force=dict(type="bool", default=False),
-            identifier=dict(type="str"),
-            options=dict(type="list", elements="str"),
-            path=dict(type="path", required=True),
-            pkcs11_provider=dict(type="str"),
-            principals=dict(type="list", elements="str"),
-            public_key=dict(type="path"),
-            regenerate=dict(
-                type="str",
-                default="partial_idempotence",
-                choices=[
+        argument_spec={
+            "force": {"type": "bool", "default": False},
+            "identifier": {"type": "str"},
+            "options": {"type": "list", "elements": "str"},
+            "path": {"type": "path", "required": True},
+            "pkcs11_provider": {"type": "str"},
+            "principals": {"type": "list", "elements": "str"},
+            "public_key": {"type": "path"},
+            "regenerate": {
+                "type": "str",
+                "default": "partial_idempotence",
+                "choices": [
                     "never",
                     "fail",
                     "partial_idempotence",
                     "full_idempotence",
                     "always",
                 ],
-            ),
-            signature_algorithm=dict(
-                type="str", choices=["ssh-rsa", "rsa-sha2-256", "rsa-sha2-512"]
-            ),
-            signing_key=dict(type="path"),
-            serial_number=dict(type="int"),
-            state=dict(type="str", default="present", choices=["absent", "present"]),
-            type=dict(type="str", choices=["host", "user"]),
-            use_agent=dict(type="bool", default=False),
-            valid_at=dict(type="str"),
-            valid_from=dict(type="str"),
-            valid_to=dict(type="str"),
-            ignore_timestamps=dict(type="bool", default=False),
-        ),
+            },
+            "signature_algorithm": {
+                "type": "str",
+                "choices": ["ssh-rsa", "rsa-sha2-256", "rsa-sha2-512"],
+            },
+            "signing_key": {"type": "path"},
+            "serial_number": {"type": "int"},
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["absent", "present"],
+            },
+            "type": {"type": "str", "choices": ["host", "user"]},
+            "use_agent": {"type": "bool", "default": False},
+            "valid_at": {"type": "str"},
+            "valid_from": {"type": "str"},
+            "valid_to": {"type": "str"},
+            "ignore_timestamps": {"type": "bool", "default": False},
+        },
         supports_check_mode=True,
         add_file_common_args=True,
         required_if=[

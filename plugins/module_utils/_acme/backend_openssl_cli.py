@@ -45,7 +45,12 @@ if t.TYPE_CHECKING:
     )
 
 
-_OPENSSL_ENVIRONMENT_UPDATE = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+_OPENSSL_ENVIRONMENT_UPDATE = {
+    "LANG": "C",
+    "LC_ALL": "C",
+    "LC_MESSAGES": "C",
+    "LC_CTYPE": "C",
+}
 
 
 def _extract_date(
@@ -66,7 +71,7 @@ def _extract_date(
     except ValueError as exc:
         raise BackendException(
             f"Failed to parse '{name}' date{cert_filename_suffix}: {exc}"
-        )
+        ) from exc
 
 
 def _decode_octets(octets_text: str) -> bytes:
@@ -118,7 +123,7 @@ class OpenSSLCLIBackend(CryptoBackend):
     def __init__(
         self, *, module: AnsibleModule, openssl_binary: str | None = None
     ) -> None:
-        super(OpenSSLCLIBackend, self).__init__(module=module, with_timezone=True)
+        super().__init__(module=module, with_timezone=True)
         if openssl_binary is None:
             openssl_binary = module.get_bin_path("openssl", True)
         self.openssl_binary = openssl_binary
@@ -156,11 +161,11 @@ class OpenSSLCLIBackend(CryptoBackend):
                 raise KeyParsingError(
                     f"failed to create temporary content file: {err}",
                     exception=traceback.format_exc(),
-                )
+                ) from err
             f.close()
         # Parse key
         account_key_type = None
-        with open(key_file, "rt") as fi:
+        with open(key_file, "r", encoding="utf-8") as fi:
             for line in fi:
                 m = re.match(
                     r"^\s*-{5,}BEGIN\s+(EC|RSA)\s+PRIVATE\s+KEY-{5,}\s*$", line
@@ -228,7 +233,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 },
                 "hash": "sha256",
             }
-        elif account_key_type == "ec":
+        if account_key_type == "ec":
             pub_data = re.search(
                 r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
                 out_text,

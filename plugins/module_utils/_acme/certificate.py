@@ -166,11 +166,11 @@ class ACMECertificateClient:
                 continue
             challenge_data = authz.get_challenge_data(client=self.client)
             data.append(
-                dict(
-                    identifier=authz.identifier,
-                    identifier_type=authz.identifier_type,
-                    challenges=challenge_data,
-                )
+                {
+                    "identifier": authz.identifier,
+                    "identifier_type": authz.identifier_type,
+                    "challenges": challenge_data,
+                }
             )
             dns_challenge = challenge_data.get(dns_challenge_type)
             if dns_challenge:
@@ -321,7 +321,7 @@ class ACMECertificateClient:
         """
         if self.csr is None and self.csr_content is None:
             raise ModuleFailException("No CSR has been provided")
-        for identifier, authz in order.authorizations.items():
+        for authz in order.authorizations.values():
             if authz.status != "valid":
                 authz.raise_error(
                     error_msg=f'Status is {authz.status!r} and not "valid"',

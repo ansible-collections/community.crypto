@@ -19,6 +19,7 @@ try:
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import dsa, ec, padding, rsa
+    from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
         Ed25519PrivateKey,
         Ed25519PublicKey,
@@ -67,6 +68,10 @@ except ImportError:
     HAS_OPENSSH_SUPPORT = False
     CRYPTOGRAPHY_VERSION = "0.0"
     _ALGORITHM_PARAMETERS = {}
+
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    is_potential_certificate_issuer_private_key,
+)
 
 
 if t.TYPE_CHECKING:
@@ -309,10 +314,10 @@ class AsymmetricKeypair:
 
         try:
             self.verify(signature=self.sign(b"message"), data=b"message")
-        except InvalidSignatureError:
+        except InvalidSignatureError as e:
             raise InvalidPublicKeyFileError(
                 "The private key and public key of this keypair do not match"
-            )
+            ) from e
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AsymmetricKeypair):
@@ -368,7 +373,7 @@ class AsymmetricKeypair:
                 data, **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"]  # type: ignore
             )
         except TypeError as e:
-            raise InvalidDataError(e)
+            raise InvalidDataError(e) from e
 
     def verify(self, *, signature: bytes, data: bytes) -> None:
         """Verifies that the signature associated with the provided data was signed
@@ -383,8 +388,8 @@ class AsymmetricKeypair:
                 data,
                 **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"],  # type: ignore
             )
-        except InvalidSignature:
-            raise InvalidSignatureError
+        except InvalidSignature as e:
+            raise InvalidSignatureError from e
 
     def update_passphrase(self, passphrase: bytes | None = None) -> None:
         """Updates the encryption algorithm of this key pair
@@ -661,10 +666,10 @@ def load_privatekey(
 
     try:
         privatekey_loader = privatekey_loaders[key_format]
-    except KeyError:
+    except KeyError as e:
         raise InvalidKeyFormatError(
             f"{key_format} is not a valid key format ({','.join(privatekey_loaders)})"
-        )
+        ) from e
 
     if not os.path.exists(path):
         raise InvalidPrivateKeyFileError(f"No file was found at {path}")
@@ -673,32 +678,33 @@ def load_privatekey(
         with open(path, "rb") as f:
             content = f.read()
 
-            privatekey = privatekey_loader(  # type: ignore
+        try:
+            privatekey = privatekey_loader(
                 data=content,
                 password=passphrase,
             )
-
-    except ValueError as exc:
-        # Revert to PEM if key could not be loaded in SSH format
-        if key_format == "SSH":
-            try:
-                privatekey = privatekey_loaders["PEM"](  # type: ignore
+        except ValueError as exc:
+            # Revert to PEM if key could not be loaded in SSH format
+            if key_format == "SSH":
+                privatekey = privatekey_loaders["PEM"](
                     data=content,
                     password=passphrase,
                 )
-            except ValueError as e:
-                raise InvalidPrivateKeyFileError(e)
-            except TypeError as e:
-                raise InvalidPassphraseError(e)
-            except UnsupportedAlgorithm as e:
-                raise InvalidAlgorithmError(e)
-        else:
-            raise InvalidPrivateKeyFileError(exc)
+            else:
+                raise InvalidPrivateKeyFileError(exc) from exc
+    except ValueError as e:
+        raise InvalidPrivateKeyFileError(e) from e
     except TypeError as e:
-        raise InvalidPassphraseError(e)
+        raise InvalidPassphraseError(e) from e
     except UnsupportedAlgorithm as e:
-        raise InvalidAlgorithmError(e)
+        raise InvalidAlgorithmError(e) from e
 
+    if not is_potential_certificate_issuer_private_key(privatekey) or isinstance(
+        privatekey, Ed448PrivateKey
+    ):
+        raise InvalidPrivateKeyFileError(
+            f"{privatekey} is not a supported private key type"
+        )
     return privatekey
 
 
@@ -713,10 +719,10 @@ def load_publickey(
 
     try:
         publickey_loader = publickey_loaders[key_format]
-    except KeyError:
+    except KeyError as e:
         raise InvalidKeyFormatError(
             f"{key_format} is not a valid key format ({','.join(publickey_loaders)})"
-        )
+        ) from e
 
     if not os.path.exists(path):
         raise InvalidPublicKeyFileError(f"No file was found at {path}")
@@ -729,9 +735,9 @@ def load_publickey(
                 data=content,
             )
     except ValueError as e:
-        raise InvalidPublicKeyFileError(e)
+        raise InvalidPublicKeyFileError(e) from e
     except UnsupportedAlgorithm as e:
-        raise InvalidAlgorithmError(e)
+        raise InvalidAlgorithmError(e) from e
 
     return publickey
 
@@ -749,8 +755,7 @@ def compare_publickeys(pk1: PublicKeyTypes, pk2: PublicKeyTypes) -> bool:
             serialization.Encoding.Raw, serialization.PublicFormat.Raw
         )
         return a_bytes == b_bytes
-    else:
-        return pk1.public_numbers() == pk2.public_numbers()  # type: ignore
+    return pk1.public_numbers() == pk2.public_numbers()  # type: ignore
 
 
 def compare_encryption_algorithms(
@@ -761,12 +766,11 @@ def compare_encryption_algorithms(
         ea2, serialization.NoEncryption
     ):
         return True
-    elif isinstance(ea1, serialization.BestAvailableEncryption) and isinstance(
+    if isinstance(ea1, serialization.BestAvailableEncryption) and isinstance(
         ea2, serialization.BestAvailableEncryption
     ):
         return ea1.password == ea2.password
-    else:
-        return False
+    return False
 
 
 def get_encryption_algorithm(
@@ -775,7 +779,7 @@ def get_encryption_algorithm(
     try:
         return serialization.BestAvailableEncryption(passphrase)
     except ValueError as e:
-        raise InvalidPassphraseError(e)
+        raise InvalidPassphraseError(e) from e
 
 
 def validate_comment(comment: str) -> None:
@@ -796,7 +800,7 @@ def extract_comment(path: str | os.PathLike) -> str:
             else:
                 comment = ""
     except (IOError, OSError) as e:
-        raise InvalidPublicKeyFileError(e)
+        raise InvalidPublicKeyFileError(e) from e
 
     return comment
 

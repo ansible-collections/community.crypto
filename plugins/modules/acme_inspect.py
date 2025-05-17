@@ -240,12 +240,14 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(require_account_key=False)
     argument_spec.update_argspec(
-        url=dict(type="str"),
-        method=dict(
-            type="str", choices=["get", "post", "directory-only"], default="get"
-        ),
-        content=dict(type="str"),
-        fail_on_acme_error=dict(type="bool", default=True),
+        url={"type": "str"},
+        method={
+            "type": "str",
+            "choices": ["get", "post", "directory-only"],
+            "default": "get",
+        },
+        content={"type": "str"},
+        fail_on_acme_error={"type": "bool", "default": True},
     )
     argument_spec.update(
         required_if=[
@@ -263,7 +265,7 @@ def main() -> t.NoReturn:
     try:
         # Get hold of ACMEClient and ACMEAccount objects (includes directory)
         client = ACMEClient(module=module, backend=backend)
-        method = module.params["method"]
+        method: t.Literal["get", "post", "directory-only"] = module.params["method"]
         result["directory"] = client.directory.directory
         # Do we have to do more requests?
         if method != "directory-only":
@@ -283,12 +285,14 @@ def main() -> t.NoReturn:
                     encode_payload=False,
                     fail_on_error=False,
                 )
+            else:
+                raise AssertionError("Can never be reached")  # pragma: no cover
             # Update results
             result.update(
-                dict(
-                    headers=info,
-                    output_text=to_native(data),
-                )
+                {
+                    "headers": info,
+                    "output_text": to_native(data),
+                }
             )
             # See if we can parse the result as JSON
             try:

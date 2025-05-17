@@ -368,7 +368,7 @@ class Pkcs(OpenSSLObject):
     path: str
 
     def __init__(self, module: AnsibleModule, iter_size_default: int = 2048) -> None:
-        super(Pkcs, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -413,7 +413,7 @@ class Pkcs(OpenSSLObject):
                 with open(self.certificate_path, "rb") as fh:
                     self.certificate_content = fh.read()
             except (IOError, OSError) as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
         elif certificate_content is not None:
             self.certificate_content = to_bytes(certificate_content)
 
@@ -423,7 +423,7 @@ class Pkcs(OpenSSLObject):
                 with open(self.privatekey_path, "rb") as fh:
                     self.privatekey_content = fh.read()
             except (IOError, OSError) as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
         elif privatekey_content is not None:
             self.privatekey_content = to_bytes(privatekey_content)
 
@@ -480,11 +480,9 @@ class Pkcs(OpenSSLObject):
     def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
         pass
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
-        state_and_perms = super(Pkcs, self).check(
-            module=module, perms_required=perms_required
-        )
+        state_and_perms = super().check(module=module, perms_required=perms_required)
 
         def _check_pkey_passphrase() -> bool:
             if self.privatekey_passphrase:
@@ -599,7 +597,7 @@ class Pkcs(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        super(Pkcs, self).remove(module)
+        super().remove(module)
 
     def parse(self) -> tuple[
         bytes | None,
@@ -616,7 +614,7 @@ class Pkcs(OpenSSLObject):
                 pkcs12_content = pkcs12_fh.read()
             return self.parse_bytes(pkcs12_content)
         except IOError as exc:
-            raise PkcsError(exc)
+            raise PkcsError(exc) from exc
 
     def generate(self, module: AnsibleModule) -> None:
         # Empty method because OpenSSLObject wants this
@@ -635,7 +633,7 @@ class Pkcs(OpenSSLObject):
 
 class PkcsCryptography(Pkcs):
     def __init__(self, module: AnsibleModule) -> None:
-        super(PkcsCryptography, self).__init__(module, iter_size_default=50000)
+        super().__init__(module, iter_size_default=50000)
         if (
             self.encryption_level == "compatibility2022"
             and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022
@@ -656,7 +654,7 @@ class PkcsCryptography(Pkcs):
                     passphrase=self.privatekey_passphrase,
                 )
             except OpenSSLBadPassphraseError as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
 
         cert = None
         if self.certificate_content:
@@ -725,7 +723,7 @@ class PkcsCryptography(Pkcs):
 
             return (pkey, crt, other_certs, friendly_name)
         except ValueError as exc:
-            raise PkcsError(exc)
+            raise PkcsError(exc) from exc
 
     def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
         return (
@@ -759,39 +757,49 @@ def select_backend(module: AnsibleModule) -> Pkcs:
 
 
 def main() -> t.NoReturn:
-    argument_spec = dict(
-        action=dict(type="str", default="export", choices=["export", "parse"]),
-        other_certificates=dict(
-            type="list", elements="path", aliases=["ca_certificates"]
-        ),
-        other_certificates_parse_all=dict(type="bool", default=False),
-        other_certificates_content=dict(type="list", elements="str"),
-        certificate_path=dict(type="path"),
-        certificate_content=dict(type="str"),
-        force=dict(type="bool", default=False),
-        friendly_name=dict(type="str", aliases=["name"]),
-        encryption_level=dict(
-            type="str", choices=["auto", "compatibility2022"], default="auto"
-        ),
-        iter_size=dict(type="int"),
-        maciter_size=dict(
-            type="int",
-            removed_in_version="4.0.0",
-            removed_from_collection="community.crypto",
-        ),
-        passphrase=dict(type="str", no_log=True),
-        path=dict(type="path", required=True),
-        privatekey_passphrase=dict(type="str", no_log=True),
-        privatekey_path=dict(type="path"),
-        privatekey_content=dict(type="str", no_log=True),
-        state=dict(type="str", default="present", choices=["absent", "present"]),
-        src=dict(type="path"),
-        backup=dict(type="bool", default=False),
-        return_content=dict(type="bool", default=False),
-        select_crypto_backend=dict(
-            type="str", default="auto", choices=["auto", "cryptography"]
-        ),
-    )
+    argument_spec = {
+        "action": {"type": "str", "default": "export", "choices": ["export", "parse"]},
+        "other_certificates": {
+            "type": "list",
+            "elements": "path",
+            "aliases": ["ca_certificates"],
+        },
+        "other_certificates_parse_all": {"type": "bool", "default": False},
+        "other_certificates_content": {"type": "list", "elements": "str"},
+        "certificate_path": {"type": "path"},
+        "certificate_content": {"type": "str"},
+        "force": {"type": "bool", "default": False},
+        "friendly_name": {"type": "str", "aliases": ["name"]},
+        "encryption_level": {
+            "type": "str",
+            "choices": ["auto", "compatibility2022"],
+            "default": "auto",
+        },
+        "iter_size": {"type": "int"},
+        "maciter_size": {
+            "type": "int",
+            "removed_in_version": "4.0.0",
+            "removed_from_collection": "community.crypto",
+        },
+        "passphrase": {"type": "str", "no_log": True},
+        "path": {"type": "path", "required": True},
+        "privatekey_passphrase": {"type": "str", "no_log": True},
+        "privatekey_path": {"type": "path"},
+        "privatekey_content": {"type": "str", "no_log": True},
+        "state": {
+            "type": "str",
+            "default": "present",
+            "choices": ["absent", "present"],
+        },
+        "src": {"type": "path"},
+        "backup": {"type": "bool", "default": False},
+        "return_content": {"type": "bool", "default": False},
+        "select_crypto_backend": {
+            "type": "str",
+            "default": "auto",
+            "choices": ["auto", "cryptography"],
+        },
+    }
 
     required_if = [
         ["action", "parse", ["src"]],
@@ -837,7 +845,7 @@ def main() -> t.NoReturn:
                     pkcs12.write(module, pkcs12_content, 0o600)
                     changed = True
                 else:
-                    pkey, cert, other_certs, friendly_name = pkcs12.parse()
+                    pkey, cert, other_certs, _friendly_name = pkcs12.parse()
                     dump_content = "".join(
                         [
                             to_native(pem)

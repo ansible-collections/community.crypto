@@ -51,13 +51,14 @@ except ImportError:
 
 class EntrustCertificateBackend(CertificateBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(EntrustCertificateBackend, self).__init__(module=module)
+        super().__init__(module=module)
         self.trackingId = None
         self.notAfter = get_relative_time_option(
             module.params["entrust_not_after"],
             input_name="entrust_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
+        self.cert_bytes: bytes | None = None
 
         if self.csr_content is None:
             if self.csr_path is None:
@@ -119,7 +120,7 @@ class EntrustCertificateBackend(CertificateBackend):
             body["csr"] = to_native(self.csr_content)
         else:
             assert self.csr_path is not None
-            with open(self.csr_path, "r") as csr_file:
+            with open(self.csr_path, "r", encoding="utf-8") as csr_file:
                 body["csr"] = csr_file.read()
 
         body["certType"] = self.module.params["entrust_cert_type"]
@@ -157,6 +158,8 @@ class EntrustCertificateBackend(CertificateBackend):
 
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
+        if self.cert_bytes is None:
+            raise AssertionError("Contract violation: cert_bytes not set")
         return self.cert_bytes
 
     def needs_regeneration(
@@ -165,7 +168,7 @@ class EntrustCertificateBackend(CertificateBackend):
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
-        parent_check = super(EntrustCertificateBackend, self).needs_regeneration()
+        parent_check = super().needs_regeneration()
 
         try:
             cert_details = self._get_cert_details()
@@ -176,7 +179,7 @@ class EntrustCertificateBackend(CertificateBackend):
 
         # Always issue a new certificate if the certificate is expired, suspended or revoked
         status = cert_details.get("status", False)
-        if status == "EXPIRED" or status == "SUSPENDED" or status == "REVOKED":
+        if status in ("EXPIRED", "SUSPENDED", "REVOKED"):
             return True
 
         # If the requested cert type was specified and it is for a different certificate type than the initial certificate, a new one is needed
@@ -239,11 +242,11 @@ class EntrustCertificateProvider(CertificateProvider):
 def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("entrust")
     argument_spec.argument_spec.update(
-        dict(
-            entrust_cert_type=dict(
-                type="str",
-                default="STANDARD_SSL",
-                choices=[
+        {
+            "entrust_cert_type": {
+                "type": "str",
+                "default": "STANDARD_SSL",
+                "choices": [
                     "STANDARD_SSL",
                     "ADVANTAGE_SSL",
                     "UC_SSL",
@@ -255,20 +258,20 @@ def add_entrust_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
                     "CDS_ENT_PRO",
                     "SMIME_ENT",
                 ],
-            ),
-            entrust_requester_email=dict(type="str"),
-            entrust_requester_name=dict(type="str"),
-            entrust_requester_phone=dict(type="str"),
-            entrust_api_user=dict(type="str"),
-            entrust_api_key=dict(type="str", no_log=True),
-            entrust_api_client_cert_path=dict(type="path"),
-            entrust_api_client_cert_key_path=dict(type="path", no_log=True),
-            entrust_api_specification_path=dict(
-                type="path",
-                default="https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml",
-            ),
-            entrust_not_after=dict(type="str", default="+365d"),
-        )
+            },
+            "entrust_requester_email": {"type": "str"},
+            "entrust_requester_name": {"type": "str"},
+            "entrust_requester_phone": {"type": "str"},
+            "entrust_api_user": {"type": "str"},
+            "entrust_api_key": {"type": "str", "no_log": True},
+            "entrust_api_client_cert_path": {"type": "path"},
+            "entrust_api_client_cert_key_path": {"type": "path", "no_log": True},
+            "entrust_api_specification_path": {
+                "type": "path",
+                "default": "https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml",
+            },
+            "entrust_not_after": {"type": "str", "default": "+365d"},
+        }
     )
     argument_spec.required_if.append(
         (

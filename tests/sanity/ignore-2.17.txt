@@ -23,6 +23,7 @@ plugins/modules/acme_certificate_revoke.py pylint:unpacking-non-sequence
 plugins/modules/acme_inspect.py pylint:unpacking-non-sequence
 plugins/modules/ecs_certificate.py no-assert
 plugins/modules/ecs_domain.py pep8:E704
+plugins/modules/get_certificate.py pylint:unknown-option-value
 plugins/modules/luks_device.py no-assert
 plugins/modules/openssl_pkcs12.py no-assert
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang

@@ -244,7 +244,9 @@ class ACMEClient:
                     passphrase=self.account_key_passphrase,
                 )
             except KeyParsingError as e:
-                raise ModuleFailException(f"Error while parsing account key: {e.msg}")
+                raise ModuleFailException(
+                    f"Error while parsing account key: {e.msg}"
+                ) from e
             self.account_jwk = self.account_key_data["jwk"]
             self.account_jws_header = {
                 "alg": self.account_key_data["alg"],
@@ -307,7 +309,7 @@ class ACMEClient:
         except Exception as e:
             raise ModuleFailException(
                 f"Failed to encode payload / headers as JSON: {e}"
-            )
+            ) from e
 
         return self.backend.sign(
             payload64=payload64, protected64=protected64, key_data=key_data
@@ -456,10 +458,10 @@ class ACMEClient:
                             result = decoded_result
                         else:
                             result = content
-                    except ValueError:
+                    except ValueError as exc:
                         raise NetworkException(
                             f"Failed to parse the ACME response: {url} {content}"
-                        )
+                        ) from exc
                 else:
                     result = content
 
@@ -569,10 +571,10 @@ class ACMEClient:
                     try:
                         result = self.module.from_json(content.decode("utf8"))
                         parsed_json_result = True
-                    except ValueError:
+                    except ValueError as exc:
                         raise NetworkException(
                             f"Failed to parse the ACME response: {uri} {content!r}"
-                        )
+                        ) from exc
                 else:
                     result = content
         else:
@@ -642,30 +644,32 @@ def create_default_argspec(
     Provides default argument spec for the options documented in the acme doc fragment.
     """
     result = ArgumentSpec(
-        argument_spec=dict(
-            acme_directory=dict(type="str", required=True),
-            acme_version=dict(type="int", choices=[2], default=2),
-            validate_certs=dict(type="bool", default=True),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "openssl", "cryptography"]
-            ),
-            request_timeout=dict(type="int", default=10),
-        ),
+        argument_spec={
+            "acme_directory": {"type": "str", "required": True},
+            "acme_version": {"type": "int", "choices": [2], "default": 2},
+            "validate_certs": {"type": "bool", "default": True},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "openssl", "cryptography"],
+            },
+            "request_timeout": {"type": "int", "default": 10},
+        },
     )
     if with_account:
         result.update_argspec(
-            account_key_src=dict(type="path", aliases=["account_key"]),
-            account_key_content=dict(type="str", no_log=True),
-            account_key_passphrase=dict(type="str", no_log=True),
-            account_uri=dict(type="str"),
+            account_key_src={"type": "path", "aliases": ["account_key"]},
+            account_key_content={"type": "str", "no_log": True},
+            account_key_passphrase={"type": "str", "no_log": True},
+            account_uri={"type": "str"},
         )
         if require_account_key:
             result.update(required_one_of=[["account_key_src", "account_key_content"]])
         result.update(mutually_exclusive=[["account_key_src", "account_key_content"]])
     if with_certificate:
         result.update_argspec(
-            csr=dict(type="path"),
-            csr_content=dict(type="str"),
+            csr={"type": "path"},
+            csr_content={"type": "str"},
         )
         result.update(
             required_one_of=[["csr", "csr_content"]],

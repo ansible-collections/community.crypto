@@ -388,15 +388,15 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.update_argspec(
-        deactivate_authzs=dict(type="bool", default=True),
-        replaces_cert_id=dict(type="str"),
-        profile=dict(type="str"),
-        order_creation_error_strategy=dict(
-            type="str",
-            default="auto",
-            choices=["auto", "always", "fail", "retry_without_replaces_cert_id"],
-        ),
-        order_creation_max_retries=dict(type="int", default=3),
+        deactivate_authzs={"type": "bool", "default": True},
+        replaces_cert_id={"type": "str"},
+        profile={"type": "str"},
+        order_creation_error_strategy={
+            "type": "str",
+            "default": "auto",
+            "choices": ["auto", "always", "fail", "retry_without_replaces_cert_id"],
+        },
+        order_creation_max_retries={"type": "int", "default": 3},
     )
     module = argument_spec.create_ansible_module()
 

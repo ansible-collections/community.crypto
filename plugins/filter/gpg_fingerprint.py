@@ -52,16 +52,18 @@ from ansible_collections.community.crypto.plugins.plugin_utils._gnupg import (
 )
 
 
-def gpg_fingerprint(input: str | bytes) -> str:
-    if not isinstance(input, (str, bytes)):
+def gpg_fingerprint(gpg_key_content: str | bytes) -> str:
+    if not isinstance(gpg_key_content, (str, bytes)):
         raise AnsibleFilterError(
-            f"The input for the community.crypto.gpg_fingerprint filter must be a string; got {type(input)} instead"
+            f"The input for the community.crypto.gpg_fingerprint filter must be a string; got {type(gpg_key_content)} instead"
         )
     try:
         gpg = PluginGPGRunner()
-        return get_fingerprint_from_bytes(gpg_runner=gpg, content=to_bytes(input))
+        return get_fingerprint_from_bytes(
+            gpg_runner=gpg, content=to_bytes(gpg_key_content)
+        )
     except GPGError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

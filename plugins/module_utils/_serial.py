@@ -41,7 +41,7 @@ def parse_serial(value: str | bytes) -> int:
         except ValueError as exc:
             raise ValueError(
                 f"The {i + 1}{th(i + 1)} part {part!r} is not a hexadecimal number in range [0, 255]: {exc}"
-            )
+            ) from exc
         result = (result << 8) | part_value
     return result
 

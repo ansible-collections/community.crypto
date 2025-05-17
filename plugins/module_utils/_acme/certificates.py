@@ -71,7 +71,7 @@ class CertificateChain:
 
         process_links(
             info=info,
-            callback=lambda link, relation: result._process_links(
+            callback=lambda link, relation: result._process_links(  # pylint: disable=protected-access
                 client=client, link=link, relation=relation
             ),
         )

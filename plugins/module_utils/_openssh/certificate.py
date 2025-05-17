@@ -124,11 +124,9 @@ class OpensshCertificateTimeParameters:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        else:
-            return (
-                self._valid_from == other._valid_from
-                and self._valid_to == other._valid_to
-            )
+        return (
+            self._valid_from == other._valid_from and self._valid_to == other._valid_to
+        )
 
     def __ne__(self, other: object) -> bool:
         return not self == other
@@ -188,12 +186,11 @@ class OpensshCertificateTimeParameters:
                 return "always"
             if dt == _FOREVER:
                 return "forever"
-            else:
-                return (
-                    dt.isoformat().replace("+00:00", "")
-                    if date_format == "human_readable"
-                    else dt.strftime("%Y%m%d%H%M%S")
-                )
+            return (
+                dt.isoformat().replace("+00:00", "")
+                if date_format == "human_readable"
+                else dt.strftime("%Y%m%d%H%M%S")
+            )
         if date_format == "timestamp":
             td = dt - _ALWAYS
             return int(
@@ -203,22 +200,17 @@ class OpensshCertificateTimeParameters:
 
     @staticmethod
     def to_datetime(time_string_or_timestamp: str | bytes | int) -> datetime:
-        try:
-            if isinstance(time_string_or_timestamp, (str, bytes)):
-                result = OpensshCertificateTimeParameters._time_string_to_datetime(
-                    to_text(time_string_or_timestamp.strip())
-                )
-            elif isinstance(time_string_or_timestamp, int):
-                result = OpensshCertificateTimeParameters._timestamp_to_datetime(
-                    time_string_or_timestamp
-                )
-            else:
-                raise ValueError(
-                    f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
-                )
-        except ValueError:
-            raise
-        return result
+        if isinstance(time_string_or_timestamp, (str, bytes)):
+            return OpensshCertificateTimeParameters._time_string_to_datetime(
+                to_text(time_string_or_timestamp.strip())
+            )
+        if isinstance(time_string_or_timestamp, int):
+            return OpensshCertificateTimeParameters._timestamp_to_datetime(
+                time_string_or_timestamp
+            )
+        raise ValueError(
+            f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
+        )
 
     @staticmethod
     def _timestamp_to_datetime(timestamp: int) -> datetime:
@@ -228,8 +220,8 @@ class OpensshCertificateTimeParameters:
             return _FOREVER
         try:
             return datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
-        except OverflowError:
-            raise ValueError
+        except OverflowError as e:
+            raise ValueError from e
 
     @staticmethod
     def _time_string_to_datetime(time_string: str) -> datetime:
@@ -382,16 +374,15 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
     def cert_type(self) -> t.Literal["user", "host", ""]:
         if self._cert_type == _USER_TYPE:
             return "user"
-        elif self._cert_type == _HOST_TYPE:
+        if self._cert_type == _HOST_TYPE:
             return "host"
-        else:
-            return ""
+        return ""
 
     @cert_type.setter
     def cert_type(self, cert_type: t.Literal["user", "host"] | int) -> None:
-        if cert_type == "user" or cert_type == _USER_TYPE:
+        if cert_type in ("user", _USER_TYPE):
             self._cert_type = _USER_TYPE
-        elif cert_type == "host" or cert_type == _HOST_TYPE:
+        elif cert_type in ("host", _HOST_TYPE):
             self._cert_type = _HOST_TYPE
         else:
             raise ValueError(f"{cert_type} is not a valid certificate type")
@@ -412,7 +403,7 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
 
 class OpensshRSACertificateInfo(OpensshCertificateInfo):
     def __init__(self, *, e: int | None = None, n: int | None = None, **kwargs) -> None:
-        super(OpensshRSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["rsa"] + _CERT_SUFFIX_V01
         self.e = e
         self.n = n
@@ -444,7 +435,7 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         y: int | None = None,
         **kwargs,
     ) -> None:
-        super(OpensshDSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["dsa"] + _CERT_SUFFIX_V01
         self.p = p
         self.q = q
@@ -476,7 +467,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
     def __init__(
         self, *, curve: bytes | None = None, public_key: bytes | None = None, **kwargs
     ):
-        super(OpensshECDSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._curve = None
         if curve is not None:
             self.curve = curve
@@ -519,7 +510,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
 class OpensshED25519CertificateInfo(OpensshCertificateInfo):
     def __init__(self, *, pk: bytes | None = None, **kwargs) -> None:
-        super(OpensshED25519CertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["ed25519"] + _CERT_SUFFIX_V01
         self.pk = pk
 
@@ -559,13 +550,13 @@ class OpensshCertificate:
             with open(path, "rb") as cert_file:
                 data = cert_file.read()
         except (IOError, OSError) as e:
-            raise ValueError(f"{path} cannot be opened for reading: {e}")
+            raise ValueError(f"{path} cannot be opened for reading: {e}") from e
 
         try:
             format_identifier, b64_cert = data.split(b" ")[:2]
             cert = binascii.a2b_base64(b64_cert)
-        except (binascii.Error, ValueError):
-            raise ValueError("Certificate not in OpenSSH format")
+        except (binascii.Error, ValueError) as e:
+            raise ValueError("Certificate not in OpenSSH format") from e
 
         for key_type, string in _SSH_TYPE_STRINGS.items():
             if format_identifier == string + _CERT_SUFFIX_V01:
@@ -585,7 +576,7 @@ class OpensshCertificate:
             cert_info = cls._parse_cert_info(pub_key_type, parser)
             signature = parser.string()
         except (TypeError, ValueError) as e:
-            raise ValueError(f"Invalid certificate data: {e}")
+            raise ValueError(f"Invalid certificate data: {e}") from e
 
         if parser.remaining_bytes():
             raise ValueError(
@@ -751,10 +742,9 @@ def apply_directives(directives: t.Iterable[str]) -> list[OpensshCertificateOpti
 
     if "clear" in directives:
         return []
-    else:
-        return list(
-            set(default_options()) - set(directive_to_option[d] for d in directives)
-        )
+    return list(
+        set(default_options()) - set(directive_to_option[d] for d in directives)
+    )
 
 
 def default_options() -> list[OpensshCertificateOption]:

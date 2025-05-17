@@ -321,16 +321,20 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.module_ba
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path"),
-            content=dict(type="str"),
-            name_encoding=dict(
-                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
-            ),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
-        ),
+        argument_spec={
+            "path": {"type": "path"},
+            "content": {"type": "str"},
+            "name_encoding": {
+                "type": "str",
+                "default": "ignore",
+                "choices": ["ignore", "idna", "unicode"],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+        },
         required_one_of=(["path", "content"],),
         mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,

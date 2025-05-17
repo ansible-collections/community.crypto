@@ -500,21 +500,21 @@ class Handler:
 
     def get_device_by_uuid(self, uuid: str | None) -> str | None:
         """Returns the device that holds UUID passed by user"""
-        self._blkid_bin = self._module.get_bin_path("blkid", True)
+        blkid_bin = self._module.get_bin_path("blkid", True)
         if uuid is None:
             return None
-        rc, stdout, dummy = self._run_command([self._blkid_bin, "--uuid", uuid])
+        rc, stdout, dummy = self._run_command([blkid_bin, "--uuid", uuid])
         if rc != 0:
             return None
         return stdout.strip()
 
     def get_device_by_label(self, label: str) -> str | None:
         """Returns the device that holds label passed by user"""
-        self._blkid_bin = self._module.get_bin_path("blkid", True)
+        blkid_bin = self._module.get_bin_path("blkid", True)
         label = self._module.params["label"]
         if label is None:
             return None
-        rc, stdout, dummy = self._run_command([self._blkid_bin, "--label", label])
+        rc, stdout, dummy = self._run_command([blkid_bin, "--label", label])
         if rc != 0:
             return None
         return stdout.strip()
@@ -536,7 +536,7 @@ class Handler:
 class CryptHandler(Handler):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(CryptHandler, self).__init__(module)
+        super().__init__(module)
         self._cryptsetup_bin = self._module.get_bin_path("cryptsetup", True)
 
     def get_container_name_by_device(self, device: str) -> str | None:
@@ -722,7 +722,7 @@ class CryptHandler(Handler):
         except Exception as exc:
             raise ValueError(
                 f"Error while wiping LUKS container signatures for {device}: {exc}"
-            )
+            ) from exc
 
     def run_luks_add_key(
         self,
@@ -869,7 +869,7 @@ class CryptHandler(Handler):
 class ConditionsHandler(Handler):
 
     def __init__(self, module: AnsibleModule, crypthandler: CryptHandler) -> None:
-        super(ConditionsHandler, self).__init__(module)
+        super().__init__(module)
         self._crypthandler = crypthandler
         self.device = self.get_device_name()
 
@@ -953,6 +953,7 @@ class ConditionsHandler(Handler):
         ) or self._module.params["state"] != "closed":
             # conditions for close not fulfilled
             return False
+        luks_is_open = False
 
         if self.device is not None:
             name = self._crypthandler.get_container_name_by_device(self.device)
@@ -1084,52 +1085,58 @@ class ConditionsHandler(Handler):
 
 def run_module() -> t.NoReturn:
     # available arguments/parameters that a user can pass
-    module_args = dict(
-        state=dict(
-            type="str",
-            default="present",
-            choices=["present", "absent", "opened", "closed"],
-        ),
-        device=dict(type="str"),
-        name=dict(type="str"),
-        keyfile=dict(type="path"),
-        new_keyfile=dict(type="path"),
-        remove_keyfile=dict(type="path"),
-        passphrase=dict(type="str", no_log=True),
-        new_passphrase=dict(type="str", no_log=True),
-        remove_passphrase=dict(type="str", no_log=True),
-        passphrase_encoding=dict(
-            type="str", default="text", choices=["text", "base64"], no_log=False
-        ),
-        keyslot=dict(type="int", no_log=False),
-        new_keyslot=dict(type="int", no_log=False),
-        remove_keyslot=dict(type="int", no_log=False),
-        force_remove_last_key=dict(type="bool", default=False),
-        keysize=dict(type="int"),
-        label=dict(type="str"),
-        uuid=dict(type="str"),
-        type=dict(type="str", choices=["luks1", "luks2"]),
-        cipher=dict(type="str"),
-        hash=dict(type="str"),
-        pbkdf=dict(
-            type="dict",
-            options=dict(
-                iteration_time=dict(type="float"),
-                iteration_count=dict(type="int"),
-                algorithm=dict(type="str", choices=["argon2i", "argon2id", "pbkdf2"]),
-                memory=dict(type="int"),
-                parallel=dict(type="int"),
-            ),
-            mutually_exclusive=[("iteration_time", "iteration_count")],
-        ),
-        sector_size=dict(type="int"),
-        perf_same_cpu_crypt=dict(type="bool", default=False),
-        perf_submit_from_crypt_cpus=dict(type="bool", default=False),
-        perf_no_read_workqueue=dict(type="bool", default=False),
-        perf_no_write_workqueue=dict(type="bool", default=False),
-        persistent=dict(type="bool", default=False),
-        allow_discards=dict(type="bool", default=False),
-    )
+    module_args = {
+        "state": {
+            "type": "str",
+            "default": "present",
+            "choices": ["present", "absent", "opened", "closed"],
+        },
+        "device": {"type": "str"},
+        "name": {"type": "str"},
+        "keyfile": {"type": "path"},
+        "new_keyfile": {"type": "path"},
+        "remove_keyfile": {"type": "path"},
+        "passphrase": {"type": "str", "no_log": True},
+        "new_passphrase": {"type": "str", "no_log": True},
+        "remove_passphrase": {"type": "str", "no_log": True},
+        "passphrase_encoding": {
+            "type": "str",
+            "default": "text",
+            "choices": ["text", "base64"],
+            "no_log": False,
+        },
+        "keyslot": {"type": "int", "no_log": False},
+        "new_keyslot": {"type": "int", "no_log": False},
+        "remove_keyslot": {"type": "int", "no_log": False},
+        "force_remove_last_key": {"type": "bool", "default": False},
+        "keysize": {"type": "int"},
+        "label": {"type": "str"},
+        "uuid": {"type": "str"},
+        "type": {"type": "str", "choices": ["luks1", "luks2"]},
+        "cipher": {"type": "str"},
+        "hash": {"type": "str"},
+        "pbkdf": {
+            "type": "dict",
+            "options": {
+                "iteration_time": {"type": "float"},
+                "iteration_count": {"type": "int"},
+                "algorithm": {
+                    "type": "str",
+                    "choices": ["argon2i", "argon2id", "pbkdf2"],
+                },
+                "memory": {"type": "int"},
+                "parallel": {"type": "int"},
+            },
+            "mutually_exclusive": [("iteration_time", "iteration_count")],
+        },
+        "sector_size": {"type": "int"},
+        "perf_same_cpu_crypt": {"type": "bool", "default": False},
+        "perf_submit_from_crypt_cpus": {"type": "bool", "default": False},
+        "perf_no_read_workqueue": {"type": "bool", "default": False},
+        "perf_no_write_workqueue": {"type": "bool", "default": False},
+        "persistent": {"type": "bool", "default": False},
+        "allow_discards": {"type": "bool", "default": False},
+    }
 
     mutually_exclusive = [
         ("keyfile", "passphrase"),
@@ -1145,9 +1152,12 @@ def run_module() -> t.NoReturn:
         supports_check_mode=True,
         mutually_exclusive=mutually_exclusive,
     )
-    module.run_command_environ_update = dict(
-        LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
-    )
+    module.run_command_environ_update = {
+        "LANG": "C",
+        "LC_ALL": "C",
+        "LC_MESSAGES": "C",
+        "LC_CTYPE": "C",
+    }
 
     if module.params["device"] is not None:
         try:

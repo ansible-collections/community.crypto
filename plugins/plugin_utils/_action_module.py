@@ -36,7 +36,7 @@ if t.TYPE_CHECKING:
 
 class _ModuleExitException(Exception):
     def __init__(self, result: dict[str, t.Any]) -> None:
-        super(_ModuleExitException, self).__init__()
+        super().__init__()
         self.result = result
 
 
@@ -187,10 +187,12 @@ class AnsibleActionModule:
                             collection_name=d.get("collection_name"),
                         )
                     else:
+                        # pylint: disable-next=unknown-option-value
                         self.deprecate(  # pylint: disable=ansible-deprecated-no-version
                             d
                         )
             else:
+                # pylint: disable-next=unknown-option-value
                 self.deprecate(  # pylint: disable=ansible-deprecated-no-version
                     kwargs["deprecations"]
                 )
@@ -226,9 +228,9 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
 
     def run(self, tmp=None, task_vars=None) -> dict[str, t.Any]:
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
-        result = super(ActionModuleBase, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:

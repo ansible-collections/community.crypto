@@ -578,7 +578,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.certificate
 from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
     combine_identifier,
     normalize_combined_identifier,
-    split_identifier,
     wait_for_validation,
 )
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
@@ -760,7 +759,6 @@ class ACMECertificateClient:
         data: dict[str, t.Any] = {}
         data_dns: dict[str, list[str]] = {}
         for type_identifier, authz in self.authorizations.items():
-            identifier_type, identifier = split_identifier(type_identifier)
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
             if authz.status == "valid":
@@ -802,7 +800,7 @@ class ACMECertificateClient:
 
         # Step 2: validate pending challenges
         authzs_to_wait_for = []
-        for type_identifier, authz in self.authorizations.items():
+        for authz in self.authorizations.values():
             if authz.status == "pending":
                 if self.challenge is not None:
                     authz.call_validate(
@@ -951,52 +949,54 @@ def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.argument_spec["csr"]["aliases"] = ["src"]
     argument_spec.update_argspec(
-        modify_account=dict(type="bool", default=True),
-        account_email=dict(type="str"),
-        agreement=dict(
-            type="str",
-            removed_in_version="4.0.0",
-            removed_from_collection="community.crypto",
-        ),
-        terms_agreed=dict(type="bool", default=False),
-        challenge=dict(
-            type="str",
-            default="http-01",
-            choices=["http-01", "dns-01", "tls-alpn-01", NO_CHALLENGE],
-        ),
-        data=dict(type="dict"),
-        dest=dict(type="path", aliases=["cert"]),
-        fullchain_dest=dict(type="path", aliases=["fullchain"]),
-        chain_dest=dict(type="path", aliases=["chain"]),
-        remaining_days=dict(type="int", default=10),
-        deactivate_authzs=dict(type="bool", default=False),
-        force=dict(type="bool", default=False),
-        retrieve_all_alternates=dict(type="bool", default=False),
-        select_chain=dict(
-            type="list",
-            elements="dict",
-            options=dict(
-                test_certificates=dict(
-                    type="str", default="all", choices=["first", "last", "all"]
-                ),
-                issuer=dict(type="dict"),
-                subject=dict(type="dict"),
-                subject_key_identifier=dict(type="str"),
-                authority_key_identifier=dict(type="str"),
-            ),
-        ),
-        include_renewal_cert_id=dict(
-            type="str",
-            choices=["never", "when_ari_supported", "always"],
-            default="never",
-        ),
-        profile=dict(type="str"),
-        order_creation_error_strategy=dict(
-            type="str",
-            default="auto",
-            choices=["auto", "always", "fail", "retry_without_replaces_cert_id"],
-        ),
-        order_creation_max_retries=dict(type="int", default=3),
+        modify_account={"type": "bool", "default": True},
+        account_email={"type": "str"},
+        agreement={
+            "type": "str",
+            "removed_in_version": "4.0.0",
+            "removed_from_collection": "community.crypto",
+        },
+        terms_agreed={"type": "bool", "default": False},
+        challenge={
+            "type": "str",
+            "default": "http-01",
+            "choices": ["http-01", "dns-01", "tls-alpn-01", NO_CHALLENGE],
+        },
+        data={"type": "dict"},
+        dest={"type": "path", "aliases": ["cert"]},
+        fullchain_dest={"type": "path", "aliases": ["fullchain"]},
+        chain_dest={"type": "path", "aliases": ["chain"]},
+        remaining_days={"type": "int", "default": 10},
+        deactivate_authzs={"type": "bool", "default": False},
+        force={"type": "bool", "default": False},
+        retrieve_all_alternates={"type": "bool", "default": False},
+        select_chain={
+            "type": "list",
+            "elements": "dict",
+            "options": {
+                "test_certificates": {
+                    "type": "str",
+                    "default": "all",
+                    "choices": ["first", "last", "all"],
+                },
+                "issuer": {"type": "dict"},
+                "subject": {"type": "dict"},
+                "subject_key_identifier": {"type": "str"},
+                "authority_key_identifier": {"type": "str"},
+            },
+        },
+        include_renewal_cert_id={
+            "type": "str",
+            "choices": ["never", "when_ari_supported", "always"],
+            "default": "never",
+        },
+        profile={"type": "str"},
+        order_creation_error_strategy={
+            "type": "str",
+            "default": "auto",
+            "choices": ["auto", "always", "fail", "retry_without_replaces_cert_id"],
+        },
+        order_creation_max_retries={"type": "int", "default": 3},
     )
     argument_spec.update(
         required_one_of=[
@@ -1045,9 +1045,9 @@ def main() -> t.NoReturn:
                         if module.params["deactivate_authzs"]:
                             client.deactivate_authzs()
                 data, data_dns = client.get_challenges_data(first_step=is_first_step)
-                auths = dict()
+                auths = {}
                 assert client.authorizations is not None
-                for k, v in client.authorizations.items():
+                for v in client.authorizations.values():
                     # Remove "type:" from key
                     auths[v.identifier] = v.to_json()
                 module.exit_json(

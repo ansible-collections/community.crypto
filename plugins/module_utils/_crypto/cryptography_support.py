@@ -113,17 +113,17 @@ if t.TYPE_CHECKING:
         PKCS12KeyAndCertificates,
     )
 
-    CertificatePrivateKeyTypes = (
-        CertificateIssuerPrivateKeyTypes
-        | cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey
-        | cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey
-    )
-    PublicKeyTypesWOEdwards = (
-        DHPublicKey | DSAPublicKey | EllipticCurvePublicKey | RSAPublicKey
-    )
-    PrivateKeyTypesWOEdwards = (
-        DHPrivateKey | DSAPrivateKey | EllipticCurvePrivateKey | RSAPrivateKey
-    )
+    CertificatePrivateKeyTypes = t.Union[
+        CertificateIssuerPrivateKeyTypes,
+        cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
+        cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+    ]
+    PublicKeyTypesWOEdwards = t.Union[
+        DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
+    ]
+    PrivateKeyTypesWOEdwards = t.Union[
+        DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
+    ]
 else:
     PublicKeyTypesWOEdwards = None
     PrivateKeyTypesWOEdwards = None
@@ -146,14 +146,14 @@ DOTTED_OID = re.compile(r"^\d+(?:\.\d+)+$")
 def cryptography_get_extensions_from_cert(
     cert: x509.Certificate,
 ) -> dict[str, dict[str, bool | str]]:
-    result = dict()
+    result = {}
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
         for ext in cert.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
-            )
+            result[ext.oid.dotted_string] = {
+                "critical": ext.critical,
+                "value": base64.b64encode(ext.value.public_bytes()).decode("ascii"),
+            }
     else:
         # Since cryptography will not give us the DER value for an extension
         # (that is only stored for unrecognized extensions), we have to re-do
@@ -161,6 +161,9 @@ def cryptography_get_extensions_from_cert(
         from cryptography.hazmat.backends import default_backend
 
         backend = default_backend()
+
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
 
         x509_obj = cert._x509  # type: ignore
         # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
@@ -175,10 +178,10 @@ def cryptography_get_extensions_from_cert(
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
             der = backend._ffi.buffer(data.data, data.length)[:]
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der).decode("ascii"),
-            )
+            entry = {
+                "critical": (crit == 1),
+                "value": base64.b64encode(der).decode("ascii"),
+            }
             try:
                 oid = obj2txt(
                     backend._lib,
@@ -195,14 +198,14 @@ def cryptography_get_extensions_from_cert(
 def cryptography_get_extensions_from_csr(
     csr: x509.CertificateSigningRequest,
 ) -> dict[str, dict[str, bool | str]]:
-    result = dict()
+    result = {}
 
     if _CRYPTOGRAPHY_36_0_OR_NEWER:
         for ext in csr.extensions:
-            result[ext.oid.dotted_string] = dict(
-                critical=ext.critical,
-                value=base64.b64encode(ext.value.public_bytes()).decode("ascii"),
-            )
+            result[ext.oid.dotted_string] = {
+                "critical": ext.critical,
+                "value": base64.b64encode(ext.value.public_bytes()).decode("ascii"),
+            }
 
     else:
         # Since cryptography will not give us the DER value for an extension
@@ -211,6 +214,9 @@ def cryptography_get_extensions_from_csr(
         from cryptography.hazmat.backends import default_backend
 
         backend = default_backend()
+
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
 
         extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)  # type: ignore
         extensions = backend._ffi.gc(
@@ -235,10 +241,10 @@ def cryptography_get_extensions_from_csr(
             data = backend._lib.X509_EXTENSION_get_data(ext)
             backend.openssl_assert(data != backend._ffi.NULL)
             der: bytes = backend._ffi.buffer(data.data, data.length)[:]  # type: ignore
-            entry = dict(
-                critical=(crit == 1),
-                value=base64.b64encode(der).decode("ascii"),
-            )
+            entry = {
+                "critical": (crit == 1),
+                "value": base64.b64encode(der).decode("ascii"),
+            }
             try:
                 oid = obj2txt(
                     backend._lib,
@@ -269,13 +275,15 @@ def cryptography_oid_to_name(
     if names:
         name = names[0]
     else:
-        name = oid._name
-        if name == "Unknown OID":
+        try:
+            name = oid._name  # pylint: disable=protected-access
+            if name == "Unknown OID":
+                name = dotted_string
+        except AttributeError:
             name = dotted_string
     if short:
         return NORMALIZE_NAMES_SHORT.get(name, name)
-    else:
-        return NORMALIZE_NAMES.get(name, name)
+    return NORMALIZE_NAMES.get(name, name)
 
 
 def _get_hex(bytesstr: bytes) -> str:
@@ -393,7 +401,7 @@ def _parse_dn(name: bytes) -> list[x509.NameAttribute]:
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
                 f"Error while parsing distinguished name {to_text(original_name)!r}: {e}"
-            )
+            ) from e
         result.append(attribute)
         if name:
             if name[0:1] != sep or len(name) < 2:
@@ -414,7 +422,7 @@ def cryptography_parse_relative_distinguished_name(
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
                 f"Error while parsing relative distinguished name {to_text(part)!r}: {e}"
-            )
+            ) from e
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
@@ -468,7 +476,7 @@ def _adjust_idn(
                 raise OpenSSLObjectError(
                     f'Error while transforming part "{part}" of {what} DNS name "{value}" to {dest}.'
                     f' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'
-                )
+                ) from exc2003
     return ".".join(parts)
 
 
@@ -561,7 +569,7 @@ def cryptography_get_name(
                 x509.Name(reversed(_parse_dn(to_bytes(name[8:]))))
             )
     except Exception as e:
-        raise OpenSSLObjectError(f'Cannot parse {what} "{name}": {e}')
+        raise OpenSSLObjectError(f'Cannot parse {what} "{name}": {e}') from e
     if ":" not in name:
         raise OpenSSLObjectError(
             f'Cannot parse {what} "{name}" (forgot "DNS:" prefix?)'
@@ -656,17 +664,17 @@ def cryptography_parse_key_usage_params(usages: t.Iterable[str]) -> dict[str, bo
     Given a list of key usage identifier strings, returns the parameters for cryptography's x509.KeyUsage().
     Raises an OpenSSLObjectError if an identifier is unknown.
     """
-    params = dict(
-        digital_signature=False,
-        content_commitment=False,
-        key_encipherment=False,
-        data_encipherment=False,
-        key_agreement=False,
-        key_cert_sign=False,
-        crl_sign=False,
-        encipher_only=False,
-        decipher_only=False,
-    )
+    params = {
+        "digital_signature": False,
+        "content_commitment": False,
+        "key_encipherment": False,
+        "data_encipherment": False,
+        "key_agreement": False,
+        "key_cert_sign": False,
+        "crl_sign": False,
+        "encipher_only": False,
+        "decipher_only": False,
+    }
     for usage in usages:
         params[_cryptography_get_keyusage(usage)] = True
     return params
@@ -699,7 +707,7 @@ def cryptography_get_basic_constraints(
                 except Exception as e:
                     raise OpenSSLObjectError(
                         f'Cannot parse path length constraint "{v}" ({e})'
-                    )
+                    ) from e
             else:
                 raise OpenSSLObjectError(f'Unknown basic constraint "{constraint}"')
     return ca, path_length
@@ -901,6 +909,9 @@ def _parse_pkcs12_35_0_0(
 
         backend = default_backend()
 
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
+
         # This code basically does what load_key_and_certificates() does, but without error-checking.
         # Since load_key_and_certificates succeeded, it should not fail.
         pkcs12 = backend._ffi.gc(
@@ -943,6 +954,9 @@ def _parse_pkcs12_legacy(
     private_key, certificate, additional_certificates = _load_key_and_certificates(
         pkcs12_bytes, passphrase
     )
+
+    # We access a *lot* of internal APIs here, so let's disable that message...
+    # pylint: disable=protected-access
 
     friendly_name = None
     if certificate:

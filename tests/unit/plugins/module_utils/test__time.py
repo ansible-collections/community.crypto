@@ -94,39 +94,51 @@ TEST_EPOCH_SECONDS: list[tuple[datetime.timedelta, float, dict[str, int]]] = (
         [
             (
                 0,
-                dict(
-                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=0
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0,
+                },
             ),
             (
                 1e-6,
-                dict(
-                    year=1970, day=1, month=1, hour=0, minute=0, second=0, microsecond=1
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 1,
+                },
             ),
             (
                 1e-3,
-                dict(
-                    year=1970,
-                    day=1,
-                    month=1,
-                    hour=0,
-                    minute=0,
-                    second=0,
-                    microsecond=1000,
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 1000,
+                },
             ),
             (
                 3691.2,
-                dict(
-                    year=1970,
-                    day=1,
-                    month=1,
-                    hour=1,
-                    minute=1,
-                    second=31,
-                    microsecond=200000,
-                ),
+                {
+                    "year": 1970,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 1,
+                    "minute": 1,
+                    "second": 31,
+                    "microsecond": 200000,
+                },
             ),
         ],
     )
@@ -283,25 +295,29 @@ TEST_GET_RELATIVE_TIME_OPTION: list[
 )
 
 
-@pytest.mark.parametrize("timezone, input, expected", TEST_REMOVE_TIMEZONE)
+@pytest.mark.parametrize("timezone, input_timestamp, expected", TEST_REMOVE_TIMEZONE)
 def test_remove_timezone(
-    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+    timezone: datetime.timedelta,
+    input_timestamp: datetime.datetime,
+    expected: datetime.datetime,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        output_1 = remove_timezone(input)
+        output_1 = remove_timezone(input_timestamp)
         assert expected == output_1
-        output_2 = add_or_remove_timezone(input, with_timezone=False)
+        output_2 = add_or_remove_timezone(input_timestamp, with_timezone=False)
         assert expected == output_2
 
 
-@pytest.mark.parametrize("timezone, input, expected", TEST_UTC_TIMEZONE)
+@pytest.mark.parametrize("timezone, input_timestamp, expected", TEST_UTC_TIMEZONE)
 def test_utc_timezone(
-    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+    timezone: datetime.timedelta,
+    input_timestamp: datetime.datetime,
+    expected: datetime.datetime,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        output_1 = ensure_utc_timezone(input)
+        output_1 = ensure_utc_timezone(input_timestamp)
         assert expected == output_1
-        output_2 = add_or_remove_timezone(input, with_timezone=True)
+        output_2 = add_or_remove_timezone(input_timestamp, with_timezone=True)
         assert expected == output_2
 
 

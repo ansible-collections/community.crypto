@@ -45,8 +45,7 @@ def restore_on_failure(
             if backup_file is not None:
                 module.atomic_move(os.path.abspath(backup_file), os.path.abspath(path))
             raise
-        else:
-            module.add_cleanup_file(backup_file)
+        module.add_cleanup_file(backup_file)
 
     return backup_and_restore
 
@@ -91,9 +90,8 @@ def _restore_all_on_failure(
                     os.path.abspath(backup), os.path.abspath(destination)
                 )
             raise
-        else:
-            for destination, backup in backups:
-                self.module.add_cleanup_file(backup)
+        for destination, backup in backups:
+            self.module.add_cleanup_file(backup)
 
     return backup_and_restore
 
@@ -126,7 +124,7 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
         result["changed"] = self.changed
 
-        if self.module._diff:
+        if self.module._diff:  # pylint: disable=protected-access
             result["diff"] = self.diff
 
         return result
@@ -219,7 +217,7 @@ class KeygenCommand:
         serial_number: int | None,
         signature_algorithm: str | None,
         signing_key_path: str,
-        type: t.Literal["host", "user"] | None,
+        cert_type: t.Literal["host", "user"] | None,
         time_parameters: OpensshCertificateTimeParameters,
         use_agent: bool,
         **kwargs,
@@ -235,7 +233,7 @@ class KeygenCommand:
             args.extend(["-n", ",".join(principals)])
         if serial_number is not None:
             args.extend(["-z", str(serial_number)])
-        if type == "host":
+        if cert_type == "host":
             args.extend(["-h"])
         if use_agent:
             args.extend(["-U"])
@@ -252,7 +250,7 @@ class KeygenCommand:
         *,
         private_key_path: str,
         size: int,
-        type: str,
+        key_type: str,
         comment: str | None,
         **kwargs,
     ) -> tuple[int, str, str]:
@@ -264,7 +262,7 @@ class KeygenCommand:
             "-b",
             str(size),
             "-t",
-            type,
+            key_type,
             "-f",
             private_key_path,
             "-C",
@@ -313,7 +311,7 @@ class KeygenCommand:
             except (IOError, OSError) as e:
                 raise ValueError(
                     f"The private key at {private_key_path} is not writeable preventing a comment update ({e})"
-                )
+                ) from e
 
         command = [self._bin_path, "-q"]
         if force_new_format:
@@ -327,12 +325,12 @@ _PrivateKey = t.TypeVar("_PrivateKey", bound="PrivateKey")
 
 class PrivateKey:
     def __init__(
-        self, *, size: int, key_type: str, fingerprint: str, format: str = ""
+        self, *, size: int, key_type: str, fingerprint: str, key_format: str = ""
     ) -> None:
         self._size = size
         self._type = key_type
         self._fingerprint = fingerprint
-        self._format = format
+        self._format = key_format
 
     @property
     def size(self) -> int:
@@ -428,11 +426,8 @@ class PublicKey:
 
     @classmethod
     def load(cls: t.Type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
-        try:
-            with open(path, "r") as f:
-                properties = f.read().strip(" \n").split(" ", 2)
-        except (IOError, OSError):
-            raise
+        with open(path, "r", encoding="utf-8") as f:
+            properties = f.read().strip(" \n").split(" ", 2)
 
         if len(properties) < 2:
             return None
@@ -454,14 +449,14 @@ def parse_private_key_format(
     *,
     path: str | os.PathLike,
 ) -> t.Literal["SSH", "PKCS8", "PKCS1", ""]:
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         header = file.readline().strip()
 
     if header == "-----BEGIN OPENSSH PRIVATE KEY-----":
         return "SSH"
-    elif header == "-----BEGIN PRIVATE KEY-----":
+    if header == "-----BEGIN PRIVATE KEY-----":
         return "PKCS8"
-    elif header == "-----BEGIN RSA PRIVATE KEY-----":
+    if header == "-----BEGIN RSA PRIVATE KEY-----":
         return "PKCS1"
 
     return ""

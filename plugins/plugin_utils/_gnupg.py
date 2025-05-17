@@ -25,8 +25,10 @@ class PluginGPGRunner(GPGRunner):
         if executable is None:
             try:
                 executable = get_bin_path("gpg")
-            except ValueError:
-                raise GPGError("Cannot find the `gpg` executable on the controller")
+            except ValueError as exc:
+                raise GPGError(
+                    "Cannot find the `gpg` executable on the controller"
+                ) from exc
         self.executable = executable
         self.cwd = cwd
 
@@ -45,17 +47,17 @@ class PluginGPGRunner(GPGRunner):
         Raises a ``GPGError`` in case of errors.
         """
         command = [self.executable] + command
-        p = Popen(
+        with Popen(
             command, shell=False, cwd=self.cwd, stdin=PIPE, stdout=PIPE, stderr=PIPE
-        )
-        stdout, stderr = p.communicate(input=data)
-        stdout_n = to_native(stdout, errors="surrogate_or_replace")
-        stderr_n = to_native(stderr, errors="surrogate_or_replace")
-        if check_rc and p.returncode != 0:
-            raise GPGError(
-                f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'
-            )
-        return t.cast(int, p.returncode), stdout_n, stderr_n
+        ) as p:
+            stdout, stderr = p.communicate(input=data)
+            stdout_n = to_native(stdout, errors="surrogate_or_replace")
+            stderr_n = to_native(stderr, errors="surrogate_or_replace")
+            if check_rc and p.returncode != 0:
+                raise GPGError(
+                    f'Running {" ".join(command)} yielded return code {p.returncode} with stdout: "{stdout_n}" and stderr: "{stderr_n}")'
+                )
+            return t.cast(int, p.returncode), stdout_n, stderr_n
 
 
 __all__ = ("PluginGPGRunner",)

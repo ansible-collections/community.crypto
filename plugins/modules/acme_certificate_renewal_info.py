@@ -179,16 +179,18 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_account=False)
     argument_spec.update_argspec(
-        certificate_path=dict(type="path"),
-        certificate_content=dict(type="str"),
-        use_ari=dict(type="bool", default=True),
-        ari_algorithm=dict(
-            type="str", choices=["standard", "start"], default="standard"
-        ),
-        remaining_days=dict(type="int"),
-        remaining_percentage=dict(type="float"),
-        now=dict(type="str"),
-        treat_parsing_error_as_non_existing=dict(type="bool", default=False),
+        certificate_path={"type": "path"},
+        certificate_content={"type": "str"},
+        use_ari={"type": "bool", "default": True},
+        ari_algorithm={
+            "type": "str",
+            "choices": ["standard", "start"],
+            "default": "standard",
+        },
+        remaining_days={"type": "int"},
+        remaining_percentage={"type": "float"},
+        now={"type": "str"},
+        treat_parsing_error_as_non_existing={"type": "bool", "default": False},
     )
     argument_spec.update(
         mutually_exclusive=[("certificate_path", "certificate_content")],
@@ -196,13 +198,13 @@ def main() -> t.NoReturn:
     module = argument_spec.create_ansible_module(supports_check_mode=True)
     backend = create_backend(module, needs_acme_v2=True)
 
-    result = dict(
-        changed=False,
-        msg="The certificate is still valid and no condition was reached",
-        exists=False,
-        parsable=False,
-        supports_ari=False,
-    )
+    result = {
+        "changed": False,
+        "msg": "The certificate is still valid and no condition was reached",
+        "exists": False,
+        "parsable": False,
+        "supports_ari": False,
+    }
 
     def complete(should_renew: bool, **kwargs) -> t.NoReturn:
         result["should_renew"] = should_renew

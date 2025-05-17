@@ -59,7 +59,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
     privatekey: CertificateIssuerPrivateKeyTypes
 
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(SelfSignedCertificateBackendCryptography, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.create_subject_key_identifier: t.Literal[
             "create_if_not_provided", "always_create", "never_create"
@@ -144,7 +144,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                     critical=False,
                 )
         except ValueError as e:
-            raise CertificateError(str(e))
+            raise CertificateError(str(e)) from e
 
         certificate = cert_builder.sign(
             private_key=self.privatekey,
@@ -167,7 +167,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
     ) -> bool:
         assert self.privatekey is not None
 
-        if super(SelfSignedCertificateBackendCryptography, self).needs_regeneration(
+        if super().needs_regeneration(
             not_before=self.notBefore, not_after=self.notAfter
         ):
             return True
@@ -185,9 +185,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         return False
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(SelfSignedCertificateBackendCryptography, self).dump(
-            include_certificate=include_certificate
-        )
+        result = super().dump(include_certificate=include_certificate)
 
         if self.module.check_mode:
             result.update(
@@ -243,21 +241,29 @@ class SelfSignedCertificateProvider(CertificateProvider):
 def add_selfsigned_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("selfsigned")
     argument_spec.argument_spec.update(
-        dict(
-            selfsigned_version=dict(type="int", default=3, choices=[3]),  # not used
-            selfsigned_digest=dict(type="str", default="sha256"),
-            selfsigned_not_before=dict(
-                type="str", default="+0s", aliases=["selfsigned_notBefore"]
-            ),
-            selfsigned_not_after=dict(
-                type="str", default="+3650d", aliases=["selfsigned_notAfter"]
-            ),
-            selfsigned_create_subject_key_identifier=dict(
-                type="str",
-                default="create_if_not_provided",
-                choices=["create_if_not_provided", "always_create", "never_create"],
-            ),
-        )
+        {
+            "selfsigned_version": {
+                "type": "int",
+                "default": 3,
+                "choices": [3],
+            },  # not used
+            "selfsigned_digest": {"type": "str", "default": "sha256"},
+            "selfsigned_not_before": {
+                "type": "str",
+                "default": "+0s",
+                "aliases": ["selfsigned_notBefore"],
+            },
+            "selfsigned_not_after": {
+                "type": "str",
+                "default": "+3650d",
+                "aliases": ["selfsigned_notAfter"],
+            },
+            "selfsigned_create_subject_key_identifier": {
+                "type": "str",
+                "default": "create_if_not_provided",
+                "choices": ["create_if_not_provided", "always_create", "never_create"],
+            },
+        }
     )
 
 

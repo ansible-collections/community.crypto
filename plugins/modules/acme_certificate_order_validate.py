@@ -252,9 +252,9 @@ if t.TYPE_CHECKING:
 def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=False)
     argument_spec.update_argspec(
-        order_uri=dict(type="str", required=True),
-        challenge=dict(type="str", choices=["http-01", "dns-01", "tls-alpn-01"]),
-        deactivate_authzs=dict(type="bool", default=True),
+        order_uri={"type": "str", "required": True},
+        challenge={"type": "str", "choices": ["http-01", "dns-01", "tls-alpn-01"]},
+        deactivate_authzs={"type": "bool", "default": True},
     )
     module = argument_spec.create_ansible_module()
 
@@ -330,13 +330,13 @@ def main() -> t.NoReturn:
             changed=len(authzs_with_challenges_to_wait_for) > 0,
             account_uri=client.client.account_uri,
             validating_challenges=[
-                dict(
-                    identifier=authz.identifier,
-                    identifier_type=authz.identifier_type,
-                    authz_url=authz.url,
-                    challenge_type=challenge_type,
-                    challenge_url=challenge.url if challenge else None,
-                )
+                {
+                    "identifier": authz.identifier,
+                    "identifier_type": authz.identifier_type,
+                    "authz_url": authz.url,
+                    "challenge_type": challenge_type,
+                    "challenge_url": challenge.url if challenge else None,
+                }
                 for authz, challenge_type, challenge in authzs_with_challenges_to_wait_for
             ],
         )

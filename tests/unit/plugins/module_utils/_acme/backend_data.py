@@ -139,47 +139,61 @@ TEST_PARSE_ACME_TIMESTAMP: list[tuple[datetime.timedelta, str, dict[str, int]]] 
         [
             (
                 "2024-01-01T00:11:22Z",
-                dict(year=2024, month=1, day=1, hour=0, minute=11, second=22),
+                {
+                    "year": 2024,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 11,
+                    "second": 22,
+                },
             ),
             (
                 "2024-01-01T00:11:22.123Z",
-                dict(
-                    year=2024,
-                    month=1,
-                    day=1,
-                    hour=0,
-                    minute=11,
-                    second=22,
-                    microsecond=123000,
-                ),
+                {
+                    "year": 2024,
+                    "month": 1,
+                    "day": 1,
+                    "hour": 0,
+                    "minute": 11,
+                    "second": 22,
+                    "microsecond": 123000,
+                },
             ),
             (
                 "2024-04-17T06:54:13.333333334Z",
-                dict(
-                    year=2024,
-                    month=4,
-                    day=17,
-                    hour=6,
-                    minute=54,
-                    second=13,
-                    microsecond=333333,
-                ),
+                {
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 6,
+                    "minute": 54,
+                    "second": 13,
+                    "microsecond": 333333,
+                },
             ),
             (
                 "2024-01-01T00:11:22+0100",
-                dict(year=2023, month=12, day=31, hour=23, minute=11, second=22),
+                {
+                    "year": 2023,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 23,
+                    "minute": 11,
+                    "second": 22,
+                },
             ),
             (
                 "2024-01-01T00:11:22.123+0100",
-                dict(
-                    year=2023,
-                    month=12,
-                    day=31,
-                    hour=23,
-                    minute=11,
-                    second=22,
-                    microsecond=123000,
-                ),
+                {
+                    "year": 2023,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 23,
+                    "minute": 11,
+                    "second": 22,
+                    "microsecond": 123000,
+                },
             ),
         ],
     )
@@ -192,22 +206,22 @@ TEST_INTERPOLATE_TIMESTAMP: list[
     TIMEZONES,
     [
         (
-            dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
-            dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0},
+            {"year": 2024, "month": 1, "day": 1, "hour": 1, "minute": 0, "second": 0},
             0.0,
-            dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0},
         ),
         (
-            dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
-            dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0},
+            {"year": 2024, "month": 1, "day": 1, "hour": 1, "minute": 0, "second": 0},
             0.5,
-            dict(year=2024, month=1, day=1, hour=0, minute=30, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 30, "second": 0},
         ),
         (
-            dict(year=2024, month=1, day=1, hour=0, minute=0, second=0),
-            dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0},
+            {"year": 2024, "month": 1, "day": 1, "hour": 1, "minute": 0, "second": 0},
             1.0,
-            dict(year=2024, month=1, day=1, hour=1, minute=0, second=0),
+            {"year": 2024, "month": 1, "day": 1, "hour": 1, "minute": 0, "second": 0},
         ),
     ],
 )
@@ -216,6 +230,7 @@ TEST_INTERPOLATE_TIMESTAMP: list[
 class FakeBackend(CryptoBackend):
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase=None,
@@ -223,15 +238,16 @@ class FakeBackend(CryptoBackend):
         raise BackendException("Not implemented in fake backend")
 
     def sign(
-        self, payload64: str, protected64: str, key_data: dict[str, t.Any] | None
+        self, *, payload64: str, protected64: str, key_data: dict[str, t.Any] | None
     ) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
-    def create_mac_key(self, alg: str, key: str) -> t.NoReturn:
+    def create_mac_key(self, *, alg: str, key: str) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
     def get_ordered_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
@@ -239,6 +255,7 @@ class FakeBackend(CryptoBackend):
 
     def get_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
@@ -246,17 +263,19 @@ class FakeBackend(CryptoBackend):
 
     def get_cert_days(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
     ) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
-    def create_chain_matcher(self, criterium: Criterium) -> t.NoReturn:
+    def create_chain_matcher(self, *, criterium: Criterium) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
     def get_cert_information(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> t.NoReturn:

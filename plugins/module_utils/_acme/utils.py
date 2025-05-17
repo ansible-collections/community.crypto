@@ -60,13 +60,13 @@ def pem_to_der(
         lines = pem_content.splitlines()
     elif pem_filename is not None:
         try:
-            with open(pem_filename, "rt") as f:
+            with open(pem_filename, "r", encoding="utf-8") as f:
                 lines = list(f)
         except Exception as err:
             raise ModuleFailException(
                 f"cannot load PEM file {pem_filename}: {err}",
                 exception=traceback.format_exc(),
-            )
+            ) from err
     else:
         raise ModuleFailException(
             "One of pem_filename and pem_content must be provided"

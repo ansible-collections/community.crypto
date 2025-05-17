@@ -60,14 +60,14 @@ class PrivateKeyModule:
         if self.module_backend.needs_regeneration():
             # Regenerate
             self.module_backend.generate_private_key()
-            privatekey_data = self.module_backend.get_private_key_data()
-            self.privatekey_bytes = privatekey_data
+            # Call get_private_key_data() to make sure that exceptions are raised now:
+            self.module_backend.get_private_key_data()
             self.changed = True
         elif self.module_backend.needs_conversion():
             # Convert
             self.module_backend.convert_private_key()
-            privatekey_data = self.module_backend.get_private_key_data()
-            self.privatekey_bytes = privatekey_data
+            # Call get_private_key_data() to make sure that exceptions are raised now:
+            self.module_backend.get_private_key_data()
             self.changed = True
 
     def dump(self) -> dict[str, t.Any]:
@@ -80,22 +80,20 @@ class PrivateKeyModule:
 
 
 class ActionModule(ActionModuleBase):
-    @staticmethod
-    def setup_module() -> tuple[ArgumentSpec, dict[str, t.Any]]:
+    def setup_module(self) -> tuple[ArgumentSpec, dict[str, t.Any]]:
         argument_spec = get_privatekey_argument_spec()
         argument_spec.argument_spec.update(
-            dict(
-                content=dict(type="str", no_log=True),
-                content_base64=dict(type="bool", default=False),
-                return_current_key=dict(type="bool", default=False),
-            )
+            {
+                "content": {"type": "str", "no_log": True},
+                "content_base64": {"type": "bool", "default": False},
+                "return_current_key": {"type": "bool", "default": False},
+            }
         )
-        return argument_spec, dict(
-            supports_check_mode=True,
-        )
+        return argument_spec, {
+            "supports_check_mode": True,
+        }
 
-    @staticmethod
-    def run_module(module: AnsibleActionModule) -> None:
+    def run_module(self, module: AnsibleActionModule) -> None:
         module_backend = select_backend(module=module)
 
         try:

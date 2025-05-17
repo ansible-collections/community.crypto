@@ -269,7 +269,7 @@ class CertificateSigningRequestModule(OpenSSLObject):
     def __init__(
         self, module: AnsibleModule, module_backend: CertificateSigningRequestBackend
     ) -> None:
-        super(CertificateSigningRequestModule, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -308,7 +308,7 @@ class CertificateSigningRequestModule(OpenSSLObject):
         self.module_backend.set_existing(csr_bytes=None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
-        super(CertificateSigningRequestModule, self).remove(module)
+        super().remove(module)
 
     def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
@@ -327,13 +327,17 @@ class CertificateSigningRequestModule(OpenSSLObject):
 def main() -> t.NoReturn:
     argument_spec = get_csr_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            state=dict(type="str", default="present", choices=["absent", "present"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-        )
+        {
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["absent", "present"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+        }
     )
     argument_spec.required_if.extend(
         [("state", "present", rof, True) for rof in argument_spec.required_one_of]

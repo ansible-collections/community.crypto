@@ -13,7 +13,7 @@ from ansible_collections.community.crypto.plugins.modules import luks_device
 class DummyModule:
     # module to mock AnsibleModule class
     def __init__(self):
-        self.params = dict()
+        self.params = {}
 
     def fail_json(self, msg=""):
         raise ValueError(msg)

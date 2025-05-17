@@ -100,7 +100,7 @@ def _get_cryptography_public_key_info(
 
 class PublicKeyParseError(OpenSSLObjectError):
     def __init__(self, msg: str, *, result: dict[str, t.Any]) -> None:
-        super(PublicKeyParseError, self).__init__(msg)
+        super().__init__(msg)
         self.error_message = msg
         self.result = result
 
@@ -132,13 +132,13 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
             try:
                 self.key = load_publickey(content=self.content)
             except OpenSSLObjectError as e:
-                raise PublicKeyParseError(str(e), result={})
+                raise PublicKeyParseError(str(e), result={}) from e
 
         pk = self._get_public_key(binary=True)
         result["fingerprints"] = (
             get_fingerprint_of_bytes(pk, prefer_one=prefer_one_fingerprint)
             if pk is not None
-            else dict()
+            else {}
         )
 
         key_type, key_public_data = self._get_key_info()
@@ -157,9 +157,7 @@ class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
         content: bytes | None = None,
         key: PublicKeyTypes | None = None,
     ) -> None:
-        super(PublicKeyInfoRetrievalCryptography, self).__init__(
-            module=module, content=content, key=key
-        )
+        super().__init__(module=module, content=content, key=key)
 
     def _get_public_key(self, binary: bool) -> bytes:
         if self.key is None:

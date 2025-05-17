@@ -166,23 +166,25 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.module_ba
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path"),
-            content=dict(type="str", no_log=True),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
-        ),
+        argument_spec={
+            "path": {"type": "path"},
+            "content": {"type": "str", "no_log": True},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+        },
         required_one_of=(["path", "content"],),
         mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
     )
 
-    result = dict(
-        can_load_key=False,
-        can_parse_key=False,
-        key_is_consistent=None,
-    )
+    result = {
+        "can_load_key": False,
+        "can_parse_key": False,
+        "key_is_consistent": None,
+    }
 
     if module.params["content"] is not None:
         data = module.params["content"].encode("utf-8")

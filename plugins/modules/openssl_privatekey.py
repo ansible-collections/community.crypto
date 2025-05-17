@@ -185,7 +185,7 @@ class PrivateKeyModule(OpenSSLObject):
     def __init__(
         self, module: AnsibleModule, module_backend: PrivateKeyBackend
     ) -> None:
-        super(PrivateKeyModule, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -216,8 +216,6 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.generate_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
-                if self.return_content:
-                    self.privatekey_bytes = privatekey_data
                 write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
         elif self.module_backend.needs_conversion():
@@ -227,8 +225,6 @@ class PrivateKeyModule(OpenSSLObject):
                     self.backup_file = module.backup_local(self.path)
                 self.module_backend.convert_private_key()
                 privatekey_data = self.module_backend.get_private_key_data()
-                if self.return_content:
-                    self.privatekey_bytes = privatekey_data
                 write_file(module=module, content=privatekey_data, default_mode=0o600)
             self.changed = True
 
@@ -244,7 +240,7 @@ class PrivateKeyModule(OpenSSLObject):
         self.module_backend.set_existing(privatekey_bytes=None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
-        super(PrivateKeyModule, self).remove(module)
+        super().remove(module)
 
     def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
@@ -262,13 +258,17 @@ def main() -> t.NoReturn:
 
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(
-        dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            backup=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-        )
+        {
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "backup": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+        }
     )
     module = argument_spec.create_ansible_module(
         supports_check_mode=True,

@@ -507,7 +507,7 @@ class CRLError(OpenSSLObjectError):
 class CRL(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(CRL, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -650,7 +650,7 @@ class CRL(OpenSSLObject):
                 passphrase=self.privatekey_passphrase,
             )
         except OpenSSLBadPassphraseError as exc:
-            raise CRLError(exc)
+            raise CRLError(exc) from exc
 
         self.crl = None
         try:
@@ -704,7 +704,7 @@ class CRL(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = self.module.backup_local(self.path)
-        super(CRL, self).remove(self.module)
+        super().remove(self.module)
 
     def _compress_entry(self, entry: dict[str, t.Any]) -> (
         tuple[
@@ -750,27 +750,27 @@ class CRL(OpenSSLObject):
                 entry["invalidity_date"],
                 entry["invalidity_date_critical"],
             )
-        else:
-            return (
-                entry["serial_number"],
-                entry["revocation_date"],
-                issuer,
-                entry["issuer_critical"],
-                entry["reason"],
-                entry["reason_critical"],
-                entry["invalidity_date"],
-                entry["invalidity_date_critical"],
-            )
+        return (
+            entry["serial_number"],
+            entry["revocation_date"],
+            issuer,
+            entry["issuer_critical"],
+            entry["reason"],
+            entry["reason_critical"],
+            entry["invalidity_date"],
+            entry["invalidity_date_critical"],
+        )
 
     def check(
         self,
         module: AnsibleModule,
+        *,
         perms_required: bool = True,
         ignore_conversion: bool = True,
     ) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(CRL, self).check(
+        state_and_perms = super().check(
             module=self.module, perms_required=perms_required
         )
 
@@ -843,16 +843,16 @@ class CRL(OpenSSLObject):
                 )
             )
         except ValueError as e:
-            raise CRLError(e)
+            raise CRLError(e) from e
 
         crl = set_last_update(crl, value=self.last_update)
         if self.next_update is not None:
             crl = set_next_update(crl, value=self.next_update)
 
         if self.update and self.crl:
-            new_entries = set(
-                [self._compress_entry(entry) for entry in self.revoked_certificates]
-            )
+            new_entries = {
+                self._compress_entry(entry) for entry in self.revoked_certificates
+            }
             for entry in self.crl:
                 decoded_entry = self._compress_entry(
                     cryptography_decode_revoked_certificate(entry)
@@ -888,8 +888,7 @@ class CRL(OpenSSLObject):
         self.crl = crl.sign(self.privatekey, digest)
         if self.format == "pem":
             return self.crl.public_bytes(Encoding.PEM)
-        else:
-            return self.crl.public_bytes(Encoding.DER)
+        return self.crl.public_bytes(Encoding.DER)
 
     def generate(self, module: AnsibleModule) -> None:
         result = None
@@ -996,49 +995,53 @@ class CRL(OpenSSLObject):
         if self.return_content:
             result["crl"] = self.crl_content
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
         return result
 
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            crl_mode=dict(
-                type="str",
-                default="generate",
-                choices=["generate", "update"],
-            ),
-            force=dict(type="bool", default=False),
-            backup=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            format=dict(type="str", default="pem", choices=["pem", "der"]),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            issuer=dict(type="dict"),
-            issuer_ordered=dict(type="list", elements="dict"),
-            last_update=dict(type="str", default="+0s"),
-            next_update=dict(type="str"),
-            digest=dict(type="str", default="sha256"),
-            ignore_timestamps=dict(type="bool", default=False),
-            return_content=dict(type="bool", default=False),
-            revoked_certificates=dict(
-                type="list",
-                elements="dict",
-                options=dict(
-                    path=dict(type="path"),
-                    content=dict(type="str"),
-                    serial_number=dict(type="raw"),
-                    revocation_date=dict(type="str", default="+0s"),
-                    issuer=dict(type="list", elements="str"),
-                    issuer_critical=dict(type="bool", default=False),
-                    reason=dict(
-                        type="str",
-                        choices=[
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "crl_mode": {
+                "type": "str",
+                "default": "generate",
+                "choices": ["generate", "update"],
+            },
+            "force": {"type": "bool", "default": False},
+            "backup": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "format": {"type": "str", "default": "pem", "choices": ["pem", "der"]},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "issuer": {"type": "dict"},
+            "issuer_ordered": {"type": "list", "elements": "dict"},
+            "last_update": {"type": "str", "default": "+0s"},
+            "next_update": {"type": "str"},
+            "digest": {"type": "str", "default": "sha256"},
+            "ignore_timestamps": {"type": "bool", "default": False},
+            "return_content": {"type": "bool", "default": False},
+            "revoked_certificates": {
+                "type": "list",
+                "elements": "dict",
+                "options": {
+                    "path": {"type": "path"},
+                    "content": {"type": "str"},
+                    "serial_number": {"type": "raw"},
+                    "revocation_date": {"type": "str", "default": "+0s"},
+                    "issuer": {"type": "list", "elements": "str"},
+                    "issuer_critical": {"type": "bool", "default": False},
+                    "reason": {
+                        "type": "str",
+                        "choices": [
                             "unspecified",
                             "key_compromise",
                             "ca_compromise",
@@ -1050,21 +1053,25 @@ def main() -> t.NoReturn:
                             "aa_compromise",
                             "remove_from_crl",
                         ],
-                    ),
-                    reason_critical=dict(type="bool", default=False),
-                    invalidity_date=dict(type="str"),
-                    invalidity_date_critical=dict(type="bool", default=False),
-                ),
-                required_one_of=[["path", "content", "serial_number"]],
-                mutually_exclusive=[["path", "content", "serial_number"]],
-            ),
-            name_encoding=dict(
-                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
-            ),
-            serial_numbers=dict(
-                type="str", default="integer", choices=["integer", "hex-octets"]
-            ),
-        ),
+                    },
+                    "reason_critical": {"type": "bool", "default": False},
+                    "invalidity_date": {"type": "str"},
+                    "invalidity_date_critical": {"type": "bool", "default": False},
+                },
+                "required_one_of": [["path", "content", "serial_number"]],
+                "mutually_exclusive": [["path", "content", "serial_number"]],
+            },
+            "name_encoding": {
+                "type": "str",
+                "default": "ignore",
+                "choices": ["ignore", "idna", "unicode"],
+            },
+            "serial_numbers": {
+                "type": "str",
+                "default": "integer",
+                "choices": ["integer", "hex-octets"],
+            },
+        },
         required_if=[
             ("state", "present", ["privatekey_path", "privatekey_content"], True),
             ("state", "present", ["issuer", "issuer_ordered"], True),

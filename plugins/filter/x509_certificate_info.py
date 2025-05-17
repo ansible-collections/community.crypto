@@ -345,7 +345,7 @@ def x509_certificate_info_filter(
     try:
         return get_certificate_info(module=module, content=to_bytes(data))
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

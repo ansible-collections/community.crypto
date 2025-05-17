@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
 
 class AcmeCertificateBackend(CertificateBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(AcmeCertificateBackend, self).__init__(module=module)
+        super().__init__(module=module)
         self.accountkey_path: str = module.params["acme_accountkey_path"]
         self.challenge_path: str = module.params["acme_challenge_path"]
         self.use_chain: bool = module.params["acme_chain"]
@@ -94,7 +94,7 @@ class AcmeCertificateBackend(CertificateBackend):
                 self.module.run_command(command, check_rc=True)[1]
             )
         except OSError as exc:
-            raise CertificateError(exc)
+            raise CertificateError(exc) from exc
 
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
@@ -103,9 +103,7 @@ class AcmeCertificateBackend(CertificateBackend):
         return self.cert_bytes
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(AcmeCertificateBackend, self).dump(
-            include_certificate=include_certificate
-        )
+        result = super().dump(include_certificate=include_certificate)
         result["accountkey"] = self.accountkey_path
         return result
 
@@ -128,14 +126,15 @@ class AcmeCertificateProvider(CertificateProvider):
 def add_acme_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
     argument_spec.argument_spec["provider"]["choices"].append("acme")
     argument_spec.argument_spec.update(
-        dict(
-            acme_accountkey_path=dict(type="path"),
-            acme_challenge_path=dict(type="path"),
-            acme_chain=dict(type="bool", default=False),
-            acme_directory=dict(
-                type="str", default="https://acme-v02.api.letsencrypt.org/directory"
-            ),
-        )
+        {
+            "acme_accountkey_path": {"type": "path"},
+            "acme_challenge_path": {"type": "path"},
+            "acme_chain": {"type": "bool", "default": False},
+            "acme_directory": {
+                "type": "str",
+                "default": "https://acme-v02.api.letsencrypt.org/directory",
+            },
+        }
     )
 
 

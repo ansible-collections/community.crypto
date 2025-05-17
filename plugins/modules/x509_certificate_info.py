@@ -410,17 +410,21 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path"),
-            content=dict(type="str"),
-            valid_at=dict(type="dict"),
-            name_encoding=dict(
-                type="str", default="ignore", choices=["ignore", "idna", "unicode"]
-            ),
-            select_crypto_backend=dict(
-                type="str", default="auto", choices=["auto", "cryptography"]
-            ),
-        ),
+        argument_spec={
+            "path": {"type": "path"},
+            "content": {"type": "str"},
+            "valid_at": {"type": "dict"},
+            "name_encoding": {
+                "type": "str",
+                "default": "ignore",
+                "choices": ["ignore", "idna", "unicode"],
+            },
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+        },
         required_one_of=(["path", "content"],),
         mutually_exclusive=(["path", "content"],),
         supports_check_mode=True,
@@ -460,7 +464,7 @@ def main() -> t.NoReturn:
         not_before = module_backend.get_not_before()
         not_after = module_backend.get_not_after()
 
-        result["valid_at"] = dict()
+        result["valid_at"] = {}
         if valid_at:
             for k, v in valid_at.items():
                 result["valid_at"][k] = not_before <= v <= not_after

@@ -324,23 +324,25 @@ def send_starttls_packet(sock: socket, server_type: t.Literal["mysql"]) -> None:
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            ca_cert=dict(type="path"),
-            host=dict(type="str", required=True),
-            port=dict(type="int", required=True),
-            proxy_host=dict(type="str"),
-            proxy_port=dict(type="int", default=8080),
-            server_name=dict(type="str"),
-            timeout=dict(type="int", default=10),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            starttls=dict(type="str", choices=["mysql"]),
-            ciphers=dict(type="list", elements="str"),
-            asn1_base64=dict(type="bool", default=True),
-            tls_ctx_options=dict(type="list", elements="raw"),
-            get_certificate_chain=dict(type="bool", default=False),
-        ),
+        argument_spec={
+            "ca_cert": {"type": "path"},
+            "host": {"type": "str", "required": True},
+            "port": {"type": "int", "required": True},
+            "proxy_host": {"type": "str"},
+            "proxy_port": {"type": "int", "default": 8080},
+            "server_name": {"type": "str"},
+            "timeout": {"type": "int", "default": 10},
+            "select_crypto_backend": {
+                "type": "str",
+                "default": "auto",
+                "choices": ["auto", "cryptography"],
+            },
+            "starttls": {"type": "str", "choices": ["mysql"]},
+            "ciphers": {"type": "list", "elements": "str"},
+            "asn1_base64": {"type": "bool", "default": True},
+            "tls_ctx_options": {"type": "list", "elements": "raw"},
+            "get_certificate_chain": {"type": "bool", "default": False},
+        },
     )
 
     ca_cert: str | None = module.params.get("ca_cert")
@@ -444,7 +446,8 @@ def main() -> t.NoReturn:
 
                 try:
                     # Add the int value of the item to ctx options
-                    ctx.options |= tls_ctx_option_int
+                    # (pylint does not yet notice that module.fail_json cannot return)
+                    ctx.options |= tls_ctx_option_int  # pylint: disable=possibly-used-before-assignment
                 except Exception:
                     module.fail_json(
                         msg=f"Failed to add {tls_ctx_option_str or tls_ctx_option_int} to CTX options"
@@ -465,9 +468,16 @@ def main() -> t.NoReturn:
                 def _convert_chain(chain):
                     if not chain:
                         return []
-                    return [c.public_bytes(ssl._ssl.ENCODING_DER) for c in chain]
+                    return [
+                        c.public_bytes(
+                            ssl._ssl.ENCODING_DER  # pylint: disable=protected-access
+                        )
+                        for c in chain
+                    ]
 
-                ssl_obj = tls_sock._sslobj  # This is of type ssl._ssl._SSLSocket
+                ssl_obj = (
+                    tls_sock._sslobj  # pylint: disable=protected-access
+                )  # This is of type ssl._ssl._SSLSocket
                 verified_der_chain = _convert_chain(ssl_obj.get_verified_chain())
                 unverified_der_chain = _convert_chain(ssl_obj.get_unverified_chain())
             else:
@@ -482,7 +492,9 @@ def main() -> t.NoReturn:
                         (
                             c
                             if isinstance(c, bytes)
-                            else c.public_bytes(ssl._ssl.ENCODING_DER)
+                            else c.public_bytes(
+                                ssl._ssl.ENCODING_DER  # pylint: disable=protected-access
+                            )
                         )
                         for c in chain
                     ]

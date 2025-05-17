@@ -123,7 +123,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.support i
 class SignatureInfoBase(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(SignatureInfoBase, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state="present",
             force=False,
@@ -152,7 +152,7 @@ class SignatureInfoBase(OpenSSLObject):
 class SignatureInfoCryptography(SignatureInfoBase):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(SignatureInfoCryptography, self).__init__(module)
+        super().__init__(module)
 
     def run(self) -> dict[str, t.Any]:
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
@@ -229,20 +229,22 @@ class SignatureInfoCryptography(SignatureInfoBase):
             return result
 
         except Exception as e:
-            raise OpenSSLObjectError(e)
+            raise OpenSSLObjectError(e) from e
 
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            certificate_path=dict(type="path"),
-            certificate_content=dict(type="str"),
-            path=dict(type="path", required=True),
-            signature=dict(type="str", required=True),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-        ),
+        argument_spec={
+            "certificate_path": {"type": "path"},
+            "certificate_content": {"type": "str"},
+            "path": {"type": "path", "required": True},
+            "signature": {"type": "str", "required": True},
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+        },
         mutually_exclusive=(["certificate_path", "certificate_content"],),
         required_one_of=(["certificate_path", "certificate_content"],),
         supports_check_mode=True,

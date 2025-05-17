@@ -233,7 +233,7 @@ class PublicKeyError(OpenSSLObjectError):
 class PublicKey(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(PublicKey, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -287,11 +287,10 @@ class PublicKey(OpenSSLObject):
                 crypto_serialization.Encoding.OpenSSH,
                 crypto_serialization.PublicFormat.OpenSSH,
             )
-        else:
-            return self.privatekey.public_key().public_bytes(
-                crypto_serialization.Encoding.PEM,
-                crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
-            )
+        return self.privatekey.public_key().public_bytes(
+            crypto_serialization.Encoding.PEM,
+            crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate the public key."""
@@ -316,9 +315,9 @@ class PublicKey(OpenSSLObject):
 
                 self.changed = True
             except OpenSSLBadPassphraseError as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
             except (IOError, OSError) as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
 
         self.fingerprint = get_fingerprint(
             path=self.privatekey_path,
@@ -331,12 +330,10 @@ class PublicKey(OpenSSLObject):
         elif module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(PublicKey, self).check(
-            module=module, perms_required=perms_required
-        )
+        state_and_perms = super().check(module=module, perms_required=perms_required)
 
         def _check_privatekey() -> bool:
             if self.privatekey_path is not None and not os.path.exists(
@@ -374,7 +371,7 @@ class PublicKey(OpenSSLObject):
             try:
                 desired_publickey = self._create_publickey(module)
             except OpenSSLBadPassphraseError as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
 
             return publickey_content == desired_publickey
 
@@ -386,7 +383,7 @@ class PublicKey(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        super(PublicKey, self).remove(module)
+        super().remove(module)
 
     def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""
@@ -409,10 +406,10 @@ class PublicKey(OpenSSLObject):
                 self.publickey_bytes.decode("utf-8") if self.publickey_bytes else None
             )
 
-        result["diff"] = dict(
-            before=self.diff_before,
-            after=self.diff_after,
-        )
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
 
         return result
 
@@ -420,20 +417,26 @@ class PublicKey(OpenSSLObject):
 def main() -> t.NoReturn:
 
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type="str", default="present", choices=["present", "absent"]),
-            force=dict(type="bool", default=False),
-            path=dict(type="path", required=True),
-            privatekey_path=dict(type="path"),
-            privatekey_content=dict(type="str", no_log=True),
-            format=dict(type="str", default="PEM", choices=["OpenSSH", "PEM"]),
-            privatekey_passphrase=dict(type="str", no_log=True),
-            backup=dict(type="bool", default=False),
-            select_crypto_backend=dict(
-                type="str", choices=["auto", "cryptography"], default="auto"
-            ),
-            return_content=dict(type="bool", default=False),
-        ),
+        argument_spec={
+            "state": {
+                "type": "str",
+                "default": "present",
+                "choices": ["present", "absent"],
+            },
+            "force": {"type": "bool", "default": False},
+            "path": {"type": "path", "required": True},
+            "privatekey_path": {"type": "path"},
+            "privatekey_content": {"type": "str", "no_log": True},
+            "format": {"type": "str", "default": "PEM", "choices": ["OpenSSH", "PEM"]},
+            "privatekey_passphrase": {"type": "str", "no_log": True},
+            "backup": {"type": "bool", "default": False},
+            "select_crypto_backend": {
+                "type": "str",
+                "choices": ["auto", "cryptography"],
+                "default": "auto",
+            },
+            "return_content": {"type": "bool", "default": False},
+        },
         supports_check_mode=True,
         add_file_common_args=True,
         required_if=[

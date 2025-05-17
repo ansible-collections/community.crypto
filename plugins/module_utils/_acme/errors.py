@@ -40,12 +40,12 @@ def format_error_problem(
     subproblems = problem.get("subproblems")
     if subproblems is not None:
         msg = f"{msg} Subproblems:"
-        for index, problem in enumerate(subproblems):
+        for index, subproblem in enumerate(subproblems):
             index_str = f"{subproblem_prefix}{index}"
-            problem_str = format_error_problem(
-                problem, subproblem_prefix=f"{index_str}."
+            subproblem_str = format_error_problem(
+                subproblem, subproblem_prefix=f"{index_str}."
             )
-            msg = f"{msg}\n({index_str}) {problem_str}"
+            msg = f"{msg}\n({index_str}) {subproblem_str}"
     return msg
 
 
@@ -55,7 +55,7 @@ class ModuleFailException(Exception):
     """
 
     def __init__(self, msg: str, **args: t.Any) -> None:
-        super(ModuleFailException, self).__init__(self, msg)
+        super().__init__(self, msg)
         self.msg = msg
         self.module_fail_args = args
 
@@ -100,7 +100,7 @@ class ACMEProtocolException(ModuleFailException):
             except Exception:
                 pass
 
-        extras = extras or dict()
+        extras = extras or {}
         error_code = None
         error_type = None
 
@@ -152,7 +152,7 @@ class ACMEProtocolException(ModuleFailException):
         elif content is not None:
             add_msg = f" The raw result: {to_text(content)}"
 
-        super(ACMEProtocolException, self).__init__(f"{msg}.{add_msg}", **extras)
+        super().__init__(f"{msg}.{add_msg}", **extras)
         self.problem: dict[str, t.Any] = {}
         self.subproblems: list[dict[str, t.Any]] = []
         self.error_code = error_code

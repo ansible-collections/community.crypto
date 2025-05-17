@@ -211,9 +211,7 @@ class CryptographyChainMatcher(ChainMatcher):
 
 class CryptographyBackend(CryptoBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(CryptographyBackend, self).__init__(
-            module=module, with_timezone=CRYPTOGRAPHY_TIMEZONE
-        )
+        super().__init__(module=module, with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
     def parse_key(
         self,
@@ -242,7 +240,7 @@ class CryptographyBackend(CryptoBackend):
                 password=to_bytes(passphrase) if passphrase is not None else None,
             )
         except Exception as e:
-            raise KeyParsingError(f"error while loading key: {e}")
+            raise KeyParsingError(f"error while loading key: {e}") from e
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
             rsa_pk = key.public_key().public_numbers()
             return {
@@ -256,7 +254,7 @@ class CryptographyBackend(CryptoBackend):
                 },
                 "hash": "sha256",
             }
-        elif isinstance(
+        if isinstance(
             key, cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey
         ):
             ec_pk = key.public_key().public_numbers()
@@ -296,8 +294,7 @@ class CryptographyBackend(CryptoBackend):
                 "hash": hashalg,
                 "point_size": point_size,
             }
-        else:
-            raise KeyParsingError(f'unknown key type "{type(key)}"')
+        raise KeyParsingError(f'unknown key type "{type(key)}"')
 
     def sign(
         self, *, payload64: str, protected64: str, key_data: dict[str, t.Any]
@@ -332,6 +329,8 @@ class CryptographyBackend(CryptoBackend):
             rr = convert_int_to_hex(r, digits=2 * key_data["point_size"])
             ss = convert_int_to_hex(s, digits=2 * key_data["point_size"])
             signature = binascii.unhexlify(rr) + binascii.unhexlify(ss)
+        else:
+            raise AssertionError("Can never be reached")  # pragma: no cover
 
         return {
             "protected": protected64,
@@ -472,8 +471,10 @@ class CryptographyBackend(CryptoBackend):
             cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
-                raise BackendException(f"Cannot parse certificate: {e}")
-            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
+                raise BackendException(f"Cannot parse certificate: {e}") from e
+            raise BackendException(
+                f"Cannot parse certificate {cert_filename}: {e}"
+            ) from e
 
         if now is None:
             now = self.get_now()
@@ -508,8 +509,10 @@ class CryptographyBackend(CryptoBackend):
             cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
-                raise BackendException(f"Cannot parse certificate: {e}")
-            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
+                raise BackendException(f"Cannot parse certificate: {e}") from e
+            raise BackendException(
+                f"Cannot parse certificate {cert_filename}: {e}"
+            ) from e
 
         ski = None
         try:

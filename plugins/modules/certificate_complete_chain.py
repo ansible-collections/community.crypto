@@ -328,12 +328,12 @@ def format_cert(cert: Certificate) -> str:
 def check_cycle(
     module: AnsibleModule,
     occured_certificates: set[cryptography.x509.Certificate],
-    next: Certificate,
+    next_certificate: Certificate,
 ) -> None:
     """
-    Make sure that next is not in occured_certificates so far, and add it.
+    Make sure that next_certificate is not in occured_certificates so far, and add it.
     """
-    next_cert = next.cert
+    next_cert = next_certificate.cert
     if next_cert in occured_certificates:
         module.fail_json(msg="Found cycle while building certificate chain")
     occured_certificates.add(next_cert)
@@ -341,11 +341,15 @@ def check_cycle(
 
 def main() -> t.NoReturn:
     module = AnsibleModule(
-        argument_spec=dict(
-            input_chain=dict(type="str", required=True),
-            root_certificates=dict(type="list", required=True, elements="path"),
-            intermediate_certificates=dict(type="list", default=[], elements="path"),
-        ),
+        argument_spec={
+            "input_chain": {"type": "str", "required": True},
+            "root_certificates": {"type": "list", "required": True, "elements": "path"},
+            "intermediate_certificates": {
+                "type": "list",
+                "default": [],
+                "elements": "path",
+            },
+        },
         supports_check_mode=True,
     )
 
@@ -382,7 +386,7 @@ def main() -> t.NoReturn:
     # Try to complete chain
     current: Certificate | None = chain[-1]
     completed = []
-    occured_certificates = set([cert.cert for cert in chain])
+    occured_certificates = {cert.cert for cert in chain}
     if current and current.cert in roots.certificate_by_cert:
         # Do not try to complete the chain when it is already ending with a root certificate
         current = None
