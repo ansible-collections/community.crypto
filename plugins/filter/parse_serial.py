@@ -56,7 +56,7 @@ def parse_serial_filter(serial_str: str | bytes) -> int:
     try:
         return parse_serial(to_native(serial_str))
     except ValueError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

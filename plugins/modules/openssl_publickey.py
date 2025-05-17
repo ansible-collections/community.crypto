@@ -315,9 +315,9 @@ class PublicKey(OpenSSLObject):
 
                 self.changed = True
             except OpenSSLBadPassphraseError as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
             except (IOError, OSError) as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
 
         self.fingerprint = get_fingerprint(
             path=self.privatekey_path,
@@ -371,7 +371,7 @@ class PublicKey(OpenSSLObject):
             try:
                 desired_publickey = self._create_publickey(module)
             except OpenSSLBadPassphraseError as exc:
-                raise PublicKeyError(exc)
+                raise PublicKeyError(exc) from exc
 
             return publickey_content == desired_publickey
 

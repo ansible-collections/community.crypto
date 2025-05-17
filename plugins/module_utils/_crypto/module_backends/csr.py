@@ -170,7 +170,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
                 )
                 self.ordered_subject = True
         except ValueError as exc:
-            raise CertificateSigningRequestError(str(exc))
+            raise CertificateSigningRequestError(str(exc)) from exc
 
         self.using_common_name_for_san = False
         if not self.subjectAltName and module.params["use_common_name_for_san"]:
@@ -189,7 +189,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse subject_key_identifier: {e}"
-                )
+                ) from e
 
         self.authority_key_identifier: bytes | None = None
         if authority_key_identifier is not None:
@@ -200,7 +200,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             except Exception as e:
                 raise CertificateSigningRequestError(
                     f"Cannot parse authority_key_identifier: {e}"
-                )
+                ) from e
 
         self.existing_csr: cryptography.x509.CertificateSigningRequest | None = None
         self.existing_csr_bytes: bytes | None = None
@@ -253,7 +253,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
                 passphrase=self.privatekey_passphrase,
             )
         except OpenSSLBadPassphraseError as exc:
-            raise CertificateSigningRequestError(exc)
+            raise CertificateSigningRequestError(exc) from exc
 
     @abc.abstractmethod
     def _check_csr(self) -> bool:
@@ -347,7 +347,7 @@ def parse_crl_distribution_points(
         except (OpenSSLObjectError, ValueError) as e:
             raise OpenSSLObjectError(
                 f"Error while parsing CRL distribution point #{index}: {e}"
-            )
+            ) from e
     return result
 
 
@@ -386,7 +386,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 )
             )
         except ValueError as e:
-            raise CertificateSigningRequestError(e)
+            raise CertificateSigningRequestError(e) from e
 
         if self.subjectAltName:
             csr = csr.add_extension(
@@ -449,7 +449,9 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                     critical=self.name_constraints_critical,
                 )
             except TypeError as e:
-                raise OpenSSLObjectError(f"Error while parsing name constraint: {e}")
+                raise OpenSSLObjectError(
+                    f"Error while parsing name constraint: {e}"
+                ) from e
 
         if self.create_subject_key_identifier:
             if not is_potential_certificate_issuer_public_key(

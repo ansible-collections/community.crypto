@@ -132,7 +132,7 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
             try:
                 self.key = load_publickey(content=self.content)
             except OpenSSLObjectError as e:
-                raise PublicKeyParseError(str(e), result={})
+                raise PublicKeyParseError(str(e), result={}) from e
 
         pk = self._get_public_key(binary=True)
         result["fingerprints"] = (

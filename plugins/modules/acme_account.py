@@ -302,7 +302,7 @@ def main() -> t.NoReturn:
             except KeyParsingError as e:
                 raise ModuleFailException(
                     f"Error while parsing new account key: {e.msg}"
-                )
+                ) from e
             # Verify that the account exists and has not been deactivated
             created, account_data = account.setup_account(allow_creation=False)
             if created:

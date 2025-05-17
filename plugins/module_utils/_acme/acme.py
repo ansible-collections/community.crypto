@@ -244,7 +244,9 @@ class ACMEClient:
                     passphrase=self.account_key_passphrase,
                 )
             except KeyParsingError as e:
-                raise ModuleFailException(f"Error while parsing account key: {e.msg}")
+                raise ModuleFailException(
+                    f"Error while parsing account key: {e.msg}"
+                ) from e
             self.account_jwk = self.account_key_data["jwk"]
             self.account_jws_header = {
                 "alg": self.account_key_data["alg"],
@@ -307,7 +309,7 @@ class ACMEClient:
         except Exception as e:
             raise ModuleFailException(
                 f"Failed to encode payload / headers as JSON: {e}"
-            )
+            ) from e
 
         return self.backend.sign(
             payload64=payload64, protected64=protected64, key_data=key_data
@@ -456,10 +458,10 @@ class ACMEClient:
                             result = decoded_result
                         else:
                             result = content
-                    except ValueError:
+                    except ValueError as exc:
                         raise NetworkException(
                             f"Failed to parse the ACME response: {url} {content}"
-                        )
+                        ) from exc
                 else:
                     result = content
 
@@ -569,10 +571,10 @@ class ACMEClient:
                     try:
                         result = self.module.from_json(content.decode("utf8"))
                         parsed_json_result = True
-                    except ValueError:
+                    except ValueError as exc:
                         raise NetworkException(
                             f"Failed to parse the ACME response: {uri} {content!r}"
-                        )
+                        ) from exc
                 else:
                     result = content
         else:

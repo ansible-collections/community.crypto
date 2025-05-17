@@ -143,7 +143,7 @@ class CertificateBackend(metaclass=abc.ABCMeta):
                 passphrase=self.privatekey_passphrase,
             )
         except OpenSSLBadPassphraseError as exc:
-            raise CertificateError(exc)
+            raise CertificateError(exc) from exc
 
     def _ensure_csr_loaded(self) -> None:
         """Load the CSR into self.csr."""

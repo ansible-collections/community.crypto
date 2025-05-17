@@ -273,7 +273,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 ),
             )
         except Exception as e:
-            raise PrivateKeyError(e)
+            raise PrivateKeyError(e) from e
 
 
 def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:

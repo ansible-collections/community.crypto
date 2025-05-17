@@ -229,7 +229,7 @@ class SignatureInfoCryptography(SignatureInfoBase):
             return result
 
         except Exception as e:
-            raise OpenSSLObjectError(e)
+            raise OpenSSLObjectError(e) from e
 
 
 def main() -> t.NoReturn:

@@ -305,7 +305,9 @@ class _OpensshWriter:
         try:
             self.string(",".join(value).encode("ASCII"))
         except UnicodeEncodeError as e:
-            raise ValueError(f"Name-list's must consist of US-ASCII characters: {e}")
+            raise ValueError(
+                f"Name-list's must consist of US-ASCII characters: {e}"
+            ) from e
 
         return self
 

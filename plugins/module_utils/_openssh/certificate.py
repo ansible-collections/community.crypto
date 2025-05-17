@@ -220,8 +220,8 @@ class OpensshCertificateTimeParameters:
             return _FOREVER
         try:
             return datetime.fromtimestamp(timestamp, tz=_datetime.timezone.utc)
-        except OverflowError:
-            raise ValueError
+        except OverflowError as e:
+            raise ValueError from e
 
     @staticmethod
     def _time_string_to_datetime(time_string: str) -> datetime:
@@ -550,13 +550,13 @@ class OpensshCertificate:
             with open(path, "rb") as cert_file:
                 data = cert_file.read()
         except (IOError, OSError) as e:
-            raise ValueError(f"{path} cannot be opened for reading: {e}")
+            raise ValueError(f"{path} cannot be opened for reading: {e}") from e
 
         try:
             format_identifier, b64_cert = data.split(b" ")[:2]
             cert = binascii.a2b_base64(b64_cert)
-        except (binascii.Error, ValueError):
-            raise ValueError("Certificate not in OpenSSH format")
+        except (binascii.Error, ValueError) as e:
+            raise ValueError("Certificate not in OpenSSH format") from e
 
         for key_type, string in _SSH_TYPE_STRINGS.items():
             if format_identifier == string + _CERT_SUFFIX_V01:
@@ -576,7 +576,7 @@ class OpensshCertificate:
             cert_info = cls._parse_cert_info(pub_key_type, parser)
             signature = parser.string()
         except (TypeError, ValueError) as e:
-            raise ValueError(f"Invalid certificate data: {e}")
+            raise ValueError(f"Invalid certificate data: {e}") from e
 
         if parser.remaining_bytes():
             raise ValueError(

@@ -66,7 +66,7 @@ def pem_to_der(
             raise ModuleFailException(
                 f"cannot load PEM file {pem_filename}: {err}",
                 exception=traceback.format_exc(),
-            )
+            ) from err
     else:
         raise ModuleFailException(
             "One of pem_filename and pem_content must be provided"

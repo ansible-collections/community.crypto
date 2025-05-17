@@ -322,7 +322,7 @@ class ECSSession:
             except HTTPError as e:
                 raise SessionConfigurationException(
                     f"Error downloading specification from address '{entrust_api_specification_path}', received error code '{e.getcode()}'"
-                )
+                ) from e
         else:
             with open(entrust_api_specification_path, "rb") as f:
                 if ".json" in entrust_api_specification_path:

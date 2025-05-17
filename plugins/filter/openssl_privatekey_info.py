@@ -193,9 +193,9 @@ def openssl_privatekey_info_filter(
         result.pop("key_is_consistent", None)
         return result
     except PrivateKeyParseError as exc:
-        raise AnsibleFilterError(exc.error_message)
+        raise AnsibleFilterError(exc.error_message) from exc
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

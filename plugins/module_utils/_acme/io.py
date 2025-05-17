@@ -29,7 +29,7 @@ def read_file(fn: str | os.PathLike) -> bytes:
         with open(fn, "rb") as f:
             return f.read()
     except Exception as e:
-        raise ModuleFailException(f'Error while reading file "{fn}": {e}')
+        raise ModuleFailException(f'Error while reading file "{fn}": {e}') from e
 
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
@@ -55,7 +55,7 @@ def write_file(
         raise ModuleFailException(
             f"failed to create temporary content file: {err}",
             exception=traceback.format_exc(),
-        )
+        ) from err
     f.close()
     checksum_src = None
     checksum_dest = None
@@ -94,7 +94,7 @@ def write_file(
             raise ModuleFailException(
                 f"failed to copy {tmpsrc} to {dest}: {err}",
                 exception=traceback.format_exc(),
-            )
+            ) from err
     os.remove(tmpsrc)
     return changed
 

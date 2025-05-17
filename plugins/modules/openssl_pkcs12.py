@@ -413,7 +413,7 @@ class Pkcs(OpenSSLObject):
                 with open(self.certificate_path, "rb") as fh:
                     self.certificate_content = fh.read()
             except (IOError, OSError) as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
         elif certificate_content is not None:
             self.certificate_content = to_bytes(certificate_content)
 
@@ -423,7 +423,7 @@ class Pkcs(OpenSSLObject):
                 with open(self.privatekey_path, "rb") as fh:
                     self.privatekey_content = fh.read()
             except (IOError, OSError) as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
         elif privatekey_content is not None:
             self.privatekey_content = to_bytes(privatekey_content)
 
@@ -614,7 +614,7 @@ class Pkcs(OpenSSLObject):
                 pkcs12_content = pkcs12_fh.read()
             return self.parse_bytes(pkcs12_content)
         except IOError as exc:
-            raise PkcsError(exc)
+            raise PkcsError(exc) from exc
 
     def generate(self, module: AnsibleModule) -> None:
         # Empty method because OpenSSLObject wants this
@@ -654,7 +654,7 @@ class PkcsCryptography(Pkcs):
                     passphrase=self.privatekey_passphrase,
                 )
             except OpenSSLBadPassphraseError as exc:
-                raise PkcsError(exc)
+                raise PkcsError(exc) from exc
 
         cert = None
         if self.certificate_content:
@@ -723,7 +723,7 @@ class PkcsCryptography(Pkcs):
 
             return (pkey, crt, other_certs, friendly_name)
         except ValueError as exc:
-            raise PkcsError(exc)
+            raise PkcsError(exc) from exc
 
     def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
         return (

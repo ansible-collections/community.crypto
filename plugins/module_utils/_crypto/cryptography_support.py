@@ -401,7 +401,7 @@ def _parse_dn(name: bytes) -> list[x509.NameAttribute]:
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
                 f"Error while parsing distinguished name {to_text(original_name)!r}: {e}"
-            )
+            ) from e
         result.append(attribute)
         if name:
             if name[0:1] != sep or len(name) < 2:
@@ -422,7 +422,7 @@ def cryptography_parse_relative_distinguished_name(
         except OpenSSLObjectError as e:
             raise OpenSSLObjectError(
                 f"Error while parsing relative distinguished name {to_text(part)!r}: {e}"
-            )
+            ) from e
     return cryptography.x509.RelativeDistinguishedName(names)
 
 
@@ -476,7 +476,7 @@ def _adjust_idn(
                 raise OpenSSLObjectError(
                     f'Error while transforming part "{part}" of {what} DNS name "{value}" to {dest}.'
                     f' IDNA2008 transformation resulted in "{exc2008}", IDNA2003 transformation resulted in "{exc2003}".'
-                )
+                ) from exc2003
     return ".".join(parts)
 
 
@@ -569,7 +569,7 @@ def cryptography_get_name(
                 x509.Name(reversed(_parse_dn(to_bytes(name[8:]))))
             )
     except Exception as e:
-        raise OpenSSLObjectError(f'Cannot parse {what} "{name}": {e}')
+        raise OpenSSLObjectError(f'Cannot parse {what} "{name}": {e}') from e
     if ":" not in name:
         raise OpenSSLObjectError(
             f'Cannot parse {what} "{name}" (forgot "DNS:" prefix?)'
@@ -707,7 +707,7 @@ def cryptography_get_basic_constraints(
                 except Exception as e:
                     raise OpenSSLObjectError(
                         f'Cannot parse path length constraint "{v}" ({e})'
-                    )
+                    ) from e
             else:
                 raise OpenSSLObjectError(f'Unknown basic constraint "{constraint}"')
     return ca, path_length

@@ -239,7 +239,7 @@ def main() -> t.NoReturn:
                 )
             )
         except Exception as e:
-            raise ModuleFailException(f"Error while loading private key: {e}")
+            raise ModuleFailException(f"Error while loading private key: {e}") from e
         if isinstance(
             private_key,
             (

@@ -722,7 +722,7 @@ class CryptHandler(Handler):
         except Exception as exc:
             raise ValueError(
                 f"Error while wiping LUKS container signatures for {device}: {exc}"
-            )
+            ) from exc
 
     def run_luks_add_key(
         self,

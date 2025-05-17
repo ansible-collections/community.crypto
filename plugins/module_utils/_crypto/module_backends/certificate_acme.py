@@ -94,7 +94,7 @@ class AcmeCertificateBackend(CertificateBackend):
                 self.module.run_command(command, check_rc=True)[1]
             )
         except OSError as exc:
-            raise CertificateError(exc)
+            raise CertificateError(exc) from exc
 
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""

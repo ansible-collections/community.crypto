@@ -505,7 +505,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
                 None if self.passphrase is None else to_bytes(self.passphrase),
             )
         except Exception as e:
-            raise PrivateKeyError(e)
+            raise PrivateKeyError(e) from e
 
     def _ensure_existing_private_key_loaded(self) -> None:
         if self.existing_private_key is None and self.has_existing():

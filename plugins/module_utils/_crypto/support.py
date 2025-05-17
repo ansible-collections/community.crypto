@@ -161,19 +161,21 @@ def load_privatekey(
         else:
             priv_key_detail = content
     except (IOError, OSError) as exc:
-        raise OpenSSLObjectError(exc)
+        raise OpenSSLObjectError(exc) from exc
 
     try:
         return load_pem_private_key(
             priv_key_detail,
             None if passphrase is None else to_bytes(passphrase),
         )
-    except TypeError:
+    except TypeError as exc:
         raise OpenSSLBadPassphraseError(
             "Wrong or empty passphrase provided for private key"
-        )
-    except ValueError:
-        raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
+        ) from exc
+    except ValueError as exc:
+        raise OpenSSLBadPassphraseError(
+            "Wrong passphrase provided for private key"
+        ) from exc
 
 
 def load_certificate_privatekey(
@@ -232,12 +234,12 @@ def load_publickey(
             with open(path, "rb") as b_priv_key_fh:
                 content = b_priv_key_fh.read()
         except (IOError, OSError) as exc:
-            raise OpenSSLObjectError(exc)
+            raise OpenSSLObjectError(exc) from exc
 
     try:
         return serialization.load_pem_public_key(content)
     except Exception as e:
-        raise OpenSSLObjectError(f"Error while deserializing key: {e}")
+        raise OpenSSLObjectError(f"Error while deserializing key: {e}") from e
 
 
 def load_certificate(
@@ -257,17 +259,17 @@ def load_certificate(
         else:
             cert_content = content
     except (IOError, OSError) as exc:
-        raise OpenSSLObjectError(exc)
+        raise OpenSSLObjectError(exc) from exc
     if der_support_enabled is False or identify_pem_format(cert_content):
         try:
             return x509.load_pem_x509_certificate(cert_content)
         except ValueError as exc:
-            raise OpenSSLObjectError(exc)
+            raise OpenSSLObjectError(exc) from exc
     elif der_support_enabled:
         try:
             return x509.load_der_x509_certificate(cert_content)
         except ValueError as exc:
-            raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}")
+            raise OpenSSLObjectError(f"Cannot parse DER certificate: {exc}") from exc
 
 
 def load_certificate_request(
@@ -283,11 +285,11 @@ def load_certificate_request(
         else:
             csr_content = content
     except (IOError, OSError) as exc:
-        raise OpenSSLObjectError(exc)
+        raise OpenSSLObjectError(exc) from exc
     try:
         return x509.load_pem_x509_csr(csr_content)
     except ValueError as exc:
-        raise OpenSSLObjectError(exc)
+        raise OpenSSLObjectError(exc) from exc
 
 
 def parse_name_field(
@@ -344,7 +346,7 @@ def parse_ordered_name_field(
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"Error while processing entry #{index + 1} in {name_field_name}: {exc}"
-            )
+            ) from exc
     return result
 
 
@@ -425,7 +427,7 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
             self.changed = True
         except OSError as exc:
             if exc.errno != errno.ENOENT:
-                raise OpenSSLObjectError(exc)
+                raise OpenSSLObjectError(exc) from exc
 
 
 __all__ = (

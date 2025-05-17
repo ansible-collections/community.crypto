@@ -76,4 +76,4 @@ class LookupModule(LookupBase):
                 )
             return result
         except GPGError as exc:
-            raise AnsibleLookupError(str(exc))
+            raise AnsibleLookupError(str(exc)) from exc

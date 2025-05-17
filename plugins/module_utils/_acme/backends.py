@@ -117,7 +117,7 @@ class CryptoBackend(metaclass=abc.ABCMeta):
                 raise BackendException(f"Invalid value for {name}: {value!r}")
             return result
         except OpenSSLObjectError as exc:
-            raise BackendException(str(exc))
+            raise BackendException(str(exc)) from exc
 
     def interpolate_timestamp(
         self,

@@ -240,7 +240,7 @@ class CryptographyBackend(CryptoBackend):
                 password=to_bytes(passphrase) if passphrase is not None else None,
             )
         except Exception as e:
-            raise KeyParsingError(f"error while loading key: {e}")
+            raise KeyParsingError(f"error while loading key: {e}") from e
         if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
             rsa_pk = key.public_key().public_numbers()
             return {
@@ -471,8 +471,10 @@ class CryptographyBackend(CryptoBackend):
             cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
-                raise BackendException(f"Cannot parse certificate: {e}")
-            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
+                raise BackendException(f"Cannot parse certificate: {e}") from e
+            raise BackendException(
+                f"Cannot parse certificate {cert_filename}: {e}"
+            ) from e
 
         if now is None:
             now = self.get_now()
@@ -507,8 +509,10 @@ class CryptographyBackend(CryptoBackend):
             cert = cryptography.x509.load_pem_x509_certificate(b_cert_content)
         except Exception as e:
             if cert_filename is None:
-                raise BackendException(f"Cannot parse certificate: {e}")
-            raise BackendException(f"Cannot parse certificate {cert_filename}: {e}")
+                raise BackendException(f"Cannot parse certificate: {e}") from e
+            raise BackendException(
+                f"Cannot parse certificate {cert_filename}: {e}"
+            ) from e
 
         ski = None
         try:

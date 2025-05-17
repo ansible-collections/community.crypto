@@ -63,7 +63,7 @@ def gpg_fingerprint(gpg_key_content: str | bytes) -> str:
             gpg_runner=gpg, content=to_bytes(gpg_key_content)
         )
     except GPGError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

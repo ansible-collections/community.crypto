@@ -144,7 +144,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
                     critical=False,
                 )
         except ValueError as e:
-            raise CertificateError(str(e))
+            raise CertificateError(str(e)) from e
 
         certificate = cert_builder.sign(
             private_key=self.privatekey,

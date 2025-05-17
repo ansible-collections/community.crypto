@@ -314,10 +314,10 @@ class AsymmetricKeypair:
 
         try:
             self.verify(signature=self.sign(b"message"), data=b"message")
-        except InvalidSignatureError:
+        except InvalidSignatureError as e:
             raise InvalidPublicKeyFileError(
                 "The private key and public key of this keypair do not match"
-            )
+            ) from e
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AsymmetricKeypair):
@@ -373,7 +373,7 @@ class AsymmetricKeypair:
                 data, **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"]  # type: ignore
             )
         except TypeError as e:
-            raise InvalidDataError(e)
+            raise InvalidDataError(e) from e
 
     def verify(self, *, signature: bytes, data: bytes) -> None:
         """Verifies that the signature associated with the provided data was signed
@@ -388,8 +388,8 @@ class AsymmetricKeypair:
                 data,
                 **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"],  # type: ignore
             )
-        except InvalidSignature:
-            raise InvalidSignatureError
+        except InvalidSignature as e:
+            raise InvalidSignatureError from e
 
     def update_passphrase(self, passphrase: bytes | None = None) -> None:
         """Updates the encryption algorithm of this key pair
@@ -666,10 +666,10 @@ def load_privatekey(
 
     try:
         privatekey_loader = privatekey_loaders[key_format]
-    except KeyError:
+    except KeyError as e:
         raise InvalidKeyFormatError(
             f"{key_format} is not a valid key format ({','.join(privatekey_loaders)})"
-        )
+        ) from e
 
     if not os.path.exists(path):
         raise InvalidPrivateKeyFileError(f"No file was found at {path}")
@@ -691,13 +691,13 @@ def load_privatekey(
                     password=passphrase,
                 )
             else:
-                raise InvalidPrivateKeyFileError(exc)
+                raise InvalidPrivateKeyFileError(exc) from exc
     except ValueError as e:
-        raise InvalidPrivateKeyFileError(e)
+        raise InvalidPrivateKeyFileError(e) from e
     except TypeError as e:
-        raise InvalidPassphraseError(e)
+        raise InvalidPassphraseError(e) from e
     except UnsupportedAlgorithm as e:
-        raise InvalidAlgorithmError(e)
+        raise InvalidAlgorithmError(e) from e
 
     if not is_potential_certificate_issuer_private_key(privatekey) or isinstance(
         privatekey, Ed448PrivateKey
@@ -719,10 +719,10 @@ def load_publickey(
 
     try:
         publickey_loader = publickey_loaders[key_format]
-    except KeyError:
+    except KeyError as e:
         raise InvalidKeyFormatError(
             f"{key_format} is not a valid key format ({','.join(publickey_loaders)})"
-        )
+        ) from e
 
     if not os.path.exists(path):
         raise InvalidPublicKeyFileError(f"No file was found at {path}")
@@ -735,9 +735,9 @@ def load_publickey(
                 data=content,
             )
     except ValueError as e:
-        raise InvalidPublicKeyFileError(e)
+        raise InvalidPublicKeyFileError(e) from e
     except UnsupportedAlgorithm as e:
-        raise InvalidAlgorithmError(e)
+        raise InvalidAlgorithmError(e) from e
 
     return publickey
 
@@ -779,7 +779,7 @@ def get_encryption_algorithm(
     try:
         return serialization.BestAvailableEncryption(passphrase)
     except ValueError as e:
-        raise InvalidPassphraseError(e)
+        raise InvalidPassphraseError(e) from e
 
 
 def validate_comment(comment: str) -> None:
@@ -800,7 +800,7 @@ def extract_comment(path: str | os.PathLike) -> str:
             else:
                 comment = ""
     except (IOError, OSError) as e:
-        raise InvalidPublicKeyFileError(e)
+        raise InvalidPublicKeyFileError(e) from e
 
     return comment
 

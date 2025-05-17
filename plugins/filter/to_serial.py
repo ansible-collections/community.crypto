@@ -57,7 +57,7 @@ def to_serial_filter(serial_int: int) -> str:
     try:
         return to_serial(serial_int)
     except ValueError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:

@@ -66,7 +66,7 @@ def _extract_date(
     except ValueError as exc:
         raise BackendException(
             f"Failed to parse '{name}' date{cert_filename_suffix}: {exc}"
-        )
+        ) from exc
 
 
 def _decode_octets(octets_text: str) -> bytes:
@@ -156,7 +156,7 @@ class OpenSSLCLIBackend(CryptoBackend):
                 raise KeyParsingError(
                     f"failed to create temporary content file: {err}",
                     exception=traceback.format_exc(),
-                )
+                ) from err
             f.close()
         # Parse key
         account_key_type = None

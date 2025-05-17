@@ -650,7 +650,7 @@ class CRL(OpenSSLObject):
                 passphrase=self.privatekey_passphrase,
             )
         except OpenSSLBadPassphraseError as exc:
-            raise CRLError(exc)
+            raise CRLError(exc) from exc
 
         self.crl = None
         try:
@@ -842,7 +842,7 @@ class CRL(OpenSSLObject):
                 )
             )
         except ValueError as e:
-            raise CRLError(e)
+            raise CRLError(e) from e
 
         crl = set_last_update(crl, value=self.last_update)
         if self.next_update is not None:

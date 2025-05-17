@@ -311,7 +311,7 @@ class KeygenCommand:
             except (IOError, OSError) as e:
                 raise ValueError(
                     f"The private key at {private_key_path} is not writeable preventing a comment update ({e})"
-                )
+                ) from e
 
         command = [self._bin_path, "-q"]
         if force_new_format:

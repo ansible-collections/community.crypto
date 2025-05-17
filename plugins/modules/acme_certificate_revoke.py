@@ -186,7 +186,9 @@ def main() -> t.NoReturn:
                     passphrase=passphrase,
                 )
             except KeyParsingError as e:
-                raise ModuleFailException(f"Error while parsing private key: {e.msg}")
+                raise ModuleFailException(
+                    f"Error while parsing private key: {e.msg}"
+                ) from e
             # Step 2: sign revokation request with private key
             jws_header = {
                 "alg": private_key_data["alg"],

@@ -150,9 +150,9 @@ def openssl_publickey_info_filter(data: str | bytes) -> dict[str, t.Any]:
     try:
         return get_publickey_info(module=module, content=to_bytes(data))
     except PublicKeyParseError as exc:
-        raise AnsibleFilterError(exc.error_message)
+        raise AnsibleFilterError(exc.error_message) from exc
     except OpenSSLObjectError as exc:
-        raise AnsibleFilterError(str(exc))
+        raise AnsibleFilterError(str(exc)) from exc
 
 
 class FilterModule:
