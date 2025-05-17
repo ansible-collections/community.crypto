@@ -849,6 +849,8 @@ class EcsCertificate:
                         result = self.ecs_client.ReissueCertRequest(  # type: ignore[attr-defined]  # pylint: disable=no-member
                             trackingId=self.tracking_id, Body=body
                         )
+                    else:
+                        raise AssertionError("Can never be reached")  # pragma: no cover
                     self.tracking_id = result.get("trackingId")
                     self.set_cert_details(module)
                     assert self.cert_details is not None

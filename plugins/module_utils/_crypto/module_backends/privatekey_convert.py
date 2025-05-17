@@ -166,6 +166,9 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 export_encoding = (
                     cryptography.hazmat.primitives.serialization.Encoding.Raw
                 )
+            else:
+                # pylint does not notice that all possible values for self.format have been covered.
+                raise AssertionError("Can never be reached")  # pragma: no cover
         except AttributeError:
             self.module.fail_json(
                 msg=f'Cryptography backend does not support the selected output format "{self.format}"'

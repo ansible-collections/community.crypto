@@ -953,6 +953,7 @@ class ConditionsHandler(Handler):
         ) or self._module.params["state"] != "closed":
             # conditions for close not fulfilled
             return False
+        luks_is_open = False
 
         if self.device is not None:
             name = self._crypthandler.get_container_name_by_device(self.device)

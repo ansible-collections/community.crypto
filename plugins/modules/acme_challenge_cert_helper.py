@@ -317,6 +317,8 @@ def main() -> t.NoReturn:
                 private_key,
                 cryptography.hazmat.primitives.hashes.SHA256(),
             )
+        else:
+            raise AssertionError("Can never be reached")  # pragma: no cover
 
         module.exit_json(
             changed=True,

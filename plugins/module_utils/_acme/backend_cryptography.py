@@ -332,6 +332,8 @@ class CryptographyBackend(CryptoBackend):
             rr = convert_int_to_hex(r, digits=2 * key_data["point_size"])
             ss = convert_int_to_hex(s, digits=2 * key_data["point_size"])
             signature = binascii.unhexlify(rr) + binascii.unhexlify(ss)
+        else:
+            raise AssertionError("Can never be reached")  # pragma: no cover
 
         return {
             "protected": protected64,

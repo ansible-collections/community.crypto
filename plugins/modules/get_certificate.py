@@ -444,7 +444,8 @@ def main() -> t.NoReturn:
 
                 try:
                     # Add the int value of the item to ctx options
-                    ctx.options |= tls_ctx_option_int
+                    # (pylint does not yet notice that module.fail_json cannot return)
+                    ctx.options |= tls_ctx_option_int  # pylint: disable=possibly-used-before-assignment
                 except Exception:
                     module.fail_json(
                         msg=f"Failed to add {tls_ctx_option_str or tls_ctx_option_int} to CTX options"

@@ -263,7 +263,7 @@ def main() -> t.NoReturn:
     try:
         # Get hold of ACMEClient and ACMEAccount objects (includes directory)
         client = ACMEClient(module=module, backend=backend)
-        method = module.params["method"]
+        method: t.Literal["get", "post", "directory-only"] = module.params["method"]
         result["directory"] = client.directory.directory
         # Do we have to do more requests?
         if method != "directory-only":
@@ -283,6 +283,8 @@ def main() -> t.NoReturn:
                     encode_payload=False,
                     fail_on_error=False,
                 )
+            else:
+                raise AssertionError("Can never be reached")  # pragma: no cover
             # Update results
             result.update(
                 dict(
