@@ -141,7 +141,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 # Implementation with using cryptography
 class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(PrivateKeyConvertCryptographyBackend, self).__init__(module=module)
+        super().__init__(module=module)
 
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format"""

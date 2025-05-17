@@ -323,7 +323,7 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         self.curves[name] = _Curve(name=name, ectype=ectype, deprecated=deprecated)
 
     def __init__(self, module: GeneralAnsibleModule) -> None:
-        super(PrivateKeyCryptographyBackend, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.curves: dict[str, _Curve] = {}
         self._add_curve("secp224r1", "SECP224R1")

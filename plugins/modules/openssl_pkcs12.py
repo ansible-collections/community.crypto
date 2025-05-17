@@ -368,7 +368,7 @@ class Pkcs(OpenSSLObject):
     path: str
 
     def __init__(self, module: AnsibleModule, iter_size_default: int = 2048) -> None:
-        super(Pkcs, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -482,9 +482,7 @@ class Pkcs(OpenSSLObject):
 
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
-        state_and_perms = super(Pkcs, self).check(
-            module=module, perms_required=perms_required
-        )
+        state_and_perms = super().check(module=module, perms_required=perms_required)
 
         def _check_pkey_passphrase() -> bool:
             if self.privatekey_passphrase:
@@ -599,7 +597,7 @@ class Pkcs(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        super(Pkcs, self).remove(module)
+        super().remove(module)
 
     def parse(self) -> tuple[
         bytes | None,
@@ -635,7 +633,7 @@ class Pkcs(OpenSSLObject):
 
 class PkcsCryptography(Pkcs):
     def __init__(self, module: AnsibleModule) -> None:
-        super(PkcsCryptography, self).__init__(module, iter_size_default=50000)
+        super().__init__(module, iter_size_default=50000)
         if (
             self.encryption_level == "compatibility2022"
             and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022

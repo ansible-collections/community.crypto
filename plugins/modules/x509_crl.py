@@ -507,7 +507,7 @@ class CRLError(OpenSSLObjectError):
 class CRL(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(CRL, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -704,7 +704,7 @@ class CRL(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = self.module.backup_local(self.path)
-        super(CRL, self).remove(self.module)
+        super().remove(self.module)
 
     def _compress_entry(self, entry: dict[str, t.Any]) -> (
         tuple[
@@ -770,7 +770,7 @@ class CRL(OpenSSLObject):
     ) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(CRL, self).check(
+        state_and_perms = super().check(
             module=self.module, perms_required=perms_required
         )
 

@@ -211,9 +211,7 @@ class CryptographyChainMatcher(ChainMatcher):
 
 class CryptographyBackend(CryptoBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(CryptographyBackend, self).__init__(
-            module=module, with_timezone=CRYPTOGRAPHY_TIMEZONE
-        )
+        super().__init__(module=module, with_timezone=CRYPTOGRAPHY_TIMEZONE)
 
     def parse_key(
         self,

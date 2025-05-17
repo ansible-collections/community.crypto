@@ -233,7 +233,7 @@ class PublicKeyError(OpenSSLObjectError):
 class PublicKey(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(PublicKey, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -334,9 +334,7 @@ class PublicKey(OpenSSLObject):
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
-        state_and_perms = super(PublicKey, self).check(
-            module=module, perms_required=perms_required
-        )
+        state_and_perms = super().check(module=module, perms_required=perms_required)
 
         def _check_privatekey() -> bool:
             if self.privatekey_path is not None and not os.path.exists(
@@ -386,7 +384,7 @@ class PublicKey(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        super(PublicKey, self).remove(module)
+        super().remove(module)
 
     def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""

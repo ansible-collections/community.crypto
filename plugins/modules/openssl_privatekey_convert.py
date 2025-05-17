@@ -89,7 +89,7 @@ class PrivateKeyConvertModule(OpenSSLObject):
     def __init__(
         self, module: AnsibleModule, module_backend: PrivateKeyConvertBackend
     ) -> None:
-        super(PrivateKeyConvertModule, self).__init__(
+        super().__init__(
             path=module.params["dest_path"],
             state="present",
             force=False,

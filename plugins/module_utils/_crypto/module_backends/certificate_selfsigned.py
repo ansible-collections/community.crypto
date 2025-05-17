@@ -59,7 +59,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
     privatekey: CertificateIssuerPrivateKeyTypes
 
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(SelfSignedCertificateBackendCryptography, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.create_subject_key_identifier: t.Literal[
             "create_if_not_provided", "always_create", "never_create"
@@ -167,7 +167,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
     ) -> bool:
         assert self.privatekey is not None
 
-        if super(SelfSignedCertificateBackendCryptography, self).needs_regeneration(
+        if super().needs_regeneration(
             not_before=self.notBefore, not_after=self.notAfter
         ):
             return True
@@ -185,9 +185,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         return False
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(SelfSignedCertificateBackendCryptography, self).dump(
-            include_certificate=include_certificate
-        )
+        result = super().dump(include_certificate=include_certificate)
 
         if self.module.check_mode:
             result.update(

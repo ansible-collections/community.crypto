@@ -249,9 +249,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
     """Validate the supplied cert, using the cryptography backend"""
 
     def __init__(self, *, module: GeneralAnsibleModule, content: bytes) -> None:
-        super(CertificateInfoRetrievalCryptography, self).__init__(
-            module=module, content=content
-        )
+        super().__init__(module=module, content=content)
         self.name_encoding = module.params.get("name_encoding", "ignore")
 
     def _get_der_bytes(self) -> bytes:

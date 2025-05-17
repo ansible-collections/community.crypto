@@ -252,7 +252,7 @@ class DHParameterBase:
 class DHParameterAbsent(DHParameterBase):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(DHParameterAbsent, self).__init__(module)
+        super().__init__(module)
 
     def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
@@ -265,7 +265,7 @@ class DHParameterAbsent(DHParameterBase):
 class DHParameterOpenSSL(DHParameterBase):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(DHParameterOpenSSL, self).__init__(module)
+        super().__init__(module)
         self.openssl_bin = module.get_bin_path("openssl", True)
 
     def _do_generate(self, module: AnsibleModule) -> None:
@@ -320,7 +320,7 @@ class DHParameterOpenSSL(DHParameterBase):
 class DHParameterCryptography(DHParameterBase):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(DHParameterCryptography, self).__init__(module)
+        super().__init__(module)
 
     def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""

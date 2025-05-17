@@ -354,9 +354,7 @@ def parse_crl_distribution_points(
 # Implementation with using cryptography
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(CertificateSigningRequestCryptographyBackend, self).__init__(
-            module=module
-        )
+        super().__init__(module=module)
         if self.version != 1:
             module.warn(
                 "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"

@@ -63,7 +63,7 @@ except ImportError:
 
 class OwnCACertificateBackendCryptography(CertificateBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(OwnCACertificateBackendCryptography, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.create_subject_key_identifier: t.Literal[
             "create_if_not_provided", "always_create", "never_create"
@@ -223,7 +223,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
-        if super(OwnCACertificateBackendCryptography, self).needs_regeneration(
+        if super().needs_regeneration(
             not_before=self.notBefore, not_after=self.notAfter
         ):
             return True
@@ -272,9 +272,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         return False
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(OwnCACertificateBackendCryptography, self).dump(
-            include_certificate=include_certificate
-        )
+        result = super().dump(include_certificate=include_certificate)
         result.update(
             {
                 "ca_cert": self.ca_cert_path,

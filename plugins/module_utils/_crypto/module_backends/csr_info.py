@@ -197,7 +197,7 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def __init__(
         self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
     ) -> None:
-        super(CSRInfoRetrievalCryptography, self).__init__(
+        super().__init__(
             module=module, content=content, validate_signature=validate_signature
         )
         self.name_encoding: t.Literal["ignore", "idna", "unicode"] = module.params.get(

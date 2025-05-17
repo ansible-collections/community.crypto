@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
 
 class AcmeCertificateBackend(CertificateBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(AcmeCertificateBackend, self).__init__(module=module)
+        super().__init__(module=module)
         self.accountkey_path: str = module.params["acme_accountkey_path"]
         self.challenge_path: str = module.params["acme_challenge_path"]
         self.use_chain: bool = module.params["acme_chain"]
@@ -103,9 +103,7 @@ class AcmeCertificateBackend(CertificateBackend):
         return self.cert_bytes
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:
-        result = super(AcmeCertificateBackend, self).dump(
-            include_certificate=include_certificate
-        )
+        result = super().dump(include_certificate=include_certificate)
         result["accountkey"] = self.accountkey_path
         return result
 

@@ -118,7 +118,7 @@ class OpenSSLCLIBackend(CryptoBackend):
     def __init__(
         self, *, module: AnsibleModule, openssl_binary: str | None = None
     ) -> None:
-        super(OpenSSLCLIBackend, self).__init__(module=module, with_timezone=True)
+        super().__init__(module=module, with_timezone=True)
         if openssl_binary is None:
             openssl_binary = module.get_bin_path("openssl", True)
         self.openssl_binary = openssl_binary

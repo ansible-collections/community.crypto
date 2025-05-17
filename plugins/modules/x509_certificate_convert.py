@@ -167,7 +167,7 @@ def parse_certificate(
 
 class X509CertificateConvertModule(OpenSSLObject):
     def __init__(self, module: AnsibleModule) -> None:
-        super(X509CertificateConvertModule, self).__init__(
+        super().__init__(
             path=module.params["dest_path"],
             state="present",
             force=False,

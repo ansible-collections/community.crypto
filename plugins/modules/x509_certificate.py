@@ -267,7 +267,7 @@ if t.TYPE_CHECKING:
 
 class CertificateAbsent(OpenSSLObject):
     def __init__(self, module: AnsibleModule) -> None:
-        super(CertificateAbsent, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -284,7 +284,7 @@ class CertificateAbsent(OpenSSLObject):
     def remove(self, module: AnsibleModule) -> None:
         if self.backup:
             self.backup_file = module.backup_local(self.path)
-        super(CertificateAbsent, self).remove(module)
+        super().remove(module)
 
     def dump(self, check_mode: bool = False) -> dict[str, t.Any]:
         result = {
@@ -305,7 +305,7 @@ class GenericCertificate(OpenSSLObject):
     """Retrieve a certificate using the given module backend."""
 
     def __init__(self, module: AnsibleModule, module_backend: CertificateBackend):
-        super(GenericCertificate, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -342,9 +342,7 @@ class GenericCertificate(OpenSSLObject):
     def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
         return (
-            super(GenericCertificate, self).check(
-                module=module, perms_required=perms_required
-            )
+            super().check(module=module, perms_required=perms_required)
             and not self.module_backend.needs_regeneration()
         )
 

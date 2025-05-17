@@ -185,7 +185,7 @@ class PrivateKeyModule(OpenSSLObject):
     def __init__(
         self, module: AnsibleModule, module_backend: PrivateKeyBackend
     ) -> None:
-        super(PrivateKeyModule, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state=module.params["state"],
             force=module.params["force"],
@@ -244,7 +244,7 @@ class PrivateKeyModule(OpenSSLObject):
         self.module_backend.set_existing(privatekey_bytes=None)
         if self.backup and not self.check_mode:
             self.backup_file = module.backup_local(self.path)
-        super(PrivateKeyModule, self).remove(module)
+        super().remove(module)
 
     def dump(self) -> dict[str, t.Any]:
         """Serialize the object into a dictionary."""

@@ -304,7 +304,7 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 class Certificate(OpensshModule):
     def __init__(self, module: AnsibleModule) -> None:
-        super(Certificate, self).__init__(module=module)
+        super().__init__(module=module)
         self.ssh_keygen = KeygenCommand(self.module)
 
         self.identifier: str = self.module.params["identifier"] or ""

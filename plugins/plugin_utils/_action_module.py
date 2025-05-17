@@ -36,7 +36,7 @@ if t.TYPE_CHECKING:
 
 class _ModuleExitException(Exception):
     def __init__(self, result: dict[str, t.Any]) -> None:
-        super(_ModuleExitException, self).__init__()
+        super().__init__()
         self.result = result
 
 
@@ -230,7 +230,7 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
         if task_vars is None:
             task_vars = dict()
 
-        result = super(ActionModuleBase, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:

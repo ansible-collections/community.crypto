@@ -54,7 +54,7 @@ if t.TYPE_CHECKING:
 class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(KeypairBackend, self).__init__(module=module)
+        super().__init__(module=module)
 
         self.comment: str | None = self.module.params["comment"]
         self.private_key_path: str = self.module.params["path"]
@@ -358,7 +358,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
 class KeypairBackendOpensshBin(KeypairBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(KeypairBackendOpensshBin, self).__init__(module=module)
+        super().__init__(module=module)
 
         if self.module.params["private_key_format"] != "auto":
             self.module.fail_json(
@@ -425,7 +425,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
 
 class KeypairBackendCryptography(KeypairBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(KeypairBackendCryptography, self).__init__(module=module)
+        super().__init__(module=module)
 
         if self.type == "rsa1":
             self.module.fail_json(

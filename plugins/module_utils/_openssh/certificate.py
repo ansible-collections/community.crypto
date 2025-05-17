@@ -412,7 +412,7 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
 
 class OpensshRSACertificateInfo(OpensshCertificateInfo):
     def __init__(self, *, e: int | None = None, n: int | None = None, **kwargs) -> None:
-        super(OpensshRSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["rsa"] + _CERT_SUFFIX_V01
         self.e = e
         self.n = n
@@ -444,7 +444,7 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         y: int | None = None,
         **kwargs,
     ) -> None:
-        super(OpensshDSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["dsa"] + _CERT_SUFFIX_V01
         self.p = p
         self.q = q
@@ -476,7 +476,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
     def __init__(
         self, *, curve: bytes | None = None, public_key: bytes | None = None, **kwargs
     ):
-        super(OpensshECDSACertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._curve = None
         if curve is not None:
             self.curve = curve
@@ -519,7 +519,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
 class OpensshED25519CertificateInfo(OpensshCertificateInfo):
     def __init__(self, *, pk: bytes | None = None, **kwargs) -> None:
-        super(OpensshED25519CertificateInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["ed25519"] + _CERT_SUFFIX_V01
         self.pk = pk
 

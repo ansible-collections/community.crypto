@@ -55,7 +55,7 @@ class ModuleFailException(Exception):
     """
 
     def __init__(self, msg: str, **args: t.Any) -> None:
-        super(ModuleFailException, self).__init__(self, msg)
+        super().__init__(self, msg)
         self.msg = msg
         self.module_fail_args = args
 
@@ -152,7 +152,7 @@ class ACMEProtocolException(ModuleFailException):
         elif content is not None:
             add_msg = f" The raw result: {to_text(content)}"
 
-        super(ACMEProtocolException, self).__init__(f"{msg}.{add_msg}", **extras)
+        super().__init__(f"{msg}.{add_msg}", **extras)
         self.problem: dict[str, t.Any] = {}
         self.subproblems: list[dict[str, t.Any]] = []
         self.error_code = error_code

@@ -51,7 +51,7 @@ except ImportError:
 
 class EntrustCertificateBackend(CertificateBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
-        super(EntrustCertificateBackend, self).__init__(module=module)
+        super().__init__(module=module)
         self.trackingId = None
         self.notAfter = get_relative_time_option(
             module.params["entrust_not_after"],
@@ -165,7 +165,7 @@ class EntrustCertificateBackend(CertificateBackend):
         not_before: datetime.datetime | None = None,
         not_after: datetime.datetime | None = None,
     ) -> bool:
-        parent_check = super(EntrustCertificateBackend, self).needs_regeneration()
+        parent_check = super().needs_regeneration()
 
         try:
             cert_details = self._get_cert_details()

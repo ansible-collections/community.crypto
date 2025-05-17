@@ -536,7 +536,7 @@ class Handler:
 class CryptHandler(Handler):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(CryptHandler, self).__init__(module)
+        super().__init__(module)
         self._cryptsetup_bin = self._module.get_bin_path("cryptsetup", True)
 
     def get_container_name_by_device(self, device: str) -> str | None:
@@ -869,7 +869,7 @@ class CryptHandler(Handler):
 class ConditionsHandler(Handler):
 
     def __init__(self, module: AnsibleModule, crypthandler: CryptHandler) -> None:
-        super(ConditionsHandler, self).__init__(module)
+        super().__init__(module)
         self._crypthandler = crypthandler
         self.device = self.get_device_name()
 

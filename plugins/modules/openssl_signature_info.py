@@ -123,7 +123,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.support i
 class SignatureInfoBase(OpenSSLObject):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(SignatureInfoBase, self).__init__(
+        super().__init__(
             path=module.params["path"],
             state="present",
             force=False,
@@ -152,7 +152,7 @@ class SignatureInfoBase(OpenSSLObject):
 class SignatureInfoCryptography(SignatureInfoBase):
 
     def __init__(self, module: AnsibleModule) -> None:
-        super(SignatureInfoCryptography, self).__init__(module)
+        super().__init__(module)
 
     def run(self) -> dict[str, t.Any]:
         _padding = cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15()
