@@ -134,7 +134,7 @@ def _is_cryptography_key_consistent(
         # key._backend was removed in cryptography 42.0.0
         backend = getattr(key, "_backend", None)
         if backend is not None:
-            return bool(backend._lib.RSA_check_key(key._rsa_cdata))  # type: ignore
+            return bool(backend._lib.RSA_check_key(key._rsa_cdata))  # type: ignore  # pylint: disable=protected-access
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey):
         result = _check_dsa_consistency(
             key_public_data=key_public_data, key_private_data=key_private_data

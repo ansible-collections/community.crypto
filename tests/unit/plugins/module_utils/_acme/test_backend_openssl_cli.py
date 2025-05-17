@@ -84,7 +84,7 @@ def test_csridentifiers_openssl(
 def test_normalize_ip(ip: str, result: str) -> None:
     module = MagicMock()
     backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
-    assert backend._normalize_ip(ip) == result
+    assert backend._normalize_ip(ip) == result  # pylint: disable=protected-access
 
 
 @pytest.mark.parametrize("timezone, now, expected_days", TEST_CERT_DAYS)

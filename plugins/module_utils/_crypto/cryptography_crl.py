@@ -145,7 +145,9 @@ def cryptography_get_signature_algorithm_oid_from_crl(
     except AttributeError:
         # Older cryptography versions do not have signature_algorithm_oid yet
         dotted = obj2txt(
-            crl._backend._lib, crl._backend._ffi, crl._x509_crl.sig_alg.algorithm  # type: ignore
+            crl._backend._lib,  # type: ignore[attr-defined]  # pylint: disable=protected-access
+            crl._backend._ffi,  # type: ignore[attr-defined]  # pylint: disable=protected-access
+            crl._x509_crl.sig_alg.algorithm,  # type: ignore[attr-defined]  # pylint: disable=protected-access
         )
         return x509.oid.ObjectIdentifier(dotted)
 

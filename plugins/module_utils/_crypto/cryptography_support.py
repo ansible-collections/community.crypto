@@ -162,6 +162,9 @@ def cryptography_get_extensions_from_cert(
 
         backend = default_backend()
 
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
+
         x509_obj = cert._x509  # type: ignore
         # With cryptography 35.0.0, we can no longer use obj2txt. Unfortunately it still does
         # not allow to get the raw value of an extension, so we have to use this ugly hack:
@@ -211,6 +214,9 @@ def cryptography_get_extensions_from_csr(
         from cryptography.hazmat.backends import default_backend
 
         backend = default_backend()
+
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
 
         extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)  # type: ignore
         extensions = backend._ffi.gc(
@@ -269,8 +275,11 @@ def cryptography_oid_to_name(
     if names:
         name = names[0]
     else:
-        name = oid._name
-        if name == "Unknown OID":
+        try:
+            name = oid._name  # pylint: disable=protected-access
+            if name == "Unknown OID":
+                name = dotted_string
+        except AttributeError:
             name = dotted_string
     if short:
         return NORMALIZE_NAMES_SHORT.get(name, name)
@@ -900,6 +909,9 @@ def _parse_pkcs12_35_0_0(
 
         backend = default_backend()
 
+        # We access a *lot* of internal APIs here, so let's disable that message...
+        # pylint: disable=protected-access
+
         # This code basically does what load_key_and_certificates() does, but without error-checking.
         # Since load_key_and_certificates succeeded, it should not fail.
         pkcs12 = backend._ffi.gc(
@@ -942,6 +954,9 @@ def _parse_pkcs12_legacy(
     private_key, certificate, additional_certificates = _load_key_and_certificates(
         pkcs12_bytes, passphrase
     )
+
+    # We access a *lot* of internal APIs here, so let's disable that message...
+    # pylint: disable=protected-access
 
     friendly_name = None
     if certificate:

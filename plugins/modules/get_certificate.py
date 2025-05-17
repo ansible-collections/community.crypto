@@ -466,9 +466,16 @@ def main() -> t.NoReturn:
                 def _convert_chain(chain):
                     if not chain:
                         return []
-                    return [c.public_bytes(ssl._ssl.ENCODING_DER) for c in chain]
+                    return [
+                        c.public_bytes(
+                            ssl._ssl.ENCODING_DER  # pylint: disable=protected-access
+                        )
+                        for c in chain
+                    ]
 
-                ssl_obj = tls_sock._sslobj  # This is of type ssl._ssl._SSLSocket
+                ssl_obj = (
+                    tls_sock._sslobj  # pylint: disable=protected-access
+                )  # This is of type ssl._ssl._SSLSocket
                 verified_der_chain = _convert_chain(ssl_obj.get_verified_chain())
                 unverified_der_chain = _convert_chain(ssl_obj.get_unverified_chain())
             else:
@@ -483,7 +490,9 @@ def main() -> t.NoReturn:
                         (
                             c
                             if isinstance(c, bytes)
-                            else c.public_bytes(ssl._ssl.ENCODING_DER)
+                            else c.public_bytes(
+                                ssl._ssl.ENCODING_DER  # pylint: disable=protected-access
+                            )
                         )
                         for c in chain
                     ]

@@ -341,12 +341,12 @@ def main() -> t.NoReturn:
                     error_msg="Failed to rollover account key",
                     expected_status_codes=[200],
                 )
-                if module._diff:
+                if module._diff:  # pylint: disable=protected-access
                     client.account_key_data = new_key_data
                     if client.account_jws_header:
                         client.account_jws_header["alg"] = new_key_data["alg"]
                     diff_after = account.get_account_data() or {}
-            elif module._diff:
+            elif module._diff:  # pylint: disable=protected-access
                 # Kind of fake diff_after
                 diff_after = dict(diff_before)
             diff_after["public_account_key"] = new_key_data["jwk"]
@@ -355,7 +355,7 @@ def main() -> t.NoReturn:
             "changed": changed,
             "account_uri": client.account_uri,
         }
-        if module._diff:
+        if module._diff:  # pylint: disable=protected-access
             result["diff"] = {
                 "before": diff_before,
                 "after": diff_after,

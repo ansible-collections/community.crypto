@@ -124,7 +124,7 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
         result["changed"] = self.changed
 
-        if self.module._diff:
+        if self.module._diff:  # pylint: disable=protected-access
             result["diff"] = self.diff
 
         return result
