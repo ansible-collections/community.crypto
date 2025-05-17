@@ -40,9 +40,8 @@ try:
 
     _HAS_CRYPTOGRAPHY = True
 except ImportError:
-    _HAS_CRYPTOGRAPHY = False
     # Error handled in the calling module.
-    pass
+    _HAS_CRYPTOGRAPHY = False
 
 try:
     import cryptography.hazmat.primitives.asymmetric.dh

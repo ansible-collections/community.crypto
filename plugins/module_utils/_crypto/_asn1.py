@@ -13,23 +13,21 @@ import re
 from ansible.module_utils.common.text.converters import to_bytes
 
 
-"""
-An ASN.1 serialized as a string in the OpenSSL format:
-    [modifier,]type[:value]
-
-modifier:
-    The modifier can be 'IMPLICIT:<tag_number><tag_class>,' or 'EXPLICIT:<tag_number><tag_class>' where IMPLICIT
-    changes the tag of the universal value to encode and EXPLICIT prefixes its tag to the existing universal value.
-    The tag_number must be set while the tag_class can be 'U', 'A', 'P', or 'C" for 'Universal', 'Application',
-    'Private', or 'Context Specific' with C being the default.
-
-type:
-    The underlying ASN.1 type of the value specified. Currently only the following have been implemented:
-        UTF8: The value must be a UTF-8 encoded string.
-
-value:
-    The value to encode, the format of this value depends on the <type> specified.
-"""
+# An ASN.1 serialized as a string in the OpenSSL format:
+#     [modifier,]type[:value]
+#
+# modifier:
+#     The modifier can be 'IMPLICIT:<tag_number><tag_class>,' or 'EXPLICIT:<tag_number><tag_class>' where IMPLICIT
+#     changes the tag of the universal value to encode and EXPLICIT prefixes its tag to the existing universal value.
+#     The tag_number must be set while the tag_class can be 'U', 'A', 'P', or 'C" for 'Universal', 'Application',
+#     'Private', or 'Context Specific' with C being the default.
+#
+# type:
+#     The underlying ASN.1 type of the value specified. Currently only the following have been implemented:
+#         UTF8: The value must be a UTF-8 encoded string.
+#
+# value:
+#     The value to encode, the format of this value depends on the <type> specified.
 ASN1_STRING_REGEX = re.compile(
     r"^((?P<tag_type>IMPLICIT|EXPLICIT):(?P<tag_number>\d+)(?P<tag_class>U|A|P|C)?,)?"
     r"(?P<value_type>[\w\d]+):(?P<value>.*)"

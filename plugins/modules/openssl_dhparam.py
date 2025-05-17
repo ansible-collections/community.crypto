@@ -188,7 +188,6 @@ class DHParameterBase:
     @abc.abstractmethod
     def _do_generate(self, module: AnsibleModule) -> None:
         """Actually generate the DH params."""
-        pass
 
     def generate(self, module: AnsibleModule) -> None:
         """Generate DH params."""

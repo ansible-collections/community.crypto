@@ -132,7 +132,6 @@ class PrivateKeyBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def generate_private_key(self) -> None:
         """(Re-)Generate private key."""
-        pass
 
     def convert_private_key(self) -> None:
         """Convert existing private key (self.existing_private_key) to new private key (self.private_key).

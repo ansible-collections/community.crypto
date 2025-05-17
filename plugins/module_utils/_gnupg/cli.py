@@ -31,7 +31,6 @@ class GPGRunner(metaclass=abc.ABCMeta):
 
         Raises a ``GPGError`` in case of errors.
         """
-        pass
 
 
 def get_fingerprint_from_stdout(*, stdout: str) -> str:

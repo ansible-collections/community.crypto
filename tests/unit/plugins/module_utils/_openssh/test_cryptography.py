@@ -205,7 +205,6 @@ def test_invalid_user_key_params(
         result = True
     except Exception as e:
         print(e)
-        pass
 
     assert result
 
@@ -225,7 +224,6 @@ def test_invalid_key_sizes(
         result = True
     except Exception as e:
         print(e)
-        pass
 
     assert result
 
@@ -239,7 +237,6 @@ def test_valid_comment_update() -> None:
         pair.comment = new_comment
     except Exception as e:
         print(e)
-        pass
 
     assert (
         pair.comment == new_comment
