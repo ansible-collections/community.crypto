@@ -379,7 +379,6 @@ disable=raw-checker-failed,
         # To clean up:
         broad-exception-caught,
         broad-exception-raised,
-        consider-using-in,
         consider-using-set-comprehension,
         consider-using-with,
         fixme,

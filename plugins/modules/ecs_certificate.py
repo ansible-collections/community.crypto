@@ -786,11 +786,7 @@ class EcsCertificate:
         self.set_cert_details(module)
         assert self.cert_details is not None
 
-        if (
-            self.cert_status == "EXPIRED"
-            or self.cert_status == "SUSPENDED"
-            or self.cert_status == "REVOKED"
-        ):
+        if self.cert_status in ("EXPIRED", "SUSPENDED", "REVOKED"):
             return False
         if self.cert_days < module.params["remaining_days"]:
             return False

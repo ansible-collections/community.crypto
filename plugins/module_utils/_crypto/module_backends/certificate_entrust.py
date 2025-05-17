@@ -179,7 +179,7 @@ class EntrustCertificateBackend(CertificateBackend):
 
         # Always issue a new certificate if the certificate is expired, suspended or revoked
         status = cert_details.get("status", False)
-        if status == "EXPIRED" or status == "SUSPENDED" or status == "REVOKED":
+        if status in ("EXPIRED", "SUSPENDED", "REVOKED"):
             return True
 
         # If the requested cert type was specified and it is for a different certificate type than the initial certificate, a new one is needed

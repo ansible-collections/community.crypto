@@ -380,9 +380,9 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
 
     @cert_type.setter
     def cert_type(self, cert_type: t.Literal["user", "host"] | int) -> None:
-        if cert_type == "user" or cert_type == _USER_TYPE:
+        if cert_type in ("user", _USER_TYPE):
             self._cert_type = _USER_TYPE
-        elif cert_type == "host" or cert_type == _HOST_TYPE:
+        elif cert_type in ("host", _HOST_TYPE):
             self._cert_type = _HOST_TYPE
         else:
             raise ValueError(f"{cert_type} is not a valid certificate type")

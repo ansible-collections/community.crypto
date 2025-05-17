@@ -322,18 +322,15 @@ class EcsDomain:
                 clientId=module.params["client_id"], domain=module.params["domain_name"]
             )
             self.set_domain_details(domain_details)
-            if (
-                self.domain_status != "APPROVED"
-                and self.domain_status != "INITIAL_VERIFICATION"
-                and self.domain_status != "RE_VERIFICATION"
+            if self.domain_status not in (
+                "APPROVED",
+                "INITIAL_VERIFICATION",
+                "RE_VERIFICATION",
             ):
                 return False
 
             # If domain verification is in process, we want to return the random values and treat it as a valid.
-            if (
-                self.domain_status == "INITIAL_VERIFICATION"
-                or self.domain_status == "RE_VERIFICATION"
-            ):
+            if self.domain_status in ("INITIAL_VERIFICATION", "RE_VERIFICATION"):
                 # Unless the verification method has changed, in which case we need to do a reverify request.
                 if self.verification_method != module.params["verification_method"]:
                     return False
