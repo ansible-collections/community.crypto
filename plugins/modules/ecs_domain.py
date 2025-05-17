@@ -276,7 +276,7 @@ class EcsDomain:
         except SessionConfigurationException as e:
             module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
-            self.ecs_client.GetAppVersion()
+            self.ecs_client.GetAppVersion()  # pylint: disable=no-member
         except RestOperationException as e:
             module.fail_json(
                 msg=f"Please verify credential information. Received exception when testing ECS connection: {e.message}"
@@ -310,7 +310,7 @@ class EcsDomain:
 
     def check(self, module):
         try:
-            domain_details = self.ecs_client.GetDomain(
+            domain_details = self.ecs_client.GetDomain(  # pylint: disable=no-member
                 clientId=module.params["client_id"], domain=module.params["domain_name"]
             )
             self.set_domain_details(domain_details)
@@ -355,18 +355,18 @@ class EcsDomain:
                 body["domainName"] = module.params["domain_name"]
             try:
                 if not self.domain_status:
-                    self.ecs_client.AddDomain(
+                    self.ecs_client.AddDomain(  # pylint: disable=no-member
                         clientId=module.params["client_id"], Body=body
                     )
                 else:
-                    self.ecs_client.ReverifyDomain(
+                    self.ecs_client.ReverifyDomain(  # pylint: disable=no-member
                         clientId=module.params["client_id"],
                         domain=module.params["domain_name"],
                         Body=body,
                     )
 
                 time.sleep(5)
-                result = self.ecs_client.GetDomain(
+                result = self.ecs_client.GetDomain(  # pylint: disable=no-member
                     clientId=module.params["client_id"],
                     domain=module.params["domain_name"],
                 )
@@ -393,7 +393,7 @@ class EcsDomain:
                             ):
                                 break
                     time.sleep(10)
-                    result = self.ecs_client.GetDomain(
+                    result = self.ecs_client.GetDomain(  # pylint: disable=no-member
                         clientId=module.params["client_id"],
                         domain=module.params["domain_name"],
                     )

@@ -91,7 +91,6 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format."""
-        pass
 
     def set_existing_destination(self, *, privatekey_bytes: bytes | None) -> None:
         """Set existing private key bytes. None indicates that the key does not exist."""

@@ -40,9 +40,8 @@ try:
 
     _HAS_CRYPTOGRAPHY = True
 except ImportError:
-    _HAS_CRYPTOGRAPHY = False
     # Error handled in the calling module.
-    pass
+    _HAS_CRYPTOGRAPHY = False
 
 try:
     import cryptography.hazmat.primitives.asymmetric.dh
@@ -906,12 +905,13 @@ def _parse_pkcs12_35_0_0(
         # Since load_key_and_certificates succeeded, it should not fail.
         pkcs12 = backend._ffi.gc(
             backend._lib.d2i_PKCS12_bio(
-                backend._bytes_to_bio(pkcs12_bytes).bio, backend._ffi.NULL
+                backend._bytes_to_bio(pkcs12_bytes).bio,  # pylint: disable=no-member
+                backend._ffi.NULL,
             ),
             backend._lib.PKCS12_free,
         )
         certificate_x509_ptr = backend._ffi.new("X509 **")
-        with backend._zeroed_null_terminated_buf(
+        with backend._zeroed_null_terminated_buf(  # pylint: disable=no-member
             to_bytes(passphrase) if passphrase is not None else None
         ) as passphrase_buffer:
             backend._lib.PKCS12_parse(

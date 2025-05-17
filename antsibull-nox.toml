@@ -9,18 +9,19 @@
 
 [sessions.lint]
 run_isort = true
-isort_config = "tests/nox-config-isort.cfg"
+isort_config = ".isort.cfg"
 run_black = true
 run_flake8 = true
-flake8_config = "tests/nox-config-flake8.ini"
-run_pylint = false
+flake8_config = ".flake8"
+run_pylint = true
+pylint_rcfile = ".pylintrc"
 run_yamllint = true
 yamllint_config = ".yamllint"
 yamllint_config_plugins = ".yamllint-docs"
 yamllint_config_plugins_examples = ".yamllint-examples"
 run_mypy = true
 mypy_ansible_core_package = "ansible-core>=2.19.0b3"
-mypy_config = "tests/nox-config-mypy.ini"
+mypy_config = ".mypy.ini"
 mypy_extra_deps = [
     "cryptography",
     "types-mock",

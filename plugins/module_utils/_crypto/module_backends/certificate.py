@@ -114,12 +114,10 @@ class CertificateBackend(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
-        pass
 
     @abc.abstractmethod
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
-        pass
 
     def set_existing(self, certificate_bytes: bytes | None) -> None:
         """Set existing certificate bytes. None indicates that the key does not exist."""

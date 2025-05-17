@@ -221,6 +221,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_dsa = True
         try:
             # added later in 1.5
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey.sign
             has_dsa_sign = True
         except AttributeError:
@@ -238,6 +239,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_rsa = True
         try:
             # added later in 1.4
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey.sign
             has_rsa_sign = True
         except AttributeError:
@@ -263,6 +265,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ed25519 = True
         try:
             # added with the primitive in 2.6
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.sign
             has_ed25519_sign = True
         except AttributeError:
@@ -286,6 +289,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ed448 = True
         try:
             # added with the primitive in 2.6
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.sign
             has_ed448_sign = True
         except AttributeError:
@@ -302,6 +306,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
 
         try:
             # added later in 2.5
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.private_bytes
             full = True
         except AttributeError:
@@ -351,6 +356,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ec = True
         try:
             # added later in 1.5
+            # pylint: disable-next=pointless-statement
             cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey.sign
             has_ec_sign = True
         except AttributeError:
