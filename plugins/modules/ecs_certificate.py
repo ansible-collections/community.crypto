@@ -739,7 +739,7 @@ class EcsCertificate:
                 self.tracking_id = cert_results[0].get("trackingId")
         except RestOperationException:
             # If we fail to find a cert by serial number, that's fine, we just do not set self.tracking_id
-            return
+            pass
 
     def set_cert_details(self, module):
         try:

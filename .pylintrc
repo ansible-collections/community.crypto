@@ -374,6 +374,7 @@ disable=raw-checker-failed,
         too-many-return-statements,
         too-many-statements,
         ungrouped-imports,
+        useless-parent-delegation,
         wrong-import-order,
         wrong-import-position,
         # To clean up:
@@ -406,8 +407,6 @@ disable=raw-checker-failed,
         unused-argument,
         unused-variable,
         use-dict-literal,
-        useless-parent-delegation,
-        useless-return,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
