@@ -40,12 +40,12 @@ def format_error_problem(
     subproblems = problem.get("subproblems")
     if subproblems is not None:
         msg = f"{msg} Subproblems:"
-        for index, problem in enumerate(subproblems):
+        for index, subproblem in enumerate(subproblems):
             index_str = f"{subproblem_prefix}{index}"
-            problem_str = format_error_problem(
-                problem, subproblem_prefix=f"{index_str}."
+            subproblem_str = format_error_problem(
+                subproblem, subproblem_prefix=f"{index_str}."
             )
-            msg = f"{msg}\n({index_str}) {problem_str}"
+            msg = f"{msg}\n({index_str}) {subproblem_str}"
     return msg
 
 
