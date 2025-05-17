@@ -161,6 +161,7 @@ CRYPTOGRAPHY_VERSION: str | None
 CRYPTOGRAPHY_IMP_ERR: str | None
 try:
     import cryptography
+    import cryptography.hazmat.primitives.asymmetric
     from cryptography.exceptions import UnsupportedAlgorithm
 
     try:
@@ -216,13 +217,12 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_dsa_sign = False
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/dsa/
-        import cryptography.hazmat.primitives.asymmetric.dsa
+        from cryptography.hazmat.primitives.asymmetric import dsa
 
         has_dsa = True
         try:
             # added later in 1.5
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey.sign
+            dsa.DSAPrivateKey.sign  # pylint: disable=pointless-statement
             has_dsa_sign = True
         except AttributeError:
             pass
@@ -234,13 +234,12 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_rsa_sign = False
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
-        import cryptography.hazmat.primitives.asymmetric.rsa
+        from cryptography.hazmat.primitives.asymmetric import rsa
 
         has_rsa = True
         try:
             # added later in 1.4
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey.sign
+            rsa.RSAPrivateKey.sign  # pylint: disable=pointless-statement
             has_rsa_sign = True
         except AttributeError:
             pass
@@ -252,21 +251,17 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_ed25519_sign = False
     try:
         # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/
-        import cryptography.hazmat.primitives.asymmetric.ed25519
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-            Ed25519PrivateKey,
-        )
+        from cryptography.hazmat.primitives.asymmetric import ed25519
 
         try:
-            Ed25519PrivateKey.from_private_bytes(b"")
+            ed25519.Ed25519PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
 
         has_ed25519 = True
         try:
             # added with the primitive in 2.6
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.sign
+            ed25519.Ed25519PrivateKey.sign  # pylint: disable=pointless-statement
             has_ed25519_sign = True
         except AttributeError:
             pass
@@ -278,19 +273,17 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_ed448_sign = False
     try:
         # added in 2.6 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed448/
-        import cryptography.hazmat.primitives.asymmetric.ed448
-        from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
+        from cryptography.hazmat.primitives.asymmetric import ed448
 
         try:
-            Ed448PrivateKey.from_private_bytes(b"")
+            ed448.Ed448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
 
         has_ed448 = True
         try:
             # added with the primitive in 2.6
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.sign
+            ed448.Ed448PrivateKey.sign  # pylint: disable=pointless-statement
             has_ed448_sign = True
         except AttributeError:
             pass
@@ -302,24 +295,21 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_x25519_full = False
     try:
         # added in 2.0 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/
-        import cryptography.hazmat.primitives.asymmetric.x25519
+        from cryptography.hazmat.primitives.asymmetric import x25519
 
         try:
             # added later in 2.5
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.private_bytes
+            x25519.X25519PrivateKey.private_bytes  # pylint: disable=pointless-statement
             full = True
         except AttributeError:
             full = False
 
         try:
             if full:
-                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
-                    b""
-                )
+                x25519.X25519PrivateKey.from_private_bytes(b"")
             else:
                 # Some versions do not support serialization and deserialization - use generate() instead
-                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.generate()
+                x25519.X25519PrivateKey.generate()
         except ValueError:
             pass
 
@@ -332,12 +322,10 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     has_x448 = False
     try:
         # added in 2.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x448/
-        import cryptography.hazmat.primitives.asymmetric.x448
+        from cryptography.hazmat.primitives.asymmetric import x448
 
         try:
-            from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
-
-            X448PrivateKey.from_private_bytes(b"")
+            x448.X448PrivateKey.from_private_bytes(b"")
         except ValueError:
             pass
 
@@ -351,13 +339,12 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
     curves = []
     try:
         # added in 0.5 - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ec/
-        import cryptography.hazmat.primitives.asymmetric.ec
+        from cryptography.hazmat.primitives.asymmetric import ec
 
         has_ec = True
         try:
             # added later in 1.5
-            # pylint: disable-next=pointless-statement
-            cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey.sign
+            ec.EllipticCurvePrivateKey.sign  # pylint: disable=pointless-statement
             has_ec_sign = True
         except AttributeError:
             pass
@@ -365,14 +352,10 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         pass
     else:
         for curve_name, constructor_name in CURVES:
-            ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(
-                constructor_name
-            )
+            ecclass = ec.__dict__.get(constructor_name)
             if ecclass:
                 try:
-                    cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
-                        curve=ecclass()
-                    )
+                    ec.generate_private_key(curve=ecclass())
                     curves.append(curve_name)
                 except UnsupportedAlgorithm:
                     pass
