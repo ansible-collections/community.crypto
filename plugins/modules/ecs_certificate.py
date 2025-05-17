@@ -658,7 +658,7 @@ class EcsCertificate:
         except SessionConfigurationException as e:
             module.fail_json(msg=f"Failed to initialize Entrust Provider: {e}")
         try:
-            self.ecs_client.GetAppVersion()
+            self.ecs_client.GetAppVersion()  # pylint: disable=no-member
         except RestOperationException as e:
             module.fail_json(
                 msg=f"Please verify credential information. Received exception when testing ECS connection: {e.message}"
@@ -732,7 +732,7 @@ class EcsCertificate:
             # Use serial_number to identify if certificate is an Entrust Certificate
             # with an associated tracking ID
             serial_number = f"{self.cert.serial_number:X}"
-            cert_results = self.ecs_client.GetCertificates(
+            cert_results = self.ecs_client.GetCertificates(  # pylint: disable=no-member
                 serialNumber=serial_number
             ).get("certificates", {})
             if len(cert_results) == 1:
@@ -743,8 +743,10 @@ class EcsCertificate:
 
     def set_cert_details(self, module):
         try:
-            self.cert_details = self.ecs_client.GetCertificate(
-                trackingId=self.tracking_id
+            self.cert_details = (
+                self.ecs_client.GetCertificate(  # pylint: disable=no-member
+                    trackingId=self.tracking_id
+                )
             )
             self.cert_status = self.cert_details.get("status")
             self.serial_number = self.cert_details.get("serialNumber")
@@ -828,15 +830,23 @@ class EcsCertificate:
                 try:
                     if self.request_type == "validate_only":
                         body["validateOnly"] = "true"
-                        result = self.ecs_client.NewCertRequest(Body=body)
+                        result = (
+                            self.ecs_client.NewCertRequest(  # pylint: disable=no-member
+                                Body=body
+                            )
+                        )
                     if self.request_type == "new":
-                        result = self.ecs_client.NewCertRequest(Body=body)
+                        result = (
+                            self.ecs_client.NewCertRequest(  # pylint: disable=no-member
+                                Body=body
+                            )
+                        )
                     elif self.request_type == "renew":
-                        result = self.ecs_client.RenewCertRequest(
+                        result = self.ecs_client.RenewCertRequest(  # pylint: disable=no-member
                             trackingId=self.tracking_id, Body=body
                         )
                     elif self.request_type == "reissue":
-                        result = self.ecs_client.ReissueCertRequest(
+                        result = self.ecs_client.ReissueCertRequest(  # pylint: disable=no-member
                             trackingId=self.tracking_id, Body=body
                         )
                     self.tracking_id = result.get("trackingId")

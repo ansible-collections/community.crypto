@@ -140,7 +140,9 @@ class EntrustCertificateBackend(CertificateBackend):
         }
 
         try:
-            result = self.ecs_client.NewCertRequest(Body=body)
+            result = self.ecs_client.NewCertRequest(  # pylint: disable=no-member
+                Body=body
+            )
             self.trackingId = result.get("trackingId")
         except RestOperationException as e:
             self.module.fail_json(
@@ -204,9 +206,11 @@ class EntrustCertificateBackend(CertificateBackend):
             # If a trackingId is not already defined (from the result of a generate)
             # use the serial number to identify the tracking Id
             if self.trackingId is None and serial_number is not None:
-                cert_results = self.ecs_client.GetCertificates(
-                    serialNumber=serial_number
-                ).get("certificates", {})
+                cert_results = (
+                    self.ecs_client.GetCertificates(  # pylint: disable=no-member
+                        serialNumber=serial_number
+                    ).get("certificates", {})
+                )
 
                 # Finding 0 or more than 1 result is a very unlikely use case, it simply means we cannot perform additional checks
                 # on the 'state' as returned by Entrust Certificate Services (ECS). The general certificate validity is
@@ -216,7 +220,9 @@ class EntrustCertificateBackend(CertificateBackend):
 
         if self.trackingId is not None:
             cert_details.update(
-                self.ecs_client.GetCertificate(trackingId=self.trackingId)
+                self.ecs_client.GetCertificate(  # pylint: disable=no-member
+                    trackingId=self.trackingId
+                )
             )
 
         return cert_details
