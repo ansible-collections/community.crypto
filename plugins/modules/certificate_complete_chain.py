@@ -382,7 +382,7 @@ def main() -> t.NoReturn:
     # Try to complete chain
     current: Certificate | None = chain[-1]
     completed = []
-    occured_certificates = set([cert.cert for cert in chain])
+    occured_certificates = {cert.cert for cert in chain}
     if current and current.cert in roots.certificate_by_cert:
         # Do not try to complete the chain when it is already ending with a root certificate
         current = None

@@ -850,9 +850,9 @@ class CRL(OpenSSLObject):
             crl = set_next_update(crl, value=self.next_update)
 
         if self.update and self.crl:
-            new_entries = set(
-                [self._compress_entry(entry) for entry in self.revoked_certificates]
-            )
+            new_entries = {
+                self._compress_entry(entry) for entry in self.revoked_certificates
+            }
             for entry in self.crl:
                 decoded_entry = self._compress_entry(
                     cryptography_decode_revoked_certificate(entry)
