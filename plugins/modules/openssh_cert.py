@@ -542,7 +542,7 @@ class Certificate(OpensshModule):
             serial_number=self.serial_number,
             signature_algorithm=self.signature_algorithm,
             signing_key_path=self.signing_key,
-            type=self.type,
+            cert_type=self.type,
             time_parameters=self.time_parameters,
             use_agent=self.use_agent,
             environ_update=dict(TZ="UTC"),

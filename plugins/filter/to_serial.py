@@ -45,17 +45,17 @@ from ansible.errors import AnsibleFilterError
 from ansible_collections.community.crypto.plugins.module_utils._serial import to_serial
 
 
-def to_serial_filter(input: int) -> str:
-    if not isinstance(input, int):
+def to_serial_filter(serial_int: int) -> str:
+    if not isinstance(serial_int, int):
         raise AnsibleFilterError(
-            f"The input for the community.crypto.to_serial filter must be an integer; got {type(input)} instead"
+            f"The input for the community.crypto.to_serial filter must be an integer; got {type(serial_int)} instead"
         )
-    if input < 0:
+    if serial_int < 0:
         raise AnsibleFilterError(
             "The input for the community.crypto.to_serial filter must not be negative"
         )
     try:
-        return to_serial(input)
+        return to_serial(serial_int)
     except ValueError as exc:
         raise AnsibleFilterError(str(exc))
 

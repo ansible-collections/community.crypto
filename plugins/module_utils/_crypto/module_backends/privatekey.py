@@ -472,8 +472,8 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
             raise AssertionError("existing_private_key_bytes not set")
         try:
             # Interpret bytes depending on format.
-            format = identify_private_key_format(data)
-            if format == "raw":
+            key_format = identify_private_key_format(data)
+            if key_format == "raw":
                 if len(data) == 56:
                     return cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                         data
@@ -518,8 +518,8 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         if self.existing_private_key_bytes is None:
             raise AssertionError("existing_private_key_bytes not set")
         try:
-            format = identify_private_key_format(self.existing_private_key_bytes)
-            if format == "raw":
+            key_format = identify_private_key_format(self.existing_private_key_bytes)
+            if key_format == "raw":
                 # Raw keys cannot be encrypted. To avoid incompatibilities, we try to
                 # actually load the key (and return False when this fails).
                 self._load_privatekey()
@@ -591,8 +591,8 @@ class PrivateKeyCryptographyBackend(PrivateKeyBackend):
         if self.format == "auto_ignore":
             return True
         try:
-            format = identify_private_key_format(self.existing_private_key_bytes)
-            return format == self._get_wanted_format()
+            key_format = identify_private_key_format(self.existing_private_key_bytes)
+            return key_format == self._get_wanted_format()
         except Exception:
             return False
 

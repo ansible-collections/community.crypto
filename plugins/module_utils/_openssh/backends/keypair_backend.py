@@ -371,7 +371,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
         self.ssh_keygen.generate_keypair(
             private_key_path=private_key_path,
             size=self.size,
-            type=self.type,
+            key_type=self.type,
             comment=self.comment,
             check_rc=True,
         )
@@ -489,7 +489,7 @@ class KeypairBackendCryptography(KeypairBackend):
             size=keypair.size,
             key_type=keypair.key_type,
             fingerprint=keypair.fingerprint,
-            format=parse_private_key_format(path=self.private_key_path),
+            key_format=parse_private_key_format(path=self.private_key_path),
         )
 
     def _get_public_key(self) -> PublicKey | t.Literal[""]:

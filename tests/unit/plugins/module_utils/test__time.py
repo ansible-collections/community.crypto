@@ -283,25 +283,29 @@ TEST_GET_RELATIVE_TIME_OPTION: list[
 )
 
 
-@pytest.mark.parametrize("timezone, input, expected", TEST_REMOVE_TIMEZONE)
+@pytest.mark.parametrize("timezone, input_timestamp, expected", TEST_REMOVE_TIMEZONE)
 def test_remove_timezone(
-    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+    timezone: datetime.timedelta,
+    input_timestamp: datetime.datetime,
+    expected: datetime.datetime,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        output_1 = remove_timezone(input)
+        output_1 = remove_timezone(input_timestamp)
         assert expected == output_1
-        output_2 = add_or_remove_timezone(input, with_timezone=False)
+        output_2 = add_or_remove_timezone(input_timestamp, with_timezone=False)
         assert expected == output_2
 
 
-@pytest.mark.parametrize("timezone, input, expected", TEST_UTC_TIMEZONE)
+@pytest.mark.parametrize("timezone, input_timestamp, expected", TEST_UTC_TIMEZONE)
 def test_utc_timezone(
-    timezone: datetime.timedelta, input: datetime.datetime, expected: datetime.datetime
+    timezone: datetime.timedelta,
+    input_timestamp: datetime.datetime,
+    expected: datetime.datetime,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        output_1 = ensure_utc_timezone(input)
+        output_1 = ensure_utc_timezone(input_timestamp)
         assert expected == output_1
-        output_2 = add_or_remove_timezone(input, with_timezone=True)
+        output_2 = add_or_remove_timezone(input_timestamp, with_timezone=True)
         assert expected == output_2
 
 

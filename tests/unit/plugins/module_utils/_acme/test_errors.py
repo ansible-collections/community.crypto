@@ -345,9 +345,11 @@ TEST_ACME_PROTOCOL_EXCEPTION: list[
 ]
 
 
-@pytest.mark.parametrize("input, from_json, msg, args", TEST_ACME_PROTOCOL_EXCEPTION)
+@pytest.mark.parametrize(
+    "parameters, from_json, msg, args", TEST_ACME_PROTOCOL_EXCEPTION
+)
 def test_acme_protocol_exception(
-    input: dict[str, t.Any],
+    parameters: dict[str, t.Any],
     from_json: t.Callable[[t.Any], t.NoReturn] | None,
     msg: str,
     args: dict[str, t.Any],
@@ -358,7 +360,7 @@ def test_acme_protocol_exception(
         module = MagicMock()
         module.from_json = from_json
     with pytest.raises(ACMEProtocolException) as exc:
-        raise ACMEProtocolException(module=module, **input)  # type: ignore
+        raise ACMEProtocolException(module=module, **parameters)  # type: ignore
 
     print(exc.value.msg)
     print(exc.value.module_fail_args)

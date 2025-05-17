@@ -121,7 +121,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
         assert self.dest_private_key_bytes is not None
 
         try:
-            format, self.dest_private_key = self._load_private_key(
+            key_format, self.dest_private_key = self._load_private_key(
                 data=self.dest_private_key_bytes,
                 passphrase=self.dest_passphrase,
                 current_hint=self.src_private_key,
@@ -129,7 +129,7 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
         except Exception:
             return True
 
-        return format != self.format or not cryptography_compare_private_keys(
+        return key_format != self.format or not cryptography_compare_private_keys(
             self.dest_private_key, self.src_private_key
         )
 
@@ -211,20 +211,20 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
     ) -> tuple[str, PrivateKeyTypes]:
         try:
             # Interpret bytes depending on format.
-            format = identify_private_key_format(data)
-            if format == "raw":
+            key_format = identify_private_key_format(data)
+            if key_format == "raw":
                 if passphrase is not None:
                     raise PrivateKeyError("Cannot load raw key with passphrase")
                 if len(data) == 56:
                     return (
-                        format,
+                        key_format,
                         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey.from_private_bytes(
                             data
                         ),
                     )
                 if len(data) == 57:
                     return (
-                        format,
+                        key_format,
                         cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey.from_private_bytes(
                             data
                         ),
@@ -236,14 +236,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                     ):
                         try:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
                                     data
                                 ),
                             )
                         except Exception:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
                                     data
                                 ),
@@ -251,14 +251,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                     else:
                         try:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey.from_private_bytes(
                                     data
                                 ),
                             )
                         except Exception:
                             return (
-                                format,
+                                key_format,
                                 cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey.from_private_bytes(
                                     data
                                 ),
@@ -266,7 +266,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 raise PrivateKeyError("Cannot load raw key")
             else:
                 return (
-                    format,
+                    key_format,
                     cryptography.hazmat.primitives.serialization.load_pem_private_key(
                         data,
                         None if passphrase is None else to_bytes(passphrase),

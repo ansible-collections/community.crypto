@@ -328,12 +328,12 @@ def format_cert(cert: Certificate) -> str:
 def check_cycle(
     module: AnsibleModule,
     occured_certificates: set[cryptography.x509.Certificate],
-    next: Certificate,
+    next_certificate: Certificate,
 ) -> None:
     """
-    Make sure that next is not in occured_certificates so far, and add it.
+    Make sure that next_certificate is not in occured_certificates so far, and add it.
     """
-    next_cert = next.cert
+    next_cert = next_certificate.cert
     if next_cert in occured_certificates:
         module.fail_json(msg="Found cycle while building certificate chain")
     occured_certificates.add(next_cert)

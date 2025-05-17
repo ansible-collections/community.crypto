@@ -219,7 +219,7 @@ class KeygenCommand:
         serial_number: int | None,
         signature_algorithm: str | None,
         signing_key_path: str,
-        type: t.Literal["host", "user"] | None,
+        cert_type: t.Literal["host", "user"] | None,
         time_parameters: OpensshCertificateTimeParameters,
         use_agent: bool,
         **kwargs,
@@ -235,7 +235,7 @@ class KeygenCommand:
             args.extend(["-n", ",".join(principals)])
         if serial_number is not None:
             args.extend(["-z", str(serial_number)])
-        if type == "host":
+        if cert_type == "host":
             args.extend(["-h"])
         if use_agent:
             args.extend(["-U"])
@@ -252,7 +252,7 @@ class KeygenCommand:
         *,
         private_key_path: str,
         size: int,
-        type: str,
+        key_type: str,
         comment: str | None,
         **kwargs,
     ) -> tuple[int, str, str]:
@@ -264,7 +264,7 @@ class KeygenCommand:
             "-b",
             str(size),
             "-t",
-            type,
+            key_type,
             "-f",
             private_key_path,
             "-C",
@@ -327,12 +327,12 @@ _PrivateKey = t.TypeVar("_PrivateKey", bound="PrivateKey")
 
 class PrivateKey:
     def __init__(
-        self, *, size: int, key_type: str, fingerprint: str, format: str = ""
+        self, *, size: int, key_type: str, fingerprint: str, key_format: str = ""
     ) -> None:
         self._size = size
         self._type = key_type
         self._fingerprint = fingerprint
-        self._format = format
+        self._format = key_format
 
     @property
     def size(self) -> int:

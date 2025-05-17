@@ -142,15 +142,15 @@ def test_now(timezone: datetime.timedelta) -> None:
         assert now == datetime.datetime(2024, 2, 3, 4, 5, 6, tzinfo=UTC)
 
 
-@pytest.mark.parametrize("timezone, input, expected", TEST_PARSE_ACME_TIMESTAMP)
+@pytest.mark.parametrize("timezone, timestamp_str, expected", TEST_PARSE_ACME_TIMESTAMP)
 def test_parse_acme_timestamp(
-    timezone: datetime.timedelta, input: str, expected: dict[str, int]
+    timezone: datetime.timedelta, timestamp_str: str, expected: dict[str, int]
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()
         backend = OpenSSLCLIBackend(module=module, openssl_binary="openssl")
         ts_expected = backend.get_utc_datetime(**expected)
-        timestamp = backend.parse_acme_timestamp(input)
+        timestamp = backend.parse_acme_timestamp(timestamp_str)
         assert ts_expected == timestamp
 
 

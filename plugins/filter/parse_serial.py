@@ -48,13 +48,13 @@ from ansible_collections.community.crypto.plugins.module_utils._serial import (
 )
 
 
-def parse_serial_filter(input: str | bytes) -> int:
-    if not isinstance(input, (str, bytes)):
+def parse_serial_filter(serial_str: str | bytes) -> int:
+    if not isinstance(serial_str, (str, bytes)):
         raise AnsibleFilterError(
-            f"The input for the community.crypto.parse_serial filter must be a string; got {type(input)} instead"
+            f"The input for the community.crypto.parse_serial filter must be a string; got {type(serial_str)} instead"
         )
     try:
-        return parse_serial(to_native(input))
+        return parse_serial(to_native(serial_str))
     except ValueError as exc:
         raise AnsibleFilterError(str(exc))
 

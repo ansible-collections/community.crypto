@@ -143,13 +143,13 @@ except ImportError:
 
 
 def parse_certificate(
-    input: bytes, strict: bool = False
+    certificate_content: bytes, strict: bool = False
 ) -> tuple[bytes, t.Literal["pem", "der"], str | None]:
     input_format: t.Literal["pem", "der"] = (
-        "pem" if identify_pem_format(input) else "der"
+        "pem" if identify_pem_format(certificate_content) else "der"
     )
     if input_format == "pem":
-        pems = split_pem_list(to_text(input))
+        pems = split_pem_list(to_text(certificate_content))
         if len(pems) > 1 and strict:
             raise ValueError(
                 f"The input contains {len(pems)} PEM objects, expecting only one since strict=true"
@@ -159,10 +159,10 @@ def parse_certificate(
             raise ValueError(
                 f"type is {pem_header_type!r}, expecting CERTIFICATE or X509 CERTIFICATE"
             )
-        input = base64.b64decode(content)
+        certificate_content = base64.b64decode(content)
     else:
         pem_header_type = None
-    return input, input_format, pem_header_type
+    return certificate_content, input_format, pem_header_type
 
 
 class X509CertificateConvertModule(OpenSSLObject):
