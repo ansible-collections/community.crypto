@@ -200,22 +200,17 @@ class OpensshCertificateTimeParameters:
 
     @staticmethod
     def to_datetime(time_string_or_timestamp: str | bytes | int) -> datetime:
-        try:
-            if isinstance(time_string_or_timestamp, (str, bytes)):
-                result = OpensshCertificateTimeParameters._time_string_to_datetime(
-                    to_text(time_string_or_timestamp.strip())
-                )
-            elif isinstance(time_string_or_timestamp, int):
-                result = OpensshCertificateTimeParameters._timestamp_to_datetime(
-                    time_string_or_timestamp
-                )
-            else:
-                raise ValueError(
-                    f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
-                )
-        except ValueError:
-            raise
-        return result
+        if isinstance(time_string_or_timestamp, (str, bytes)):
+            return OpensshCertificateTimeParameters._time_string_to_datetime(
+                to_text(time_string_or_timestamp.strip())
+            )
+        if isinstance(time_string_or_timestamp, int):
+            return OpensshCertificateTimeParameters._timestamp_to_datetime(
+                time_string_or_timestamp
+            )
+        raise ValueError(
+            f"Value must be of type (str, unicode, int) not {type(time_string_or_timestamp)}"
+        )
 
     @staticmethod
     def _timestamp_to_datetime(timestamp: int) -> datetime:

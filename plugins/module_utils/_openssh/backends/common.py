@@ -426,11 +426,8 @@ class PublicKey:
 
     @classmethod
     def load(cls: t.Type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                properties = f.read().strip(" \n").split(" ", 2)
-        except (IOError, OSError):
-            raise
+        with open(path, "r", encoding="utf-8") as f:
+            properties = f.read().strip(" \n").split(" ", 2)
 
         if len(properties) < 2:
             return None
