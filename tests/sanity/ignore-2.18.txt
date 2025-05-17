@@ -13,6 +13,8 @@ plugins/module_utils/_crypto/support.py pep8:E704
 plugins/module_utils/_openssh/backends/keypair_backend.py no-assert
 plugins/module_utils/_openssh/certificate.py pep8:E704
 plugins/modules/acme_certificate.py no-assert
+plugins/modules/ecs_certificate.py no-assert
+plugins/modules/ecs_domain.py pep8:E704
 plugins/modules/luks_device.py no-assert
 plugins/modules/openssl_pkcs12.py no-assert
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang

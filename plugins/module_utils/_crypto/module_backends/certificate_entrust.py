@@ -140,7 +140,7 @@ class EntrustCertificateBackend(CertificateBackend):
         }
 
         try:
-            result = self.ecs_client.NewCertRequest(  # pylint: disable=no-member
+            result = self.ecs_client.NewCertRequest(  # type: ignore[attr-defined]  # pylint: disable=no-member
                 Body=body
             )
             self.trackingId = result.get("trackingId")
@@ -206,10 +206,10 @@ class EntrustCertificateBackend(CertificateBackend):
             # If a trackingId is not already defined (from the result of a generate)
             # use the serial number to identify the tracking Id
             if self.trackingId is None and serial_number is not None:
-                cert_results = (
-                    self.ecs_client.GetCertificates(  # pylint: disable=no-member
-                        serialNumber=serial_number
-                    ).get("certificates", {})
+                cert_results = self.ecs_client.GetCertificates(  # type: ignore[attr-defined]  # pylint: disable=no-member
+                    serialNumber=serial_number
+                ).get(
+                    "certificates", {}
                 )
 
                 # Finding 0 or more than 1 result is a very unlikely use case, it simply means we cannot perform additional checks
