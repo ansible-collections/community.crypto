@@ -80,8 +80,7 @@ class PrivateKeyModule:
 
 
 class ActionModule(ActionModuleBase):
-    @staticmethod
-    def setup_module() -> tuple[ArgumentSpec, dict[str, t.Any]]:
+    def setup_module(self) -> tuple[ArgumentSpec, dict[str, t.Any]]:
         argument_spec = get_privatekey_argument_spec()
         argument_spec.argument_spec.update(
             dict(
@@ -94,8 +93,7 @@ class ActionModule(ActionModuleBase):
             supports_check_mode=True,
         )
 
-    @staticmethod
-    def run_module(module: AnsibleActionModule) -> None:
+    def run_module(self, module: AnsibleActionModule) -> None:
         module_backend = select_backend(module=module)
 
         try:

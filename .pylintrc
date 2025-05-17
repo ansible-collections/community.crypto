@@ -379,7 +379,6 @@ disable=raw-checker-failed,
         wrong-import-order,
         wrong-import-position,
         # To clean up:
-        arguments-differ,
         broad-exception-caught,
         broad-exception-raised,
         consider-using-dict-items,

@@ -216,6 +216,7 @@ TEST_INTERPOLATE_TIMESTAMP: list[
 class FakeBackend(CryptoBackend):
     def parse_key(
         self,
+        *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
         passphrase=None,
@@ -223,15 +224,16 @@ class FakeBackend(CryptoBackend):
         raise BackendException("Not implemented in fake backend")
 
     def sign(
-        self, payload64: str, protected64: str, key_data: dict[str, t.Any] | None
+        self, *, payload64: str, protected64: str, key_data: dict[str, t.Any] | None
     ) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
-    def create_mac_key(self, alg: str, key: str) -> t.NoReturn:
+    def create_mac_key(self, *, alg: str, key: str) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
     def get_ordered_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
@@ -239,6 +241,7 @@ class FakeBackend(CryptoBackend):
 
     def get_csr_identifiers(
         self,
+        *,
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
@@ -246,17 +249,19 @@ class FakeBackend(CryptoBackend):
 
     def get_cert_days(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
     ) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
-    def create_chain_matcher(self, criterium: Criterium) -> t.NoReturn:
+    def create_chain_matcher(self, *, criterium: Criterium) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
     def get_cert_information(
         self,
+        *,
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> t.NoReturn:

@@ -339,7 +339,7 @@ class GenericCertificate(OpenSSLObject):
                 file_args, self.changed
             )
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
         return (
             super().check(module=module, perms_required=perms_required)

@@ -480,7 +480,7 @@ class Pkcs(OpenSSLObject):
     def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
         pass
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
         state_and_perms = super().check(module=module, perms_required=perms_required)
 

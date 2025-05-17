@@ -330,7 +330,7 @@ class PublicKey(OpenSSLObject):
         elif module.set_fs_attributes_if_different(file_args, False):
             self.changed = True
 
-    def check(self, module: AnsibleModule, perms_required: bool = True) -> bool:
+    def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
 
         state_and_perms = super().check(module=module, perms_required=perms_required)

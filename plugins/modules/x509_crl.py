@@ -764,6 +764,7 @@ class CRL(OpenSSLObject):
     def check(
         self,
         module: AnsibleModule,
+        *,
         perms_required: bool = True,
         ignore_conversion: bool = True,
     ) -> bool:
