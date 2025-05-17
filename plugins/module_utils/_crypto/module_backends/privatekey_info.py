@@ -12,7 +12,7 @@ from __future__ import annotations
 import abc
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -261,7 +261,7 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
         except OpenSSLObjectError as exc:
             raise PrivateKeyParseError(str(exc), result=result) from exc
 
-        result["public_key"] = to_native(self._get_public_key(binary=False))
+        result["public_key"] = to_text(self._get_public_key(binary=False))
         pk = self._get_public_key(binary=True)
         result["public_key_fingerprints"] = (
             get_fingerprint_of_bytes(pk, prefer_one=prefer_one_fingerprint)

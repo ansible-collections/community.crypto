@@ -42,7 +42,7 @@ _value:
 import typing as t
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._serial import (
     parse_serial,
 )
@@ -54,7 +54,7 @@ def parse_serial_filter(serial_str: str | bytes) -> int:
             f"The input for the community.crypto.parse_serial filter must be a string; got {type(serial_str)} instead"
         )
     try:
-        return parse_serial(to_native(serial_str))
+        return parse_serial(to_text(serial_str))
     except ValueError as exc:
         raise AnsibleFilterError(str(exc)) from exc
 

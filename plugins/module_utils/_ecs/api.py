@@ -22,7 +22,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import Request
 
 
@@ -67,8 +67,8 @@ class RestOperationException(Exception):
     """Encapsulate a REST API error"""
 
     def __init__(self, error: dict[str, t.Any]) -> None:
-        self.status = to_native(error.get("status", None))
-        self.errors = [to_native(err.get("message")) for err in error.get("errors", {})]
+        self.status = to_text(error.get("status", None))
+        self.errors = [to_text(err.get("message")) for err in error.get("errors", {})]
         self.message = " ".join(self.errors)
 
 

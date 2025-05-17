@@ -135,7 +135,7 @@ import tempfile
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.math import (
     count_bits,
 )
@@ -298,7 +298,7 @@ class DHParameterOpenSSL(DHParameterBase):
             self.path,
         ]
         rc, out, err = module.run_command(command, check_rc=False)
-        result = to_native(out)
+        result = to_text(out)
         if rc != 0:
             # If the call failed the file probably does not exist or is
             # unreadable
@@ -311,7 +311,7 @@ class DHParameterOpenSSL(DHParameterBase):
         bits = int(match.group(1))
 
         # if output contains "WARNING" we've got a problem
-        if "WARNING" in result or "WARNING" in to_native(err):
+        if "WARNING" in result or "WARNING" in to_text(err):
             return False
 
         return bits == self.size

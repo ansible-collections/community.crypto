@@ -46,7 +46,7 @@ import os
 import typing as t
 
 from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
 from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
@@ -72,7 +72,7 @@ class LookupModule(LookupBase):
                         f"Lookup parameter #{i} should be string or a path object, but got {type(path)}"
                     )
                 result.append(
-                    get_fingerprint_from_file(gpg_runner=gpg, path=to_native(path))
+                    get_fingerprint_from_file(gpg_runner=gpg, path=to_text(path))
                 )
             return result
         except GPGError as exc:

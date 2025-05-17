@@ -424,7 +424,7 @@ import typing as t
 from base64 import b64decode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
 # used to get <luks-name> out of lsblk output in format 'crypt <luks-name>'
@@ -487,7 +487,7 @@ class Handler:
         if self._passphrase_encoding == "text":
             return to_bytes(passphrase)
         try:
-            return b64decode(to_native(passphrase))
+            return b64decode(to_text(passphrase))
         except Exception as exc:
             self._module.fail_json(
                 f"Error while base64-decoding '{parameter_name}': {exc}"

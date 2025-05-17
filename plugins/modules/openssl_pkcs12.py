@@ -282,7 +282,7 @@ import traceback
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,
@@ -559,7 +559,7 @@ class Pkcs(OpenSSLObject):
             expected_content = to_bytes(
                 "".join(
                     [
-                        to_native(pem)
+                        to_text(pem)
                         for pem in [pkey, cert] + other_certs
                         if pem is not None
                     ]
@@ -848,7 +848,7 @@ def main() -> t.NoReturn:
                     pkey, cert, other_certs, _friendly_name = pkcs12.parse()
                     dump_content = "".join(
                         [
-                            to_native(pem)
+                            to_text(pem)
                             for pem in [pkey, cert] + other_certs
                             if pem is not None
                         ]

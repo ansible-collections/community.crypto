@@ -10,7 +10,7 @@ from __future__ import annotations
 import datetime
 import re
 
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -118,7 +118,7 @@ def get_relative_time_option(
 
     The return value will be a datetime object.
     """
-    result = to_native(input_string)
+    result = to_text(input_string)
     if result is None:
         raise OpenSSLObjectError(
             f'The timespec "{input_string}" for {input_name} is not valid'

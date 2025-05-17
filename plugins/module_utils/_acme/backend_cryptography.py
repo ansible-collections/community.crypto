@@ -14,7 +14,7 @@ import os
 import traceback
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
     CertificateInformation,
     CryptoBackend,
@@ -120,14 +120,14 @@ class CryptographyChainMatcher(ChainMatcher):
         self.issuer: list[tuple[cryptography.x509.oid.ObjectIdentifier, str]] = []
         if criterium.subject:
             self.subject = [
-                (cryptography_name_to_oid(k), to_native(v))
+                (cryptography_name_to_oid(k), to_text(v))
                 for k, v in parse_name_field(
                     criterium.subject, name_field_name="subject"
                 )
             ]
         if criterium.issuer:
             self.issuer = [
-                (cryptography_name_to_oid(k), to_native(v))
+                (cryptography_name_to_oid(k), to_text(v))
                 for k, v in parse_name_field(criterium.issuer, name_field_name="issuer")
             ]
         self.subject_key_identifier = CryptographyChainMatcher._parse_key_identifier(
@@ -153,7 +153,7 @@ class CryptographyChainMatcher(ChainMatcher):
         for oid, value in match_subject:
             found = False
             for attribute in x509_subject:
-                if attribute.oid == oid and value == to_native(attribute.value):
+                if attribute.oid == oid and value == to_text(attribute.value):
                     found = True
                     break
             if not found:
