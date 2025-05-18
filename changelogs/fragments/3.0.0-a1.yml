@@ -1,3 +1,0 @@
-release_summary: |
-  First pre-release for community.crypto 3.0.0.
-  This release drops compatibility for ansible-core before 2.17, for Python before 3.7, and for cryptography before 3.3.

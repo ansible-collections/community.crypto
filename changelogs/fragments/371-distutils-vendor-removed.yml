@@ -1,2 +1,0 @@
-minor_changes:
-  - "Remove vendored copy of ``distutils.version`` in favor of vendored copy included with ansible-core 2.12+ (https://github.com/ansible-collections/community.crypto/pull/371)."

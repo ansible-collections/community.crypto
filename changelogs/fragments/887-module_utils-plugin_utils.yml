@@ -1,4 +1,0 @@
-breaking_changes:
-  - "All module_utils and plugin_utils are now private to the collection and must not be used from other collections or unrelated plugins/modules.
-     Breaking changes in these can happen at any time, even in bugfix releases
-     (https://github.com/ansible-collections/community.crypto/pull/887)."

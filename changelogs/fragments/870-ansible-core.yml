@@ -1,5 +1,0 @@
-removed_features:
-  - "community.crypto no longer supports Ansible 2.9, ansible-base 2.10, and ansible-core versions 2.11, 2.12, 2.13, 2.14, 2.15, and 2.16.
-     While content from this collection might still work with some older versions of ansible-core, it will not work with any Python version
-     before 3.7
-     (https://github.com/ansible-collections/community.crypto/pull/870)."
