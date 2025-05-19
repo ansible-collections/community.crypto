@@ -49,7 +49,7 @@ exclusions = [
     "acme_certificate_renewal_info",  # does not support ACME account
     "acme_challenge_cert_helper",  # does not support (and need) any common parameters
 ]
-doc_fragment = "community.crypto.attributes.actiongroup_acme"
+doc_fragment = "community.crypto._attributes.actiongroup_acme"
 
 [sessions.build_import_check]
 run_galaxy_importer = true
