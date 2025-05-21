@@ -3,9 +3,13 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: RedHat - Enable the dynamic CA configuration feature
+- name: RedHat - Enable the dynamic CA configuration feature (RHEL up to 9)
   command: update-ca-trust force-enable
-  when: ansible_os_family == 'RedHat' and ansible_distribution != "Fedora"
+  when: ansible_os_family == 'RedHat' and ansible_distribution != "Fedora" and (ansible_distribution_major_version | int) < 10
+
+- name: RedHat - Enable the dynamic CA configuration feature (RHEL 10+)
+  command: update-ca-trust
+  when: ansible_os_family == 'RedHat' and ansible_distribution != "Fedora" and (ansible_distribution_major_version | int) >= 10
 
 - name: RedHat - Retrieve test cacert
   get_url:
