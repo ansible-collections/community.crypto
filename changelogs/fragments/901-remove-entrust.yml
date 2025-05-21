@@ -1,0 +1,5 @@
+deprecated_features:
+  - "ecs_certificate - the module will be removed from community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895, https://github.com/ansible-collections/community.crypto/pull/901)."
+  - "ecs_domain - the module will be removed from community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895, https://github.com/ansible-collections/community.crypto/pull/901)."
+  - "x509_certificate - the ``entrust`` provider will be removed from community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895, https://github.com/ansible-collections/community.crypto/pull/901)."
+  - "x509_certificate_pipe - the ``entrust`` provider will be removed from community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895, https://github.com/ansible-collections/community.crypto/pull/901)."
