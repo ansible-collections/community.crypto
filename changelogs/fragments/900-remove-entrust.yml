@@ -1,0 +1,5 @@
+removed_features:
+  - "ecs_certificate - the module has been removed. Please use community.crypto 2.x.y if you need this module (https://github.com/ansible-collections/community.crypto/pull/900)."
+  - "ecs_domain - the module has been removed. Please use community.crypto 2.x.y if you need this module (https://github.com/ansible-collections/community.crypto/pull/900)."
+  - "x509_certificate - the ``entrust`` provider has been removed. Please use community.crypto 2.x.y if you need this provider (https://github.com/ansible-collections/community.crypto/pull/900)."
+  - "x509_certificate_pipe - the ``entrust`` provider has been removed. Please use community.crypto 2.x.y if you need this provider (https://github.com/ansible-collections/community.crypto/pull/900)."
