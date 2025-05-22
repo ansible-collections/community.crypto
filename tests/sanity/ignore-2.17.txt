@@ -1,3 +1,4 @@
+meta/runtime.yml runtime-metadata  # Bug in ansible-test: https://github.com/ansible/ansible/pull/85198
 plugins/module_utils/_acme/account.py pep8:E704
 plugins/module_utils/_acme/acme.py pep8:E704
 plugins/module_utils/_acme/acme.py pylint:unpacking-non-sequence
@@ -5,7 +6,6 @@ plugins/module_utils/_acme/backend_openssl_cli.py pep8:E704
 plugins/module_utils/_acme/certificate.py pep8:E704
 plugins/module_utils/_crypto/cryptography_support.py pep8:E704
 plugins/module_utils/_crypto/module_backends/certificate.py no-assert
-plugins/module_utils/_crypto/module_backends/certificate_entrust.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_ownca.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_selfsigned.py no-assert
 plugins/module_utils/_crypto/module_backends/csr.py no-assert
@@ -21,8 +21,6 @@ plugins/modules/acme_certificate_deactivate_authz.py pylint:unpacking-non-sequen
 plugins/modules/acme_certificate_order_finalize.py pylint:unpacking-non-sequence
 plugins/modules/acme_certificate_revoke.py pylint:unpacking-non-sequence
 plugins/modules/acme_inspect.py pylint:unpacking-non-sequence
-plugins/modules/ecs_certificate.py no-assert
-plugins/modules/ecs_domain.py pep8:E704
 plugins/modules/get_certificate.py pylint:unknown-option-value
 plugins/modules/luks_device.py no-assert
 plugins/modules/openssl_pkcs12.py no-assert

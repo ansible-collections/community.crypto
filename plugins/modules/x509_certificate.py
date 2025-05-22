@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 module: x509_certificate
 short_description: Generate and/or check OpenSSL certificates
 description:
-  - It implements a notion of provider (one of V(selfsigned), V(ownca), V(acme), and V(entrust)) for your certificate.
+  - It implements a notion of provider (one of V(selfsigned), V(ownca), and V(acme)) for your certificate.
   - Please note that the module regenerates existing certificate if it does not match the module's options, or if it seems
     to be corrupt. If you are concerned that this could overwrite your existing certificate, consider using the O(backup)
     option.
@@ -29,7 +29,6 @@ extends_documentation_fragment:
   - community.crypto._attributes.files
   - community.crypto._module_certificate
   - community.crypto._module_certificate.backend_acme_documentation
-  - community.crypto._module_certificate.backend_entrust_documentation
   - community.crypto._module_certificate.backend_ownca_documentation
   - community.crypto._module_certificate.backend_selfsigned_documentation
 attributes:
@@ -56,11 +55,10 @@ options:
       - Name of the provider to use to generate/retrieve the OpenSSL certificate. Please see the examples on how to emulate
         it with M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info), M(community.crypto.openssl_privatekey_info)
         and M(ansible.builtin.assert).
-      - The V(entrust) provider was added for Ansible 2.9 and requires credentials for the
-        L(Entrust Certificate Services,https://www.entrustdatacard.com/products/categories/ssl-certificates) (ECS) API.
       - Required if O(state) is V(present).
+      - The V(entrust) provider has been removed from community.crypto 3.0.0 due to sunsetting of the ECS API.
     type: str
-    choices: [acme, entrust, ownca, selfsigned]
+    choices: [acme, ownca, selfsigned]
 
   return_content:
     description:
@@ -124,21 +122,6 @@ EXAMPLES = r"""
     acme_accountkey_path: /etc/ssl/private/ansible.com.pem
     acme_challenge_path: /etc/ssl/challenges/ansible.com/
     force: true
-
-- name: Generate an Entrust certificate via the Entrust Certificate Services (ECS) API
-  community.crypto.x509_certificate:
-    path: /etc/ssl/crt/ansible.com.crt
-    csr_path: /etc/ssl/csr/ansible.com.csr
-    provider: entrust
-    entrust_requester_name: Jo Doe
-    entrust_requester_email: jdoe@ansible.com
-    entrust_requester_phone: 555-555-5555
-    entrust_cert_type: STANDARD_SSL
-    entrust_api_user: apiusername
-    entrust_api_key: a^lv*32!cd9LnT
-    entrust_api_client_cert_path: /etc/ssl/entrust/ecs-client.crt
-    entrust_api_client_cert_key_path: /etc/ssl/entrust/ecs-key.crt
-    entrust_api_specification_path: /etc/ssl/entrust/api-docs/cms-api-2.1.0.yaml
 
 # The following example shows how to emulate the behavior of the removed
 # "assertonly" provider with the x509_certificate_info, openssl_csr_info,
@@ -236,10 +219,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.module_ba
 from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_acme import (
     AcmeCertificateProvider,
     add_acme_provider_to_argument_spec,
-)
-from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_entrust import (
-    EntrustCertificateProvider,
-    add_entrust_provider_to_argument_spec,
 )
 from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.certificate_ownca import (
     OwnCACertificateProvider,
@@ -362,7 +341,6 @@ class GenericCertificate(OpenSSLObject):
 def main() -> t.NoReturn:
     argument_spec = get_certificate_argument_spec()
     add_acme_provider_to_argument_spec(argument_spec)
-    add_entrust_provider_to_argument_spec(argument_spec)
     add_ownca_provider_to_argument_spec(argument_spec)
     add_selfsigned_provider_to_argument_spec(argument_spec)
     argument_spec.argument_spec.update(
@@ -407,12 +385,10 @@ def main() -> t.NoReturn:
             provider_map: dict[
                 str,
                 type[AcmeCertificateProvider]
-                | type[EntrustCertificateProvider]
                 | type[OwnCACertificateProvider]
                 | type[SelfSignedCertificateProvider],
             ] = {
                 "acme": AcmeCertificateProvider,
-                "entrust": EntrustCertificateProvider,
                 "ownca": OwnCACertificateProvider,
                 "selfsigned": SelfSignedCertificateProvider,
             }

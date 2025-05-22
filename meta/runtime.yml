@@ -20,6 +20,14 @@ action_groups:
 
 plugin_routing:
   modules:
+    ecs_certificate:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: The 'community.crypto.ecs_certificate' module has been removed due to the upcoming sunsetting of the ECS service. Please use community.crypto 2.x.y to continue using this module
+    ecs_domain:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: The 'community.crypto.ecs_domain' module has been removed due to the upcoming sunsetting of the ECS service. Please use community.crypto 2.x.y to continue using this module.
     acme_account_facts:
       tombstone:
         removal_version: 2.0.0
