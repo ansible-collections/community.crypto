@@ -96,8 +96,6 @@
 <li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ecs_certificate_module.html">community.crypto.ecs_certificate module – Request SSL/TLS certificates with the Entrust Certificate Services (ECS) API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
 <li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
@@ -206,7 +204,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>It implements a notion of provider (one of <code class="ansible-value docutils literal notranslate"><span class="pre">selfsigned</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">acme</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>) for your certificate.</p></li>
+<li><p>It implements a notion of provider (one of <code class="ansible-value docutils literal notranslate"><span class="pre">selfsigned</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ownca</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">acme</span></code>) for your certificate.</p></li>
 <li><p>It uses the cryptography python library to interact with OpenSSL.</p></li>
 <li><p>Note that this module was called <code class="docutils literal notranslate"><span class="pre">openssl_certificate</span></code> when included directly in Ansible up to version 2.9. When moved to the collection <code class="docutils literal notranslate"><span class="pre">community.crypto</span></code>, it was renamed to <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a>. From Ansible 2.10 on, it can still be used by the old short name (or by <code class="docutils literal notranslate"><span class="pre">ansible.builtin.openssl_certificate</span></code>), which redirects to <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a>. When using FQCNs or when using the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-a-playbook">collections</a> keyword, the new name <a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a> should be used to avoid a deprecation warning.</p></li>
 <li><p>Please note that the module regenerates existing certificate if it does not match the module’s options, or if it seems to be corrupt. If you are concerned that this could overwrite your existing certificate, consider using the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> option.</p></li>
@@ -310,118 +308,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to the Certificate Signing Request (CSR) used to generate this certificate.</p>
 <p>This is mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module-parameter-csr-content"><span class="std std-ref"><span class="pre">csr_content</span></span></a></strong></code>.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_api_client_cert_key_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-api-client-cert-key-path"><strong>entrust_api_client_cert_key_path</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_api_client_cert_key_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The path to the private key of the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_api_client_cert_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-api-client-cert-path"><strong>entrust_api_client_cert_path</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_api_client_cert_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The path to the client certificate used to authenticate to the Entrust Certificate Services (ECS) API.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_api_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-api-key"><strong>entrust_api_key</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_api_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The key (password) for authentication to the Entrust Certificate Services (ECS) API.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_api_specification_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-api-specification-path"><strong>entrust_api_specification_path</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_api_specification_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The path to the specification file defining the Entrust Certificate Services (ECS) API configuration.</p>
-<p>You can use this to keep a local copy of the specification to avoid downloading it every time the module is used.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;https://cloud.entrust.net/EntrustCloud/documentation/cms-api-2.1.0.yaml&quot;</span></code></p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_api_user"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-api-user"><strong>entrust_api_user</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_api_user" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The username for authentication to the Entrust Certificate Services (ECS) API.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_cert_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-cert-type"><strong>entrust_cert_type</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_cert_type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>Specify the type of certificate requested.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
-<ul class="simple">
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;STANDARD_SSL&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ADVANTAGE_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;UC_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;EV_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;WILDCARD_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;PRIVATE_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;PD_SSL&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;CDS_ENT_LITE&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;CDS_ENT_PRO&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;SMIME_ENT&quot;</span></code></p></li>
-</ul>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_not_after"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-not-after"><strong>entrust_not_after</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_not_after" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The point in time at which the certificate stops being valid.</p>
-<p>Time can be specified either as relative time or as an absolute timestamp.</p>
-<p>A valid absolute time format is <code class="docutils literal notranslate"><span class="pre">ASN.1</span> <span class="pre">TIME</span></code> such as <code class="ansible-value docutils literal notranslate"><span class="pre">2019-06-18</span></code>.</p>
-<p>A valid relative time format is <code class="ansible-value docutils literal notranslate"><span class="pre">[+-]timespec</span></code> where timespec can be an integer + <code class="docutils literal notranslate"><span class="pre">[w</span> <span class="pre">|</span> <span class="pre">d</span> <span class="pre">|</span> <span class="pre">h</span> <span class="pre">|</span> <span class="pre">m</span> <span class="pre">|</span> <span class="pre">s]</span></code>, such as <code class="ansible-value docutils literal notranslate"><span class="pre">+365d</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">+32w1d2h</span></code>).</p>
-<p>Time will always be interpreted as UTC.</p>
-<p>Note that only the date (day, month, year) is supported for specifying the expiry date of the issued certificate.</p>
-<p>The full date-time is adjusted to EST (GMT -5:00) before issuance, which may result in a certificate with an expiration date one day earlier than expected if a relative time is used.</p>
-<p>The minimum certificate lifetime is 90 days, and maximum is three years.</p>
-<p>If this value is not specified, the certificate will stop being valid 365 days the date of issue.</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>Please note that this value is <strong>not</strong> covered by the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module-parameter-ignore-timestamps"><span class="std std-ref"><span class="pre">ignore_timestamps</span></span></a></strong></code> option.</p>
-<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;+365d&quot;</span></code></p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_requester_email"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-requester-email"><strong>entrust_requester_email</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_requester_email" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The email of the requester of the certificate (for tracking purposes).</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_requester_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-requester-name"><strong>entrust_requester_name</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_requester_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The name of the requester of the certificate (for tracking purposes).</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
-</div></td>
-</tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-entrust_requester_phone"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-x509-certificate-module-parameter-entrust-requester-phone"><strong>entrust_requester_phone</strong></p>
-<a class="ansibleOptionLink" href="#parameter-entrust_requester_phone" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
-</div></td>
-<td><div class="ansible-option-cell"><p>The phone number of the requester of the certificate (for tracking purposes).</p>
-<p>This is only used by the <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider.</p>
-<p>This is required if the provider is <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -645,12 +531,11 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <a class="ansibleOptionLink" href="#parameter-provider" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Name of the provider to use to generate/retrieve the OpenSSL certificate. Please see the examples on how to emulate it with <a class="reference internal" href="x509_certificate_info_module.html#ansible-collections-community-crypto-x509-certificate-info-module"><span class="std std-ref">community.crypto.x509_certificate_info</span></a>, <a class="reference internal" href="openssl_csr_info_module.html#ansible-collections-community-crypto-openssl-csr-info-module"><span class="std std-ref">community.crypto.openssl_csr_info</span></a>, <a class="reference internal" href="openssl_privatekey_info_module.html#ansible-collections-community-crypto-openssl-privatekey-info-module"><span class="std std-ref">community.crypto.openssl_privatekey_info</span></a> and <a class="reference external" href="https://docs.ansible.com/ansible/devel/collections/ansible/builtin/assert_module.html#ansible-collections-ansible-builtin-assert-module" title="(in Ansible vdevel)"><span class="xref std std-ref">ansible.builtin.assert</span></a>.</p>
-<p>The <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider was added for Ansible 2.9 and requires credentials for the <a class="reference external" href="https://www.entrustdatacard.com/products/categories/ssl-certificates">Entrust Certificate Services</a> (ECS) API.</p>
 <p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-x509-certificate-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">present</span></code>.</p>
+<p>The <code class="ansible-value docutils literal notranslate"><span class="pre">entrust</span></code> provider has been removed from community.crypto 3.0.0 due to sunsetting of the ECS API.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;acme&quot;</span></code></p></li>
-<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;entrust&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ownca&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;selfsigned&quot;</span></code></p></li>
 </ul>
@@ -938,21 +823,6 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-x5
 <span class="w">    </span><span class="nt">acme_accountkey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
 <span class="w">    </span><span class="nt">acme_challenge_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/challenges/ansible.com/</span>
 <span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an Entrust certificate via the Entrust Certificate Services (ECS) API</span>
-<span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/crt/ansible.com.crt</span>
-<span class="w">    </span><span class="nt">csr_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/ansible.com.csr</span>
-<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">entrust</span>
-<span class="w">    </span><span class="nt">entrust_requester_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jo Doe</span>
-<span class="w">    </span><span class="nt">entrust_requester_email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdoe@ansible.com</span>
-<span class="w">    </span><span class="nt">entrust_requester_phone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">555-555-5555</span>
-<span class="w">    </span><span class="nt">entrust_cert_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STANDARD_SSL</span>
-<span class="w">    </span><span class="nt">entrust_api_user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apiusername</span>
-<span class="w">    </span><span class="nt">entrust_api_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">a^lv*32!cd9LnT</span>
-<span class="w">    </span><span class="nt">entrust_api_client_cert_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-client.crt</span>
-<span class="w">    </span><span class="nt">entrust_api_client_cert_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/ecs-key.crt</span>
-<span class="w">    </span><span class="nt">entrust_api_specification_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/entrust/api-docs/cms-api-2.1.0.yaml</span>
 
 <span class="c1"># The following example shows how to emulate the behavior of the removed</span>
 <span class="c1"># &quot;assertonly&quot; provider with the x509_certificate_info, openssl_csr_info,</span>
