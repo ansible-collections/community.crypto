@@ -1643,3 +1643,28 @@ releases:
       - 867-passphrase-encoding-nolog.yml
       - 868-luks-remove-keyslot.yml
     release_date: '2025-04-28'
+  2.26.2:
+    changes:
+      deprecated_features:
+        - The Entrust service in currently being sunsetted after the sale of Entrust's
+          Public Certificates Business to Sectigo; see `the announcement with key
+          dates <https://www.entrust.com/tls-certificate-information-center>`__ and
+          `the migration brief for customers <https://www.sectigo.com/uploads/resources/EOL_Migration-Brief-End-Customer.pdf>`__
+          for details (https://github.com/ansible-collections/community.crypto/issues/895,
+          https://github.com/ansible-collections/community.crypto/pull/901).
+        - ecs_certificate - the module will be removed from community.crypto 3.0.0
+          (https://github.com/ansible-collections/community.crypto/issues/895, https://github.com/ansible-collections/community.crypto/pull/901).
+        - ecs_domain - the module will be removed from community.crypto 3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895,
+          https://github.com/ansible-collections/community.crypto/pull/901).
+        - x509_certificate - the ``entrust`` provider will be removed from community.crypto
+          3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895,
+          https://github.com/ansible-collections/community.crypto/pull/901).
+        - x509_certificate_pipe - the ``entrust`` provider will be removed from community.crypto
+          3.0.0 (https://github.com/ansible-collections/community.crypto/issues/895,
+          https://github.com/ansible-collections/community.crypto/pull/901).
+      release_summary: Maintenance release announcing removal of the Entrust content
+        from community.crypto 3.0.0.
+    fragments:
+      - 2.26.2.yml
+      - 901-remove-entrust.yml
+    release_date: '2025-05-22'
