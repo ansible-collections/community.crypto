@@ -32,7 +32,7 @@ options:
   provider:
     description:
       - Name of the provider to use to generate/retrieve the OpenSSL certificate.
-      - The V(entrust) provider has been removed from community.crypto 3.0.0.
+      - The V(entrust) provider has been removed from community.crypto 3.0.0 due to sunsetting of the ECS API.
     type: str
     choices: [ownca, selfsigned]
     required: true

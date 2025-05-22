@@ -56,7 +56,7 @@ options:
         it with M(community.crypto.x509_certificate_info), M(community.crypto.openssl_csr_info), M(community.crypto.openssl_privatekey_info)
         and M(ansible.builtin.assert).
       - Required if O(state) is V(present).
-      - The V(entrust) provider has been removed from community.crypto 3.0.0.
+      - The V(entrust) provider has been removed from community.crypto 3.0.0 due to sunsetting of the ECS API.
     type: str
     choices: [acme, ownca, selfsigned]
 
