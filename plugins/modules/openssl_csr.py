@@ -265,7 +265,6 @@ if t.TYPE_CHECKING:
 
 
 class CertificateSigningRequestModule(OpenSSLObject):
-
     def __init__(
         self, module: AnsibleModule, module_backend: CertificateSigningRequestBackend
     ) -> None:

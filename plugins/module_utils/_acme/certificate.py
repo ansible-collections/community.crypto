@@ -191,8 +191,7 @@ class ACMECertificateClient:
         if bad_authzs:
             bad_authzs_str = ", ".join(sorted(bad_authzs))
             raise ModuleFailException(
-                "Some of the authorizations for the order are in a bad state, so the order"
-                f" can no longer be satisfied: {bad_authzs_str}",
+                f"Some of the authorizations for the order are in a bad state, so the order can no longer be satisfied: {bad_authzs_str}",
             )
 
     def collect_invalid_authzs(self, order: Order) -> list[Authorization]:

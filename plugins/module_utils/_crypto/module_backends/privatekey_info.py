@@ -283,10 +283,7 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
             )
             if result["key_is_consistent"] is False:
                 # Only fail when it is False, to avoid to fail on None (which means "we do not know")
-                msg = (
-                    "Private key is not consistent! (See "
-                    "https://blog.hboeck.de/archives/888-How-I-tricked-Symantec-with-a-Fake-Private-Key.html)"
-                )
+                msg = "Private key is not consistent! (See https://blog.hboeck.de/archives/888-How-I-tricked-Symantec-with-a-Fake-Private-Key.html)"
                 raise PrivateKeyConsistencyError(msg, result=result)
         return result
 

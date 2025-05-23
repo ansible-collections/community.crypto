@@ -194,7 +194,8 @@ def main() -> t.NoReturn:
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(
-                msg=f"Error while reading public key file from disk: {e}", **result  # type: ignore
+                msg=f"Error while reading public key file from disk: {e}",
+                **result,  # type: ignore
             )
 
     module_backend = select_backend(module=module, content=data)

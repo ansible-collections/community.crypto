@@ -486,7 +486,7 @@ def _adjust_idn_email(
     idx = value.find("@")
     if idx < 0:
         return value
-    return f"{value[:idx]}@{_adjust_idn(value[idx + 1:], idn_rewrite=idn_rewrite)}"
+    return f"{value[:idx]}@{_adjust_idn(value[idx + 1 :], idn_rewrite=idn_rewrite)}"
 
 
 def _adjust_idn_url(

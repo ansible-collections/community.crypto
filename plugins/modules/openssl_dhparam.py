@@ -173,7 +173,6 @@ class DHParameterError(Exception):
 
 
 class DHParameterBase:
-
     def __init__(self, module: AnsibleModule) -> None:
         self.state: t.Literal["absent", "present"] = module.params["state"]
         self.path: str = module.params["path"]
@@ -250,7 +249,6 @@ class DHParameterBase:
 
 
 class DHParameterAbsent(DHParameterBase):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
 
@@ -263,7 +261,6 @@ class DHParameterAbsent(DHParameterBase):
 
 
 class DHParameterOpenSSL(DHParameterBase):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
         self.openssl_bin = module.get_bin_path("openssl", True)
@@ -318,7 +315,6 @@ class DHParameterOpenSSL(DHParameterBase):
 
 
 class DHParameterCryptography(DHParameterBase):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
 
@@ -408,8 +404,7 @@ def main() -> t.NoReturn:
             if backend == "auto":
                 module.fail_json(
                     msg=(
-                        f"Cannot detect either the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION}) "
-                        "or the OpenSSL binary openssl"
+                        f"Cannot detect either the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION}) or the OpenSSL binary openssl"
                     )
                 )
 

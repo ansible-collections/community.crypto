@@ -381,7 +381,6 @@ def select_message_digest(
 
 
 class OpenSSLObject(metaclass=abc.ABCMeta):
-
     def __init__(self, *, path: str, state: str, force: bool, check_mode: bool) -> None:
         self.path = path
         self.state = state

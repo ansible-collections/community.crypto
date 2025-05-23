@@ -99,8 +99,7 @@ class ACMEAccount:
             and allow_creation
         ):
             raise ModuleFailException(
-                "To create an account, an external account binding must be specified. "
-                "Use the acme_account module with the external_account_binding option."
+                "To create an account, an external account binding must be specified. Use the acme_account module with the external_account_binding option."
             )
 
         result, info = self.client.send_signed_request(

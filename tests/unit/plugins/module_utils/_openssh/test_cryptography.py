@@ -230,7 +230,6 @@ def test_invalid_key_sizes(
 
 @pytest.mark.skipif(not HAS_OPENSSH_SUPPORT, reason="requires cryptography")
 def test_valid_comment_update() -> None:
-
     pair = OpensshKeypair.generate()
     new_comment = "comment"
     try:

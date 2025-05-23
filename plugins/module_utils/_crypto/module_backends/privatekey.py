@@ -312,7 +312,6 @@ class _Curve:
 
 # Implementation with using cryptography
 class PrivateKeyCryptographyBackend(PrivateKeyBackend):
-
     def _add_curve(
         self,
         name: str,

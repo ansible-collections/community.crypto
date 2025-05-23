@@ -599,7 +599,9 @@ class Pkcs(OpenSSLObject):
             self.backup_file = module.backup_local(self.path)
         super().remove(module)
 
-    def parse(self) -> tuple[
+    def parse(
+        self,
+    ) -> tuple[
         bytes | None,
         bytes | None,
         list[bytes],

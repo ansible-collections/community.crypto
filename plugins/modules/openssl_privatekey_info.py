@@ -246,7 +246,8 @@ def main() -> t.NoReturn:
                 data = f.read()
         except (IOError, OSError) as e:
             module.fail_json(
-                msg=f"Error while reading private key file from disk: {e}", **result  # type: ignore
+                msg=f"Error while reading private key file from disk: {e}",
+                **result,  # type: ignore
             )
 
     result["can_load_key"] = True

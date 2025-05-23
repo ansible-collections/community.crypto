@@ -440,7 +440,6 @@ def test_luks_remove_key(
     expected: bool | t.Literal["exception"],
     monkeypatch,
 ) -> None:
-
     module = DummyModule()
     module.params["device"] = device
     module.params["passphrase_encoding"] = "text"

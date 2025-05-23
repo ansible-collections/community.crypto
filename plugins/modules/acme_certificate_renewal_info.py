@@ -310,8 +310,7 @@ def main() -> t.NoReturn:
             if timestamp < now:
                 complete(
                     True,
-                    msg=f"The remaining percentage {module.params['remaining_percentage'] * 100}%"
-                    f" of the certificate's lifespan was reached on {timestamp}",
+                    msg=f"The remaining percentage {module.params['remaining_percentage'] * 100}% of the certificate's lifespan was reached on {timestamp}",
                 )
 
         complete(False)
