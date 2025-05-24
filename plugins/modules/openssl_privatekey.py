@@ -181,7 +181,6 @@ if t.TYPE_CHECKING:
 
 
 class PrivateKeyModule(OpenSSLObject):
-
     def __init__(
         self, module: AnsibleModule, module_backend: PrivateKeyBackend
     ) -> None:
@@ -255,7 +254,6 @@ class PrivateKeyModule(OpenSSLObject):
 
 
 def main() -> t.NoReturn:
-
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(
         {

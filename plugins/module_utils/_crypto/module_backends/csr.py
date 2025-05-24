@@ -525,8 +525,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             if self.using_common_name_for_san:
                 self.module.fail_json(
                     msg=msg
-                    + "This is probably caused because the Common Name is used as a SAN."
-                    " Specifying use_common_name_for_san=false might fix this."
+                    + "This is probably caused because the Common Name is used as a SAN. Specifying use_common_name_for_san=false might fix this."
                 )
             self.module.fail_json(
                 msg=msg

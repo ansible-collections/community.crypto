@@ -231,7 +231,6 @@ class PublicKeyError(OpenSSLObjectError):
 
 
 class PublicKey(OpenSSLObject):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(
             path=module.params["path"],
@@ -415,7 +414,6 @@ class PublicKey(OpenSSLObject):
 
 
 def main() -> t.NoReturn:
-
     module = AnsibleModule(
         argument_spec={
             "state": {

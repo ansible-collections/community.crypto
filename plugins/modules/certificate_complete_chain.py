@@ -368,8 +368,7 @@ def main() -> t.NoReturn:
             if not is_parent(module, chain[i - 1], parent):
                 module.fail_json(
                     msg=(
-                        f"Cannot verify input chain: certificate #{i + 1}: {format_cert(parent)} is not issuer "
-                        f"of certificate #{i}: {format_cert(chain[i - 1])}"
+                        f"Cannot verify input chain: certificate #{i + 1}: {format_cert(parent)} is not issuer of certificate #{i}: {format_cert(chain[i - 1])}"
                     )
                 )
 

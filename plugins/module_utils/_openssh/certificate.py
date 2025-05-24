@@ -779,8 +779,7 @@ def get_option_type(name: str) -> t.Literal["critical", "extension"]:
     if name in _EXTENSIONS:
         return "extension"
     raise ValueError(
-        f"{name} is not a valid option. "
-        "Custom options must start with 'critical:' or 'extension:' to indicate type"
+        f"{name} is not a valid option. Custom options must start with 'critical:' or 'extension:' to indicate type"
     )
 
 

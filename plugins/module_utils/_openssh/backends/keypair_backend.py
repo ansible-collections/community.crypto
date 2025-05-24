@@ -52,7 +52,6 @@ if t.TYPE_CHECKING:
 
 
 class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
-
     def __init__(self, *, module: AnsibleModule) -> None:
         super().__init__(module=module)
 
@@ -567,8 +566,7 @@ def select_backend(
         else:
             module.fail_json(
                 msg=(
-                    "Cannot find either the OpenSSH binary in the PATH "
-                    f"or cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION} installed on this system"
+                    f"Cannot find either the OpenSSH binary in the PATH or cryptography >= {COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION} installed on this system"
                 )
             )
 

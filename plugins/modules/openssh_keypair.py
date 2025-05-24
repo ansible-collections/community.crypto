@@ -207,7 +207,6 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.backends
 
 
 def main() -> t.NoReturn:
-
     module = AnsibleModule(
         argument_spec={
             "state": {

@@ -142,7 +142,6 @@ class PrivateKeyConvertModule(OpenSSLObject):
 
 
 def main() -> t.NoReturn:
-
     argument_spec = get_privatekey_argument_spec()
     argument_spec.argument_spec.update(
         {

@@ -121,7 +121,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.support i
 
 
 class SignatureInfoBase(OpenSSLObject):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(
             path=module.params["path"],
@@ -150,7 +149,6 @@ class SignatureInfoBase(OpenSSLObject):
 
 # Implementation with using cryptography
 class SignatureInfoCryptography(SignatureInfoBase):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
 

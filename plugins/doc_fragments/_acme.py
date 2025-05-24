@@ -9,7 +9,6 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # Basic documentation fragment without account data
     BASIC = r"""
 notes:

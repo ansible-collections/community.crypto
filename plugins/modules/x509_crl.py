@@ -505,7 +505,6 @@ class CRLError(OpenSSLObjectError):
 
 
 class CRL(OpenSSLObject):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(
             path=module.params["path"],

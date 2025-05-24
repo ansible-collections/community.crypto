@@ -474,7 +474,6 @@ def wipe_luks_headers(device: str) -> None:
 
 
 class Handler:
-
     def __init__(self, module: AnsibleModule) -> None:
         self._module = module
         self._lsblk_bin = self._module.get_bin_path("lsblk", True)
@@ -534,7 +533,6 @@ class Handler:
 
 
 class CryptHandler(Handler):
-
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
         self._cryptsetup_bin = self._module.get_bin_path("cryptsetup", True)
@@ -807,8 +805,7 @@ class CryptHandler(Handler):
                     keyslot_area = False
             if keyslot_count < 2:
                 self._module.fail_json(
-                    msg=f"LUKS device {device} has less than two active keyslots. "
-                    "To be able to remove a key, please set `force_remove_last_key` to `true`."
+                    msg=f"LUKS device {device} has less than two active keyslots. To be able to remove a key, please set `force_remove_last_key` to `true`."
                 )
 
         if keyslot is None:
@@ -867,7 +864,6 @@ class CryptHandler(Handler):
 
 
 class ConditionsHandler(Handler):
-
     def __init__(self, module: AnsibleModule, crypthandler: CryptHandler) -> None:
         super().__init__(module)
         self._crypthandler = crypthandler
@@ -988,7 +984,7 @@ class ConditionsHandler(Handler):
 
         if self._module.params["state"] == "absent":
             self._module.fail_json(
-                msg="Contradiction in setup: Asking to " "add a key to absent LUKS."
+                msg="Contradiction in setup: Asking to add a key to absent LUKS."
             )
 
         key_present = self._crypthandler.luks_test_key(
@@ -1021,8 +1017,7 @@ class ConditionsHandler(Handler):
 
         if self._module.params["state"] == "absent":
             self._module.fail_json(
-                msg="Contradiction in setup: Asking to "
-                "remove a key from absent LUKS."
+                msg="Contradiction in setup: Asking to remove a key from absent LUKS."
             )
 
         if self._module.params["remove_keyslot"] is not None:

@@ -370,7 +370,8 @@ class AsymmetricKeypair:
 
         try:
             return self.__privatekey.sign(
-                data, **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"]  # type: ignore
+                data,
+                **_ALGORITHM_PARAMETERS[self.__keytype]["signer_params"],  # type: ignore
             )
         except TypeError as e:
             raise InvalidDataError(e) from e
@@ -788,7 +789,6 @@ def validate_comment(comment: str) -> None:
 
 
 def extract_comment(path: str | os.PathLike) -> str:
-
     if not os.path.exists(path):
         raise InvalidPublicKeyFileError(f"No file was found at {path}")
 

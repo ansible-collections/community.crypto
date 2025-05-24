@@ -108,8 +108,7 @@ class CryptographyChainMatcher(ChainMatcher):
                     )
                 else:
                     module.warn(
-                        f"Criterium {criterium_idx} in select_chain has invalid {name} value. "
-                        "Ignoring criterium."
+                        f"Criterium {criterium_idx} in select_chain has invalid {name} value. Ignoring criterium."
                     )
         return None
 
