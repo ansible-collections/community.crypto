@@ -292,11 +292,27 @@ def load_certificate_request(
         raise OpenSSLObjectError(exc) from exc
 
 
+@t.overload
+def parse_name_field(
+    input_dict: dict[str, list[str] | str],
+    *,
+    name_field_name: str | None = None,
+) -> list[tuple[str, str]]: ...
+
+
+@t.overload
 def parse_name_field(
     input_dict: dict[str, list[str | bytes] | str | bytes],
     *,
     name_field_name: str | None = None,
-) -> list[tuple[str, str | bytes]]:
+) -> list[tuple[str, str | bytes]]: ...
+
+
+def parse_name_field(
+    input_dict: dict[str, t.Any],
+    *,
+    name_field_name: str | None = None,
+) -> list:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
     def error_str(key: str) -> str:
@@ -328,11 +344,27 @@ def parse_name_field(
     return result
 
 
+@t.overload
+def parse_ordered_name_field(
+    input_list: list[dict[str, list[str] | str]],
+    *,
+    name_field_name: str,
+) -> list[tuple[str, str]]: ...
+
+
+@t.overload
 def parse_ordered_name_field(
     input_list: list[dict[str, list[str | bytes] | str | bytes]],
     *,
     name_field_name: str,
-) -> list[tuple[str, str | bytes]]:
+) -> list[tuple[str, str | bytes]]: ...
+
+
+def parse_ordered_name_field(
+    input_list: list[dict[str, t.Any]],
+    *,
+    name_field_name: str,
+) -> list:
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
     result = []
