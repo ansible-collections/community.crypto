@@ -403,6 +403,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
         )
 
     def _update_comment(self) -> None:
+        assert self.comment is not None
         try:
             ssh_version = self._get_ssh_version() or "7.8"
             force_new_format = (
@@ -527,6 +528,7 @@ class KeypairBackendCryptography(KeypairBackend):
         return True
 
     def _update_comment(self) -> None:
+        assert self.comment is not None
         keypair = OpensshKeypair.load(
             path=self.private_key_path, passphrase=self.passphrase, no_public_key=True
         )

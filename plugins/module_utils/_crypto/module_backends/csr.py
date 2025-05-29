@@ -144,7 +144,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             )
 
         self.ordered_subject = False
-        self.subject = [
+        subject = [
             ("C", module.params["country_name"]),
             ("ST", module.params["state_or_province_name"]),
             ("L", module.params["locality_name"]),
@@ -153,7 +153,9 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             ("CN", module.params["common_name"]),
             ("emailAddress", module.params["email_address"]),
         ]
-        self.subject = [(entry[0], entry[1]) for entry in self.subject if entry[1]]
+        self.subject: list[tuple[str, str]] = [
+            (entry[0], entry[1]) for entry in subject if entry[1]
+        ]
 
         try:
             if module.params["subject"]:

@@ -468,7 +468,7 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
         self, *, curve: bytes | None = None, public_key: bytes | None = None, **kwargs
     ):
         super().__init__(**kwargs)
-        self._curve = None
+        self._curve: bytes | None = None
         if curve is not None:
             self.curve = curve
 
