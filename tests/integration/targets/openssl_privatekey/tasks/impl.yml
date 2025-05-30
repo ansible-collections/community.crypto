@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: true
@@ -12,14 +12,14 @@
   register: privatekey1_check
 
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: true
   register: privatekey1
 
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (idempotence, check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: true
@@ -27,33 +27,33 @@
   register: privatekey1_idempotence_check
 
 - name: "({{ select_crypto_backend }}) Generate privatekey1 - standard (idempotence)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     return_content: true
   register: privatekey1_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate privatekey2 - size 2048"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey2.pem'
     size: 2048
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey3 - type DSA"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey3.pem'
     type: DSA
     size: 3072
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey4 - standard"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey4.pem'
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Delete privatekey4 - standard"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     state: absent
     path: '{{ remote_tmp_dir }}/privatekey4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -61,14 +61,14 @@
   register: privatekey4_delete
 
 - name: "({{ select_crypto_backend }}) Delete privatekey4 - standard (idempotence)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     state: absent
     path: '{{ remote_tmp_dir }}/privatekey4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey4_delete_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate privatekey5 - standard - with passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey5.pem'
     passphrase: ansible
     cipher: auto
@@ -76,7 +76,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey5 - standard - idempotence"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey5.pem'
     passphrase: ansible
     cipher: auto
@@ -85,13 +85,13 @@
   register: privatekey5_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate privatekey6 - standard - with non-ASCII passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey6.pem'
     passphrase: ànsïblé
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- set_fact:
+- ansible.builtin.set_fact:
     ecc_types:
       - curve: secp384r1
         openssl_name: secp384r1
@@ -152,7 +152,7 @@
         min_cryptography_version: "0.5"
 
 - name: "({{ select_crypto_backend }}) Test ECC key generation"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey-{{ item.curve }}.pem'
     type: ECC
     curve: "{{ item.curve }}"
@@ -166,7 +166,7 @@
   register: privatekey_ecc_generate
 
 - name: "({{ select_crypto_backend }}) Test ECC key generation (idempotency)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey-{{ item.curve }}.pem'
     type: ECC
     curve: "{{ item.curve }}"
@@ -181,7 +181,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Test other type generation"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey-{{ item.type }}.pem'
         type: "{{ item.type }}"
         select_crypto_backend: '{{ select_crypto_backend }}'
@@ -193,7 +193,7 @@
       register: privatekey_t1_generate
 
     - name: "({{ select_crypto_backend }}) Test other type generation (idempotency)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey-{{ item.type }}.pem'
         type: "{{ item.type }}"
         select_crypto_backend: '{{ select_crypto_backend }}'
@@ -217,7 +217,7 @@
         min_version: '2.6'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey with passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     size: '{{ default_rsa_key_size }}'
@@ -226,7 +226,7 @@
   register: passphrase_1
 
 - name: "({{ select_crypto_backend }}) Generate privatekey with passphrase (idempotent)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: auto
@@ -236,7 +236,7 @@
   register: passphrase_2
 
 - name: "({{ select_crypto_backend }}) Regenerate privatekey without passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -244,7 +244,7 @@
   register: passphrase_3
 
 - name: "({{ select_crypto_backend }}) Regenerate privatekey without passphrase (idempotent)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -252,7 +252,7 @@
   register: passphrase_4
 
 - name: "({{ select_crypto_backend }}) Regenerate privatekey with passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     size: '{{ default_rsa_key_size }}'
@@ -261,18 +261,18 @@
   register: passphrase_5
 
 - name: "({{ select_crypto_backend }}) Create broken key"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/broken"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken key"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/broken.pem'
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: output_broken
 
 - name: "({{ select_crypto_backend }}) Remove module"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     size: '{{ default_rsa_key_size }}'
@@ -282,7 +282,7 @@
   register: remove_1
 
 - name: "({{ select_crypto_backend }}) Remove module (idempotent)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     cipher: auto
@@ -293,7 +293,7 @@
   register: remove_2
 
 - name: "({{ select_crypto_backend }}) Generate privatekey_mode (mode 0400)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
     mode: '0400'
     size: '{{ default_rsa_key_size }}'
@@ -301,7 +301,7 @@
   register: privatekey_mode_1
 
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_1_stat
 
@@ -312,7 +312,7 @@
   register: privatekey_mode_1_fileinfo
 
 - name: "({{ select_crypto_backend }}) Generate privatekey_mode (mode 0400, idempotency)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
     mode: '0400'
     size: '{{ default_rsa_key_size }}'
@@ -320,7 +320,7 @@
   register: privatekey_mode_2
 
 - name: "({{ select_crypto_backend }}) Generate privatekey_mode (mode 0400, force)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
     mode: '0400'
     force: true
@@ -329,7 +329,7 @@
   register: privatekey_mode_3
 
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_3_stat
 
@@ -340,7 +340,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - auto format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: auto
         size: '{{ default_rsa_key_size }}'
@@ -348,7 +348,7 @@
       register: privatekey_fmt_1_step_1
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - auto format (idempotent)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: auto
         size: '{{ default_rsa_key_size }}'
@@ -356,7 +356,7 @@
       register: privatekey_fmt_1_step_2
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS1 format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: pkcs1
         size: '{{ default_rsa_key_size }}'
@@ -364,7 +364,7 @@
       register: privatekey_fmt_1_step_3
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS8 format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: pkcs8
         size: '{{ default_rsa_key_size }}'
@@ -372,7 +372,7 @@
       register: privatekey_fmt_1_step_4
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS8 format (idempotent)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: pkcs8
         size: '{{ default_rsa_key_size }}'
@@ -380,7 +380,7 @@
       register: privatekey_fmt_1_step_5
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - auto format (ignore)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: auto_ignore
         size: '{{ default_rsa_key_size }}'
@@ -388,7 +388,7 @@
       register: privatekey_fmt_1_step_6
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - auto format (no ignore)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: auto
         size: '{{ default_rsa_key_size }}'
@@ -396,7 +396,7 @@
       register: privatekey_fmt_1_step_7
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - raw format (fail)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: raw
         size: '{{ default_rsa_key_size }}'
@@ -405,13 +405,13 @@
       register: privatekey_fmt_1_step_8
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS8 format (convert)"
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         select_crypto_backend: '{{ select_crypto_backend }}'
       register: privatekey_fmt_1_step_9_before
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS8 format (convert)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         format: pkcs8
         format_mismatch: convert
@@ -420,7 +420,7 @@
       register: privatekey_fmt_1_step_9
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_1 - PKCS8 format (convert)"
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_1.pem'
         select_crypto_backend: '{{ select_crypto_backend }}'
       register: privatekey_fmt_1_step_9_after
@@ -429,7 +429,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - PKCS8 format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: pkcs8
@@ -438,7 +438,7 @@
       register: privatekey_fmt_2_step_1
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - PKCS8 format (idempotent)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: pkcs8
@@ -447,7 +447,7 @@
       register: privatekey_fmt_2_step_2
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - raw format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: raw
@@ -457,19 +457,19 @@
       register: privatekey_fmt_2_step_3
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_3.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - raw format (idempotent)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: raw
@@ -479,19 +479,19 @@
       register: privatekey_fmt_2_step_4
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_4.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - auto format (ignore)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: auto_ignore
@@ -501,19 +501,19 @@
       register: privatekey_fmt_2_step_5
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_5.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - auto format (no ignore)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
         type: X448
         format: auto
@@ -523,13 +523,13 @@
       register: privatekey_fmt_2_step_6
 
     - name: "({{ select_crypto_backend }}) Read private key"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
       register: slurp
       when: privatekey_fmt_2_step_1 is not failed
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is not base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_6.privatekey == (slurp.content | b64decode)
       when: privatekey_fmt_2_step_1 is not failed
@@ -540,14 +540,14 @@
 # Test regenerate option
 
 - name: "({{ select_crypto_backend }}) Regenerate - setup simple keys"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
 - name: "({{ select_crypto_backend }}) Regenerate - setup password protected keys"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -556,14 +556,14 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
 - name: "({{ select_crypto_backend }}) Regenerate - setup broken keys"
-  copy:
+  ansible.builtin.copy:
     dest: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}.pem'
     content: 'broken key'
     mode: '0700'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ select_crypto_backend }}) Regenerate - modify broken keys (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -573,7 +573,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg or 'Cannot load raw key' in result.results[0].msg"
@@ -585,7 +585,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - modify broken keys"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -594,7 +594,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg or 'Cannot load raw key' in result.results[0].msg"
@@ -606,7 +606,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - modify password protected keys (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -616,7 +616,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -628,7 +628,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - modify password protected keys"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -637,7 +637,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -649,7 +649,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - not modify regular keys (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -658,7 +658,7 @@
   check_mode: true
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -667,7 +667,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - not modify regular keys"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size }}'
@@ -675,7 +675,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -684,7 +684,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - adjust key size (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size + 20 }}'
@@ -694,7 +694,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -704,7 +704,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - adjust key size"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: RSA
     size: '{{ default_rsa_key_size + 20 }}'
@@ -713,7 +713,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -723,7 +723,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-  copy:
+  ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
     dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     remote_src: true
@@ -731,7 +731,7 @@
   when: "item != 'always'"
 
 - name: "({{ select_crypto_backend }}) Regenerate - adjust key type (check mode)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: DSA
     size: '{{ default_rsa_key_size }}'
@@ -741,7 +741,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -751,7 +751,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - adjust key type"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     type: DSA
     size: '{{ default_rsa_key_size }}'
@@ -760,7 +760,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -771,7 +771,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         remote_src: true
@@ -779,7 +779,7 @@
       when: "item != 'always'"
 
     - name: "({{ select_crypto_backend }}) Regenerate - format mismatch (check mode)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         type: DSA
         size: '{{ default_rsa_key_size }}'
@@ -790,7 +790,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -800,7 +800,7 @@
           - result.results[4] is changed
 
     - name: "({{ select_crypto_backend }}) Regenerate - format mismatch"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         type: DSA
         size: '{{ default_rsa_key_size }}'
@@ -810,7 +810,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -820,7 +820,7 @@
           - result.results[4] is changed
 
     - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         remote_src: true
@@ -828,7 +828,7 @@
       when: "item != 'always'"
 
     - name: "({{ select_crypto_backend }}) Regenerate - convert format (check mode)"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         type: DSA
         size: '{{ default_rsa_key_size }}'
@@ -839,7 +839,7 @@
       check_mode: true
       loop: "{{ regenerate_values }}"
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is changed
           - result.results[1] is changed
@@ -848,7 +848,7 @@
           - result.results[4] is changed
 
     - name: "({{ select_crypto_backend }}) Regenerate - convert format"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         type: DSA
         size: '{{ default_rsa_key_size }}'
@@ -858,7 +858,7 @@
         select_crypto_backend: '{{ select_crypto_backend }}'
       loop: "{{ regenerate_values }}"
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is changed
           - result.results[1] is changed

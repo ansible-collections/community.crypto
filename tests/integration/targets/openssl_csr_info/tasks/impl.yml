@@ -3,31 +3,31 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug:
+- ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_1.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: "({{ select_crypto_backend }}) Get CSR info (IDNA encoding)"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_1.csr'
     name_encoding: idna
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_idna
 
 - name: "({{ select_crypto_backend }}) Get CSR info (Unicode encoding)"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_1.csr'
     name_encoding: unicode
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_unicode
 
 - name: "({{ select_crypto_backend }}) Check whether subject and extensions behaves as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject.organizationalUnitName == 'ACME Department'
       - "['organizationalUnitName', 'Crypto Department'] in result.subject_ordered"
@@ -54,7 +54,7 @@
       - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
 
 - name: "({{ select_crypto_backend }}) Check SubjectKeyIdentifier and AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_key_identifier == "00:11:22:33"
       - result.authority_key_identifier == "44:55:66:77"
@@ -71,18 +71,18 @@
   when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: "({{ select_crypto_backend }}) Read CSR"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/csr_1.csr'
   register: slurp
 
 - name: "({{ select_crypto_backend }}) Get CSR info directly"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
 - name: "({{ select_crypto_backend }}) Compare output of direct and loaded info"
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         (result | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
@@ -90,19 +90,19 @@
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_2.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_3.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: "({{ select_crypto_backend }}) Check AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier is none
       - result.authority_cert_issuer == expected_authority_cert_issuer
@@ -114,13 +114,13 @@
   when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: "({{ select_crypto_backend }}) Get CSR info"
-  openssl_csr_info:
+  community.crypto.openssl_csr_info:
     path: '{{ remote_tmp_dir }}/csr_4.csr'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: "({{ select_crypto_backend }}) Check AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none

@@ -6,7 +6,7 @@
 # The tests for this module generate unsafe parameters for testing purposes;
 # otherwise tests would be too slow. Use sizes of at least 2048 in production!
 - name: "[{{ select_crypto_backend }}] Generate parameter (check mode)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -15,7 +15,7 @@
   register: dhparam_check
 
 - name: "[{{ select_crypto_backend }}] Generate parameter"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -23,7 +23,7 @@
   register: dhparam
 
 - name: "[{{ select_crypto_backend }}] Don't regenerate parameters with no change (check mode)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -32,7 +32,7 @@
   register: dhparam_changed_check
 
 - name: "[{{ select_crypto_backend }}] Don't regenerate parameters with no change"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     size: 768
     path: '{{ remote_tmp_dir }}/dh768.pem'
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -40,32 +40,32 @@
   register: dhparam_changed
 
 - name: "[{{ select_crypto_backend }}] Generate parameters with size option"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh512.pem'
     size: 512
     select_crypto_backend: "{{ select_crypto_backend }}"
 
 - name: "[{{ select_crypto_backend }}] Don't regenerate parameters with size option and no change"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh512.pem'
     size: 512
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_changed_512
 
-- copy:
+- ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/dh768.pem'
     remote_src: true
     dest: '{{ remote_tmp_dir }}/dh512.pem'
 
 - name: "[{{ select_crypto_backend }}] Re-generate if size is different"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh512.pem'
     size: 512
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_changed_to_512
 
 - name: "[{{ select_crypto_backend }}] Force re-generate parameters with size option"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh512.pem'
     size: 512
     force: true
@@ -73,11 +73,11 @@
   register: dhparam_changed_force
 
 - name: "[{{ select_crypto_backend }}] Create broken params"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/dhbroken.pem"
     content: "broken"
 - name: "[{{ select_crypto_backend }}] Regenerate broken params"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dhbroken.pem'
     size: 512
     force: true
@@ -85,21 +85,21 @@
   register: output_broken
 
 - name: "[{{ select_crypto_backend }}] Generate params"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
     backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_1
 - name: "[{{ select_crypto_backend }}] Generate params (idempotent)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
     backup: true
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_2
 - name: "[{{ select_crypto_backend }}] Generate params (change)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     size: 512
     force: true
@@ -107,7 +107,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_backup_3
 - name: "[{{ select_crypto_backend }}] Generate params (remove)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     state: absent
     backup: true
@@ -115,7 +115,7 @@
     return_content: true
   register: dhparam_backup_4
 - name: "[{{ select_crypto_backend }}] Generate params (remove, idempotent)"
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backup.pem'
     state: absent
     backup: true

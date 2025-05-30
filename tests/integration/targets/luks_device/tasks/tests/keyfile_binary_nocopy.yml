@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create with keyfile3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ keyfile3 }}"
@@ -21,7 +21,7 @@
   register: create_passphrase_1
 
 - name: Create with keyfile3 (without argon2i)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ keyfile3 }}"
@@ -32,7 +32,7 @@
   when: create_passphrase_1 is failed
 
 - name: Open with keyfile3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ keyfile3 }}"
@@ -40,29 +40,29 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Try to open with passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase1 }}"
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is failed
 
 - name: Give access to passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ keyfile3 }}"
@@ -73,7 +73,7 @@
   become: true
 
 - name: Remove access for keyfile3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     remove_passphrase: "{{ keyfile3 }}"
@@ -81,25 +81,25 @@
   become: true
 
 - name: Try to open with keyfile3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ keyfile3 }}"
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is failed
 
 - name: Open with passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase1 }}"
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed

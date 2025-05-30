@@ -8,7 +8,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     skip_tests: false
     has_get_certificate_chain: >-
       {{ ansible_facts.python_version is version('3.10.0', '>=') }}
@@ -16,14 +16,14 @@
 - block:
 
     - name: Get servers certificate with backend auto-detection
-      get_certificate:
+      community.crypto.get_certificate:
         host: "{{ httpbin_host }}"
         port: 443
         asn1_base64: "{{ true if ansible_version.full is version('2.18', '>=') else omit }}"
       ignore_errors: true
       register: result
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         skip_tests: |
           {{
             result is failed and (
@@ -33,7 +33,7 @@
             )
           }}
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is success or skip_tests
 
@@ -41,7 +41,7 @@
 
 - block:
 
-    - include_tasks: ../tests/validate.yml
+    - ansible.builtin.include_tasks: ../tests/validate.yml
       vars:
         select_crypto_backend: cryptography
 

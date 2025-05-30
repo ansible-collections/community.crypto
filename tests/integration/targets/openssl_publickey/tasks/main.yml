@@ -10,21 +10,21 @@
 
 - block:
     - name: Generate privatekey1 - standard
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_autodetect.pem'
         size: '{{ default_rsa_key_size }}'
 
     - name: Run module with backend autodetection
-      openssl_publickey:
+      community.crypto.openssl_publickey:
         path: '{{ remote_tmp_dir }}/privatekey_autodetect_public.pem'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey_autodetect.pem'
 
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
       vars:
         select_crypto_backend: cryptography
 

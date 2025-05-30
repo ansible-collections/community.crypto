@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create luks with keyslot 4 (check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -15,7 +15,7 @@
   become: true
   register: create_luks_slot4_check
 - name: Create luks with keyslot 4
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -25,7 +25,7 @@
   become: true
   register: create_luks_slot4
 - name: Create luks with keyslot 4 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -35,7 +35,7 @@
   become: true
   register: create_luks_slot4_idem
 - name: Create luks with keyslot 4 (idempotent, check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -46,10 +46,10 @@
   become: true
   register: create_luks_slot4_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot4
-- assert:
+- ansible.builtin.assert:
     that:
       - create_luks_slot4_check is changed
       - create_luks_slot4 is changed
@@ -58,7 +58,7 @@
       - "'Key Slot 4: ENABLED' in luks_header_slot4.stdout or '4: luks2' in luks_header_slot4.stdout"
 
 - name: Add key in slot 2 (check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -70,7 +70,7 @@
   become: true
   register: add_luks_slot2_check
 - name: Add key in slot 2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -81,7 +81,7 @@
   become: true
   register: add_luks_slot2
 - name: Add key in slot 2 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -92,7 +92,7 @@
   become: true
   register: add_luks_slot2_idem
 - name: Add key in slot 2 (idempotent, check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -104,10 +104,10 @@
   become: true
   register: add_luks_slot2_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot2
-- assert:
+- ansible.builtin.assert:
     that:
       - add_luks_slot2_check is changed
       - add_luks_slot2 is changed
@@ -116,27 +116,27 @@
       - "'Key Slot 2: ENABLED' in luks_header_slot2.stdout or '2: luks2' in luks_header_slot2.stdout"
 
 - name: Check remove slot 4 without key
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     remove_keyslot: 4
   ignore_errors: true
   become: true
   register: kill_slot4_nokey
 - name: Check remove slot 4 with slot 4 key
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     remove_keyslot: 4
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
   ignore_errors: true
   become: true
   register: kill_slot4_key_slot4
-- assert:
+- ansible.builtin.assert:
     that:
       - kill_slot4_nokey is failed
       - kill_slot4_key_slot4 is failed
 
 - name: Remove key in slot 4 (check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyslot: 4
@@ -144,21 +144,21 @@
   become: true
   register: kill_luks_slot4_check
 - name: Remove key in slot 4
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyslot: 4
   become: true
   register: kill_luks_slot4
 - name: Remove key in slot 4 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyslot: 4
   become: true
   register: kill_luks_slot4_idem
 - name: Remove key in slot 4 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyslot: 4
@@ -166,10 +166,10 @@
   become: true
   register: kill_luks_slot4_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot4_removed
-- assert:
+- ansible.builtin.assert:
     that:
       - kill_luks_slot4_check is changed
       - kill_luks_slot4 is changed
@@ -178,7 +178,7 @@
       - "'Key Slot 4: DISABLED' in luks_header_slot4_removed.stdout or not '4: luks' in luks_header_slot4_removed.stdout"
 
 - name: Add key in slot 0
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -189,17 +189,17 @@
   become: true
   register: add_luks_slot0
 - name: Remove key in slot 0
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
     remove_keyslot: 0
   become: true
   register: kill_luks_slot0
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot0_removed
-- assert:
+- ansible.builtin.assert:
     that:
       - add_luks_slot0 is changed
       - kill_luks_slot0 is changed

@@ -9,14 +9,14 @@
 ####################################################################
 
 - name: Generate CSR for {{ certificate.name }}
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/{{ certificate.name }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{ certificate.name }}.key'
     subject: '{{ certificate.subject }}'
     useCommonNameForSAN: false
 
 - name: Generate certificate for {{ certificate.name }}
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/{{ certificate.name }}.pem'
     csr_path: '{{ remote_tmp_dir }}/{{ certificate.name }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{ certificate.name }}.key'

@@ -5,7 +5,7 @@
 
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item }}.pem"
         type: ECC
         curve: secp256r1
@@ -13,7 +13,7 @@
       loop: "{{ account_keys }}"
 
     - name: Parse account keys (to ease debugging some test failures)
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: "{{ remote_tmp_dir }}/{{ item }}.pem"
         return_private_key_data: true
       loop: "{{ account_keys }}"
@@ -24,7 +24,7 @@
       - accountkey2
 
 - name: Check that account does not exist
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -33,7 +33,7 @@
   register: account_not_created
 
 - name: Create it now
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -46,7 +46,7 @@
       - mailto:example@example.org
 
 - name: Check that account exists
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -55,12 +55,12 @@
   register: account_created
 
 - name: Read account key
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/accountkey.pem'
   register: slurp
 
 - name: Clear email address
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
@@ -71,7 +71,7 @@
     contact: []
 
 - name: Check that account was modified
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -81,7 +81,7 @@
   register: account_modified
 
 - name: Check with wrong account URI
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -91,7 +91,7 @@
   register: account_not_exist
 
 - name: Check with wrong account key
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     acme_version: 2

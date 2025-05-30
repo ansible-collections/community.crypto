@@ -4,21 +4,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: RedHat - Enable the dynamic CA configuration feature (RHEL up to 9)
-  command: update-ca-trust force-enable
+  ansible.builtin.command: update-ca-trust force-enable
   when: ansible_os_family == 'RedHat' and ansible_distribution != "Fedora" and (ansible_distribution_major_version | int) < 10
 
 - name: RedHat - Enable the dynamic CA configuration feature (RHEL 10+)
-  command: update-ca-trust
+  ansible.builtin.command: update-ca-trust
   when: ansible_os_family == 'RedHat' and ansible_distribution != "Fedora" and (ansible_distribution_major_version | int) >= 10
 
 - name: RedHat - Retrieve test cacert
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/cacert.pem"
     dest: "/etc/pki/ca-trust/source/anchors/ansible.pem"
   when: ansible_os_family == 'RedHat'
 
 - name: Get client cert/key
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/{{ item }}"
     dest: "{{ remote_tmp_dir }}/{{ item }}"
   with_items:
@@ -26,39 +26,39 @@
     - client.key
 
 - name: Suse - Retrieve test cacert
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/cacert.pem"
     dest: "/etc/pki/trust/anchors/ansible.pem"
   when: ansible_os_family == 'Suse'
 
 - name: Debian - Retrieve test cacert
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/cacert.pem"
     dest: "/usr/local/share/ca-certificates/ansible.crt"
   when: ansible_os_family == 'Debian'
 
 - name: Redhat - Update ca trust
-  command: update-ca-trust extract
+  ansible.builtin.command: update-ca-trust extract
   when: ansible_os_family == 'RedHat'
 
 - name: Debian/Suse - Update ca certificates
-  command: update-ca-certificates
+  ansible.builtin.command: update-ca-certificates
   when: ansible_os_family == 'Debian' or ansible_os_family == 'Suse'
 
 - name: FreeBSD - Retrieve test cacert
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/cacert.pem"
     dest: "/tmp/ansible.pem"
   when: ansible_os_family == 'FreeBSD'
 
 - name: FreeBSD - Read test cacert
-  slurp:
+  ansible.builtin.slurp:
     src: "/tmp/ansible.pem"
   register: slurp
   when: ansible_os_family == 'FreeBSD'
 
 - name: FreeBSD - Add cacert to root certificate store
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: "/etc/ssl/cert.pem"
     block: "{{ slurp.content | b64decode }}"
   when: ansible_os_family == 'FreeBSD'
@@ -66,14 +66,14 @@
 - name: MacOS - Retrieve test cacert
   when: ansible_os_family == 'Darwin'
   block:
-    - uri:
+    - ansible.builtin.uri:
         url: "http://ansible.http.tests/cacert.pem"
         return_content: true
       register: cacert_pem
 
-    - raw: '{{ ansible_python_interpreter }} -c "import ssl; print(ssl.get_default_verify_paths().cafile)"'
+    - ansible.builtin.raw: '{{ ansible_python_interpreter }} -c "import ssl; print(ssl.get_default_verify_paths().cafile)"'
       register: macos_cafile
 
-    - blockinfile:
-        path: "{{ macos_cafile.stdout_lines|first }}"
+    - ansible.builtin.blockinfile:
+        path: "{{ macos_cafile.stdout_lines | first }}"
         block: "{{ cacert_pem.content }}"

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test to_serial filter
-  assert:
+  ansible.builtin.assert:
     that:
       - 0 | community.crypto.to_serial == '00'
       - 1 | community.crypto.to_serial == '01'
@@ -13,21 +13,21 @@
       - 65536 | community.crypto.to_serial == '01:00:00'
 
 - name: "Test error 1: negative number"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ (-1) | community.crypto.to_serial }}
   ignore_errors: true
   register: error_1
 
 - name: "Test error 2: invalid type"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ [] | community.crypto.to_serial }}
   ignore_errors: true
   register: error_2
 
 - name: Validate error
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         error_1 is failed and "The input for the community.crypto.to_serial filter must not be negative" in error_1.msg

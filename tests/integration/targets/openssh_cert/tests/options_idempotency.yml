@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Generate cert with no options
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -22,7 +22,7 @@
   register: no_options
 
 - name: Generate cert with no options with explicit directives
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -39,7 +39,7 @@
   register: no_options_explicit_directives
 
 - name: Generate cert with explicit extension
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -53,7 +53,7 @@
   register: explicit_extension_before
 
 - name: Generate cert with explicit extension (idempotency)
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -67,7 +67,7 @@
   register: explicit_extension_after
 
 - name: Generate cert with explicit extension and corresponding directive
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -81,7 +81,7 @@
   register: explicit_extension_and_directive
 
 - name: Generate cert with default options
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -92,7 +92,7 @@
   register: default_options
 
 - name: Generate cert with relative timestamp
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -104,7 +104,7 @@
   register: relative_timestamp
 
 - name: Generate cert with ignore_timestamp true
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -117,7 +117,7 @@
   register: relative_timestamp_true
 
 - name: Generate cert with ignore_timestamp false
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -130,7 +130,7 @@
   register: relative_timestamp_false
 
 - name: Generate cert with ignore_timestamp true
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -143,7 +143,7 @@
   register: relative_timestamp_invalid_at
 
 - name: Generate host cert full_idempotence
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: host
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -153,7 +153,7 @@
     regenerate: full_idempotence
 
 - name: Generate host cert full_idempotence again
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: host
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -164,7 +164,7 @@
   register: host_cert_full_idempotence
 
 - name: Assert options results
-  assert:
+  ansible.builtin.assert:
     that:
       - no_options is changed
       - no_options_explicit_directives is not changed
@@ -179,6 +179,6 @@
       - host_cert_full_idempotence is not changed
 
 - name: Remove certificate
-  openssh_cert:
+  community.crypto.openssh_cert:
     path: "{{ certificate_path }}"
     state: absent

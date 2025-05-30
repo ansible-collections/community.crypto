@@ -4,17 +4,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate privatekey"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Read privatekey"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey
 
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -25,7 +25,7 @@
   register: generate_csr_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -35,7 +35,7 @@
   register: generate_csr
 
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_content: '{{ privatekey.content | b64decode }}'
     subject_ordered:
@@ -45,7 +45,7 @@
   register: generate_csr_idempotent
 
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent, check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -56,7 +56,7 @@
   register: generate_csr_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR without SAN (check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr-nosan.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -67,7 +67,7 @@
   register: generate_csr_nosan_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR without SAN"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr-nosan.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -77,7 +77,7 @@
   register: generate_csr_nosan
 
 - name: "({{ select_crypto_backend }}) Generate CSR without SAN (idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr-nosan.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -87,7 +87,7 @@
   register: generate_csr_nosan_check_idempotent
 
 - name: "({{ select_crypto_backend }}) Generate CSR without SAN (idempotent, check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr-nosan.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -102,7 +102,7 @@
 # but the short name is used to test idempotency for ipsecuser
 # and vice-versa for biometricInfo
 - name: "({{ select_crypto_backend }}) Generate CSR with KU and XKU"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ku_xku.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -118,7 +118,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with KU and XKU (test idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ku_xku.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -135,7 +135,7 @@
   register: csr_ku_xku
 
 - name: "({{ select_crypto_backend }}) Generate CSR with KU and XKU (test XKU change)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ku_xku.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -151,7 +151,7 @@
   register: csr_ku_xku_change
 
 - name: "({{ select_crypto_backend }}) Generate CSR with KU and XKU (test KU change)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ku_xku.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -166,14 +166,14 @@
   register: csr_ku_xku_change_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with old API"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_oldapi.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     commonName: www.ansible.com
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with invalid SAN (1/2)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csrinvsan.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_alt_name: invalid-san.example.com
@@ -182,7 +182,7 @@
   ignore_errors: true
 
 - name: "({{ select_crypto_backend }}) Generate CSR with invalid SAN (2/2)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csrinvsan2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_alt_name: "DNS:system:kube-controller-manager"
@@ -191,7 +191,7 @@
   ignore_errors: true
 
 - name: "({{ select_crypto_backend }}) Generate CSR with OCSP Must Staple"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ocsp.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_alt_name: "DNS:www.ansible.com"
@@ -199,7 +199,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with OCSP Must Staple (test idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ocsp.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_alt_name: "DNS:www.ansible.com"
@@ -208,13 +208,13 @@
   register: csr_ocsp_idempotency
 
 - name: "({{ select_crypto_backend }}) Generate ECC privatekey"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey2.pem'
     type: ECC
     curve: secp384r1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with ECC privatekey"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     subject:
@@ -222,7 +222,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with text common name"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr3.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     subject:
@@ -231,7 +231,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR with country name"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     country_name: de
@@ -239,7 +239,7 @@
   register: country_idempotent_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with country name (idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     country_name: de
@@ -247,7 +247,7 @@
   register: country_idempotent_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with country name (idempotent 2)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     subject:
@@ -256,7 +256,7 @@
   register: country_idempotent_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with country name (bad country name)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     subject:
@@ -266,19 +266,19 @@
   ignore_errors: true
 
 - name: "({{ select_crypto_backend }}) Generate privatekey with password"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Read privatekey"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekeypw.pem'
   register: privatekeypw
 
 - name: "({{ select_crypto_backend }}) Generate CSR with privatekey passphrase"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
@@ -286,7 +286,7 @@
   register: passphrase_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with privatekey passphrase and private key content"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw.csr'
     privatekey_content: '{{ privatekeypw.content | b64decode }}'
     privatekey_passphrase: hunter2
@@ -294,7 +294,7 @@
   register: passphrase_1_content
 
 - name: "({{ select_crypto_backend }}) Generate CSR (failed passphrase 1)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw1.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     privatekey_passphrase: hunter2
@@ -303,7 +303,7 @@
   register: passphrase_error_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR (failed passphrase 2)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: wrong_password
@@ -312,7 +312,7 @@
   register: passphrase_error_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR (failed passphrase 3)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pw3.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -320,11 +320,11 @@
   register: passphrase_error_3
 
 - name: "({{ select_crypto_backend }}) Create broken CSR"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/csrbroken.csr"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken CSR"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csrbroken.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
     subject:
@@ -334,7 +334,7 @@
   register: output_broken
 
 - name: "({{ select_crypto_backend }}) Generate CSR"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_backup.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -343,7 +343,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: csr_backup_1
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_backup.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -352,7 +352,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: csr_backup_2
 - name: "({{ select_crypto_backend }}) Generate CSR (change)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_backup.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -361,7 +361,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: csr_backup_3
 - name: "({{ select_crypto_backend }}) Generate CSR (remove)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_backup.csr'
     state: absent
     backup: true
@@ -369,7 +369,7 @@
     return_content: true
   register: csr_backup_4
 - name: "({{ select_crypto_backend }}) Generate CSR (remove, idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_backup.csr'
     state: absent
     backup: true
@@ -377,7 +377,7 @@
   register: csr_backup_5
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -387,7 +387,7 @@
   register: subject_key_identifier_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -397,7 +397,7 @@
   register: subject_key_identifier_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (change)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -407,7 +407,7 @@
   register: subject_key_identifier_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (auto-create)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -417,7 +417,7 @@
   register: subject_key_identifier_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (auto-create idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -427,7 +427,7 @@
   register: subject_key_identifier_5
 
 - name: "({{ select_crypto_backend }}) Generate CSR with subject key identifier (remove)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ski.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -436,7 +436,7 @@
   register: subject_key_identifier_6
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_aki.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -446,7 +446,7 @@
   register: authority_key_identifier_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_aki.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -456,7 +456,7 @@
   register: authority_key_identifier_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (change)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_aki.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -466,7 +466,7 @@
   register: authority_key_identifier_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority key identifier (remove)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_aki.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -475,7 +475,7 @@
   register: authority_key_identifier_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_acisn.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -488,7 +488,7 @@
   register: authority_cert_issuer_sn_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (idempotency)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_acisn.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -501,7 +501,7 @@
   register: authority_cert_issuer_sn_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (change issuer)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_acisn.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -514,7 +514,7 @@
   register: authority_cert_issuer_sn_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (change serial number)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_acisn.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -527,7 +527,7 @@
   register: authority_cert_issuer_sn_4
 
 - name: "({{ select_crypto_backend }}) Generate CSR with authority cert issuer / serial number (remove)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_acisn.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -535,7 +535,7 @@
   register: authority_cert_issuer_sn_5
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_ordered:
@@ -620,7 +620,7 @@
   register: everything_1
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything (idempotent, check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_ordered:
@@ -706,7 +706,7 @@
   register: everything_2
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything (idempotent)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -792,7 +792,7 @@
   register: everything_3
 
 - name: "({{ select_crypto_backend }}) Generate CSR with everything (not idempotent, check mode)"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_everything.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject_ordered:
@@ -887,7 +887,7 @@
 - name: "({{ select_crypto_backend }}) Ed25519 and Ed448 tests (for cryptography >= 2.6)"
   block:
     - name: "({{ select_crypto_backend }}) Generate privatekeys"
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
         type: '{{ item }}'
       loop:
@@ -901,7 +901,7 @@
       block:
 
         - name: "({{ select_crypto_backend }}) Generate CSR"
-          openssl_csr:
+          community.crypto.openssl_csr:
             path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             subject:
@@ -914,7 +914,7 @@
           ignore_errors: true
 
         - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
-          openssl_csr:
+          community.crypto.openssl_csr:
             path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             subject:
@@ -931,7 +931,7 @@
 - name: "({{ select_crypto_backend }}) CRL distribution endpoints (for cryptography >= 1.6)"
   block:
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints"
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/csr_crl_d_e.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
         subject:
@@ -953,7 +953,7 @@
       register: crl_distribution_endpoints_1
 
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (idempotence)"
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/csr_crl_d_e.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
         subject:
@@ -975,7 +975,7 @@
       register: crl_distribution_endpoints_2
 
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (change)"
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/csr_crl_d_e.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
         subject:
@@ -995,7 +995,7 @@
       register: crl_distribution_endpoints_3
 
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints (no endpoints)"
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/csr_crl_d_e.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
         subject:
@@ -1004,7 +1004,7 @@
       register: crl_distribution_endpoints_4
 
     - name: "({{ select_crypto_backend }}) Create CSR with CRL distribution endpoints"
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/csr_crl_d_e.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
         subject:
