@@ -440,7 +440,7 @@ def main() -> t.NoReturn:
                     module.fail_json(
                         msg=f"tls_ctx_options must be a string or integer, got {tls_ctx_option!r}"
                     )
-                    tls_ctx_option_int = (
+                    tls_ctx_option_int = (  # type: ignore[unreachable]
                         0  # make pylint happy; this code is actually unreachable
                     )
 
@@ -558,7 +558,7 @@ def main() -> t.NoReturn:
     elif x509.version == cryptography.x509.Version.v3:
         result["version"] = 3 - 1
     else:
-        result["version"] = "unknown"
+        result["version"] = "unknown"  # type: ignore[unreachable]
 
     if verified_chain is not None:
         result["verified_chain"] = verified_chain

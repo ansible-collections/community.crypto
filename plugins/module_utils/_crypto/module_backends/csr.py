@@ -133,7 +133,7 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         self.authority_cert_issuer: list[str] | None = module.params[
             "authority_cert_issuer"
         ]
-        self.authority_cert_serial_number: int = module.params[
+        self.authority_cert_serial_number: int | None = module.params[
             "authority_cert_serial_number"
         ]
         self.crl_distribution_points: (
@@ -361,10 +361,6 @@ def parse_crl_distribution_points(
 class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
     def __init__(self, *, module: AnsibleModule) -> None:
         super().__init__(module=module)
-        if self.version != 1:
-            module.warn(
-                "The cryptography backend only supports version 1. (The only valid value according to RFC 2986.)"
-            )
 
         crl_distribution_points: list[dict[str, t.Any]] | None = module.params[
             "crl_distribution_points"

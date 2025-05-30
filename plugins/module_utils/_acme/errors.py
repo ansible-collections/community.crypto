@@ -72,7 +72,7 @@ class ACMEProtocolException(ModuleFailException):
         info: dict[str, t.Any] | None = None,
         response=None,
         content: bytes | None = None,
-        content_json: dict[str, t.Any] | None = None,
+        content_json: dict[str, t.Any] | bytes | None = None,
         extras: dict[str, t.Any] | None = None,
     ):
         # Try to get hold of content, if response is given and content is not provided
@@ -88,15 +88,18 @@ class ACMEProtocolException(ModuleFailException):
                     content = info.pop("body", None)
 
         # Make sure that content_json is None or a dictionary
+        content_json_json: dict[str, t.Any] | None = None
         if content_json is not None and not isinstance(content_json, dict):
             if content is None and isinstance(content_json, bytes):
                 content = content_json
             content_json = None
+        elif content_json is not None:
+            content_json_json = content_json.copy()
 
         # Try to get hold of JSON decoded content, when content is given and JSON not provided
-        if content_json is None and content is not None and module is not None:
+        if content_json_json is None and content is not None and module is not None:
             try:
-                content_json = module.from_json(to_text(content))
+                content_json_json = module.from_json(to_text(content))
             except Exception:
                 pass
 
@@ -117,19 +120,22 @@ class ACMEProtocolException(ModuleFailException):
             if (
                 code is not None
                 and code >= 400
-                and content_json is not None
-                and "type" in content_json
+                and content_json_json is not None
+                and "type" in content_json_json
             ):
-                error_type = content_json["type"]
-                if "status" in content_json and content_json["status"] != code:
-                    code_msg = f"status {content_json['status']} (HTTP status: {format_http_status(code)})"
+                error_type = content_json_json["type"]
+                if (
+                    "status" in content_json_json
+                    and content_json_json["status"] != code
+                ):
+                    code_msg = f"status {content_json_json['status']} (HTTP status: {format_http_status(code)})"
                 else:
                     code_msg = f"status {format_http_status(code)}"
                     if code == -1 and info.get("msg"):
                         code_msg = f"error: {info['msg']}"
-                subproblems = content_json.pop("subproblems", None)
-                add_msg = f" {format_error_problem(content_json)}."
-                extras["problem"] = content_json
+                subproblems = content_json_json.pop("subproblems", None)
+                add_msg = f" {format_error_problem(content_json_json)}."
+                extras["problem"] = content_json_json
                 extras["subproblems"] = subproblems or []
                 if subproblems is not None:
                     add_msg = f"{add_msg} Subproblems:"
@@ -142,13 +148,13 @@ class ACMEProtocolException(ModuleFailException):
                 code_msg = f"HTTP status {format_http_status(code)}"
                 if code == -1 and info.get("msg"):
                     code_msg = f"error: {info['msg']}"
-                if content_json is not None:
-                    add_msg = f" The JSON error result: {content_json}"
+                if content_json_json is not None:
+                    add_msg = f" The JSON error result: {content_json_json}"
                 elif content is not None:
                     add_msg = f" The raw error result: {to_text(content)}"
             msg = f"{msg} for {url} with {code_msg}"
-        elif content_json is not None:
-            add_msg = f" The JSON result: {content_json}"
+        elif content_json_json is not None:
+            add_msg = f" The JSON result: {content_json_json}"
         elif content is not None:
             add_msg = f" The raw result: {to_text(content)}"
 

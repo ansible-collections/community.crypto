@@ -102,14 +102,9 @@ class CryptographyChainMatcher(ChainMatcher):
             try:
                 return binascii.unhexlify(key_identifier.replace(":", ""))
             except Exception:
-                if criterium_idx is None:
-                    module.warn(
-                        f"Criterium has invalid {name} value. Ignoring criterium."
-                    )
-                else:
-                    module.warn(
-                        f"Criterium {criterium_idx} in select_chain has invalid {name} value. Ignoring criterium."
-                    )
+                module.warn(
+                    f"Criterium {criterium_idx} in select_chain has invalid {name} value. Ignoring criterium."
+                )
         return None
 
     def __init__(self, *, criterium: Criterium, module: AnsibleModule) -> None:

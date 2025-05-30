@@ -287,8 +287,6 @@ def cryptography_oid_to_name(
 
 
 def _get_hex(bytesstr: bytes) -> str:
-    if bytesstr is None:
-        return bytesstr
     data = binascii.hexlify(bytesstr)
     return to_text(b":".join(data[i : i + 2] for i in range(0, len(data), 2)))
 
@@ -863,7 +861,7 @@ def parse_pkcs12(
     if _load_pkcs12 is not None:
         return _parse_pkcs12_36_0_0(pkcs12_bytes, passphrase=passphrase_bytes)
 
-    if LooseVersion(cryptography.__version__) >= LooseVersion("35.0"):
+    if LooseVersion(cryptography.__version__) >= LooseVersion("35.0"):  # type: ignore[unreachable]
         return _parse_pkcs12_35_0_0(pkcs12_bytes, passphrase=passphrase_bytes)
 
     return _parse_pkcs12_legacy(pkcs12_bytes, passphrase=passphrase_bytes)

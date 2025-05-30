@@ -510,9 +510,6 @@ class Handler:
     def get_device_by_label(self, label: str) -> str | None:
         """Returns the device that holds label passed by user"""
         blkid_bin = self._module.get_bin_path("blkid", True)
-        label = self._module.params["label"]
-        if label is None:
-            return None
         rc, stdout, dummy = self._run_command([blkid_bin, "--label", label])
         if rc != 0:
             return None

@@ -634,7 +634,7 @@ class ACMECertificateClient:
         self.cert_days = -1
         self.order: Order | None = None
         self.order_uri = self.data.get("order_uri") if self.data else None
-        self.all_chains = None
+        self.all_chains: list[dict[str, t.Any]] | None = None
         self.select_chain_matcher = []
         self.include_renewal_cert_id = module.params["include_renewal_cert_id"]
         self.profile = module.params["profile"]

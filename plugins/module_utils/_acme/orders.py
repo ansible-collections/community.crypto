@@ -39,11 +39,11 @@ class Order:
 
         self.data: dict[str, t.Any] | None = None
 
-        self.status = None
+        self.status: str | None = None
         self.identifiers: list[tuple[str, str]] = []
-        self.replaces_cert_id = None
-        self.finalize_uri = None
-        self.certificate_uri = None
+        self.replaces_cert_id: str | None = None
+        self.finalize_uri: str | None = None
+        self.certificate_uri: str | None = None
         self.authorization_uris: list[str] = []
         self.authorizations: dict[str, Authorization] = {}
 
