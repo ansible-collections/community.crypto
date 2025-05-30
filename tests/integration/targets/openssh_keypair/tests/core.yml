@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: "({{ backend }}) Generate key (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
     size: 1280
     backend: "{{ backend }}"
@@ -17,14 +17,14 @@
   check_mode: true
 
 - name: "({{ backend }}) Generate key"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
     size: 1280
     backend: "{{ backend }}"
   register: core_output
 
 - name: "({{ backend }}) Generate key (check mode idempotent)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/core"
     size: 1280
     backend: "{{ backend }}"
@@ -32,18 +32,18 @@
   check_mode: true
 
 - name: "({{ backend }}) Generate key (idempotent)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/core'
     size: 1280
     backend: "{{ backend }}"
   register: idempotency_core_output
 
 - name: "({{ backend }}) Log key return values"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ core_output }}"
 
 - name: "({{ backend }}) Assert core behavior"
-  assert:
+  ansible.builtin.assert:
     that:
       - check_core_output is changed
       - core_output is changed
@@ -52,7 +52,7 @@
       - idempotency_core_output is not changed
 
 - name: "({{ backend }}) Assert key returns fingerprint"
-  assert:
+  ansible.builtin.assert:
     that:
       - core_output['fingerprint'] is string
       - core_output['fingerprint'].startswith('SHA256:')
@@ -60,44 +60,44 @@
   when: not (backend == 'opensshbin' and openssh_version is version('6.8', '<'))
 
 - name: "({{ backend }}) Assert key returns public_key"
-  assert:
+  ansible.builtin.assert:
     that:
       - core_output['public_key'] is string
       - core_output['public_key'].startswith('ssh-rsa ')
 
 - name: "({{ backend }}) Assert key returns size value"
-  assert:
+  ansible.builtin.assert:
     that:
       - core_output['size']|type_debug == 'int'
       - core_output['size'] == 1280
 
 - name: "({{ backend }}) Assert key returns key type"
-  assert:
+  ansible.builtin.assert:
     that:
       - core_output['type'] is string
       - core_output['type'] == 'rsa'
 
 - name: "({{ backend }}) Retrieve key size from 'ssh-keygen'"
-  shell: "ssh-keygen -lf {{ remote_tmp_dir }}/core | grep -o -E '^[0-9]+'"
+  ansible.builtin.shell: "ssh-keygen -lf {{ remote_tmp_dir }}/core | grep -o -E '^[0-9]+'"
   register: core_size_ssh_keygen
 
 - name: "({{ backend }}) Assert key size matches 'ssh-keygen' output"
-  assert:
+  ansible.builtin.assert:
     that:
       - core_size_ssh_keygen.stdout == '1280'
 
 - name: "({{ backend }}) Read core.pub"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/core.pub'
   register: slurp
 
 - name: "({{ backend }}) Assert public key module return equal to the public key content"
-  assert:
+  ansible.builtin.assert:
     that:
       - "core_output.public_key == (slurp.content | b64decode).strip('\n ')"
 
 - name: "({{ backend }}) Remove key"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/core'
     backend: "{{ backend }}"
     state: absent

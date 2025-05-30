@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get key 1 info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_1.pem') | community.crypto.openssl_privatekey_info }}
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"
@@ -21,12 +21,12 @@
       - "'private_data' not in result"
 
 - name: Get key 2 info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_2.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"
@@ -41,26 +41,26 @@
       - "result.private_data.exponent > 5"
 
 - name: Get key 3 info (without passphrase)
-  set_fact:
+  ansible.builtin.set_fact:
     result_: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_3.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
   ignore_errors: true
   register: result
 
 - name: Check that loading passphrase protected key without passphrase failed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - >-
         'Wrong or empty passphrase provided for private key' in result.msg
 
 - name: Get key 3 info (with passphrase)
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_3.pem') | community.crypto.openssl_privatekey_info(passphrase='hunter2', return_private_key_data=true) }}
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"
@@ -74,12 +74,12 @@
       - "result.private_data.exponent > 5"
 
 - name: Get key 4 info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_4.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
 
 - name: Check that ECC key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"
@@ -94,12 +94,12 @@
       - "result.private_data.multiplier > 1024"
 
 - name: Get key 5 info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/privatekey_5.pem') | community.crypto.openssl_privatekey_info(return_private_key_data=true) }}
 
 - name: Check that DSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'public_key' in result"
       - "'public_key_fingerprints' in result"

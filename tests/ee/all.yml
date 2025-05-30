@@ -6,11 +6,11 @@
 - hosts: localhost
   tasks:
     - name: Show Python info
-      debug:
+      ansible.builtin.debug:
         var: ansible_python
 
     - name: Register cryptography version
-      command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+      ansible.builtin.command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
       register: cryptography_version
 
     - name: Register pyOpenSSL version
@@ -19,7 +19,7 @@
       register: pyopenssl_version
 
     - name: Determine output directory
-      set_fact:
+      ansible.builtin.set_fact:
         output_path: "{{ 'output-%0x' % ((2**32) | random) }}"
 
     - name: Find all roles

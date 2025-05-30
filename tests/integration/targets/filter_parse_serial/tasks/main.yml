@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test parse_serial filter
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         '0' | community.crypto.parse_serial == 0
@@ -22,35 +22,35 @@
         '1:2:3' | community.crypto.parse_serial == 66051
 
 - name: "Test error 1: empty string"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ '' | community.crypto.parse_serial }}
   ignore_errors: true
   register: error_1
 
 - name: "Test error 2: invalid type"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ [] | community.crypto.parse_serial }}
   ignore_errors: true
   register: error_2
 
 - name: "Test error 3: invalid values (range)"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ '100' | community.crypto.parse_serial }}
   ignore_errors: true
   register: error_3
 
 - name: "Test error 4: invalid values (digits)"
-  debug:
+  ansible.builtin.debug:
     msg: >-
       {{ 'abcdefg' | community.crypto.parse_serial }}
   ignore_errors: true
   register: error_4
 
 - name: Validate errors
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         error_1 is failed and "The 1st part '' is not a hexadecimal number in range [0, 255]: invalid literal" in error_1.msg

@@ -5,7 +5,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (check mode)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -17,7 +17,7 @@
       register: p12_standard_check
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -28,7 +28,7 @@
       register: p12_standard
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (check mode)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -40,7 +40,7 @@
       register: p12_standard_idempotency_check
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -51,7 +51,7 @@
       register: p12_standard_idempotency
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (empty other_certificates)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -63,17 +63,17 @@
       register: p12_standard_idempotency_no_certs
 
     - name: "({{ select_crypto_backend }}) Read ansible_pkey1.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
       register: ansible_pkey_content
 
     - name: "({{ select_crypto_backend }}) Read ansible1.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible1.crt'
       register: ansible_crt_content
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file again, idempotency (private key from file)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -84,18 +84,18 @@
       register: p12_standard_idempotency_2
 
     - name: "({{ select_crypto_backend }}) Read ansible.p12"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible.p12'
       register: ansible_p12_content
 
     - name: "({{ select_crypto_backend }}) Validate PKCS#12"
-      assert:
+      ansible.builtin.assert:
         that:
           - p12_standard.pkcs12 == ansible_p12_content.content
           - p12_standard_idempotency.pkcs12 == p12_standard.pkcs12
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (force)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -106,7 +106,7 @@
       register: p12_force
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (force + change mode)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
@@ -118,7 +118,7 @@
       register: p12_force_and_mode
 
     - name: "({{ select_crypto_backend }}) Dump PKCS#12"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         src: '{{ remote_tmp_dir }}/ansible.p12'
         path: '{{ remote_tmp_dir }}/ansible_parse.pem'
@@ -127,7 +127,7 @@
       register: p12_dumped
 
     - name: "({{ select_crypto_backend }}) Dump PKCS#12 file again, idempotency"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         src: '{{ remote_tmp_dir }}/ansible.p12'
         path: '{{ remote_tmp_dir }}/ansible_parse.pem'
@@ -136,7 +136,7 @@
       register: p12_dumped_idempotency
 
     - name: "({{ select_crypto_backend }}) Dump PKCS#12, check mode"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         src: '{{ remote_tmp_dir }}/ansible.p12'
         path: '{{ remote_tmp_dir }}/ansible_parse.pem'
@@ -146,7 +146,7 @@
       register: p12_dumped_check_mode
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file with multiple certs and passphrase"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
         friendly_name: abracadabra
@@ -160,7 +160,7 @@
       register: p12_multiple_certs
 
     - name: "({{ select_crypto_backend }}) Read ansible2.crt / ansible3.crt.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ item }}"
       loop:
         - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
@@ -168,7 +168,7 @@
       register: ansible_other_content
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file with multiple certs and passphrase, again (idempotency)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
         friendly_name: abracadabra
@@ -182,7 +182,7 @@
       register: p12_multiple_certs_idempotency
 
     - name: "({{ select_crypto_backend }}) Dump PKCS#12 with multiple certs and passphrase"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         src: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
         path: '{{ remote_tmp_dir }}/ansible_parse_multi_certs.pem'
@@ -191,7 +191,7 @@
         state: present
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (password fail 1)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_pw1.p12'
         friendly_name: abracadabra
@@ -203,7 +203,7 @@
       register: passphrase_error_1
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (password fail 2)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_pw2.p12'
         friendly_name: abracadabra
@@ -215,7 +215,7 @@
       register: passphrase_error_2
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (password fail 3)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_pw3.p12'
         friendly_name: abracadabra
@@ -226,7 +226,7 @@
       register: passphrase_error_3
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file, no privatekey"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_no_pkey.p12'
         friendly_name: abracadabra
@@ -235,12 +235,12 @@
       register: p12_no_pkey
 
     - name: "({{ select_crypto_backend }}) Create broken PKCS#12"
-      copy:
+      ansible.builtin.copy:
         dest: '{{ remote_tmp_dir }}/broken.p12'
         content: broken
 
     - name: "({{ select_crypto_backend }}) Regenerate broken PKCS#12"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/broken.p12'
         friendly_name: abracadabra
@@ -252,7 +252,7 @@
       register: output_broken
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_backup.p12'
         friendly_name: abracadabra
@@ -263,7 +263,7 @@
       register: p12_backup_1
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (idempotent)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_backup.p12'
         friendly_name: abracadabra
@@ -274,7 +274,7 @@
       register: p12_backup_2
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (change)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_backup.p12'
         friendly_name: abra
@@ -286,7 +286,7 @@
       register: p12_backup_3
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (remove)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_backup.p12'
         state: absent
@@ -295,7 +295,7 @@
       register: p12_backup_4
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file (remove, idempotent)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_backup.p12'
         state: absent
@@ -303,7 +303,7 @@
       register: p12_backup_5
 
     - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_empty.p12'
         friendly_name: abracadabra
@@ -315,7 +315,7 @@
 
 
     - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (idempotent)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_empty.p12'
         friendly_name: abracadabra
@@ -326,7 +326,7 @@
       register: p12_empty_idem
 
     - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (idempotent, concatenated other certificates)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_empty.p12'
         friendly_name: abracadabra
@@ -337,12 +337,12 @@
       register: p12_empty_concat_idem
 
     - name: "({{ select_crypto_backend }}) Read ansible23.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/ansible23.crt' }}"
       register: ansible_other_content_concat
 
     - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (idempotent, concatenated other certificates)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_empty.p12'
         friendly_name: abracadabra
@@ -353,14 +353,14 @@
       register: p12_empty_concat_content_idem
 
     - name: "({{ select_crypto_backend }}) Generate 'empty' PKCS#12 file (parse)"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         src: '{{ remote_tmp_dir }}/ansible_empty.p12'
         path: '{{ remote_tmp_dir }}/ansible_empty.pem'
         action: parse
 
     - name: "({{ select_crypto_backend }}) Generate PKCS#12 file passphrase and compatibility encryption"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         select_crypto_backend: '{{ select_crypto_backend }}'
         path: '{{ remote_tmp_dir }}/ansible_compatibility2022.p12'
         friendly_name: compat_fn
@@ -378,11 +378,11 @@
         - select_crypto_backend == 'cryptography'
         - cryptography_version.stdout is version('38.0.0', '>=')
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   always:
     - name: "({{ select_crypto_backend }}) Delete PKCS#12 file"
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         state: absent
         path: '{{ remote_tmp_dir }}/{{ item }}.p12'
       loop:

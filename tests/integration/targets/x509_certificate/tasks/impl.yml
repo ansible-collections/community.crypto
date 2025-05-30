@@ -3,8 +3,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug:
+- ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
-- import_tasks: selfsigned.yml
-- import_tasks: ownca.yml
-- import_tasks: removal.yml
+- ansible.builtin.import_tasks: selfsigned.yml
+- ansible.builtin.import_tasks: ownca.yml
+- ansible.builtin.import_tasks: removal.yml

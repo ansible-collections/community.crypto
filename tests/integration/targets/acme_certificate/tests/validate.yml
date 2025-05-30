@@ -4,15 +4,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check that certificate 1 is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_1_valid is not failed
 - name: Check that certificate 1 contains correct SANs
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS:example.com' in cert_1_text.stdout"
 - name: Read certificate 1 files
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
     - cert-1.pem
@@ -20,7 +20,7 @@
     - cert-1-fullchain.pem
   register: slurp
 - name: Check that certificate 1 retrieval got all chains
-  assert:
+  ansible.builtin.assert:
     that:
       - "'all_chains' in cert_1_obtain_results"
       - "cert_1_obtain_results.all_chains | length > 1"
@@ -32,16 +32,16 @@
       - "(slurp.results[2].content | b64decode) == cert_1_obtain_results.all_chains[cert_1_alternate | int].full_chain"
 
 - name: Check that certificate 2 is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_2_valid is not failed
 - name: Check that certificate 2 contains correct SANs
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS:*.example.com' in cert_2_text.stdout"
       - "'DNS:example.com' in cert_2_text.stdout"
 - name: Read certificate 2 files
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
     - cert-2.pem
@@ -49,7 +49,7 @@
     - cert-2-fullchain.pem
   register: slurp
 - name: Check that certificate 1 retrieval got all chains
-  assert:
+  ansible.builtin.assert:
     that:
       - "'all_chains' in cert_2_obtain_results"
       - "cert_2_obtain_results.all_chains | length > 1"
@@ -61,17 +61,17 @@
       - "(slurp.results[2].content | b64decode) == cert_2_obtain_results.all_chains[cert_2_alternate | int].full_chain"
 
 - name: Check that certificate 3 is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_3_valid is not failed
 - name: Check that certificate 3 contains correct SANs
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS:*.example.com' in cert_3_text.stdout"
       - "'DNS:example.org' in cert_3_text.stdout"
       - "'DNS:t1.example.com' in cert_3_text.stdout"
 - name: Read certificate 3 files
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
     - cert-3.pem
@@ -79,7 +79,7 @@
     - cert-3-fullchain.pem
   register: slurp
 - name: Check that certificate 1 retrieval got all chains
-  assert:
+  ansible.builtin.assert:
     that:
       - "'all_chains' in cert_3_obtain_results"
       - "cert_3_obtain_results.all_chains | length > 1"
@@ -91,11 +91,11 @@
       - "(slurp.results[2].content | b64decode) == cert_3_obtain_results.all_chains[cert_3_alternate | int].full_chain"
 
 - name: Check that certificate 4 is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_4_valid is not failed
 - name: Check that certificate 4 contains correct SANs
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS:example.com' in cert_4_text.stdout"
       - "'DNS:t1.example.com' in cert_4_text.stdout"
@@ -103,72 +103,72 @@
       - "'DNS:example.org' in cert_4_text.stdout"
       - "'DNS:TesT.example.org' in cert_4_text.stdout"
 - name: Check that certificate 4 retrieval did not get all chains
-  assert:
+  ansible.builtin.assert:
     that:
       - "'all_chains' not in cert_4_obtain_results"
 
 - name: Check that certificate 5 is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_5_valid is not failed
 - name: Check that certificate 5 contains correct SANs
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS:t2.example.com' in cert_5_text.stdout"
 - name: Check that certificate 5 was not recreated on the first try
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_5_recreate_1 == false
 - name: Check that certificate 5 was recreated on the second try
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_5_recreate_2 == true
 - name: Check that certificate 5 was recreated on the third try
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_5_recreate_3 == true
 
 - block:
     - name: Check that certificate 6 is valid
-      assert:
+      ansible.builtin.assert:
         that:
           - cert_6_valid is not failed
     - name: Check that certificate 6 contains correct SANs
-      assert:
+      ansible.builtin.assert:
         that:
           - "'DNS:example.org' in cert_6_text.stdout"
   when: acme_intermediates[0].subject_key_identifier is defined
 
 - block:
     - name: Check that certificate 7 is valid
-      assert:
+      ansible.builtin.assert:
         that:
           - cert_7_valid is not failed
     - name: Check that certificate 7 contains correct SANs
-      assert:
+      ansible.builtin.assert:
         that:
           - "'IP Address:127.0.0.1' in cert_8_text.stdout or 'IP:127.0.0.1' in cert_8_text.stdout"
   when: acme_roots[2].subject_key_identifier is defined
 
 - block:
     - name: Check that certificate 8 is valid
-      assert:
+      ansible.builtin.assert:
         that:
           - cert_8_valid is not failed
     - name: Check that certificate 8 contains correct SANs
-      assert:
+      ansible.builtin.assert:
         that:
           - "'IP Address:127.0.0.1' in cert_8_text.stdout or 'IP:127.0.0.1' in cert_8_text.stdout"
   when: cryptography_version.stdout is version('1.3', '>=')
 
 - name: Validate that orders were not retrieved
-  assert:
+  ansible.builtin.assert:
     that:
       - "'account' in account_orders_not"
       - "'orders' not in account_orders_not"
 
 - name: Validate that orders were retrieved as list of URLs (1/2)
-  assert:
+  ansible.builtin.assert:
     that:
       - "'account' in account_orders_urls"
       - "'orders' not in account_orders_urls"
@@ -176,7 +176,7 @@
       - "account_orders_urls.order_uris[0] is string"
 
 - name: Validate that orders were retrieved as list of URLs (2/2)
-  assert:
+  ansible.builtin.assert:
     that:
       - "'account' in account_orders_urls2"
       - "'orders' not in account_orders_urls2"
@@ -184,7 +184,7 @@
       - "account_orders_urls2.order_uris[0] is string"
 
 - name: Validate that orders were retrieved as list of objects (1/2)
-  assert:
+  ansible.builtin.assert:
     that:
       - "'account' in account_orders_full"
       - "'orders' in account_orders_full"
@@ -193,7 +193,7 @@
       - "account_orders_full.order_uris[0] is string"
 
 - name: Validate that orders were retrieved as list of objects (2/2)
-  assert:
+  ansible.builtin.assert:
     that:
       - "'account' in account_orders_full2"
       - "'orders' in account_orders_full2"

@@ -3,16 +3,16 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- set_fact:
+- ansible.builtin.set_fact:
     system_potentially_has_no_algorithm_support: "{{ ansible_os_family == 'FreeBSD' }}"
 
 - name: "({{ select_crypto_backend }}) Read private key"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekey1.pem'
   register: slurp
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 idempotency and content returned"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey1_check is changed
       - privatekey1 is changed
@@ -23,47 +23,47 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 (test - RSA key with size 4096 bits)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey1.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  ansible.builtin.shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey1.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey1
 
 - name: "({{ select_crypto_backend }}) Validate privatekey1 (assert - RSA key with size 4096 bits)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey1.stdout == '4096'
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey2 (test - RSA key with size 2048 bits)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey2.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  ansible.builtin.shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey2.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey2
 
 - name: "({{ select_crypto_backend }}) Validate privatekey2 (assert - RSA key with size 2048 bits)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey2.stdout == '2048'
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey3 (test - DSA key with size 3072 bits)"
-  shell: "{{ openssl_binary }} dsa -noout -text -in {{ remote_tmp_dir }}/privatekey3.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  ansible.builtin.shell: "{{ openssl_binary }} dsa -noout -text -in {{ remote_tmp_dir }}/privatekey3.pem  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey3
 
 - name: Validate privatekey3 (assert - DSA key with size 3072 bits)
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey3.stdout == '3072'
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey4 (test - Ensure key has been removed)"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/privatekey4.pem'
   register: privatekey4
 
 - name: "({{ select_crypto_backend }}) Validate privatekey4 (assert - Ensure key has been removed)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey4.stat.exists == False
 
 - name: "({{ select_crypto_backend }}) Validate privatekey4 removal behavior"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey4_delete is changed
       - privatekey4_delete.privatekey is none
@@ -71,37 +71,37 @@
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (test - Passphrase protected key + idempotence)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  ansible.builtin.shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey5
   # Current version of OS/X that runs in the CI (10.11) does not have an up to date version of the OpenSSL library
   # leading to this test to fail when run in the CI. However, this test has been run for 10.12 and has returned successfully.
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 (assert - Passphrase protected key + idempotence)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey5.stdout == (default_rsa_key_size | string)
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey5 idempotence (assert - Passphrase protected key + idempotence)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey5_idempotence is not changed
 
 
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (test - Passphrase protected key with non ascii character)"
-  shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey6.pem -passin pass:ànsïblé | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
+  ansible.builtin.shell: "{{ openssl_binary }} rsa -noout -text -in {{ remote_tmp_dir }}/privatekey6.pem -passin pass:ànsïblé | grep Private | sed 's/\\(RSA *\\)*Private-Key: (\\(.*\\) bit.*)/\\2/'"
   register: privatekey6
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate privatekey6 (assert - Passphrase protected key with non ascii character)"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey6.stdout == (default_rsa_key_size | string)
   when: openssl_version.stdout is version('0.9.8zh', '>=')
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (dump with OpenSSL)"
-  shell: "{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"
+  ansible.builtin.shell: "{{ openssl_binary }} ec -in {{ remote_tmp_dir }}/privatekey-{{ item.item.curve }}.pem -noout -text | grep 'ASN1 OID: ' | sed 's/ASN1 OID: \\([^ ]*\\)/\\1/'"
   loop: "{{ privatekey_ecc_generate.results }}"
   register: privatekey_ecc_dump
   when: openssl_version.stdout is version('0.9.8zh', '>=') and 'skip_reason' not in item
@@ -109,7 +109,7 @@
     label: "{{ item.item.curve }}"
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation"
-  assert:
+  ansible.builtin.assert:
     that:
       - item is changed
   loop: "{{ privatekey_ecc_generate.results }}"
@@ -118,7 +118,7 @@
     label: "{{ item.item.curve }}"
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation (curve type)"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'skip_reason' in item or item.item.item.openssl_name == item.stdout"
   loop: "{{ privatekey_ecc_dump.results }}"
@@ -127,7 +127,7 @@
     label: "{{ item.item.item }} - {{ item.stdout if 'stdout' in item else '<unsupported>' }}"
 
 - name: "({{ select_crypto_backend }}) Validate ECC generation idempotency"
-  assert:
+  ansible.builtin.assert:
     that:
       - item is not changed
   loop: "{{ privatekey_ecc_idempotency.results }}"
@@ -136,7 +136,7 @@
     label: "{{ item.item.curve }}"
 
 - name: "({{ select_crypto_backend }}) Validate other type generation (just check changed)"
-  assert:
+  ansible.builtin.assert:
     that:
       - (item is succeeded and item is changed) or
         (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
@@ -146,7 +146,7 @@
     label: "{{ item.item.type }}"
 
 - name: "({{ select_crypto_backend }}) Validate other type generation idempotency"
-  assert:
+  ansible.builtin.assert:
     that:
       - (item is succeeded and item is not changed) or
         (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
@@ -156,7 +156,7 @@
     label: "{{ item.item.type }}"
 
 - name: "({{ select_crypto_backend }}) Validate passphrase changing"
-  assert:
+  ansible.builtin.assert:
     that:
       - passphrase_1 is changed
       - passphrase_2 is not changed
@@ -170,12 +170,12 @@
       - passphrase_5.backup_file is string
 
 - name: "({{ select_crypto_backend }}) Verify that broken key will be regenerated"
-  assert:
+  ansible.builtin.assert:
     that:
       - output_broken is changed
 
 - name: "({{ select_crypto_backend }}) Validate remove"
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_1 is changed
       - remove_2 is not changed
@@ -183,7 +183,7 @@
       - remove_2.backup_file is undefined
 
 - name: "({{ select_crypto_backend }}) Validate mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey_mode_1 is changed
       - privatekey_mode_1_stat.stat.mode == '0400'
@@ -193,7 +193,7 @@
       - privatekey_mode_3_file_change is changed
 
 - name: "({{ select_crypto_backend }}) Validate format 1"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey_fmt_1_step_1 is changed
       - privatekey_fmt_1_step_2 is not changed
@@ -208,7 +208,7 @@
   when: 'select_crypto_backend == "cryptography"'
 
 - name: "({{ select_crypto_backend }}) Validate format 2 (failed)"
-  assert:
+  ansible.builtin.assert:
     that:
       - system_potentially_has_no_algorithm_support
       - privatekey_fmt_2_step_1 is failed
@@ -216,7 +216,7 @@
   when: 'select_crypto_backend == "cryptography" and cryptography_version.stdout is version("2.6", ">=") and privatekey_fmt_2_step_1 is failed'
 
 - name: "({{ select_crypto_backend }}) Validate format 2"
-  assert:
+  ansible.builtin.assert:
     that:
       - privatekey_fmt_2_step_1 is succeeded and privatekey_fmt_2_step_1 is changed
       - privatekey_fmt_2_step_2 is succeeded and privatekey_fmt_2_step_2 is not changed

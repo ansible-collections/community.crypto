@@ -8,11 +8,11 @@
   register: result
 
 - name: Dump result
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Validate result
-  assert:
+  ansible.builtin.assert:
     that:
       - result.openssl_present
       - result.python_cryptography_installed

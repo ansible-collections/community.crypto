@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Checks
-  assert:
+  ansible.builtin.assert:
     that:
       - order_1.output_json.status == 'pending'
       - deactivate_1 is changed

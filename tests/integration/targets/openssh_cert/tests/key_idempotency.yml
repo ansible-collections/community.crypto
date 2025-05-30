@@ -8,16 +8,16 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     new_signing_key: "{{ remote_tmp_dir }}/new_key"
     new_public_key: "{{ remote_tmp_dir }}/new_key.pub"
 
 - name: Generate new test key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ new_signing_key }}"
 
 - name: Generate cert with original keys
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -27,7 +27,7 @@
 
 - block:
     - name: Generate cert with updated signature algorithm
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         path: "{{ certificate_path }}"
         public_key: "{{ public_key }}"
@@ -38,12 +38,12 @@
       register: updated_signature_algorithm
 
     - name: Assert signature algorithm update causes change
-      assert:
+      ansible.builtin.assert:
         that:
           - updated_signature_algorithm is changed
 
     - name: Generate cert with updated signature algorithm (idempotent)
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         path: "{{ certificate_path }}"
         public_key: "{{ public_key }}"
@@ -54,13 +54,13 @@
       register: updated_signature_algorithm_idempotent
 
     - name: Assert signature algorithm update is idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - updated_signature_algorithm_idempotent is not changed
 
     - block:
         - name: Generate cert with original signature algorithm
-          openssh_cert:
+          community.crypto.openssh_cert:
             type: user
             path: "{{ certificate_path }}"
             public_key: "{{ public_key }}"
@@ -71,7 +71,7 @@
           register: second_signature_algorithm
 
         - name: Assert second signature algorithm update causes change
-          assert:
+          ansible.builtin.assert:
             that:
               - second_signature_algorithm is changed
       # RHEL9, Fedora 41 and Rocky 9 disable the SHA-1 algorithms by default, making this test fail with a 'libcrypt' error.
@@ -81,7 +81,7 @@
         - not (ansible_facts['distribution'] == "Fedora" and (ansible_facts['distribution_major_version'] | int) >= 41)
 
     - name: Omit signature algorithm
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         path: "{{ certificate_path }}"
         public_key: "{{ public_key }}"
@@ -91,12 +91,12 @@
       register: omitted_signature_algorithm
 
     - name: Assert omitted_signature_algorithm does not cause change
-      assert:
+      ansible.builtin.assert:
         that:
           - omitted_signature_algorithm is not changed
 
     - name: Revert to original certificate
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         path: "{{ certificate_path }}"
         public_key: "{{ public_key }}"
@@ -107,7 +107,7 @@
   when: openssh_version is version("7.3", ">=")
 
 - name: Generate cert with new signing key
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -117,7 +117,7 @@
   register: new_signing_key_output
 
 - name: Generate cert with new public key
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ new_public_key }}"
@@ -127,7 +127,7 @@
   register: new_public_key_output
 
 - name: Generate cert with new signing key - full idempotency
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ public_key }}"
@@ -138,7 +138,7 @@
   register: new_signing_key_full_idempotency_output
 
 - name: Generate cert with new pubic key - full idempotency
-  openssh_cert:
+  community.crypto.openssh_cert:
     type: user
     path: "{{ certificate_path }}"
     public_key: "{{ new_public_key }}"
@@ -149,7 +149,7 @@
   register: new_public_key_full_idempotency_output
 
 - name: Assert changes to public key or signing key results in no change unless idempotency=full
-  assert:
+  ansible.builtin.assert:
     that:
       - new_signing_key_output is not changed
       - new_public_key_output is not changed
@@ -157,11 +157,11 @@
       - new_public_key_full_idempotency_output is changed
 
 - name: Remove certificate
-  openssh_cert:
+  community.crypto.openssh_cert:
     path: "{{ certificate_path }}"
     state: absent
 
 - name: Remove new keypair
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ new_signing_key }}"
     state: absent

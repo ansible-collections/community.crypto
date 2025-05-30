@@ -23,7 +23,7 @@
   loop: "{{ old_test_artifacts.files }}"
 
 - name: "({{ backend }}) Regenerate - setup simple keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -31,11 +31,11 @@
     regenerate: "{{ item }}"
   loop: "{{ regenerate_values }}"
 - name: "({{ backend }}) Regenerate - setup password protected keys"
-  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - setup broken keys"
-  copy:
+  ansible.builtin.copy:
     dest: '{{ remote_tmp_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
     content: 'broken key'
     mode: '0700'
@@ -44,11 +44,11 @@
     - ['', '.pub']
 
 - name: "({{ backend }}) Regenerate - setup password protected keys for passphrse test"
-  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - modify broken keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
@@ -58,7 +58,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -70,7 +70,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify broken keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
@@ -79,7 +79,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -91,7 +91,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -101,7 +101,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -113,7 +113,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -126,7 +126,7 @@
   register: result
   when: backend == 'cryptography'
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success
       - result.results[1] is failed
@@ -137,7 +137,7 @@
   when: backend == 'cryptography'
 
 - name: "({{ backend }}) Regenerate - modify password protected keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -146,7 +146,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -158,7 +158,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-d-{{ item }}'
     type: rsa
     size: 1024
@@ -170,7 +170,7 @@
   register: result
   when: backend == 'cryptography'
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success
       - result.results[1] is failed
@@ -181,7 +181,7 @@
   when: backend == 'cryptography'
 
 - name: "({{ backend }}) Regenerate - not modify regular keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -190,7 +190,7 @@
   check_mode: true
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -199,7 +199,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - not modify regular keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -207,7 +207,7 @@
     backend: "{{ backend }}"
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -216,7 +216,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - adjust key size (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
@@ -226,7 +226,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -236,7 +236,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - adjust key size"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
@@ -245,7 +245,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -255,7 +255,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - redistribute keys"
-  copy:
+  ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
     dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
     remote_src: true
@@ -270,7 +270,7 @@
 
   block:
     - name: "({{ backend }}) Regenerate - adjust key type (check mode)"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -280,7 +280,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -290,7 +290,7 @@
           - result.results[4] is changed
 
     - name: "({{ backend }}) Regenerate - adjust key type"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -299,7 +299,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -309,7 +309,7 @@
           - result.results[4] is changed
 
     - name: "({{ backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
         remote_src: true
@@ -319,7 +319,7 @@
       when: "item.0 != 'always'"
 
     - name: "({{ backend }}) Regenerate - adjust comment (check mode)"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -330,7 +330,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -338,7 +338,7 @@
     - when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
       block:
         - name: "({{ backend }}) Regenerate - adjust comment"
-          openssh_keypair:
+          community.crypto.openssh_keypair:
             path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
             type: '{{ ssh_type }}'
             size: '{{ ssh_size }}'
@@ -347,7 +347,7 @@
             backend: "{{ backend }}"
           loop: "{{ regenerate_values }}"
           register: result
-        - assert:
+        - ansible.builtin.assert:
             that:
               - result is changed
               # for all values but 'always', the key should not be regenerated.

@@ -10,46 +10,46 @@
 
 - block:
     - name: Obtain root and intermediate certificates
-      get_url:
+      ansible.builtin.get_url:
         url: "http://{{ acme_host }}:5000/{{ item.0 }}-certificate-for-ca/{{ item.1 }}"
         dest: "{{ remote_tmp_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
       loop: "{{ query('nested', types, root_numbers) }}"
 
     - name: Analyze root certificates
-      x509_certificate_info:
+      community.crypto.x509_certificate_info:
         path: "{{ remote_tmp_dir }}/acme-root-{{ item }}.pem"
       loop: "{{ root_numbers }}"
       register: acme_roots
 
     - name: Analyze intermediate certificates
-      x509_certificate_info:
+      community.crypto.x509_certificate_info:
         path: "{{ remote_tmp_dir }}/acme-intermediate-{{ item }}.pem"
       loop: "{{ root_numbers }}"
       register: acme_intermediates
 
     - name: Read root certificates
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/acme-root-' ~ item ~ '.pem' }}"
       loop: "{{ root_numbers }}"
       register: slurp_roots
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
       loop: "{{ acme_roots.results }}"
       register: acme_roots_tmp
 
     - name: Read intermediate certificates
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/acme-intermediate-' ~ item ~ '.pem' }}"
       loop: "{{ root_numbers }}"
       register: slurp_intermediates
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
       loop: "{{ acme_intermediates.results }}"
       register: acme_intermediates_tmp
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
         acme_root_certs: "{{ slurp_roots.results | map(attribute='content') | map('b64decode') | list }}"
         acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
@@ -74,48 +74,48 @@
       # - public_key_fingerprints
 
 - name: ACME root certificate info
-  debug:
+  ansible.builtin.debug:
     var: acme_roots
 
 # - name: ACME root certificates as PEM
-#   debug:
+#   ansible.builtin.debug:
 #     var: acme_root_certs
 
 - name: ACME intermediate certificate info
-  debug:
+  ansible.builtin.debug:
     var: acme_intermediates
 
 # - name: ACME intermediate certificates as PEM
-#   debug:
+#   ansible.builtin.debug:
 #     var: acme_intermediate_certs
 
 - block:
     - name: Running tests with OpenSSL backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: openssl
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
   when: openssl_version.stdout is version('1.0.0', '>=')
 
 - name: Remove output directory
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   when: cryptography_version.stdout is version('1.5', '>=')

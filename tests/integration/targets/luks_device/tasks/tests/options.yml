@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create with keysize
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -15,7 +15,7 @@
   become: true
   register: create_with_keysize
 - name: Create with keysize (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -26,7 +26,7 @@
   become: true
   register: create_idem_with_keysize
 - name: Create with different keysize (idempotent since we do not update keysize)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -37,7 +37,7 @@
   become: true
   register: create_idem_with_diff_keysize
 - name: Create with ambiguous arguments
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -49,7 +49,7 @@
   become: true
   register: create_with_ambiguous
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_with_keysize is changed
       - create_idem_with_keysize is not changed

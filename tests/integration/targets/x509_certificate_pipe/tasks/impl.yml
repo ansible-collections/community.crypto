@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate privatekey"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/{{ item }}.pem'
     size: '{{ default_rsa_key_size_certificates }}'
   loop:
@@ -12,7 +12,7 @@
     - privatekey2
 
 - name: "({{ select_crypto_backend }}) Generate CSRs"
-  openssl_csr:
+  community.crypto.openssl_csr:
     privatekey_path: '{{ remote_tmp_dir }}/{{ item.key }}.pem'
     path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     subject:
@@ -35,7 +35,7 @@
 ## Self Signed
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
@@ -46,7 +46,7 @@
   register: generate_certificate_check
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     selfsigned_not_before: 20181023133742Z
@@ -56,7 +56,7 @@
   register: generate_certificate
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (idempotent)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -67,7 +67,7 @@
   register: generate_certificate_idempotent
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (idempotent, check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -79,7 +79,7 @@
   register: generate_certificate_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (changed)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -90,7 +90,7 @@
   register: generate_certificate_changed
 
 - name: "({{ select_crypto_backend }}) Generate self-signed certificate (changed, check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: selfsigned
     content: "{{ generate_certificate.certificate }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -102,29 +102,29 @@
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  ansible.builtin.shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - certificate_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - certificate_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate certificate (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_certificate_check is changed
       - generate_certificate is changed
@@ -136,7 +136,7 @@
 ## Own CA
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     ownca_content: '{{ generate_certificate.certificate }}'
     ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -148,7 +148,7 @@
   register: ownca_generate_certificate_check
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     ownca_content: '{{ generate_certificate.certificate }}'
     ownca_privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -159,7 +159,7 @@
   register: ownca_generate_certificate
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (idempotent)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
@@ -171,7 +171,7 @@
   register: ownca_generate_certificate_idempotent
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (idempotent, check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
@@ -184,7 +184,7 @@
   register: ownca_generate_certificate_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (changed)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
@@ -196,7 +196,7 @@
   register: ownca_generate_certificate_changed
 
 - name: "({{ select_crypto_backend }}) Generate own CA certificate (changed, check mode)"
-  x509_certificate_pipe:
+  community.crypto.x509_certificate_pipe:
     provider: ownca
     content: "{{ ownca_generate_certificate.certificate }}"
     ownca_content: '{{ generate_certificate.certificate }}'
@@ -209,29 +209,29 @@
   register: ownca_generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
+  ansible.builtin.shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - certificate_cn.stdout.split('=')[-1] == 'example.com'
       - certificate_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate certificate (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - ownca_generate_certificate_check is changed
       - ownca_generate_certificate is changed

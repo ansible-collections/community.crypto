@@ -10,20 +10,20 @@
 
 # The docker --link functionality gives us an ENV var we can key off of to see if we have access to
 # the httptester container
-- set_fact:
+- ansible.builtin.set_fact:
     has_httptester: "{{ lookup('env', 'HTTPTESTER') != '' }}"
 
 - name: make sure we have the ansible_os_family and ansible_distribution_version facts
-  setup:
+  ansible.builtin.setup:
     gather_subset: distribution
   when: ansible_facts == {}
 
 # If we are running with access to a httptester container, grab it's cacert and install it
 - block:
     # Override hostname defaults with httptester linked names
-    - include_vars: httptester.yml
+    - ansible.builtin.include_vars: httptester.yml
 
-    - include_tasks: "{{ lookup('first_found', files)}}"
+    - ansible.builtin.include_tasks: "{{ lookup('first_found', files) }}"
       vars:
         files:
           - "{{ ansible_os_family | lower }}.yml"

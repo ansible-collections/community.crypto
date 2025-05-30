@@ -4,25 +4,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"
-  shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  ansible.builtin.shell: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - Common Name)"
-  shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr.csr -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr.csr -nameopt oneline,-space_eq"
   register: csr_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - csr modulus)"
-  shell: '{{ openssl_binary }} req -noout -modulus -in {{ remote_tmp_dir }}/csr.csr'
+  ansible.builtin.shell: '{{ openssl_binary }} req -noout -modulus -in {{ remote_tmp_dir }}/csr.csr'
   register: csr_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - csr_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate CSR (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_check is changed
       - generate_csr is changed
@@ -30,12 +30,12 @@
       - generate_csr_idempotent_check is not changed
 
 - name: "({{ select_crypto_backend }}) Read CSR"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/csr.csr'
   register: slurp
 
 - name: "({{ select_crypto_backend }}) Validate CSR (data retrieval)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_check.csr is none
       - generate_csr.csr == (slurp.content | b64decode)
@@ -43,7 +43,7 @@
       - generate_csr.csr == generate_csr_idempotent_check.csr
 
 - name: "({{ select_crypto_backend }}) Validate CSR without SAN (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_nosan_check is changed
       - generate_csr_nosan is changed
@@ -51,28 +51,28 @@
       - generate_csr_nosan_check_idempotent_check is not changed
 
 - name: "({{ select_crypto_backend }}) Validate CSR_KU_XKU (assert idempotency, change)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_ku_xku is not changed
       - csr_ku_xku_change is changed
       - csr_ku_xku_change_2 is changed
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (test - Common Name)"
-  shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr_oldapi.csr -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr_oldapi.csr -nameopt oneline,-space_eq"
   register: csr_oldapi_cn
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (test - csr modulus)"
-  shell: '{{ openssl_binary }} req -noout -modulus -in {{ remote_tmp_dir }}/csr_oldapi.csr'
+  ansible.builtin.shell: '{{ openssl_binary }} req -noout -modulus -in {{ remote_tmp_dir }}/csr_oldapi.csr'
   register: csr_oldapi_modulus
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_oldapi_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - csr_oldapi_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate invalid SAN (1/2)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_invalid_san is failed
       - "'Subject Alternative Name' in generate_csr_invalid_san.msg"
@@ -87,49 +87,49 @@
   when: cryptography_version.stdout is version('2.0', '<')
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (test - everything)"
-  shell: "{{ openssl_binary }} req -noout -in {{ remote_tmp_dir }}/csr_ocsp.csr -text"
+  ansible.builtin.shell: "{{ openssl_binary }} req -noout -in {{ remote_tmp_dir }}/csr_ocsp.csr -text"
   register: csr_ocsp
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - "(csr_ocsp.stdout is search('\\s+TLS Feature:\\s*\\n\\s+status_request\\s+')) or
          (csr_ocsp.stdout is search('\\s+1.3.6.1.5.5.7.1.24:\\s*\\n\\s+0\\.\\.\\.\\.\\s+'))"
 
 - name: "({{ select_crypto_backend }}) Validate OCSP Must Staple CSR (assert idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_ocsp_idempotency is not changed
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - privatekey's public key)"
-  shell: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey2.pem'
+  ansible.builtin.shell: '{{ openssl_binary }} ec -pubout -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey_ecc_key
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - Common Name)"
-  shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr2.csr -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr2.csr -nameopt oneline,-space_eq"
   register: csr_ecc_cn
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (test - CSR pubkey)"
-  shell: '{{ openssl_binary }} req -noout -pubkey -in {{ remote_tmp_dir }}/csr2.csr'
+  ansible.builtin.shell: '{{ openssl_binary }} req -noout -pubkey -in {{ remote_tmp_dir }}/csr2.csr'
   register: csr_ecc_pubkey
 
 - name: "({{ select_crypto_backend }}) Validate ECC CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_ecc_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - csr_ecc_pubkey.stdout == privatekey_ecc_key.stdout
 
 - name: "({{ select_crypto_backend }}) Validate CSR (text common name - Common Name)"
-  shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr3.csr -nameopt oneline,-space_eq"
+  ansible.builtin.shell: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr3.csr -nameopt oneline,-space_eq"
   register: csr3_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr3_cn.stdout.split('=')[-1] == 'This is for Ansible'
 
 - name: "({{ select_crypto_backend }}) Validate country name idempotency and validation"
-  assert:
+  ansible.builtin.assert:
     that:
       - country_idempotent_1 is changed
       - country_idempotent_2 is not changed
@@ -137,13 +137,13 @@
       - country_fail_4 is failed
 
 - name: "({{ select_crypto_backend }}) Validate idempotency of privatekey_passphrase"
-  assert:
+  ansible.builtin.assert:
     that:
       - passphrase_1 is changed
       - passphrase_1_content is not changed
 
 - name: "({{ select_crypto_backend }}) Validate private key passphrase errors"
-  assert:
+  ansible.builtin.assert:
     that:
       - passphrase_error_1 is failed
       - "'assphrase' in passphrase_error_1.msg or 'assword' in passphrase_error_1.msg"
@@ -153,12 +153,12 @@
       - "'assphrase' in passphrase_error_3.msg or 'assword' in passphrase_error_3.msg or 'serializ' in passphrase_error_3.msg"
 
 - name: "({{ select_crypto_backend }}) Verify that broken CSR will be regenerated"
-  assert:
+  ansible.builtin.assert:
     that:
       - output_broken is changed
 
 - name: "({{ select_crypto_backend }}) Verify that subject key identifier handling works"
-  assert:
+  ansible.builtin.assert:
     that:
       - subject_key_identifier_1 is changed
       - subject_key_identifier_2 is not changed
@@ -168,7 +168,7 @@
       - subject_key_identifier_6 is changed
 
 - name: "({{ select_crypto_backend }}) Verify that authority key identifier handling works"
-  assert:
+  ansible.builtin.assert:
     that:
       - authority_key_identifier_1 is changed
       - authority_key_identifier_2 is not changed
@@ -176,7 +176,7 @@
       - authority_key_identifier_4 is changed
 
 - name: "({{ select_crypto_backend }}) Verify that authority cert issuer / serial number handling works"
-  assert:
+  ansible.builtin.assert:
     that:
       - authority_cert_issuer_sn_1 is changed
       - authority_cert_issuer_sn_2 is not changed
@@ -185,7 +185,7 @@
       - authority_cert_issuer_sn_5 is changed
 
 - name: "({{ select_crypto_backend }}) Check backup"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_backup_1 is changed
       - csr_backup_1.backup_file is undefined
@@ -200,7 +200,7 @@
       - csr_backup_4.csr is none
 
 - name: "({{ select_crypto_backend }}) Check CSR with everything"
-  assert:
+  ansible.builtin.assert:
     that:
       - everything_1 is changed
       - everything_2 is not changed
@@ -271,7 +271,7 @@
       - everything_info.name_constraints_critical == true
 
 - name: "({{ select_crypto_backend }}) Check CSR with everything"
-  assert:
+  ansible.builtin.assert:
     that:
       - everything_info.authority_cert_issuer == [
             "DNS:ca.example.org",
@@ -314,7 +314,7 @@
         ]
 
 - name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.6, < 2.8)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_ed25519_ed448.results[0] is failed
       - generate_csr_ed25519_ed448.results[1] is failed
@@ -325,7 +325,7 @@
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.6', '>=') and cryptography_version.stdout is version('2.8', '<') and generate_csr_ed25519_ed448_privatekey is not failed
 
 - name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests (for cryptography >= 2.8)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_ed25519_ed448 is succeeded
       - generate_csr_ed25519_ed448.results[0] is changed
@@ -336,7 +336,7 @@
   when: select_crypto_backend == 'cryptography' and cryptography_version.stdout is version('2.8', '>=') and generate_csr_ed25519_ed448_privatekey is not failed
 
 - name: "({{ select_crypto_backend }}) Verify CRL distribution endpoints (for cryptography >= 1.6)"
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_distribution_endpoints_1 is changed
       - crl_distribution_endpoints_2 is not changed

@@ -3,17 +3,17 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug:
+- ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
-- name: ({{select_crypto_backend}}) Get key 1 info
-  openssl_publickey_info:
+- name: ({{ select_crypto_backend }}) Get key 1 info
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -22,33 +22,33 @@
       - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
       - "result.public_data.exponent > 5"
 
-- name: ({{select_crypto_backend}}) Read file
-  slurp:
+- name: ({{ select_crypto_backend }}) Read file
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/publickey_1.pem'
   register: slurp
 
-- name: ({{select_crypto_backend}}) Get key 1 info directly
-  openssl_publickey_info:
+- name: ({{ select_crypto_backend }}) Get key 1 info directly
+  community.crypto.openssl_publickey_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
-- name: ({{select_crypto_backend}}) Compare output of direct and loaded info
-  assert:
+- name: ({{ select_crypto_backend }}) Compare output of direct and loaded info
+  ansible.builtin.assert:
     that:
       - >-
         (result | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
         ==
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
-- name: ({{select_crypto_backend}}) Get key 2 info
-  openssl_publickey_info:
+- name: ({{ select_crypto_backend }}) Get key 2 info
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -58,14 +58,14 @@
       - "2 ** (result.public_data.size - 1) < result.public_data.modulus < 2 ** result.public_data.size"
       - "result.public_data.exponent > 5"
 
-- name: ({{select_crypto_backend}}) Get key 3 info
-  openssl_publickey_info:
+- name: ({{ select_crypto_backend }}) Get key 3 info
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check that ECC key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -76,14 +76,14 @@
       - "result.public_data.y != 0"
       - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
 
-- name: ({{select_crypto_backend}}) Get key 4 info
-  openssl_publickey_info:
+- name: ({{ select_crypto_backend }}) Get key 4 info
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check that DSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"

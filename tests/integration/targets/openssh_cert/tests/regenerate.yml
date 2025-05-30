@@ -8,7 +8,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     test_cases:
       - test_name: Generate certificate
         type: user
@@ -104,7 +104,7 @@
         changed: true
 
 - name: Execute regenerate tests
-  openssh_cert:
+  community.crypto.openssh_cert:
     force: "{{ test_case.force | default(omit) }}"
     options: "{{ test_case.options | default(omit) }}"
     path: "{{ test_case.path | default(omit) }}"
@@ -126,7 +126,7 @@
     loop_var: test_case
 
 - name: Assert task statuses
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed == test_cases[index].changed
   loop: "{{ regenerate_tests_output.results }}"
@@ -135,6 +135,6 @@
     loop_var: result
 
 - name: Remove certificate
-  openssh_cert:
+  community.crypto.openssh_cert:
     path: "{{ certificate_path }}"
     state: absent
