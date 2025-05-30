@@ -18,7 +18,7 @@
     - "{{ remote_tmp_dir }}/broken.pub"
 
 - name: "({{ backend }}) Regenerate key - broken"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
   register: broken_output
@@ -31,7 +31,7 @@
       - "'Unable to read the key. The key is protected with a passphrase or broken.' in broken_output.msg"
 
 - name: "({{ backend }}) Regenerate key with force - broken"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
     force: true
@@ -43,13 +43,13 @@
       - force_broken_output is changed
 
 - name: "({{ backend }}) Remove key - broken"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/broken"
     backend: "{{ backend }}"
     state: absent
 
 - name: "({{ backend }}) Generate key - write-only"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/write-only"
     mode: "0200"
     backend: "{{ backend }}"
@@ -71,7 +71,7 @@
       - write_only_public_key.stat.mode == '0200'
 
 - name: "({{ backend }}) Regenerate key with force - write-only"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/write-only"
     backend: "{{ backend }}"
     force: true
@@ -93,7 +93,7 @@
       - write_only_private_key_after.stat.mode == '0200'
 
 - name: "({{ backend }}) Remove key - write-only"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/write-only"
     backend: "{{ backend }}"
     state: absent
@@ -102,7 +102,7 @@
   ansible.builtin.command: "ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}"
 
 - name: "({{ backend }}) Modify key - password_protected"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/password_protected"
     size: 1280
     backend: "{{ backend }}"
@@ -116,7 +116,7 @@
       - "'Unable to read the key. The key is protected with a passphrase or broken.' in password_protected_output.msg"
 
 - name: "({{ backend }}) Modify key with 'force=true' - password_protected"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/password_protected"
     size: 1280
     backend: "{{ backend }}"
@@ -129,7 +129,7 @@
       - force_password_protected_output is changed
 
 - name: "({{ backend }}) Remove key - password_protected"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/password_protected"
     backend: "{{ backend }}"
     state: absent

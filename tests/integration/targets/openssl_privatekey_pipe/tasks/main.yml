@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Run module with backend autodetection
-  openssl_privatekey_pipe:
+  community.crypto.openssl_privatekey_pipe:
     size: '{{ default_rsa_key_size }}'
 
 - block:

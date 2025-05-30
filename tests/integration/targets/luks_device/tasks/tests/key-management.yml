@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create with keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -15,7 +15,7 @@
 # Access: keyfile1
 
 - name: Try to open with keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -26,13 +26,13 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Try to open with keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -44,7 +44,7 @@
       - open_try is failed
 
 - name: Give access to keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -55,7 +55,7 @@
   register: result_1
 
 - name: Give access to keyfile2 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -71,7 +71,7 @@
 # Access: keyfile1 and keyfile2
 
 - name: Try to open with keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -82,7 +82,7 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
@@ -92,7 +92,7 @@
   become: true
 
 - name: Remove access from keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -101,7 +101,7 @@
   register: result_1
 
 - name: Remove access from keyfile1 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -117,7 +117,7 @@
 # Access: keyfile2
 
 - name: Try to open with keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -129,7 +129,7 @@
       - open_try is failed
 
 - name: Try to open with keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -140,7 +140,7 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
@@ -150,7 +150,7 @@
   become: true
 
 - name: Remove access from keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -166,7 +166,7 @@
 # Access: keyfile2
 
 - name: Try to open with keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -177,13 +177,13 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Remove access from keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile2"
@@ -194,7 +194,7 @@
 # Access: none
 
 - name: Try to open with keyfile2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile2"

@@ -10,7 +10,7 @@
 
 - block:
     - name: Find root for cert 1 using directory
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: '{{ fullchain | trim }}'
         root_certificates:
           - '{{ remote_tmp_dir }}/files/roots/'
@@ -26,7 +26,7 @@
 
 - block:
     - name: Find rootchain for cert 1 using intermediate and root PEM
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: '{{ cert }}'
         intermediate_certificates:
           - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
@@ -46,7 +46,7 @@
 
 - block:
     - name: Find root for cert 2 using directory
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: "{{ fullchain | trim }}"
         root_certificates:
           - '{{ remote_tmp_dir }}/files/roots/'
@@ -62,7 +62,7 @@
 
 - block:
     - name: Find rootchain for cert 2 using intermediate and root PEM
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: '{{ cert }}'
         intermediate_certificates:
           - '{{ remote_tmp_dir }}/files/cert2-chain.pem'
@@ -82,7 +82,7 @@
 
 - block:
     - name: Find alternate rootchain for cert 2 using intermediate and root PEM
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: '{{ cert }}'
         intermediate_certificates:
           - '{{ remote_tmp_dir }}/files/cert2-altchain.pem'
@@ -102,7 +102,7 @@
 
 - block:
     - name: Find alternate rootchain for cert 2 when complete chain is already presented to the module
-      certificate_complete_chain:
+      community.crypto.certificate_complete_chain:
         input_chain: '{{ cert ~ chain ~ root }}'
         root_certificates:
           - '{{ remote_tmp_dir }}/files/roots.pem'
@@ -119,7 +119,7 @@
     root: "{{ lookup('file', 'cert2-altroot.pem', rstrip=False) }}"
 
 - name: Check failure when no intermediate certificate can be found
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: '{{ lookup("file", "cert2.pem", rstrip=true) }}'
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/files/cert1-chain.pem'
@@ -134,7 +134,7 @@
       - "cert2_no_intermediate.msg.startswith('Cannot complete chain. Stuck at certificate ')"
 
 - name: Check failure when infinite loop is found
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: '{{ lookup("file", "cert1-fullchain.pem", rstrip=true) }}'
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/files/roots.pem'

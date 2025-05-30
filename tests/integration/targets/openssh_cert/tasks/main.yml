@@ -15,7 +15,7 @@
     certificate_path: '{{ remote_tmp_dir }}/id_cert'
 
 - name: Generate keypair
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ signing_key }}"
     type: rsa
     size: 1024
@@ -42,6 +42,6 @@
   when: openssh_version is version("7.6",">=")
 
 - name: Remove keypair
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ signing_key }}"
     state: absent

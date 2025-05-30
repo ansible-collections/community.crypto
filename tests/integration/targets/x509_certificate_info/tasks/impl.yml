@@ -7,20 +7,20 @@
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: ({{select_crypto_backend}}) Get certificate info (IDNA encoding)
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: idna
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_idna
 
 - name: ({{select_crypto_backend}}) Get certificate info (Unicode encoding)
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: unicode
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -105,7 +105,7 @@
   register: slurp
 
 - name: ({{select_crypto_backend}}) Get certificate info directly
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
@@ -119,7 +119,7 @@
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     valid_at:
@@ -134,7 +134,7 @@
       - not result.valid_at.twentydays
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -151,7 +151,7 @@
       - "IP:1.2.3.4"
 
 - name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -169,7 +169,7 @@
     dest: '{{ remote_tmp_dir }}/packed-cert-1.pem'
 
 - name: ({{select_crypto_backend}}) Get certificate info for packaged cert 1
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/packed-cert-1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result

@@ -7,7 +7,7 @@
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: ({{select_crypto_backend}}) Get key 1 info
-  openssl_publickey_info:
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -28,7 +28,7 @@
   register: slurp
 
 - name: ({{select_crypto_backend}}) Get key 1 info directly
-  openssl_publickey_info:
+  community.crypto.openssl_publickey_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
@@ -42,7 +42,7 @@
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
 - name: ({{select_crypto_backend}}) Get key 2 info
-  openssl_publickey_info:
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -59,7 +59,7 @@
       - "result.public_data.exponent > 5"
 
 - name: ({{select_crypto_backend}}) Get key 3 info
-  openssl_publickey_info:
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -77,7 +77,7 @@
       - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
 
 - name: ({{select_crypto_backend}}) Get key 4 info
-  openssl_publickey_info:
+  community.crypto.openssl_publickey_info:
     path: '{{ remote_tmp_dir }}/publickey_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result

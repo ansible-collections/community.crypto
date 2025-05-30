@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey with passphrase
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/ca_privatekey_pw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ item.path }}'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
     subject: '{{ item.subject }}'
@@ -33,7 +33,7 @@
         commonName: Example CA 2
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate CA CSR (privatekey passphrase)
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/ca_csr_pw.csr'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_pw.pem'
     privatekey_passphrase: hunter2
@@ -45,7 +45,7 @@
     basic_constraints_critical: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (check mode)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ca_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/ca_csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
@@ -56,7 +56,7 @@
   register: result_check_mode
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ca_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/ca_csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
@@ -72,7 +72,7 @@
       - result is changed
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate with different commonName
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ca_cert2.pem'
     csr_path: '{{ remote_tmp_dir }}/ca_csr2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
@@ -81,7 +81,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate (privatekey passphrase)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ca_cert_pw.pem'
     csr_path: '{{ remote_tmp_dir }}/ca_csr_pw.csr'
     privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_pw.pem'
@@ -91,7 +91,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -104,7 +104,7 @@
   register: ownca_certificate
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -117,7 +117,7 @@
   register: ownca_certificate_idempotence
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (check mode)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -138,7 +138,7 @@
     - '{{ remote_tmp_dir }}/ownca_cert_ca_key.pem'
 
 - name: (OwnCA, {{select_crypto_backend}}) Regenerate ownca certificate with different CA subject
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ca_cn.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -151,7 +151,7 @@
   register: ownca_certificate_ca_subject_changed
 
 - name: (OwnCA, {{select_crypto_backend}}) Regenerate ownca certificate with different CA key
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ca_key.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -187,7 +187,7 @@
       - result.version == 3
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca v2 certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_v2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -201,7 +201,7 @@
   ignore_errors: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate2
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey2.pem'
@@ -242,7 +242,7 @@
       - "'Biometric Info' in result.extended_key_usage"
 
 - name: (OwnCA, {{select_crypto_backend}}) Create ownca certificate with notBefore and notAfter
-  x509_certificate:
+  community.crypto.x509_certificate:
     provider: ownca
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
@@ -254,7 +254,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Create ownca certificate with notBefore and notAfter (idempotent)
-  x509_certificate:
+  community.crypto.x509_certificate:
     provider: ownca
     ownca_not_before: 20181023133742Z
     ownca_not_after: 20191023133742Z
@@ -268,7 +268,7 @@
   register: ownca_cert3_idem
 
 - name: (OwnCA, {{select_crypto_backend}}) Create ownca certificate with relative notBefore and notAfter
-  x509_certificate:
+  community.crypto.x509_certificate:
     provider: ownca
     ownca_not_before: +1s
     ownca_not_after: +52w
@@ -280,7 +280,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca ECC certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ecc.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
@@ -292,7 +292,7 @@
   register: ownca_certificate_ecc
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned certificate (privatekey passphrase)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ecc_2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert_pw.pem'
@@ -304,7 +304,7 @@
   register: selfsigned_certificate_passphrase
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (failed passphrase 1)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_pw1.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -317,7 +317,7 @@
   register: passphrase_error_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (failed passphrase 2)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_pw2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -330,7 +330,7 @@
   register: passphrase_error_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (failed passphrase 3)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_pw3.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -346,7 +346,7 @@
     dest: "{{ remote_tmp_dir }}/ownca_broken.pem"
     content: "broken"
 - name: (OwnCA, {{select_crypto_backend}}) Regenerate broken cert
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_broken.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
@@ -357,7 +357,7 @@
   register: ownca_broken
 
 - name: (OwnCA, {{select_crypto_backend}}) Backup test
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -368,7 +368,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_1
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (idempotent)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -379,7 +379,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_2
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (change)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -390,7 +390,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_3
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (remove)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     state: absent
     provider: ownca
@@ -398,7 +398,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_backup_4
 - name: (OwnCA, {{select_crypto_backend}}) Backup test (remove, idempotent)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_backup.pem'
     state: absent
     provider: ownca
@@ -407,7 +407,7 @@
   register: ownca_backup_5
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -419,7 +419,7 @@
   register: ownca_subject_key_identifier_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (idempotency)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -431,7 +431,7 @@
   register: ownca_subject_key_identifier_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (remove)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -443,7 +443,7 @@
   register: ownca_subject_key_identifier_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (remove idempotency)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -455,7 +455,7 @@
   register: ownca_subject_key_identifier_4
 
 - name: (OwnCA, {{select_crypto_backend}}) Create subject key identifier (re-enable)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -467,7 +467,7 @@
   register: ownca_subject_key_identifier_5
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -479,7 +479,7 @@
   register: ownca_authority_key_identifier_1
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (idempotency)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -491,7 +491,7 @@
   register: ownca_authority_key_identifier_2
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (remove)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -503,7 +503,7 @@
   register: ownca_authority_key_identifier_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (remove idempotency)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -515,7 +515,7 @@
   register: ownca_authority_key_identifier_4
 
 - name: (OwnCA, {{select_crypto_backend}}) Create authority key identifier (re-add)
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/ownca_cert_aki.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -529,7 +529,7 @@
 - name: (OwnCA, {{select_crypto_backend}}) Ed25519 and Ed448 tests (for cryptography >= 2.6)
   block:
     - name: (OwnCA, {{select_crypto_backend}}) Generate privatekeys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
         type: '{{ item }}'
       loop:
@@ -543,7 +543,7 @@
       block:
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate CSR
-          openssl_csr:
+          community.crypto.openssl_csr:
             path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
             subject:
@@ -555,7 +555,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate
-          x509_certificate:
+          community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}.pem'
             csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -570,7 +570,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
-          x509_certificate:
+          community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}.pem'
             csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
@@ -585,7 +585,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate CA privatekey
-          openssl_privatekey:
+          community.crypto.openssl_privatekey:
             path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
             type: '{{ item }}'
             passphrase: Test123
@@ -595,7 +595,7 @@
             - Ed448
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate CA CSR
-          openssl_csr:
+          community.crypto.openssl_csr:
             path: '{{ remote_tmp_dir }}/ca_csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
             privatekey_passphrase: Test123
@@ -614,7 +614,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate selfsigned CA certificate
-          x509_certificate:
+          community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'
             csr_path: '{{ remote_tmp_dir }}/ca_csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
@@ -627,7 +627,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate
-          x509_certificate:
+          community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}_2.pem'
             csr_path: '{{ remote_tmp_dir }}/csr.csr'
             ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'
@@ -643,7 +643,7 @@
           ignore_errors: true
 
         - name: (OwnCA, {{select_crypto_backend}}) Generate ownca certificate (idempotent)
-          x509_certificate:
+          community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}_2.pem'
             csr_path: '{{ remote_tmp_dir }}/csr.csr'
             ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'

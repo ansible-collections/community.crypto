@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate privatekey"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (check mode)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -18,7 +18,7 @@
   register: publickey_check
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -26,7 +26,7 @@
   register: publickey
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (check mode, idempotence)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -35,7 +35,7 @@
   register: publickey_check2
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (idempotence)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -51,7 +51,7 @@
       - publickey_idempotence is not changed
 
 - name: "({{ select_crypto_backend }}) Generate publickey - OpenSSH format"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey-ssh.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     format: OpenSSH
@@ -59,7 +59,7 @@
   when: select_crypto_backend == 'cryptography'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - OpenSSH format - test idempotence (issue 33256)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey-ssh.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     format: OpenSSH
@@ -68,13 +68,13 @@
   register: publickey_ssh_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate publickey2 - standard"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey2.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Delete publickey2 - standard"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     state: absent
     path: '{{ remote_tmp_dir }}/publickey2.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -83,7 +83,7 @@
   register: publickey2_absent
 
 - name: "({{ select_crypto_backend }}) Delete publickey2 - standard (idempotence)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     state: absent
     path: '{{ remote_tmp_dir }}/publickey2.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -91,20 +91,20 @@
   register: publickey2_absent_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate privatekey3 - with passphrase"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey3.pem'
     passphrase: ansible
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey3 - with passphrase protected privatekey"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey3.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey3.pem'
     privatekey_passphrase: ansible
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey3 - with passphrase protected privatekey - idempotence"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey3.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey3.pem'
     privatekey_passphrase: ansible
@@ -117,34 +117,34 @@
     state: touch
 
 - name: "({{ select_crypto_backend }}) Generate publickey in empty existing file (issue 33072)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey4.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey 5 (ECC)"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey5.pem'
     type: ECC
     curve: secp256r1
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_1
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format (idempotent)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: privatekey5_2
 - name: "({{ select_crypto_backend }}) Generate publickey 5 - PEM format (different private key)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey5.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey5.pem'
     backup: true
@@ -152,14 +152,14 @@
   register: privatekey5_3
 
 - name: "({{ select_crypto_backend }}) Generate privatekey with password"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 1)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey_pw1.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     privatekey_passphrase: hunter2
@@ -168,7 +168,7 @@
   register: passphrase_error_1
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 2)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey_pw2.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: wrong_password
@@ -177,7 +177,7 @@
   register: passphrase_error_2
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (failed passphrase 3)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey_pw3.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -189,19 +189,19 @@
     dest: "{{ remote_tmp_dir }}/publickeybroken.pub"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken key"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickeybroken.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey5.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: output_broken
 
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (for removal)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/publickey_removal.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (removal)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     state: absent
     path: '{{ remote_tmp_dir }}/publickey_removal.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -209,7 +209,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: remove_1
 - name: "({{ select_crypto_backend }}) Generate publickey - PEM format (removal, idempotent)"
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     state: absent
     path: '{{ remote_tmp_dir }}/publickey_removal.pub'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'

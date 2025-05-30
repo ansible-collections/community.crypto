@@ -8,19 +8,19 @@
     domain_name: "host{{ '%0x' % ((2**32) | random) }}.example.com"
 
 - name: "({{ select_crypto_backend }}) Generate account key"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ remote_tmp_dir }}/accountkey.pem"
     type: ECC
     curve: secp256r1
     force: true
 
 - name: "({{ select_crypto_backend }}) Parse account keys (to ease debugging some test failures)"
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: "{{ remote_tmp_dir }}/accountkey.pem"
     return_private_key_data: true
 
 - name: "({{ select_crypto_backend }}) Create ACME account"
-  acme_account:
+  community.crypto.acme_account:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -31,14 +31,14 @@
   register: account
 
 - name: "({{ select_crypto_backend }}) Generate certificate key"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ remote_tmp_dir }}/cert.key"
     type: ECC
     curve: secp256r1
     force: true
 
 - name: "({{ select_crypto_backend }}) Generate certificate CSR"
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ remote_tmp_dir }}/cert.csr"
     privatekey_path: "{{ remote_tmp_dir }}/cert.key"
     subject:
@@ -47,7 +47,7 @@
   register: csr
 
 - name: "({{ select_crypto_backend }}) Create certificate order"
-  acme_certificate_order_create:
+  community.crypto.acme_certificate_order_create:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -81,7 +81,7 @@
       - order_1.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Get order information"
-  acme_certificate_order_info:
+  community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -148,7 +148,7 @@
       - validate_1.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Get order information"
-  acme_certificate_order_info:
+  community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -247,7 +247,7 @@
       - finalize_1.selected_chain.full_chain == slurp.results[2].content | b64decode
 
 - name: "({{ select_crypto_backend }}) Get order information"
-  acme_certificate_order_info:
+  community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -311,7 +311,7 @@
       - finalize_2.selected_chain == finalize_1.selected_chain
 
 - name: "({{ select_crypto_backend }}) Get order information"
-  acme_certificate_order_info:
+  community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -351,7 +351,7 @@
 - when: acme_supports_ari
   block:
     - name: "({{ select_crypto_backend }}) Get certificate renewal information"
-      acme_certificate_renewal_info:
+      community.crypto.acme_certificate_renewal_info:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: false
@@ -368,7 +368,7 @@
           - cert_info.cert_id is string
 
     - name: "({{ select_crypto_backend }}) Create replacement order 1"
-      acme_certificate_order_create:
+      community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: false
@@ -381,7 +381,7 @@
       register: replacement_order_1
 
     - name: "({{ select_crypto_backend }}) Get replacement order 1 information"
-      acme_certificate_order_info:
+      community.crypto.acme_certificate_order_info:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: false
@@ -441,7 +441,7 @@
     - when: false  # TODO get Pebble improved
       block:
         - name: "({{ select_crypto_backend }}) Create replacement order 2 (should fail)"
-          acme_certificate_order_create:
+          community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -465,7 +465,7 @@
                 )
 
         - name: "({{ select_crypto_backend }}) Create replacement order 3 with error handling"
-          acme_certificate_order_create:
+          community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -477,7 +477,7 @@
           register: replacement_order_3
 
         - name: "({{ select_crypto_backend }}) Get replacement order 3 information"
-          acme_certificate_order_info:
+          community.crypto.acme_certificate_order_info:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -535,7 +535,7 @@
               - order_info_6.account_uri == account.account_uri
 
         - name: "({{ select_crypto_backend }}) Deactivate authzs for replacement order 3"
-          acme_certificate_deactivate_authz:
+          community.crypto.acme_certificate_deactivate_authz:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -585,7 +585,7 @@
     - when: true
       block:
         - name: "({{ select_crypto_backend }}) Create replacement order 4 (should fail)"
-          acme_certificate_order_create:
+          community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -606,7 +606,7 @@
                 ' with status 409 Conflict. Error urn:ietf:params:acme:error:malformed: ' in replacement_order_4.msg
 
         - name: "({{ select_crypto_backend }}) Create replacement order 5 with error handling"
-          acme_certificate_order_create:
+          community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -618,7 +618,7 @@
           register: replacement_order_5
 
         - name: "({{ select_crypto_backend }}) Get replacement order 5 information"
-          acme_certificate_order_info:
+          community.crypto.acme_certificate_order_info:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -676,7 +676,7 @@
               - order_info_7.account_uri == account.account_uri
 
         - name: "({{ select_crypto_backend }}) Deactivate authzs for replacement order 5"
-          acme_certificate_deactivate_authz:
+          community.crypto.acme_certificate_deactivate_authz:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
             validate_certs: false
@@ -689,7 +689,7 @@
 - when: acme_supports_profiles
   block:
     - name: "({{ select_crypto_backend }}) Create order with invalid profile (should fail)"
-      acme_certificate_order_create:
+      community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: false
@@ -712,7 +712,7 @@
 - when: not acme_supports_profiles
   block:
     - name: "({{ select_crypto_backend }}) Create order with profile when server does not support it (should fail)"
-      acme_certificate_order_create:
+      community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: false

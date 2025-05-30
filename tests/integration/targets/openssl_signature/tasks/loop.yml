@@ -5,7 +5,7 @@
 
 # This file is intended to be included in a loop statement
 - name: Sign statement with {{ item.type }} key - {{ item.passwd }} using {{ item.backend }}
-  openssl_signature:
+  community.crypto.openssl_signature:
     privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
     path: '{{ remote_tmp_dir }}/statement.txt'
@@ -16,7 +16,7 @@
     var: sign_result
 
 - name: Verify {{ item.type }} signature - {{ item.passwd }} using {{ item.backend }}
-  openssl_signature_info:
+  community.crypto.openssl_signature_info:
     certificate_path: '{{ remote_tmp_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
     path: '{{ remote_tmp_dir }}/statement.txt'
     signature: '{{ sign_result.signature }}'

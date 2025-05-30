@@ -9,24 +9,24 @@
     account_email: example@example.org
   block:
     - name: Generate account key
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/account-ec256.pem"
         type: ECC
         curve: secp256r1
         force: true
     - name: Create cert private key
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
         type: ECC
         curve: secp256r1
         force: true
     - name: Create cert CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
         privatekey_path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
         subject_alt_name: "{{ subject_alt_name }}"
     - name: Start process of obtaining certificate
-      acme_certificate:
+      community.crypto.acme_certificate:
         select_crypto_backend: "{{ select_crypto_backend }}"
         acme_version: 2
         acme_directory: "{{ acme_directory_url }}"
@@ -42,7 +42,7 @@
       register: certificate_data
 
 - name: Inspect order
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -56,7 +56,7 @@
     var: order_1.output_json
 
 - name: Deactivate order (check mode)
-  acme_certificate_deactivate_authz:
+  community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -67,7 +67,7 @@
   register: deactivate_1
 
 - name: Inspect order again
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -81,7 +81,7 @@
     var: order_2.output_json
 
 - name: Deactivate order
-  acme_certificate_deactivate_authz:
+  community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -91,7 +91,7 @@
   register: deactivate_2
 
 - name: Inspect order again
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -105,7 +105,7 @@
     var: order_3.output_json
 
 - name: Deactivate order (check mode, idempotent)
-  acme_certificate_deactivate_authz:
+  community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -116,7 +116,7 @@
   register: deactivate_3
 
 - name: Inspect order again
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -130,7 +130,7 @@
     var: order_4.output_json
 
 - name: Deactivate order (idempotent)
-  acme_certificate_deactivate_authz:
+  community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -140,7 +140,7 @@
   register: deactivate_4
 
 - name: Inspect order again
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false

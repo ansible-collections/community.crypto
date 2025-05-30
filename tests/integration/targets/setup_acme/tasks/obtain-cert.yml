@@ -5,7 +5,7 @@
 
 ## PRIVATE KEY ################################################################################
 - name: ({{ certgen_title }}) Create cert private key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     type: "{{ 'RSA' if key_type == 'rsa' else 'ECC' }}"
     size: "{{ rsa_bits if key_type == 'rsa' else omit }}"
@@ -19,7 +19,7 @@
     force: true
 ## CSR ########################################################################################
 - name: ({{ certgen_title }}) Create cert CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
     privatekey_path: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
     privatekey_passphrase: "{{ certificate_passphrase | default(omit) | default(omit, true) }}"
@@ -29,7 +29,7 @@
   register: csr_result
 ## ACME STEP 1 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 1
-  acme_certificate:
+  community.crypto.acme_certificate:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -74,7 +74,7 @@
   with_dict: "{{ challenge_data.challenge_data_dns }}"
   when: "challenge_data is changed and challenge == 'dns-01'"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (acme_challenge_cert_helper)
-  acme_challenge_cert_helper:
+  community.crypto.acme_challenge_cert_helper:
     challenge: tls-alpn-01
     challenge_data: "{{ item.value['tls-alpn-01'] }}"
     private_key_src: "{{ remote_tmp_dir }}/{{ certificate_name }}.key"
@@ -109,7 +109,7 @@
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'der-value-b64')"
 ## ACME STEP 2 ################################################################################
 - name: ({{ certgen_title }}) Obtain cert, step 2
-  acme_certificate:
+  community.crypto.acme_certificate:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"

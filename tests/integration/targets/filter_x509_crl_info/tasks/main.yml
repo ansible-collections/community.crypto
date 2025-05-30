@@ -39,14 +39,14 @@
           - DNS:b64.ansible.com
 
 - name: Generate private keys
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
     type: ECC
     curve: secp256r1
   loop: "{{ certificates }}"
 
 - name: Generate CSRs
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
     subject: "{{ item.subject | default(omit) }}"
@@ -56,7 +56,7 @@
   loop: "{{ certificates }}"
 
 - name: Generate CA certificates
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
     csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{ item.name }}.key'
@@ -65,7 +65,7 @@
   when: item.is_ca | default(false)
 
 - name: Generate other certificates
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
     csr_path: '{{ remote_tmp_dir }}/{{ item.name }}.csr'
     provider: ownca
@@ -75,7 +75,7 @@
   when: not (item.is_ca | default(false))
 
 - name: Get certificate infos
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/{{ item }}.pem'
   loop:
     - cert-1

@@ -6,7 +6,7 @@
 - name: On kernel >= 5.9 use performance flags
   block:
     - name: Create and open (check)
-      luks_device:
+      community.crypto.luks_device:
         device: "{{ cryptfile_device }}"
         state: opened
         keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -22,7 +22,7 @@
       become: true
       register: create_open_check
     - name: Create and open
-      luks_device:
+      community.crypto.luks_device:
         device: "{{ cryptfile_device }}"
         state: opened
         keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -37,7 +37,7 @@
       become: true
       register: create_open
     - name: Create and open (idempotent)
-      luks_device:
+      community.crypto.luks_device:
         device: "{{ cryptfile_device }}"
         state: opened
         keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -52,7 +52,7 @@
       become: true
       register: create_open_idem
     - name: Create and open (idempotent, check)
-      luks_device:
+      community.crypto.luks_device:
         device: "{{ cryptfile_device }}"
         state: present
         keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -99,7 +99,7 @@
           - "'allow_discards' in dm_table.stdout"
 
     - name: Closed and Removed
-      luks_device:
+      community.crypto.luks_device:
         name: "{{ cryptfile_device }}"
         state: absent
       become: true

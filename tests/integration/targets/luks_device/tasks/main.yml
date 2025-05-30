@@ -77,7 +77,7 @@
 
   always:
     - name: Make sure LUKS device is gone
-      luks_device:
+      community.crypto.luks_device:
         device: "{{ cryptfile_device }}"
         state: absent
       become: true

@@ -4,17 +4,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: (Removal, {{select_crypto_backend}}) Generate privatekey
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
     size: '{{ default_rsa_key_size_certificates }}'
 
 - name: (Removal, {{select_crypto_backend}}) Generate CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/removal_csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
 
 - name: (Removal, {{select_crypto_backend}}) Generate selfsigned certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/removal_cert.pem'
     csr_path: '{{ remote_tmp_dir }}/removal_csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/removal_privatekey.pem'
@@ -28,7 +28,7 @@
   register: removal_1_prestat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate"
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: "{{ remote_tmp_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -41,7 +41,7 @@
   register: removal_1_poststat
 
 - name: "(Removal, {{select_crypto_backend}}) Remove certificate (idempotent)"
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: "{{ remote_tmp_dir }}/removal_cert.pem"
     state: absent
     select_crypto_backend: '{{ select_crypto_backend }}'

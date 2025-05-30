@@ -14,7 +14,7 @@
   register: slurp_der
 
 - name: Convert PEM cert (check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.pem'
     format: pem
     strict: true
@@ -23,7 +23,7 @@
   check_mode: true
 
 - name: Convert PEM cert
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.pem'
     format: pem
     strict: true
@@ -31,7 +31,7 @@
   register: result_2
 
 - name: Convert PEM cert (idempotent, check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.pem'
     format: pem
     strict: true
@@ -40,7 +40,7 @@
   check_mode: true
 
 - name: Convert PEM cert (idempotent)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.pem'
     format: pem
     strict: true
@@ -48,7 +48,7 @@
   register: result_4
 
 - name: Convert PEM cert (overwrite, check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.pem'
     format: pem
     strict: true
@@ -57,7 +57,7 @@
   check_mode: true
 
 - name: Convert PEM cert (overwrite)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.pem'
     format: pem
     strict: true
@@ -65,7 +65,7 @@
   register: result_6
 
 - name: Convert PEM cert (idempotent, content)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_pem.content | b64decode }}'
     format: pem
     strict: true
@@ -73,7 +73,7 @@
   register: result_7
 
 - name: Convert PEM cert (idempotent, content, base64)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_pem.content }}'
     src_content_base64: true
     format: pem
@@ -82,7 +82,7 @@
   register: result_8
 
 - name: Convert PEM cert (idempotent, content, base64, from DER)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_der.content }}'
     src_content_base64: true
     format: pem
@@ -91,7 +91,7 @@
   register: result_9
 
 - name: Convert PEM cert (idempotent, from DER)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.der'
     format: pem
     strict: true
@@ -113,7 +113,7 @@
       - result_10 is not changed
 
 - name: Convert DER cert (check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.der'
     format: der
     strict: true
@@ -122,7 +122,7 @@
   check_mode: true
 
 - name: Convert DER cert
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.der'
     format: der
     strict: true
@@ -130,7 +130,7 @@
   register: result_2
 
 - name: Convert DER cert (idempotent, check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.der'
     format: der
     strict: true
@@ -139,7 +139,7 @@
   check_mode: true
 
 - name: Convert DER cert (idempotent)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_1.der'
     format: der
     strict: true
@@ -147,7 +147,7 @@
   register: result_4
 
 - name: Convert DER cert (overwrite, check mode)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.der'
     format: der
     strict: true
@@ -156,7 +156,7 @@
   check_mode: true
 
 - name: Convert DER cert (overwrite)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.der'
     format: der
     strict: true
@@ -164,7 +164,7 @@
   register: result_6
 
 - name: Convert DER cert (idempotent, content, base64)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_der.content }}'
     src_content_base64: true
     format: der
@@ -173,7 +173,7 @@
   register: result_7
 
 - name: Convert DER cert (idempotent, content, from PEM)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_pem.content | b64decode }}'
     format: der
     strict: true
@@ -181,7 +181,7 @@
   register: result_8
 
 - name: Convert DER cert (idempotent, content, base64, from PEM)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_content: '{{ slurp_pem.content }}'
     src_content_base64: true
     format: der
@@ -190,7 +190,7 @@
   register: result_9
 
 - name: Convert DER cert (idempotent, from PEM)
-  x509_certificate_convert:
+  community.crypto.x509_certificate_convert:
     src_path: '{{ remote_tmp_dir }}/cert_2.pem'
     format: der
     strict: true

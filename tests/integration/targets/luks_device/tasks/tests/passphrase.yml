@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create with passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -26,7 +26,7 @@
   when: create_passphrase_1 is failed
 
 - name: Create with passphrase1 (without argon2i)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -36,7 +36,7 @@
   when: create_passphrase_1 is failed
 
 - name: Open with passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     # Encode passphrase with Base64 to test passphrase_encoding
@@ -49,13 +49,13 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Give access with ambiguous new_ arguments
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -71,7 +71,7 @@
       - new_try is failed
 
 - name: Try to open with passphrase2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase2 }}"
@@ -83,7 +83,7 @@
       - open_try is failed
 
 - name: Give access to passphrase2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -94,7 +94,7 @@
   register: result_1
 
 - name: Give access to passphrase2 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -108,7 +108,7 @@
       - result_2 is not changed
 
 - name: Open with passphrase2
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase2 }}"
@@ -119,13 +119,13 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Try to open with keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -137,7 +137,7 @@
       - open_try is failed
 
 - name: Give access to keyfile1 from passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -147,7 +147,7 @@
   become: true
 
 - name: Remove access with ambiguous remove_ arguments
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     remove_keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -160,7 +160,7 @@
       - remove_try is failed
 
 - name: Open with keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -171,13 +171,13 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true
 
 - name: Remove access for passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     remove_passphrase: "{{ cryptfile_passphrase1 }}"
@@ -185,7 +185,7 @@
   register: result_1
 
 - name: Remove access for passphrase1 (idempotent)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     remove_passphrase: "{{ cryptfile_passphrase1 }}"
@@ -198,7 +198,7 @@
       - result_2 is not changed
 
 - name: Try to open with passphrase1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase1 }}"
@@ -210,7 +210,7 @@
       - open_try is failed
 
 - name: Try to open with passphrase3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase3 }}"
@@ -222,7 +222,7 @@
       - open_try is failed
 
 - name: Give access to passphrase3 from keyfile1
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -232,7 +232,7 @@
   become: true
 
 - name: Open with passphrase3
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: opened
     passphrase: "{{ cryptfile_passphrase3 }}"
@@ -243,7 +243,7 @@
     that:
       - open_try is not failed
 - name: Close
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: closed
   become: true

@@ -5,7 +5,7 @@
 
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
         type: ECC
@@ -14,7 +14,7 @@
       loop: "{{ account_keys }}"
 
     - name: Parse account keys (to ease debugging some test failures)
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         passphrase: "{{ item.pass | default(omit) | default(omit, true) }}"
         return_private_key_data: true
@@ -30,7 +30,7 @@
       - name: accountkey5
 
 - name: Do not try to create account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -42,7 +42,7 @@
   register: account_not_created
 
 - name: Create it now (check mode, diff)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -58,7 +58,7 @@
   register: account_created_check
 
 - name: Create it now
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -72,7 +72,7 @@
   register: account_created
 
 - name: Create it now (idempotent)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -91,7 +91,7 @@
   register: slurp
 
 - name: Change email address (check mode, diff)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
@@ -106,7 +106,7 @@
   register: account_modified_check
 
 - name: Change email address
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
@@ -119,7 +119,7 @@
   register: account_modified
 
 - name: Change email address (idempotent)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri }}"
@@ -133,7 +133,7 @@
   register: account_modified_idempotent
 
 - name: Cannot access account with wrong URI
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_created.account_uri ~ '12345thisdoesnotexist' }}"
@@ -146,7 +146,7 @@
   register: account_modified_wrong_uri
 
 - name: Clear contact email addresses (check mode, diff)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -160,7 +160,7 @@
   register: account_modified_2_check
 
 - name: Clear contact email addresses
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -172,7 +172,7 @@
   register: account_modified_2
 
 - name: Clear contact email addresses (idempotent)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -184,7 +184,7 @@
   register: account_modified_2_idempotent
 
 - name: Change account key (check mode, diff)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -200,7 +200,7 @@
   register: account_change_key_check
 
 - name: Change account key
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -214,7 +214,7 @@
   register: account_change_key
 
 - name: Deactivate account (check mode, diff)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -227,7 +227,7 @@
   register: account_deactivate_check
 
 - name: Deactivate account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -238,7 +238,7 @@
   register: account_deactivate
 
 - name: Deactivate account (idempotent)
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -249,7 +249,7 @@
   register: account_deactivate_idempotent
 
 - name: Do not try to create account II
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -262,7 +262,7 @@
   register: account_not_created_2
 
 - name: Do not try to create account III
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
@@ -274,7 +274,7 @@
   register: account_not_created_3
 
 - name: Create account with External Account Binding
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/{{ item.account }}.pem"
     acme_version: 2

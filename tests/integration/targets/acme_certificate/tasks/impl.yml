@@ -6,7 +6,7 @@
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         type: "{{ item.type }}"
         size: "{{ item.size | default(omit) }}"
@@ -28,7 +28,7 @@
 
 ## SET UP ACCOUNTS ############################################################################
 - name: Make sure ECC256 account hasn't been created yet
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -40,7 +40,7 @@
     src: '{{ remote_tmp_dir }}/account-ec384.pem'
   register: slurp
 - name: Create ECC384 account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -53,7 +53,7 @@
       - mailto:example@example.org
       - mailto:example@example.com
 - name: Create RSA account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -432,43 +432,43 @@
 
 # Dump certificate info
 - name: Dumping cert 1
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-1.pem"
   register: cert_1_info
 - name: Dumping cert 2
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-2.pem"
   register: cert_2_info
 - name: Dumping cert 3
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-3.pem"
   register: cert_3_info
 - name: Dumping cert 4
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-4.pem"
   register: cert_4_info
 - name: Dumping cert 5
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-5.pem"
   register: cert_5_info
 - name: Dumping cert 6
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-6.pem"
   register: cert_6_info
   when: acme_intermediates[0].subject_key_identifier is defined
 - name: Dumping cert 7
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-7.pem"
   register: cert_7_info
   when: acme_roots[2].subject_key_identifier is defined
 - name: Dumping cert 8
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-8.pem"
   register: cert_8_info
 
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -477,7 +477,7 @@
     retrieve_orders: ignore
   register: account_orders_not
 - name: Retrieve orders as URL list (1/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -486,7 +486,7 @@
     retrieve_orders: url_list
   register: account_orders_urls
 - name: Retrieve orders as URL list (2/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
@@ -495,7 +495,7 @@
     retrieve_orders: url_list
   register: account_orders_urls2
 - name: Retrieve orders as object list (1/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -504,7 +504,7 @@
     retrieve_orders: object_list
   register: account_orders_full
 - name: Retrieve orders as object list (2/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2

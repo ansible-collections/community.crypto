@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate privatekey"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Generate CSR (check mode)"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
@@ -18,7 +18,7 @@
   register: generate_csr_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.ansible.com
@@ -26,7 +26,7 @@
   register: generate_csr
 
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -35,7 +35,7 @@
   register: generate_csr_idempotent
 
 - name: "({{ select_crypto_backend }}) Generate CSR (idempotent, check mode)"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -45,7 +45,7 @@
   register: generate_csr_idempotent_check
 
 - name: "({{ select_crypto_backend }}) Generate CSR (changed)"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -54,7 +54,7 @@
   register: generate_csr_changed
 
 - name: "({{ select_crypto_backend }}) Generate CSR (changed, check mode)"
-  openssl_csr_pipe:
+  community.crypto.openssl_csr_pipe:
     content: "{{ generate_csr.csr }}"
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:

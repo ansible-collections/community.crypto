@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create CRL 1
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl1.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
@@ -70,7 +70,7 @@
       - crl_1_info_1 == crl_1_info_2
 
 - name: Recreate CRL 1 as DER file
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl1.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     format: der
@@ -105,7 +105,7 @@
       - crl_1_info_5.format == 'der'
 
 - name: Create CRL 2
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer_ordered:
@@ -131,7 +131,7 @@
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl2.crl') | community.crypto.x509_crl_info(list_revoked_certificates=false) }}
 
 - name: Create CRL 2 (changed order)
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl2.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer_ordered:
@@ -176,7 +176,7 @@
         ]
 
 - name: Create CRL 3
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl3.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
@@ -199,7 +199,7 @@
   register: crl_3
 
 - name: Create CRL 3 (IDNA encoding)
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl3.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:
@@ -224,7 +224,7 @@
   register: crl_3_idna
 
 - name: Create CRL 3 (Unicode encoding)
-  x509_crl:
+  community.crypto.x509_crl:
     path: '{{ remote_tmp_dir }}/ca-crl3.crl'
     privatekey_path: '{{ remote_tmp_dir }}/ca.key'
     issuer:

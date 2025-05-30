@@ -6,7 +6,7 @@
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         type: "{{ item.type }}"
         size: "{{ item.size | default(omit) }}"
@@ -84,7 +84,7 @@
 
 ## REVOKE CERTIFICATES ########################################################################
 - name: Revoke certificate 1 via account key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     certificate: "{{ remote_tmp_dir }}/cert-1.pem"
@@ -94,7 +94,7 @@
   ignore_errors: true
   register: cert_1_revoke
 - name: Revoke certificate 2 via certificate private key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     private_key_src: "{{ remote_tmp_dir }}/cert-2.key"
     private_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -109,7 +109,7 @@
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
   register: slurp_account_key
 - name: Revoke certificate 3 via account key (fullchain)
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"

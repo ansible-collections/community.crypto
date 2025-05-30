@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create with invalid device name (check)
-  luks_device:
+  community.crypto.luks_device:
     device: /dev/asdfasdfasdf
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -15,7 +15,7 @@
   become: true
   register: create_check
 - name: Create with invalid device name
-  luks_device:
+  community.crypto.luks_device:
     device: /dev/asdfasdfasdf
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -32,7 +32,7 @@
       - "'o such file or directory' in create.msg"
 
 - name: Create with something which is not a device (check)
-  luks_device:
+  community.crypto.luks_device:
     device: /tmp/
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -43,7 +43,7 @@
   become: true
   register: create_check
 - name: Create with something which is not a device
-  luks_device:
+  community.crypto.luks_device:
     device: /tmp/
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"

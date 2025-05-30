@@ -38,7 +38,7 @@
         changed: false
 
 - name: Execute remove tests
-  openssh_cert:
+  community.crypto.openssh_cert:
     options: "{{ test_case.options | default(omit) }}"
     path: "{{ test_case.path | default(omit) }}"
     public_key: "{{ test_case.public_key | default(omit) }}"

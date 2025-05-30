@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Retrieve information
-  crypto_info:
+  community.crypto.crypto_info:
   register: result
 
 - name: Display information

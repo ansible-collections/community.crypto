@@ -253,7 +253,7 @@
         changed: true
 
 - name: Execute idempotency tests
-  openssh_cert:
+  community.crypto.openssh_cert:
     force: "{{ test_case.force | default(omit) }}"
     identifier: "{{ test_case.identifier | default(omit) }}"
     options: "{{ test_case.options | default(omit) }}"
@@ -284,6 +284,6 @@
     loop_var: result
 
 - name: Remove certificate
-  openssh_cert:
+  community.crypto.openssh_cert:
     path: "{{ certificate_path }}"
     state: absent

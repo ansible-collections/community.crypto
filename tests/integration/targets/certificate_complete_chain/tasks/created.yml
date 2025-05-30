@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Case A => works
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/b-intermediate.pem'
@@ -19,7 +19,7 @@
 - name: Case B => doesn't work, but this is expected
   failed_when: false
   register: caseb
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/c-intermediate.pem'
@@ -31,7 +31,7 @@
     that: "'Cannot complete chain' in caseb.msg"
 
 - name: Case C => works
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/c-intermediate.pem'
@@ -40,7 +40,7 @@
       - '{{ remote_tmp_dir }}/a-root.pem'
 
 - name: Case D => works as well after PR 403
-  certificate_complete_chain:
+  community.crypto.certificate_complete_chain:
     input_chain: "{{ read_certificates['d-leaf'] }}"
     intermediate_certificates:
       - '{{ remote_tmp_dir }}/b-intermediate.pem'

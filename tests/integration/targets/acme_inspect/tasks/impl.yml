@@ -5,7 +5,7 @@
 
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item }}.pem"
         type: ECC
         curve: secp256r1
@@ -13,7 +13,7 @@
       loop: "{{ account_keys }}"
 
     - name: Parse account keys (to ease debugging some test failures)
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: "{{ remote_tmp_dir }}/{{ item }}.pem"
         return_private_key_data: true
       loop: "{{ account_keys }}"
@@ -23,7 +23,7 @@
       - accountkey
 
 - name: Get directory
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -33,7 +33,7 @@
 - ansible.builtin.debug: var=directory
 
 - name: Create an account
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -48,7 +48,7 @@
 - ansible.builtin.debug: var=account_creation
 
 - name: Get account information
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -61,7 +61,7 @@
 - ansible.builtin.debug: var=account_get
 
 - name: Update account contacts
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -81,7 +81,7 @@
 - ansible.builtin.debug: var=account_update
 
 - name: Create certificate order
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -105,7 +105,7 @@
 - ansible.builtin.debug: var=new_order
 
 - name: Get order information
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -118,7 +118,7 @@
 - ansible.builtin.debug: var=order
 
 - name: Get authzs for order
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -132,7 +132,7 @@
 - ansible.builtin.debug: var=authz
 
 - name: Get HTTP-01 challenge for authz
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -146,7 +146,7 @@
 - ansible.builtin.debug: var=http01challenge
 
 - name: Activate HTTP-01 challenge manually
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false
@@ -161,7 +161,7 @@
 - ansible.builtin.debug: var=activation
 
 - name: Get HTTP-01 challenge results
-  acme_inspect:
+  community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
     validate_certs: false

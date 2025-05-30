@@ -13,7 +13,6 @@ skip_list:
   - yaml  # we're using yamllint ourselves
 
   # To be checked and maybe fixed:
-  - fqcn[action]
   - ignore-errors
   - jinja[spacing]
   - key-order[task]

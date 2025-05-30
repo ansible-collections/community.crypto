@@ -7,7 +7,7 @@
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: ({{select_crypto_backend}}) Get key 1 info
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
@@ -30,7 +30,7 @@
   register: slurp
 
 - name: ({{select_crypto_backend}}) Get key 1 info directly
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
@@ -44,7 +44,7 @@
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
 - name: ({{select_crypto_backend}}) Get key 2 info
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_2.pem'
     return_private_key_data: true
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -66,7 +66,7 @@
       - "result.private_data.exponent > 5"
 
 - name: ({{select_crypto_backend}}) Get key 3 info (without passphrase)
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     return_private_key_data: true
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -91,7 +91,7 @@
       - "'private_data' not in result"
 
 - name: ({{select_crypto_backend}}) Get key 3 info (with passphrase)
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     passphrase: hunter2
     return_private_key_data: true
@@ -113,7 +113,7 @@
       - "result.private_data.exponent > 5"
 
 - name: ({{select_crypto_backend}}) Get key 4 info
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_4.pem'
     return_private_key_data: true
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -135,7 +135,7 @@
       - "result.private_data.multiplier > 1024"
 
 - name: ({{select_crypto_backend}}) Get key 5 info
-  openssl_privatekey_info:
+  community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_5.pem'
     return_private_key_data: true
     select_crypto_backend: '{{ select_crypto_backend }}'

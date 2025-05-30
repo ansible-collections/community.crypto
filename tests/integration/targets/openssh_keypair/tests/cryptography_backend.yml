@@ -7,7 +7,7 @@
   ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}'
 
 - name: Modify the password protected key with passphrase
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/password_protected'
     size: 1024
     passphrase: "{{ passphrase }}"
@@ -15,7 +15,7 @@
   register: password_protected_output
 
 - name: Check password protected key idempotency
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/password_protected'
     size: 1024
     passphrase: "{{ passphrase }}"
@@ -34,18 +34,18 @@
       - password_protected_ssh_keygen_output is success
 
 - name: Remove password protected key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/password_protected'
     backend: cryptography
     state: absent
 
 - name: Generate an unprotected key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
     backend: cryptography
 
 - name: Modify unprotected key with passphrase
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
     size: 1280
     passphrase: "{{ passphrase }}"
@@ -54,7 +54,7 @@
   register: unprotected_modification_output
 
 - name: Modify unprotected key with passphrase (force)
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
     size: 1280
     passphrase: "{{ passphrase }}"
@@ -69,7 +69,7 @@
       - force_unprotected_modification_output is changed
 
 - name: Remove unprotected key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/unprotected'
     backend: cryptography
     state: absent
@@ -78,7 +78,7 @@
   ansible.builtin.command: 'ssh-keygen -t rsa -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/pem_encoded'
     passphrase: "{{ passphrase }}"
     backend: cryptography
@@ -91,19 +91,19 @@
       - pem_encoded_output is not changed
 
 - name: Remove PEM encoded key
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/pem_encoded'
     backend: cryptography
     state: absent
 
 - name: Generate a private key with specified format
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: pkcs1
     backend: cryptography
 
 - name: Generate a private key with specified format (Idempotent)
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: pkcs1
     backend: cryptography
@@ -115,7 +115,7 @@
       - private_key_format_idempotent is not changed
 
 - name: Change to PKCS8 format
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: pkcs8
     backend: cryptography
@@ -127,7 +127,7 @@
       - private_key_format_pkcs8 is changed
 
 - name: Change to PKCS8 format (Idempotent)
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: pkcs8
     backend: cryptography
@@ -139,7 +139,7 @@
       - private_key_format_pkcs8_idempotent is not changed
 
 - name: Change to SSH format
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: ssh
     backend: cryptography
@@ -151,7 +151,7 @@
       - private_key_format_ssh is changed
 
 - name: Change to SSH format (Idempotent)
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     private_key_format: ssh
     backend: cryptography
@@ -163,7 +163,7 @@
       - private_key_format_ssh_idempotent is not changed
 
 - name: Remove private key with specified format
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/private_key_format'
     backend: cryptography
     state: absent

@@ -10,26 +10,26 @@
 
 - block:
     - name: Generate private keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
         size: '{{ default_rsa_key_size_certificates }}'
       loop: "{{ range(1, 4) | list }}"
 
     - name: Generate privatekey with password
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekeypw.pem'
         passphrase: hunter2
         size: '{{ default_rsa_key_size }}'
 
     - name: Generate CSRs
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
         privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
         commonName: www{{ item }}.ansible.com
       loop: "{{ range(1, 4) | list }}"
 
     - name: Generate certificate
-      x509_certificate:
+      community.crypto.x509_certificate:
         path: '{{ remote_tmp_dir }}/ansible{{ item }}.crt'
         privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
         csr_path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
@@ -50,7 +50,7 @@
         content: '{{ slurp.results[0].content | b64decode }}{{ slurp.results[1].content | b64decode }}'
 
     - name: Generate PKCS#12 file with backend autodetection
-      openssl_pkcs12:
+      community.crypto.openssl_pkcs12:
         path: '{{ remote_tmp_dir }}/ansible.p12'
         friendly_name: abracadabra
         privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'

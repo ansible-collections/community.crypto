@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get servers certificate for SNI test part 1
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ httpbin_host }}"
     port: 443
     server_name: "{{ sni_host }}"
@@ -22,7 +22,7 @@
       - "'{{ sni_host }}' == result.subject.CN"
 
 - name: Get servers certificate for SNI test part 2
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ sni_host }}"
     port: 443
     server_name: "{{ httpbin_host }}"
@@ -40,7 +40,7 @@
       - "'{{ httpbin_host }}' == result.subject.CN"
 
 - name: Get servers certificate
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ httpbin_host }}"
     port: 443
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -58,7 +58,7 @@
       - "'North Carolina' == result.subject.ST"
 
 - name: Connect to http port (will fail because there is no SSL cert to get)
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ httpbin_host }}"
     port: 80
     select_crypto_backend: "{{ select_crypto_backend }}"
@@ -78,7 +78,7 @@
         or 'record layer failure' in result.msg
 
 - name: Test timeout option
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ httpbin_host }}"
     port: 1234
     timeout: 1
@@ -95,7 +95,7 @@
       - "'Failed to get cert from port with error: timed out' == result.msg or 'Connection refused' in result.msg"
 
 - name: Test failure if ca_cert is not a valid file
-  get_certificate:
+  community.crypto.get_certificate:
     host: "{{ httpbin_host }}"
     port: 443
     ca_cert: dn.e
@@ -117,7 +117,7 @@
     dest: "{{ remote_tmp_dir }}/temp.pem"
 
 - name: Get servers certificate comparing it to its own ca_cert file
-  get_certificate:
+  community.crypto.get_certificate:
     ca_cert: '{{ remote_tmp_dir }}/temp.pem'
     host: "{{ httpbin_host }}"
     port: 443
@@ -156,13 +156,13 @@
   when: not has_get_certificate_chain
 
 - name: Generate bogus CA privatekey
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/bogus_ca.key'
     type: ECC
     curve: secp256r1
 
 - name: Generate bogus CA CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/bogus_ca.csr'
     privatekey_path: '{{ remote_tmp_dir }}/bogus_ca.key'
     subject:
@@ -173,7 +173,7 @@
     basic_constraints_critical: true
 
 - name: Generate selfsigned bogus CA certificate
-  x509_certificate:
+  community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/bogus_ca.pem'
     csr_path: '{{ remote_tmp_dir }}/bogus_ca.csr'
     privatekey_path: '{{ remote_tmp_dir }}/bogus_ca.key'
@@ -181,7 +181,7 @@
     selfsigned_digest: sha256
 
 - name: Get servers certificate comparing it to an invalid ca_cert file
-  get_certificate:
+  community.crypto.get_certificate:
     ca_cert: '{{ remote_tmp_dir }}/bogus_ca.pem'
     host: "{{ httpbin_host }}"
     port: 443

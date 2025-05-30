@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Backend auto-detection test
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/auto_backend_key'
     state: "{{ item }}"
   loop: ['present', 'absent']

@@ -56,7 +56,7 @@
       register: brew_stat
 
     - name: MACOS | Install openssl
-      homebrew:
+      community.general.homebrew:
         name: openssl
         state: present
       become: true

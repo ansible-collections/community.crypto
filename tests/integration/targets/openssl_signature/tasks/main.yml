@@ -50,7 +50,7 @@
     all_tests: "{{ [backends, key_types, key_password] | openssl_signatures_combiner }}"
 
 - name: Generate private keys
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     type: '{{ item.type }}'
     curve: '{{ item.curve | default(omit) }}'
@@ -60,21 +60,21 @@
   loop: '{{ all_tests }}'
 
 - name: Generate public keys
-  openssl_publickey:
+  community.crypto.openssl_publickey:
     path: '{{ remote_tmp_dir }}/{{item.backend}}_publickey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
   loop: '{{ all_tests }}'
 
 - name: Generate CSRs
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/{{item.backend}}_{{ item.type }}_{{ item.passwd }}.csr'
     privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_passphrase: '{{ item.privatekey_passphrase | default(omit) }}'
   loop: '{{ all_tests }}'
 
 - name: Generate selfsigned certificates
-  x509_certificate:
+  community.crypto.x509_certificate:
     provider: selfsigned
     path: '{{ remote_tmp_dir }}/{{item.backend}}_certificate_{{ item.type }}_{{ item.passwd }}.pem'
     privatekey_path: '{{ remote_tmp_dir }}/{{item.backend}}_privatekey_{{ item.type }}_{{ item.passwd }}.pem'

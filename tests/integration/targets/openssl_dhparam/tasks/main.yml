@@ -12,7 +12,7 @@
 # otherwise tests would be too slow. Use sizes of at least 2048 in production!
 
 - name: Run module with backend autodetection
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: '{{ remote_tmp_dir }}/dh_backend_selection.pem'
     size: 512
 

@@ -23,7 +23,7 @@
   loop: "{{ old_test_artifacts.files }}"
 
 - name: "({{ backend }}) Regenerate - setup simple keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -48,7 +48,7 @@
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - modify broken keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
@@ -70,7 +70,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify broken keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}'
     type: rsa
     size: 1024
@@ -91,7 +91,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -113,7 +113,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -137,7 +137,7 @@
   when: backend == 'cryptography'
 
 - name: "({{ backend }}) Regenerate - modify password protected keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-b-{{ item }}'
     type: rsa
     size: 1024
@@ -158,7 +158,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - modify password protected keys with passphrase"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-d-{{ item }}'
     type: rsa
     size: 1024
@@ -181,7 +181,7 @@
   when: backend == 'cryptography'
 
 - name: "({{ backend }}) Regenerate - not modify regular keys (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -199,7 +199,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - not modify regular keys"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1024
@@ -216,7 +216,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - adjust key size (check mode)"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
@@ -236,7 +236,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - adjust key size"
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
     type: rsa
     size: 1048
@@ -270,7 +270,7 @@
 
   block:
     - name: "({{ backend }}) Regenerate - adjust key type (check mode)"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -290,7 +290,7 @@
           - result.results[4] is changed
 
     - name: "({{ backend }}) Regenerate - adjust key type"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -319,7 +319,7 @@
       when: "item.0 != 'always'"
 
     - name: "({{ backend }}) Regenerate - adjust comment (check mode)"
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
         type: '{{ ssh_type }}'
         size: '{{ ssh_size }}'
@@ -338,7 +338,7 @@
     - when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
       block:
         - name: "({{ backend }}) Regenerate - adjust comment"
-          openssh_keypair:
+          community.crypto.openssh_keypair:
             path: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}'
             type: '{{ ssh_type }}'
             size: '{{ ssh_size }}'

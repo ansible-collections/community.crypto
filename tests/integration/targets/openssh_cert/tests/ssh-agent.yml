@@ -14,7 +14,7 @@
 
   block:
     - name: Generate always valid cert using agent without key in agent (should fail)
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
@@ -35,7 +35,7 @@
       ansible.builtin.command: 'ssh-add {{ signing_key }}'
 
     - name: Generate always valid cert with agent (check mode)
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
@@ -46,7 +46,7 @@
       check_mode: true
 
     - name: Generate always valid cert with agent
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
@@ -56,7 +56,7 @@
         valid_to: forever
 
     - name: Generate always valid cert with agent (idempotent)
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
@@ -73,7 +73,7 @@
         msg: OpenSSH certificate generation without serial number is idempotent.
 
     - name: Generate always valid cert with agent (idempotent, check mode)
-      openssh_cert:
+      community.crypto.openssh_cert:
         type: user
         signing_key: "{{ signing_key }}"
         public_key: "{{ public_key }}"
@@ -84,6 +84,6 @@
       check_mode: true
 
     - name: Remove certificate
-      openssh_cert:
+      community.crypto.openssh_cert:
         state: absent
         path: '{{ remote_tmp_dir }}/id_cert_with_agent'

@@ -6,7 +6,7 @@
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         type: "{{ item.type }}"
         size: "{{ item.size | default(omit) }}"
@@ -42,7 +42,7 @@
   ansible.builtin.command:
     cmd: openssl x509 -in {{ remote_tmp_dir }}/cert-1.pem -noout -text
 - name: Obtain certificate information
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-1.pem"
   register: cert_1_info
 - name: Read certificate
@@ -50,7 +50,7 @@
     src: '{{ remote_tmp_dir }}/cert-1.pem'
   register: slurp_cert_1
 - name: Obtain certificate information
-  acme_ari_info:
+  community.crypto.acme_ari_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
