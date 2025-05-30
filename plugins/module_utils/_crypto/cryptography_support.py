@@ -118,15 +118,15 @@ if t.TYPE_CHECKING:
         cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
     ]
-    PublicKeyTypesWOEdwards = t.Union[
+    PublicKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
         DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
     ]
-    PrivateKeyTypesWOEdwards = t.Union[
+    PrivateKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
         DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
     ]
 else:
-    PublicKeyTypesWOEdwards = None
-    PrivateKeyTypesWOEdwards = None
+    PublicKeyTypesWOEdwards = None  # pylint: disable=invalid-name
+    PrivateKeyTypesWOEdwards = None  # pylint: disable=invalid-name
 
 
 CRYPTOGRAPHY_TIMEZONE = False

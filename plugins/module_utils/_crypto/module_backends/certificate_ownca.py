@@ -71,12 +71,12 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         self.create_authority_key_identifier: bool = module.params[
             "ownca_create_authority_key_identifier"
         ]
-        self.notBefore = get_relative_time_option(
+        self.not_before = get_relative_time_option(
             module.params["ownca_not_before"],
             input_name="ownca_not_before",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
-        self.notAfter = get_relative_time_option(
+        self.not_after = get_relative_time_option(
             module.params["ownca_not_after"],
             input_name="ownca_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
@@ -162,8 +162,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         cert_builder = cert_builder.subject_name(self.csr.subject)
         cert_builder = cert_builder.issuer_name(self.ca_cert.subject)
         cert_builder = cert_builder.serial_number(self.serial_number)
-        cert_builder = set_not_valid_before(cert_builder, self.notBefore)
-        cert_builder = set_not_valid_after(cert_builder, self.notAfter)
+        cert_builder = set_not_valid_before(cert_builder, self.not_before)
+        cert_builder = set_not_valid_after(cert_builder, self.not_after)
         cert_builder = cert_builder.public_key(self.csr.public_key())
         has_ski = False
         for extension in self.csr.extensions:
@@ -224,7 +224,7 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         not_after: datetime.datetime | None = None,
     ) -> bool:
         if super().needs_regeneration(
-            not_before=self.notBefore, not_after=self.notAfter
+            not_before=self.not_before, not_after=self.not_after
         ):
             return True
 
@@ -283,8 +283,8 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
         if self.module.check_mode:
             result.update(
                 {
-                    "notBefore": self.notBefore.strftime("%Y%m%d%H%M%SZ"),
-                    "notAfter": self.notAfter.strftime("%Y%m%d%H%M%SZ"),
+                    "notBefore": self.not_before.strftime("%Y%m%d%H%M%SZ"),
+                    "notAfter": self.not_after.strftime("%Y%m%d%H%M%SZ"),
                     "serial_number": self.serial_number,
                 }
             )

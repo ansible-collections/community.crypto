@@ -226,7 +226,7 @@ def is_parent(
         module.fail_json(msg=f"Unknown error on signature validation: {e}")
 
 
-def parse_PEM_list(
+def parse_pem_list(
     module: AnsibleModule,
     text: str,
     source: str | os.PathLike,
@@ -250,7 +250,7 @@ def parse_PEM_list(
     return result
 
 
-def load_PEM_list(
+def load_pem_list(
     module: AnsibleModule, path: str | os.PathLike, fail_on_error: bool = True
 ) -> list[Certificate]:
     """
@@ -258,7 +258,7 @@ def load_PEM_list(
     """
     try:
         with open(path, "rb") as f:
-            return parse_PEM_list(
+            return parse_pem_list(
                 module,
                 f.read().decode("utf-8"),
                 source=path,
@@ -287,7 +287,7 @@ class CertificateSet:
         self.certificate_by_cert: dict[cryptography.x509.Certificate, Certificate] = {}
 
     def _load_file(self, path: str | os.PathLike) -> None:
-        certs = load_PEM_list(self.module, path, fail_on_error=False)
+        certs = load_pem_list(self.module, path, fail_on_error=False)
         for cert in certs:
             self.certificates.add(cert)
             if cert.cert.subject not in self.certificates_by_issuer:
@@ -358,7 +358,7 @@ def main() -> t.NoReturn:
     )
 
     # Load chain
-    chain = parse_PEM_list(module, module.params["input_chain"], source="input chain")
+    chain = parse_pem_list(module, module.params["input_chain"], source="input chain")
     if len(chain) == 0:
         module.fail_json(msg="Input chain must contain at least one certificate")
 

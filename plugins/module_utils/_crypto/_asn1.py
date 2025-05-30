@@ -35,15 +35,15 @@ ASN1_STRING_REGEX = re.compile(
 
 
 class TagClass(enum.Enum):
-    universal = 0
-    application = 1
-    context_specific = 2
-    private = 3
+    UNIVERSAL = 0
+    APPLICATION = 1
+    CONTEXT_SPECIFIC = 2
+    PRIVATE = 3
 
 
 # Universal tag numbers that can be encoded.
 class TagNumber(enum.Enum):
-    utf8_string = 12
+    UTF8_STRING = 12
 
 
 def _pack_octet_integer(value: int) -> bytes:
@@ -92,22 +92,22 @@ def serialize_asn1_string_as_der(value: str) -> bytes:
     # We should only do a universal type tag if not IMPLICITLY tagged or the tag class is not universal.
     if not tag_type or (tag_type == "EXPLICIT" and tag_class != "U"):
         b_value = pack_asn1(
-            tag_class=TagClass.universal,
+            tag_class=TagClass.UNIVERSAL,
             constructed=False,
-            tag_number=TagNumber.utf8_string,
+            tag_number=TagNumber.UTF8_STRING,
             b_data=b_value,
         )
 
     if tag_type:
         tag_class_enum = {
-            "U": TagClass.universal,
-            "A": TagClass.application,
-            "P": TagClass.private,
-            "C": TagClass.context_specific,
+            "U": TagClass.UNIVERSAL,
+            "A": TagClass.APPLICATION,
+            "P": TagClass.PRIVATE,
+            "C": TagClass.CONTEXT_SPECIFIC,
         }[tag_class]
 
         # When adding support for more types this should be looked into further. For now it works with UTF8Strings.
-        constructed = tag_type == "EXPLICIT" and tag_class_enum != TagClass.universal
+        constructed = tag_type == "EXPLICIT" and tag_class_enum != TagClass.UNIVERSAL
         b_value = pack_asn1(
             tag_class=tag_class_enum,
             constructed=constructed,

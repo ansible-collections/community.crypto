@@ -39,7 +39,7 @@ if t.TYPE_CHECKING:
     DateFormatStr = t.Literal["human_readable", "openssh"]
     DateFormatInt = t.Literal["timestamp"]
 else:
-    KeyType = None
+    KeyType = None  # pylint: disable=invalid-name
 
 
 # Protocol References
