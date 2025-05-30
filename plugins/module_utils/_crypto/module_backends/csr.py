@@ -600,8 +600,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 return False
             params = cryptography_parse_key_usage_params(self.keyUsage)
             for param, value in params.items():
-                # TODO: check whether getattr() with '_' prepended is really needed
-                if getattr(current_keyusage_ext.value, "_" + param) != value:
+                if getattr(current_keyusage_ext.value, param) != value:
                     return False
             return current_keyusage_ext.critical == self.keyUsage_critical
 
