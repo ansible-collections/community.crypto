@@ -185,6 +185,7 @@ options:
   account_key_src:
     description:
       - Path to a file containing the ACME account RSA or Elliptic Curve key.
+      - "For Elliptic Curve keys only the following curves are supported: V(secp256r1), V(secp384r1), and V(secp521r1)."
       - 'Private keys can be created with the M(community.crypto.openssl_privatekey) or M(community.crypto.openssl_privatekey_pipe)
         modules. If the requisite (cryptography) is not available, keys can also be created directly with the C(openssl) command
         line tool: RSA keys can be created with C(openssl genrsa ...). Elliptic curve keys can be created with C(openssl ecparam
@@ -197,6 +198,7 @@ options:
   account_key_content:
     description:
       - Content of the ACME account RSA or Elliptic Curve key.
+      - "For Elliptic Curve keys only the following curves are supported: V(secp256r1), V(secp384r1), and V(secp521r1)."
       - Mutually exclusive with O(account_key_src).
       - Required if O(account_key_src) is not used.
       - B(Warning:) the content will be written into a temporary file, which will be deleted by Ansible when the module completes.
