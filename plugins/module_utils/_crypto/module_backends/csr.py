@@ -98,20 +98,24 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             self.privatekey_content = None
         self.privatekey_passphrase: str | None = module.params["privatekey_passphrase"]
         self.version: t.Literal[1] = module.params["version"]
-        self.subjectAltName: list[str] | None = module.params["subject_alt_name"]
-        self.subjectAltName_critical: bool = module.params["subject_alt_name_critical"]
-        self.keyUsage: list[str] | None = module.params["key_usage"]
-        self.keyUsage_critical: bool = module.params["key_usage_critical"]
-        self.extendedKeyUsage: list[str] | None = module.params["extended_key_usage"]
-        self.extendedKeyUsage_critical: bool = module.params[
+        self.subject_alt_name: list[str] | None = module.params["subject_alt_name"]
+        self.subject_alt_name_critical: bool = module.params[
+            "subject_alt_name_critical"
+        ]
+        self.key_usage: list[str] | None = module.params["key_usage"]
+        self.key_usage_critical: bool = module.params["key_usage_critical"]
+        self.extended_key_usage: list[str] | None = module.params["extended_key_usage"]
+        self.extended_key_usage_critical: bool = module.params[
             "extended_key_usage_critical"
         ]
-        self.basicConstraints: list[str] | None = module.params["basic_constraints"]
-        self.basicConstraints_critical: bool = module.params[
+        self.basic_constraints: list[str] | None = module.params["basic_constraints"]
+        self.basic_constraints_critical: bool = module.params[
             "basic_constraints_critical"
         ]
-        self.ocspMustStaple: bool = module.params["ocsp_must_staple"]
-        self.ocspMustStaple_critical: bool = module.params["ocsp_must_staple_critical"]
+        self.ocsp_must_staple: bool = module.params["ocsp_must_staple"]
+        self.ocsp_must_staple_critical: bool = module.params[
+            "ocsp_must_staple_critical"
+        ]
         self.name_constraints_permitted: list[str] = (
             module.params["name_constraints_permitted"] or []
         )
@@ -175,10 +179,10 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             raise CertificateSigningRequestError(str(exc)) from exc
 
         self.using_common_name_for_san = False
-        if not self.subjectAltName and module.params["use_common_name_for_san"]:
+        if not self.subject_alt_name and module.params["use_common_name_for_san"]:
             for sub in self.subject:
                 if sub[0] in ("commonName", "CN"):
-                    self.subjectAltName = [f"DNS:{sub[1]}"]
+                    self.subject_alt_name = [f"DNS:{sub[1]}"]
                     self.using_common_name_for_san = True
                     break
 
@@ -279,11 +283,11 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         result: dict[str, t.Any] = {
             "privatekey": self.privatekey_path,
             "subject": self.subject,
-            "subjectAltName": self.subjectAltName,
-            "keyUsage": self.keyUsage,
-            "extendedKeyUsage": self.extendedKeyUsage,
-            "basicConstraints": self.basicConstraints,
-            "ocspMustStaple": self.ocspMustStaple,
+            "subjectAltName": self.subject_alt_name,
+            "keyUsage": self.key_usage,
+            "extendedKeyUsage": self.extended_key_usage,
+            "basicConstraints": self.basic_constraints,
+            "ocspMustStaple": self.ocsp_must_staple,
             "name_constraints_permitted": self.name_constraints_permitted,
             "name_constraints_excluded": self.name_constraints_excluded,
         }
@@ -390,43 +394,43 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         except ValueError as e:
             raise CertificateSigningRequestError(e) from e
 
-        if self.subjectAltName:
+        if self.subject_alt_name:
             csr = csr.add_extension(
                 cryptography.x509.SubjectAlternativeName(
-                    [cryptography_get_name(name) for name in self.subjectAltName]
+                    [cryptography_get_name(name) for name in self.subject_alt_name]
                 ),
-                critical=self.subjectAltName_critical,
+                critical=self.subject_alt_name_critical,
             )
 
-        if self.keyUsage:
-            params = cryptography_parse_key_usage_params(self.keyUsage)
+        if self.key_usage:
+            params = cryptography_parse_key_usage_params(self.key_usage)
             csr = csr.add_extension(
-                cryptography.x509.KeyUsage(**params), critical=self.keyUsage_critical
+                cryptography.x509.KeyUsage(**params), critical=self.key_usage_critical
             )
 
-        if self.extendedKeyUsage:
+        if self.extended_key_usage:
             usages = [
-                cryptography_name_to_oid(usage) for usage in self.extendedKeyUsage
+                cryptography_name_to_oid(usage) for usage in self.extended_key_usage
             ]
             csr = csr.add_extension(
                 cryptography.x509.ExtendedKeyUsage(usages),
-                critical=self.extendedKeyUsage_critical,
+                critical=self.extended_key_usage_critical,
             )
 
-        if self.basicConstraints:
+        if self.basic_constraints:
             params = {}
-            ca, path_length = cryptography_get_basic_constraints(self.basicConstraints)
+            ca, path_length = cryptography_get_basic_constraints(self.basic_constraints)
             csr = csr.add_extension(
                 cryptography.x509.BasicConstraints(ca, path_length),
-                critical=self.basicConstraints_critical,
+                critical=self.basic_constraints_critical,
             )
 
-        if self.ocspMustStaple:
+        if self.ocsp_must_staple:
             csr = csr.add_extension(
                 cryptography.x509.TLSFeature(
                     [cryptography.x509.TLSFeatureType.status_request]
                 ),
-                critical=self.ocspMustStaple_critical,
+                critical=self.ocsp_must_staple_critical,
             )
 
         if self.name_constraints_permitted or self.name_constraints_excluded:
@@ -566,7 +570,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 (ext for ext in extensions if isinstance(ext.value, exttype)), None
             )
 
-        def _check_subjectAltName(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_subject_alt_name(extensions: cryptography.x509.Extensions) -> bool:
             current_altnames_ext = _find_extension(
                 extensions, cryptography.x509.SubjectAlternativeName
             )
@@ -578,33 +582,33 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             altnames = (
                 [
                     to_text(cryptography_get_name(altname))
-                    for altname in self.subjectAltName
+                    for altname in self.subject_alt_name
                 ]
-                if self.subjectAltName
+                if self.subject_alt_name
                 else []
             )
             if set(altnames) != set(current_altnames):
                 return False
             if altnames and current_altnames_ext:
-                if current_altnames_ext.critical != self.subjectAltName_critical:
+                if current_altnames_ext.critical != self.subject_alt_name_critical:
                     return False
             return True
 
-        def _check_keyUsage(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_key_usage(extensions: cryptography.x509.Extensions) -> bool:
             current_keyusage_ext = _find_extension(
                 extensions, cryptography.x509.KeyUsage
             )
-            if not self.keyUsage:
+            if not self.key_usage:
                 return current_keyusage_ext is None
             if current_keyusage_ext is None:
                 return False
-            params = cryptography_parse_key_usage_params(self.keyUsage)
+            params = cryptography_parse_key_usage_params(self.key_usage)
             for param, value in params.items():
                 if getattr(current_keyusage_ext.value, param) != value:
                     return False
-            return current_keyusage_ext.critical == self.keyUsage_critical
+            return current_keyusage_ext.critical == self.key_usage_critical
 
-        def _check_extenededKeyUsage(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_extended_key_usage(extensions: cryptography.x509.Extensions) -> bool:
             current_usages_ext = _find_extension(
                 extensions, cryptography.x509.ExtendedKeyUsage
             )
@@ -616,23 +620,23 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             usages = (
                 [
                     str(cryptography_name_to_oid(usage))
-                    for usage in self.extendedKeyUsage
+                    for usage in self.extended_key_usage
                 ]
-                if self.extendedKeyUsage
+                if self.extended_key_usage
                 else []
             )
             if set(current_usages) != set(usages):
                 return False
             if usages and current_usages_ext:
-                if current_usages_ext.critical != self.extendedKeyUsage_critical:
+                if current_usages_ext.critical != self.extended_key_usage_critical:
                     return False
             return True
 
-        def _check_basicConstraints(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_basic_constraints(extensions: cryptography.x509.Extensions) -> bool:
             bc_ext = _find_extension(extensions, cryptography.x509.BasicConstraints)
             current_ca = bc_ext.value.ca if bc_ext else False
             current_path_length = bc_ext.value.path_length if bc_ext else None
-            ca, path_length = cryptography_get_basic_constraints(self.basicConstraints)
+            ca, path_length = cryptography_get_basic_constraints(self.basic_constraints)
             # Check CA flag
             if ca != current_ca:
                 return False
@@ -640,19 +644,19 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             if path_length != current_path_length:
                 return False
             # Check criticality
-            if self.basicConstraints:
+            if self.basic_constraints:
                 return (
                     bc_ext is not None
-                    and bc_ext.critical == self.basicConstraints_critical
+                    and bc_ext.critical == self.basic_constraints_critical
                 )
             return bc_ext is None
 
-        def _check_ocspMustStaple(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_ocsp_must_staple(extensions: cryptography.x509.Extensions) -> bool:
             tlsfeature_ext = _find_extension(extensions, cryptography.x509.TLSFeature)
-            if self.ocspMustStaple:
+            if self.ocsp_must_staple:
                 if (
                     not tlsfeature_ext
-                    or tlsfeature_ext.critical != self.ocspMustStaple_critical
+                    or tlsfeature_ext.critical != self.ocsp_must_staple_critical
                 ):
                     return False
                 return (
@@ -661,7 +665,7 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
                 )
             return tlsfeature_ext is None
 
-        def _check_nameConstraints(extensions: cryptography.x509.Extensions) -> bool:
+        def _check_name_constraints(extensions: cryptography.x509.Extensions) -> bool:
             current_nc_ext = _find_extension(
                 extensions, cryptography.x509.NameConstraints
             )
@@ -762,14 +766,14 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         def _check_extensions(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             extensions = csr.extensions
             return (
-                _check_subjectAltName(extensions)
-                and _check_keyUsage(extensions)
-                and _check_extenededKeyUsage(extensions)
-                and _check_basicConstraints(extensions)
-                and _check_ocspMustStaple(extensions)
+                _check_subject_alt_name(extensions)
+                and _check_key_usage(extensions)
+                and _check_extended_key_usage(extensions)
+                and _check_basic_constraints(extensions)
+                and _check_ocsp_must_staple(extensions)
                 and _check_subject_key_identifier(extensions)
                 and _check_authority_key_identifier(extensions)
-                and _check_nameConstraints(extensions)
+                and _check_name_constraints(extensions)
                 and _check_crl_distribution_points(extensions)
             )
 

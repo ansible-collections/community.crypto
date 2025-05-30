@@ -64,12 +64,12 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         self.create_subject_key_identifier: t.Literal[
             "create_if_not_provided", "always_create", "never_create"
         ] = module.params["selfsigned_create_subject_key_identifier"]
-        self.notBefore = get_relative_time_option(
+        self.not_before = get_relative_time_option(
             module.params["selfsigned_not_before"],
             input_name="selfsigned_not_before",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
         )
-        self.notAfter = get_relative_time_option(
+        self.not_after = get_relative_time_option(
             module.params["selfsigned_not_after"],
             input_name="selfsigned_not_after",
             with_timezone=CRYPTOGRAPHY_TIMEZONE,
@@ -124,8 +124,8 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
             cert_builder = cert_builder.subject_name(self.csr.subject)
             cert_builder = cert_builder.issuer_name(self.csr.subject)
             cert_builder = cert_builder.serial_number(self.serial_number)
-            cert_builder = set_not_valid_before(cert_builder, self.notBefore)
-            cert_builder = set_not_valid_after(cert_builder, self.notAfter)
+            cert_builder = set_not_valid_before(cert_builder, self.not_before)
+            cert_builder = set_not_valid_after(cert_builder, self.not_after)
             cert_builder = cert_builder.public_key(self.privatekey.public_key())
             has_ski = False
             for extension in self.csr.extensions:
@@ -168,7 +168,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         assert self.privatekey is not None
 
         if super().needs_regeneration(
-            not_before=self.notBefore, not_after=self.notAfter
+            not_before=self.not_before, not_after=self.not_after
         ):
             return True
 
@@ -190,8 +190,8 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         if self.module.check_mode:
             result.update(
                 {
-                    "notBefore": self.notBefore.strftime("%Y%m%d%H%M%SZ"),
-                    "notAfter": self.notAfter.strftime("%Y%m%d%H%M%SZ"),
+                    "notBefore": self.not_before.strftime("%Y%m%d%H%M%SZ"),
+                    "notAfter": self.not_after.strftime("%Y%m%d%H%M%SZ"),
                     "serial_number": self.serial_number,
                 }
             )

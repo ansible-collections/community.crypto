@@ -380,7 +380,6 @@ disable=raw-checker-failed,
         broad-exception-caught,
         broad-exception-raised,
         fixme,
-        invalid-name,
         unused-argument,
         # Cannot remove yet due to inadequacy of rules
         inconsistent-return-statements,  # doesn't notice that fail_json() does not return
