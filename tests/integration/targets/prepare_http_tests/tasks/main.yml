@@ -23,7 +23,7 @@
     # Override hostname defaults with httptester linked names
     - ansible.builtin.include_vars: httptester.yml
 
-    - ansible.builtin.include_tasks: "{{ lookup('first_found', files)}}"
+    - ansible.builtin.include_tasks: "{{ lookup('first_found', files) }}"
       vars:
         files:
           - "{{ ansible_os_family | lower }}.yml"

@@ -57,7 +57,7 @@
     var: challenge_data
 - name: ({{ certgen_title }}) Create HTTP challenges
   ansible.builtin.uri:
-    url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
+    url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/' | length) :] }}"
     method: PUT
     body_format: raw
     body: "{{ item.value['http-01'].resource_value }}"
@@ -137,7 +137,7 @@
   when: challenge_data is changed
 - name: ({{ certgen_title }}) Deleting HTTP challenges
   ansible.builtin.uri:
-    url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
+    url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/' | length) :] }}"
     method: DELETE
   with_dict: "{{ challenge_data.challenge_data }}"
   when: "challenge_data is changed and challenge == 'http-01'"

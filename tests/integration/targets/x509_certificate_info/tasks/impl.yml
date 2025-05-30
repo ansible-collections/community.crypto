@@ -6,20 +6,20 @@
 - ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
-- name: ({{select_crypto_backend}}) Get certificate info
+- name: ({{ select_crypto_backend }}) Get certificate info
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: ({{select_crypto_backend}}) Get certificate info (IDNA encoding)
+- name: ({{ select_crypto_backend }}) Get certificate info (IDNA encoding)
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: idna
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_idna
 
-- name: ({{select_crypto_backend}}) Get certificate info (Unicode encoding)
+- name: ({{ select_crypto_backend }}) Get certificate info (Unicode encoding)
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: unicode
@@ -99,18 +99,18 @@
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
 
-- name: ({{select_crypto_backend}}) Read file
+- name: ({{ select_crypto_backend }}) Read file
   ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/cert_1.pem'
   register: slurp
 
-- name: ({{select_crypto_backend}}) Get certificate info directly
+- name: ({{ select_crypto_backend }}) Get certificate info directly
   community.crypto.x509_certificate_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
-- name: ({{select_crypto_backend}}) Compare output of direct and loaded info
+- name: ({{ select_crypto_backend }}) Compare output of direct and loaded info
   ansible.builtin.assert:
     that:
       - >-
@@ -118,7 +118,7 @@
         ==
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
-- name: ({{select_crypto_backend}}) Get certificate info
+- name: ({{ select_crypto_backend }}) Get certificate info
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -133,7 +133,7 @@
       - not result.valid_at.past
       - not result.valid_at.twentydays
 
-- name: ({{select_crypto_backend}}) Get certificate info
+- name: ({{ select_crypto_backend }}) Get certificate info
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -150,7 +150,7 @@
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
 
-- name: ({{select_crypto_backend}}) Get certificate info
+- name: ({{ select_crypto_backend }}) Get certificate info
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -168,7 +168,7 @@
     src: cert1.pem
     dest: '{{ remote_tmp_dir }}/packed-cert-1.pem'
 
-- name: ({{select_crypto_backend}}) Get certificate info for packaged cert 1
+- name: ({{ select_crypto_backend }}) Get certificate info for packaged cert 1
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/packed-cert-1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'

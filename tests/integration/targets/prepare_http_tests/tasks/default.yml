@@ -75,5 +75,5 @@
       register: macos_cafile
 
     - ansible.builtin.blockinfile:
-        path: "{{ macos_cafile.stdout_lines|first }}"
+        path: "{{ macos_cafile.stdout_lines | first }}"
         block: "{{ cacert_pem.content }}"

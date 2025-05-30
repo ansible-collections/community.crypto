@@ -3,12 +3,12 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: ({{select_crypto_backend}}) Create key
+- name: ({{ select_crypto_backend }}) Create key
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: ({{select_crypto_backend}}) Get key info
+- name: ({{ select_crypto_backend }}) Get key info
   community.crypto.openssl_privatekey_info:
     content: "{{ result.privatekey }}"
   register: result_info
@@ -27,7 +27,7 @@
       - result.fingerprint.sha256 == result_info.public_key_fingerprints.sha256
   when: result.fingerprint is not none
 
-- name: ({{select_crypto_backend}}) Update key (check mode)
+- name: ({{ select_crypto_backend }}) Update key (check mode)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ result.privatekey }}"
@@ -35,7 +35,7 @@
   register: update_check
   check_mode: true
 
-- name: ({{select_crypto_backend}}) Update key (check mode, with return_current_key=true)
+- name: ({{ select_crypto_backend }}) Update key (check mode, with return_current_key=true)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ result.privatekey }}"
@@ -44,14 +44,14 @@
   register: update_check_return
   check_mode: true
 
-- name: ({{select_crypto_backend}}) Update key
+- name: ({{ select_crypto_backend }}) Update key
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ result.privatekey }}"
     size: '{{ default_rsa_key_size }}'
   register: update
 
-- name: ({{select_crypto_backend}}) Update key (idempotent, check mode)
+- name: ({{ select_crypto_backend }}) Update key (idempotent, check mode)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ update.privatekey }}"
@@ -59,14 +59,14 @@
   register: update_idempotent_check
   check_mode: true
 
-- name: ({{select_crypto_backend}}) Update key (idempotent)
+- name: ({{ select_crypto_backend }}) Update key (idempotent)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ update.privatekey }}"
     size: '{{ default_rsa_key_size }}'
   register: update_idempotent
 
-- name: ({{select_crypto_backend}}) Update key (idempotent, check mode, with return_current_key=true)
+- name: ({{ select_crypto_backend }}) Update key (idempotent, check mode, with return_current_key=true)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ update.privatekey }}"
@@ -75,7 +75,7 @@
   register: update_idempotent_return_check
   check_mode: true
 
-- name: ({{select_crypto_backend}}) Update key (idempotent, with return_current_key=true)
+- name: ({{ select_crypto_backend }}) Update key (idempotent, with return_current_key=true)
   community.crypto.openssl_privatekey_pipe:
     select_crypto_backend: '{{ select_crypto_backend }}'
     content: "{{ update.privatekey }}"
@@ -83,7 +83,7 @@
     return_current_key: true
   register: update_idempotent_return
 
-- name: ({{select_crypto_backend}}) Get key info
+- name: ({{ select_crypto_backend }}) Get key info
   community.crypto.openssl_privatekey_info:
     content: "{{ update.privatekey }}"
   register: update_info

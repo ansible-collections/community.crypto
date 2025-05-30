@@ -38,7 +38,7 @@
     acme_version: 2
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
-    url: "{{ directory.directory.newAccount}}"
+    url: "{{ directory.directory.newAccount }}"
     method: post
     content: '{"termsOfServiceAgreed":true}'
     select_crypto_backend: "{{ select_crypto_backend }}"

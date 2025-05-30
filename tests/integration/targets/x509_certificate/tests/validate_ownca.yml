@@ -3,23 +3,23 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - verify CA)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate (test - verify CA)
   ansible.builtin.shell: '{{ openssl_binary }} verify -CAfile {{ remote_tmp_dir }}/ca_cert.pem {{ remote_tmp_dir }}/ownca_cert.pem | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_verify_ca
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certificate modulus)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate (test - ownca certificate modulus)
   ansible.builtin.command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert.pem'
   register: ownca_cert_modulus
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca issuer value)
-  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate (test - ownca issuer value)
+  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir }}/ownca_cert.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_cert_issuer
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (test - ownca certificate version == default == 3)
-  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate (test - ownca certificate version == default == 3)
+  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir }}/ownca_cert.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert_version
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate (assert)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate (assert)
   ansible.builtin.assert:
     that:
       - ownca_verify_ca.stdout == 'OK'
@@ -28,96 +28,96 @@
       # openssl 1.1.x adds a space between the output
       - ownca_cert_issuer.stdout in ['CN=Example CA', 'CN = Example CA']
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate idempotence
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate idempotence
   ansible.builtin.assert:
     that:
       - ownca_certificate.serial_number == ownca_certificate_idempotence.serial_number
       - ownca_certificate.notBefore == ownca_certificate_idempotence.notBefore
       - ownca_certificate.notAfter == ownca_certificate_idempotence.notAfter
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate regeneration
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate regeneration
   ansible.builtin.assert:
     that:
       - ownca_certificate_ca_subject_changed is changed
       - ownca_certificate_ca_key_changed is changed
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Read certificate
+- name: (OwnCA validation, {{ select_crypto_backend }}) Read certificate
   ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/ownca_cert.pem'
   register: slurp
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca data return
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca data return
   ansible.builtin.assert:
     that:
       - ownca_certificate.certificate == (slurp.content | b64decode)
       - ownca_certificate.certificate == ownca_certificate_idempotence.certificate
 
 - block:
-    - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate v2 (test - ownca certificate version == 2)
-      ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
+    - name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate v2 (test - ownca certificate version == 2)
+      ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir }}/ownca_cert_v2.pem -text | grep "Version" | sed "s/.*: \(.*\) .*/\1/g"'
       register: ownca_cert_v2_version
 
-    - name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate version 2 (assert)
+    - name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate version 2 (assert)
       ansible.builtin.assert:
         that:
           - ownca_cert_v2_version.stdout == '2'
   when: "select_crypto_backend != 'cryptography'"
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate v2 (test - ownca certificate version == 2)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate v2 (test - ownca certificate version == 2)
   ansible.builtin.assert:
     that:
       - ownca_v2_certificate is failed
   when: "select_crypto_backend == 'cryptography'"
 
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (test - ownca certificate modulus)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate2 (test - ownca certificate modulus)
   ansible.builtin.command: '{{ openssl_binary }} x509 -noout -modulus -in {{ remote_tmp_dir }}/ownca_cert2.pem'
   register: ownca_cert2_modulus
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate2 (assert)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate2 (assert)
   ansible.builtin.assert:
     that:
       - ownca_cert2_modulus.stdout == privatekey2_modulus.stdout
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate owncal certificate3 (test - notBefore)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate owncal certificate3 (test - notBefore)
   ansible.builtin.shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/ownca_cert3.pem -text | grep "Not Before" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert3_notBefore
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate3 (test - notAfter)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate3 (test - notAfter)
   ansible.builtin.shell: '{{ openssl_binary }} x509 -noout -in {{ remote_tmp_dir }}/ownca_cert3.pem -text | grep "Not After" | sed "s/.*: \(.*\) .*/\1/g"'
   register: ownca_cert3_notAfter
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate3 (assert - notBefore)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate3 (assert - notBefore)
   ansible.builtin.assert:
     that:
       - ownca_cert3_notBefore.stdout == 'Oct 23 13:37:42 2018'
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca certificate3 (assert - notAfter)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca certificate3 (assert - notAfter)
   ansible.builtin.assert:
     that:
       - ownca_cert3_notAfter.stdout == 'Oct 23 13:37:42 2019'
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate idempotency
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate idempotency
   ansible.builtin.assert:
     that:
       - ownca_cert3_idem is not changed
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca certificate pubkey)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca ECC certificate (test - ownca certificate pubkey)
   ansible.builtin.command: '{{ openssl_binary }} x509 -noout -pubkey -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem'
   register: ownca_cert_ecc_pubkey
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (test - ownca issuer value)
-  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir}}/ownca_cert_ecc.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca ECC certificate (test - ownca issuer value)
+  ansible.builtin.shell: '{{ openssl_binary }} x509 -noout  -in {{ remote_tmp_dir }}/ownca_cert_ecc.pem -text | grep "Issuer" | sed "s/.*: \(.*\)/\1/g"'
   register: ownca_cert_ecc_issuer
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Validate ownca ECC certificate (assert)
+- name: (OwnCA validation, {{ select_crypto_backend }}) Validate ownca ECC certificate (assert)
   ansible.builtin.assert:
     that:
       - ownca_cert_ecc_pubkey.stdout == privatekey_ecc_pubkey.stdout
       # openssl 1.1.x adds a space between the output
       - ownca_cert_ecc_issuer.stdout in ['CN=Example CA', 'CN = Example CA']
 
-- name: (OwnCA validation, {{select_crypto_backend}})
+- name: (OwnCA validation, {{ select_crypto_backend }})
   ansible.builtin.assert:
     that:
       - passphrase_error_1 is failed
@@ -127,12 +127,12 @@
       - passphrase_error_3 is failed
       - "'assphrase' in passphrase_error_3.msg or 'assword' in passphrase_error_3.msg or 'serializ' in passphrase_error_3.msg"
 
-- name: (OwnCA validation, {{select_crypto_backend}})Verify that broken certificate will be regenerated
+- name: (OwnCA validation, {{ select_crypto_backend }})Verify that broken certificate will be regenerated
   ansible.builtin.assert:
     that:
       - ownca_broken is changed
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Check backup
+- name: (OwnCA validation, {{ select_crypto_backend }}) Check backup
   ansible.builtin.assert:
     that:
       - ownca_backup_1 is changed
@@ -146,7 +146,7 @@
       - ownca_backup_5 is not changed
       - ownca_backup_5.backup_file is undefined
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Check create subject key identifier
+- name: (OwnCA validation, {{ select_crypto_backend }}) Check create subject key identifier
   ansible.builtin.assert:
     that:
       - ownca_subject_key_identifier_1 is changed
@@ -155,7 +155,7 @@
       - ownca_subject_key_identifier_4 is not changed
       - ownca_subject_key_identifier_5 is changed
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Check create authority key identifier
+- name: (OwnCA validation, {{ select_crypto_backend }}) Check create authority key identifier
   ansible.builtin.assert:
     that:
       - ownca_authority_key_identifier_1 is changed
@@ -164,7 +164,7 @@
       - ownca_authority_key_identifier_4 is not changed
       - ownca_authority_key_identifier_5 is changed
 
-- name: (OwnCA validation, {{select_crypto_backend}}) Verify Ed25519 and Ed448 tests
+- name: (OwnCA validation, {{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests
   ansible.builtin.assert:
     that:
       - ownca_certificate_ed25519_ed448 is succeeded

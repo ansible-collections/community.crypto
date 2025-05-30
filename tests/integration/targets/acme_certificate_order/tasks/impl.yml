@@ -121,7 +121,7 @@
 
 - name: "({{ select_crypto_backend }}) Create HTTP challenges"
   ansible.builtin.uri:
-    url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
+    url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/' | length) :] }}"
     method: PUT
     body_format: raw
     body: "{{ item.challenges['http-01'].resource_value }}"
@@ -547,7 +547,7 @@
 
     - name: "({{ select_crypto_backend }}) Create HTTP challenges (replacement order 1)"
       ansible.builtin.uri:
-        url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
+        url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/' | length) :] }}"
         method: PUT
         body_format: raw
         body: "{{ item.challenges['http-01'].resource_value }}"

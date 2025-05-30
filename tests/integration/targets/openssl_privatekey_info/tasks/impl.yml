@@ -6,7 +6,7 @@
 - ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
-- name: ({{select_crypto_backend}}) Get key 1 info
+- name: ({{ select_crypto_backend }}) Get key 1 info
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
@@ -24,18 +24,18 @@
       - "result.public_data.exponent > 5"
       - "'private_data' not in result"
 
-- name: ({{select_crypto_backend}}) Read private key
+- name: ({{ select_crypto_backend }}) Read private key
   ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekey_1.pem'
   register: slurp
 
-- name: ({{select_crypto_backend}}) Get key 1 info directly
+- name: ({{ select_crypto_backend }}) Get key 1 info directly
   community.crypto.openssl_privatekey_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
-- name: ({{select_crypto_backend}}) Compare output of direct and loaded info
+- name: ({{ select_crypto_backend }}) Compare output of direct and loaded info
   ansible.builtin.assert:
     that:
       - >-
@@ -43,7 +43,7 @@
         ==
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
-- name: ({{select_crypto_backend}}) Get key 2 info
+- name: ({{ select_crypto_backend }}) Get key 2 info
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_2.pem'
     return_private_key_data: true
@@ -65,7 +65,7 @@
       - "result.public_data.modulus == result.private_data.p * result.private_data.q"
       - "result.private_data.exponent > 5"
 
-- name: ({{select_crypto_backend}}) Get key 3 info (without passphrase)
+- name: ({{ select_crypto_backend }}) Get key 3 info (without passphrase)
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     return_private_key_data: true
@@ -90,7 +90,7 @@
       - "'public_data' not in result"
       - "'private_data' not in result"
 
-- name: ({{select_crypto_backend}}) Get key 3 info (with passphrase)
+- name: ({{ select_crypto_backend }}) Get key 3 info (with passphrase)
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_3.pem'
     passphrase: hunter2
@@ -112,7 +112,7 @@
       - "result.public_data.modulus == result.private_data.p * result.private_data.q"
       - "result.private_data.exponent > 5"
 
-- name: ({{select_crypto_backend}}) Get key 4 info
+- name: ({{ select_crypto_backend }}) Get key 4 info
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_4.pem'
     return_private_key_data: true
@@ -134,7 +134,7 @@
       - "'private_data' in result"
       - "result.private_data.multiplier > 1024"
 
-- name: ({{select_crypto_backend}}) Get key 5 info
+- name: ({{ select_crypto_backend }}) Get key 5 info
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey_5.pem'
     return_private_key_data: true

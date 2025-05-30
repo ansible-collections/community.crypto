@@ -3,19 +3,19 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate privatekey
   community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size_certificates }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey with password
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate privatekey with password
   community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size_certificates }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate without CSR
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -25,7 +25,7 @@
     return_content: true
   register: selfsigned_certificate_no_csr
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR - idempotency
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate without CSR - idempotency
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -35,7 +35,7 @@
     return_content: true
   register: selfsigned_certificate_no_csr_idempotence
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate without CSR (check mode)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate without CSR (check mode)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_no_csr.pem'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
@@ -45,21 +45,21 @@
   check_mode: true
   register: selfsigned_certificate_no_csr_idempotence_check
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR
   community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.example.com
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR
   community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_minimal_change.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
       commonName: www.example.org
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
@@ -70,7 +70,7 @@
     return_content: true
   register: selfsigned_certificate
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate - idempotency
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
@@ -81,7 +81,7 @@
     return_content: true
   register: selfsigned_certificate_idempotence
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (check mode)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
@@ -91,7 +91,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   check_mode: true
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (check mode, other CSR)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (check mode, other CSR)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_minimal_change.csr'
@@ -102,19 +102,19 @@
   check_mode: true
   register: selfsigned_certificate_csr_minimal_change
 
-- name: (Selfsigned, {{select_crypto_backend}}) Get certificate information
+- name: (Selfsigned, {{ select_crypto_backend }}) Get certificate information
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: (Selfsigned, {{select_crypto_backend}}) Get private key information
+- name: (Selfsigned, {{ select_crypto_backend }}) Get private key information
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_privatekey
 
-- name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate
+- name: (Selfsigned, {{ select_crypto_backend }}) Check selfsigned certificate
   ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
@@ -123,7 +123,7 @@
       - not result.expired
       - result.version == 3
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned v2 certificate
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned v2 certificate
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_v2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
@@ -135,12 +135,12 @@
   register: selfsigned_v2_cert
   ignore_errors: true
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey2
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate privatekey2
   community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey2.pem'
     size: '{{ default_rsa_key_size_certificates }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate CSR2
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR2
   community.crypto.openssl_csr:
     subject:
       CN: www.example.com
@@ -159,7 +159,7 @@
       - ipsecUser
       - biometricInfo
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate2
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate2
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr2.csr'
@@ -168,19 +168,19 @@
     selfsigned_digest: sha256
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Get certificate information
+- name: (Selfsigned, {{ select_crypto_backend }}) Get certificate information
   community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: (Selfsigned, {{select_crypto_backend}}) Get private key information
+- name: (Selfsigned, {{ select_crypto_backend }}) Get private key information
   community.crypto.openssl_privatekey_info:
     path: '{{ remote_tmp_dir }}/privatekey2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_privatekey
 
-- name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate2
+- name: (Selfsigned, {{ select_crypto_backend }}) Check selfsigned certificate2
   ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
@@ -197,19 +197,19 @@
       - "'IPSec User' in result.extended_key_usage"
       - "'Biometric Info' in result.extended_key_usage"
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create private key 3
+- name: (Selfsigned, {{ select_crypto_backend }}) Create private key 3
   community.crypto.openssl_privatekey:
     path: "{{ remote_tmp_dir }}/privatekey3.pem"
     size: '{{ default_rsa_key_size_certificates }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create CSR 3
+- name: (Selfsigned, {{ select_crypto_backend }}) Create CSR 3
   community.crypto.openssl_csr:
     subject:
       CN: www.example.com
     privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
     path: "{{ remote_tmp_dir }}/csr3.pem"
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create certificate3 with notBefore and notAfter
+- name: (Selfsigned, {{ select_crypto_backend }}) Create certificate3 with notBefore and notAfter
   community.crypto.x509_certificate:
     provider: selfsigned
     selfsigned_not_before: 20181023133742Z
@@ -219,7 +219,7 @@
     privatekey_path: "{{ remote_tmp_dir }}/privatekey3.pem"
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create certificate3 with notBefore and notAfter (idempotent)
+- name: (Selfsigned, {{ select_crypto_backend }}) Create certificate3 with notBefore and notAfter (idempotent)
   community.crypto.x509_certificate:
     provider: selfsigned
     selfsigned_not_before: 20181023133742Z
@@ -231,21 +231,21 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: cert3_selfsigned_idem
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate privatekey
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate privatekey
   community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     type: ECC
     curve: "{{ (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') | ternary('secp521r1', 'secp256k1') }}"
     # ^ cryptography on CentOS6 doesn't support secp256k1, so we use secp521r1 instead
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR
   community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_ecc.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey_ecc.pem'
     subject:
       commonName: www.example.com
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_ecc.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -255,7 +255,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_certificate_ecc
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate CSR (privatekey passphrase)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR (privatekey passphrase)
   community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_pass.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
@@ -263,7 +263,7 @@
     subject:
       commonName: www.example.com
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (privatekey passphrase)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (privatekey passphrase)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_pass.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_pass.csr'
@@ -274,7 +274,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_certificate_passphrase
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 1)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (failed passphrase 1)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_pw1.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -286,7 +286,7 @@
   ignore_errors: true
   register: passphrase_error_1
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 2)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (failed passphrase 2)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_pw2.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -298,7 +298,7 @@
   ignore_errors: true
   register: passphrase_error_2
 
-- name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate (failed passphrase 3)
+- name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate (failed passphrase 3)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_pw3.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -309,11 +309,11 @@
   ignore_errors: true
   register: passphrase_error_3
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
+- name: (Selfsigned, {{ select_crypto_backend }}) Create broken certificate
   ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/cert_broken.pem"
     content: "broken"
-- name: (Selfsigned, {{select_crypto_backend}}) Regenerate broken cert
+- name: (Selfsigned, {{ select_crypto_backend }}) Regenerate broken cert
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/cert_broken.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -322,7 +322,7 @@
     selfsigned_digest: sha256
   register: selfsigned_broken
 
-- name: (Selfsigned, {{select_crypto_backend}}) Backup test
+- name: (Selfsigned, {{ select_crypto_backend }}) Backup test
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -332,7 +332,7 @@
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_1
-- name: (Selfsigned, {{select_crypto_backend}}) Backup test (idempotent)
+- name: (Selfsigned, {{ select_crypto_backend }}) Backup test (idempotent)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -342,7 +342,7 @@
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_2
-- name: (Selfsigned, {{select_crypto_backend}}) Backup test (change)
+- name: (Selfsigned, {{ select_crypto_backend }}) Backup test (change)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     csr_path: '{{ remote_tmp_dir }}/csr.csr'
@@ -352,7 +352,7 @@
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_3
-- name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove)
+- name: (Selfsigned, {{ select_crypto_backend }}) Backup test (remove)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
@@ -360,7 +360,7 @@
     backup: true
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_4
-- name: (Selfsigned, {{select_crypto_backend}}) Backup test (remove, idempotent)
+- name: (Selfsigned, {{ select_crypto_backend }}) Backup test (remove, idempotent)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_backup.pem'
     state: absent
@@ -369,7 +369,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_backup_5
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test
+- name: (Selfsigned, {{ select_crypto_backend }}) Create subject key identifier test
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -380,7 +380,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_subject_key_identifier_1
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (idempotency)
+- name: (Selfsigned, {{ select_crypto_backend }}) Create subject key identifier test (idempotency)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -391,7 +391,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_subject_key_identifier_2
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove)
+- name: (Selfsigned, {{ select_crypto_backend }}) Create subject key identifier test (remove)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -402,7 +402,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_subject_key_identifier_3
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (remove idempotency)
+- name: (Selfsigned, {{ select_crypto_backend }}) Create subject key identifier test (remove idempotency)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -413,7 +413,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_subject_key_identifier_4
 
-- name: (Selfsigned, {{select_crypto_backend}}) Create subject key identifier test (re-enable)
+- name: (Selfsigned, {{ select_crypto_backend }}) Create subject key identifier test (re-enable)
   community.crypto.x509_certificate:
     path: '{{ remote_tmp_dir }}/selfsigned_cert_ski.pem'
     csr_path: '{{ remote_tmp_dir }}/csr_ecc.csr'
@@ -424,9 +424,9 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: selfsigned_subject_key_identifier_5
 
-- name: (Selfsigned, {{select_crypto_backend}}) Ed25519 and Ed448 tests (for cryptography >= 2.6)
+- name: (Selfsigned, {{ select_crypto_backend }}) Ed25519 and Ed448 tests (for cryptography >= 2.6)
   block:
-    - name: (Selfsigned, {{select_crypto_backend}}) Generate privatekeys
+    - name: (Selfsigned, {{ select_crypto_backend }}) Generate privatekeys
       community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
         type: '{{ item }}'
@@ -436,11 +436,11 @@
       register: selfsigned_certificate_ed25519_ed448_privatekey
       ignore_errors: true
 
-    - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR etc. if private key generation succeeded
+    - name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR etc. if private key generation succeeded
       when: selfsigned_certificate_ed25519_ed448_privatekey is not failed
       block:
 
-        - name: (Selfsigned, {{select_crypto_backend}}) Generate CSR
+        - name: (Selfsigned, {{ select_crypto_backend }}) Generate CSR
           community.crypto.openssl_csr:
             path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
             privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
@@ -452,7 +452,7 @@
             - Ed448
           ignore_errors: true
 
-        - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate
+        - name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate
           community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/cert_{{ item }}.pem'
             csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
@@ -466,7 +466,7 @@
           register: selfsigned_certificate_ed25519_ed448
           ignore_errors: true
 
-        - name: (Selfsigned, {{select_crypto_backend}}) Generate selfsigned certificate - idempotency
+        - name: (Selfsigned, {{ select_crypto_backend }}) Generate selfsigned certificate - idempotency
           community.crypto.x509_certificate:
             path: '{{ remote_tmp_dir }}/cert_{{ item }}.pem'
             csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
