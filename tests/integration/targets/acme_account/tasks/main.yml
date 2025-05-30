@@ -10,31 +10,31 @@
 
 - block:
     - name: Running tests with OpenSSL backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: openssl
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   # Old 0.9.8 versions have insufficient CLI support for signing with EC keys
   when: openssl_version is version('1.0.0', '>=')
 
 - name: Remove output directory
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     state: absent
 
 - name: Re-create output directory
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     state: directory
 
 - block:
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   when: cryptography_version is version('3.3', '>=')

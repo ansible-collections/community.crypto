@@ -8,7 +8,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     key_types: "{{ key_types_src | reject('equalto', '') | list }}"
   vars:
     key_types_src:
@@ -24,12 +24,12 @@
   loop: "{{ key_types }}"
 
 - name: "({{ backend }}) Retrieve key size from 'ssh-keygen' - size"
-  shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_{{ item }} | grep -o -E '^[0-9]+'"
+  ansible.builtin.shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_{{ item }} | grep -o -E '^[0-9]+'"
   loop: "{{ key_types }}"
   register: key_size_output
 
 - name: "({{ backend }}) Assert key sizes match default size - size"
-  assert:
+  ansible.builtin.assert:
     that:
       - (key_size_output.results | selectattr('item', 'equalto', 'rsa') | first).stdout == '4096'
       - not openssh_supports_dsa or (key_size_output.results | selectattr('item', 'equalto', 'dsa') | first).stdout == '1024'
@@ -49,11 +49,11 @@
         backend: "{{ backend }}"
 
     - name: "({{ backend }}) Retrieve ed25519 key size from 'ssh-keygen' - size"
-      shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_ed25519 | grep -o -E '^[0-9]+'"
+      ansible.builtin.shell: "ssh-keygen -lf {{ remote_tmp_dir }}/default_size_ed25519 | grep -o -E '^[0-9]+'"
       register: ed25519_key_size_output
 
     - name: "({{ backend }}) Assert ed25519 key size matches default size - size"
-      assert:
+      ansible.builtin.assert:
         that:
           - ed25519_key_size_output.stdout == '256'
 
@@ -79,7 +79,7 @@
   register: force_output
 
 - name: "({{ backend }}) Assert key regenerated - force"
-  assert:
+  ansible.builtin.assert:
     that:
       - force_output is changed
 
@@ -106,13 +106,13 @@
 
 - name: "({{ backend }}) Assert comment preserved public key - comment"
   when: modified_comment_output is succeeded
-  assert:
+  ansible.builtin.assert:
     that:
       - comment_output.public_key == modified_comment_output.public_key
       - comment_output.comment == 'test@comment'
 
 - name: "({{ backend }}) Assert comment changed - comment"
-  assert:
+  ansible.builtin.assert:
     that:
       - modified_comment_output.comment == 'test_modified@comment'
       - modified_comment_output is succeeded
@@ -120,7 +120,7 @@
   when: not (backend == 'opensshbin' and openssh_version is version('7.2', '<'))
 
 - name: "({{ backend }}) Assert comment not changed - comment"
-  assert:
+  ansible.builtin.assert:
     that:
       - modified_comment_output is failed
   # Support for updating comments for key types other than rsa1 was added in OpenSSH 7.2

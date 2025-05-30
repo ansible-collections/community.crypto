@@ -49,7 +49,7 @@
   become: true
   register: create_with_ambiguous
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_with_keysize is changed
       - create_idem_with_keysize is not changed

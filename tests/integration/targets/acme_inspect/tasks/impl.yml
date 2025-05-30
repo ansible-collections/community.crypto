@@ -30,7 +30,7 @@
     method: directory-only
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: directory
-- debug: var=directory
+- ansible.builtin.debug: var=directory
 
 - name: Create an account
   acme_inspect:
@@ -45,7 +45,7 @@
   register: account_creation
   # account_creation.headers.location contains the account URI
   # if creation was successful
-- debug: var=account_creation
+- ansible.builtin.debug: var=account_creation
 
 - name: Get account information
   acme_inspect:
@@ -58,7 +58,7 @@
     method: get
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: account_get
-- debug: var=account_get
+- ansible.builtin.debug: var=account_get
 
 - name: Update account contacts
   acme_inspect:
@@ -78,7 +78,7 @@
       contact:
         - mailto:me@example.com
   register: account_update
-- debug: var=account_update
+- ansible.builtin.debug: var=account_update
 
 - name: Create certificate order
   acme_inspect:
@@ -102,7 +102,7 @@
         - type: dns
           value: example.org
   register: new_order
-- debug: var=new_order
+- ansible.builtin.debug: var=new_order
 
 - name: Get order information
   acme_inspect:
@@ -115,7 +115,7 @@
     method: get
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: order
-- debug: var=order
+- ansible.builtin.debug: var=order
 
 - name: Get authzs for order
   acme_inspect:
@@ -129,7 +129,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
   loop: "{{ order.output_json.authorizations }}"
   register: authz
-- debug: var=authz
+- ansible.builtin.debug: var=authz
 
 - name: Get HTTP-01 challenge for authz
   acme_inspect:
@@ -143,7 +143,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: http01challenge
   loop: "{{ authz.results | map(attribute='output_json') | list }}"
-- debug: var=http01challenge
+- ansible.builtin.debug: var=http01challenge
 
 - name: Activate HTTP-01 challenge manually
   acme_inspect:
@@ -158,7 +158,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: activation
   loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
-- debug: var=activation
+- ansible.builtin.debug: var=activation
 
 - name: Get HTTP-01 challenge results
   acme_inspect:
@@ -175,4 +175,4 @@
   until: "validation_result.output_json.status not in ['pending', 'processing']"
   retries: 20
   delay: 1
-- debug: var=validation_result
+- ansible.builtin.debug: var=validation_result

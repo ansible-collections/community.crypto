@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Determine capabilities
-  set_fact:
+  ansible.builtin.set_fact:
     supports_ed25519: >-
       {{
         not (
@@ -54,7 +54,7 @@
 
 - block:
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 

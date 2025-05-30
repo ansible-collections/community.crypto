@@ -11,9 +11,9 @@
     asn1_base64: true
   register: result
 
-- debug: var=result
+- ansible.builtin.debug: var=result
 
-- assert:
+- ansible.builtin.assert:
     that:
       # This module should never change anything
       - result is not changed
@@ -29,9 +29,9 @@
     asn1_base64: true
   register: result
 
-- debug: var=result
+- ansible.builtin.debug: var=result
 
-- assert:
+- ansible.builtin.assert:
     that:
       # This module should never change anything
       - result is not changed
@@ -47,9 +47,9 @@
     asn1_base64: true
   register: result
 
-- debug: var=result
+- ansible.builtin.debug: var=result
 
-- assert:
+- ansible.builtin.assert:
     that:
       # This module should never change anything
       - result is not changed
@@ -66,7 +66,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed
@@ -87,7 +87,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed
@@ -104,7 +104,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed
@@ -112,7 +112,7 @@
       - "'ca_cert file does not exist' == result.msg"
 
 - name: Download CA Cert as pem from server
-  get_url:
+  ansible.builtin.get_url:
     url: "http://ansible.http.tests/cacert.pem"
     dest: "{{ remote_tmp_dir }}/temp.pem"
 
@@ -126,19 +126,19 @@
     get_certificate_chain: "{{ has_get_certificate_chain }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result is not failed
 
 - name: Read CA cert
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/temp.pem'
   register: cacert
   when: has_get_certificate_chain
 
 - name: Validate get_certificate_chain=true results
-  assert:
+  ansible.builtin.assert:
     that:
       - result.verified_chain is sequence
       - result.unverified_chain is sequence
@@ -149,7 +149,7 @@
   when: has_get_certificate_chain
 
 - name: Validate get_certificate_chain=false results
-  assert:
+  ansible.builtin.assert:
     that:
       - result.verified_chain is undefined
       - result.unverified_chain is undefined
@@ -190,7 +190,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed

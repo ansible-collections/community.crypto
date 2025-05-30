@@ -44,7 +44,7 @@
   register: result
 
 - name: Validate certificate information
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_alt_name | length == 1
       - "'DNS:example.com' in result.subject_alt_name"
@@ -66,7 +66,7 @@
   register: result
 
 - name: Validate certificate information
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_alt_name | length == 2
       - "'DNS:example.com' in result.subject_alt_name"

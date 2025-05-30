@@ -55,7 +55,7 @@
   register: account_created
 
 - name: Read account key
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/accountkey.pem'
   register: slurp
 

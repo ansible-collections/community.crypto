@@ -16,7 +16,7 @@
         curve: secp256r1
         force: true
     - name: Obtain cert 1
-      include_tasks: obtain-cert.yml
+      ansible.builtin.include_tasks: obtain-cert.yml
       vars:
         select_crypto_backend: auto
         certgen_title: Certificate 1

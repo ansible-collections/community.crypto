@@ -53,10 +53,10 @@
     include_renewal_cert_id: "{{ acme_certificate_include_renewal_cert_id | default(omit) }}"
   register: challenge_data
 - name: ({{ certgen_title }}) Print challenge data
-  debug:
+  ansible.builtin.debug:
     var: challenge_data
 - name: ({{ certgen_title }}) Create HTTP challenges
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
     method: PUT
     body_format: raw
@@ -66,7 +66,7 @@
   with_dict: "{{ challenge_data.challenge_data }}"
   when: "challenge_data is changed and challenge == 'http-01'"
 - name: ({{ certgen_title }}) Create DNS challenges
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/dns/{{ item.key }}"
     method: PUT
     body_format: json
@@ -83,12 +83,12 @@
   register: tls_alpn_challenges
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Read private key
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/{{ certificate_name }}.key'
   register: slurp
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Set TLS ALPN challenges (acme_challenge_cert_helper)
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.domain }}/{{ item.identifier }}/certificate-and-key"
     method: PUT
     body_format: raw
@@ -98,7 +98,7 @@
   with_items: "{{ tls_alpn_challenges.results if challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper') else [] }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01' and (challenge_alpn_tls | default('der-value-b64') == 'acme_challenge_cert_helper')"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (der-value-b64)
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.value['tls-alpn-01'].resource }}/{{ item.value['tls-alpn-01'].resource_original }}/der-value-b64"
     method: PUT
     body_format: raw
@@ -136,25 +136,25 @@
   register: certificate_obtain_result
   when: challenge_data is changed
 - name: ({{ certgen_title }}) Deleting HTTP challenges
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/http/{{ item.key }}/{{ item.value['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
     method: DELETE
   with_dict: "{{ challenge_data.challenge_data }}"
   when: "challenge_data is changed and challenge == 'http-01'"
 - name: ({{ certgen_title }}) Deleting DNS challenges
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/dns/{{ item.key }}"
     method: DELETE
   with_dict: "{{ challenge_data.challenge_data_dns }}"
   when: "challenge_data is changed and challenge == 'dns-01'"
 - name: ({{ certgen_title }}) Deleting TLS ALPN challenges
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.value['tls-alpn-01'].resource }}"
     method: DELETE
   with_dict: "{{ challenge_data.challenge_data }}"
   when: "challenge_data is changed and challenge == 'tls-alpn-01'"
 - name: ({{ certgen_title }}) Get root certificate
-  get_url:
+  ansible.builtin.get_url:
     url: "http://{{ acme_host }}:5000/root-certificate-for-ca/{{ acme_expected_root_number | default(0) if select_crypto_backend == 'cryptography' else 0 }}"
     dest: "{{ remote_tmp_dir }}/{{ certificate_name }}-root.pem"
 ###############################################################################################

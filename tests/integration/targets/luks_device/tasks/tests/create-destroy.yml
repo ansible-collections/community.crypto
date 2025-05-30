@@ -41,7 +41,7 @@
   check_mode: true
   become: true
   register: create_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - create_check is changed
       - create is changed
@@ -78,7 +78,7 @@
   check_mode: true
   become: true
   register: open_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - open_check is changed
       - open is changed
@@ -111,7 +111,7 @@
   check_mode: true
   become: true
   register: close_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - close_check is changed
       - close is changed
@@ -151,7 +151,7 @@
   check_mode: true
   become: true
   register: close_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - close_check is changed
       - close is changed
@@ -191,7 +191,7 @@
   check_mode: true
   become: true
   register: absent_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - absent_check is changed
       - absent is changed

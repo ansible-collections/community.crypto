@@ -9,11 +9,11 @@
 ####################################################################
 
 - name: Find out which elliptic curves are supported by installed OpenSSL
-  command: "{{ openssl_binary }} ecparam -list_curves"
+  ansible.builtin.command: "{{ openssl_binary }} ecparam -list_curves"
   register: openssl_ecc
 
 - name: Compile list of elliptic curves supported by OpenSSL
-  set_fact:
+  ansible.builtin.set_fact:
     openssl_ecc_list: |
       {{
         openssl_ecc.stdout_lines
@@ -25,7 +25,7 @@
   when: ansible_distribution != 'CentOS' or ansible_distribution_major_version != '6'
   # CentOS comes with a very old jinja2 which does not include the map() filter...
 - name: Compile list of elliptic curves supported by OpenSSL (CentOS 6)
-  set_fact:
+  ansible.builtin.set_fact:
     openssl_ecc_list:
       - secp384r1
       - secp521r1
@@ -33,7 +33,7 @@
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
 
 - name: List of elliptic curves supported by OpenSSL
-  debug: var=openssl_ecc_list
+  ansible.builtin.debug: var=openssl_ecc_list
 
 - name: Run module with backend autodetection
   openssl_privatekey:
@@ -42,11 +42,11 @@
 
 - block:
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
       vars:
         select_crypto_backend: cryptography
 

@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug:
+- ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
 - name: ({{select_crypto_backend}}) Get key 1 info
@@ -13,7 +13,7 @@
   register: result
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -23,7 +23,7 @@
       - "result.public_data.exponent > 5"
 
 - name: ({{select_crypto_backend}}) Read file
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/publickey_1.pem'
   register: slurp
 
@@ -34,7 +34,7 @@
   register: result_direct
 
 - name: ({{select_crypto_backend}}) Compare output of direct and loaded info
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         (result | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
@@ -48,7 +48,7 @@
   register: result
 
 - name: Check that RSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -65,7 +65,7 @@
   register: result
 
 - name: Check that ECC key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"
@@ -83,7 +83,7 @@
   register: result
 
 - name: Check that DSA key info is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - "'fingerprints' in result"
       - "'type' in result"

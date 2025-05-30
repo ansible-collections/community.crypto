@@ -8,7 +8,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     new_signing_key: "{{ remote_tmp_dir }}/new_key"
     new_public_key: "{{ remote_tmp_dir }}/new_key.pub"
 
@@ -38,7 +38,7 @@
       register: updated_signature_algorithm
 
     - name: Assert signature algorithm update causes change
-      assert:
+      ansible.builtin.assert:
         that:
           - updated_signature_algorithm is changed
 
@@ -54,7 +54,7 @@
       register: updated_signature_algorithm_idempotent
 
     - name: Assert signature algorithm update is idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - updated_signature_algorithm_idempotent is not changed
 
@@ -71,7 +71,7 @@
           register: second_signature_algorithm
 
         - name: Assert second signature algorithm update causes change
-          assert:
+          ansible.builtin.assert:
             that:
               - second_signature_algorithm is changed
       # RHEL9, Fedora 41 and Rocky 9 disable the SHA-1 algorithms by default, making this test fail with a 'libcrypt' error.
@@ -91,7 +91,7 @@
       register: omitted_signature_algorithm
 
     - name: Assert omitted_signature_algorithm does not cause change
-      assert:
+      ansible.builtin.assert:
         that:
           - omitted_signature_algorithm is not changed
 
@@ -149,7 +149,7 @@
   register: new_public_key_full_idempotency_output
 
 - name: Assert changes to public key or signing key results in no change unless idempotency=full
-  assert:
+  ansible.builtin.assert:
     that:
       - new_signing_key_output is not changed
       - new_public_key_output is not changed

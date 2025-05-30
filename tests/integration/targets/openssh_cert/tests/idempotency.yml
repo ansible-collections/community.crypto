@@ -8,7 +8,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- set_fact:
+- ansible.builtin.set_fact:
     test_cases:
       - test_name: Generate cert - force option (check_mode)
         force: true
@@ -275,7 +275,7 @@
     loop_var: test_case
 
 - name: Assert task statuses
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed == test_cases[index].changed
   loop: "{{ idempotency_test_output.results }}"

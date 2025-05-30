@@ -102,29 +102,29 @@
   register: generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  ansible.builtin.command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  ansible.builtin.command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_certificate.certificate }}"
   register: certificate_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - certificate_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - certificate_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate certificate (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_certificate_check is changed
       - generate_certificate is changed
@@ -209,29 +209,29 @@
   register: ownca_generate_certificate_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - privatekey modulus)"
-  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
+  ansible.builtin.command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey2.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - Common Name)"
-  command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  ansible.builtin.command: "{{ openssl_binary }} x509 -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_cn
 
 - name: "({{ select_crypto_backend }}) Validate certificate (test - certificate modulus)"
-  command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ ownca_generate_certificate.certificate }}"
   register: certificate_modulus
 
 - name: "({{ select_crypto_backend }}) Validate certificate (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - certificate_cn.stdout.split('=')[-1] == 'example.com'
       - certificate_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate certificate (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - ownca_generate_certificate_check is changed
       - ownca_generate_certificate is changed

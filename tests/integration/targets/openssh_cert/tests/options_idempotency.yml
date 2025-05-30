@@ -164,7 +164,7 @@
   register: host_cert_full_idempotence
 
 - name: Assert options results
-  assert:
+  ansible.builtin.assert:
     that:
       - no_options is changed
       - no_options_explicit_directives is not changed

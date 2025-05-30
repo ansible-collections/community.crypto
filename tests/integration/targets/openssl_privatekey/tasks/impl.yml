@@ -91,7 +91,7 @@
     size: '{{ default_rsa_key_size }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
 
-- set_fact:
+- ansible.builtin.set_fact:
     ecc_types:
       - curve: secp384r1
         openssl_name: secp384r1
@@ -261,7 +261,7 @@
   register: passphrase_5
 
 - name: "({{ select_crypto_backend }}) Create broken key"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/broken"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken key"
@@ -301,7 +301,7 @@
   register: privatekey_mode_1
 
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_1_stat
 
@@ -329,7 +329,7 @@
   register: privatekey_mode_3
 
 - name: "({{ select_crypto_backend }}) Stat for privatekey_mode"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/privatekey_mode.pem'
   register: privatekey_mode_3_stat
 
@@ -457,13 +457,13 @@
       register: privatekey_fmt_2_step_3
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_3.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
@@ -479,13 +479,13 @@
       register: privatekey_fmt_2_step_4
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_4.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
@@ -501,13 +501,13 @@
       register: privatekey_fmt_2_step_5
 
     - name: "({{ select_crypto_backend }}) Read privatekey_fmt_2.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir }}/privatekey_fmt_2.pem"
       ignore_errors: true
       register: content
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_5.privatekey == content.content
       when: privatekey_fmt_2_step_1 is not failed
@@ -523,13 +523,13 @@
       register: privatekey_fmt_2_step_6
 
     - name: "({{ select_crypto_backend }}) Read private key"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/privatekey_fmt_2.pem'
       register: slurp
       when: privatekey_fmt_2_step_1 is not failed
 
     - name: "({{ select_crypto_backend }}) Generate privatekey_fmt_2 - verify that returned content is not base64 encoded"
-      assert:
+      ansible.builtin.assert:
         that:
           - privatekey_fmt_2_step_6.privatekey == (slurp.content | b64decode)
       when: privatekey_fmt_2_step_1 is not failed
@@ -556,7 +556,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
 - name: "({{ select_crypto_backend }}) Regenerate - setup broken keys"
-  copy:
+  ansible.builtin.copy:
     dest: '{{ remote_tmp_dir }}/regenerate-c-{{ item }}.pem'
     content: 'broken key'
     mode: '0700'
@@ -573,7 +573,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg or 'Cannot load raw key' in result.results[0].msg"
@@ -594,7 +594,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg or 'Cannot load raw key' in result.results[0].msg"
@@ -616,7 +616,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -637,7 +637,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a another passphrase / no passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -658,7 +658,7 @@
   check_mode: true
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -675,7 +675,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -694,7 +694,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -713,7 +713,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -723,7 +723,7 @@
       - result.results[4] is changed
 
 - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-  copy:
+  ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
     dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
     remote_src: true
@@ -741,7 +741,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -760,7 +760,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -771,7 +771,7 @@
 
 - block:
     - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         remote_src: true
@@ -790,7 +790,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -810,7 +810,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -820,7 +820,7 @@
           - result.results[4] is changed
 
     - name: "({{ select_crypto_backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always.pem'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item }}.pem'
         remote_src: true
@@ -839,7 +839,7 @@
       check_mode: true
       loop: "{{ regenerate_values }}"
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is changed
           - result.results[1] is changed
@@ -858,7 +858,7 @@
         select_crypto_backend: '{{ select_crypto_backend }}'
       loop: "{{ regenerate_values }}"
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is changed
           - result.results[1] is changed

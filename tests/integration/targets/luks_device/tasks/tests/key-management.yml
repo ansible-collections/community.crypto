@@ -22,7 +22,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed
 - name: Close
@@ -39,7 +39,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is failed
 
@@ -63,7 +63,7 @@
   become: true
   register: result_2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result_1 is changed
       - result_2 is not changed
@@ -78,7 +78,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed
 - name: Close
@@ -88,7 +88,7 @@
   become: true
 
 - name: Dump LUKS header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
 
 - name: Remove access from keyfile1
@@ -109,7 +109,7 @@
   become: true
   register: result_2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result_1 is changed
       - result_2 is not changed
@@ -124,7 +124,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is failed
 
@@ -136,7 +136,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed
 - name: Close
@@ -146,7 +146,7 @@
   become: true
 
 - name: Dump LUKS header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
 
 - name: Remove access from keyfile2
@@ -158,7 +158,7 @@
   become: true
   ignore_errors: true
   register: remove_last_key
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_last_key is failed
       - "'force_remove_last_key' in remove_last_key.msg"
@@ -173,7 +173,7 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is not failed
 - name: Close
@@ -201,6 +201,6 @@
   become: true
   ignore_errors: true
   register: open_try
-- assert:
+- ansible.builtin.assert:
     that:
       - open_try is failed

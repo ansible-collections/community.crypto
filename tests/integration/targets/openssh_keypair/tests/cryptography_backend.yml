@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Generate a password protected key
-  command: 'ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}'
 
 - name: Modify the password protected key with passphrase
   openssh_keypair:
@@ -23,11 +23,11 @@
   register: password_protected_idempotency_output
 
 - name: Ensure that ssh-keygen can read keys generated with passphrase
-  command: 'ssh-keygen -yf {{ remote_tmp_dir }}/password_protected -P {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -yf {{ remote_tmp_dir }}/password_protected -P {{ passphrase }}'
   register: password_protected_ssh_keygen_output
 
 - name: Check that password protected key with passphrase was regenerated
-  assert:
+  ansible.builtin.assert:
     that:
       - password_protected_output is changed
       - password_protected_idempotency_output is not changed
@@ -63,7 +63,7 @@
   register: force_unprotected_modification_output
 
 - name: Check that unprotected key was modified
-  assert:
+  ansible.builtin.assert:
     that:
       - unprotected_modification_output is failed
       - force_unprotected_modification_output is changed
@@ -75,7 +75,7 @@
     state: absent
 
 - name: Generate PEM encoded key with passphrase
-  command: 'ssh-keygen -t rsa -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
+  ansible.builtin.command: 'ssh-keygen -t rsa -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 
 - name: Try to verify a PEM encoded key
   openssh_keypair:
@@ -86,7 +86,7 @@
   register: pem_encoded_output
 
 - name: Check that PEM encoded file is read without errors
-  assert:
+  ansible.builtin.assert:
     that:
       - pem_encoded_output is not changed
 
@@ -110,7 +110,7 @@
   register: private_key_format_idempotent
 
 - name: Check that private key with specified format is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - private_key_format_idempotent is not changed
 
@@ -122,7 +122,7 @@
   register: private_key_format_pkcs8
 
 - name: Check that format change causes regeneration
-  assert:
+  ansible.builtin.assert:
     that:
       - private_key_format_pkcs8 is changed
 
@@ -134,7 +134,7 @@
   register: private_key_format_pkcs8_idempotent
 
 - name: Check that private key with PKCS8 format is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - private_key_format_pkcs8_idempotent is not changed
 
@@ -146,7 +146,7 @@
   register: private_key_format_ssh
 
 - name: Check that format change causes regeneration
-  assert:
+  ansible.builtin.assert:
     that:
       - private_key_format_ssh is changed
 
@@ -158,7 +158,7 @@
   register: private_key_format_ssh_idempotent
 
 - name: Check that private key with SSH format is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - private_key_format_ssh_idempotent is not changed
 

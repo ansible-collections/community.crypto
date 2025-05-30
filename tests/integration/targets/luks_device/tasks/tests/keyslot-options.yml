@@ -38,7 +38,7 @@
   ignore_errors: true
   become: true
   register: create_luks_slot8
-- assert:
+- ansible.builtin.assert:
     that:
       - create_luks1_slot8 is failed
       - create_luks2_slot32 is failed
@@ -57,7 +57,7 @@
   ignore_errors: true
   register: create_luks2_slot8
 - name: Make sure that the previous task only fails if LUKS2 is not supported
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Unknown option --type' in create_luks2_slot8.msg"
   when: create_luks2_slot8 is failed
@@ -73,7 +73,7 @@
   become: true
   register: create_luks_slot10
   when: create_luks2_slot8 is changed
-- assert:
+- ansible.builtin.assert:
     that:
       - create_luks_slot10 is changed
   when: create_luks2_slot8 is changed

@@ -66,7 +66,7 @@
   register: result
 
 - name: (OwnCA, {{select_crypto_backend}}) Verify changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_check_mode is changed
       - result is changed
@@ -129,7 +129,7 @@
   check_mode: true
 
 - name: (OwnCA, {{select_crypto_backend}}) Copy ownca certificate to new file to check regeneration
-  copy:
+  ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/ownca_cert.pem'
     dest: '{{ item }}'
     remote_src: true
@@ -177,7 +177,7 @@
   register: result_privatekey
 
 - name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate
-  assert:
+  ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
       - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
@@ -224,7 +224,7 @@
   register: result_privatekey
 
 - name: (OwnCA, {{select_crypto_backend}}) Check ownca certificate2
-  assert:
+  ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
       - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
@@ -342,7 +342,7 @@
   register: passphrase_error_3
 
 - name: (OwnCA, {{select_crypto_backend}}) Create broken certificate
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/ownca_broken.pem"
     content: "broken"
 - name: (OwnCA, {{select_crypto_backend}}) Regenerate broken cert
@@ -660,4 +660,4 @@
 
   when: select_crypto_backend == 'cryptography' and cryptography_version is version('3.3', '>=')
 
-- import_tasks: ../tests/validate_ownca.yml
+- ansible.builtin.import_tasks: ../tests/validate_ownca.yml

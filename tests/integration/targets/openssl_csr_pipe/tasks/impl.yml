@@ -64,29 +64,29 @@
   register: generate_csr_changed_check
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - privatekey modulus)"
-  command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
+  ansible.builtin.command: '{{ openssl_binary }} rsa -noout -modulus -in {{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - Common Name)"
-  command: "{{ openssl_binary }} req -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
+  ansible.builtin.command: "{{ openssl_binary }} req -noout -subject -in /dev/stdin -nameopt oneline,-space_eq"
   args:
     stdin: "{{ generate_csr.csr }}"
   register: csr_cn
 
 - name: "({{ select_crypto_backend }}) Validate CSR (test - csr modulus)"
-  command: '{{ openssl_binary }} req -noout -modulus -in /dev/stdin'
+  ansible.builtin.command: '{{ openssl_binary }} req -noout -modulus -in /dev/stdin'
   args:
     stdin: "{{ generate_csr.csr }}"
   register: csr_modulus
 
 - name: "({{ select_crypto_backend }}) Validate CSR (assert)"
-  assert:
+  ansible.builtin.assert:
     that:
       - csr_cn.stdout.split('=')[-1] == 'www.ansible.com'
       - csr_modulus.stdout == privatekey_modulus.stdout
 
 - name: "({{ select_crypto_backend }}) Validate CSR (check mode, idempotency)"
-  assert:
+  ansible.builtin.assert:
     that:
       - generate_csr_check is changed
       - generate_csr is changed

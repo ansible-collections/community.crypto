@@ -13,19 +13,19 @@
   register: result
 
 - name: Display information
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Register cryptography version
-  command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  ansible.builtin.command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: local_cryptography_version
 
 - name: Set cryptography version
-  set_fact:
+  ansible.builtin.set_fact:
     local_cryptography_version: "{{ local_cryptography_version.stdout }}"
 
 - name: Determine complex version-based capabilities
-  set_fact:
+  ansible.builtin.set_fact:
     supports_ed25519: >-
       {{
         local_cryptography_version is version("2.6", ">=")
@@ -46,7 +46,7 @@
       }}
 
 - name: Verify cryptography information
-  assert:
+  ansible.builtin.assert:
     that:
       - result.python_cryptography_installed
       - "'python_cryptography_import_error' not in result"
@@ -67,15 +67,15 @@
       - result.python_cryptography_capabilities.has_x448 == (local_cryptography_version is version('2.5', '>='))
 
 - name: Find OpenSSL binary
-  command: which openssl
+  ansible.builtin.command: which openssl
   register: local_openssl_path
 
 - name: Find OpenSSL version
-  command: openssl version
+  ansible.builtin.command: openssl version
   register: local_openssl_version_full
 
 - name: Verify OpenSSL information
-  assert:
+  ansible.builtin.assert:
     that:
       - result.openssl_present
       - result.openssl.path == local_openssl_path.stdout

@@ -9,23 +9,23 @@
 ####################################################################
 
 - name: Include OS-specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
+  ansible.builtin.include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin" and not ansible_os_family == "FreeBSD"
 
 - name: Install ssh-keygen
-  package:
+  ansible.builtin.package:
     name: '{{ openssh_client_package_name }}'
   when: not ansible_os_family == "Darwin" and not ansible_os_family == "FreeBSD"
 
 - name: Get ssh version
-  shell: ssh -Vq 2>&1|sed 's/^.*OpenSSH_\([0-9]\{1,\}\.[0-9]\{1,\}\).*$/\1/'
+  ansible.builtin.shell: ssh -Vq 2>&1|sed 's/^.*OpenSSH_\([0-9]\{1,\}\.[0-9]\{1,\}\).*$/\1/'
   register:
     rc_openssh_version_output
 
 - name: Set ssh version facts
-  set_fact:
+  ansible.builtin.set_fact:
     openssh_version: "{{ rc_openssh_version_output.stdout.strip() }}"
 
 - name: Set ssh support facts
-  set_fact:
+  ansible.builtin.set_fact:
     openssh_supports_dsa: "{{ openssh_version is version('9.8', '<') }}"

@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Set ACME server information
-  set_fact:
+  ansible.builtin.set_fact:
     # ARI and profiles have been added in https://github.com/ansible/ansible/pull/84547
     # See also https://github.com/ansible/acme-test-container/pull/25
     acme_supports_ari: "{{ ansible_version.full is version('2.19', '>=') }}"
@@ -17,7 +17,7 @@
     acme_directory_url: "https://{{ acme_host }}:14000/dir"
 
 - name: Print ACME server information
-  debug:
+  ansible.builtin.debug:
     msg: |-
       ACME test container IP is {{ acme_host }}
       ACME directory: {{ acme_directory_url }}

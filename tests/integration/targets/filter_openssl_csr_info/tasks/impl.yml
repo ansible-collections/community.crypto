@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Get CSR info"
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/csr_1.csr') | community.crypto.openssl_csr_info }}
     result_idna: >-
@@ -13,7 +13,7 @@
       {{ lookup('file', remote_tmp_dir ~ '/csr_1.csr') | community.crypto.openssl_csr_info(name_encoding='unicode') }}
 
 - name: "Check whether subject and extensions behaves as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject.organizationalUnitName == 'ACME Department'
       - "['organizationalUnitName', 'Crypto Department'] in result.subject_ordered"
@@ -40,7 +40,7 @@
       - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
 
 - name: "Check SubjectKeyIdentifier and AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_key_identifier == "00:11:22:33"
       - result.authority_key_identifier == "44:55:66:77"
@@ -56,17 +56,17 @@
       - "IP:1.2.3.4"
 
 - name: "Get CSR info"
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/csr_2.csr') | community.crypto.openssl_csr_info }}
 
 - name: "Get CSR info"
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/csr_3.csr') | community.crypto.openssl_csr_info }}
 
 - name: "Check AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier is none
       - result.authority_cert_issuer == expected_authority_cert_issuer
@@ -77,65 +77,65 @@
       - "IP:1.2.3.4"
 
 - name: "Get CSR info"
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/csr_4.csr') | community.crypto.openssl_csr_info }}
 
 - name: "Check AuthorityKeyIdentifier"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none
       - result.authority_cert_serial_number is none
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ [] | community.crypto.openssl_csr_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The community.crypto.openssl_csr_info input must be a text type, not ")
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.openssl_csr_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("Unable to load (?:request|PEM file)(?:\.|$)")
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.openssl_csr_info(name_encoding=[]) }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be of a text type, not ")
 
 - name: Get invalid name_encoding parameter
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'bar' | community.crypto.openssl_csr_info(name_encoding='foo') }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")

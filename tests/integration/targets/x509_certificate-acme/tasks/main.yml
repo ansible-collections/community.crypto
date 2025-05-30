@@ -10,7 +10,7 @@
 
 - block:
     - name: Obtain root and intermediate certificates
-      get_url:
+      ansible.builtin.get_url:
         url: "http://{{ acme_host }}:5000/{{ item.0 }}-certificate-for-ca/{{ item.1 }}"
         dest: "{{ remote_tmp_dir }}/acme-{{ item.0 }}-{{ item.1 }}.pem"
       loop: "{{ query('nested', types, root_numbers) }}"
@@ -28,28 +28,28 @@
       register: acme_intermediates
 
     - name: Read root certificates
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/acme-root-' ~ item ~ '.pem' }}"
       loop: "{{ root_numbers }}"
       register: slurp_roots
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
       loop: "{{ acme_roots.results }}"
       register: acme_roots_tmp
 
     - name: Read intermediate certificates
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/acme-intermediate-' ~ item ~ '.pem' }}"
       loop: "{{ root_numbers }}"
       register: slurp_intermediates
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         x__: "{{ item | dict2items | selectattr('key', 'in', interesting_keys) | list | items2dict }}"
       loop: "{{ acme_intermediates.results }}"
       register: acme_intermediates_tmp
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         acme_roots: "{{ acme_roots_tmp.results | map(attribute='ansible_facts.x__') | list }}"
         acme_root_certs: "{{ slurp_roots.results | map(attribute='content') | map('b64decode') | list }}"
         acme_intermediates: "{{ acme_intermediates_tmp.results | map(attribute='ansible_facts.x__') | list }}"
@@ -68,13 +68,13 @@
       - subject
 
 - name: Get hold of acme-tiny executable
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/diafygi/acme-tiny/master/acme_tiny.py
     dest: "{{ remote_tmp_dir }}/acme-tiny"
     mode: "0755"
 
 - name: "Monkey-patch acme-tiny: Disable certificate validation"
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: DISABLE CERTIFICATE VALIDATION FOR HTTPS REQUESTS"
     insertafter: '^#!.*'
@@ -92,42 +92,42 @@
           from urllib2 import Request # Python 2
 
 - name: "Monkey-patch acme-tiny: adjust shebang"
-  replace:
+  ansible.builtin.replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: '^\#\!/usr/bin/env .*$'
     replace: '#!{{ ansible_python_interpreter }}'
 
 - name: "Monkey-patch acme-tiny: Disable check that challenge file is reachable via HTTP"
-  replace:
+  ansible.builtin.replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'parser\.add_argument\("--disable-check", default=False,'
     replace: 'parser.add_argument("--disable-check", default=True,'
 
 - name: "Monkey-patch acme-tiny: Instead of writing challenge files to disk, post them to challenge server"
-  replace:
+  ansible.builtin.replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'with open\(wellknown_path, "w"\) as [^:]+:\n\s+[^. ]+\.write\(([^)]+)\)'
     replace: 'r = Request(url="http://{{ acme_host }}:5000/http/" + domain + "/" + token, data=\1.encode("utf8"), headers={"content-type": "application/octet-stream"}) ; r.get_method = lambda: "PUT" ; urlopen(r).close()'
 
 - name: "Monkey-patch acme-tiny: Remove file cleanup"
-  replace:
+  ansible.builtin.replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: 'os\.remove\(wellknown_path\)'
     replace: 'pass'
 
 - name: "Monkey-patch acme-tiny: Allow to run with Python 2"
-  replace:
+  ansible.builtin.replace:
     path: "{{ remote_tmp_dir }}/acme-tiny"
     regexp: '#!/usr/bin/env python3'
     replace: '#!/usr/bin/env python'
   when: ansible_facts.python.version.major == 2
 
 - name: Create challenges directory
-  file:
+  ansible.builtin.file:
     path: '{{ remote_tmp_dir }}/challenges'
     state: directory
 
 - name: Running tests
-  include_tasks: impl.yml
+  ansible.builtin.include_tasks: impl.yml
   # Make x509_certificate module happy
   when: cryptography_version is version('3.3', '>=')

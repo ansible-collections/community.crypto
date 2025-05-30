@@ -24,13 +24,13 @@
   when: false
   block:
     - name: Create lookback device
-      command: losetup -f {{ cryptfile_path }}
+      ansible.builtin.command: losetup -f {{ cryptfile_path }}
 
     - name: Determine loop device name
-      command: losetup -j {{ cryptfile_path }} --output name
+      ansible.builtin.command: losetup -j {{ cryptfile_path }} --output name
       register: cryptfile_device_output
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         cryptfile_device: "{{ cryptfile_device_output.stdout_lines[1] }}"
 
     - name: Create LUKS container

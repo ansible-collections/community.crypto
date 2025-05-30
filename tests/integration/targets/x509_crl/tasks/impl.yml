@@ -44,7 +44,7 @@
         revocation_date: 20191001000000Z
   register: crl_1
 
-- assert:
+- ansible.builtin.assert:
     that:
       - crl_1_check is changed
       - crl_1 is changed
@@ -55,7 +55,7 @@
   register: crl_1_info_1
 
 - name: Read ca-crl1.crl
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/ca-crl1.crl'
   register: slurp
 
@@ -111,7 +111,7 @@
   register: crl_1_idem
 
 - name: Read file
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
     - ca.key
@@ -255,7 +255,7 @@
   register: crl_1_info_4
 
 - name: Read ca-crl1.crl
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir }}/ca-crl1.crl"
   register: content
 
@@ -467,7 +467,7 @@
   register: crl_2_change
 
 - name: Read ca-crl2.crl
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/ca-crl2.crl'
   register: slurp_crl2_1
 
@@ -521,7 +521,7 @@
   register: crl_2_change_order
 
 - name: Read ca-crl2.crl
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/ca-crl2.crl'
   register: slurp_crl2_2
 

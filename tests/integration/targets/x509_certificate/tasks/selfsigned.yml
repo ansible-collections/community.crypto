@@ -115,7 +115,7 @@
   register: result_privatekey
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate
-  assert:
+  ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
       - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
@@ -181,7 +181,7 @@
   register: result_privatekey
 
 - name: (Selfsigned, {{select_crypto_backend}}) Check selfsigned certificate2
-  assert:
+  ansible.builtin.assert:
     that:
       - result.public_key == result_privatekey.public_key
       - "result.signature_algorithm == 'sha256WithRSAEncryption' or result.signature_algorithm == 'sha256WithECDSAEncryption'"
@@ -310,7 +310,7 @@
   register: passphrase_error_3
 
 - name: (Selfsigned, {{select_crypto_backend}}) Create broken certificate
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/cert_broken.pem"
     content: "broken"
 - name: (Selfsigned, {{select_crypto_backend}}) Regenerate broken cert
@@ -482,4 +482,4 @@
 
   when: select_crypto_backend == 'cryptography' and cryptography_version is version('3.3', '>=')
 
-- import_tasks: ../tests/validate_selfsigned.yml
+- ansible.builtin.import_tasks: ../tests/validate_selfsigned.yml

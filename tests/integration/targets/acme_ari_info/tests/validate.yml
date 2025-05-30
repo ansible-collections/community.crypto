@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Validate results
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_1 is not changed
       - cert_1.renewal_info.explanationURL is not defined or cert_1.renewal_info.explanationURL is string

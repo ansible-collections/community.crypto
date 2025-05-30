@@ -63,12 +63,12 @@
       register: p12_standard_idempotency_no_certs
 
     - name: "({{ select_crypto_backend }}) Read ansible_pkey1.pem"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
       register: ansible_pkey_content
 
     - name: "({{ select_crypto_backend }}) Read ansible1.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible1.crt'
       register: ansible_crt_content
 
@@ -84,12 +84,12 @@
       register: p12_standard_idempotency_2
 
     - name: "({{ select_crypto_backend }}) Read ansible.p12"
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/ansible.p12'
       register: ansible_p12_content
 
     - name: "({{ select_crypto_backend }}) Validate PKCS#12"
-      assert:
+      ansible.builtin.assert:
         that:
           - p12_standard.pkcs12 == ansible_p12_content.content
           - p12_standard_idempotency.pkcs12 == p12_standard.pkcs12
@@ -160,7 +160,7 @@
       register: p12_multiple_certs
 
     - name: "({{ select_crypto_backend }}) Read ansible2.crt / ansible3.crt.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ item }}"
       loop:
         - "{{ remote_tmp_dir ~ '/ansible2.crt' }}"
@@ -235,7 +235,7 @@
       register: p12_no_pkey
 
     - name: "({{ select_crypto_backend }}) Create broken PKCS#12"
-      copy:
+      ansible.builtin.copy:
         dest: '{{ remote_tmp_dir }}/broken.p12'
         content: broken
 
@@ -337,7 +337,7 @@
       register: p12_empty_concat_idem
 
     - name: "({{ select_crypto_backend }}) Read ansible23.crt"
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_tmp_dir ~ '/ansible23.crt' }}"
       register: ansible_other_content_concat
 
@@ -378,7 +378,7 @@
         - select_crypto_backend == 'cryptography'
         - cryptography_version is version('38.0.0', '>=')
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
 
   always:
     - name: "({{ select_crypto_backend }}) Delete PKCS#12 file"

@@ -27,7 +27,7 @@
       - '{{ remote_tmp_dir }}/a-root.pem'
 
 - name: Assert that case B failed
-  assert:
+  ansible.builtin.assert:
     that: "'Cannot complete chain' in caseb.msg"
 
 - name: Case C => works

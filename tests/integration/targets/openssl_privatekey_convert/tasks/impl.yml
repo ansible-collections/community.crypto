@@ -24,7 +24,7 @@
     # select_crypto_backend: '{{ select_crypto_backend }}'
   register: convert
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_check is changed
       - convert is changed
@@ -61,7 +61,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
@@ -93,7 +93,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -131,7 +131,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
@@ -163,7 +163,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -201,7 +201,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
@@ -231,7 +231,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -267,7 +267,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
@@ -292,7 +292,7 @@
         # select_crypto_backend: '{{ select_crypto_backend }}'
       register: convert_not_idem
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - convert_not_idem_check is changed
           - convert_not_idem is changed
@@ -325,7 +325,7 @@
         state: '{{ convert_file_info_data }}'
       register: convert_file_info
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - convert_idem_check is not changed
           - convert_idem is not changed
@@ -348,7 +348,7 @@
     # select_crypto_backend: '{{ select_crypto_backend }}'
   register: convert_not_idem
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -381,7 +381,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed

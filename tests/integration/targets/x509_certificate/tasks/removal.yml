@@ -23,7 +23,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
 
 - name: "(Removal, {{select_crypto_backend}}) Check that file is not gone"
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/removal_cert.pem"
   register: removal_1_prestat
 
@@ -36,7 +36,7 @@
   register: removal_1
 
 - name: "(Removal, {{select_crypto_backend}}) Check that file is gone"
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/removal_cert.pem"
   register: removal_1_poststat
 
@@ -48,7 +48,7 @@
   register: removal_2
 
 - name: (Removal, {{select_crypto_backend}}) Ensure removal worked
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_1_prestat.stat.exists
       - removal_1 is changed

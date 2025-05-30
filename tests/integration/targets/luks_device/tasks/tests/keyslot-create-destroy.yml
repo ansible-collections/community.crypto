@@ -46,10 +46,10 @@
   become: true
   register: create_luks_slot4_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot4
-- assert:
+- ansible.builtin.assert:
     that:
       - create_luks_slot4_check is changed
       - create_luks_slot4 is changed
@@ -104,10 +104,10 @@
   become: true
   register: add_luks_slot2_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot2
-- assert:
+- ansible.builtin.assert:
     that:
       - add_luks_slot2_check is changed
       - add_luks_slot2 is changed
@@ -130,7 +130,7 @@
   ignore_errors: true
   become: true
   register: kill_slot4_key_slot4
-- assert:
+- ansible.builtin.assert:
     that:
       - kill_slot4_nokey is failed
       - kill_slot4_key_slot4 is failed
@@ -166,10 +166,10 @@
   become: true
   register: kill_luks_slot4_idem_check
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot4_removed
-- assert:
+- ansible.builtin.assert:
     that:
       - kill_luks_slot4_check is changed
       - kill_luks_slot4 is changed
@@ -196,10 +196,10 @@
   become: true
   register: kill_luks_slot0
 - name: Dump luks header
-  command: "cryptsetup luksDump {{ cryptfile_device }}"
+  ansible.builtin.command: "cryptsetup luksDump {{ cryptfile_device }}"
   become: true
   register: luks_header_slot0_removed
-- assert:
+- ansible.builtin.assert:
     that:
       - add_luks_slot0 is changed
       - kill_luks_slot0 is changed

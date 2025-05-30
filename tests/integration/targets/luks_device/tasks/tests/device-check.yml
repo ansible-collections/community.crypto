@@ -24,7 +24,7 @@
   ignore_errors: true
   become: true
   register: create
-- assert:
+- ansible.builtin.assert:
     that:
       - create_check is failed
       - create is failed
@@ -52,7 +52,7 @@
   ignore_errors: true
   become: true
   register: create
-- assert:
+- ansible.builtin.assert:
     that:
       - create_check is failed
       - create is failed

@@ -43,7 +43,7 @@
   register: publickey_idempotence
 
 - name: "({{ select_crypto_backend }}) Verify check mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - publickey_check is changed
       - publickey is changed
@@ -112,7 +112,7 @@
   register: publickey3_idempotence
 
 - name: "({{ select_crypto_backend }}) Generate empty file that will hold a public key (issue 33072)"
-  file:
+  ansible.builtin.file:
     path: '{{ remote_tmp_dir }}/publickey4.pub'
     state: touch
 
@@ -185,7 +185,7 @@
   register: passphrase_error_3
 
 - name: "({{ select_crypto_backend }}) Create broken key"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/publickeybroken.pub"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken key"

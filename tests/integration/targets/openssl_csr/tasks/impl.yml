@@ -9,7 +9,7 @@
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Read privatekey"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekey.pem'
   register: privatekey
 
@@ -273,7 +273,7 @@
     size: '{{ default_rsa_key_size }}'
 
 - name: "({{ select_crypto_backend }}) Read privatekey"
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/privatekeypw.pem'
   register: privatekeypw
 
@@ -320,7 +320,7 @@
   register: passphrase_error_3
 
 - name: "({{ select_crypto_backend }}) Create broken CSR"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/csrbroken.csr"
     content: "broken"
 - name: "({{ select_crypto_backend }}) Regenerate broken CSR"

@@ -33,17 +33,17 @@
     backend: "{{ backend }}"
 
 - name: "({{ backend }}) Check private key status"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/removed'
   register: removed_private_key
 
 - name: "({{ backend }}) Check public key status"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/removed.pub'
   register: removed_public_key
 
 - name: "({{ backend }}) Assert key pair files are removed"
-  assert:
+  ansible.builtin.assert:
     that:
       - not removed_private_key.stat.exists
       - not removed_public_key.stat.exists

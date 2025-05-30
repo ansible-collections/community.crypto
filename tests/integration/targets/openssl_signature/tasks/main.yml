@@ -14,7 +14,7 @@
 # * password protected private key or not
 
 - name: Set up test combinations
-  set_fact:
+  ansible.builtin.set_fact:
     all_tests: []
     backends: []
     key_types: []
@@ -24,29 +24,29 @@
         privatekey_passphrase: hunter2
 
 - name: Add cryptography backend
-  set_fact:
+  ansible.builtin.set_fact:
     backends: "{{ backends + [ { 'backend': 'cryptography' } ] }}"
 
 - name: Add RSA tests
-  set_fact:
+  ansible.builtin.set_fact:
     key_types: "{{ key_types + [ { 'type': 'RSA', 'size': default_rsa_key_size } ] }}"
 
 - name: Add DSA + ECDSA tests
-  set_fact:
+  ansible.builtin.set_fact:
     key_types: "{{ key_types + [ { 'type': 'DSA', 'size': 2048 }, { 'type': 'ECC', 'curve': 'secp256r1' } ] }}"
   when:
     # FreeBSD 11 fails on secp256r1 keys
     - not ansible_os_family == 'FreeBSD'
 
 - name: Add Ed25519 + Ed448 tests
-  set_fact:
+  ansible.builtin.set_fact:
     key_types: "{{ key_types + [ { 'type': 'Ed25519' }, { 'type': 'Ed448' } ] }}"
   when:
     # FreeBSD doesn't have support for Ed448/25519
     - not ansible_os_family == 'FreeBSD'
 
 - name: Create all test combinations
-  set_fact:
+  ansible.builtin.set_fact:
     all_tests: "{{ [backends, key_types, key_password] | openssl_signatures_combiner }}"
 
 - name: Generate private keys
@@ -83,10 +83,10 @@
   loop: '{{ all_tests }}'
 
 - name: Create statement to be signed
-  copy:
+  ansible.builtin.copy:
     content: "Erst wenn der Subwoofer die Katze inhaliert, fickt der Bass richtig übel. -- W.A. Mozart"
     dest: '{{ remote_tmp_dir }}/statement.txt'
 
 - name: Loop over all variants
-  include_tasks: loop.yml
+  ansible.builtin.include_tasks: loop.yml
   loop: '{{ all_tests }}'

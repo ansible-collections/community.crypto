@@ -16,7 +16,7 @@
           - '{{ remote_tmp_dir }}/files/roots/'
       register: cert1_root
     - name: Verify root for cert 1
-      assert:
+      ansible.builtin.assert:
         that:
           - cert1_root.complete_chain | join('') == (fullchain ~ root)
           - cert1_root.root == root
@@ -34,7 +34,7 @@
           - '{{ remote_tmp_dir }}/files/roots.pem'
       register: cert1_rootchain
     - name: Verify rootchain for cert 1
-      assert:
+      ansible.builtin.assert:
         that:
           - cert1_rootchain.complete_chain | join('') == (cert ~ chain ~ root)
           - cert1_rootchain.chain[:-1] | join('') == chain
@@ -52,7 +52,7 @@
           - '{{ remote_tmp_dir }}/files/roots/'
       register: cert2_root
     - name: Verify root for cert 2
-      assert:
+      ansible.builtin.assert:
         that:
           - cert2_root.complete_chain | join('') == (fullchain ~ root)
           - cert2_root.root == root
@@ -70,7 +70,7 @@
           - '{{ remote_tmp_dir }}/files/roots.pem'
       register: cert2_rootchain
     - name: Verify rootchain for cert 2
-      assert:
+      ansible.builtin.assert:
         that:
           - cert2_rootchain.complete_chain | join('') == (cert ~ chain ~ root)
           - cert2_rootchain.chain[:-1] | join('') == chain
@@ -90,7 +90,7 @@
           - '{{ remote_tmp_dir }}/files/roots.pem'
       register: cert2_rootchain_alt
     - name: Verify rootchain for cert 2
-      assert:
+      ansible.builtin.assert:
         that:
           - cert2_rootchain_alt.complete_chain | join('') == (cert ~ chain ~ root)
           - cert2_rootchain_alt.chain[:-1] | join('') == chain
@@ -108,7 +108,7 @@
           - '{{ remote_tmp_dir }}/files/roots.pem'
       register: cert2_complete_chain
     - name: Verify rootchain for cert 2
-      assert:
+      ansible.builtin.assert:
         that:
           - cert2_complete_chain.complete_chain | join('') == (cert ~ chain ~ root)
           - cert2_complete_chain.chain == []
@@ -128,7 +128,7 @@
   register: cert2_no_intermediate
   ignore_errors: true
 - name: Verify failure
-  assert:
+  ansible.builtin.assert:
     that:
       - cert2_no_intermediate is failed
       - "cert2_no_intermediate.msg.startswith('Cannot complete chain. Stuck at certificate ')"
@@ -143,7 +143,7 @@
   register: cert2_infinite_loop
   ignore_errors: true
 - name: Verify failure
-  assert:
+  ansible.builtin.assert:
     that:
       - cert2_infinite_loop is failed
       - "cert2_infinite_loop.msg == 'Found cycle while building certificate chain'"

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "({{ select_crypto_backend }}) Generate random domain name"
-  set_fact:
+  ansible.builtin.set_fact:
     domain_name: "host{{ '%0x' % ((2**32) | random) }}.example.com"
 
 - name: "({{ select_crypto_backend }}) Generate account key"
@@ -57,11 +57,11 @@
   register: order_1
 
 - name: "({{ select_crypto_backend }}) Show order information"
-  debug:
+  ansible.builtin.debug:
     var: order_1
 
 - name: "({{ select_crypto_backend }}) Check order"
-  assert:
+  ansible.builtin.assert:
     that:
       - order_1 is changed
       - order_1.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
@@ -91,11 +91,11 @@
   register: order_info_1
 
 - name: "({{ select_crypto_backend }}) Show order information"
-  debug:
+  ansible.builtin.debug:
     var: order_info_1
 
 - name: "({{ select_crypto_backend }}) Check order information"
-  assert:
+  ansible.builtin.assert:
     that:
       - order_info_1 is not changed
       - order_info_1.authorizations_by_identifier | length == 1
@@ -120,7 +120,7 @@
       - order_info_1.account_uri == account.account_uri
 
 - name: "({{ select_crypto_backend }}) Create HTTP challenges"
-  uri:
+  ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
     method: PUT
     body_format: raw
@@ -142,7 +142,7 @@
   register: validate_1
 
 - name: "({{ select_crypto_backend }}) Check validation result"
-  assert:
+  ansible.builtin.assert:
     that:
       - validate_1 is changed
       - validate_1.account_uri == account.account_uri
@@ -158,11 +158,11 @@
   register: order_info_2
 
 - name: "({{ select_crypto_backend }}) Show order information"
-  debug:
+  ansible.builtin.debug:
     var: order_info_2
 
 - name: "({{ select_crypto_backend }}) Check order information"
-  assert:
+  ansible.builtin.assert:
     that:
       - order_info_2 is not changed
       - order_info_2.authorizations_by_identifier | length == 1
@@ -198,7 +198,7 @@
   register: validate_2
 
 - name: "({{ select_crypto_backend }}) Check validation result"
-  assert:
+  ansible.builtin.assert:
     that:
       - validate_2 is not changed
       - validate_2.account_uri == account.account_uri
@@ -220,7 +220,7 @@
   register: finalize_1
 
 - name: "({{ select_crypto_backend }}) Check finalization result"
-  assert:
+  ansible.builtin.assert:
     that:
       - finalize_1 is changed
       - finalize_1.account_uri == account.account_uri
@@ -231,7 +231,7 @@
       - finalize_1.selected_chain.full_chain == finalize_1.selected_chain.cert + finalize_1.selected_chain.chain
 
 - name: "({{ select_crypto_backend }}) Read files from disk"
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir }}/{{ item }}.pem"
   loop:
     - cert
@@ -240,7 +240,7 @@
   register: slurp
 
 - name: "({{ select_crypto_backend }}) Compare finalization result with files on disk"
-  assert:
+  ansible.builtin.assert:
     that:
       - finalize_1.selected_chain.cert == slurp.results[0].content | b64decode
       - finalize_1.selected_chain.chain == slurp.results[1].content | b64decode
@@ -257,11 +257,11 @@
   register: order_info_3
 
 - name: "({{ select_crypto_backend }}) Show order information"
-  debug:
+  ansible.builtin.debug:
     var: order_info_3
 
 - name: "({{ select_crypto_backend }}) Check order information"
-  assert:
+  ansible.builtin.assert:
     that:
       - order_info_3 is not changed
       - order_info_3.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
@@ -299,7 +299,7 @@
   register: finalize_2
 
 - name: "({{ select_crypto_backend }}) Check finalization result"
-  assert:
+  ansible.builtin.assert:
     that:
       - finalize_2 is not changed
       - finalize_2.account_uri == account.account_uri
@@ -321,11 +321,11 @@
   register: order_info_4
 
 - name: "({{ select_crypto_backend }}) Show order information"
-  debug:
+  ansible.builtin.debug:
     var: order_info_4
 
 - name: "({{ select_crypto_backend }}) Check order information"
-  assert:
+  ansible.builtin.assert:
     that:
       - order_info_4 is not changed
       - order_info_4.authorizations_by_identifier['dns:' ~ domain_name].identifier.type == 'dns'
@@ -361,7 +361,7 @@
       register: cert_info
 
     - name: "({{ select_crypto_backend }}) Verify information"
-      assert:
+      ansible.builtin.assert:
         that:
           - cert_info.supports_ari == true
           - cert_info.should_renew == false
@@ -391,7 +391,7 @@
       register: order_info_5
 
     - name: "({{ select_crypto_backend }}) Check replacement order 1"
-      assert:
+      ansible.builtin.assert:
         that:
           - replacement_order_1 is changed
           - replacement_order_1.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
@@ -412,7 +412,7 @@
           - replacement_order_1.order_uri not in [order_1.order_uri]
 
     - name: "({{ select_crypto_backend }}) Check replacement order 1 information"
-      assert:
+      ansible.builtin.assert:
         that:
           - order_info_5 is not changed
           - order_info_5.authorizations_by_identifier | length == 1
@@ -454,7 +454,7 @@
           ignore_errors: true
 
         - name: "({{ select_crypto_backend }}) Check replacement order 2"
-          assert:
+          ansible.builtin.assert:
             that:
               - replacement_order_2 is failed
               - >-
@@ -487,7 +487,7 @@
           register: order_info_6
 
         - name: "({{ select_crypto_backend }}) Check replacement order 3"
-          assert:
+          ansible.builtin.assert:
             that:
               - replacement_order_3 is changed
               - replacement_order_3.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
@@ -510,7 +510,7 @@
                 ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_3.warnings
 
         - name: "({{ select_crypto_backend }}) Check replacement order 3 information"
-          assert:
+          ansible.builtin.assert:
             that:
               - order_info_6 is not changed
               - order_info_6.authorizations_by_identifier | length == 1
@@ -546,7 +546,7 @@
     # Complete replacement order 1
 
     - name: "({{ select_crypto_backend }}) Create HTTP challenges (replacement order 1)"
-      uri:
+      ansible.builtin.uri:
         url: "http://{{ acme_host }}:5000/http/{{ item.identifier }}/{{ item.challenges['http-01'].resource[('.well-known/acme-challenge/'|length):] }}"
         method: PUT
         body_format: raw
@@ -598,7 +598,7 @@
           ignore_errors: true
 
         - name: "({{ select_crypto_backend }}) Check replacement order 4"
-          assert:
+          ansible.builtin.assert:
             that:
               - replacement_order_4 is failed
               - replacement_order_4.msg.startswith('Failed to start new order for https://' ~ acme_host)
@@ -628,7 +628,7 @@
           register: order_info_7
 
         - name: "({{ select_crypto_backend }}) Check replacement order 5"
-          assert:
+          ansible.builtin.assert:
             that:
               - replacement_order_5 is changed
               - replacement_order_5.order_uri.startswith('https://' ~ acme_host ~ ':14000/')
@@ -651,7 +651,7 @@
                 ('Stop passing `replaces=' ~ cert_info.cert_id ~ '` due to error 409 urn:ietf:params:acme:error:malformed when creating ACME order') in replacement_order_5.warnings
 
         - name: "({{ select_crypto_backend }}) Check replacement order 5 information"
-          assert:
+          ansible.builtin.assert:
             that:
               - order_info_7 is not changed
               - order_info_7.authorizations_by_identifier | length == 1
@@ -702,7 +702,7 @@
       ignore_errors: true
 
     - name: "({{ select_crypto_backend }}) Check invalid profile order"
-      assert:
+      ansible.builtin.assert:
         that:
           - invalid_profile_order is failed
           - invalid_profile_order.msg == "The ACME CA does not support selected profile 'does-not-exist'."
@@ -724,7 +724,7 @@
       ignore_errors: true
 
     - name: "({{ select_crypto_backend }}) Check profile without server support order"
-      assert:
+      ansible.builtin.assert:
         that:
           - profile_without_server_support is failed
           - profile_without_server_support.msg == 'The ACME CA does not support profiles. Please omit the "profile" option.'

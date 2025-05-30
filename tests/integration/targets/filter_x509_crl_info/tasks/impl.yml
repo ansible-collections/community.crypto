@@ -23,17 +23,17 @@
         revocation_date: 20191001000000Z
 
 - name: Retrieve CRL 1 infos
-  set_fact:
+  ansible.builtin.set_fact:
     crl_1_info_1: >-
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl1.crl') | community.crypto.x509_crl_info }}
 
 - name: Retrieve CRL 1 infos
-  set_fact:
+  ansible.builtin.set_fact:
     crl_1_info_2: >-
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl1.crl') | b64encode | community.crypto.x509_crl_info }}
 
 - name: Validate CRL 1 info
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_info_1.format == 'pem'
       - crl_1_info_1.digest == 'ecdsa-with-SHA256'
@@ -90,17 +90,17 @@
         revocation_date: 20191001000000Z
 
 - name: Read ca-crl1.crl
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir }}/ca-crl1.crl"
   register: content
 
 - name: Retrieve CRL 1 infos from DER (Base64 encoded)
-  set_fact:
+  ansible.builtin.set_fact:
     crl_1_info_5: >-
       {{ content.content | community.crypto.x509_crl_info }}
 
 - name: Validate CRL 1
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_info_5.format == 'der'
 
@@ -126,7 +126,7 @@
   register: crl_2_change
 
 - name: Retrieve CRL 2 infos
-  set_fact:
+  ansible.builtin.set_fact:
     crl_2_info_1: >-
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl2.crl') | community.crypto.x509_crl_info(list_revoked_certificates=false) }}
 
@@ -152,12 +152,12 @@
   register: crl_2_change_order
 
 - name: Retrieve CRL 2 infos again
-  set_fact:
+  ansible.builtin.set_fact:
     crl_2_info_2: >-
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl2.crl') | community.crypto.x509_crl_info(list_revoked_certificates=false) }}
 
 - name: Validate CRL 2 info
-  assert:
+  ansible.builtin.assert:
     that:
       - "'revoked_certificates' not in crl_2_info_1"
       - >
@@ -249,7 +249,7 @@
   register: crl_3_unicode
 
 - name: Retrieve CRL 3 infos
-  set_fact:
+  ansible.builtin.set_fact:
     crl_3_info: >-
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl3.crl') | community.crypto.x509_crl_info(list_revoked_certificates=true) }}
     crl_3_info_idna: >-
@@ -258,73 +258,73 @@
       {{ lookup('file', remote_tmp_dir ~ '/ca-crl3.crl') | community.crypto.x509_crl_info(list_revoked_certificates=true, name_encoding='unicode') }}
 
 - name: Validate CRL 3 info
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_3.revoked_certificates == crl_3_info.revoked_certificates
       - crl_3_idna.revoked_certificates == crl_3_info_idna.revoked_certificates
       - crl_3_unicode.revoked_certificates == crl_3_info_unicode.revoked_certificates
 
 - name: Get invalid CRL info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ [] | community.crypto.x509_crl_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The community.crypto.x509_crl_info input must be a text type, not ")
 
 - name: Get invalid CRL info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.x509_crl_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("Error while decoding CRL")
 
 - name: Get invalid CRL info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.x509_crl_info(name_encoding=[]) }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be of a text type, not ")
 
 - name: Get invalid name_encoding parameter
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'bar' | community.crypto.x509_crl_info(name_encoding='foo') }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")
 
 - name: Get invalid list_revoked_certificates parameter
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'bar' | community.crypto.x509_crl_info(list_revoked_certificates=[]) }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The list_revoked_certificates option must be a boolean, not ")

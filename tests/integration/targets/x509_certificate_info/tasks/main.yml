@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Make sure the Python idna library is installed
-  pip:
+  ansible.builtin.pip:
     name: idna
     state: present
 
@@ -146,7 +146,7 @@
     - 4
 
 - name: Running tests with cryptography backend
-  include_tasks: impl.yml
+  ansible.builtin.include_tasks: impl.yml
   vars:
     select_crypto_backend: cryptography
   when: cryptography_version is version('3.3', '>=')

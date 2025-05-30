@@ -86,7 +86,7 @@
   register: account_created_idempotent
 
 - name: Read account key
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/accountkey.pem'
   register: slurp
 
@@ -304,4 +304,4 @@
       kid: kid-3
       alg: HS512
       key: zWNDZM6eQGHWpSRTPal5eIUYFTu7EajVIoguysqZ9wG44nMEtx3MUAsUDkMTQ12W
-- debug: var=account_created_eab
+- ansible.builtin.debug: var=account_created_eab

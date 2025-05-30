@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check directory output
-  assert:
+  ansible.builtin.assert:
     that:
       - directory is not changed
       - "'directory' in directory"
@@ -16,7 +16,7 @@
       - "'output_json' not in directory"
 
 - name: Check account creation output
-  assert:
+  ansible.builtin.assert:
     that:
       - account_creation is changed
       - "'directory' in account_creation"
@@ -30,7 +30,7 @@
       - account_creation.output_text | from_json == account_creation.output_json
 
 - name: Check account get output
-  assert:
+  ansible.builtin.assert:
     that:
       - account_get is not changed
       - "'directory' in account_get"
@@ -41,7 +41,7 @@
       - account_get.output_json == account_creation.output_json
 
 - name: Check account update output
-  assert:
+  ansible.builtin.assert:
     that:
       - account_update is changed
       - "'directory' in account_update"
@@ -53,7 +53,7 @@
       - account_update.output_json.contact[0] in ['mailto:me@example.com', 'mailto:*******@example.com']
 
 - name: Check certificate request output
-  assert:
+  ansible.builtin.assert:
     that:
       - new_order is changed
       - "'directory' in new_order"
@@ -66,7 +66,7 @@
       - "'finalize' in new_order.output_json"
 
 - name: Check get order output
-  assert:
+  ansible.builtin.assert:
     that:
       - order is not changed
       - "'directory' in order"
@@ -77,7 +77,7 @@
       # - new_order.output_json == order.output_json
 
 - name: Check get authz output
-  assert:
+  ansible.builtin.assert:
     that:
       - item is not changed
       - "'directory' in item"
@@ -90,7 +90,7 @@
   loop: "{{ authz.results }}"
 
 - name: Check get challenge output
-  assert:
+  ansible.builtin.assert:
     that:
       - item is not changed
       - "'directory' in item"
@@ -104,7 +104,7 @@
   loop: "{{ http01challenge.results }}"
 
 - name: Check challenge activation output
-  assert:
+  ansible.builtin.assert:
     that:
       - item is changed
       - "'directory' in item"
@@ -118,7 +118,7 @@
   loop: "{{ activation.results }}"
 
 - name: Check validation result
-  assert:
+  ansible.builtin.assert:
     that:
       - item is not changed
       - "'directory' in item"

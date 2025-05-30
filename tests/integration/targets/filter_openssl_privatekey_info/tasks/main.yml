@@ -38,5 +38,5 @@
     size: 1024
 
 - name: Running tests
-  include_tasks: impl.yml
+  ansible.builtin.include_tasks: impl.yml
   when: cryptography_version is version('3.3', '>=')

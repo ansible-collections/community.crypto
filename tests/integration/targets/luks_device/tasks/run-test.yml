@@ -9,4 +9,4 @@
     state: absent
   become: true
 - name: "Loading tasks from {{ item }}"
-  include_tasks: "{{ item }}"
+  ansible.builtin.include_tasks: "{{ item }}"

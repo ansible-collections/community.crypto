@@ -21,11 +21,11 @@
           commonName: www.ansible.com
 
     - name: Running tests with cryptography backend
-      include_tasks: impl.yml
+      ansible.builtin.include_tasks: impl.yml
       vars:
         select_crypto_backend: cryptography
 
-    - import_tasks: ../tests/validate.yml
+    - ansible.builtin.import_tasks: ../tests/validate.yml
       vars:
         select_crypto_backend: cryptography
 

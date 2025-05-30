@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Read PEM cert
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/cert_2.pem'
   register: slurp_pem
 
 - name: Read DER cert
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/cert_2.der'
   register: slurp_der
 
@@ -99,7 +99,7 @@
   register: result_10
 
 - name: Check conditions
-  assert:
+  ansible.builtin.assert:
     that:
       - result_1 is changed
       - result_2 is changed
@@ -198,7 +198,7 @@
   register: result_10
 
 - name: Check conditions
-  assert:
+  ansible.builtin.assert:
     that:
       - result_1 is changed
       - result_2 is changed
@@ -234,7 +234,7 @@
   ignore_errors: true
 
 - name: Check conditions
-  assert:
+  ansible.builtin.assert:
     that:
       - result_1 is changed
       - result_2 is failed

@@ -31,11 +31,11 @@
     regenerate: "{{ item }}"
   loop: "{{ regenerate_values }}"
 - name: "({{ backend }}) Regenerate - setup password protected keys"
-  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-b-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - setup broken keys"
-  copy:
+  ansible.builtin.copy:
     dest: '{{ remote_tmp_dir }}/regenerate-c-{{ item.0 }}{{ item.1 }}'
     content: 'broken key'
     mode: '0700'
@@ -44,7 +44,7 @@
     - ['', '.pub']
 
 - name: "({{ backend }}) Regenerate - setup password protected keys for passphrse test"
-  command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
+  ansible.builtin.command: 'ssh-keygen -f {{ remote_tmp_dir }}/regenerate-d-{{ item }} -N {{ passphrase }}'
   loop: "{{ regenerate_values }}"
 
 - name: "({{ backend }}) Regenerate - modify broken keys (check mode)"
@@ -58,7 +58,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -79,7 +79,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -101,7 +101,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -126,7 +126,7 @@
   register: result
   when: backend == 'cryptography'
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success
       - result.results[1] is failed
@@ -146,7 +146,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken. Will not proceed.' in result.results[0].msg"
@@ -170,7 +170,7 @@
   register: result
   when: backend == 'cryptography'
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success
       - result.results[1] is failed
@@ -190,7 +190,7 @@
   check_mode: true
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -207,7 +207,7 @@
     backend: "{{ backend }}"
   loop: "{{ regenerate_values }}"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is not changed
       - result.results[1] is not changed
@@ -226,7 +226,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -245,7 +245,7 @@
   loop: "{{ regenerate_values }}"
   ignore_errors: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.results[0] is success and result.results[0] is not changed
       - result.results[1] is failed
@@ -255,7 +255,7 @@
       - result.results[4] is changed
 
 - name: "({{ backend }}) Regenerate - redistribute keys"
-  copy:
+  ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
     dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
     remote_src: true
@@ -280,7 +280,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -299,7 +299,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.results[0] is success and result.results[0] is not changed
           - result.results[1] is failed
@@ -309,7 +309,7 @@
           - result.results[4] is changed
 
     - name: "({{ backend }}) Regenerate - redistribute keys"
-      copy:
+      ansible.builtin.copy:
         src: '{{ remote_tmp_dir }}/regenerate-a-always{{ item.1 }}'
         dest: '{{ remote_tmp_dir }}/regenerate-a-{{ item.0 }}{{ item.1 }}'
         remote_src: true
@@ -330,7 +330,7 @@
       loop: "{{ regenerate_values }}"
       ignore_errors: true
       register: result
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -347,7 +347,7 @@
             backend: "{{ backend }}"
           loop: "{{ regenerate_values }}"
           register: result
-        - assert:
+        - ansible.builtin.assert:
             that:
               - result is changed
               # for all values but 'always', the key should not be regenerated.

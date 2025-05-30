@@ -16,19 +16,19 @@
       loop: '{{ certificates }}'
 
     - name: Generate certificates
-      include_tasks: create-single-certificate.yml
+      ansible.builtin.include_tasks: create-single-certificate.yml
       loop: '{{ certificates }}'
       loop_control:
         loop_var: certificate
 
     - name: Read certificates
-      slurp:
+      ansible.builtin.slurp:
         src: '{{ remote_tmp_dir }}/{{ item.name }}.pem'
       loop: '{{ certificates }}'
       register: certificates_read
 
     - name: Store read certificates
-      set_fact:
+      ansible.builtin.set_fact:
         read_certificates: >-
           {{ certificates_read.results | map(attribute='content') | map('b64decode')
              | zip(certificates | map(attribute='name'))

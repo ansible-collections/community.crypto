@@ -14,7 +14,6 @@ skip_list:
 
   # To be checked and maybe fixed:
   - fqcn[action]
-  - fqcn[action-core]
   - ignore-errors
   - jinja[spacing]
   - key-order[task]

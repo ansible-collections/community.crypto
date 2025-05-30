@@ -26,13 +26,13 @@
       ignore_errors: true
 
     - name: Make sure cert creation with agent fails if key not in agent
-      assert:
+      ansible.builtin.assert:
         that:
           - rc_no_key_in_agent is failed
           - "'agent contains no identities' in rc_no_key_in_agent.msg or 'not found in agent' in rc_no_key_in_agent.msg"
 
     - name: Add key to agent
-      command: 'ssh-add {{ signing_key }}'
+      ansible.builtin.command: 'ssh-add {{ signing_key }}'
 
     - name: Generate always valid cert with agent (check mode)
       openssh_cert:
@@ -67,7 +67,7 @@
       register: rc_cert_with_agent_idempotent
 
     - name: Check agent idempotency
-      assert:
+      ansible.builtin.assert:
         that:
           - rc_cert_with_agent_idempotent is not changed
         msg: OpenSSH certificate generation without serial number is idempotent.

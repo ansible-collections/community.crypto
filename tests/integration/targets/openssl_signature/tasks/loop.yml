@@ -12,7 +12,7 @@
     select_crypto_backend: '{{ item.backend }}'
   register: sign_result
 
-- debug:
+- ansible.builtin.debug:
     var: sign_result
 
 - name: Verify {{ item.type }} signature - {{ item.passwd }} using {{ item.backend }}
@@ -24,9 +24,9 @@
   register: verify_result
 
 - name: Make sure the signature is valid
-  assert:
+  ansible.builtin.assert:
     that:
       - verify_result.valid
 
-- debug:
+- ansible.builtin.debug:
     var: verify_result

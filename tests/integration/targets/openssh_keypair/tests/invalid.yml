@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: "({{ backend }}) Generate key - broken"
-  copy:
+  ansible.builtin.copy:
     dest: '{{ item }}'
     content: ''
     mode: '0700'
@@ -25,7 +25,7 @@
   ignore_errors: true
 
 - name: "({{ backend }}) Assert broken key causes failure - broken"
-  assert:
+  ansible.builtin.assert:
     that:
       - broken_output is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken.' in broken_output.msg"
@@ -38,7 +38,7 @@
   register: force_broken_output
 
 - name: "({{ backend }}) Assert broken key regenerated when 'force=true' - broken"
-  assert:
+  ansible.builtin.assert:
     that:
       - force_broken_output is changed
 
@@ -55,17 +55,17 @@
     backend: "{{ backend }}"
 
 - name: "({{ backend }}) Check private key status - write-only"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/write-only'
   register: write_only_private_key
 
 - name: "({{ backend }}) Check public key status - write-only"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/write-only.pub'
   register: write_only_public_key
 
 - name: "({{ backend }}) Assert that private and public keys match permissions - write-only"
-  assert:
+  ansible.builtin.assert:
     that:
       - write_only_private_key.stat.mode == '0200'
       - write_only_public_key.stat.mode == '0200'
@@ -78,17 +78,17 @@
   register: write_only_output
 
 - name: "({{ backend }}) Check private key status after regeneration - write-only"
-  stat:
+  ansible.builtin.stat:
     path: '{{ remote_tmp_dir }}/write-only'
   register: write_only_private_key_after
 
 - name: "({{ backend }}) Assert key is regenerated - write-only"
-  assert:
+  ansible.builtin.assert:
     that:
       - write_only_output is changed
 
 - name: "({{ backend }}) Assert key permissions are preserved with 'opensshbin'"
-  assert:
+  ansible.builtin.assert:
     that:
       - write_only_private_key_after.stat.mode == '0200'
 
@@ -99,7 +99,7 @@
     state: absent
 
 - name: "({{ backend }}) Generate key with ssh-keygen - password_protected"
-  command: "ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}"
+  ansible.builtin.command: "ssh-keygen -f {{ remote_tmp_dir }}/password_protected -N {{ passphrase }}"
 
 - name: "({{ backend }}) Modify key - password_protected"
   openssh_keypair:
@@ -110,7 +110,7 @@
   ignore_errors: true
 
 - name: "({{ backend }}) Assert key cannot be read - password_protected"
-  assert:
+  ansible.builtin.assert:
     that:
       - password_protected_output is failed
       - "'Unable to read the key. The key is protected with a passphrase or broken.' in password_protected_output.msg"
@@ -124,7 +124,7 @@
   register: force_password_protected_output
 
 - name: "({{ backend }}) Assert key regenerated with 'force=true' - password_protected"
-  assert:
+  ansible.builtin.assert:
     that:
       - force_password_protected_output is changed
 

@@ -13,7 +13,7 @@
     content: "{{ result.privatekey }}"
   register: result_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.privatekey.startswith('----')
@@ -21,7 +21,7 @@
       - result_info.public_data.size == 4096
       - result_info.public_data.exponent >= 5
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result_info.public_key_fingerprints.sha256 | length > 10
       - result.fingerprint.sha256 == result_info.public_key_fingerprints.sha256
@@ -88,7 +88,7 @@
     content: "{{ update.privatekey }}"
   register: update_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_check is changed
       - update_check.privatekey != 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'

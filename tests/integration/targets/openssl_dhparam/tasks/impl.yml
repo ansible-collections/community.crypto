@@ -52,7 +52,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: dhparam_changed_512
 
-- copy:
+- ansible.builtin.copy:
     src: '{{ remote_tmp_dir }}/dh768.pem'
     remote_src: true
     dest: '{{ remote_tmp_dir }}/dh512.pem'
@@ -73,7 +73,7 @@
   register: dhparam_changed_force
 
 - name: "[{{ select_crypto_backend }}] Create broken params"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/dhbroken.pem"
     content: "broken"
 - name: "[{{ select_crypto_backend }}] Regenerate broken params"

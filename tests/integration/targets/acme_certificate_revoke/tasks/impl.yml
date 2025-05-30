@@ -28,11 +28,11 @@
 
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Read account key (EC256)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-ec256.pem'
   register: slurp_account_key
 - name: Obtain cert 1
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 1 for revocation
     certificate_name: cert-1
@@ -49,7 +49,7 @@
     terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 2
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 2 for revocation
     certificate_name: cert-2
@@ -66,7 +66,7 @@
     terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 3
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 3 for revocation
     certificate_name: cert-3
@@ -105,7 +105,7 @@
   ignore_errors: true
   register: cert_2_revoke
 - name: Read account key (RSA)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
   register: slurp_account_key
 - name: Revoke certificate 3 via account key (fullchain)

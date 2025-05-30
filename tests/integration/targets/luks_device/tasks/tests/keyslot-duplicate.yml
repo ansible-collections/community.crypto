@@ -32,7 +32,7 @@
   become: true
   ignore_errors: true
   register: keyslot_duplicate
-- assert:
+- ansible.builtin.assert:
     that:
       - keyslot_duplicate_check is failed
       - "'Trying to add key that is already present in another slot' in keyslot_duplicate_check.msg"

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Fix name
-  set_fact:
+  ansible.builtin.set_fact:
     cryptname: "crypt{{ '%0x' % ((2**32) | random) }}"
 
 - name: Create
@@ -52,7 +52,7 @@
     state: absent
   become: true
   register: absent
-- assert:
+- ansible.builtin.assert:
     that:
       - create is changed
       - open is changed

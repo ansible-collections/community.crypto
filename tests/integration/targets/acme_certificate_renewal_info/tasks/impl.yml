@@ -22,7 +22,7 @@
 
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Obtain cert 1
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 1 for renewal check
     certificate_name: cert-1
@@ -41,14 +41,14 @@
 
 ## OBTAIN CERTIFICATE INFOS ###################################################################
 - name: Dump OpenSSL x509 info
-  command:
+  ansible.builtin.command:
     cmd: openssl x509 -in {{ remote_tmp_dir }}/cert-1.pem -noout -text
 - name: Obtain certificate information
   x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-1.pem"
   register: cert_1_info
 - name: Read certificate
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/cert-1.pem'
   register: slurp_cert_1
 - name: Obtain certificate information (1/11)
@@ -137,7 +137,7 @@
     validate_certs: false
   register: cert_1_renewal_9
 - name: Create broken file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ remote_tmp_dir }}/cert-is-broken.pem"
     content: |
       --- THIS IS NOT A CERT ---
