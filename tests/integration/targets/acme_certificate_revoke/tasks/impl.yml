@@ -6,7 +6,7 @@
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         type: "{{ item.type }}"
         size: "{{ item.size | default(omit) }}"
@@ -28,11 +28,11 @@
 
 ## CREATE ACCOUNTS AND OBTAIN CERTIFICATES ####################################################
 - name: Read account key (EC256)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-ec256.pem'
   register: slurp_account_key
 - name: Obtain cert 1
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 1 for revocation
     certificate_name: cert-1
@@ -49,7 +49,7 @@
     terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 2
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 2 for revocation
     certificate_name: cert-2
@@ -66,7 +66,7 @@
     terms_agreed: true
     account_email: "example@example.org"
 - name: Obtain cert 3
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 3 for revocation
     certificate_name: cert-3
@@ -84,7 +84,7 @@
 
 ## REVOKE CERTIFICATES ########################################################################
 - name: Revoke certificate 1 via account key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     certificate: "{{ remote_tmp_dir }}/cert-1.pem"
@@ -94,7 +94,7 @@
   ignore_errors: true
   register: cert_1_revoke
 - name: Revoke certificate 2 via certificate private key
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     private_key_src: "{{ remote_tmp_dir }}/cert-2.key"
     private_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
@@ -105,11 +105,11 @@
   ignore_errors: true
   register: cert_2_revoke
 - name: Read account key (RSA)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
   register: slurp_account_key
 - name: Revoke certificate 3 via account key (fullchain)
-  acme_certificate_revoke:
+  community.crypto.acme_certificate_revoke:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     certificate: "{{ remote_tmp_dir }}/cert-3-fullchain.pem"

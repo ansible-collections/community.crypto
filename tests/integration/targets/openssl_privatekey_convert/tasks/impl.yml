@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Convert (check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -15,7 +15,7 @@
   check_mode: true
 
 - name: Convert
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -24,7 +24,7 @@
     # select_crypto_backend: '{{ select_crypto_backend }}'
   register: convert
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_check is changed
       - convert is changed
@@ -36,7 +36,7 @@
   register: convert_file_info_data
 
 - name: Convert (idempotent, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -47,7 +47,7 @@
   check_mode: true
 
 - name: Convert (idempotent)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -61,14 +61,14 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
       - convert_file_info is not changed
 
 - name: Convert (change format, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -79,7 +79,7 @@
   check_mode: true
 
 - name: Convert (change format)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -93,7 +93,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -106,7 +106,7 @@
   register: convert_file_info_data
 
 - name: Convert (idempotent, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -117,7 +117,7 @@
   check_mode: true
 
 - name: Convert (idempotent)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -131,14 +131,14 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
       - convert_file_info is not changed
 
 - name: Convert (change password, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -149,7 +149,7 @@
   check_mode: true
 
 - name: Convert (change password)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -163,7 +163,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -176,7 +176,7 @@
   register: convert_file_info_data
 
 - name: Convert (idempotent, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -187,7 +187,7 @@
   check_mode: true
 
 - name: Convert (idempotent)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -201,14 +201,14 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
       - convert_file_info is not changed
 
 - name: Convert (remove password, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -218,7 +218,7 @@
   check_mode: true
 
 - name: Convert (remove password)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -231,7 +231,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -244,7 +244,7 @@
   register: convert_file_info_data
 
 - name: Convert (idempotent, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -254,7 +254,7 @@
   check_mode: true
 
 - name: Convert (idempotent)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_rsa_pass1.pem'
     src_passphrase: secret
     dest_path: '{{ remote_tmp_dir }}/output_1.pem'
@@ -267,7 +267,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed
@@ -276,7 +276,7 @@
 - when: supports_ed25519 | bool
   block:
     - name: Convert (change format to raw, check mode)
-      openssl_privatekey_convert:
+      community.crypto.openssl_privatekey_convert:
         src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
         dest_path: '{{ remote_tmp_dir }}/output_2.pem'
         format: raw
@@ -285,14 +285,14 @@
       check_mode: true
 
     - name: Convert (change format to raw)
-      openssl_privatekey_convert:
+      community.crypto.openssl_privatekey_convert:
         src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
         dest_path: '{{ remote_tmp_dir }}/output_2.pem'
         format: raw
         # select_crypto_backend: '{{ select_crypto_backend }}'
       register: convert_not_idem
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - convert_not_idem_check is changed
           - convert_not_idem is changed
@@ -304,7 +304,7 @@
       register: convert_file_info_data
 
     - name: Convert (idempotent, check mode)
-      openssl_privatekey_convert:
+      community.crypto.openssl_privatekey_convert:
         src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
         dest_path: '{{ remote_tmp_dir }}/output_2.pem'
         format: raw
@@ -313,7 +313,7 @@
       check_mode: true
 
     - name: Convert (idempotent)
-      openssl_privatekey_convert:
+      community.crypto.openssl_privatekey_convert:
         src_path: '{{ remote_tmp_dir }}/privatekey_ed25519.pem'
         dest_path: '{{ remote_tmp_dir }}/output_2.pem'
         format: raw
@@ -325,14 +325,14 @@
         state: '{{ convert_file_info_data }}'
       register: convert_file_info
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - convert_idem_check is not changed
           - convert_idem is not changed
           - convert_file_info is not changed
 
 - name: Convert (change format to raw, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
     dest_path: '{{ remote_tmp_dir }}/output_3.pem'
     format: raw
@@ -341,14 +341,14 @@
   check_mode: true
 
 - name: Convert (change format to raw)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
     dest_path: '{{ remote_tmp_dir }}/output_3.pem'
     format: raw
     # select_crypto_backend: '{{ select_crypto_backend }}'
   register: convert_not_idem
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_not_idem_check is changed
       - convert_not_idem is changed
@@ -360,7 +360,7 @@
   register: convert_file_info_data
 
 - name: Convert (idempotent, check mode)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
     dest_path: '{{ remote_tmp_dir }}/output_3.pem'
     format: raw
@@ -369,7 +369,7 @@
   check_mode: true
 
 - name: Convert (idempotent)
-  openssl_privatekey_convert:
+  community.crypto.openssl_privatekey_convert:
     src_path: '{{ remote_tmp_dir }}/privatekey_x25519.pem'
     dest_path: '{{ remote_tmp_dir }}/output_3.pem'
     format: raw
@@ -381,7 +381,7 @@
     state: '{{ convert_file_info_data }}'
   register: convert_file_info
 
-- assert:
+- ansible.builtin.assert:
     that:
       - convert_idem_check is not changed
       - convert_idem is not changed

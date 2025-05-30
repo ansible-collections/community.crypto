@@ -11,17 +11,17 @@
 - block:
 
     - name: Copy test files to testhost
-      copy:
+      ansible.builtin.copy:
         src: '{{ role_path }}/files/'
         dest: '{{ remote_tmp_dir }}/files/'
 
     - name: Run tests with copied certificates
-      import_tasks: existing.yml
+      ansible.builtin.import_tasks: existing.yml
 
     - name: Create more certificates
-      import_tasks: create.yml
+      ansible.builtin.import_tasks: create.yml
 
     - name: Run tests with created certificates
-      import_tasks: created.yml
+      ansible.builtin.import_tasks: created.yml
 
   when: cryptography_version is version('3.3', '>=')

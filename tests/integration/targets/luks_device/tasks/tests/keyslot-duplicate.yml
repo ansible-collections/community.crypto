@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create new luks
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     keyfile: "{{ remote_tmp_dir }}/keyfile1"
@@ -12,7 +12,7 @@
       iteration_time: 0.1
   become: true
 - name: Add new keyslot with same keyfile (check)
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     new_keyslot: 1
@@ -23,7 +23,7 @@
   check_mode: true
   register: keyslot_duplicate_check
 - name: Add new keyslot with same keyfile
-  luks_device:
+  community.crypto.luks_device:
     device: "{{ cryptfile_device }}"
     state: present
     new_keyslot: 1
@@ -32,7 +32,7 @@
   become: true
   ignore_errors: true
   register: keyslot_duplicate
-- assert:
+- ansible.builtin.assert:
     that:
       - keyslot_duplicate_check is failed
       - "'Trying to add key that is already present in another slot' in keyslot_duplicate_check.msg"

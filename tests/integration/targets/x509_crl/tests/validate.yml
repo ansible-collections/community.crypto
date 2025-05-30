@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Validate CRL 1
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_check is changed
       - crl_1 is changed
@@ -14,7 +14,7 @@
       - crl_1_idem_content is not changed
 
 - name: Validate CRL 1 info
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_info_1.format == 'pem'
       - crl_1_info_1.digest == 'ecdsa-with-SHA256'
@@ -52,7 +52,7 @@
       - crl_1_info_1 == crl_1_info_3
 
 - name: Validate CRL 1
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_format_check is changed
       - crl_1_format is changed
@@ -62,16 +62,16 @@
       - crl_1_info_5.format == 'der'
 
 - name: Read ca-crl1.crl
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir }}/ca-crl1.crl"
   register: content
 - name: Validate CRL 1 Base64 content
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_1_format_idem.crl | b64decode == content.content | b64decode
 
 - name: Validate CRL 2
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_2_check is changed
       - crl_2 is changed
@@ -89,7 +89,7 @@
       - crl_2_change_order.crl == (slurp_crl2_2.content | b64decode)
 
 - name: Validate CRL 2 info
-  assert:
+  ansible.builtin.assert:
     that:
       - "'revoked_certificates' not in crl_2_info_1"
       - >
@@ -108,7 +108,7 @@
         ]
 
 - name: Validate CRL 3 info
-  assert:
+  ansible.builtin.assert:
     that:
       - crl_3.revoked_certificates == crl_3_info.revoked_certificates
       - crl_3.revoked_certificates[0].issuer == [
@@ -147,7 +147,7 @@
         ]
 
 - name: Verify Ed25519 and Ed448 tests
-  assert:
+  ansible.builtin.assert:
     that:
       - ed25519_ed448_crl is succeeded
       - ed25519_ed448_crl.results[0] is changed

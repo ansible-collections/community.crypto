@@ -9,84 +9,84 @@
 ####################################################################
 
 - name: Register system environment
-  command: "{{ ansible_python.executable }} -c 'import os; print(dict(os.environ))'"
+  ansible.builtin.command: "{{ ansible_python.executable }} -c 'import os; print(dict(os.environ))'"
   register: sys_environment
 
 - name: Show system environment
-  debug:
+  ansible.builtin.debug:
     var: sys_environment.stdout_lines
 
 - name: Default value for OpenSSL binary path
-  set_fact:
+  ansible.builtin.set_fact:
     openssl_binary: openssl
 
 - name: Include OS-specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
+  ansible.builtin.include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"
 
 - name: Check whether OpenSSL is there
-  command: "{{ openssl_binary }} version"
+  ansible.builtin.command: "{{ openssl_binary }} version"
   register: openssl_version_full
   ignore_errors: true
 
 - name: Install OpenSSL
   become: true
-  package:
+  ansible.builtin.package:
     name: '{{ openssl_package_name }}'
   when: not ansible_os_family == 'Darwin' and openssl_version_full is failed
 
 - name: Register openssl version (full)
-  command: "{{ openssl_binary }} version"
+  ansible.builtin.command: "{{ openssl_binary }} version"
   register: openssl_version_full
 
 - name: Show openssl version (full)
-  debug:
+  ansible.builtin.debug:
     var: openssl_version_full.stdout_lines
 
 - when: ansible_os_family == "Darwin" and "LibreSSL" in openssl_version_full.stdout
   # In case LibreSSL is installed on macOS, we need to install a more modern OpenSSL
   block:
     - name: MACOS | Find brew binary
-      command: which brew
+      ansible.builtin.command: which brew
       register: brew_which
 
     - name: MACOS | Get owner of brew binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ brew_which.stdout }}"
       register: brew_stat
 
     - name: MACOS | Install openssl
-      homebrew:
+      community.general.homebrew:
         name: openssl
         state: present
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
     - name: MACOS | Locale openssl binary
-      command: brew --prefix openssl
+      ansible.builtin.command: brew --prefix openssl
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: brew_openssl_prefix
 
     - name: MACOS | Point to OpenSSL binary
-      set_fact:
+      ansible.builtin.set_fact:
         openssl_binary: "{{ brew_openssl_prefix.stdout }}/bin/openssl"
 
     - name: MACOS | Register openssl version (full)
-      command: "{{ openssl_binary }} version"
+      ansible.builtin.command: "{{ openssl_binary }} version"
       register: openssl_version_full_again
       # We must use a different variable to prevent the 'when' condition of the surrounding block to fail
 
     - name: MACOS | Show openssl version (full)
-      debug:
+      ansible.builtin.debug:
         var: openssl_version_full_again.stdout_lines
 
 - name: Register openssl version
-  shell: "{{ openssl_binary }} version | cut -d' ' -f2"
+  ansible.builtin.shell: "{{ openssl_binary }} version | cut -d' ' -f2"
   register: openssl_version
 
 - name: Make openssl version a string
-  set_fact:
+  ansible.builtin.set_fact:
     openssl_version: "{{ openssl_version.stdout }}"
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
@@ -98,13 +98,13 @@
 
         - name: Install cryptography (Python 3 from system packages)
           become: true
-          package:
+          ansible.builtin.package:
             name: '{{ cryptography_package_name_python3 }}'
           when: ansible_python_version is version('3.0', '>=')
 
         - name: Install cryptography (Python 2 from system packages)
           become: true
-          package:
+          ansible.builtin.package:
             name: '{{ cryptography_package_name }}'
           when: ansible_python_version is version('3.0', '<')
 
@@ -114,7 +114,7 @@
 
         - name: Install cryptography (PyPi)
           become: true
-          pip:
+          ansible.builtin.pip:
             name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
             state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
             extra_args: "-c {{ remote_constraints }}"
@@ -124,9 +124,9 @@
   register: crypto_info
 
 - name: Register cryptography version
-  set_fact:
+  ansible.builtin.set_fact:
     cryptography_version: "{{ crypto_info.python_cryptography_capabilities.version }}"
 
 - name: Print default key sizes
-  debug:
+  ansible.builtin.debug:
     msg: "Default RSA key size: {{ default_rsa_key_size }} (for certificates: {{ default_rsa_key_size_certificates }})"

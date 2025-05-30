@@ -3,31 +3,31 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug:
+- ansible.builtin.debug:
     msg: "Executing tests with backend {{ select_crypto_backend }}"
 
-- name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
-- name: ({{select_crypto_backend}}) Get certificate info (IDNA encoding)
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info (IDNA encoding)
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: idna
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_idna
 
-- name: ({{select_crypto_backend}}) Get certificate info (Unicode encoding)
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info (Unicode encoding)
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_1.pem'
     name_encoding: unicode
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_unicode
 
 - name: Check whether issuer and subject and extensions behave as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result.issuer.organizationalUnitName == 'ACME Department'
       - "['organizationalUnitName', 'Crypto Department'] in result.issuer_ordered"
@@ -84,7 +84,7 @@
       - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
 
 - name: Check SubjectKeyIdentifier and AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_key_identifier == "00:11:22:33"
       - result.authority_key_identifier == "44:55:66:77"
@@ -99,27 +99,27 @@
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
 
-- name: ({{select_crypto_backend}}) Read file
-  slurp:
+- name: ({{ select_crypto_backend }}) Read file
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/cert_1.pem'
   register: slurp
 
-- name: ({{select_crypto_backend}}) Get certificate info directly
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info directly
+  community.crypto.x509_certificate_info:
     content: '{{ slurp.content | b64decode }}'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result_direct
 
-- name: ({{select_crypto_backend}}) Compare output of direct and loaded info
-  assert:
+- name: ({{ select_crypto_backend }}) Compare output of direct and loaded info
+  ansible.builtin.assert:
     that:
       - >-
         (result | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
         ==
         (result_direct | dict2items | rejectattr("key", "equalto", "warnings") | list | items2dict)
 
-- name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_2.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
     valid_at:
@@ -127,20 +127,20 @@
       past: "20190101235901Z"
       twentydays: "+20d"
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result.valid_at.today
       - not result.valid_at.past
       - not result.valid_at.twentydays
 
-- name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_3.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier is none
       - result.authority_cert_issuer == expected_authority_cert_issuer
@@ -150,31 +150,31 @@
       - "DNS:ca.example.org"
       - "IP:1.2.3.4"
 
-- name: ({{select_crypto_backend}}) Get certificate info
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/cert_4.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 
 - name: Check AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none
       - result.authority_cert_serial_number is none
 
 - name: Copy packed cert 1 to remote
-  copy:
+  ansible.builtin.copy:
     src: cert1.pem
     dest: '{{ remote_tmp_dir }}/packed-cert-1.pem'
 
-- name: ({{select_crypto_backend}}) Get certificate info for packaged cert 1
-  x509_certificate_info:
+- name: ({{ select_crypto_backend }}) Get certificate info for packaged cert 1
+  community.crypto.x509_certificate_info:
     path: '{{ remote_tmp_dir }}/packed-cert-1.pem'
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: result
 - name: Check extensions
-  assert:
+  ansible.builtin.assert:
     that:
       - "'ocsp_uri' in result"
       - "result.ocsp_uri == 'http://ocsp.foobarbaz.example.com'"
@@ -211,7 +211,7 @@
       - result.extensions_by_oid['2.5.29.37'].critical == false
       - result.extensions_by_oid['2.5.29.37'].value == 'MBQGCCsGAQUFBwMBBggrBgEFBQcDAg=='
 - name: Check fingerprints
-  assert:
+  ansible.builtin.assert:
     that:
       - (result.fingerprints.sha256 == '08:26:60:3d:29:11:f2:88:09:3f:40:71:bb:67:cb:59:9c:6e:cf:e0:49:22:ab:e8:60:bd:f6:9a:01:e3:0e:2c' if result.fingerprints.sha256 is defined else true)
       - (result.fingerprints.sha1 == '5a:32:7f:22:61:f3:2e:ad:a7:d8:77:07:1c:7f:08:cd:ab:7f:bc:11' if result.fingerprints.sha1 is defined else true)

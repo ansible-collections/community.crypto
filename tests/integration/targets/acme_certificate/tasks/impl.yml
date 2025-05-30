@@ -6,7 +6,7 @@
 ## SET UP ACCOUNT KEYS ########################################################################
 - block:
     - name: Generate account keys
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ remote_tmp_dir }}/{{ item.name }}.pem"
         type: "{{ item.type }}"
         size: "{{ item.size | default(omit) }}"
@@ -28,7 +28,7 @@
 
 ## SET UP ACCOUNTS ############################################################################
 - name: Make sure ECC256 account hasn't been created yet
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -36,11 +36,11 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     state: absent
 - name: Read account key (EC384)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-ec384.pem'
   register: slurp
 - name: Create ECC384 account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -53,7 +53,7 @@
       - mailto:example@example.org
       - mailto:example@example.com
 - name: Create RSA account
-  acme_account:
+  community.crypto.acme_account:
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
@@ -66,7 +66,7 @@
 
 ## OBTAIN CERTIFICATES ########################################################################
 - name: Obtain cert 1
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 1
     certificate_name: cert-1
@@ -89,11 +89,11 @@
         issuer: "{{ acme_roots[1].subject }}"
     use_csr_content: true
 - name: Store obtain results for cert 1
-  set_fact:
+  ansible.builtin.set_fact:
     cert_1_obtain_results: "{{ certificate_obtain_result }}"
     cert_1_alternate: "{{ 1 if select_crypto_backend == 'cryptography' else 0 }}"
 - name: Obtain cert 2
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 2
     certificate_name: cert-2
@@ -122,15 +122,15 @@
         issuer: "{{ acme_roots[2].subject }}"
     use_csr_content: false
 - name: Store obtain results for cert 2
-  set_fact:
+  ansible.builtin.set_fact:
     cert_2_obtain_results: "{{ certificate_obtain_result }}"
     cert_2_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
 - name: Read account key (RSA)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-rsa.pem'
   register: slurp_account_key
 - name: Obtain cert 3
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 3
     certificate_name: cert-3
@@ -152,11 +152,11 @@
         subject: "{{ acme_roots[1].subject }}"
     use_csr_content: true
 - name: Store obtain results for cert 3
-  set_fact:
+  ansible.builtin.set_fact:
     cert_3_obtain_results: "{{ certificate_obtain_result }}"
     cert_3_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
 - name: Obtain cert 4
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 4
     certificate_name: cert-4
@@ -181,11 +181,11 @@
         issuer: "{{ acme_roots[1].subject }}"
     use_csr_content: false
 - name: Store obtain results for cert 4
-  set_fact:
+  ansible.builtin.set_fact:
     cert_4_obtain_results: "{{ certificate_obtain_result }}"
     cert_4_alternate: "{{ 2 if select_crypto_backend == 'cryptography' else 0 }}"
 - name: Obtain cert 5
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 5, Iteration 1/4
     certificate_name: cert-5
@@ -202,11 +202,11 @@
     account_email: ""
     use_csr_content: true
 - name: Store obtain results for cert 5a
-  set_fact:
+  ansible.builtin.set_fact:
     cert_5a_obtain_results: "{{ certificate_obtain_result }}"
     cert_5_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
 - name: Obtain cert 5 (should not, since already there and valid for more than 1 days)
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 5, Iteration 2/4
     certificate_name: cert-5
@@ -223,10 +223,10 @@
     account_email: ""
     use_csr_content: false
 - name: Store obtain results for cert 5b
-  set_fact:
+  ansible.builtin.set_fact:
     cert_5_recreate_1: "{{ challenge_data is changed }}"
 - name: Obtain cert 5 (should again by less days)
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 5, Iteration 3/4
     certificate_name: cert-5
@@ -245,15 +245,15 @@
     acme_certificate_profile: "{{ '6days' if acme_supports_profiles else omit }}"
     acme_certificate_include_renewal_cert_id: when_ari_supported
 - name: Store obtain results for cert 5c
-  set_fact:
+  ansible.builtin.set_fact:
     cert_5_recreate_2: "{{ challenge_data is changed }}"
     cert_5c_obtain_results: "{{ certificate_obtain_result }}"
 - name: Read account key (EC384)
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ remote_tmp_dir }}/account-ec384.pem'
   register: slurp_account_key
 - name: Obtain cert 5 (should again by force)
-  include_tasks: obtain-cert.yml
+  ansible.builtin.include_tasks: obtain-cert.yml
   vars:
     certgen_title: Certificate 5, Iteration 4/4
     certificate_name: cert-5
@@ -270,12 +270,12 @@
     account_email: ""
     use_csr_content: false
 - name: Store obtain results for cert 5d
-  set_fact:
+  ansible.builtin.set_fact:
     cert_5_recreate_3: "{{ challenge_data is changed }}"
     cert_5d_obtain_results: "{{ certificate_obtain_result }}"
 - block:
     - name: Obtain cert 6
-      include_tasks: obtain-cert.yml
+      ansible.builtin.include_tasks: obtain-cert.yml
       vars:
         certgen_title: Certificate 6
         certificate_name: cert-6
@@ -303,13 +303,13 @@
             issuer: "{{ acme_roots[1].subject }}"
         use_csr_content: true
     - name: Store obtain results for cert 6
-      set_fact:
+      ansible.builtin.set_fact:
         cert_6_obtain_results: "{{ certificate_obtain_result }}"
         cert_6_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
   when: acme_intermediates[0].subject_key_identifier is defined
 - block:
     - name: Obtain cert 7
-      include_tasks: obtain-cert.yml
+      ansible.builtin.include_tasks: obtain-cert.yml
       vars:
         certgen_title: Certificate 7
         certificate_name: cert-7
@@ -333,13 +333,13 @@
             authority_key_identifier: "{{ acme_roots[2].subject_key_identifier }}"
         use_csr_content: false
     - name: Store obtain results for cert 7
-      set_fact:
+      ansible.builtin.set_fact:
         cert_7_obtain_results: "{{ certificate_obtain_result }}"
         cert_7_alternate: "{{ 2 if select_crypto_backend == 'cryptography' else 0 }}"
   when: acme_roots[2].subject_key_identifier is defined
 - block:
     - name: Obtain cert 8
-      include_tasks: obtain-cert.yml
+      ansible.builtin.include_tasks: obtain-cert.yml
       vars:
         certgen_title: Certificate 8
         certificate_name: cert-8
@@ -361,114 +361,114 @@
         account_email: "example@example.org"
         use_csr_content: true
     - name: Store obtain results for cert 8
-      set_fact:
+      ansible.builtin.set_fact:
         cert_8_obtain_results: "{{ certificate_obtain_result }}"
         cert_8_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
 
 ## DISSECT CERTIFICATES #######################################################################
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
 - name: Verifying cert 1
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-1-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-1-chain.pem" "{{ remote_tmp_dir }}/cert-1.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-1-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-1-chain.pem" "{{ remote_tmp_dir }}/cert-1.pem"'
   ignore_errors: true
   register: cert_1_valid
 - name: Verifying cert 2
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-2-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-2-chain.pem" "{{ remote_tmp_dir }}/cert-2.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-2-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-2-chain.pem" "{{ remote_tmp_dir }}/cert-2.pem"'
   ignore_errors: true
   register: cert_2_valid
 - name: Verifying cert 3
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-3-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-3-chain.pem" "{{ remote_tmp_dir }}/cert-3.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-3-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-3-chain.pem" "{{ remote_tmp_dir }}/cert-3.pem"'
   ignore_errors: true
   register: cert_3_valid
 - name: Verifying cert 4
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-4-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-4-chain.pem" "{{ remote_tmp_dir }}/cert-4.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-4-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-4-chain.pem" "{{ remote_tmp_dir }}/cert-4.pem"'
   ignore_errors: true
   register: cert_4_valid
 - name: Verifying cert 5
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-5-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-5-chain.pem" "{{ remote_tmp_dir }}/cert-5.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-5-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-5-chain.pem" "{{ remote_tmp_dir }}/cert-5.pem"'
   ignore_errors: true
   register: cert_5_valid
 - name: Verifying cert 6
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-6-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-6-chain.pem" "{{ remote_tmp_dir }}/cert-6.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-6-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-6-chain.pem" "{{ remote_tmp_dir }}/cert-6.pem"'
   ignore_errors: true
   register: cert_6_valid
   when: acme_intermediates[0].subject_key_identifier is defined
 - name: Verifying cert 7
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-7-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-7-chain.pem" "{{ remote_tmp_dir }}/cert-7.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-7-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-7-chain.pem" "{{ remote_tmp_dir }}/cert-7.pem"'
   ignore_errors: true
   register: cert_7_valid
   when: acme_roots[2].subject_key_identifier is defined
 - name: Verifying cert 8
-  command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
   ignore_errors: true
   register: cert_8_valid
 
 # Dump certificate info
 - name: Dumping cert 1
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-1.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-1.pem" -noout -text'
   register: cert_1_text
 - name: Dumping cert 2
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-2.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-2.pem" -noout -text'
   register: cert_2_text
 - name: Dumping cert 3
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-3.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-3.pem" -noout -text'
   register: cert_3_text
 - name: Dumping cert 4
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-4.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-4.pem" -noout -text'
   register: cert_4_text
 - name: Dumping cert 5
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-5.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-5.pem" -noout -text'
   register: cert_5_text
 - name: Dumping cert 6
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-6.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-6.pem" -noout -text'
   register: cert_6_text
   when: acme_intermediates[0].subject_key_identifier is defined
 - name: Dumping cert 7
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-7.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-7.pem" -noout -text'
   register: cert_7_text
   when: acme_roots[2].subject_key_identifier is defined
 - name: Dumping cert 8
-  command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
   register: cert_8_text
 
 # Dump certificate info
 - name: Dumping cert 1
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-1.pem"
   register: cert_1_info
 - name: Dumping cert 2
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-2.pem"
   register: cert_2_info
 - name: Dumping cert 3
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-3.pem"
   register: cert_3_info
 - name: Dumping cert 4
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-4.pem"
   register: cert_4_info
 - name: Dumping cert 5
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-5.pem"
   register: cert_5_info
 - name: Dumping cert 6
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-6.pem"
   register: cert_6_info
   when: acme_intermediates[0].subject_key_identifier is defined
 - name: Dumping cert 7
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-7.pem"
   register: cert_7_info
   when: acme_roots[2].subject_key_identifier is defined
 - name: Dumping cert 8
-  x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-8.pem"
   register: cert_8_info
 
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -477,7 +477,7 @@
     retrieve_orders: ignore
   register: account_orders_not
 - name: Retrieve orders as URL list (1/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -486,7 +486,7 @@
     retrieve_orders: url_list
   register: account_orders_urls
 - name: Retrieve orders as URL list (2/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2
@@ -495,7 +495,7 @@
     retrieve_orders: url_list
   register: account_orders_urls2
 - name: Retrieve orders as object list (1/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
@@ -504,7 +504,7 @@
     retrieve_orders: object_list
   register: account_orders_full
 - name: Retrieve orders as object list (2/2)
-  acme_account_info:
+  community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
     acme_version: 2

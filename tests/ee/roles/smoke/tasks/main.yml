@@ -8,7 +8,7 @@
   register: result
 
 - name: Validate result
-  assert:
+  ansible.builtin.assert:
     that:
       - result.msg == 'Everything is ok'
 
@@ -17,6 +17,6 @@
   register: result
 
 - name: Validate result
-  assert:
+  ansible.builtin.assert:
     that:
       - result.msg == 'Everything is ok'

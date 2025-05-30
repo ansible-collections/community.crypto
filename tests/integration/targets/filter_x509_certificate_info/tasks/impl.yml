@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/cert_1.pem') | community.crypto.x509_certificate_info }}
     result_idna: >-
@@ -13,7 +13,7 @@
       {{ lookup('file', remote_tmp_dir ~ '/cert_1.pem') | community.crypto.x509_certificate_info(name_encoding='unicode') }}
 
 - name: Check whether issuer and subject and extensions behave as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result.issuer.organizationalUnitName == 'ACME Department'
       - "['organizationalUnitName', 'Crypto Department'] in result.issuer_ordered"
@@ -70,7 +70,7 @@
       - result.extensions_by_oid['2.5.29.37'].value == 'MHQGCCsGAQUFBwMBBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgGCCsGAQUFBwMJBgRVHSUABggrBgEFBQcBAwYIKwYBBQUHAwoGCCsGAQUFBwMHBggrBgEFBQcBAg=='
 
 - name: Check SubjectKeyIdentifier and AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.subject_key_identifier == "00:11:22:33"
       - result.authority_key_identifier == "44:55:66:77"
@@ -86,17 +86,17 @@
       - "IP:1.2.3.4"
 
 - name: Get certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/cert_2.pem') | community.crypto.x509_certificate_info }}
 
 - name: Get certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/cert_3.pem') | community.crypto.x509_certificate_info }}
 
 - name: Check AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier is none
       - result.authority_cert_issuer == expected_authority_cert_issuer
@@ -107,23 +107,23 @@
       - "IP:1.2.3.4"
 
 - name: Get certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', remote_tmp_dir ~ '/cert_4.pem') | community.crypto.x509_certificate_info }}
 
 - name: Check AuthorityKeyIdentifier
-  assert:
+  ansible.builtin.assert:
     that:
       - result.authority_key_identifier == "44:55:66:77"
       - result.authority_cert_issuer is none
       - result.authority_cert_serial_number is none
 
 - name: Get certificate info for packaged cert 1
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ lookup('file', role_path ~ '/../x509_certificate_info/files/cert1.pem') | community.crypto.x509_certificate_info }}
 - name: Check extensions
-  assert:
+  ansible.builtin.assert:
     that:
       - "'ocsp_uri' in result"
       - "result.ocsp_uri == 'http://ocsp.foobarbaz.example.com'"
@@ -160,59 +160,59 @@
       - result.extensions_by_oid['2.5.29.37'].critical == false
       - result.extensions_by_oid['2.5.29.37'].value == 'MBQGCCsGAQUFBwMBBggrBgEFBQcDAg=='
 - name: Check fingerprints
-  assert:
+  ansible.builtin.assert:
     that:
       - (result.fingerprints.sha256 == '08:26:60:3d:29:11:f2:88:09:3f:40:71:bb:67:cb:59:9c:6e:cf:e0:49:22:ab:e8:60:bd:f6:9a:01:e3:0e:2c' if result.fingerprints.sha256 is defined else true)
       - (result.fingerprints.sha1 == '5a:32:7f:22:61:f3:2e:ad:a7:d8:77:07:1c:7f:08:cd:ab:7f:bc:11' if result.fingerprints.sha1 is defined else true)
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ [] | community.crypto.x509_certificate_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The community.crypto.x509_certificate_info input must be a text type, not ")
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.x509_certificate_info }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("Unable to load (?:certificate|PEM file)(?:\.|$)")
 
 - name: Get invalid certificate info
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'foo' | community.crypto.x509_certificate_info(name_encoding=[]) }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be of a text type, not ")
 
 - name: Get invalid name_encoding parameter
-  set_fact:
+  ansible.builtin.set_fact:
     result: >-
       {{ 'bar' | community.crypto.x509_certificate_info(name_encoding='foo') }}
   ignore_errors: true
   register: output
 
 - name: Check that task failed and error message is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The name_encoding option must be one of the values \"ignore\", \"idna\", or \"unicode\", not \"foo\"$")

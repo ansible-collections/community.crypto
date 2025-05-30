@@ -9,24 +9,24 @@
 ####################################################################
 
 - name: Make sure the Python idna library is installed
-  pip:
+  ansible.builtin.pip:
     name: idna
     state: present
 
 - name: Generate privatekey
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekey.pem'
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate privatekey with password
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     passphrase: hunter2
     select_crypto_backend: cryptography
     size: '{{ default_rsa_key_size }}'
 
 - name: Generate CSR 1
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_1.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     subject:
@@ -95,7 +95,7 @@
       - "IP:1.2.3.4"
 
 - name: Generate CSR 2
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_2.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekeypw.pem'
     privatekey_passphrase: hunter2
@@ -104,7 +104,7 @@
       - "CA:TRUE"
 
 - name: Generate CSR 3
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_3.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     useCommonNameForSAN: false
@@ -122,14 +122,14 @@
       - "IP:1.2.3.4"
 
 - name: Generate CSR 4
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_4.csr'
     privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
     useCommonNameForSAN: false
     authority_key_identifier: "44:55:66:77"
 
 - name: Running tests with cryptography backend
-  include_tasks: impl.yml
+  ansible.builtin.include_tasks: impl.yml
   vars:
     select_crypto_backend: cryptography
   when: cryptography_version is version('3.3', '>=')

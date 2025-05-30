@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Run tests that raise no errors
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         '' | community.crypto.split_pem == []
@@ -49,13 +49,13 @@
       AAb=
 
 - name: Invalid input
-  debug:
+  ansible.builtin.debug:
     msg: "{{ [] | community.crypto.split_pem }}"
   ignore_errors: true
   register: output
 
 - name: Validate error
-  assert:
+  ansible.builtin.assert:
     that:
       - output is failed
       - output.msg is search("The community.crypto.split_pem input must be a text type, not ")
