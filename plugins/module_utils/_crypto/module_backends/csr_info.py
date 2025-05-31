@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-import abc
 import binascii
 import typing as t
 
@@ -60,7 +59,7 @@ except ImportError:
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
 
 
-class CSRInfoRetrieval(metaclass=abc.ABCMeta):
+class CSRInfoRetrieval:
     csr: x509.CertificateSigningRequest
 
     def __init__(
@@ -69,139 +68,6 @@ class CSRInfoRetrieval(metaclass=abc.ABCMeta):
         self.module = module
         self.content = content
         self.validate_signature = validate_signature
-
-    @abc.abstractmethod
-    def _get_subject_ordered(self) -> list[list[str]]:
-        pass
-
-    @abc.abstractmethod
-    def _get_key_usage(self) -> tuple[list[str] | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_extended_key_usage(self) -> tuple[list[str] | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_basic_constraints(self) -> tuple[list[str] | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_ocsp_must_staple(self) -> tuple[bool | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_subject_alt_name(self) -> tuple[list[str] | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_name_constraints(self) -> tuple[list[str] | None, list[str] | None, bool]:
-        pass
-
-    @abc.abstractmethod
-    def _get_public_key_pem(self) -> bytes:
-        pass
-
-    @abc.abstractmethod
-    def _get_public_key_object(self) -> CertificatePublicKeyTypes:
-        pass
-
-    @abc.abstractmethod
-    def _get_subject_key_identifier(self) -> bytes | None:
-        pass
-
-    @abc.abstractmethod
-    def _get_authority_key_identifier(
-        self,
-    ) -> tuple[bytes | None, list[str] | None, int | None]:
-        pass
-
-    @abc.abstractmethod
-    def _get_all_extensions(self) -> dict[str, dict[str, bool | str]]:
-        pass
-
-    @abc.abstractmethod
-    def _is_signature_valid(self) -> bool:
-        pass
-
-    def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
-        result: dict[str, t.Any] = {}
-        self.csr = load_certificate_request(
-            content=self.content,
-        )
-
-        subject = self._get_subject_ordered()
-        result["subject"] = {}
-        for k, v in subject:
-            result["subject"][k] = v
-        result["subject_ordered"] = subject
-        result["key_usage"], result["key_usage_critical"] = self._get_key_usage()
-        result["extended_key_usage"], result["extended_key_usage_critical"] = (
-            self._get_extended_key_usage()
-        )
-        result["basic_constraints"], result["basic_constraints_critical"] = (
-            self._get_basic_constraints()
-        )
-        result["ocsp_must_staple"], result["ocsp_must_staple_critical"] = (
-            self._get_ocsp_must_staple()
-        )
-        result["subject_alt_name"], result["subject_alt_name_critical"] = (
-            self._get_subject_alt_name()
-        )
-        (
-            result["name_constraints_permitted"],
-            result["name_constraints_excluded"],
-            result["name_constraints_critical"],
-        ) = self._get_name_constraints()
-
-        result["public_key"] = to_text(self._get_public_key_pem())
-
-        public_key_info = get_publickey_info(
-            module=self.module,
-            key=self._get_public_key_object(),
-            prefer_one_fingerprint=prefer_one_fingerprint,
-        )
-        result.update(
-            {
-                "public_key_type": public_key_info["type"],
-                "public_key_data": public_key_info["public_data"],
-                "public_key_fingerprints": public_key_info["fingerprints"],
-            }
-        )
-
-        ski_bytes = self._get_subject_key_identifier()
-        ski = None
-        if ski_bytes is not None:
-            ski = binascii.hexlify(ski_bytes).decode("ascii")
-            ski = ":".join([ski[i : i + 2] for i in range(0, len(ski), 2)])
-        result["subject_key_identifier"] = ski
-
-        aki_bytes, aci, acsn = self._get_authority_key_identifier()
-        aki = None
-        if aki_bytes is not None:
-            aki = binascii.hexlify(aki_bytes).decode("ascii")
-            aki = ":".join([aki[i : i + 2] for i in range(0, len(aki), 2)])
-        result["authority_key_identifier"] = aki
-        result["authority_cert_issuer"] = aci
-        result["authority_cert_serial_number"] = acsn
-
-        result["extensions_by_oid"] = self._get_all_extensions()
-
-        result["signature_valid"] = self._is_signature_valid()
-        if self.validate_signature and not result["signature_valid"]:
-            self.module.fail_json(msg="CSR signature is invalid!", **result)
-        return result
-
-
-class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
-    """Validate the supplied CSR, using the cryptography backend"""
-
-    def __init__(
-        self, *, module: GeneralAnsibleModule, content: bytes, validate_signature: bool
-    ) -> None:
-        super().__init__(
-            module=module, content=content, validate_signature=validate_signature
-        )
         self.name_encoding: t.Literal["ignore", "idna", "unicode"] = module.params.get(
             "name_encoding", "ignore"
         )
@@ -371,6 +237,74 @@ class CSRInfoRetrievalCryptography(CSRInfoRetrieval):
     def _is_signature_valid(self) -> bool:
         return self.csr.is_signature_valid
 
+    def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {}
+        self.csr = load_certificate_request(
+            content=self.content,
+        )
+
+        subject = self._get_subject_ordered()
+        result["subject"] = {}
+        for k, v in subject:
+            result["subject"][k] = v
+        result["subject_ordered"] = subject
+        result["key_usage"], result["key_usage_critical"] = self._get_key_usage()
+        result["extended_key_usage"], result["extended_key_usage_critical"] = (
+            self._get_extended_key_usage()
+        )
+        result["basic_constraints"], result["basic_constraints_critical"] = (
+            self._get_basic_constraints()
+        )
+        result["ocsp_must_staple"], result["ocsp_must_staple_critical"] = (
+            self._get_ocsp_must_staple()
+        )
+        result["subject_alt_name"], result["subject_alt_name_critical"] = (
+            self._get_subject_alt_name()
+        )
+        (
+            result["name_constraints_permitted"],
+            result["name_constraints_excluded"],
+            result["name_constraints_critical"],
+        ) = self._get_name_constraints()
+
+        result["public_key"] = to_text(self._get_public_key_pem())
+
+        public_key_info = get_publickey_info(
+            module=self.module,
+            key=self._get_public_key_object(),
+            prefer_one_fingerprint=prefer_one_fingerprint,
+        )
+        result.update(
+            {
+                "public_key_type": public_key_info["type"],
+                "public_key_data": public_key_info["public_data"],
+                "public_key_fingerprints": public_key_info["fingerprints"],
+            }
+        )
+
+        ski_bytes = self._get_subject_key_identifier()
+        ski = None
+        if ski_bytes is not None:
+            ski = binascii.hexlify(ski_bytes).decode("ascii")
+            ski = ":".join([ski[i : i + 2] for i in range(0, len(ski), 2)])
+        result["subject_key_identifier"] = ski
+
+        aki_bytes, aci, acsn = self._get_authority_key_identifier()
+        aki = None
+        if aki_bytes is not None:
+            aki = binascii.hexlify(aki_bytes).decode("ascii")
+            aki = ":".join([aki[i : i + 2] for i in range(0, len(aki), 2)])
+        result["authority_key_identifier"] = aki
+        result["authority_cert_issuer"] = aci
+        result["authority_cert_serial_number"] = acsn
+
+        result["extensions_by_oid"] = self._get_all_extensions()
+
+        result["signature_valid"] = self._is_signature_valid()
+        if self.validate_signature and not result["signature_valid"]:
+            self.module.fail_json(msg="CSR signature is invalid!", **result)
+        return result
+
 
 def get_csr_info(
     *,
@@ -379,7 +313,7 @@ def get_csr_info(
     validate_signature: bool = True,
     prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
-    info = CSRInfoRetrievalCryptography(
+    info = CSRInfoRetrieval(
         module=module, content=content, validate_signature=validate_signature
     )
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
@@ -391,7 +325,7 @@ def select_backend(
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return CSRInfoRetrievalCryptography(
+    return CSRInfoRetrieval(
         module=module, content=content, validate_signature=validate_signature
     )
 
