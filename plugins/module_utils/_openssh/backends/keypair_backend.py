@@ -285,7 +285,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             self._update_comment()
 
     def _create_temp_public_key(self, content: str | bytes) -> str:
-        temp_public_key = os.path.join(
+        temp_public_key: str = os.path.join(
             self.module.tmpdir, os.path.basename(self.public_key_path)
         )
 

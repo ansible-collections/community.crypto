@@ -293,7 +293,7 @@ class GenericCertificate(OpenSSLObject):
         self.module = module
         self.return_content = module.params["return_content"]
         self.backup = module.params["backup"]
-        self.backup_file = None
+        self.backup_file: str | None = None
 
         self.module_backend = module_backend
         self.module_backend.set_existing(

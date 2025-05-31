@@ -236,6 +236,12 @@ class Authorization:
             error_msg="Failed to request challenges",
             expected_status_codes=[200, 201],
         )
+        if not isinstance(result, dict):
+            raise ACMEProtocolException(
+                module=client.module,
+                msg="Unexpected authorization creation result",
+                content_json=result,
+            )
         return cls.from_json(client=client, data=result, url=info["location"])
 
     @property
@@ -358,7 +364,11 @@ class Authorization:
         result, info = client.send_signed_request(
             self.url, authz_deactivate, fail_on_error=False
         )
-        if 200 <= info["status"] < 300 and result.get("status") == "deactivated":
+        if (
+            200 <= info["status"] < 300
+            and isinstance(result, dict)
+            and result.get("status") == "deactivated"
+        ):
             self.status = "deactivated"
             return True
         return False
@@ -377,6 +387,12 @@ class Authorization:
         result, _info = client.send_signed_request(
             url, authz_deactivate, fail_on_error=True
         )
+        if not isinstance(result, dict):
+            raise ACMEProtocolException(
+                module=client.module,
+                msg="Unexpected challenge deactivation result",
+                content_json=result,
+            )
         authz._setup(client=client, data=result)
         return authz
 

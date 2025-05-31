@@ -176,6 +176,7 @@ class ACMEAccount:
         # check whether that failed with a malformed request error
         if (
             info["status"] >= 400
+            and isinstance(result, Mapping)
             and result.get("type") == "urn:ietf:params:acme:error:malformed"
         ):
             # retry as a regular POST (with no changed data) for pre-draft-15 ACME servers
@@ -183,7 +184,7 @@ class ACMEAccount:
             result, info = self.client.send_signed_request(
                 self.client.account_uri, data, fail_on_error=False
             )
-        if not isinstance(result, Mapping):
+        if not isinstance(result, dict):
             raise ACMEProtocolException(
                 module=self.client.module,
                 msg="Invalid account data retrieved from ACME server",
@@ -328,16 +329,17 @@ class ACMEAccount:
             account_data = dict(account_data)
             account_data.update(update_request)
         else:
-            account_data, info = self.client.send_signed_request(
+            raw_account_data, info = self.client.send_signed_request(
                 self.client.account_uri, update_request
             )
-            if not isinstance(account_data, Mapping):
+            if not isinstance(raw_account_data, Mapping):
                 raise ACMEProtocolException(
                     module=self.client.module,
                     msg="Invalid account updating reply from ACME server",
                     info=info,
                     content_json=account_data,
                 )
+            account_data = raw_account_data
 
         return True, account_data
 

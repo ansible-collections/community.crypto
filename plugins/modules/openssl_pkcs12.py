@@ -529,13 +529,8 @@ class Pkcs(OpenSSLObject):
             elif bool(pkcs12_certificate) != bool(self.certificate_content):
                 return False
 
-            if (pkcs12_other_certificates is not None) and (
-                self.other_certificates is not None
-            ):
-                expected_other_certs = self._dump_other_certificates(self.pkcs12)
-                if set(pkcs12_other_certificates) != set(expected_other_certs):
-                    return False
-            elif bool(pkcs12_other_certificates) != bool(self.other_certificates):
+            expected_other_certs = self._dump_other_certificates(self.pkcs12)
+            if set(pkcs12_other_certificates) != set(expected_other_certs):
                 return False
 
             if pkcs12_privatekey:

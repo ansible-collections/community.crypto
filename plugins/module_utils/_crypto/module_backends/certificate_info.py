@@ -281,7 +281,7 @@ class CertificateInfoRetrievalCryptography(CertificateInfoRetrieval):
             return 1
         if self.cert.version == x509.Version.v3:
             return 3
-        return "unknown"
+        return "unknown"  # type: ignore[unreachable]
 
     def _get_key_usage(self) -> tuple[list[str] | None, bool]:
         try:

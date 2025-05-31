@@ -343,7 +343,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any], dict[str, t.Any]]: ...
+    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]: ...
 
     @t.overload
     def send_signed_request(

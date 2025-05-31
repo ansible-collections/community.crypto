@@ -217,12 +217,16 @@ def main() -> t.NoReturn:
         if info["status"] != 200:
             already_revoked = False
             # Standardized error from draft 14 on (https://tools.ietf.org/html/rfc8555#section-7.6)
-            if result.get("type") == "urn:ietf:params:acme:error:alreadyRevoked":
+            if (
+                isinstance(result, dict)
+                and result.get("type") == "urn:ietf:params:acme:error:alreadyRevoked"
+            ):
                 already_revoked = True
             else:
                 # Hack for Boulder errors
                 if (
-                    result.get("type") == "urn:ietf:params:acme:error:malformed"
+                    isinstance(result, dict)
+                    and result.get("type") == "urn:ietf:params:acme:error:malformed"
                     and result.get("detail") == "Certificate already revoked"
                 ):
                     # Fallback: boulder returns this in case the certificate was already revoked.
