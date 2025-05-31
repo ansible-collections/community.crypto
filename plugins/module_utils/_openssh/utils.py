@@ -101,21 +101,21 @@ class OpensshParser:
     def boolean(self) -> bool:
         next_pos = self._check_position(self.BOOLEAN_OFFSET)
 
-        value = _BOOLEAN.unpack(self._data[self._pos : next_pos])[0]
+        value: bool = _BOOLEAN.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint32(self) -> int:
         next_pos = self._check_position(self.UINT32_OFFSET)
 
-        value = _UINT32.unpack(self._data[self._pos : next_pos])[0]
+        value: int = _UINT32.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 
     def uint64(self) -> int:
         next_pos = self._check_position(self.UINT64_OFFSET)
 
-        value = _UINT64.unpack(self._data[self._pos : next_pos])[0]
+        value: int = _UINT64.unpack(self._data[self._pos : next_pos])[0]
         self._pos = next_pos
         return value
 

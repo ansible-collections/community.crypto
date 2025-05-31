@@ -57,7 +57,8 @@ def obj2txt(openssl_lib, openssl_ffi, obj) -> str:
         buf_len = res + 1
         buf = openssl_ffi.new("char[]", buf_len)
         res = openssl_lib.OBJ_obj2txt(buf, buf_len, obj, 1)
-    return openssl_ffi.buffer(buf, res)[:].decode()
+    bytes_str: bytes = openssl_ffi.buffer(buf, res)[:]
+    return bytes_str.decode()
 
 
 __all__ = ("obj2txt",)

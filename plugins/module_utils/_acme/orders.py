@@ -106,6 +106,12 @@ class Order:
             error_msg="Failed to start new order",
             expected_status_codes=[201],
         )
+        if not isinstance(result, dict):
+            raise ACMEProtocolException(
+                module=client.module,
+                msg="Unexpected new order response",
+                content_json=result,
+            )
         return cls.from_json(client=client, data=result, url=info["location"])
 
     @classmethod
