@@ -273,7 +273,6 @@ pkcs12:
   version_added: "1.0.0"
 """
 
-import abc
 import base64
 import itertools
 import os
@@ -367,7 +366,7 @@ class PkcsError(OpenSSLObjectError):
 class Pkcs(OpenSSLObject):
     path: str
 
-    def __init__(self, module: AnsibleModule, iter_size_default: int = 2048) -> None:
+    def __init__(self, module: AnsibleModule, iter_size_default: int = 50000) -> None:
         super().__init__(
             path=module.params["path"],
             state=module.params["state"],
@@ -451,34 +450,119 @@ class Pkcs(OpenSSLObject):
                 load_certificate(content=to_bytes(other_cert)) for other_cert in certs
             ]
 
-    @abc.abstractmethod
+        if (
+            self.encryption_level == "compatibility2022"
+            and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022
+        ):
+            module.fail_json(
+                msg="The installed cryptography version does not support encryption_level = compatibility2022."
+                " You need cryptography >= 38.0.0 and support for SHA1",
+                exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR,
+            )
+
     def generate_bytes(self, module: AnsibleModule) -> bytes:
         """Generate PKCS#12 file archive."""
+        pkey = None
+        if self.privatekey_content:
+            try:
+                pkey = load_certificate_issuer_privatekey(
+                    content=self.privatekey_content,
+                    passphrase=self.privatekey_passphrase,
+                )
+            except OpenSSLBadPassphraseError as exc:
+                raise PkcsError(exc) from exc
 
-    @abc.abstractmethod
+        cert = None
+        if self.certificate_content:
+            cert = load_certificate(content=self.certificate_content)
+
+        friendly_name = (
+            to_bytes(self.friendly_name) if self.friendly_name is not None else None
+        )
+
+        # Store fake object which can be used to retrieve the components back
+        self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
+
+        encryption: serialization.KeySerializationEncryption
+        if not self.passphrase:
+            encryption = serialization.NoEncryption()
+        elif self.encryption_level == "compatibility2022":
+            encryption = (
+                serialization.PrivateFormat.PKCS12.encryption_builder()
+                .kdf_rounds(self.iter_size)
+                .key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC)
+                .hmac_hash(hashes.SHA1())
+                .build(to_bytes(self.passphrase))
+            )
+        else:
+            encryption = serialization.BestAvailableEncryption(
+                to_bytes(self.passphrase)
+            )
+
+        return serialize_key_and_certificates(
+            friendly_name,
+            pkey,
+            cert,
+            self.other_certificates,
+            encryption,
+        )
+
     def parse_bytes(self, pkcs12_content: bytes) -> tuple[
         bytes | None,
         bytes | None,
         list[bytes],
         bytes | None,
     ]:
-        pass
+        try:
+            private_key, certificate, additional_certificates, friendly_name = (
+                parse_pkcs12(pkcs12_content, passphrase=self.passphrase)
+            )
 
-    @abc.abstractmethod
+            pkey = None
+            if private_key is not None:
+                pkey = private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                )
+
+            crt = None
+            if certificate is not None:
+                crt = certificate.public_bytes(serialization.Encoding.PEM)
+
+            other_certs = []
+            if additional_certificates is not None:
+                other_certs = [
+                    other_cert.public_bytes(serialization.Encoding.PEM)
+                    for other_cert in additional_certificates
+                ]
+
+            return (pkey, crt, other_certs, friendly_name)
+        except ValueError as exc:
+            raise PkcsError(exc) from exc
+
     def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
-        pass
+        return (
+            pkcs12[0].private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+            if pkcs12[0]
+            else None
+        )
 
-    @abc.abstractmethod
     def _dump_certificate(self, pkcs12: PKCS12) -> bytes | None:
-        pass
+        return pkcs12[1].public_bytes(serialization.Encoding.PEM) if pkcs12[1] else None
 
-    @abc.abstractmethod
     def _dump_other_certificates(self, pkcs12: PKCS12) -> list[bytes]:
-        pass
+        return [
+            other_cert.public_bytes(serialization.Encoding.PEM)
+            for other_cert in pkcs12[2]
+        ]
 
-    @abc.abstractmethod
     def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
-        pass
+        return pkcs12[3]
 
     def check(self, module: AnsibleModule, *, perms_required: bool = True) -> bool:
         """Ensure the resource is in its desired state."""
@@ -628,129 +712,11 @@ class Pkcs(OpenSSLObject):
             self.pkcs12_bytes = content
 
 
-class PkcsCryptography(Pkcs):
-    def __init__(self, module: AnsibleModule) -> None:
-        super().__init__(module, iter_size_default=50000)
-        if (
-            self.encryption_level == "compatibility2022"
-            and not CRYPTOGRAPHY_HAS_COMPATIBILITY2022
-        ):
-            module.fail_json(
-                msg="The installed cryptography version does not support encryption_level = compatibility2022."
-                " You need cryptography >= 38.0.0 and support for SHA1",
-                exception=CRYPTOGRAPHY_COMPATIBILITY2022_ERR,
-            )
-
-    def generate_bytes(self, module: AnsibleModule) -> bytes:
-        """Generate PKCS#12 file archive."""
-        pkey = None
-        if self.privatekey_content:
-            try:
-                pkey = load_certificate_issuer_privatekey(
-                    content=self.privatekey_content,
-                    passphrase=self.privatekey_passphrase,
-                )
-            except OpenSSLBadPassphraseError as exc:
-                raise PkcsError(exc) from exc
-
-        cert = None
-        if self.certificate_content:
-            cert = load_certificate(content=self.certificate_content)
-
-        friendly_name = (
-            to_bytes(self.friendly_name) if self.friendly_name is not None else None
-        )
-
-        # Store fake object which can be used to retrieve the components back
-        self.pkcs12 = (pkey, cert, self.other_certificates, friendly_name)
-
-        encryption: serialization.KeySerializationEncryption
-        if not self.passphrase:
-            encryption = serialization.NoEncryption()
-        elif self.encryption_level == "compatibility2022":
-            encryption = (
-                serialization.PrivateFormat.PKCS12.encryption_builder()
-                .kdf_rounds(self.iter_size)
-                .key_cert_algorithm(PBES.PBESv1SHA1And3KeyTripleDESCBC)
-                .hmac_hash(hashes.SHA1())
-                .build(to_bytes(self.passphrase))
-            )
-        else:
-            encryption = serialization.BestAvailableEncryption(
-                to_bytes(self.passphrase)
-            )
-
-        return serialize_key_and_certificates(
-            friendly_name,
-            pkey,
-            cert,
-            self.other_certificates,
-            encryption,
-        )
-
-    def parse_bytes(self, pkcs12_content: bytes) -> tuple[
-        bytes | None,
-        bytes | None,
-        list[bytes],
-        bytes | None,
-    ]:
-        try:
-            private_key, certificate, additional_certificates, friendly_name = (
-                parse_pkcs12(pkcs12_content, passphrase=self.passphrase)
-            )
-
-            pkey = None
-            if private_key is not None:
-                pkey = private_key.private_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PrivateFormat.TraditionalOpenSSL,
-                    encryption_algorithm=serialization.NoEncryption(),
-                )
-
-            crt = None
-            if certificate is not None:
-                crt = certificate.public_bytes(serialization.Encoding.PEM)
-
-            other_certs = []
-            if additional_certificates is not None:
-                other_certs = [
-                    other_cert.public_bytes(serialization.Encoding.PEM)
-                    for other_cert in additional_certificates
-                ]
-
-            return (pkey, crt, other_certs, friendly_name)
-        except ValueError as exc:
-            raise PkcsError(exc) from exc
-
-    def _dump_privatekey(self, pkcs12: PKCS12) -> bytes | None:
-        return (
-            pkcs12[0].private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            )
-            if pkcs12[0]
-            else None
-        )
-
-    def _dump_certificate(self, pkcs12: PKCS12) -> bytes | None:
-        return pkcs12[1].public_bytes(serialization.Encoding.PEM) if pkcs12[1] else None
-
-    def _dump_other_certificates(self, pkcs12: PKCS12) -> list[bytes]:
-        return [
-            other_cert.public_bytes(serialization.Encoding.PEM)
-            for other_cert in pkcs12[2]
-        ]
-
-    def _get_friendly_name(self, pkcs12: PKCS12) -> bytes | None:
-        return pkcs12[3]
-
-
 def select_backend(module: AnsibleModule) -> Pkcs:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PkcsCryptography(module)
+    return Pkcs(module)
 
 
 def main() -> t.NoReturn:

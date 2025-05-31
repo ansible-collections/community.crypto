@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import abc
 import traceback
 import typing as t
 
@@ -68,7 +67,7 @@ class PrivateKeyError(OpenSSLObjectError):
 #  - module.fail_json(msg: str, **kwargs)
 
 
-class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
+class PrivateKeyConvertBackend:
     def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
         self.src_path: str | None = module.params["src_path"]
@@ -87,61 +86,6 @@ class PrivateKeyConvertBackend(metaclass=abc.ABCMeta):
 
         self.dest_private_key: PrivateKeyTypes | None = None
         self.dest_private_key_bytes: bytes | None = None
-
-    @abc.abstractmethod
-    def get_private_key_data(self) -> bytes:
-        """Return bytes for self.src_private_key in output format."""
-
-    def set_existing_destination(self, *, privatekey_bytes: bytes | None) -> None:
-        """Set existing private key bytes. None indicates that the key does not exist."""
-        self.dest_private_key_bytes = privatekey_bytes
-
-    def has_existing_destination(self) -> bool:
-        """Query whether an existing private key is/has been there."""
-        return self.dest_private_key_bytes is not None
-
-    @abc.abstractmethod
-    def _load_private_key(
-        self,
-        *,
-        data: bytes,
-        passphrase: str | None,
-        current_hint: PrivateKeyTypes | None = None,
-    ) -> tuple[str, PrivateKeyTypes]:
-        """Check whether data can be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
-
-    def needs_conversion(self) -> bool:
-        """Check whether a conversion is necessary. Must only be called if needs_regeneration() returned False."""
-        dummy, self.src_private_key = self._load_private_key(
-            data=self.src_private_key_bytes, passphrase=self.src_passphrase
-        )
-
-        if not self.has_existing_destination():
-            return True
-        assert self.dest_private_key_bytes is not None
-
-        try:
-            key_format, self.dest_private_key = self._load_private_key(
-                data=self.dest_private_key_bytes,
-                passphrase=self.dest_passphrase,
-                current_hint=self.src_private_key,
-            )
-        except Exception:
-            return True
-
-        return key_format != self.format or not cryptography_compare_private_keys(
-            self.dest_private_key, self.src_private_key
-        )
-
-    def dump(self) -> dict[str, t.Any]:
-        """Serialize the object into a dictionary."""
-        return {}
-
-
-# Implementation with using cryptography
-class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
-    def __init__(self, *, module: AnsibleModule) -> None:
-        super().__init__(module=module)
 
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format"""
@@ -202,6 +146,14 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
                 exception=traceback.format_exc(),
             )
 
+    def set_existing_destination(self, *, privatekey_bytes: bytes | None) -> None:
+        """Set existing private key bytes. None indicates that the key does not exist."""
+        self.dest_private_key_bytes = privatekey_bytes
+
+    def has_existing_destination(self) -> bool:
+        """Query whether an existing private key is/has been there."""
+        return self.dest_private_key_bytes is not None
+
     def _load_private_key(
         self,
         *,
@@ -209,6 +161,7 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
         passphrase: str | None,
         current_hint: PrivateKeyTypes | None = None,
     ) -> tuple[str, PrivateKeyTypes]:
+        """Check whether data can be loaded as a private key with the provided passphrase. Return tuple (type, private_key)."""
         try:
             # Interpret bytes depending on format.
             key_format = identify_private_key_format(data)
@@ -275,12 +228,39 @@ class PrivateKeyConvertCryptographyBackend(PrivateKeyConvertBackend):
         except Exception as e:
             raise PrivateKeyError(e) from e
 
+    def needs_conversion(self) -> bool:
+        """Check whether a conversion is necessary. Must only be called if needs_regeneration() returned False."""
+        dummy, self.src_private_key = self._load_private_key(
+            data=self.src_private_key_bytes, passphrase=self.src_passphrase
+        )
+
+        if not self.has_existing_destination():
+            return True
+        assert self.dest_private_key_bytes is not None
+
+        try:
+            key_format, self.dest_private_key = self._load_private_key(
+                data=self.dest_private_key_bytes,
+                passphrase=self.dest_passphrase,
+                current_hint=self.src_private_key,
+            )
+        except Exception:
+            return True
+
+        return key_format != self.format or not cryptography_compare_private_keys(
+            self.dest_private_key, self.src_private_key
+        )
+
+    def dump(self) -> dict[str, t.Any]:
+        """Serialize the object into a dictionary."""
+        return {}
+
 
 def select_backend(module: AnsibleModule) -> PrivateKeyConvertBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PrivateKeyConvertCryptographyBackend(module=module)
+    return PrivateKeyConvertBackend(module=module)
 
 
 def get_privatekey_argument_spec() -> ArgumentSpec:
