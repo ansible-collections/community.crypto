@@ -85,6 +85,7 @@ class AcmeCertificateBackend(CertificateBackend):
             f.close()
             command.extend(["--csr", tmpsrc])
         else:
+            assert self.csr_path is not None
             command.extend(["--csr", self.csr_path])
         command.extend(["--acme-dir", self.challenge_path])
         command.extend(["--directory-url", self.acme_directory])

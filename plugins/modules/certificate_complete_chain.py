@@ -124,7 +124,7 @@ import os
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.crypto.plugins.module_utils._crypto.pem import (
     split_pem_list,
 )
@@ -229,7 +229,7 @@ def is_parent(
 def parse_pem_list(
     module: AnsibleModule,
     text: str,
-    source: str | os.PathLike,
+    source: bytes | str | os.PathLike,
     fail_on_error: bool = True,
 ) -> list[Certificate]:
     """
@@ -242,7 +242,7 @@ def parse_pem_list(
             cert = cryptography.x509.load_pem_x509_certificate(to_bytes(cert_pem))
             result.append(Certificate(cert_pem, cert))
         except Exception as e:
-            msg = f"Cannot parse certificate #{len(result) + 1} from {source}: {e}"
+            msg = f"Cannot parse certificate #{len(result) + 1} from {to_text(source)!r}: {e}"
             if fail_on_error:
                 module.fail_json(msg=msg)
             else:
@@ -251,7 +251,7 @@ def parse_pem_list(
 
 
 def load_pem_list(
-    module: AnsibleModule, path: str | os.PathLike, fail_on_error: bool = True
+    module: AnsibleModule, path: bytes | str | os.PathLike, fail_on_error: bool = True
 ) -> list[Certificate]:
     """
     Load concatenated PEM certificates from file. Return list of ``Certificate`` objects.
@@ -265,7 +265,7 @@ def load_pem_list(
                 fail_on_error=fail_on_error,
             )
     except Exception as e:
-        msg = f"Cannot read certificate file {path}: {e}"
+        msg = f"Cannot read certificate file {to_text(path)!r}: {e}"
         if fail_on_error:
             module.fail_json(msg=msg)
         else:
@@ -286,7 +286,7 @@ class CertificateSet:
         )
         self.certificate_by_cert: dict[cryptography.x509.Certificate, Certificate] = {}
 
-    def _load_file(self, path: str | os.PathLike) -> None:
+    def _load_file(self, path: bytes | str | os.PathLike) -> None:
         certs = load_pem_list(self.module, path, fail_on_error=False)
         for cert in certs:
             self.certificates.add(cert)
