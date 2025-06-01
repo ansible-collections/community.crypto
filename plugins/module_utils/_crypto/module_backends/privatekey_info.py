@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-import abc
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
@@ -207,7 +206,7 @@ class PrivateKeyParseError(OpenSSLObjectError):
         self.result = result
 
 
-class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
+class PrivateKeyInfoRetrieval:
     key: PrivateKeyTypes
 
     def __init__(
@@ -225,21 +224,28 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
         self.return_private_key_data = return_private_key_data
         self.check_consistency = check_consistency
 
-    @abc.abstractmethod
     def _get_public_key(self, *, binary: bool) -> bytes:
-        pass
+        return self.key.public_key().public_bytes(
+            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
 
-    @abc.abstractmethod
     def _get_key_info(
         self, *, need_private_key_data: bool = False
     ) -> tuple[str, dict[str, t.Any], dict[str, t.Any]]:
-        pass
+        return _get_cryptography_private_key_info(
+            self.key, need_private_key_data=need_private_key_data
+        )
 
-    @abc.abstractmethod
     def _is_key_consistent(
         self, *, key_public_data: dict[str, t.Any], key_private_data: dict[str, t.Any]
     ) -> bool | None:
-        pass
+        return _is_cryptography_key_consistent(
+            self.key,
+            key_public_data=key_public_data,
+            key_private_data=key_private_data,
+            warn_func=self.module.warn,
+        )
 
     def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {
@@ -288,38 +294,6 @@ class PrivateKeyInfoRetrieval(metaclass=abc.ABCMeta):
         return result
 
 
-class PrivateKeyInfoRetrievalCryptography(PrivateKeyInfoRetrieval):
-    """Validate the supplied private key, using the cryptography backend"""
-
-    def __init__(
-        self, *, module: GeneralAnsibleModule, content: bytes, **kwargs
-    ) -> None:
-        super().__init__(module=module, content=content, **kwargs)
-
-    def _get_public_key(self, *, binary: bool) -> bytes:
-        return self.key.public_key().public_bytes(
-            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo,
-        )
-
-    def _get_key_info(
-        self, *, need_private_key_data: bool = False
-    ) -> tuple[str, dict[str, t.Any], dict[str, t.Any]]:
-        return _get_cryptography_private_key_info(
-            self.key, need_private_key_data=need_private_key_data
-        )
-
-    def _is_key_consistent(
-        self, *, key_public_data: dict[str, t.Any], key_private_data: dict[str, t.Any]
-    ) -> bool | None:
-        return _is_cryptography_key_consistent(
-            self.key,
-            key_public_data=key_public_data,
-            key_private_data=key_private_data,
-            warn_func=self.module.warn,
-        )
-
-
 def get_privatekey_info(
     *,
     module: GeneralAnsibleModule,
@@ -328,7 +302,7 @@ def get_privatekey_info(
     return_private_key_data: bool = False,
     prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
-    info = PrivateKeyInfoRetrievalCryptography(
+    info = PrivateKeyInfoRetrieval(
         module=module,
         content=content,
         passphrase=passphrase,
@@ -348,7 +322,7 @@ def select_backend(
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PrivateKeyInfoRetrievalCryptography(
+    return PrivateKeyInfoRetrieval(
         module=module,
         content=content,
         passphrase=passphrase,

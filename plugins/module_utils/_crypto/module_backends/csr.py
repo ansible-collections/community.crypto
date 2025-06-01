@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-import abc
 import binascii
 import typing as t
 
@@ -86,7 +85,57 @@ class CertificateSigningRequestError(OpenSSLObjectError):
 #  - module.fail_json(msg: str, **kwargs)
 
 
-class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
+def parse_crl_distribution_points(
+    *, module: AnsibleModule, crl_distribution_points: list[dict[str, t.Any]]
+) -> list[cryptography.x509.DistributionPoint]:
+    result = []
+    for index, parse_crl_distribution_point in enumerate(crl_distribution_points):
+        try:
+            full_name = None
+            relative_name = None
+            crl_issuer = None
+            reasons = None
+            if parse_crl_distribution_point["full_name"] is not None:
+                if not parse_crl_distribution_point["full_name"]:
+                    raise OpenSSLObjectError("full_name must not be empty")
+                full_name = [
+                    cryptography_get_name(name, what="full name")
+                    for name in parse_crl_distribution_point["full_name"]
+                ]
+            if parse_crl_distribution_point["relative_name"] is not None:
+                if not parse_crl_distribution_point["relative_name"]:
+                    raise OpenSSLObjectError("relative_name must not be empty")
+                relative_name = cryptography_parse_relative_distinguished_name(
+                    parse_crl_distribution_point["relative_name"]
+                )
+            if parse_crl_distribution_point["crl_issuer"] is not None:
+                if not parse_crl_distribution_point["crl_issuer"]:
+                    raise OpenSSLObjectError("crl_issuer must not be empty")
+                crl_issuer = [
+                    cryptography_get_name(name, what="CRL issuer")
+                    for name in parse_crl_distribution_point["crl_issuer"]
+                ]
+            if parse_crl_distribution_point["reasons"] is not None:
+                reasons_list = []
+                for reason in parse_crl_distribution_point["reasons"]:
+                    reasons_list.append(REVOCATION_REASON_MAP[reason])
+                reasons = frozenset(reasons_list)
+            result.append(
+                cryptography.x509.DistributionPoint(
+                    full_name=full_name,
+                    relative_name=relative_name,
+                    crl_issuer=crl_issuer,
+                    reasons=reasons,
+                )
+            )
+        except (OpenSSLObjectError, ValueError) as e:
+            raise OpenSSLObjectError(
+                f"Error while parsing CRL distribution point #{index}: {e}"
+            ) from e
+    return result
+
+
+class CertificateSigningRequestBackend:
     def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
         self.digest: str = module.params["digest"]
@@ -214,6 +263,14 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
         self.diff_before = self._get_info(data=None)
         self.diff_after = self._get_info(data=None)
 
+        crl_distribution_points: list[dict[str, t.Any]] | None = module.params[
+            "crl_distribution_points"
+        ]
+        if crl_distribution_points:
+            self.crl_distribution_points = parse_crl_distribution_points(
+                module=module, crl_distribution_points=crl_distribution_points
+            )
+
     def _get_info(self, *, data: bytes | None) -> dict[str, t.Any]:
         if data is None:
             return {}
@@ -228,147 +285,6 @@ class CertificateSigningRequestBackend(metaclass=abc.ABCMeta):
             return result
         except Exception:
             return {"can_parse_csr": False}
-
-    @abc.abstractmethod
-    def generate_csr(self) -> None:
-        """(Re-)Generate CSR."""
-
-    @abc.abstractmethod
-    def get_csr_data(self) -> bytes:
-        """Return bytes for self.csr."""
-
-    def set_existing(self, *, csr_bytes: bytes | None) -> None:
-        """Set existing CSR bytes. None indicates that the CSR does not exist."""
-        self.existing_csr_bytes = csr_bytes
-        self.diff_after = self.diff_before = self._get_info(
-            data=self.existing_csr_bytes
-        )
-
-    def has_existing(self) -> bool:
-        """Query whether an existing CSR is/has been there."""
-        return self.existing_csr_bytes is not None
-
-    def _ensure_private_key_loaded(self) -> None:
-        """Load the provided private key into self.privatekey."""
-        if self.privatekey is not None:
-            return
-        try:
-            self.privatekey = load_certificate_issuer_privatekey(
-                path=self.privatekey_path,
-                content=self.privatekey_content,
-                passphrase=self.privatekey_passphrase,
-            )
-        except OpenSSLBadPassphraseError as exc:
-            raise CertificateSigningRequestError(exc) from exc
-
-    @abc.abstractmethod
-    def _check_csr(self) -> bool:
-        """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
-
-    def needs_regeneration(self) -> bool:
-        """Check whether a regeneration is necessary."""
-        if self.existing_csr_bytes is None:
-            return True
-        try:
-            self.existing_csr = load_certificate_request(
-                content=self.existing_csr_bytes,
-            )
-        except Exception:
-            return True
-        self._ensure_private_key_loaded()
-        return not self._check_csr()
-
-    def dump(self, *, include_csr: bool) -> dict[str, t.Any]:
-        """Serialize the object into a dictionary."""
-        result: dict[str, t.Any] = {
-            "privatekey": self.privatekey_path,
-            "subject": self.subject,
-            "subjectAltName": self.subject_alt_name,
-            "keyUsage": self.key_usage,
-            "extendedKeyUsage": self.extended_key_usage,
-            "basicConstraints": self.basic_constraints,
-            "ocspMustStaple": self.ocsp_must_staple,
-            "name_constraints_permitted": self.name_constraints_permitted,
-            "name_constraints_excluded": self.name_constraints_excluded,
-        }
-        # Get hold of CSR bytes
-        csr_bytes = self.existing_csr_bytes
-        if self.csr is not None:
-            csr_bytes = self.get_csr_data()
-        self.diff_after = self._get_info(data=csr_bytes)
-        if include_csr:
-            # Store result
-            result["csr"] = csr_bytes.decode("utf-8") if csr_bytes else None
-
-        result["diff"] = {
-            "before": self.diff_before,
-            "after": self.diff_after,
-        }
-        return result
-
-
-def parse_crl_distribution_points(
-    *, module: AnsibleModule, crl_distribution_points: list[dict[str, t.Any]]
-) -> list[cryptography.x509.DistributionPoint]:
-    result = []
-    for index, parse_crl_distribution_point in enumerate(crl_distribution_points):
-        try:
-            full_name = None
-            relative_name = None
-            crl_issuer = None
-            reasons = None
-            if parse_crl_distribution_point["full_name"] is not None:
-                if not parse_crl_distribution_point["full_name"]:
-                    raise OpenSSLObjectError("full_name must not be empty")
-                full_name = [
-                    cryptography_get_name(name, what="full name")
-                    for name in parse_crl_distribution_point["full_name"]
-                ]
-            if parse_crl_distribution_point["relative_name"] is not None:
-                if not parse_crl_distribution_point["relative_name"]:
-                    raise OpenSSLObjectError("relative_name must not be empty")
-                relative_name = cryptography_parse_relative_distinguished_name(
-                    parse_crl_distribution_point["relative_name"]
-                )
-            if parse_crl_distribution_point["crl_issuer"] is not None:
-                if not parse_crl_distribution_point["crl_issuer"]:
-                    raise OpenSSLObjectError("crl_issuer must not be empty")
-                crl_issuer = [
-                    cryptography_get_name(name, what="CRL issuer")
-                    for name in parse_crl_distribution_point["crl_issuer"]
-                ]
-            if parse_crl_distribution_point["reasons"] is not None:
-                reasons_list = []
-                for reason in parse_crl_distribution_point["reasons"]:
-                    reasons_list.append(REVOCATION_REASON_MAP[reason])
-                reasons = frozenset(reasons_list)
-            result.append(
-                cryptography.x509.DistributionPoint(
-                    full_name=full_name,
-                    relative_name=relative_name,
-                    crl_issuer=crl_issuer,
-                    reasons=reasons,
-                )
-            )
-        except (OpenSSLObjectError, ValueError) as e:
-            raise OpenSSLObjectError(
-                f"Error while parsing CRL distribution point #{index}: {e}"
-            ) from e
-    return result
-
-
-# Implementation with using cryptography
-class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBackend):
-    def __init__(self, *, module: AnsibleModule) -> None:
-        super().__init__(module=module)
-
-        crl_distribution_points: list[dict[str, t.Any]] | None = module.params[
-            "crl_distribution_points"
-        ]
-        if crl_distribution_points:
-            self.crl_distribution_points = parse_crl_distribution_points(
-                module=module, crl_distribution_points=crl_distribution_points
-            )
 
     def generate_csr(self) -> None:
         """(Re-)Generate CSR."""
@@ -541,6 +457,30 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
         return self.csr.public_bytes(
             cryptography.hazmat.primitives.serialization.Encoding.PEM
         )
+
+    def set_existing(self, *, csr_bytes: bytes | None) -> None:
+        """Set existing CSR bytes. None indicates that the CSR does not exist."""
+        self.existing_csr_bytes = csr_bytes
+        self.diff_after = self.diff_before = self._get_info(
+            data=self.existing_csr_bytes
+        )
+
+    def has_existing(self) -> bool:
+        """Query whether an existing CSR is/has been there."""
+        return self.existing_csr_bytes is not None
+
+    def _ensure_private_key_loaded(self) -> None:
+        """Load the provided private key into self.privatekey."""
+        if self.privatekey is not None:
+            return
+        try:
+            self.privatekey = load_certificate_issuer_privatekey(
+                path=self.privatekey_path,
+                content=self.privatekey_content,
+                passphrase=self.privatekey_passphrase,
+            )
+        except OpenSSLBadPassphraseError as exc:
+            raise CertificateSigningRequestError(exc) from exc
 
     def _check_csr(self) -> bool:
         """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
@@ -795,14 +735,55 @@ class CertificateSigningRequestCryptographyBackend(CertificateSigningRequestBack
             and _check_signature(self.existing_csr)
         )
 
+    def needs_regeneration(self) -> bool:
+        """Check whether a regeneration is necessary."""
+        if self.existing_csr_bytes is None:
+            return True
+        try:
+            self.existing_csr = load_certificate_request(
+                content=self.existing_csr_bytes,
+            )
+        except Exception:
+            return True
+        self._ensure_private_key_loaded()
+        return not self._check_csr()
+
+    def dump(self, *, include_csr: bool) -> dict[str, t.Any]:
+        """Serialize the object into a dictionary."""
+        result: dict[str, t.Any] = {
+            "privatekey": self.privatekey_path,
+            "subject": self.subject,
+            "subjectAltName": self.subject_alt_name,
+            "keyUsage": self.key_usage,
+            "extendedKeyUsage": self.extended_key_usage,
+            "basicConstraints": self.basic_constraints,
+            "ocspMustStaple": self.ocsp_must_staple,
+            "name_constraints_permitted": self.name_constraints_permitted,
+            "name_constraints_excluded": self.name_constraints_excluded,
+        }
+        # Get hold of CSR bytes
+        csr_bytes = self.existing_csr_bytes
+        if self.csr is not None:
+            csr_bytes = self.get_csr_data()
+        self.diff_after = self._get_info(data=csr_bytes)
+        if include_csr:
+            # Store result
+            result["csr"] = csr_bytes.decode("utf-8") if csr_bytes else None
+
+        result["diff"] = {
+            "before": self.diff_before,
+            "after": self.diff_after,
+        }
+        return result
+
 
 def select_backend(
     module: AnsibleModule,
-) -> CertificateSigningRequestCryptographyBackend:
+) -> CertificateSigningRequestBackend:
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return CertificateSigningRequestCryptographyBackend(module=module)
+    return CertificateSigningRequestBackend(module=module)
 
 
 def get_csr_argument_spec() -> ArgumentSpec:

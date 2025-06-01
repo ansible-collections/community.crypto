@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import abc
 import typing as t
 
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
@@ -105,7 +104,7 @@ class PublicKeyParseError(OpenSSLObjectError):
         self.result = result
 
 
-class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
+class PublicKeyInfoRetrieval:
     def __init__(
         self,
         *,
@@ -118,13 +117,18 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
         self.content = content
         self.key = key
 
-    @abc.abstractmethod
     def _get_public_key(self, binary: bool) -> bytes:
-        pass
+        if self.key is None:
+            raise AssertionError("key must be set")
+        return self.key.public_bytes(
+            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
 
-    @abc.abstractmethod
     def _get_key_info(self) -> tuple[str, dict[str, t.Any]]:
-        pass
+        if self.key is None:
+            raise AssertionError("key must be set")
+        return _get_cryptography_public_key_info(self.key)
 
     def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {}
@@ -147,32 +151,6 @@ class PublicKeyInfoRetrieval(metaclass=abc.ABCMeta):
         return result
 
 
-class PublicKeyInfoRetrievalCryptography(PublicKeyInfoRetrieval):
-    """Validate the supplied public key, using the cryptography backend"""
-
-    def __init__(
-        self,
-        *,
-        module: GeneralAnsibleModule,
-        content: bytes | None = None,
-        key: PublicKeyTypes | None = None,
-    ) -> None:
-        super().__init__(module=module, content=content, key=key)
-
-    def _get_public_key(self, binary: bool) -> bytes:
-        if self.key is None:
-            raise AssertionError("key must be set")
-        return self.key.public_bytes(
-            serialization.Encoding.DER if binary else serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo,
-        )
-
-    def _get_key_info(self) -> tuple[str, dict[str, t.Any]]:
-        if self.key is None:
-            raise AssertionError("key must be set")
-        return _get_cryptography_public_key_info(self.key)
-
-
 def get_publickey_info(
     *,
     module: GeneralAnsibleModule,
@@ -180,7 +158,7 @@ def get_publickey_info(
     key: PublicKeyTypes | None = None,
     prefer_one_fingerprint: bool = False,
 ) -> dict[str, t.Any]:
-    info = PublicKeyInfoRetrievalCryptography(module=module, content=content, key=key)
+    info = PublicKeyInfoRetrieval(module=module, content=content, key=key)
     return info.get_info(prefer_one_fingerprint=prefer_one_fingerprint)
 
 
@@ -193,7 +171,7 @@ def select_backend(
     assert_required_cryptography_version(
         module, minimum_cryptography_version=MINIMAL_CRYPTOGRAPHY_VERSION
     )
-    return PublicKeyInfoRetrievalCryptography(module=module, content=content, key=key)
+    return PublicKeyInfoRetrieval(module=module, content=content, key=key)
 
 
 __all__ = (
