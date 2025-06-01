@@ -1,5 +1,6 @@
 meta/runtime.yml runtime-metadata  # Bug in ansible-test: https://github.com/ansible/ansible/pull/85198
 plugins/module_utils/_crypto/module_backends/certificate.py no-assert
+plugins/module_utils/_crypto/module_backends/certificate_acme.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_ownca.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_selfsigned.py no-assert
 plugins/module_utils/_crypto/module_backends/csr.py no-assert

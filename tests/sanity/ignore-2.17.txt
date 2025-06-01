@@ -6,6 +6,7 @@ plugins/module_utils/_acme/backend_openssl_cli.py pep8:E704
 plugins/module_utils/_acme/certificate.py pep8:E704
 plugins/module_utils/_crypto/cryptography_support.py pep8:E704
 plugins/module_utils/_crypto/module_backends/certificate.py no-assert
+plugins/module_utils/_crypto/module_backends/certificate_acme.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_ownca.py no-assert
 plugins/module_utils/_crypto/module_backends/certificate_selfsigned.py no-assert
 plugins/module_utils/_crypto/module_backends/csr.py no-assert

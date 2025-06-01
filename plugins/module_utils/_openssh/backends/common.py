@@ -45,7 +45,8 @@ def restore_on_failure(
             if backup_file is not None:
                 module.atomic_move(os.path.abspath(backup_file), os.path.abspath(path))
             raise
-        module.add_cleanup_file(backup_file)
+        if backup_file is not None:
+            module.add_cleanup_file(backup_file)
 
     return backup_and_restore
 

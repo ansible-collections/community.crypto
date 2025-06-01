@@ -34,7 +34,7 @@ def read_file(fn: str | os.PathLike) -> bytes:
 
 # This function was adapted from an earlier version of https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/uri.py
 def write_file(
-    *, module: AnsibleModule, dest: str | os.PathLike, content: bytes
+    *, module: AnsibleModule, dest: str | os.PathLike[str], content: bytes
 ) -> bool:
     """
     Write content to destination file dest, only if the content
@@ -79,7 +79,7 @@ def write_file(
         if not os.access(dest, os.R_OK):
             os.remove(tmpsrc)
             raise ModuleFailException(f"Destination {dest} not readable")
-        checksum_dest = module.sha1(dest)
+        checksum_dest = module.sha1(str(dest))
     else:
         dirname = os.path.dirname(dest) or "."
         if not os.access(dirname, os.W_OK):

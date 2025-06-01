@@ -313,6 +313,8 @@ class OpenSSLCLIBackend(CryptoBackend):
             f"-{key_data['hash']}",
         ] + cmd_postfix
 
+        out: bytes | str
+
         rc, out, err = self.module.run_command(
             openssl_sign_cmd,
             data=sign_payload,
@@ -326,7 +328,7 @@ class OpenSSLCLIBackend(CryptoBackend):
             )
 
         if key_data["type"] == "ec":
-            dummy, der_out, dummy = self.module.run_command(
+            dummy, der_out, dummy2 = self.module.run_command(
                 [self.openssl_binary, "asn1parse", "-inform", "DER"],
                 data=out,
                 binary_data=True,

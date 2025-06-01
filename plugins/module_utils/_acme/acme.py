@@ -285,11 +285,41 @@ class ACMEClient:
             key_file=key_file, key_content=key_content, passphrase=passphrase
         )
 
+    @t.overload
     def sign_request(
         self,
         *,
         protected: dict[str, t.Any],
-        payload: str | dict[str, t.Any] | None,
+        payload: dict[str, t.Any] | None,
+        key_data: dict[str, t.Any],
+        encode_payload: t.Literal[True] = True,
+    ) -> dict[str, t.Any]: ...
+
+    @t.overload
+    def sign_request(
+        self,
+        *,
+        protected: dict[str, t.Any],
+        payload: str | bytes | None,
+        key_data: dict[str, t.Any],
+        encode_payload: t.Literal[False],
+    ) -> dict[str, t.Any]: ...
+
+    @t.overload
+    def sign_request(
+        self,
+        *,
+        protected: dict[str, t.Any],
+        payload: str | bytes | dict[str, t.Any] | None,
+        key_data: dict[str, t.Any],
+        encode_payload: bool = True,
+    ) -> dict[str, t.Any]: ...
+
+    def sign_request(
+        self,
+        *,
+        protected: dict[str, t.Any],
+        payload: str | bytes | dict[str, t.Any] | None,
         key_data: dict[str, t.Any],
         encode_payload: bool = True,
     ) -> dict[str, t.Any]:
@@ -334,12 +364,12 @@ class ACMEClient:
     def send_signed_request(
         self,
         url: str,
-        payload: str | dict[str, t.Any] | None,
+        payload: dict[str, t.Any] | None,
         *,
         key_data: dict[str, t.Any] | None = None,
         jws_header: dict[str, t.Any] | None = None,
         parse_json_result: t.Literal[True] = True,
-        encode_payload: bool = True,
+        encode_payload: t.Literal[True] = True,
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
@@ -349,12 +379,42 @@ class ACMEClient:
     def send_signed_request(
         self,
         url: str,
-        payload: str | dict[str, t.Any] | None,
+        payload: str | bytes | None,
+        *,
+        key_data: dict[str, t.Any] | None = None,
+        jws_header: dict[str, t.Any] | None = None,
+        parse_json_result: t.Literal[True] = True,
+        encode_payload: t.Literal[False],
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]: ...
+
+    @t.overload
+    def send_signed_request(
+        self,
+        url: str,
+        payload: dict[str, t.Any] | None,
         *,
         key_data: dict[str, t.Any] | None = None,
         jws_header: dict[str, t.Any] | None = None,
         parse_json_result: t.Literal[False],
-        encode_payload: bool = True,
+        encode_payload: t.Literal[True] = True,
+        fail_on_error: bool = True,
+        error_msg: str | None = None,
+        expected_status_codes: t.Iterable[int] | None = None,
+    ) -> tuple[bytes, dict[str, t.Any]]: ...
+
+    @t.overload
+    def send_signed_request(
+        self,
+        url: str,
+        payload: str | bytes | None,
+        *,
+        key_data: dict[str, t.Any] | None = None,
+        jws_header: dict[str, t.Any] | None = None,
+        parse_json_result: t.Literal[False],
+        encode_payload: t.Literal[False],
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
@@ -363,7 +423,7 @@ class ACMEClient:
     def send_signed_request(
         self,
         url: str,
-        payload: str | dict[str, t.Any] | None,
+        payload: str | bytes | dict[str, t.Any] | None,
         *,
         key_data: dict[str, t.Any] | None = None,
         jws_header: dict[str, t.Any] | None = None,
@@ -404,7 +464,7 @@ class ACMEClient:
                 encode_payload=encode_payload,
             )
             self._log("signed request", data=data)
-            data = self.module.jsonify(data)
+            data_str = self.module.jsonify(data)
 
             headers = {
                 "Content-Type": "application/jose+json",
@@ -412,7 +472,7 @@ class ACMEClient:
             resp, info = fetch_url(
                 self.module,
                 url,
-                data=data,
+                data=data_str,
                 headers=headers,
                 method="POST",
                 timeout=self.request_timeout,
