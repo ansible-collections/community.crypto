@@ -41,6 +41,9 @@ no_unwanted_files_module_extensions = [".py"]
 no_unwanted_files_yaml_extensions = [".yml"]
 run_action_groups = true
 run_no_trailing_whitespace = true
+no_trailing_whitespace_skip_paths = [
+    "tests/integration/targets/luks_device/files/keyfile3",
+]
 no_trailing_whitespace_skip_directories = [
     "tests/unit/plugins/module_utils/_acme/fixtures/",
 ]
