@@ -215,6 +215,7 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.acme import
     create_default_argspec,
 )
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
+    ACMEProtocolException,
     ModuleFailException,
 )
 from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
@@ -239,6 +240,13 @@ def get_orders_list(
         res, info = client.get_request(
             next_orders_url, parse_json_result=True, fail_on_error=True
         )
+        if not isinstance(res, dict):
+            raise ACMEProtocolException(
+                module=module,
+                msg="Unexpected account information",
+                info=info,
+                content_json=res,
+            )
         if not res.get("orders"):
             if orders:
                 module.warn(
@@ -267,7 +275,17 @@ def get_order(client: ACMEClient, order_url: str) -> dict[str, t.Any]:
     """
     Retrieve order data.
     """
-    return client.get_request(order_url, parse_json_result=True, fail_on_error=True)[0]
+    result, info = client.get_request(
+        order_url, parse_json_result=True, fail_on_error=True
+    )
+    if not isinstance(result, dict):
+        raise ACMEProtocolException(
+            module=client.module,
+            msg="Unexpected order data",
+            info=info,
+            content_json=result,
+        )
+    return result
 
 
 def main() -> t.NoReturn:

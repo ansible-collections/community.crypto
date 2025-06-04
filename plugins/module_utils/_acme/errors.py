@@ -72,7 +72,7 @@ class ACMEProtocolException(ModuleFailException):
         info: dict[str, t.Any] | None = None,
         response=None,
         content: bytes | None = None,
-        content_json: dict[str, t.Any] | bytes | None = None,
+        content_json: object | bytes | None = None,
         extras: dict[str, t.Any] | None = None,
     ):
         # Try to get hold of content, if response is given and content is not provided
@@ -99,7 +99,9 @@ class ACMEProtocolException(ModuleFailException):
         # Try to get hold of JSON decoded content, when content is given and JSON not provided
         if content_json_json is None and content is not None and module is not None:
             try:
-                content_json_json = module.from_json(to_text(content))
+                cjj = module.from_json(to_text(content))
+                if isinstance(cjj, dict):
+                    content_json_json = cjj
             except Exception:
                 pass
 
