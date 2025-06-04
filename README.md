@@ -43,7 +43,7 @@ Tested with the current ansible-core-2.17, ansible-core 2.18, and ansible-core 2
 
 ## External requirements
 
-The exact requirements for every module are listed in the module documentation. 
+The exact requirements for every module are listed in the module documentation.
 
 Most modules require a recent enough version of [the Python cryptography library](https://pypi.org/project/cryptography/); the minimum supported version by this collection is 3.3. See the module documentations for the minimal version supported for each module.
 
