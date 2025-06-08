@@ -146,7 +146,15 @@ class ACMEDirectory:
         self.directory_root = module.params["acme_directory"]
         self.version = module.params["acme_version"]
 
-        self.directory, dummy = client.get_request(self.directory_root, get_only=True)
+        directory, info = client.get_request(self.directory_root, get_only=True)
+        if not isinstance(directory, dict):
+            raise ACMEProtocolException(
+                module=module,
+                msg=f"ACME directory is not a dictionary, but {type(directory)}",
+                info=info,
+                content_json=directory,
+            )
+        self.directory = directory
 
         self.request_timeout = module.params["request_timeout"]
 
@@ -373,7 +381,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]: ...
+    ) -> tuple[object | bytes, dict[str, t.Any]]: ...
 
     @t.overload
     def send_signed_request(
@@ -388,7 +396,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]: ...
+    ) -> tuple[object | bytes, dict[str, t.Any]]: ...
 
     @t.overload
     def send_signed_request(
@@ -432,7 +440,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]:
+    ) -> tuple[object | bytes, dict[str, t.Any]]:
         """
         Sends a JWS signed HTTP POST request to the ACME server and returns
         the response as dictionary (if parse_json_result is True) or in raw form
@@ -483,7 +491,7 @@ class ACMEClient:
                 failed_tries += 1
                 continue
             _assert_fetch_url_success(module=self.module, response=resp, info=info)
-            result = {}
+            result: object | bytes = {}
 
             try:
                 # In Python 2, reading from a closed response yields a TypeError.
@@ -504,13 +512,12 @@ class ACMEClient:
                         self._log("parsed result", data=decoded_result)
                         # In case of badNonce error, try again (up to 5 times)
                         # (https://tools.ietf.org/html/rfc8555#section-6.7)
-                        if all(
-                            (
-                                400 <= info["status"] < 600,
-                                decoded_result.get("type")
-                                == "urn:ietf:params:acme:error:badNonce",
-                                failed_tries <= 5,
-                            )
+                        if (
+                            400 <= info["status"] < 600
+                            and failed_tries <= 5
+                            and isinstance(decoded_result, dict)
+                            and decoded_result.get("type")
+                            == "urn:ietf:params:acme:error:badNonce"
                         ):
                             failed_tries += 1
                             continue
@@ -548,7 +555,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any], dict[str, t.Any]]: ...
+    ) -> tuple[object, dict[str, t.Any]]: ...
 
     @t.overload
     def get_request(
@@ -573,7 +580,7 @@ class ACMEClient:
         fail_on_error: bool = True,
         error_msg: str | None = None,
         expected_status_codes: t.Iterable[int] | None = None,
-    ) -> tuple[dict[str, t.Any] | bytes, dict[str, t.Any]]:
+    ) -> tuple[object | bytes, dict[str, t.Any]]:
         """
         Perform a GET-like request. Will try POST-as-GET for ACMEv2, with fallback
         to GET if server replies with a status code of 405.
@@ -623,7 +630,7 @@ class ACMEClient:
 
         # Process result
         parsed_json_result = False
-        result: dict[str, t.Any] | bytes
+        result: object | bytes
         if parse_json_result:
             result = {}
             if content:
@@ -681,6 +688,13 @@ class ACMEClient:
         data, info = self.get_request(
             url, parse_json_result=True, fail_on_error=True, get_only=True
         )
+        if not isinstance(data, dict):
+            raise ACMEProtocolException(
+                module=self.module,
+                msg="Unexpected renewal information",
+                info=info,
+                content_json=data,
+            )
 
         # Include Retry-After header if asked for
         if include_retry_after and "retry-after" in info:

@@ -173,7 +173,14 @@ class Order:
                 raise
 
     def refresh(self, *, client: ACMEClient) -> bool:
-        result, dummy = client.get_request(self.url)
+        result, info = client.get_request(self.url)
+        if not isinstance(result, dict):
+            raise ACMEProtocolException(
+                module=client.module,
+                msg="Unexpected authorization data",
+                info=info,
+                content_json=result,
+            )
         changed = self.data != result
         self._setup(client=client, data=result)
         return changed
