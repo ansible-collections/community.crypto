@@ -206,7 +206,7 @@ def main() -> t.NoReturn:
         "supports_ari": False,
     }
 
-    def complete(should_renew: bool, **kwargs) -> t.NoReturn:
+    def complete(should_renew: bool, **kwargs: t.Any) -> t.NoReturn:
         result["should_renew"] = should_renew
         result.update(kwargs)
         module.exit_json(**result)

@@ -132,12 +132,24 @@ class CryptoBackend(metaclass=abc.ABCMeta):
             start + percentage * (end - start), with_timezone=self._with_timezone
         )
 
-    def get_utc_datetime(self, *args, **kwargs) -> datetime.datetime:
-        kwargs_ext: dict[str, t.Any] = dict(kwargs)
-        if self._with_timezone and ("tzinfo" not in kwargs_ext and len(args) < 8):
-            kwargs_ext["tzinfo"] = UTC
-        result = datetime.datetime(*args, **kwargs_ext)
-        if self._with_timezone and ("tzinfo" in kwargs or len(args) >= 8):
+    def get_utc_datetime(
+        self,
+        year: int,
+        month: int,
+        day: int,
+        hour: int = 0,
+        minute: int = 0,
+        second: int = 0,
+        microsecond: int = 0,
+        tzinfo: datetime.timezone | None = None,
+    ) -> datetime.datetime:
+        has_tzinfo = tzinfo is not None
+        if self._with_timezone and not has_tzinfo:
+            tzinfo = UTC
+        result = datetime.datetime(
+            year, month, day, hour, minute, second, microsecond, tzinfo
+        )
+        if self._with_timezone and has_tzinfo:
             result = ensure_utc_timezone(result)
         return result
 

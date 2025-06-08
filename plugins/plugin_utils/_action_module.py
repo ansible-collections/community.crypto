@@ -203,13 +203,13 @@ class AnsibleActionModule:
         kwargs = remove_values(kwargs, self.no_log_values)
         raise _ModuleExitException(kwargs)
 
-    def exit_json(self, **kwargs) -> t.NoReturn:
+    def exit_json(self, **kwargs: t.Any) -> t.NoReturn:
         result = dict(kwargs)
         if "failed" not in result:
             result["failed"] = False
         self._return_formatted(result)
 
-    def fail_json(self, msg: str, **kwargs) -> t.NoReturn:
+    def fail_json(self, msg: str, **kwargs: t.Any) -> t.NoReturn:
         result = dict(kwargs)
         result["failed"] = True
         result["msg"] = msg
@@ -226,7 +226,9 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
         """Run module code"""
         module.fail_json(msg="Not implemented.")
 
-    def run(self, tmp=None, task_vars=None) -> dict[str, t.Any]:
+    def run(
+        self, tmp: None = None, task_vars: dict[str, t.Any] | None = None
+    ) -> dict[str, t.Any]:
         if task_vars is None:
             task_vars = {}
 

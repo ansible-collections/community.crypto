@@ -45,7 +45,7 @@ class ArgumentSpec:
         self.required_if = _ensure_list(required_if)
         self.required_by = required_by or {}
 
-    def update_argspec(self, **kwargs) -> t.Self:
+    def update_argspec(self, **kwargs: t.Any) -> t.Self:
         self.argument_spec.update(kwargs)
         return self
 
@@ -63,7 +63,7 @@ class ArgumentSpec:
             | None
         ) = None,
         required_by: dict[str, tuple[str, ...] | list[str]] | None = None,
-    ):
+    ) -> t.Self:
         if mutually_exclusive:
             self.mutually_exclusive.extend(mutually_exclusive)
         if required_together:

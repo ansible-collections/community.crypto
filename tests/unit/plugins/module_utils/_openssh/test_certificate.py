@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import pathlib
+
 import pytest
 from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (
     OpensshCertificate,
@@ -303,9 +305,9 @@ INVALID_OPTIONS: list[str | list] = [
 ]
 
 
-def test_rsa_certificate(tmpdir) -> None:
-    cert_file = tmpdir / "id_rsa-cert.pub"
-    cert_file.write(RSA_CERT_SIGNED_BY_DSA, mode="wb")
+def test_rsa_certificate(tmp_path: pathlib.Path) -> None:
+    cert_file = tmp_path / "id_rsa-cert.pub"
+    cert_file.write_bytes(RSA_CERT_SIGNED_BY_DSA)
 
     cert = OpensshCertificate.load(str(cert_file))
     assert cert.key_id == "test"
@@ -315,9 +317,9 @@ def test_rsa_certificate(tmpdir) -> None:
     assert cert.signing_key == DSA_FINGERPRINT
 
 
-def test_dsa_certificate(tmpdir) -> None:
-    cert_file = tmpdir / "id_dsa-cert.pub"
-    cert_file.write(DSA_CERT_SIGNED_BY_ECDSA_NO_OPTS)
+def test_dsa_certificate(tmp_path: pathlib.Path) -> None:
+    cert_file = tmp_path / "id_dsa-cert.pub"
+    cert_file.write_bytes(DSA_CERT_SIGNED_BY_ECDSA_NO_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
 
@@ -328,9 +330,9 @@ def test_dsa_certificate(tmpdir) -> None:
     assert cert.extensions == []
 
 
-def test_ecdsa_certificate(tmpdir) -> None:
-    cert_file = tmpdir / "id_ecdsa-cert.pub"
-    cert_file.write(ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS)
+def test_ecdsa_certificate(tmp_path: pathlib.Path) -> None:
+    cert_file = tmp_path / "id_ecdsa-cert.pub"
+    cert_file.write_bytes(ECDSA_CERT_SIGNED_BY_ED25519_VALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
     assert cert.type_string == "ecdsa-sha2-nistp256-cert-v01@openssh.com"
@@ -340,9 +342,9 @@ def test_ecdsa_certificate(tmpdir) -> None:
     assert cert.extensions == VALID_EXTENSIONS
 
 
-def test_ed25519_certificate(tmpdir) -> None:
-    cert_file = tmpdir / "id_ed25519-cert.pub"
-    cert_file.write(ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS)
+def test_ed25519_certificate(tmp_path: pathlib.Path) -> None:
+    cert_file = tmp_path / "id_ed25519-cert.pub"
+    cert_file.write_bytes(ED25519_CERT_SIGNED_BY_RSA_INVALID_OPTS)
 
     cert = OpensshCertificate.load(str(cert_file))
     assert cert.type_string == "ssh-ed25519-cert-v01@openssh.com"
@@ -352,10 +354,10 @@ def test_ed25519_certificate(tmpdir) -> None:
     assert cert.extensions == INVALID_EXTENSIONS
 
 
-def test_invalid_data(tmpdir) -> None:
+def test_invalid_data(tmp_path: pathlib.Path) -> None:
     result = False
-    cert_file = tmpdir / "invalid-cert.pub"
-    cert_file.write(INVALID_DATA)
+    cert_file = tmp_path / "invalid-cert.pub"
+    cert_file.write_bytes(INVALID_DATA)
 
     try:
         OpensshCertificate.load(str(cert_file))

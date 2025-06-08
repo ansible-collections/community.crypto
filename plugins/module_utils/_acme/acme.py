@@ -49,7 +49,9 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
+    import http.client
     import os
+    import urllib.error
 
     from ansible.module_utils.basic import AnsibleModule
     from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
@@ -68,7 +70,11 @@ RETRY_COUNT = 10
 
 
 def _decode_retry(
-    *, module: AnsibleModule, response: t.Any, info: dict[str, t.Any], retry_count: int
+    *,
+    module: AnsibleModule,
+    response: urllib.error.HTTPError | http.client.HTTPResponse | None,
+    info: dict[str, t.Any],
+    retry_count: int,
 ) -> bool:
     if info["status"] not in RETRY_STATUS_CODES:
         return False
@@ -102,7 +108,7 @@ def _decode_retry(
 def _assert_fetch_url_success(
     *,
     module: AnsibleModule,
-    response: t.Any,
+    response: urllib.error.HTTPError | http.client.HTTPResponse | None,
     info: dict[str, t.Any],
     allow_redirect: bool = False,
     allow_client_error: bool = True,

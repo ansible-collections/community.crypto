@@ -35,7 +35,10 @@ def restore_on_failure(
     f: t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None],
 ) -> t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None]:
     def backup_and_restore(
-        module: AnsibleModule, path: str | os.PathLike, *args, **kwargs
+        module: AnsibleModule,
+        path: str | os.PathLike,
+        *args: Param.args,
+        **kwargs: Param.kwargs,
     ) -> None:
         backup_file = module.backup_local(path) if os.path.exists(path) else None
 
@@ -74,8 +77,8 @@ def _restore_all_on_failure(
     def backup_and_restore(
         self: OpensshModule,
         sources_and_destinations: list[tuple[str | os.PathLike, str | os.PathLike]],
-        *args,
-        **kwargs,
+        *args: Param.args,
+        **kwargs: Param.kwargs,
     ) -> None:
         backups = [
             (d, self.module.backup_local(d))
@@ -95,6 +98,9 @@ def _restore_all_on_failure(
             self.module.add_cleanup_file(backup)
 
     return backup_and_restore
+
+
+_OpensshModule = t.TypeVar("_OpensshModule", bound="OpensshModule")
 
 
 class OpensshModule(metaclass=abc.ABCMeta):
@@ -141,16 +147,24 @@ class OpensshModule(metaclass=abc.ABCMeta):
         pass
 
     @staticmethod
-    def skip_if_check_mode(f: t.Callable[Param, None]) -> t.Callable[Param, None]:
-        def wrapper(self, *args, **kwargs) -> None:
+    def skip_if_check_mode(
+        f: t.Callable[t.Concatenate[_OpensshModule, Param], None],
+    ) -> t.Callable[t.Concatenate[_OpensshModule, Param], None]:
+        def wrapper(
+            self: _OpensshModule, *args: Param.args, **kwargs: Param.kwargs
+        ) -> None:
             if not self.check_mode:
                 f(self, *args, **kwargs)
 
         return wrapper  # type: ignore
 
     @staticmethod
-    def trigger_change(f: t.Callable[Param, None]) -> t.Callable[Param, None]:
-        def wrapper(self, *args, **kwargs) -> None:
+    def trigger_change(
+        f: t.Callable[t.Concatenate[_OpensshModule, Param], None],
+    ) -> t.Callable[t.Concatenate[_OpensshModule, Param], None]:
+        def wrapper(
+            self: _OpensshModule, *args: Param.args, **kwargs: Param.kwargs
+        ) -> None:
             f(self, *args, **kwargs)
             self.changed = True
 
@@ -202,6 +216,13 @@ class OpensshModule(metaclass=abc.ABCMeta):
             self.changed = True
 
 
+if t.TYPE_CHECKING:
+
+    class _RunCommandKwarg(t.TypedDict):
+        check_rc: t.NotRequired[bool]
+        environ_update: t.NotRequired[dict[str, str] | None]
+
+
 class KeygenCommand:
     def __init__(self, module: AnsibleModule) -> None:
         self._bin_path = module.get_bin_path("ssh-keygen", True)
@@ -221,7 +242,7 @@ class KeygenCommand:
         cert_type: t.Literal["host", "user"] | None,
         time_parameters: OpensshCertificateTimeParameters,
         use_agent: bool,
-        **kwargs,
+        **kwargs: t.Unpack[_RunCommandKwarg],
     ) -> tuple[int, str, str]:
         args = [self._bin_path, "-s", signing_key_path, "-P", "", "-I", identifier]
 
@@ -253,7 +274,7 @@ class KeygenCommand:
         size: int,
         key_type: str,
         comment: str | None,
-        **kwargs,
+        **kwargs: t.Unpack[_RunCommandKwarg],
     ) -> tuple[int, str, str]:
         args = [
             self._bin_path,
@@ -276,21 +297,21 @@ class KeygenCommand:
         return self._run_command(args, data=data, **kwargs)
 
     def get_certificate_info(
-        self, *, certificate_path: str, **kwargs
+        self, *, certificate_path: str, **kwargs: t.Unpack[_RunCommandKwarg]
     ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-L", "-f", certificate_path], **kwargs
         )
 
     def get_matching_public_key(
-        self, *, private_key_path: str, **kwargs
+        self, *, private_key_path: str, **kwargs: t.Unpack[_RunCommandKwarg]
     ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-P", "", "-y", "-f", private_key_path], **kwargs
         )
 
     def get_private_key(
-        self, *, private_key_path: str, **kwargs
+        self, *, private_key_path: str, **kwargs: t.Unpack[_RunCommandKwarg]
     ) -> tuple[int, str, str]:
         return self._run_command(
             [self._bin_path, "-l", "-f", private_key_path], **kwargs
@@ -302,7 +323,7 @@ class KeygenCommand:
         private_key_path: str,
         comment: str,
         force_new_format: bool = True,
-        **kwargs,
+        **kwargs: t.Unpack[_RunCommandKwarg],
     ) -> tuple[int, str, str]:
         if os.path.exists(private_key_path) and not os.access(
             private_key_path, os.W_OK

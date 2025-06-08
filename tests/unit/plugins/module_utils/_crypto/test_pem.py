@@ -60,7 +60,7 @@ def test_pem_handling(
     pems: list[str],
     is_pem: bool,
     private_key_type: t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"],
-):
+) -> None:
     assert identify_pem_format(data) == is_pem
     assert identify_private_key_format(data) == private_key_type
     try:

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import datetime
+import pathlib
 import typing as t
 
 import pytest
@@ -100,9 +101,9 @@ def test_nopad_b64(value: str, result: str) -> None:
 
 
 @pytest.mark.parametrize("pem, der", TEST_PEM_DERS)
-def test_pem_to_der(pem: str, der: bytes, tmpdir):
-    fn = tmpdir / "test.pem"
-    fn.write(pem)
+def test_pem_to_der(pem: str, der: bytes, tmp_path: pathlib.Path) -> None:
+    fn = tmp_path / "test.pem"
+    fn.write_text(pem)
     assert pem_to_der(pem_filename=str(fn)) == der
     assert pem_to_der(pem_content=pem) == der
 
@@ -111,9 +112,9 @@ def test_pem_to_der(pem: str, der: bytes, tmpdir):
 def test_process_links(
     value: dict[str, t.Any], expected_result: list[tuple[str, str]]
 ) -> None:
-    data = []
+    data: list[tuple[str, str]] = []
 
-    def callback(url, rel):
+    def callback(url: str, rel: str) -> None:
         data.append((url, rel))
 
     process_links(info=value, callback=callback)

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import pathlib
 from unittest.mock import (
     MagicMock,
 )
@@ -18,14 +19,14 @@ TEST_TEXT = r"""1234
 5678"""
 
 
-def test_read_file(tmpdir) -> None:
-    fn = tmpdir / "test.txt"
-    fn.write(TEST_TEXT)
+def test_read_file(tmp_path: pathlib.Path) -> None:
+    fn = tmp_path / "test.txt"
+    fn.write_text(TEST_TEXT)
     assert read_file(str(fn)) == TEST_TEXT.encode("utf-8")
 
 
-def test_write_file(tmpdir) -> None:
-    fn = tmpdir / "test.txt"
+def test_write_file(tmp_path: pathlib.Path) -> None:
+    fn = tmp_path / "test.txt"
     module = MagicMock()
     write_file(module=module, dest=str(fn), content=TEST_TEXT.encode("utf-8"))
-    assert fn.read() == TEST_TEXT
+    assert fn.read_text() == TEST_TEXT

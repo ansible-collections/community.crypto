@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import base64
+import pathlib
 import re
 import subprocess
 
@@ -104,7 +105,7 @@ def test_serialize_asn1_string_as_der_invalid_type() -> None:
 
 @pytest.mark.skip()  # This is to just to build the test case assertions and shouldn't run normally.
 @pytest.mark.parametrize("value, expected", TEST_CASES)
-def test_test_cases(value: str, expected: bytes, tmp_path) -> None:
+def test_test_cases(value: str, expected: bytes, tmp_path: pathlib.Path) -> None:
     test_file = tmp_path / "test.der"
     subprocess.run(
         ["openssl", "asn1parse", "-genstr", value, "-noout", "-out", test_file],

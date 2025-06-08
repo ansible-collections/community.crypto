@@ -25,6 +25,16 @@ if t.TYPE_CHECKING:
         Criterium,
     )
 
+    class DatetimeKwarg(t.TypedDict):
+        year: int
+        month: int
+        day: int
+        hour: t.NotRequired[int]
+        minute: t.NotRequired[int]
+        second: t.NotRequired[int]
+        microsecond: t.NotRequired[int]
+        tzinfo: t.NotRequired[datetime.timezone | None]
+
 
 def load_fixture(name: str) -> str:
     with open(
@@ -133,7 +143,7 @@ TEST_CERT_INFO: list[tuple[str, CertificateInformation, str]] = [
 ]
 
 
-TEST_PARSE_ACME_TIMESTAMP: list[tuple[datetime.timedelta, str, dict[str, int]]] = (
+TEST_PARSE_ACME_TIMESTAMP: list[tuple[datetime.timedelta, str, DatetimeKwarg]] = (
     cartesian_product(
         TIMEZONES,
         [
@@ -201,7 +211,7 @@ TEST_PARSE_ACME_TIMESTAMP: list[tuple[datetime.timedelta, str, dict[str, int]]] 
 
 
 TEST_INTERPOLATE_TIMESTAMP: list[
-    tuple[datetime.timedelta, dict[str, int], dict[str, int], float, dict[str, int]]
+    tuple[datetime.timedelta, DatetimeKwarg, DatetimeKwarg, float, DatetimeKwarg]
 ] = cartesian_product(
     TIMEZONES,
     [
@@ -233,7 +243,7 @@ class FakeBackend(CryptoBackend):
         *,
         key_file: str | os.PathLike | None = None,
         key_content: str | None = None,
-        passphrase=None,
+        passphrase: str | None = None,
     ) -> t.NoReturn:
         raise BackendException("Not implemented in fake backend")
 
