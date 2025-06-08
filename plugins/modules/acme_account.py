@@ -105,8 +105,8 @@ options:
   external_account_binding:
     description:
       - Allows to provide external account binding data during account creation.
-      - This is used by CAs like Sectigo to bind a new ACME account to an existing CA-specific account, to be able to properly
-        identify a customer.
+      - This is used by CAs like Sectigo, HARICA, or ZeroSSL to bind a new ACME account to an existing CA-specific account,
+        to be able to properly identify a customer.
       - Only used when creating a new account. Can not be specified for ACME v1.
     type: dict
     suboptions:
