@@ -49,15 +49,15 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    import http.client
-    import os
-    import urllib.error
+    import http.client  # pragma: no cover
+    import os  # pragma: no cover
+    import urllib.error  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.account import (  # pragma: no cover
         ACMEAccount,
     )
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
         CryptoBackend,
     )
@@ -294,7 +294,9 @@ class ACMEClient:
         In case of an error, raises KeyParsingError.
         """
         if key_file is None and key_content is None:
-            raise AssertionError("One of key_file and key_content must be specified!")
+            raise AssertionError(
+                "One of key_file and key_content must be specified!"
+            )  # pragma: no cover
         return self.backend.parse_key(
             key_file=key_file, key_content=key_content, passphrase=passphrase
         )

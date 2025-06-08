@@ -75,22 +75,22 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
 
 
 if t.TYPE_CHECKING:
-    KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]
-    KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]
-    KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]
+    KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]  # pragma: no cover
+    KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]  # pragma: no cover
+    KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]  # pragma: no cover
 
     PrivateKeyTypes = t.Union[
         rsa.RSAPrivateKey,
         dsa.DSAPrivateKey,
         ec.EllipticCurvePrivateKey,
         Ed25519PrivateKey,
-    ]
+    ]  # pragma: no cover
     PublicKeyTypes = t.Union[
         rsa.RSAPublicKey, dsa.DSAPublicKey, ec.EllipticCurvePublicKey, Ed25519PublicKey
-    ]
+    ]  # pragma: no cover
 
     from cryptography.hazmat.primitives.asymmetric.types import (
-        PublicKeyTypes as AllPublicKeyTypes,
+        PublicKeyTypes as AllPublicKeyTypes,  # pragma: no cover
     )
 
 

@@ -497,7 +497,7 @@ except ImportError:
     pass
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
 
 class CRLError(OpenSSLObjectError):

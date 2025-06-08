@@ -141,7 +141,7 @@ class AnsibleActionModule:
         collection_name: str | None = None,
     ) -> None:
         if version is not None and date is not None:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 "implementation error -- version and date must not both be set"
             )
 

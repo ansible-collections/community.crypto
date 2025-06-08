@@ -224,7 +224,7 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
 
 def get_orders_list(
@@ -310,7 +310,7 @@ def main() -> t.NoReturn:
             remove_account_uri_if_not_exists=True,
         )
         if created:
-            raise AssertionError("Unwanted account creation")
+            raise AssertionError("Unwanted account creation")  # pragma: no cover
         result: dict[str, t.Any] = {
             "changed": False,
             "exists": False,

@@ -21,11 +21,11 @@ from ..test__time import TIMEZONES, cartesian_product
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         Criterium,
     )
 
-    class DatetimeKwarg(t.TypedDict):
+    class DatetimeKwarg(t.TypedDict):  # pragma: no cover
         year: int
         month: int
         day: int
@@ -245,15 +245,15 @@ class FakeBackend(CryptoBackend):
         key_content: str | None = None,
         passphrase: str | None = None,
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def sign(
         self, *, payload64: str, protected64: str, key_data: dict[str, t.Any] | None
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def create_mac_key(self, *, alg: str, key: str) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def get_ordered_csr_identifiers(
         self,
@@ -261,7 +261,7 @@ class FakeBackend(CryptoBackend):
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def get_csr_identifiers(
         self,
@@ -269,7 +269,7 @@ class FakeBackend(CryptoBackend):
         csr_filename: str | os.PathLike | None = None,
         csr_content: str | bytes | None = None,
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def get_cert_days(
         self,
@@ -278,10 +278,10 @@ class FakeBackend(CryptoBackend):
         cert_content: str | bytes | None = None,
         now: datetime.datetime | None = None,
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def create_chain_matcher(self, *, criterium: Criterium) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover
 
     def get_cert_information(
         self,
@@ -289,4 +289,4 @@ class FakeBackend(CryptoBackend):
         cert_filename: str | os.PathLike | None = None,
         cert_content: str | bytes | None = None,
     ) -> t.NoReturn:
-        raise BackendException("Not implemented in fake backend")
+        raise BackendException("Not implemented in fake backend")  # pragma: no cover

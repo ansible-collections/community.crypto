@@ -205,7 +205,7 @@ def main() -> t.NoReturn:
             # Step 1: get hold of account URI
             created, account_data = account.setup_account(allow_creation=False)
             if created:
-                raise AssertionError("Unwanted account creation")
+                raise AssertionError("Unwanted account creation")  # pragma: no cover
             if account_data is None:
                 raise ModuleFailException(
                     msg="Account does not exist or is deactivated."

@@ -38,13 +38,13 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
         CertificatePrivateKeyTypes,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
     )
 
@@ -170,11 +170,11 @@ class CertificateBackend(metaclass=abc.ABCMeta):
     def _check_privatekey(self) -> bool:
         """Check whether provided parameters match, assuming self.existing_certificate and self.privatekey have been populated."""
         if self.existing_certificate is None:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 "Contract violation: existing_certificate has not been populated"
             )
         if self.privatekey is None:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 "Contract violation: privatekey has not been populated"
             )
         return cryptography_compare_public_keys(
@@ -184,11 +184,13 @@ class CertificateBackend(metaclass=abc.ABCMeta):
     def _check_csr(self) -> bool:
         """Check whether provided parameters match, assuming self.existing_certificate and self.csr have been populated."""
         if self.existing_certificate is None:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 "Contract violation: existing_certificate has not been populated"
             )
         if self.csr is None:
-            raise AssertionError("Contract violation: csr has not been populated")
+            raise AssertionError(
+                "Contract violation: csr has not been populated"
+            )  # pragma: no cover
         # Verify that CSR is signed by certificate's private key
         if not self.csr.is_signature_valid:
             return False
@@ -249,11 +251,13 @@ class CertificateBackend(metaclass=abc.ABCMeta):
     def _check_subject_key_identifier(self) -> bool:
         """Check whether Subject Key Identifier matches, assuming self.existing_certificate and self.csr have been populated."""
         if self.existing_certificate is None:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 "Contract violation: existing_certificate has not been populated"
             )
         if self.csr is None:
-            raise AssertionError("Contract violation: csr has not been populated")
+            raise AssertionError(
+                "Contract violation: csr has not been populated"
+            )  # pragma: no cover
         # Get hold of certificate's SKI
         try:
             ext = self.existing_certificate.extensions.get_extension_for_class(

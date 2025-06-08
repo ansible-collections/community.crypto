@@ -37,14 +37,14 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CryptoBackend,
     )
-    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (  # pragma: no cover
         ChainMatcher,
     )
-    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (  # pragma: no cover
         Challenge,
     )
 

@@ -19,7 +19,7 @@ NORMALIZE_NAMES_SHORT: dict[str, str] = {}
 for dotted, names in OID_MAP.items():
     for name in names:
         if name in NORMALIZE_NAMES and OID_LOOKUP[name] != dotted:
-            raise AssertionError(
+            raise AssertionError(  # pragma: no cover
                 f'Name collision during setup: "{name}" for OIDs {dotted} and {OID_LOOKUP[name]}'
             )
         NORMALIZE_NAMES[name] = names[0]
@@ -27,7 +27,7 @@ for dotted, names in OID_MAP.items():
         OID_LOOKUP[name] = dotted
 for alias, original in [("userID", "userId")]:
     if alias in NORMALIZE_NAMES:
-        raise AssertionError(
+        raise AssertionError(  # pragma: no cover
             f'Name collision during adding aliases: "{alias}" (alias for "{original}") is already mapped to OID {OID_LOOKUP[alias]}'
         )
     NORMALIZE_NAMES[alias] = original

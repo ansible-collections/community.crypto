@@ -38,11 +38,11 @@ from .backend_data import (
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
     )
 
-    from .backend_data import DatetimeKwarg
+    from .backend_data import DatetimeKwarg  # pragma: no cover
 
 
 if not HAS_CURRENT_CRYPTOGRAPHY:

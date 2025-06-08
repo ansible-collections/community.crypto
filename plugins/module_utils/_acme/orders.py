@@ -25,7 +25,7 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (  # pragma: no cover
         ACMEClient,
     )
 

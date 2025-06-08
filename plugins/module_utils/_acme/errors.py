@@ -15,10 +15,10 @@ from ansible.module_utils.common.text.converters import to_text
 
 
 if t.TYPE_CHECKING:
-    import http.client
-    import urllib.error
+    import http.client  # pragma: no cover
+    import urllib.error  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
 
 def format_http_status(status_code: int) -> str:

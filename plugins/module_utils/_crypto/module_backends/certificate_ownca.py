@@ -42,13 +42,13 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
     )
 
@@ -157,7 +157,9 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
     def generate_certificate(self) -> None:
         """(Re-)Generate certificate."""
         if self.csr is None:
-            raise AssertionError("Contract violation: csr has not been populated")
+            raise AssertionError(
+                "Contract violation: csr has not been populated"
+            )  # pragma: no cover
         cert_builder = x509.CertificateBuilder()
         cert_builder = cert_builder.subject_name(self.csr.subject)
         cert_builder = cert_builder.issuer_name(self.ca_cert.subject)
@@ -214,7 +216,9 @@ class OwnCACertificateBackendCryptography(CertificateBackend):
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
         if self.cert is None:
-            raise AssertionError("Contract violation: cert has not been populated")
+            raise AssertionError(
+                "Contract violation: cert has not been populated"
+            )  # pragma: no cover
         return self.cert.public_bytes(Encoding.PEM)
 
     def needs_regeneration(

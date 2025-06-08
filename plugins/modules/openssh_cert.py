@@ -421,11 +421,17 @@ class Certificate(OpensshModule):
 
     def _is_fully_valid(self) -> bool:
         if self.original_data is None:
-            raise AssertionError("Contract violation original_data not provided")
+            raise AssertionError(
+                "Contract violation original_data not provided"
+            )  # pragma: no cover
         if self.public_key is None:
-            raise AssertionError("Contract violation public_key not provided")
+            raise AssertionError(
+                "Contract violation public_key not provided"
+            )  # pragma: no cover
         if self.signing_key is None:
-            raise AssertionError("Contract violation signing_key not provided")
+            raise AssertionError(
+                "Contract violation signing_key not provided"
+            )  # pragma: no cover
         return self._is_partially_valid() and all(
             [
                 self._compare_options() if self.original_data.type == "user" else True,
@@ -439,7 +445,9 @@ class Certificate(OpensshModule):
 
     def _is_partially_valid(self) -> bool:
         if self.original_data is None:
-            raise AssertionError("Contract violation original_data not provided")
+            raise AssertionError(
+                "Contract violation original_data not provided"
+            )  # pragma: no cover
         return all(
             [
                 set(self.original_data.principals) == set(self.principals),
@@ -460,7 +468,9 @@ class Certificate(OpensshModule):
 
     def _compare_time_parameters(self) -> bool:
         if self.original_data is None:
-            raise AssertionError("Contract violation original_data not provided")
+            raise AssertionError(
+                "Contract violation original_data not provided"
+            )  # pragma: no cover
         try:
             original_time_parameters = OpensshCertificateTimeParameters(
                 valid_from=self.original_data.valid_after,
@@ -481,7 +491,9 @@ class Certificate(OpensshModule):
 
     def _compare_options(self) -> bool:
         if self.original_data is None:
-            raise AssertionError("Contract violation original_data not provided")
+            raise AssertionError(
+                "Contract violation original_data not provided"
+            )  # pragma: no cover
         try:
             critical_options, extensions = parse_option_list(self.options)
         except ValueError as e:
@@ -518,11 +530,17 @@ class Certificate(OpensshModule):
 
     def _generate_temp_certificate(self) -> str:
         if self.public_key is None:
-            raise AssertionError("Contract violation public_key not provided")
+            raise AssertionError(
+                "Contract violation public_key not provided"
+            )  # pragma: no cover
         if self.signing_key is None:
-            raise AssertionError("Contract violation signing_key not provided")
+            raise AssertionError(
+                "Contract violation signing_key not provided"
+            )  # pragma: no cover
         if self.time_parameters is None:
-            raise AssertionError("Contract violation time_parameters not provided")
+            raise AssertionError(
+                "Contract violation time_parameters not provided"
+            )  # pragma: no cover
 
         key_copy = os.path.join(self.module.tmpdir, os.path.basename(self.public_key))
 

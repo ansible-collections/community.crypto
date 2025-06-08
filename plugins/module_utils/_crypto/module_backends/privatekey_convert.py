@@ -31,8 +31,8 @@ from ansible_collections.community.crypto.plugins.module_utils._io import load_f
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         PrivateKeyTypes,
     )
 
@@ -81,7 +81,7 @@ class PrivateKeyConvertBackend:
             self.src_private_key_bytes = load_file(path=self.src_path, module=module)
         else:
             if self.src_content is None:
-                raise AssertionError("src_content is None")
+                raise AssertionError("src_content is None")  # pragma: no cover
             self.src_private_key_bytes = self.src_content.encode("utf-8")
 
         self.dest_private_key: PrivateKeyTypes | None = None
@@ -90,7 +90,7 @@ class PrivateKeyConvertBackend:
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.src_private_key in output format"""
         if self.src_private_key is None:
-            raise AssertionError("src_private_key not set")
+            raise AssertionError("src_private_key not set")  # pragma: no cover
         # Select export format and encoding
         try:
             export_encoding = cryptography.hazmat.primitives.serialization.Encoding.PEM

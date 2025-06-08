@@ -252,7 +252,7 @@ def main() -> t.NoReturn:
                 if client.account_key_data:
                     diff_before["public_account_key"] = client.account_key_data["jwk"]
             if created:
-                raise AssertionError("Unwanted account creation")
+                raise AssertionError("Unwanted account creation")  # pragma: no cover
             if account_data is not None:
                 # Account is not yet deactivated
                 if not module.check_mode:
@@ -310,7 +310,7 @@ def main() -> t.NoReturn:
             # Verify that the account exists and has not been deactivated
             created, account_data = account.setup_account(allow_creation=False)
             if created:
-                raise AssertionError("Unwanted account creation")
+                raise AssertionError("Unwanted account creation")  # pragma: no cover
             if account_data is None:
                 raise ModuleFailException(
                     msg="Account does not exist or is deactivated."

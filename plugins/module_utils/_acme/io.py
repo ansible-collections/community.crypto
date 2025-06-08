@@ -21,7 +21,7 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
 
 def read_file(fn: str | os.PathLike) -> bytes:

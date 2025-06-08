@@ -31,13 +31,13 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
         KeyType,
     )
 
-    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]
-    DateFormatStr = t.Literal["human_readable", "openssh"]
-    DateFormatInt = t.Literal["timestamp"]
+    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]  # pragma: no cover
+    DateFormatStr = t.Literal["human_readable", "openssh"]  # pragma: no cover
+    DateFormatInt = t.Literal["timestamp"]  # pragma: no cover
 else:
     KeyType = None  # pylint: disable=invalid-name
 
