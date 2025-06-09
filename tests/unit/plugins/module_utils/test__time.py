@@ -31,8 +31,8 @@ TIMEZONES = [
 
 
 if t.TYPE_CHECKING:
-    _S = t.TypeVar("_S")
-    _Ts = t.TypeVarTuple("_Ts")
+    _S = t.TypeVar("_S")  # pragma: no cover
+    _Ts = t.TypeVarTuple("_Ts")  # pragma: no cover
 
 
 def cartesian_product(

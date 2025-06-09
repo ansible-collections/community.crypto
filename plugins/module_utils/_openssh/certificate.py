@@ -31,13 +31,13 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
         KeyType,
     )
 
-    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]
-    DateFormatStr = t.Literal["human_readable", "openssh"]
-    DateFormatInt = t.Literal["timestamp"]
+    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]  # pragma: no cover
+    DateFormatStr = t.Literal["human_readable", "openssh"]  # pragma: no cover
+    DateFormatInt = t.Literal["timestamp"]  # pragma: no cover
 else:
     KeyType = None  # pylint: disable=invalid-name
 
@@ -338,6 +338,22 @@ class OpensshCertificateOption:
         )
 
 
+if t.TYPE_CHECKING:
+
+    class _OpensshCertificateInfoKwarg(t.TypedDict):
+        nonce: t.NotRequired[bytes | None]
+        serial: t.NotRequired[int | None]
+        cert_type: t.NotRequired[int | None]
+        key_id: t.NotRequired[bytes | None]
+        principals: t.NotRequired[list[bytes] | None]
+        valid_after: t.NotRequired[int | None]
+        valid_before: t.NotRequired[int | None]
+        critical_options: t.NotRequired[list[tuple[bytes, bytes]] | None]
+        extensions: t.NotRequired[list[tuple[bytes, bytes]] | None]
+        reserved: t.NotRequired[bytes | None]
+        signing_key: t.NotRequired[bytes | None]
+
+
 class OpensshCertificateInfo(metaclass=abc.ABCMeta):
     """Encapsulates all certificate information which is signed by a CA key"""
 
@@ -402,7 +418,13 @@ class OpensshCertificateInfo(metaclass=abc.ABCMeta):
 
 
 class OpensshRSACertificateInfo(OpensshCertificateInfo):
-    def __init__(self, *, e: int | None = None, n: int | None = None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        e: int | None = None,
+        n: int | None = None,
+        **kwargs: t.Unpack[_OpensshCertificateInfoKwarg],
+    ) -> None:
         super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["rsa"] + _CERT_SUFFIX_V01
         self.e = e
@@ -433,7 +455,7 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
         q: int | None = None,
         g: int | None = None,
         y: int | None = None,
-        **kwargs,
+        **kwargs: t.Unpack[_OpensshCertificateInfoKwarg],
     ) -> None:
         super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["dsa"] + _CERT_SUFFIX_V01
@@ -465,7 +487,11 @@ class OpensshDSACertificateInfo(OpensshCertificateInfo):
 
 class OpensshECDSACertificateInfo(OpensshCertificateInfo):
     def __init__(
-        self, *, curve: bytes | None = None, public_key: bytes | None = None, **kwargs
+        self,
+        *,
+        curve: bytes | None = None,
+        public_key: bytes | None = None,
+        **kwargs: t.Unpack[_OpensshCertificateInfoKwarg],
     ):
         super().__init__(**kwargs)
         self._curve: bytes | None = None
@@ -509,7 +535,12 @@ class OpensshECDSACertificateInfo(OpensshCertificateInfo):
 
 
 class OpensshED25519CertificateInfo(OpensshCertificateInfo):
-    def __init__(self, *, pk: bytes | None = None, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        pk: bytes | None = None,
+        **kwargs: t.Unpack[_OpensshCertificateInfoKwarg],
+    ) -> None:
         super().__init__(**kwargs)
         self.type_string = _SSH_TYPE_STRINGS["ed25519"] + _CERT_SUFFIX_V01
         self.pk = pk

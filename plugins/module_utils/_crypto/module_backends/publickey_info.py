@@ -23,18 +23,20 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (  # pragma: no cover
         FilterModuleMock,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         PublicKeyTypes,
     )
 
-    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+    GeneralAnsibleModule = t.Union[
+        AnsibleModule, AnsibleActionModule, FilterModuleMock
+    ]  # pragma: no cover
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -119,7 +121,7 @@ class PublicKeyInfoRetrieval:
 
     def _get_public_key(self, binary: bool) -> bytes:
         if self.key is None:
-            raise AssertionError("key must be set")
+            raise AssertionError("key must be set")  # pragma: no cover
         return self.key.public_bytes(
             serialization.Encoding.DER if binary else serialization.Encoding.PEM,
             serialization.PublicFormat.SubjectPublicKeyInfo,
@@ -127,7 +129,7 @@ class PublicKeyInfoRetrieval:
 
     def _get_key_info(self) -> tuple[str, dict[str, t.Any]]:
         if self.key is None:
-            raise AssertionError("key must be set")
+            raise AssertionError("key must be set")  # pragma: no cover
         return _get_cryptography_public_key_info(self.key)
 
     def get_info(self, *, prefer_one_fingerprint: bool = False) -> dict[str, t.Any]:

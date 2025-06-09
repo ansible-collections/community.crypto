@@ -79,8 +79,8 @@ from ansible_collections.community.crypto.plugins.module_utils._io import (
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey_convert import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey_convert import (  # pragma: no cover
         PrivateKeyConvertBackend,
     )
 
@@ -115,7 +115,9 @@ class PrivateKeyConvertModule(OpenSSLObject):
             # Convert
             privatekey_data = self.module_backend.get_private_key_data()
             if privatekey_data is None:
-                raise AssertionError("Contract violation: privatekey_data is None")
+                raise AssertionError(
+                    "Contract violation: privatekey_data is None"
+                )  # pragma: no cover
             if not self.check_mode:
                 if self.backup:
                     self.backup_file = module.backup_local(self.path)

@@ -86,30 +86,33 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.basic imp
 
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.asymmetric.dh import DHPrivateKey, DHPublicKey
-    from cryptography.hazmat.primitives.asymmetric.dsa import (
+    from cryptography.hazmat.primitives import hashes  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.dh import (  # pragma: no cover
+        DHPrivateKey,
+        DHPublicKey,
+    )
+    from cryptography.hazmat.primitives.asymmetric.dsa import (  # pragma: no cover
         DSAPrivateKey,
         DSAPublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.ec import (
+    from cryptography.hazmat.primitives.asymmetric.ec import (  # pragma: no cover
         EllipticCurvePrivateKey,
         EllipticCurvePublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.rsa import (
+    from cryptography.hazmat.primitives.asymmetric.rsa import (  # pragma: no cover
         RSAPrivateKey,
         RSAPublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
         CertificateIssuerPublicKeyTypes,
         CertificatePublicKeyTypes,
         PrivateKeyTypes,
         PublicKeyTypes,
     )
-    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (  # pragma: no cover
         PKCS12KeyAndCertificates,
     )
 
@@ -117,13 +120,13 @@ if t.TYPE_CHECKING:
         CertificateIssuerPrivateKeyTypes,
         cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
-    ]
+    ]  # pragma: no cover
     PublicKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
         DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
-    ]
+    ]  # pragma: no cover
     PrivateKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
         DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
-    ]
+    ]  # pragma: no cover
 else:
     PublicKeyTypesWOEdwards = None  # pylint: disable=invalid-name
     PrivateKeyTypesWOEdwards = None  # pylint: disable=invalid-name
@@ -602,7 +605,7 @@ def cryptography_decode_name(
     Raises an OpenSSLObjectError if the name is not supported.
     """
     if idn_rewrite not in ("ignore", "idna", "unicode"):
-        raise AssertionError(
+        raise AssertionError(  # pragma: no cover
             'idn_rewrite must be one of "ignore", "idna", or "unicode"'
         )
     if isinstance(name, x509.DNSName):

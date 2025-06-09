@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import datetime
+import pathlib
 import typing as t
 from unittest.mock import (
     MagicMock,
@@ -37,9 +38,11 @@ from .backend_data import (
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
     )
+
+    from .backend_data import DatetimeKwarg  # pragma: no cover
 
 
 if not HAS_CURRENT_CRYPTOGRAPHY:
@@ -48,10 +51,10 @@ if not HAS_CURRENT_CRYPTOGRAPHY:
 
 @pytest.mark.parametrize("pem, result, dummy", TEST_KEYS)
 def test_eckeyparse_cryptography(
-    pem: str, result: dict[str, t.Any], dummy: str, tmpdir
+    pem: str, result: dict[str, t.Any], dummy: str, tmp_path: pathlib.Path
 ) -> None:
-    fn = tmpdir / "test.pem"
-    fn.write(pem)
+    fn = tmp_path / "test.pem"
+    fn.write_text(pem)
     module = MagicMock()
     backend = CryptographyBackend(module=module)
     key = backend.parse_key(key_file=str(fn))
@@ -64,10 +67,10 @@ def test_eckeyparse_cryptography(
 
 @pytest.mark.parametrize("csr, result, openssl_output", TEST_CSRS)
 def test_csridentifiers_cryptography(
-    csr: str, result: set[tuple[str, str]], openssl_output: str, tmpdir
+    csr: str, result: set[tuple[str, str]], openssl_output: str, tmp_path: pathlib.Path
 ) -> None:
-    fn = tmpdir / "test.csr"
-    fn.write(csr)
+    fn = tmp_path / "test.csr"
+    fn.write_text(csr)
     module = MagicMock()
     backend = CryptographyBackend(module=module)
     identifiers = backend.get_csr_identifiers(csr_filename=str(fn))
@@ -78,11 +81,14 @@ def test_csridentifiers_cryptography(
 
 @pytest.mark.parametrize("timezone, now, expected_days", TEST_CERT_DAYS)
 def test_certdays_cryptography(
-    timezone: datetime.timedelta, now: datetime.datetime, expected_days: int, tmpdir
+    timezone: datetime.timedelta,
+    now: datetime.datetime,
+    expected_days: int,
+    tmp_path: pathlib.Path,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
-        fn = tmpdir / "test-cert.pem"
-        fn.write(TEST_CERT)
+        fn = tmp_path / "test-cert.pem"
+        fn.write_text(TEST_CERT)
         module = MagicMock()
         backend = CryptographyBackend(module=module)
         days = backend.get_cert_days(cert_filename=str(fn), now=now)
@@ -98,10 +104,10 @@ def test_get_cert_information(
     cert_content: str,
     expected_cert_info: CertificateInformation,
     openssl_output: str,
-    tmpdir,
+    tmp_path: pathlib.Path,
 ) -> None:
-    fn = tmpdir / "test-cert.pem"
-    fn.write(cert_content)
+    fn = tmp_path / "test-cert.pem"
+    fn.write_text(cert_content)
     module = MagicMock()
     backend = CryptographyBackend(module=module)
 
@@ -138,7 +144,7 @@ def test_now(timezone: datetime.timedelta) -> None:
 
 @pytest.mark.parametrize("timezone, timestamp_str, expected", TEST_PARSE_ACME_TIMESTAMP)
 def test_parse_acme_timestamp(
-    timezone: datetime.timedelta, timestamp_str: str, expected: dict[str, int]
+    timezone: datetime.timedelta, timestamp_str: str, expected: DatetimeKwarg
 ) -> None:
     with freeze_time("2024-02-03 04:05:06 +00:00", tz_offset=timezone):
         module = MagicMock()
@@ -153,10 +159,10 @@ def test_parse_acme_timestamp(
 )
 def test_interpolate_timestamp(
     timezone: datetime.timedelta,
-    start: dict[str, int],
-    end: dict[str, int],
+    start: DatetimeKwarg,
+    end: DatetimeKwarg,
     percentage: float,
-    expected: dict[str, int],
+    expected: DatetimeKwarg,
 ) -> None:
     with freeze_time("2024-02-03 04:05:06", tz_offset=timezone):
         module = MagicMock()

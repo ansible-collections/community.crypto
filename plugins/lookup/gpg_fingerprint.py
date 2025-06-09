@@ -58,10 +58,14 @@ from ansible_collections.community.crypto.plugins.plugin_utils._gnupg import (
 
 
 class LookupModule(LookupBase):
-    def run(self, terms: list[t.Any], variables=None, **kwargs) -> list[str]:
+    def run(
+        self, terms: list[t.Any], variables: None = None, **kwargs: t.Any
+    ) -> list[str]:
         self.set_options(direct=kwargs)
         if self._loader is None:
-            raise AssertionError("Contract violation: self._loader is None")
+            raise AssertionError(
+                "Contract violation: self._loader is None"
+            )  # pragma: no cover
 
         try:
             gpg = PluginGPGRunner(cwd=self._loader.get_basedir())

@@ -80,10 +80,10 @@ else:
     )
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (  # pragma: no cover
         CertificateChain,
         Criterium,
     )

@@ -416,7 +416,7 @@ def main() -> t.NoReturn:
             )
             dhparam = DHParameterCryptography(module)
         else:
-            raise AssertionError("Internal error: unknown backend")
+            raise AssertionError("Internal error: unknown backend")  # pragma: no cover
 
         if module.check_mode:
             result = dhparam.dump()

@@ -34,7 +34,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
 
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
 
 # TODO: once cryptography has a _utc variant of InvalidityDate.invalidity_date, set this

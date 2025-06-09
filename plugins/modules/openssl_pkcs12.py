@@ -334,7 +334,7 @@ else:
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
     )
 
@@ -343,7 +343,7 @@ if t.TYPE_CHECKING:
         t.Union[cryptography.x509.Certificate, None],
         list[cryptography.x509.Certificate],
         t.Union[bytes, None],
-    ]
+    ]  # pragma: no cover
 
 
 def load_certificate_set(
@@ -688,7 +688,7 @@ class Pkcs(OpenSSLObject):
     ]:
         """Read PKCS#12 file."""
         if self.src is None:
-            raise AssertionError("Contract violation: src is None")
+            raise AssertionError("Contract violation: src is None")  # pragma: no cover
 
         try:
             with open(self.src, "rb") as pkcs12_fh:

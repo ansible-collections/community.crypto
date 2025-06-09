@@ -15,7 +15,10 @@ from ansible.module_utils.common.text.converters import to_text
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
+    import http.client  # pragma: no cover
+    import urllib.error  # pragma: no cover
+
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
 
 def format_http_status(status_code: int) -> str:
@@ -59,7 +62,7 @@ class ModuleFailException(Exception):
         self.msg = msg
         self.module_fail_args = args
 
-    def do_fail(self, *, module: AnsibleModule, **arguments) -> t.NoReturn:
+    def do_fail(self, *, module: AnsibleModule, **arguments: t.Any) -> t.NoReturn:
         module.fail_json(msg=self.msg, other=self.module_fail_args, **arguments)
 
 
@@ -70,11 +73,11 @@ class ACMEProtocolException(ModuleFailException):
         module: AnsibleModule,
         msg: str | None = None,
         info: dict[str, t.Any] | None = None,
-        response=None,
+        response: urllib.error.HTTPError | http.client.HTTPResponse | None = None,
         content: bytes | None = None,
         content_json: object | bytes | None = None,
         extras: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         # Try to get hold of content, if response is given and content is not provided
         if content is None and content_json is None and response is not None:
             try:

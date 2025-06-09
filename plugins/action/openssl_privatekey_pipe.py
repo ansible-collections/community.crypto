@@ -21,13 +21,13 @@ from ansible_collections.community.crypto.plugins.plugin_utils._action_module im
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,
     )
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.privatekey import (  # pragma: no cover
         PrivateKeyBackend,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
 

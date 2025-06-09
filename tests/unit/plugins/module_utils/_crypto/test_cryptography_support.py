@@ -254,6 +254,6 @@ def test_parse_dn(name: bytes, expected: list[NameAttribute]) -> None:
         ),
     ],
 )
-def test_parse_dn_failure(name: bytes, message: str):
+def test_parse_dn_failure(name: bytes, message: str) -> None:
     with pytest.raises(OpenSSLObjectError, match=f"^{re.escape(message)}$"):
         _parse_dn(name)

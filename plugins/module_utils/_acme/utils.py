@@ -29,7 +29,7 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
         CryptoBackend,
     )

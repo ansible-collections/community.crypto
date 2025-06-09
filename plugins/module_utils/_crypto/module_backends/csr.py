@@ -48,16 +48,16 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
         CertificatePrivateKeyTypes,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
     )
 
-    _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")
+    _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")  # pragma: no cover
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -453,7 +453,9 @@ class CertificateSigningRequestBackend:
     def get_csr_data(self) -> bytes:
         """Return bytes for self.csr."""
         if self.csr is None:
-            raise AssertionError("Violated contract: csr is not populated")
+            raise AssertionError(
+                "Violated contract: csr is not populated"
+            )  # pragma: no cover
         return self.csr.public_bytes(
             cryptography.hazmat.primitives.serialization.Encoding.PEM
         )
@@ -485,9 +487,13 @@ class CertificateSigningRequestBackend:
     def _check_csr(self) -> bool:
         """Check whether provided parameters, assuming self.existing_csr and self.privatekey have been populated."""
         if self.existing_csr is None:
-            raise AssertionError("Violated contract: existing_csr is not populated")
+            raise AssertionError(
+                "Violated contract: existing_csr is not populated"
+            )  # pragma: no cover
         if self.privatekey is None:
-            raise AssertionError("Violated contract: privatekey is not populated")
+            raise AssertionError(
+                "Violated contract: privatekey is not populated"
+            )  # pragma: no cover
 
         def _check_subject(csr: cryptography.x509.CertificateSigningRequest) -> bool:
             subject = [

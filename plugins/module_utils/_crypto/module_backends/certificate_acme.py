@@ -22,8 +22,8 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.module_ba
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,
     )
 
@@ -100,7 +100,9 @@ class AcmeCertificateBackend(CertificateBackend):
     def get_certificate_data(self) -> bytes:
         """Return bytes for self.cert."""
         if self.cert_bytes is None:
-            raise AssertionError("Contract violation: cert_bytes is None")
+            raise AssertionError(
+                "Contract violation: cert_bytes is None"
+            )  # pragma: no cover
         return self.cert_bytes
 
     def dump(self, *, include_certificate: bool) -> dict[str, t.Any]:

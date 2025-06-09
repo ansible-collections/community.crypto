@@ -24,7 +24,7 @@ class FilterModuleMock:
         self.params = params
         self._diff = False
 
-    def fail_json(self, msg: str, **kwargs) -> t.NoReturn:
+    def fail_json(self, msg: str, **kwargs: t.Any) -> t.NoReturn:
         raise AnsibleFilterError(msg)
 
     def warn(self, warning: str) -> None:

@@ -179,7 +179,7 @@ def is_parent(
             public_key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey
         ):
             if cert.cert.signature_hash_algorithm is None:
-                raise AssertionError(
+                raise AssertionError(  # pragma: no cover
                     "signature_hash_algorithm should be present for RSA certificates"
                 )
             public_key.verify(
@@ -193,7 +193,7 @@ def is_parent(
             cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey,
         ):
             if cert.cert.signature_hash_algorithm is None:
-                raise AssertionError(
+                raise AssertionError(  # pragma: no cover
                     "signature_hash_algorithm should be present for EC certificates"
                 )
             public_key.verify(

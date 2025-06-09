@@ -12,20 +12,20 @@ from ansible_collections.community.crypto.plugins.modules import luks_device
 
 class DummyModule:
     # module to mock AnsibleModule class
-    def __init__(self):
-        self.params = {}
+    def __init__(self) -> None:
+        self.params: dict[str, t.Any] = {}
 
-    def fail_json(self, msg=""):
+    def fail_json(self, msg: str = "") -> t.NoReturn:
         raise ValueError(msg)
 
-    def get_bin_path(self, command, dummy):
+    def get_bin_path(self, command: str, dummy: bool) -> str | None:
         return command
 
 
 # ===== Handler & CryptHandler methods tests =====
 
 
-def test_generate_luks_name(monkeypatch) -> None:
+def test_generate_luks_name(monkeypatch: pytest.MonkeyPatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
@@ -35,7 +35,7 @@ def test_generate_luks_name(monkeypatch) -> None:
     assert crypt.generate_luks_name("/dev/dummy") == "luks-UUID"
 
 
-def test_get_container_name_by_device(monkeypatch) -> None:
+def test_get_container_name_by_device(monkeypatch: pytest.MonkeyPatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
@@ -47,7 +47,7 @@ def test_get_container_name_by_device(monkeypatch) -> None:
     assert crypt.get_container_name_by_device("/dev/dummy") == "container_name"
 
 
-def test_get_container_device_by_name(monkeypatch) -> None:
+def test_get_container_device_by_name(monkeypatch: pytest.MonkeyPatch) -> None:
     module = DummyModule()
     module.params["passphrase_encoding"] = "text"
     monkeypatch.setattr(
@@ -59,8 +59,10 @@ def test_get_container_device_by_name(monkeypatch) -> None:
     assert crypt.get_container_device_by_name("dummy") == "/dev/luksdevice"
 
 
-def test_run_luks_remove(monkeypatch) -> None:
-    def run_command_check(self, command: list[str]) -> tuple[int, str, str]:
+def test_run_luks_remove(monkeypatch: pytest.MonkeyPatch) -> None:
+    def run_command_check(
+        self: luks_device.Handler, command: list[str]
+    ) -> tuple[int, str, str]:
         # check that wipefs command is actually called
         assert command[0] == "wipefs"
         return 0, "", ""
@@ -249,7 +251,7 @@ def test_luks_create(
     cipher: str | None,
     hash_: str | None,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
 
@@ -286,7 +288,7 @@ def test_luks_remove(
     state: t.Literal["present", "absent", "opened", "closed"],
     is_luks: bool,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
 
@@ -315,7 +317,7 @@ def test_luks_open(
     name: str | None,
     name_by_dev: str | None,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
     module.params["device"] = device
@@ -356,7 +358,7 @@ def test_luks_close(
     state: t.Literal["present", "absent", "opened", "closed"],
     label: str | None,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
     module.params["device"] = device
@@ -397,7 +399,7 @@ def test_luks_add_key(
     state: t.Literal["present", "absent", "opened", "closed"],
     label: str | None,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
     module.params["device"] = device
@@ -438,7 +440,7 @@ def test_luks_remove_key(
     state: t.Literal["present", "absent", "opened", "closed"],
     label: str | None,
     expected: bool | t.Literal["exception"],
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
     module.params["device"] = device

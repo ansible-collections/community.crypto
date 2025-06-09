@@ -38,21 +38,25 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 
 if t.TYPE_CHECKING:
-    import datetime
+    import datetime  # pragma: no cover
 
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (  # pragma: no cover
         FilterModuleMock,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PublicKeyTypes,  # pragma: no cover
+    )
 
-    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule, FilterModuleMock]
+    GeneralAnsibleModule = t.Union[
+        AnsibleModule, AnsibleActionModule, FilterModuleMock
+    ]  # pragma: no cover
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION

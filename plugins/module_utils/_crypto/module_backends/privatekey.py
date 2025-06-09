@@ -37,15 +37,17 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         PrivateKeyTypes,
     )
 
-    GeneralAnsibleModule = t.Union[AnsibleModule, AnsibleActionModule]
+    GeneralAnsibleModule = t.Union[
+        AnsibleModule, AnsibleActionModule
+    ]  # pragma: no cover
 
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -267,7 +269,7 @@ class PrivateKeyBackend:
     def get_private_key_data(self) -> bytes:
         """Return bytes for self.private_key"""
         if self.private_key is None:
-            raise AssertionError("private_key not set")
+            raise AssertionError("private_key not set")  # pragma: no cover
         # Select export format and encoding
         try:
             export_format_txt = self._get_wanted_format()
@@ -341,7 +343,9 @@ class PrivateKeyBackend:
     def _load_privatekey(self) -> PrivateKeyTypes:
         data = self.existing_private_key_bytes
         if data is None:
-            raise AssertionError("existing_private_key_bytes not set")
+            raise AssertionError(
+                "existing_private_key_bytes not set"
+            )  # pragma: no cover
         try:
             # Interpret bytes depending on format.
             key_format = identify_private_key_format(data)
@@ -388,7 +392,9 @@ class PrivateKeyBackend:
     def _check_passphrase(self) -> bool:
         """Check whether provided passphrase matches, assuming self.existing_private_key_bytes has been populated."""
         if self.existing_private_key_bytes is None:
-            raise AssertionError("existing_private_key_bytes not set")
+            raise AssertionError(
+                "existing_private_key_bytes not set"
+            )  # pragma: no cover
         try:
             key_format = identify_private_key_format(self.existing_private_key_bytes)
             if key_format == "raw":
@@ -460,7 +466,9 @@ class PrivateKeyBackend:
     def _check_format(self) -> bool:
         """Check whether the key file format, assuming self.existing_private_key and self.existing_private_key_bytes has been populated."""
         if self.existing_private_key_bytes is None:
-            raise AssertionError("existing_private_key_bytes not set")
+            raise AssertionError(
+                "existing_private_key_bytes not set"
+            )  # pragma: no cover
         if self.format == "auto_ignore":
             return True
         try:

@@ -139,8 +139,8 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.module_ba
 
 
 if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr import (
+    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.module_backends.csr import (  # pragma: no cover
         CertificateSigningRequestBackend,
     )
 
