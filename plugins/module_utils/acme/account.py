@@ -73,13 +73,28 @@ class ACMEAccount(object):
                 # and provide external_account_binding credentials. Thus we first send a request with allow_creation=False
                 # to see whether the account already exists.
 
-                # Note that we pass contact here: ZeroSSL does not accept registration calls without contacts, even
-                # if onlyReturnExisting is set to true.
-                created, data = self._new_reg(contact=contact, allow_creation=False)
-                if data:
-                    # An account already exists! Return data
-                    return created, data
-                # An account does not yet exist. Try to create one next.
+                # Unfortunately, for other ACME servers it's the other way around: (at least some) HARICA endpoints
+                # do not allow *any* access without external account data. That's why we catch errors and check
+                # for 'externalAccountRequired'.
+                try:
+                    # Note that we pass contact here: ZeroSSL does not accept registration calls without contacts, even
+                    # if onlyReturnExisting is set to true.
+                    created, data = self._new_reg(contact=contact, allow_creation=False)
+                    if data:
+                        # An account already exists! Return data
+                        return created, data
+                    # An account does not yet exist. Try to create one next.
+                except ACMEProtocolException as exc:
+                    if (
+                        exc.error_type
+                        != "urn:ietf:params:acme:error:externalAccountRequired"
+                        or external_account_binding is None
+                    ):
+                        # Either another error happened, or we got 'externalAccountRequired' and external account data was not supplied
+                        # => re-raise exception!
+                        raise
+                    # In this case, the server really wants external account data.
+                    # The below code tries to create the account with external account data present.
 
             new_reg = {"contact": contact}
             if not allow_creation:
