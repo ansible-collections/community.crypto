@@ -284,7 +284,7 @@ jobs:
           pre-test-cmd: >-
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
             ;
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.general.git ../../community/general
+            git clone --depth=1 --single-branch --branch stable-10 https://github.com/ansible-collections/community.general.git ../../community/general
           pull-request-change-detection: 'true'
           target: ${{ matrix.target }}
           target-python-version: ${{ matrix.python }}
