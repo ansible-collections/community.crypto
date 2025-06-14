@@ -1668,3 +1668,14 @@ releases:
       - 2.26.2.yml
       - 901-remove-entrust.yml
     release_date: '2025-05-22'
+  2.26.3:
+    changes:
+      bugfixes:
+        - acme_account - make work with CAs that do not accept any account request
+          without External Account Binding data (https://github.com/ansible-collections/community.crypto/issues/918,
+          https://github.com/ansible-collections/community.crypto/pull/919).
+      release_summary: Bugfix release.
+    fragments:
+      - 2.26.3.yml
+      - 919-acme_account-ear.yml
+    release_date: '2025-06-14'
