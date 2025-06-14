@@ -227,7 +227,7 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
         module.fail_json(msg="Not implemented.")
 
     def run(
-        self, tmp: None = None, task_vars: dict[str, t.Any] | None = None
+        self, tmp: str | None = None, task_vars: dict[str, t.Any] | None = None
     ) -> dict[str, t.Any]:
         if task_vars is None:
             task_vars = {}
