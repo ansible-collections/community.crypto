@@ -1,2 +1,0 @@
-bugfixes:
-  - "openssl_csr, openssl_csr_pipe - avoid accessing internal members of cryptography's ``KeyUsage`` extension object (https://github.com/ansible-collections/community.crypto/pull/910)."

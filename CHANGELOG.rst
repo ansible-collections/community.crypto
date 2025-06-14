@@ -4,6 +4,26 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.0.0-rc1
+==========
+
+Release Summary
+---------------
+
+First release candidate for new major 3.0.0 release. Contains two bugfixes and some refactorings.
+
+Minor Changes
+-------------
+
+- Remove various no longer needed abstraction layers for multiple backends (https://github.com/ansible-collections/community.crypto/pull/912).
+- Various code refactorings (https://github.com/ansible-collections/community.crypto/pull/905, https://github.com/ansible-collections/community.crypto/pull/909, https://github.com/ansible-collections/community.crypto/pull/911, https://github.com/ansible-collections/community.crypto/pull/913, https://github.com/ansible-collections/community.crypto/pull/914, https://github.com/ansible-collections/community.crypto/pull/917).
+
+Bugfixes
+--------
+
+- acme_account - make work with CAs that do not accept any account request without External Account Binding data (https://github.com/ansible-collections/community.crypto/issues/918, https://github.com/ansible-collections/community.crypto/pull/919).
+- openssl_csr, openssl_csr_pipe - avoid accessing internal members of cryptography's ``KeyUsage`` extension object (https://github.com/ansible-collections/community.crypto/pull/910).
+
 v3.0.0-a2
 =========
 
