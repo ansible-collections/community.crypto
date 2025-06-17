@@ -20,6 +20,7 @@ run_yamllint = true
 yamllint_config = ".yamllint"
 yamllint_config_plugins = ".yamllint-docs"
 yamllint_config_plugins_examples = ".yamllint-examples"
+yamllint_config_extra_docs = ".yamllint-extra-docs"
 run_mypy = true
 mypy_ansible_core_package = "ansible-core>=2.19.0b4"
 mypy_config = ".mypy.ini"
