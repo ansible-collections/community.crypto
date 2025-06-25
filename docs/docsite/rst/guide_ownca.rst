@@ -51,7 +51,7 @@ The following instructions show how to set up a simple self-signed CA certificat
 Use the CA to sign a certificate
 --------------------------------
 
-To sign a certificate, you must pass a CSR to the :ref:`community.crypto.x509_certificate module <ansible_collections.community.crypto.x509_certificate_module>` or :ref:`community.crypto.x509_certificate_pipe module <ansible_collections.community.crypto.x509_certificate_pipe_module>`.
+To sign a certificate, you must pass a CSR to the :ansplugin:`community.crypto.x509_certificate module <community.crypto.x509_certificate#module>` or :ansplugin:`community.crypto.x509_certificate_pipe module <community.crypto.x509_certificate_pipe#module>`.
 
 In the following example, we assume that the certificate to sign (including its private key) are on ``server_1``, while our CA certificate is on ``server_2``. We do not want any key material to leave each respective server.
 
@@ -94,7 +94,7 @@ In the following example, we assume that the certificate to sign (including its 
       delegate_to: server_1
       run_once: true
 
-Please note that the above procedure is **not idempotent**. The following extended example reads the existing certificate from ``server_1`` (if exists) and provides it to the :ref:`community.crypto.x509_certificate_pipe module <ansible_collections.community.crypto.x509_certificate_pipe_module>`, and only writes the result back if it was changed:
+Please note that the above procedure is **not idempotent**. The following extended example reads the existing certificate from ``server_1`` (if exists) and provides it to the :ansplugin:`community.crypto.x509_certificate_pipe module <community.crypto.x509_certificate_pipe#module>`, and only writes the result back if it was changed:
 
 .. code-block:: yaml+jinja
 
