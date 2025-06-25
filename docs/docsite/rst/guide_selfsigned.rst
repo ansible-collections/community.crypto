@@ -10,7 +10,7 @@ How to create self-signed certificates
 
 The `community.crypto collection <https://galaxy.ansible.com/ui/repo/published/community/crypto/>`_ offers multiple modules that create private keys, certificate signing requests, and certificates. This guide shows how to create self-signed certificates.
 
-For creating any kind of certificate, you always have to start with a private key. You can use the :ref:`community.crypto.openssl_privatekey module <ansible_collections.community.crypto.openssl_privatekey_module>` to create a private key. If you only specify :ansopt:`community.crypto.openssl_privatekey#module:path`, the default parameters will be used. This will result in a 4096 bit RSA private key:
+For creating any kind of certificate, you always have to start with a private key. You can use the :ansplugin:`community.crypto.openssl_privatekey module <community.crypto.openssl_privatekey#module>` to create a private key. If you only specify :ansopt:`community.crypto.openssl_privatekey#module:path`, the default parameters will be used. This will result in a 4096 bit RSA private key:
 
 .. code-block:: yaml+jinja
 
@@ -28,7 +28,7 @@ You can specify :ansopt:`community.crypto.openssl_privatekey#module:type` to sel
         type: X25519
         passphrase: changeme
 
-To create a very simple self-signed certificate with no specific information, you can proceed directly with the :ref:`community.crypto.x509_certificate module <ansible_collections.community.crypto.x509_certificate_module>`:
+To create a very simple self-signed certificate with no specific information, you can proceed directly with the :ansplugin:`community.crypto.x509_certificate module <community.crypto.x509_certificate#module>`:
 
 .. code-block:: yaml+jinja
 
@@ -42,7 +42,7 @@ To create a very simple self-signed certificate with no specific information, yo
 
 You can use :ansopt:`community.crypto.x509_certificate#module:selfsigned_not_after` to define when the certificate expires (default: in roughly 10 years), and :ansopt:`community.crypto.x509_certificate#module:selfsigned_not_before` to define from when the certificate is valid (default: now).
 
-To define further properties of the certificate, like the subject, Subject Alternative Names (SANs), key usages, name constraints, etc., you need to first create a Certificate Signing Request (CSR) and provide it to the :ref:`community.crypto.x509_certificate module <ansible_collections.community.crypto.x509_certificate_module>`. If you do not need the CSR file, you can use the :ref:`community.crypto.openssl_csr_pipe module <ansible_collections.community.crypto.openssl_csr_pipe_module>` as in the example below. (To store it to disk, use the :ref:`community.crypto.openssl_csr module <ansible_collections.community.crypto.openssl_csr_module>` instead.)
+To define further properties of the certificate, like the subject, Subject Alternative Names (SANs), key usages, name constraints, etc., you need to first create a Certificate Signing Request (CSR) and provide it to the :ansplugin:`community.crypto.x509_certificate module <community.crypto.x509_certificate#module>`. If you do not need the CSR file, you can use the :ansplugin:`community.crypto.openssl_csr_pipe module <community.crypto.openssl_csr_pipe#module>` as in the example below. (To store it to disk, use the :ansplugin:`community.crypto.openssl_csr module <community.crypto.openssl_csr#module>` instead.)
 
 .. code-block:: yaml+jinja
 
