@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="2.18.0" name="antsibull-docs" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer &mdash; Community.Crypto Collection  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
+      <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="community.crypto.split_pem filter – Split PEM file contents into multiple objects" href="split_pem_filter.html" />
+    <link rel="prev" title="community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format" href="openssl_publickey_info_filter.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="https://ansible-collections.github.io/community.crypto/branch/main/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Community.Crypto Collection Docs</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Community.Crypto Collection
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Community.Crypto Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_selfsigned.html">How to create self-signed certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_ownca.html">How to create a small CA</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_ari_info_module.html">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_deactivate_authz_module.html">community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_create_module.html">community.crypto.acme_certificate_order_create module – Create an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_finalize_module.html">community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_info_module.html">community.crypto.acme_certificate_order_info module – Obtain information for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_validate_module.html">community.crypto.acme_certificate_order_validate module – Validate authorizations of an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_renewal_info_module.html">community.crypto.acme_certificate_renewal_info module – Determine whether a certificate should be renewed or not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_pipe_module.html">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_dhparam_module.html">community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_module.html">community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_module.html">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_module.html">community.crypto.x509_certificate module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_convert_module.html">community.crypto.x509_certificate_convert module – Convert X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_module.html">community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_pipe_module.html">community.crypto.x509_certificate_pipe module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_module.html">community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input">Input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-value">Return Value</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_lookup.html">community.crypto.gpg_fingerprint lookup – Retrieve a GPG fingerprint from a GPG public or private key file</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Community.Crypto Collection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/filter/parse_serial.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-community-crypto-parse-serial-filter"></span><section id="community-crypto-parse-serial-filter-convert-a-serial-number-as-a-colon-separated-list-of-hex-numbers-to-an-integer">
+<h1>community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer<a class="headerlink" href="#community-crypto-parse-serial-filter-convert-a-serial-number-as-a-colon-separated-list-of-hex-numbers-to-an-integer" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This filter plugin is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.0-rc1).</p>
+<p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
+To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
+<p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.parse_serial</span></code>.</p>
+</div>
+<p class="ansible-version-added">New in community.crypto 2.18.0</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#input" id="id2">Input</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id3">See Also</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id4">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-value" id="id5">Return Value</a></p></li>
+</ul>
+</nav>
+<section id="synopsis">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Parses a colon-separated list of hex numbers of the form <code class="docutils literal notranslate"><span class="pre">00:11:22:33</span></code> and returns the corresponding integer.</p></li>
+</ul>
+</section>
+<section id="input">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Input</a><a class="headerlink" href="#input" title="Link to this heading"></a></h2>
+<p>This describes the input of the filter, the value before <code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">community.crypto.parse_serial</span></code>.</p>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-_input"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-parse-serial-filter-parameter-input"><strong>Input</strong></p>
+<a class="ansibleOptionLink" href="#parameter-_input" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>A serial number represented as a colon-separated list of hex numbers between 0 and 255.</p>
+<p>These numbers are interpreted as the byte presentation of an unsigned integer in network byte order. That is, <code class="docutils literal notranslate"><span class="pre">01:00</span></code> is interpreted as the integer 256.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="to_serial_filter.html#ansible-collections-community-crypto-to-serial-filter"><span class="std std-ref">community.crypto.to_serial</span></a> filter plugin</dt><dd><p>Convert an integer to a colon-separated list of hex numbers.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Parse serial number</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;11:22:33&#39;</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.parse_serial</span> <span class="cp">}}</span><span class="s">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="return-value">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Return Value</a><a class="headerlink" href="#return-value" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-parse-serial-filter-return-value"><strong>Return value</strong></p>
+<a class="ansibleOptionLink" href="#return-_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The serial number as an integer.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Felix Fontein (&#64;felixfontein)</p></li>
+</ul>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Configuration entries for each entry type have a low to high priority order. For example, a variable that is lower in the list will override a variable that is higher up.</p>
+</div>
+</section>
+<section id="collection-links">
+<h3>Collection links<a class="headerlink" href="#collection-links" title="Link to this heading"></a></h3>
+<ul class="ansible-links">
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
+<li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="openssl_publickey_info_filter.html" class="btn btn-neutral float-left" title="community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="split_pem_filter.html" class="btn btn-neutral float-right" title="community.crypto.split_pem filter – Split PEM file contents into multiple objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Community.Crypto Contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
