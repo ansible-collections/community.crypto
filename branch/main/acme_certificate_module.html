@@ -448,10 +448,11 @@ Only send the certificate ID if the ARI endpoint is found in the ACME directory.
 <td><div class="ansible-option-cell"><p>Boolean indicating whether the module should create the account if necessary, and update its contact data.</p>
 <p>Set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> if you want to use the <a class="reference internal" href="acme_account_module.html#ansible-collections-community-crypto-acme-account-module"><span class="std std-ref">community.crypto.acme_account</span></a> module to manage your account instead, and to avoid accidental creation of a new account using an old key if you changed the account key with <a class="reference internal" href="acme_account_module.html#ansible-collections-community-crypto-acme-account-module"><span class="std std-ref">community.crypto.acme_account</span></a>.</p>
 <p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-terms-agreed"><span class="std std-ref"><span class="pre">terms_agreed</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-module-parameter-account-email"><span class="std std-ref"><span class="pre">account_email</span></span></a></strong></code> are ignored.</p>
+<p>The current default <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> is <strong>deprecated</strong> and will change to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> in community.crypto 4.0.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
-<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
 </ul>
 </div></td>
 </tr>
@@ -752,6 +753,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
 <span class="c1"># Alternative first step:</span>
@@ -761,6 +763,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.hashi_vault.hashi_vault&#39;</span><span class="o">,</span> <span class="s1">&#39;secret=secret/account_private_key:value&#39;</span><span class="o">)</span> <span class="cp">}}</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
 <span class="c1"># Alternative first step:</span>
@@ -770,6 +773,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/pki/cert/csr/sample.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
 <span class="c1"># perform the necessary steps to fulfill the challenge</span>
@@ -798,6 +802,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
 <span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 
 <span class="nn">---</span>
 <span class="c1">### Example with DNS challenge against production ACME server ###</span>
@@ -812,6 +817,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="c1"># Renew if the certificate is at least 30 days old</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
 <span class="c1"># perform the necessary steps to fulfill the challenge</span>
@@ -857,6 +863,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
 <span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge is changed</span>
 
 <span class="c1"># Alternative second step:</span>
@@ -883,6 +890,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">        </span><span class="nt">issuer</span><span class="p">:</span>
 <span class="w">          </span><span class="nt">CN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DST Root CA X3</span>
 <span class="w">          </span><span class="nt">O</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Digital Signature Trust Co.</span>
+<span class="w">    </span><span class="nt">modify_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge is changed</span>
 </pre></div>
 </div>
