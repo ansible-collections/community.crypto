@@ -77,6 +77,7 @@ EXAMPLES = r"""
     challenge: tls-alpn-01
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
+    modify_account: false
   register: sample_com_challenge
 
 - name: Create certificates for challenges
@@ -110,6 +111,7 @@ EXAMPLES = r"""
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
     data: "{{ sample_com_challenge }}"
+    modify_account: false
 """
 
 RETURN = r"""

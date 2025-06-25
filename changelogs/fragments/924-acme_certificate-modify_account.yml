@@ -1,0 +1,5 @@
+deprecated_features:
+  - "acme_certificate - the option ``modify_account``'s default value ``true`` has been deprecated. It will change to ``false`` in community.crypto 4.0.0.
+     We recommend to set the option to an explicit value to avoid deprecation warnings, and to prefer setting it to ``false`` already now.
+     Better use the ``community.crypto.acme_account`` module instead
+     (https://github.com/ansible-collections/community.crypto/issues/924)."

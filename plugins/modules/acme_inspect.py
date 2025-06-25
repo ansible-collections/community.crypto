@@ -123,6 +123,7 @@ EXAMPLES = r"""
     csr: /etc/pki/cert/csr/sample.com.csr
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
     challenge: http-01
+    modify_account: false
   register: certificate_request
 
 # Assume something went wrong. certificate_request.order_uri contains

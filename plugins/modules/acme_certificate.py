@@ -111,8 +111,8 @@ options:
       - Set to V(false) if you want to use the M(community.crypto.acme_account) module to manage your account instead, and
         to avoid accidental creation of a new account using an old key if you changed the account key with M(community.crypto.acme_account).
       - If set to V(false), O(terms_agreed) and O(account_email) are ignored.
+      - The current default V(true) is B(deprecated) and will change to V(false) in community.crypto 4.0.0.
     type: bool
-    default: true
   challenge:
     description:
       - The challenge to be performed.
@@ -306,6 +306,7 @@ EXAMPLES = r"""
     account_key_content: "{{ account_private_key }}"
     csr: /etc/pki/cert/csr/sample.com.csr
     dest: /etc/httpd/ssl/sample.com.crt
+    modify_account: false
   register: sample_com_challenge
 
 # Alternative first step:
@@ -315,6 +316,7 @@ EXAMPLES = r"""
       {{ lookup('community.hashi_vault.hashi_vault', 'secret=secret/account_private_key:value') }}
     csr: /etc/pki/cert/csr/sample.com.csr
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
+    modify_account: false
   register: sample_com_challenge
 
 # Alternative first step:
@@ -324,6 +326,7 @@ EXAMPLES = r"""
     csr_content: "{{ lookup('file', '/etc/pki/cert/csr/sample.com.csr') }}"
     dest: /etc/httpd/ssl/sample.com.crt
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
+    modify_account: false
   register: sample_com_challenge
 
 # perform the necessary steps to fulfill the challenge
@@ -352,6 +355,7 @@ EXAMPLES = r"""
     fullchain_dest: /etc/httpd/ssl/sample.com-fullchain.crt
     chain_dest: /etc/httpd/ssl/sample.com-intermediate.crt
     data: "{{ sample_com_challenge }}"
+    modify_account: false
 
 ---
 ### Example with DNS challenge against production ACME server ###
@@ -366,6 +370,7 @@ EXAMPLES = r"""
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
     # Renew if the certificate is at least 30 days old
     remaining_days: 60
+    modify_account: false
   register: sample_com_challenge
 
 # perform the necessary steps to fulfill the challenge
@@ -411,6 +416,7 @@ EXAMPLES = r"""
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
     remaining_days: 60
     data: "{{ sample_com_challenge }}"
+    modify_account: false
   when: sample_com_challenge is changed
 
 # Alternative second step:
@@ -437,6 +443,7 @@ EXAMPLES = r"""
         issuer:
           CN: DST Root CA X3
           O: Digital Signature Trust Co.
+    modify_account: false
   when: sample_com_challenge is changed
 """
 
@@ -671,6 +678,18 @@ class ACMECertificateClient:
 
         # Make sure account exists
         modify_account = module.params["modify_account"]
+        if modify_account is None:
+            module.deprecate(
+                "The default 'true' for modify_account has been deprecated."
+                " The default will change to 'false' in community.crypto 4.0.0."
+                " We suggest to explicitly set this option to a value to avoid"
+                " this warning. We also recommend to not set it to 'true',"
+                " but to use the community.crypto.acme_account module instead.",
+                version="4.0.0",
+                collection_name="community.crypto",
+            )
+
+            modify_account = True
         contact = []
         if module.params["account_email"]:
             contact.append("mailto:" + module.params["account_email"])
@@ -949,7 +968,7 @@ def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=True)
     argument_spec.argument_spec["csr"]["aliases"] = ["src"]
     argument_spec.update_argspec(
-        modify_account={"type": "bool", "default": True},
+        modify_account={"type": "bool"},
         account_email={"type": "str"},
         agreement={
             "type": "str",
