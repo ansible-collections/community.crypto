@@ -50,17 +50,17 @@ pool: Standard
 
 stages:
 ### Sanity & units
-  - stage: Ansible_devel
-    displayName: Sanity & Units devel
+  - stage: Ansible_2_19
+    displayName: Sanity & Units 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           targets:
             - name: Sanity
-              test: 'devel/sanity/1'
+              test: '2.19/sanity/1'
             - name: Units
-              test: 'devel/units/1'
+              test: '2.19/units/1'
   - stage: Ansible_2_18
     displayName: Sanity & Units 2.18
     dependsOn: []
@@ -95,13 +95,13 @@ stages:
             - name: Units
               test: '2.16/units/1'
 ### Docker
-  - stage: Docker_devel
-    displayName: Docker devel
+  - stage: Docker_2_19
+    displayName: Docker 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux/{0}
+          testFormat: 2.19/linux/{0}
           targets:
             - name: Fedora 41
               test: fedora41
@@ -165,13 +165,13 @@ stages:
             - 2
 
 ### Community Docker
-  - stage: Docker_community_devel
-    displayName: Docker (community images) devel
+  - stage: Docker_community_2_19
+    displayName: Docker (community images) 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux-community/{0}
+          testFormat: 2.19/linux-community/{0}
           targets:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
@@ -184,13 +184,13 @@ stages:
             - 2
 
 ### Remote
-  - stage: Remote_devel_extra_vms
-    displayName: Remote devel extra VMs
+  - stage: Remote_2_19_extra_vms
+    displayName: Remote 2.19 extra VMs
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}
+          testFormat: 2.19/{0}
           targets:
             - name: Alpine 3.21
               test: alpine/3.21
@@ -202,13 +202,13 @@ stages:
               test: ubuntu/24.04
           groups:
             - vm
-  - stage: Remote_devel
-    displayName: Remote devel
+  - stage: Remote_2_19
+    displayName: Remote 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}
+          testFormat: 2.19/{0}
           targets:
             - name: macOS 15.3
               test: macos/15.3
@@ -277,14 +277,14 @@ stages:
             - 1
             - 2
 ### Generic
-  - stage: Generic_devel
-    displayName: Generic devel
+  - stage: Generic_2_19
+    displayName: Generic 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: devel/generic/{0}
+          testFormat: 2.19/generic/{0}
           targets:
             - test: "3.8"
             # - test: "3.9"
@@ -343,21 +343,21 @@ stages:
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
-      - Ansible_devel
+      - Ansible_2_19
       - Ansible_2_18
       - Ansible_2_17
       - Ansible_2_16
-      - Remote_devel_extra_vms
-      - Remote_devel
+      - Remote_2_19_extra_vms
+      - Remote_2_19
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
-      - Docker_devel
+      - Docker_2_19
       - Docker_2_18
       - Docker_2_17
       - Docker_2_16
-      - Docker_community_devel
-      - Generic_devel
+      - Docker_community_2_19
+      - Generic_2_19
       - Generic_2_18
       - Generic_2_17
       - Generic_2_16
