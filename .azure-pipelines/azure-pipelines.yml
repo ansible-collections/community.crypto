@@ -61,6 +61,17 @@ stages:
               test: 'devel/sanity/1'
             - name: Units
               test: 'devel/units/1'
+  - stage: Ansible_2_19
+    displayName: Sanity & Units 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Sanity
+              test: '2.19/sanity/1'
+            - name: Units
+              test: '2.19/units/1'
   - stage: Ansible_2_18
     displayName: Sanity & Units 2.18
     dependsOn: []
@@ -98,6 +109,19 @@ stages:
               test: ubuntu2404
             - name: Alpine 3.21
               test: alpine321
+          groups:
+            - 1
+            - 2
+  - stage: Docker_2_19
+    displayName: Docker 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.19/linux/{0}
+          targets:
+            - name: Fedora 41
+              test: fedora41
           groups:
             - 1
             - 2
@@ -195,6 +219,19 @@ stages:
           groups:
             - 1
             - 2
+  - stage: Remote_2_19
+    displayName: Remote 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.19/{0}
+          targets:
+            - name: RHEL 10.0
+              test: rhel/10.0
+          groups:
+            - 1
+            - 2
   - stage: Remote_2_18
     displayName: Remote 2.18
     dependsOn: []
@@ -245,6 +282,20 @@ stages:
           groups:
             - 1
             - 2
+  - stage: Generic_2_19
+    displayName: Generic 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.19/generic/{0}
+          targets:
+            - test: "3.9"
+            - test: "3.13"
+          groups:
+            - 1
+            - 2
   - stage: Generic_2_18
     displayName: Generic 2.18
     dependsOn: []
@@ -280,18 +331,22 @@ stages:
     condition: succeededOrFailed()
     dependsOn:
       - Ansible_devel
+      - Ansible_2_19
       - Ansible_2_18
       - Ansible_2_17
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_18
+      - Remote_2_19
       - Remote_2_17
       - Docker_devel
       - Docker_2_18
+      - Docker_2_19
       - Docker_2_17
       - Docker_community_devel
       - Generic_devel
       - Generic_2_18
+      - Generic_2_19
       - Generic_2_17
     jobs:
       - template: templates/coverage.yml
