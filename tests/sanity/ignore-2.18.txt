@@ -1,4 +1,3 @@
-meta/runtime.yml runtime-metadata  # Bug in ansible-test: https://github.com/ansible/ansible/pull/85198
 plugins/module_utils/_acme/account.py pep8:E704
 plugins/module_utils/_acme/acme.py pep8:E704
 plugins/module_utils/_acme/backend_openssl_cli.py pep8:E704
