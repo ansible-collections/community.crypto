@@ -1,0 +1,201 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="2.18.0" name="antsibull-docs" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>community.crypto.acme_account_facts &mdash; Community.Crypto Collection  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
+      <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="https://ansible-collections.github.io/community.crypto/branch/main/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Community.Crypto Collection Docs</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Community.Crypto Collection
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Community.Crypto Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_selfsigned.html">How to create self-signed certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_ownca.html">How to create a small CA</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_ari_info_module.html">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_deactivate_authz_module.html">community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_create_module.html">community.crypto.acme_certificate_order_create module – Create an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_finalize_module.html">community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_info_module.html">community.crypto.acme_certificate_order_info module – Obtain information for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_validate_module.html">community.crypto.acme_certificate_order_validate module – Validate authorizations of an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_renewal_info_module.html">community.crypto.acme_certificate_renewal_info module – Determine whether a certificate should be renewed or not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_pipe_module.html">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_dhparam_module.html">community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_module.html">community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_module.html">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_module.html">community.crypto.x509_certificate module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_convert_module.html">community.crypto.x509_certificate_convert module – Convert X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_module.html">community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_pipe_module.html">community.crypto.x509_certificate_pipe module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_module.html">community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_lookup.html">community.crypto.gpg_fingerprint lookup – Retrieve a GPG fingerprint from a GPG public or private key file</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Community.Crypto Collection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">community.crypto.acme_account_facts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-community-crypto-acme-account-facts-module"></span><section id="community-crypto-acme-account-facts">
+<h1>community.crypto.acme_account_facts<a class="headerlink" href="#community-crypto-acme-account-facts" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This plugin was part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.0).</p>
+</div>
+<p>This module has been removed
+in version 2.0.0 of community.crypto.
+The ‘community.crypto.acme_account_facts’ module has been renamed to ‘community.crypto.acme_account_info’.</p>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Community.Crypto Contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
