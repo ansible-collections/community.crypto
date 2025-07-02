@@ -1804,3 +1804,29 @@ releases:
       - 919-acme_account-ear.yml
       - refactoring.yml
     release_date: '2025-06-14'
+  3.0.0:
+    changes:
+      deprecated_features:
+        - acme_certificate - the option ``modify_account``'s default value ``true``
+          has been deprecated. It will change to ``false`` in community.crypto 4.0.0.
+          We recommend to set the option to an explicit value to avoid deprecation
+          warnings, and to prefer setting it to ``false`` already now. Better use
+          the ``community.crypto.acme_account`` module instead (https://github.com/ansible-collections/community.crypto/issues/924).
+      release_summary: 'New major release of community.crypto with a lot of code modernization.
+
+        This release drops compatibility for ansible-core before 2.17, for Python
+
+        before 3.7, and for cryptography before 3.3.
+
+        It also removes all Entrust modules, and the Entrust provider for the
+
+        ``community.crypto.x509_certificate*`` modules.
+
+
+        See below for a more detailled list of changes.
+
+        '
+    fragments:
+      - 3.0.0.yml
+      - 924-acme_certificate-modify_account.yml
+    release_date: '2025-07-02'
