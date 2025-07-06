@@ -180,10 +180,10 @@ order:
     replaces:
       description:
         - If the order was created to replace an existing certificate using the C(replaces) mechanism from
-          L(draft-ietf-acme-ari, https://datatracker.ietf.org/doc/draft-ietf-acme-ari/), this provides the
+          L(RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html), this provides the
           certificate ID of the certificate that will be replaced by this order.
       type: str
-      returned: when the certificate order is replacing a certificate through draft-ietf-acme-ari
+      returned: when the certificate order is replacing a certificate through RFC 9773
     profile:
       description:
         - If the ACME CA supports profiles through the L(draft-aaron-acme-profiles,

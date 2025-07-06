@@ -18,8 +18,8 @@ version_added: 2.20.0
 short_description: Determine whether a certificate should be renewed or not
 description:
   - Uses various information to determine whether a certificate should be renewed or not.
-  - If available, the ARI extension (ACME Renewal Information, U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)) is
-    used. This module implements version 3 of the ARI draft.".
+  - If available, the ARI extension (ACME Renewal Information, L(RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html)) is
+    used.
 extends_documentation_fragment:
   - community.crypto.acme.basic
   - community.crypto.acme.no_account
@@ -54,7 +54,7 @@ options:
     description:
       - If ARI information is used, selects which algorithm is used to determine whether to renew now.
       - V(standard) selects the L(algorithm provided in the the ARI specification,
-        https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#name-renewalinfo-objects).
+        https://www.rfc-editor.org/rfc/rfc9773.html#section-4.2).
       - V(start) returns RV(should_renew=true) once the start of the renewal interval has been reached.
     type: str
     choices:
@@ -157,7 +157,7 @@ supports_ari:
 
 cert_id:
   description:
-    - The certificate ID according to the L(ARI specification, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1).
+    - The certificate ID according to L(Section 4.1 in RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html#section-4.1).
   returned: success, the certificate exists, and has an Authority Key Identifier X.509 extension
   type: str
   sample: aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
