@@ -15,7 +15,6 @@ description:
   - Allows to retrieve renewal information on a certificate obtained with the L(ACME protocol,https://tools.ietf.org/html/rfc8555).
   - This module only works with the ACME v2 protocol, and requires the ACME server to support the ARI extension
     (L(RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html)).
-    This module implements version 3 of the ARI draft.
 extends_documentation_fragment:
   - community.crypto._acme.basic
   - community.crypto._acme.no_account

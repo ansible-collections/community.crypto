@@ -14,7 +14,7 @@ short_description: Determine whether a certificate should be renewed or not
 description:
   - Uses various information to determine whether a certificate should be renewed or not.
   - If available, the ARI extension (ACME Renewal Information, L(RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html)) is
-    used. This module implements version 3 of the ARI draft.".
+    used.
 extends_documentation_fragment:
   - community.crypto._acme.basic
   - community.crypto._acme.no_account
