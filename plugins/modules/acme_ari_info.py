@@ -14,7 +14,7 @@ short_description: Retrieves ACME Renewal Information (ARI) for a certificate
 description:
   - Allows to retrieve renewal information on a certificate obtained with the L(ACME protocol,https://tools.ietf.org/html/rfc8555).
   - This module only works with the ACME v2 protocol, and requires the ACME server to support the ARI extension
-    (U(https://datatracker.ietf.org/doc/draft-ietf-acme-ari/)).
+    (L(RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html)).
     This module implements version 3 of the ARI draft.
 extends_documentation_fragment:
   - community.crypto._acme.basic
@@ -54,7 +54,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 renewal_info:
-  description: The ARI renewal info object (U(https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.2)).
+  description: The ARI renewal info object (U(https://www.rfc-editor.org/rfc/rfc9773.html#section-4.2)).
   returned: success
   type: dict
   contains:
