@@ -242,8 +242,8 @@ options:
         type: str
   include_renewal_cert_id:
     description:
-      - Determines whether to request renewal of an existing certificate according to L(the ACME ARI draft 3,
-        https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
+      - Determines whether to request renewal of an existing certificate according to L(Section 5 of RFC 9773,
+        https://www.rfc-editor.org/rfc/rfc9773.html#section-5).
       - This is only used when the certificate specified in O(dest) or O(fullchain_dest) already exists.
       - Generally you should use V(when_ari_supported) if you know that the ACME service supports a compatible draft (or final
         version, once it is out) of the ARI extension. V(always) should never be necessary. If you are not sure, or if you

@@ -111,9 +111,9 @@ options:
   replaces_cert_id:
     description:
       - If provided, will request the order to replace the certificate identified by this certificate ID
-        according to L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-5).
+        according to L(Section 5 of RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html#section-5).
       - This certificate ID must be computed as specified in
-        L(the ACME ARI draft 3, https://www.ietf.org/archive/id/draft-ietf-acme-ari-03.html#section-4.1).
+        L(Section 4.1 of RFC 9773, https://www.rfc-editor.org/rfc/rfc9773.html#section-4.1).
         It is returned as return value RV(community.crypto.acme_certificate_renewal_info#module:cert_id) of the
         M(community.crypto.acme_certificate_renewal_info) module.
       - ACME servers might refuse to create new orders that indicate to replace a certificate for which
