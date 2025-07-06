@@ -56,6 +56,7 @@ no_trailing_whitespace_skip_paths = [
 no_trailing_whitespace_skip_directories = [
     "tests/unit/plugins/module_utils/_acme/fixtures/",
 ]
+run_avoid_characters = true
 
 [[sessions.extra_checks.action_groups_config]]
 name = "acme"
@@ -66,6 +67,13 @@ exclusions = [
     "acme_challenge_cert_helper",  # does not support (and need) any common parameters
 ]
 doc_fragment = "community.crypto._attributes.actiongroup_acme"
+
+[[sessions.extra_checks.avoid_character_group]]
+name = "tab"
+regex = "\\x09"
+skip_paths = [
+    "tests/integration/targets/luks_device/files/keyfile3",
+]
 
 [sessions.build_import_check]
 run_galaxy_importer = true
