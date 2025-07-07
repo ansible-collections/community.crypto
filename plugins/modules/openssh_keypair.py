@@ -158,7 +158,6 @@ EXAMPLES = r"""
   community.crypto.openssh_keypair:
     path: /tmp/id_ssh_rsa
     force: true
-    
 - name: Regenerate SSH keypair only if format or options mismatch
   community.crypto.openssh_keypair:
     path: /home/devops/.ssh/id_ed25519
