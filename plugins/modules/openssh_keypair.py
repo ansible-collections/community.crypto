@@ -164,6 +164,13 @@ EXAMPLES = r"""
     path: /tmp/id_ssh_rsa
     force: true
 
+- name: Regenerate SSH keypair only if format or options mismatch
+  community.crypto.openssh_keypair:
+    path: /home/devops/.ssh/id_ed25519
+    type: ed25519
+    regenerate: full_idempotence
+    private_key_format: ssh
+
 - name: Generate an OpenSSH keypair with a different algorithm (dsa)
   community.crypto.openssh_keypair:
     path: /tmp/id_ssh_dsa
