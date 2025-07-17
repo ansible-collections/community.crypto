@@ -56,6 +56,7 @@
       - csr_ku_xku is not changed
       - csr_ku_xku_change is changed
       - csr_ku_xku_change_2 is changed
+      - csr_ku_xku_change_2_idempotency is not changed
 
 - name: "({{ select_crypto_backend }}) Validate old_API CSR (test - Common Name)"
   ansible.builtin.command: "{{ openssl_binary }} req -noout -subject -in {{ remote_tmp_dir }}/csr_oldapi.csr -nameopt oneline,-space_eq"

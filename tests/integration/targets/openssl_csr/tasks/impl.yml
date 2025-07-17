@@ -165,6 +165,21 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: csr_ku_xku_change_2
 
+- name: "({{ select_crypto_backend }}) Generate CSR with KU and XKU (idempotency 2)"
+  community.crypto.openssl_csr:
+    path: '{{ remote_tmp_dir }}/csr_ku_xku.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+    subject:
+      commonName: 'www.ansible.com'
+    keyUsage:
+      - digitalSignature
+    extendedKeyUsage:
+      - ipsecUser
+      - qcStatements
+      - Biometric Info
+    select_crypto_backend: '{{ select_crypto_backend }}'
+  register: csr_ku_xku_change_2_idempotency
+
 - name: "({{ select_crypto_backend }}) Generate CSR with old API"
   community.crypto.openssl_csr:
     path: '{{ remote_tmp_dir }}/csr_oldapi.csr'

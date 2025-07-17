@@ -546,7 +546,14 @@ class CertificateSigningRequestBackend:
                 return False
             params = cryptography_parse_key_usage_params(self.key_usage)
             for param, value in params.items():
-                if getattr(current_keyusage_ext.value, param) != value:
+                try:
+                    # param in ('encipher_only', 'decipher_only') can result in ValueError()
+                    # being raised if key_agreement == False.
+                    current_value = getattr(current_keyusage_ext.value, param)
+                except ValueError:
+                    # In that case, assume that the value is False.
+                    current_value = False
+                if current_value != value:
                     return False
             return current_keyusage_ext.critical == self.key_usage_critical
 
