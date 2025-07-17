@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- openssl_csr and openssl_csr_pipe - the idempotency check for ``key_usage`` resulted in a crash if ``Key Agreement``/``keyAgreement`` was not set (https://github.com/ansible-collections/community.crypto/issues/934, https://github.com/ansible-collections/community.crypto/pull/935).
+
 v3.0.0
 ======
 
