@@ -250,8 +250,8 @@ stages:
           targets:
             - name: RHEL 9.3
               test: rhel/9.3
-            - name: FreeBSD 13.3
-              test: freebsd/13.3
+            - name: FreeBSD 13.5
+              test: freebsd/13.5
           groups:
             - 1
             - 2
