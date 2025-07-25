@@ -25,6 +25,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
 
 try:
     from cryptography import x509
+    from cryptography.exceptions import UnsupportedAlgorithm
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
 except ImportError:
@@ -168,13 +169,15 @@ def load_privatekey(
             priv_key_detail,
             None if passphrase is None else to_bytes(passphrase),
         )
+    except UnsupportedAlgorithm as exc:
+        raise OpenSSLBadPassphraseError(f"Unsupported private key type: {exc}") from exc
     except TypeError as exc:
         raise OpenSSLBadPassphraseError(
             "Wrong or empty passphrase provided for private key"
         ) from exc
     except ValueError as exc:
         raise OpenSSLBadPassphraseError(
-            "Wrong passphrase provided for private key"
+            f"Wrong passphrase provided for private key, or private key cannot be parsed: {exc}"
         ) from exc
 
 
