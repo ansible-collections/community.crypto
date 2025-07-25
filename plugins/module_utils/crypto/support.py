@@ -40,6 +40,7 @@ except (ImportError, AttributeError):
 
 try:
     from cryptography import x509
+    from cryptography.exceptions import UnsupportedAlgorithm
     from cryptography.hazmat.backends import default_backend as cryptography_backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
@@ -213,12 +214,16 @@ def load_privatekey(
                 None if passphrase is None else to_bytes(passphrase),
                 cryptography_backend(),
             )
+        except UnsupportedAlgorithm as exc:
+            raise OpenSSLBadPassphraseError("Unsupported private key type: {exc}".format(exc=exc))
         except TypeError:
             raise OpenSSLBadPassphraseError(
                 "Wrong or empty passphrase provided for private key"
             )
-        except ValueError:
-            raise OpenSSLBadPassphraseError("Wrong passphrase provided for private key")
+        except ValueError as exc:
+            raise OpenSSLBadPassphraseError(
+                "Wrong passphrase provided for private key, or private key cannot be parsed: {exc}".format(exc=exc)
+            )
 
     return result
 
