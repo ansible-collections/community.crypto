@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.4
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- Improve error message when loading a private key fails due to correct private key files or wrong passwords. Also include the original cryptography error since it likely contains more helpful information (https://github.com/ansible-collections/community.crypto/issues/936, https://github.com/ansible-collections/community.crypto/pull/939).
+
 v2.26.3
 =======
 

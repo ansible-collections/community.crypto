@@ -1679,3 +1679,15 @@ releases:
       - 2.26.3.yml
       - 919-acme_account-ear.yml
     release_date: '2025-06-14'
+  2.26.4:
+    changes:
+      bugfixes:
+        - Improve error message when loading a private key fails due to correct private
+          key files or wrong passwords. Also include the original cryptography error
+          since it likely contains more helpful information (https://github.com/ansible-collections/community.crypto/issues/936,
+          https://github.com/ansible-collections/community.crypto/pull/939).
+      release_summary: Bugfix release.
+    fragments:
+      - 2.26.4.yml
+      - 939-private-key-errors.yml
+    release_date: '2025-07-26'
