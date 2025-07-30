@@ -24,5 +24,6 @@ skip_list:
   - risky-file-permissions
   - risky-shell-pipe
   - var-naming[no-reserved]
+  - var-naming[no-role-prefix]
   - var-naming[pattern]
   - var-naming[read-only]
