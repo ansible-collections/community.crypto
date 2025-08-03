@@ -62,7 +62,7 @@ else:
 # -1 usually means connection problems
 RETRY_STATUS_CODES = (-1, 408, 429, 502, 503, 504)
 
-RETRY_COUNT = 10
+RETRY_COUNT = 20
 
 
 def _decode_retry(module, response, info, retry_count):
