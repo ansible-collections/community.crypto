@@ -4,6 +4,20 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.0.3
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- acme_* modules - also retry on HTTP responses 502 Bad Gateway and 504 Gateway Timeout. The latter is needed for ZeroSSL, which seems to have a lot of 504s (https://github.com/ansible-collections/community.crypto/issues/945, https://github.com/ansible-collections/community.crypto/pull/947).
+- acme_* modules - increase the maximum amount of retries from 10 to 20 to accomodate ZeroSSL's buggy implementation (https://github.com/ansible-collections/community.crypto/pull/949).
+
 v3.0.2
 ======
 

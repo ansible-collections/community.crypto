@@ -1,3 +1,0 @@
-bugfixes:
-  - "acme_* modules - increase the maximum amount of retries from 10 to 20 to accomodate ZeroSSL's buggy implementation
-     (https://github.com/ansible-collections/community.crypto/pull/949)."

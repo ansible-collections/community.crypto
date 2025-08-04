@@ -1853,3 +1853,18 @@ releases:
       - 3.0.2.yml
       - 939-private-key-errors.yml
     release_date: '2025-07-26'
+  3.0.3:
+    changes:
+      bugfixes:
+        - acme_* modules - also retry on HTTP responses 502 Bad Gateway and 504 Gateway
+          Timeout. The latter is needed for ZeroSSL, which seems to have a lot of
+          504s (https://github.com/ansible-collections/community.crypto/issues/945,
+          https://github.com/ansible-collections/community.crypto/pull/947).
+        - acme_* modules - increase the maximum amount of retries from 10 to 20 to
+          accomodate ZeroSSL's buggy implementation (https://github.com/ansible-collections/community.crypto/pull/949).
+      release_summary: Bugfix release.
+    fragments:
+      - 3.0.3.yml
+      - 947-acme-retry.yml
+      - 949-acme-retry.yml
+    release_date: '2025-08-04'
