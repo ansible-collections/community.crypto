@@ -76,6 +76,8 @@ system_python_version_data:
       - '3.9'
     '12':
       - '3.11'
+    '13':
+      - '3.13'
   Alpine:
     '3.16':
       - '3.10'
@@ -95,3 +97,6 @@ cannot_upgrade_cryptography:
       - '3.9'  # this is the default container for ansible-core 2.12; upgrading cryptography wrecks pyOpenSSL
     '24':
       - '3.12'  # ERROR: Cannot uninstall cryptography 41.0.7, RECORD file not found. Hint: The package was installed by debian.
+  Debian:
+    '13':
+      - '3.13'  #  ERROR: Cannot uninstall cryptography 43.0.0, RECORD file not found. Hint: The package was installed by debian.
