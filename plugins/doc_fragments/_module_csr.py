@@ -341,3 +341,60 @@ seealso:
   - plugin: community.crypto.parse_serial
     plugin_type: filter
 """
+
+    RETURN = r"""
+privatekey:
+  description:
+    - Path to the TLS/SSL private key the CSR was generated for.
+    - Will be V(none) if the private key has been provided in O(privatekey_content).
+  returned: changed or success
+  type: str
+  sample: /etc/ssl/private/ansible.com.pem
+subject:
+  description: A list of the subject tuples attached to the CSR.
+  returned: changed or success
+  type: list
+  elements: list
+  sample: [['CN', 'www.ansible.com'], ['O', 'Ansible']]
+subjectAltName:
+  description: The alternative names this CSR is valid for.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['DNS:www.ansible.com', 'DNS:m.ansible.com']
+keyUsage:
+  description: Purpose for which the public key may be used.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['digitalSignature', 'keyAgreement']
+extendedKeyUsage:
+  description: Additional restriction on the public key purposes.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['clientAuth']
+basicConstraints:
+  description: Indicates if the certificate belongs to a CA.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['CA:TRUE', 'pathLenConstraint:0']
+ocsp_must_staple:
+  description: Indicates whether the certificate has the OCSP Must Staple feature enabled.
+  returned: changed or success
+  type: bool
+  sample: false
+name_constraints_permitted:
+  description: List of permitted subtrees to sign certificates for.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['email:.somedomain.com']
+name_constraints_excluded:
+  description: List of excluded subtrees the CA cannot sign certificates for.
+  returned: changed or success
+  type: list
+  elements: str
+  sample: ['email:.com']
+"""
