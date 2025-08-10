@@ -27,6 +27,7 @@ jobs:
     name: Build Ansible Docs
     uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-push.yml@main
     with:
+      ansible-ref: devel
       collection-name: community.crypto
       init-lenient: false
       init-fail-on-error: true
