@@ -171,9 +171,11 @@ stages:
         parameters:
           testFormat: devel/linux-community/{0}
           targets:
-            - name: Debian Bookworm
+            - name: Debian 13 Trixie
+              test: debian-13-trixie/3.13
+            - name: Debian 12 Bookworm
               test: debian-bookworm/3.11
-            - name: Debian Bullseye
+            - name: Debian 11 Bullseye
               test: debian-bullseye/3.9
             - name: ArchLinux
               test: archlinux/3.13
