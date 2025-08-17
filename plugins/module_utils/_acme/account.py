@@ -9,8 +9,8 @@
 from __future__ import annotations
 
 import typing as t
+from collections.abc import Mapping
 
-from ansible.module_utils.common._collections_compat import Mapping
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
@@ -21,6 +21,11 @@ if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (  # pragma: no cover
         ACMEClient,
     )
+
+    _JsonMapping = Mapping[str, t.Any]
+else:
+    # Since we need to pass this to t.cast(), we need a version that doesn't break with Python 3.7 and 3.8
+    _JsonMapping = Mapping
 
 
 class ACMEAccount:
@@ -42,7 +47,7 @@ class ACMEAccount:
         terms_agreed: bool = False,
         allow_creation: bool = True,
         external_account_binding: dict[str, t.Any] | None = None,
-    ) -> tuple[bool, dict[str, t.Any] | None]:
+    ) -> tuple[bool, Mapping[str, t.Any] | None]:
         """
         Registers a new ACME account. Returns a pair ``(created, data)``.
         Here, ``created`` is ``True`` if the account was created and
@@ -132,7 +137,7 @@ class ACMEAccount:
             # Account did not exist
             if "location" in info:
                 self.client.set_account_uri(info["location"])
-            return True, result
+            return True, t.cast(_JsonMapping, result)
         if info["status"] == 200:
             # Account did exist
             if result.get("status") == "deactivated":
@@ -147,7 +152,7 @@ class ACMEAccount:
                 raise ModuleFailException("Account is deactivated")
             if "location" in info:
                 self.client.set_account_uri(info["location"])
-            return False, result
+            return False, t.cast(_JsonMapping, result)
         if (
             info["status"] in (400, 404)
             and result["type"] == "urn:ietf:params:acme:error:accountDoesNotExist"
@@ -236,7 +241,7 @@ class ACMEAccount:
         allow_creation: t.Literal[True] = True,
         remove_account_uri_if_not_exists: bool = False,
         external_account_binding: dict[str, t.Any] | None = None,
-    ) -> tuple[bool, dict[str, t.Any]]: ...
+    ) -> tuple[bool, Mapping[str, t.Any]]: ...
 
     @t.overload
     def setup_account(
@@ -247,7 +252,7 @@ class ACMEAccount:
         allow_creation: bool = True,
         remove_account_uri_if_not_exists: bool = False,
         external_account_binding: dict[str, t.Any] | None = None,
-    ) -> tuple[bool, dict[str, t.Any] | None]: ...
+    ) -> tuple[bool, Mapping[str, t.Any] | None]: ...
 
     def setup_account(
         self,
@@ -257,7 +262,7 @@ class ACMEAccount:
         allow_creation: bool = True,
         remove_account_uri_if_not_exists: bool = False,
         external_account_binding: dict[str, t.Any] | None = None,
-    ) -> tuple[bool, dict[str, t.Any] | None]:
+    ) -> tuple[bool, Mapping[str, t.Any] | None]:
         """
         Detect or create an account on the ACME server. For ACME v1,
         as the only way (without knowing an account URI) to test if an
@@ -288,7 +293,7 @@ class ACMEAccount:
             created = False
             # Verify that the account key belongs to the URI.
             # (If update_contact is True, this will be done below.)
-            account_data = self.get_account_data()
+            account_data: Mapping[str, t.Any] | None = self.get_account_data()
             if account_data is None:
                 if remove_account_uri_if_not_exists and not allow_creation:
                     self.client.account_uri = None
@@ -314,7 +319,7 @@ class ACMEAccount:
 
     def update_account(
         self, *, account_data: dict[str, t.Any], contact: list[str] | None = None
-    ) -> tuple[bool, dict[str, t.Any]]:
+    ) -> tuple[bool, Mapping[str, t.Any]]:
         """
         Update an account on the ACME server. Check mode is fully respected.
 
@@ -340,9 +345,11 @@ class ACMEAccount:
             return False, dict(account_data)
 
         # Apply change
+        account_data_res: Mapping[str, t.Any]
         if self.client.module.check_mode:
-            account_data = dict(account_data)
-            account_data.update(update_request)
+            account_data_dict = dict(account_data)
+            account_data_dict.update(update_request)
+            account_data_res = account_data_dict
         else:
             raw_account_data, info = self.client.send_signed_request(
                 self.client.account_uri, update_request
@@ -354,9 +361,9 @@ class ACMEAccount:
                     info=info,
                     content_json=account_data,
                 )
-            account_data = raw_account_data
+            account_data_res = raw_account_data
 
-        return True, account_data
+        return True, account_data_res
 
 
 __all__ = ("ACMEAccount",)
