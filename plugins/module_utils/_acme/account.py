@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import typing as t
 
-from ansible.module_utils.common._collections_compat import Mapping
+from collections.abc import Mapping
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ACMEProtocolException,
     ModuleFailException,

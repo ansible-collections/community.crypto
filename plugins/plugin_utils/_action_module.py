@@ -22,7 +22,7 @@ import typing as t
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.basic import SEQUENCETYPE, remove_values
-from ansible.module_utils.common._collections_compat import Mapping
+from collections.abc import Mapping
 from ansible.module_utils.common.arg_spec import ArgumentSpecValidator
 from ansible.module_utils.errors import UnsupportedError
 from ansible.plugins.action import ActionBase
