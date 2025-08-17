@@ -9,8 +9,8 @@
 from __future__ import annotations
 
 import typing as t
-
 from collections.abc import Mapping
+
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ACMEProtocolException,
     ModuleFailException,
