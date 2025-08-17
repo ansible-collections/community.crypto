@@ -320,11 +320,12 @@ def main() -> t.NoReturn:
             result["account_uri"] = client.account_uri
             result["exists"] = True
             # Make sure promised data is there
+            account_data_dict = dict(account_data)
             if "contact" not in account_data:
-                account_data["contact"] = []
+                account_data_dict["contact"] = []
             if client.account_key_data:
-                account_data["public_account_key"] = client.account_key_data["jwk"]
-            result["account"] = account_data
+                account_data_dict["public_account_key"] = client.account_key_data["jwk"]
+            result["account"] = account_data_dict
             # Retrieve orders list
             if (
                 account_data.get("orders")
