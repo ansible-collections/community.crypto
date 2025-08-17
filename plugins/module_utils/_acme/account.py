@@ -22,6 +22,11 @@ if t.TYPE_CHECKING:
         ACMEClient,
     )
 
+    _JsonMapping = Mapping[str, t.Any]
+else:
+    # Since we need to pass this to t.cast(), we need a version that doesn't break with Python 3.7 and 3.8
+    _JsonMapping = Mapping
+
 
 class ACMEAccount:
     """
@@ -132,7 +137,7 @@ class ACMEAccount:
             # Account did not exist
             if "location" in info:
                 self.client.set_account_uri(info["location"])
-            return True, t.cast(Mapping[str, t.Any], result)
+            return True, t.cast(_JsonMapping, result)
         if info["status"] == 200:
             # Account did exist
             if result.get("status") == "deactivated":
@@ -147,7 +152,7 @@ class ACMEAccount:
                 raise ModuleFailException("Account is deactivated")
             if "location" in info:
                 self.client.set_account_uri(info["location"])
-            return False, t.cast(Mapping[str, t.Any], result)
+            return False, t.cast(_JsonMapping, result)
         if (
             info["status"] in (400, 404)
             and result["type"] == "urn:ietf:params:acme:error:accountDoesNotExist"
