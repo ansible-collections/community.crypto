@@ -1,0 +1,167 @@
+---
+- set_fact:
+    certificates:
+      - name: ca
+        subject:
+          commonName: Ansible
+        is_ca: yes
+      - name: ca-2
+        subject:
+          commonName: Ansible Other CA
+        is_ca: yes
+      - name: cert-1
+        subject_alt_name:
+          - DNS:ansible.com
+      - name: cert-2
+        subject_alt_name:
+          - DNS:example.com
+      - name: cert-3
+        subject_alt_name:
+          - DNS:example.org
+          - IP:1.2.3.4
+      - name: cert-4
+        subject_alt_name:
+          - DNS:test.ansible.com
+          - DNS:b64.ansible.com
+
+- name: Generate private keys
+  openssl_privatekey:
+    path: '{{ output_dir }}/{{ item.name }}.key'
+    type: ECC
+    curve: secp256r1
+  loop: "{{ certificates }}"
+
+- name: Generate CSRs
+  openssl_csr:
+    path: '{{ output_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ output_dir }}/{{ item.name }}.key'
+    subject: "{{ item.subject | default(omit) }}"
+    subject_alt_name: "{{ item.subject_alt_name | default(omit) }}"
+    basic_constraints: "{{ 'CA:TRUE' if item.is_ca | default(false) else omit }}"
+    use_common_name_for_san: no
+  loop: "{{ certificates }}"
+
+- name: Generate CA certificates
+  x509_certificate:
+    path: '{{ output_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ output_dir }}/{{ item.name }}.csr'
+    privatekey_path: '{{ output_dir }}/{{ item.name }}.key'
+    provider: selfsigned
+  loop: "{{ certificates }}"
+  when: item.is_ca | default(false)
+
+- name: Generate other certificates
+  x509_certificate:
+    path: '{{ output_dir }}/{{ item.name }}.pem'
+    csr_path: '{{ output_dir }}/{{ item.name }}.csr'
+    provider: ownca
+    ownca_path: '{{ output_dir }}/ca.pem'
+    ownca_privatekey_path: '{{ output_dir }}/ca.key'
+  loop: "{{ certificates }}"
+  when: not (item.is_ca | default(false))
+
+- name: Get certificate infos
+  x509_certificate_info:
+    path: '{{ output_dir }}/{{ item }}.pem'
+  loop:
+  - cert-1
+  - cert-2
+  - cert-3
+  - cert-4
+  register: certificate_infos
+
+- name: Create CRL 1
+  x509_crl:
+    path: '{{ output_dir }}/ca-crl1.crl'
+    privatekey_path: '{{ output_dir }}/ca.key'
+    issuer:
+      CN: Ansible
+    last_update: 20191013000000Z
+    next_update: 20191113000000Z
+    revoked_certificates:
+      - path: '{{ output_dir }}/cert-1.pem'
+        revocation_date: 20191013000000Z
+      - path: '{{ output_dir }}/cert-2.pem'
+        revocation_date: 20191013000000Z
+        reason: key_compromise
+        reason_critical: yes
+        invalidity_date: 20191012000000Z
+      - serial_number: 1234
+        revocation_date: 20191001000000Z
+
+- name: Create CRL 2
+  x509_crl:
+    path: '{{ output_dir }}/ca-crl2.crl'
+    # format: der   -- httpbin's base64/ endpoint will die
+    format: pem
+    privatekey_path: '{{ output_dir }}/ca.key'
+    issuer:
+      CN: Ansible
+    last_update: 20191013000000Z
+    next_update: 20191113000000Z
+    revoked_certificates:
+      - path: '{{ output_dir }}/cert-4.pem'
+        revocation_date: 20200411000000Z
+      - serial_number: 1234
+        revocation_date: 20191001000000Z
+
+- name: Create OpenSSL config for certificate with CRL
+  copy:
+    dest: '{{ output_dir }}/cert-0.cnf'
+    content: |
+      HOME     = .
+      RANDFILE = $ENV::HOME/.rnd
+
+      [req]
+      distinguished_name = req_DN
+      req_extensions     = req_SAN
+
+      [req_DN]
+
+      [req_SAN]
+      subjectAltName = DNS:ansible.com
+
+      {% if ansible_os_family == 'Darwin' %}
+      [crl]
+      crlDistributionPoints=@crl_section
+
+      [crl_section]
+      URI = http://{{ httpbin_host }}/base64/{{ lookup('file', output_dir ~ '/ca-crl2.crl') | b64encode | replace('+', '-') | replace('/', '_') }}
+      {% else %}
+      [crl]
+      crlDistributionPoints=crldp1_section
+
+      [crldp1_section]
+      fullname=URI:http://{{ httpbin_host }}/base64/{{ lookup('file', output_dir ~ '/ca-crl2.crl') | b64encode | replace('+', '-') | replace('/', '_') }}
+      reasons=keyCompromise
+      {% endif %}
+  when: httpbin_host is defined
+
+- name: Create certificate with CRL
+  command: >-
+    openssl req
+      -x509
+      -nodes
+      {% if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') or (ansible_os_family == 'Darwin') %}
+      -newkey rsa:2048
+      {% else %}
+      -newkey ec -pkeyopt ec_paramgen_curve:prime256v1
+      {% endif %}
+      -keyout cert-0.key
+      -out cert-0.pem
+      -config cert-0.cnf
+      -days 365
+      -set_serial 1234
+      -subj /CN=ansible.com
+      -extensions crl
+  args:
+    chdir: '{{ output_dir }}'
+  when: httpbin_host is defined
+
+- block:
+  - name: Running tests with cryptography backend
+    include_tasks: impl.yml
+    vars:
+      select_crypto_backend: cryptography
+
+  when: cryptography_version.stdout is version('1.2', '>=')

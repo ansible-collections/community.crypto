@@ -1,0 +1,3 @@
+---
+# needed when role is used outside of ansible-test
+httpbin_host: httpbin.org
