@@ -170,10 +170,6 @@ filename:
   returned: changed or success
   type: str
   sample: /etc/ssl/csr/www.ansible.com.csr
-name_constraints_permitted:
-  version_added: 1.1.0
-name_constraints_excluded:
-  version_added: 1.1.0
 backup_file:
   description: Name of backup file created.
   returned: changed and if O(backup) is V(true)
@@ -187,6 +183,7 @@ csr:
 
 extends_documentation_fragment:
   - community.crypto._module_csr
+  - community.crypto._module_csr._return_csr
 """
 
 import os
