@@ -398,3 +398,11 @@ name_constraints_excluded:
   elements: str
   sample: ['email:.com']
 """
+
+    # Private fragment only for community.crypto.csr!
+    _RETURN_CSR = r"""
+name_constraints_permitted:
+  version_added: 1.1.0
+name_constraints_excluded:
+  version_added: 1.1.0
+"""
