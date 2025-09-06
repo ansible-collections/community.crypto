@@ -92,7 +92,7 @@ config.dependencies.python_interpreter.python_path = "/usr/bin/python3.12"
 runtime_environment = {"ANSIBLE_PRIVATE_ROLE_VARS" = "true"}
 
 [[sessions.ee_check.execution_environments]]
-name = "2.15-rocky-9"
+name = "2.17-rocky-9"
 description = "ansible-core 2.17 @ Rocky Linux 9"
 test_playbooks = ["tests/ee/all.yml"]
 config.images.base_image.name = "quay.io/rockylinux/rockylinux:9"
@@ -103,7 +103,7 @@ config.dependencies.python_interpreter.python_path = "/usr/bin/python3.11"
 runtime_environment = {"ANSIBLE_PRIVATE_ROLE_VARS" = "true"}
 
 [[sessions.ee_check.execution_environments]]
-name = "2.14-centos-stream-9"
+name = "2.18-centos-stream-9"
 description = "ansible-core 2.18 @ CentOS Stream 9"
 test_playbooks = ["tests/ee/all.yml"]
 config.images.base_image.name = "quay.io/centos/centos:stream9"
