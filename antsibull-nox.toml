@@ -5,6 +5,11 @@
 [collection_sources]
 "community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
 
+[vcs]
+vcs = "git"
+development_branch = "main"
+stable_branches = [ "stable-*" ]
+
 [sessions]
 
 [sessions.lint]
