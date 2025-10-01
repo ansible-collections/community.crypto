@@ -1868,3 +1868,12 @@ releases:
       - 947-acme-retry.yml
       - 949-acme-retry.yml
     release_date: '2025-08-04'
+  3.0.4:
+    changes:
+      bugfixes:
+        - Avoid deprecated functionality in ansible-core 2.20 (https://github.com/ansible-collections/community.crypto/pull/953).
+      release_summary: Maintenance release.
+    fragments:
+      - 3.0.4.yml
+      - 953-deprecations.yml
+    release_date: '2025-10-01'
