@@ -17,6 +17,7 @@ import traceback
 import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
+
 from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
@@ -24,6 +25,7 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+
     from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )

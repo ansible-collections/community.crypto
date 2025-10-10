@@ -8,6 +8,7 @@ import base64
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )

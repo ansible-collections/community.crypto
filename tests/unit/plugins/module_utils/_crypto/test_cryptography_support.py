@@ -9,6 +9,8 @@ import typing as t
 
 import cryptography
 import pytest
+from cryptography.x509 import NameAttribute, OtherName, oid
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -21,7 +23,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
 from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
-from cryptography.x509 import NameAttribute, OtherName, oid
 
 
 @pytest.mark.parametrize(

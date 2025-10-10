@@ -18,6 +18,7 @@ import typing as t
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import fetch_url
+
 from ansible_collections.community.crypto.plugins.module_utils._acme.backend_cryptography import (
     CRYPTOGRAPHY_ERROR,
     CRYPTOGRAPHY_MINIMAL_VERSION,
@@ -54,6 +55,7 @@ if t.TYPE_CHECKING:
     import urllib.error  # pragma: no cover
 
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+
     from ansible_collections.community.crypto.plugins.module_utils._acme.account import (  # pragma: no cover
         ACMEAccount,
     )

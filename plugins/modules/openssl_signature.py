@@ -122,6 +122,7 @@ except ImportError:
     CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )

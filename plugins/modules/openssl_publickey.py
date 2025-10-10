@@ -189,6 +189,7 @@ import os
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,

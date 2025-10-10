@@ -43,6 +43,7 @@ import typing as t
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes
+
 from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
     get_fingerprint_from_bytes,

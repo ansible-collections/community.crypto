@@ -12,6 +12,7 @@ from __future__ import annotations
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -34,14 +35,15 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
+        PrivateKeyTypes,
+    )
+
     from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
     from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (  # pragma: no cover
         FilterModuleMock,
-    )
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
-        PrivateKeyTypes,
     )
 
     GeneralAnsibleModule = t.Union[

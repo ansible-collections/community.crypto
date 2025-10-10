@@ -9,6 +9,7 @@ import pathlib
 import typing as t
 
 import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
     CertificateInformation,
     CryptoBackend,

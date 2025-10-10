@@ -10,6 +10,7 @@ from unittest.mock import (
 )
 
 import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
     Authorization,
     Challenge,

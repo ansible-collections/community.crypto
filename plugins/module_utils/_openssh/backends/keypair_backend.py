@@ -14,6 +14,7 @@ import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
 )

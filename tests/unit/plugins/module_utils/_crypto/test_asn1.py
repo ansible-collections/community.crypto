@@ -10,6 +10,7 @@ import re
 import subprocess
 
 import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto._asn1 import (
     serialize_asn1_string_as_der,
 )

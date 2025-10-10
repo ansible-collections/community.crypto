@@ -12,6 +12,8 @@ from unittest.mock import (
 )
 
 import pytest
+from freezegun import freeze_time
+
 from ansible_collections.community.crypto.plugins.module_utils._acme.backend_cryptography import (
     HAS_CURRENT_CRYPTOGRAPHY,
     CryptographyBackend,
@@ -23,7 +25,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     UTC,
     ensure_utc_timezone,
 )
-from freezegun import freeze_time
 
 from ..test__time import TIMEZONES
 from .backend_data import (

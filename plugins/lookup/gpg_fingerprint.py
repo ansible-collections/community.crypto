@@ -48,6 +48,7 @@ import typing as t
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
+
 from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
     get_fingerprint_from_file,

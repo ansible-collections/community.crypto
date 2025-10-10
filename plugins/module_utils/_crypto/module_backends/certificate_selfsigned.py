@@ -39,11 +39,12 @@ if t.TYPE_CHECKING:
     import datetime  # pragma: no cover
 
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
-        ArgumentSpec,
-    )
     from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
+    )
+
+    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
+        ArgumentSpec,
     )
 
 

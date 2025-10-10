@@ -12,6 +12,7 @@ import binascii
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._argspec import (
     ArgumentSpec,
 )
@@ -49,12 +50,13 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
-        CertificatePrivateKeyTypes,
-    )
     from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
+    )
+
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
+        CertificatePrivateKeyTypes,
     )
 
     _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")  # pragma: no cover

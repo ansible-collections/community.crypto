@@ -20,6 +20,7 @@ from urllib.parse import (
 )
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto._asn1 import (
     serialize_asn1_string_as_der,
 )
@@ -71,6 +72,7 @@ except ImportError:
     IDNA_IMP_ERROR = traceback.format_exc()
 
 from ansible.module_utils.basic import missing_required_lib
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto._obj2txt import (
     obj2txt,
 )

@@ -13,6 +13,7 @@ import binascii
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
@@ -41,6 +42,10 @@ if t.TYPE_CHECKING:
     import datetime  # pragma: no cover
 
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.types import (
+        PublicKeyTypes,  # pragma: no cover
+    )
+
     from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,
     )
@@ -49,9 +54,6 @@ if t.TYPE_CHECKING:
     )
     from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (  # pragma: no cover
         FilterModuleMock,
-    )
-    from cryptography.hazmat.primitives.asymmetric.types import (
-        PublicKeyTypes,  # pragma: no cover
     )
 
     GeneralAnsibleModule = t.Union[

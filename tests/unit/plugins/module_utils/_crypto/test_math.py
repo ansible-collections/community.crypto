@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.math import (
     binary_exp_mod,
     convert_bytes_to_int,

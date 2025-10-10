@@ -12,6 +12,7 @@ from subprocess import PIPE, Popen
 
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_text
+
 from ansible_collections.community.crypto.plugins.module_utils._gnupg.cli import (
     GPGError,
     GPGRunner,

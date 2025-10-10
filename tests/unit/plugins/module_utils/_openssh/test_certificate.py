@@ -7,6 +7,7 @@ from __future__ import annotations
 import pathlib
 
 import pytest
+
 from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (
     OpensshCertificate,
     OpensshCertificateOption,

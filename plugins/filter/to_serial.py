@@ -42,6 +42,7 @@ _value:
 import typing as t
 
 from ansible.errors import AnsibleFilterError
+
 from ansible_collections.community.crypto.plugins.module_utils._serial import to_serial
 
 
