@@ -10,6 +10,11 @@ __metaclass__ = type
 import datetime
 
 import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
+)
+from freezegun import freeze_time
+
 from ansible_collections.community.crypto.plugins.module_utils.acme.backend_cryptography import (
     HAS_CURRENT_CRYPTOGRAPHY,
     CryptographyBackend,
@@ -21,10 +26,6 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
     UTC,
     ensure_utc_timezone,
 )
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
-)
-from freezegun import freeze_time
 
 from ..test_time import TIMEZONES
 from .backend_data import (
