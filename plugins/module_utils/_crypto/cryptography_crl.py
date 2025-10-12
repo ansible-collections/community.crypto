@@ -40,7 +40,7 @@ if t.TYPE_CHECKING:
 # TODO: once cryptography has a _utc variant of InvalidityDate.invalidity_date, set this
 #       to True and adjust get_invalidity_date() accordingly.
 #       (https://github.com/pyca/cryptography/issues/10818)
-CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = False
+CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = False  # pylint: disable=invalid-name
 if HAS_CRYPTOGRAPHY:
     CRYPTOGRAPHY_TIMEZONE_INVALIDITY_DATE = _LooseVersion(
         cryptography.__version__

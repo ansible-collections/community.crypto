@@ -134,8 +134,8 @@ else:
     PrivateKeyTypesWOEdwards = None  # pylint: disable=invalid-name
 
 
-CRYPTOGRAPHY_TIMEZONE = False
-_CRYPTOGRAPHY_36_0_OR_NEWER = False
+CRYPTOGRAPHY_TIMEZONE = False  # pylint: disable=invalid-name
+_CRYPTOGRAPHY_36_0_OR_NEWER = False  # pylint: disable=invalid-name
 if _HAS_CRYPTOGRAPHY:
     CRYPTOGRAPHY_TIMEZONE = LooseVersion(cryptography.__version__) >= LooseVersion(
         "42.0.0"

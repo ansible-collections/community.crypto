@@ -38,20 +38,21 @@ if t.TYPE_CHECKING:
     ]  # pragma: no cover
 
 
-_CRYPTOGRAPHY_IMP_ERR: str | None = None
-_CRYPTOGRAPHY_FILE: str | None = None
+_CRYPTOGRAPHY_IMP_ERR: str | None = None  # pylint: disable=invalid-name
+_CRYPTOGRAPHY_FILE: str | None = None  # pylint: disable=invalid-name
 try:
     import cryptography
     from cryptography import x509  # noqa: F401, pylint: disable=unused-import
 
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
-    _CRYPTOGRAPHY_FILE = cryptography.__file__
 except ImportError:
-    _CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
+    _CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()  # pylint: disable=invalid-name
     CRYPTOGRAPHY_FOUND = False
-    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
+    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")  # pylint: disable=invalid-name
 else:
     CRYPTOGRAPHY_FOUND = True
+    # pylint: disable-next=invalid-name
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
+    _CRYPTOGRAPHY_FILE = cryptography.__file__  # pylint: disable=invalid-name
 
 
 # Corresponds to the community.crypto.cryptography_dep.minimum doc fragment

@@ -174,12 +174,12 @@ except ImportError:
     UnsupportedAlgorithm = Exception  # type: ignore
     CryptographyInternalError = Exception  # type: ignore
     HAS_CRYPTOGRAPHY = False
-    CRYPTOGRAPHY_VERSION = None
-    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()
+    CRYPTOGRAPHY_VERSION = None  # pylint: disable=invalid-name
+    CRYPTOGRAPHY_IMP_ERR = traceback.format_exc()  # pylint: disable=invalid-name
 else:
     HAS_CRYPTOGRAPHY = True
-    CRYPTOGRAPHY_VERSION = cryptography.__version__
-    CRYPTOGRAPHY_IMP_ERR = None
+    CRYPTOGRAPHY_VERSION = cryptography.__version__  # pylint: disable=invalid-name
+    CRYPTOGRAPHY_IMP_ERR = None  # pylint: disable=invalid-name
 
 
 CURVES = (

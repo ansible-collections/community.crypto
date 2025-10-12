@@ -57,7 +57,7 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
 
 CRYPTOGRAPHY_MINIMAL_VERSION = "1.5"
 
-CRYPTOGRAPHY_ERROR = None
+CRYPTOGRAPHY_ERROR: None | str
 try:
     import cryptography
     import cryptography.hazmat.backends
@@ -71,14 +71,15 @@ try:
     import cryptography.x509
     import cryptography.x509.oid
 except ImportError:
-    HAS_CURRENT_CRYPTOGRAPHY = False
-    CRYPTOGRAPHY_VERSION = None
-    CRYPTOGRAPHY_ERROR = traceback.format_exc()
+    HAS_CURRENT_CRYPTOGRAPHY = False  # pylint: disable=invalid-name
+    CRYPTOGRAPHY_VERSION = None  # pylint: disable=invalid-name
+    CRYPTOGRAPHY_ERROR = traceback.format_exc()  # pylint: disable=invalid-name
 else:
-    CRYPTOGRAPHY_VERSION = cryptography.__version__
+    CRYPTOGRAPHY_VERSION = cryptography.__version__  # pylint: disable=invalid-name
     HAS_CURRENT_CRYPTOGRAPHY = LooseVersion(CRYPTOGRAPHY_VERSION) >= LooseVersion(
         CRYPTOGRAPHY_MINIMAL_VERSION
     )
+    CRYPTOGRAPHY_ERROR = None  # pylint: disable=invalid-name
 
 if t.TYPE_CHECKING:
     import datetime  # pragma: no cover

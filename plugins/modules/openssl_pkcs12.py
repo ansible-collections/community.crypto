@@ -318,7 +318,7 @@ try:
 except ImportError:
     pass
 
-CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None
+CRYPTOGRAPHY_COMPATIBILITY2022_ERR: str | None
 try:
     import cryptography.x509
     from cryptography.hazmat.primitives import hashes
@@ -329,9 +329,11 @@ try:
         PBES.PBESv1SHA1And3KeyTripleDESCBC
     ).hmac_hash(hashes.SHA1())
 except Exception:
+    # pylint: disable-next=invalid-name
     CRYPTOGRAPHY_COMPATIBILITY2022_ERR = traceback.format_exc()
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = False
 else:
+    CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None  # pylint: disable=invalid-name
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
 if t.TYPE_CHECKING:

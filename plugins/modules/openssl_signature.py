@@ -117,9 +117,11 @@ try:
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.hashes
 
-    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 except ImportError:
-    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")
+    CRYPTOGRAPHY_VERSION = LooseVersion("0.0")  # pylint: disable=invalid-name
+else:
+    # pylint: disable-next=invalid-name
+    CRYPTOGRAPHY_VERSION = LooseVersion(cryptography.__version__)
 
 from ansible.module_utils.basic import AnsibleModule
 
