@@ -1,0 +1,12 @@
+plugins/module_utils/_crypto/module_backends/certificate.py no-assert
+plugins/module_utils/_crypto/module_backends/certificate_acme.py no-assert
+plugins/module_utils/_crypto/module_backends/certificate_ownca.py no-assert
+plugins/module_utils/_crypto/module_backends/certificate_selfsigned.py no-assert
+plugins/module_utils/_crypto/module_backends/csr.py no-assert
+plugins/module_utils/_crypto/module_backends/privatekey_convert.py no-assert
+plugins/module_utils/_openssh/backends/keypair_backend.py no-assert
+plugins/modules/acme_certificate.py no-assert
+plugins/modules/luks_device.py no-assert
+plugins/modules/openssl_pkcs12.py no-assert
+tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
+tests/ee/roles/smoke/library/smoke_pyyaml.py shebang
