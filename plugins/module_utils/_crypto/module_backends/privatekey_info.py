@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import typing as t
+from collections.abc import Callable
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
@@ -131,7 +132,7 @@ def _is_cryptography_key_consistent(
     *,
     key_public_data: dict[str, t.Any],
     key_private_data: dict[str, t.Any],
-    warn_func: t.Callable[[str], None] | None = None,
+    warn_func: Callable[[str], None] | None = None,
 ) -> bool | None:
     if isinstance(key, cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey):
         # key._backend was removed in cryptography 42.0.0

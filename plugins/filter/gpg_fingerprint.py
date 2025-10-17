@@ -39,7 +39,7 @@ _value:
   type: string
 """
 
-import typing as t
+from collections.abc import Callable
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_bytes
@@ -70,7 +70,7 @@ def gpg_fingerprint(gpg_key_content: str | bytes) -> str:
 class FilterModule:
     """Ansible jinja2 filters"""
 
-    def filters(self) -> dict[str, t.Callable]:
+    def filters(self) -> dict[str, Callable]:
         return {
             "gpg_fingerprint": gpg_fingerprint,
         }

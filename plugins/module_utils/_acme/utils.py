@@ -15,6 +15,7 @@ import re
 import textwrap
 import traceback
 import typing as t
+from collections.abc import Callable
 from urllib.parse import unquote
 
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
@@ -85,7 +86,7 @@ def pem_to_der(
 
 
 def process_links(
-    *, info: dict[str, t.Any], callback: t.Callable[[str, str], None]
+    *, info: dict[str, t.Any], callback: Callable[[str, str], None]
 ) -> None:
     """
     Process link header, calls callback for every link header with the URL and relation as options.
