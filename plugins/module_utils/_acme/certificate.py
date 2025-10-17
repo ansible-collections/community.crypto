@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import typing as t
+from collections.abc import Callable
 
 from ansible_collections.community.crypto.plugins.module_utils._acme.account import (
     ACMEAccount,
@@ -213,7 +214,7 @@ class ACMECertificateClient:
         self,
         pending_authzs: list[Authorization],
         *,
-        get_challenge: t.Callable[[Authorization], str],
+        get_challenge: Callable[[Authorization], str],
         wait: bool = True,
     ) -> list[tuple[Authorization, str, Challenge | None]]:
         authzs_with_challenges_to_wait_for = []

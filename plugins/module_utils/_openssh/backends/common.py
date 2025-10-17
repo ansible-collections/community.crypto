@@ -12,6 +12,7 @@ import os
 import stat
 import traceback
 import typing as t
+from collections.abc import Callable
 
 from ansible_collections.community.crypto.plugins.module_utils._openssh.utils import (
     parse_openssh_version,
@@ -33,8 +34,8 @@ if t.TYPE_CHECKING:
 
 
 def restore_on_failure(
-    f: t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None],
-) -> t.Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None]:
+    f: Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None],
+) -> Callable[t.Concatenate[AnsibleModule, str | os.PathLike, Param], None]:
     def backup_and_restore(
         module: AnsibleModule,
         path: str | os.PathLike,
@@ -63,13 +64,13 @@ def safe_atomic_move(
 
 
 def _restore_all_on_failure(
-    f: t.Callable[
+    f: Callable[
         t.Concatenate[
             OpensshModule, list[tuple[str | os.PathLike, str | os.PathLike]], Param
         ],
         None,
     ],
-) -> t.Callable[
+) -> Callable[
     t.Concatenate[
         OpensshModule, list[tuple[str | os.PathLike, str | os.PathLike]], Param
     ],
@@ -149,8 +150,8 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
     @staticmethod
     def skip_if_check_mode(
-        f: t.Callable[t.Concatenate[_OpensshModule, Param], None],
-    ) -> t.Callable[t.Concatenate[_OpensshModule, Param], None]:
+        f: Callable[t.Concatenate[_OpensshModule, Param], None],
+    ) -> Callable[t.Concatenate[_OpensshModule, Param], None]:
         def wrapper(
             self: _OpensshModule, *args: Param.args, **kwargs: Param.kwargs
         ) -> None:
@@ -161,8 +162,8 @@ class OpensshModule(metaclass=abc.ABCMeta):
 
     @staticmethod
     def trigger_change(
-        f: t.Callable[t.Concatenate[_OpensshModule, Param], None],
-    ) -> t.Callable[t.Concatenate[_OpensshModule, Param], None]:
+        f: Callable[t.Concatenate[_OpensshModule, Param], None],
+    ) -> Callable[t.Concatenate[_OpensshModule, Param], None]:
         def wrapper(
             self: _OpensshModule, *args: Param.args, **kwargs: Param.kwargs
         ) -> None:
