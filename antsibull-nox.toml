@@ -45,6 +45,7 @@ codeblocks_restrict_types = [
 codeblocks_restrict_type_exact_case = true
 codeblocks_allow_without_type = false
 codeblocks_allow_literal_blocks = false
+ansible_core_package = "https://github.com/ansible/ansible/archive/devel.tar.gz"
 
 [sessions.license_check]
 run_reuse = true
