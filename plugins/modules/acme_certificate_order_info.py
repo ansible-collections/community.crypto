@@ -136,7 +136,7 @@ order:
         - Encoded in the date format defined in L(RFC 3339, https://www.rfc-editor.org/rfc/rfc3339).
       type: str
       returned: depending on order
-    notAfter (optional, string):
+    notAfter:
       description:
         - The requested value of the C(notAfter) field in the certificate.
         - Encoded in the date format defined in L(RFC 3339, https://www.rfc-editor.org/rfc/rfc3339).
