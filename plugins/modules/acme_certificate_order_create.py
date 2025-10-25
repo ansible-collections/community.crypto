@@ -281,6 +281,7 @@ challenge_data:
     challenges:
       description:
         - Information for different challenge types supported for this identifier.
+        - Note that the keys are not valid Jinja2 identifiers.
       type: dict
       contains:
         http-01:
