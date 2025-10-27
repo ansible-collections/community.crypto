@@ -47,7 +47,7 @@ if t.TYPE_CHECKING:
         FilterModuleMock,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
     ]  # pragma: no cover
 
@@ -122,9 +122,7 @@ def _check_dsa_consistency(
     if binary_exp_mod(g, x, m=p) != y:
         return False
     # Check (quickly) whether p or q are not primes
-    if quick_is_not_prime(q) or quick_is_not_prime(p):
-        return False
-    return True
+    return not (quick_is_not_prime(q) or quick_is_not_prime(p))
 
 
 def _is_cryptography_key_consistent(

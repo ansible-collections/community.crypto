@@ -181,7 +181,7 @@ class SelfSignedCertificateBackendCryptography(CertificateBackend):
         assert self.existing_certificate is not None
 
         # Check whether certificate is signed by private key
-        if not cryptography_verify_certificate_signature(
+        if not cryptography_verify_certificate_signature(  # noqa: SIM103
             certificate=self.existing_certificate,
             signer_public_key=self.privatekey.public_key(),
         ):

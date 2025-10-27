@@ -114,19 +114,16 @@ if t.TYPE_CHECKING:
         PrivateKeyTypes,
         PublicKeyTypes,
     )
-    from cryptography.hazmat.primitives.serialization.pkcs12 import (  # pragma: no cover
-        PKCS12KeyAndCertificates,
-    )
 
-    CertificatePrivateKeyTypes = t.Union[
+    CertificatePrivateKeyTypes = t.Union[  # noqa: UP007
         CertificateIssuerPrivateKeyTypes,
         cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
     ]  # pragma: no cover
-    PublicKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
+    PublicKeyTypesWOEdwards = t.Union[  # noqa: UP007 # pylint: disable=invalid-name
         DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
     ]  # pragma: no cover
-    PrivateKeyTypesWOEdwards = t.Union[  # pylint: disable=invalid-name
+    PrivateKeyTypesWOEdwards = t.Union[  # noqa: UP007 # pylint: disable=invalid-name
         DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
     ]  # pragma: no cover
 else:
@@ -727,9 +724,9 @@ def cryptography_key_needs_digest_for_signing(
         key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey
     ):
         return False
-    if isinstance(key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey):
-        return False
-    return True
+    return not isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
+    )
 
 
 def _compare_public_keys(

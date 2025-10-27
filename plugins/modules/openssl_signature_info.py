@@ -197,15 +197,10 @@ class SignatureInfoCryptography(SignatureInfoBase):
 
                 elif isinstance(
                     public_key,
-                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
-                ):
-                    public_key.verify(_signature, _in)
-                    verified = True
-                    valid = True
-
-                elif isinstance(
-                    public_key,
-                    cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
+                    (
+                        cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+                        cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
+                    ),
                 ):
                     public_key.verify(_signature, _in)
                     verified = True

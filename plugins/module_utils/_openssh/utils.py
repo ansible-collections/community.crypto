@@ -331,7 +331,7 @@ class _OpensshWriter:
         for name, data in value:
             writer.string(name)
             # SSH option data is encoded twice though this behavior is not documented
-            writer.string(_OpensshWriter().string(data).bytes() if data else bytes())
+            writer.string(_OpensshWriter().string(data).bytes() if data else b"")
 
         self.string(writer.bytes())
 

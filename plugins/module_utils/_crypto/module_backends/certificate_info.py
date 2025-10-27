@@ -46,9 +46,6 @@ if t.TYPE_CHECKING:
         PublicKeyTypes,  # pragma: no cover
     )
 
-    from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
-        ArgumentSpec,
-    )
     from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
         AnsibleActionModule,
     )
@@ -56,7 +53,7 @@ if t.TYPE_CHECKING:
         FilterModuleMock,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
     ]  # pragma: no cover
 
@@ -270,9 +267,11 @@ class CertificateInfoRetrieval:
                 x509.AuthorityInformationAccess
             )
             for desc in ext.value:
-                if desc.access_method == x509.oid.AuthorityInformationAccessOID.OCSP:
-                    if isinstance(desc.access_location, x509.UniformResourceIdentifier):
-                        return desc.access_location.value
+                if (
+                    desc.access_method == x509.oid.AuthorityInformationAccessOID.OCSP
+                    and isinstance(desc.access_location, x509.UniformResourceIdentifier)
+                ):
+                    return desc.access_location.value
         except x509.ExtensionNotFound:
             pass
         return None
@@ -286,9 +285,8 @@ class CertificateInfoRetrieval:
                 if (
                     desc.access_method
                     == x509.oid.AuthorityInformationAccessOID.CA_ISSUERS
-                ):
-                    if isinstance(desc.access_location, x509.UniformResourceIdentifier):
-                        return desc.access_location.value
+                ) and isinstance(desc.access_location, x509.UniformResourceIdentifier):
+                    return desc.access_location.value
         except x509.ExtensionNotFound:
             pass
         return None

@@ -46,7 +46,7 @@ class CertificateChain:
 
     @classmethod
     def download(
-        cls: t.Type[_CertificateChain], *, client: ACMEClient, url: str
+        cls: type[_CertificateChain], *, client: ACMEClient, url: str
     ) -> _CertificateChain:
         content, info = client.get_request(
             url,

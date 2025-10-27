@@ -795,13 +795,12 @@ class ACMECertificateClient:
                 raise ModuleFailException(
                     f"Found no challenge of type '{self.challenge}' for identifier {type_identifier}!"
                 )
-            if self.challenge == "dns-01":
-                if self.challenge in challenges:
-                    values = data_dns.get(challenges[self.challenge]["record"])
-                    if values is None:
-                        values = []
-                        data_dns[challenges[self.challenge]["record"]] = values
-                    values.append(challenges[self.challenge]["resource_value"])
+            if self.challenge == "dns-01" and self.challenge in challenges:
+                values = data_dns.get(challenges[self.challenge]["record"])
+                if values is None:
+                    values = []
+                    data_dns[challenges[self.challenge]["record"]] = values
+                values.append(challenges[self.challenge]["resource_value"])
         return data, data_dns
 
     def finish_challenges(self) -> None:

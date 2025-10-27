@@ -936,9 +936,7 @@ class ConditionsHandler(Handler):
 
         name = self.opened_luks_name(self.device)
 
-        if name is None:
-            return True
-        return False
+        return name is None
 
     def luks_close(self) -> bool:
         if (

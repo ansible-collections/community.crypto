@@ -82,7 +82,7 @@ class Challenge:
 
     @classmethod
     def from_json(
-        cls: t.Type[_Challenge],
+        cls: type[_Challenge],
         *,
         client: ACMEClient,
         data: dict[str, t.Any],
@@ -188,7 +188,7 @@ class Authorization:
 
     @classmethod
     def from_json(
-        cls: t.Type[_Authorization],
+        cls: type[_Authorization],
         *,
         client: ACMEClient,
         data: dict[str, t.Any],
@@ -200,7 +200,7 @@ class Authorization:
 
     @classmethod
     def from_url(
-        cls: t.Type[_Authorization], *, client: ACMEClient, url: str
+        cls: type[_Authorization], *, client: ACMEClient, url: str
     ) -> _Authorization:
         result = cls(url=url)
         result.refresh(client=client)
@@ -208,7 +208,7 @@ class Authorization:
 
     @classmethod
     def create(
-        cls: t.Type[_Authorization],
+        cls: type[_Authorization],
         *,
         client: ACMEClient,
         identifier_type: str,
@@ -384,7 +384,7 @@ class Authorization:
 
     @classmethod
     def deactivate_url(
-        cls: t.Type[_Authorization], *, client: ACMEClient, url: str
+        cls: type[_Authorization], *, client: ACMEClient, url: str
     ) -> _Authorization:
         """
         Deactivates this authorization.
