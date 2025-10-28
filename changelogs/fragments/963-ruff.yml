@@ -1,0 +1,2 @@
+bugfixes:
+  - "Smaller code cleanup (https://github.com/ansible-collections/community.crypto/pull/963)."
