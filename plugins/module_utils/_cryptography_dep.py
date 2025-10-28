@@ -33,7 +33,7 @@ if t.TYPE_CHECKING:
         FilterModuleMock,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
     ]  # pragma: no cover
 
@@ -69,7 +69,7 @@ def assert_required_cryptography_version(
             msg=missing_required_lib(f"cryptography >= {minimum_cryptography_version}"),
             exception=_CRYPTOGRAPHY_IMP_ERR,
         )
-    if CRYPTOGRAPHY_VERSION < LooseVersion(minimum_cryptography_version):
+    if LooseVersion(minimum_cryptography_version) > CRYPTOGRAPHY_VERSION:
         module.fail_json(
             msg=(
                 f"Cannot detect the required Python library cryptography (>= {minimum_cryptography_version})."

@@ -222,7 +222,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_dsa = True
         try:
             # added later in 1.5
-            dsa.DSAPrivateKey.sign  # pylint: disable=pointless-statement
+            dsa.DSAPrivateKey.sign  # noqa: B018 # pylint: disable=pointless-statement
             has_dsa_sign = True
         except AttributeError:
             pass
@@ -239,7 +239,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_rsa = True
         try:
             # added later in 1.4
-            rsa.RSAPrivateKey.sign  # pylint: disable=pointless-statement
+            rsa.RSAPrivateKey.sign  # noqa: B018 # pylint: disable=pointless-statement
             has_rsa_sign = True
         except AttributeError:
             pass
@@ -261,7 +261,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ed25519 = True
         try:
             # added with the primitive in 2.6
-            ed25519.Ed25519PrivateKey.sign  # pylint: disable=pointless-statement
+            ed25519.Ed25519PrivateKey.sign  # noqa: B018 # pylint: disable=pointless-statement
             has_ed25519_sign = True
         except AttributeError:
             pass
@@ -283,7 +283,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ed448 = True
         try:
             # added with the primitive in 2.6
-            ed448.Ed448PrivateKey.sign  # pylint: disable=pointless-statement
+            ed448.Ed448PrivateKey.sign  # noqa: B018 # pylint: disable=pointless-statement
             has_ed448_sign = True
         except AttributeError:
             pass
@@ -299,7 +299,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
 
         try:
             # added later in 2.5
-            x25519.X25519PrivateKey.private_bytes  # pylint: disable=pointless-statement
+            x25519.X25519PrivateKey.private_bytes  # noqa: B018 # pylint: disable=pointless-statement
             full = True
         except AttributeError:
             full = False
@@ -344,7 +344,7 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         has_ec = True
         try:
             # added later in 1.5
-            ec.EllipticCurvePrivateKey.sign  # pylint: disable=pointless-statement
+            ec.EllipticCurvePrivateKey.sign  # noqa: B018 # pylint: disable=pointless-statement
             has_ec_sign = True
         except AttributeError:
             pass

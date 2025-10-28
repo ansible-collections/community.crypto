@@ -244,9 +244,9 @@ class X509CertificateConvertModule(OpenSSLObject):
             return True
         if self.input != self.dest_content:
             return True
-        if self.format == "pem" and self.dest_content_pem_type != self.wanted_pem_type:
-            return True
-        return False
+        return bool(
+            self.format == "pem" and self.dest_content_pem_type != self.wanted_pem_type
+        )
 
     def get_dest_certificate(self) -> bytes:
         if self.format == "der":

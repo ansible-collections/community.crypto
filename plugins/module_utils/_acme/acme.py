@@ -56,9 +56,6 @@ if t.TYPE_CHECKING:
 
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
-    from ansible_collections.community.crypto.plugins.module_utils._acme.account import (  # pragma: no cover
-        ACMEAccount,
-    )
     from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
         CryptoBackend,
@@ -132,12 +129,10 @@ def _is_failed(
 ) -> bool:
     if info["status"] < 200 or info["status"] >= 400:
         return True
-    if (
+    return bool(
         expected_status_codes is not None
         and info["status"] not in expected_status_codes
-    ):
-        return True
-    return False
+    )
 
 
 class ACMEDirectory:

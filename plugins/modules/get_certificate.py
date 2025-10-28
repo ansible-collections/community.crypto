@@ -376,9 +376,8 @@ def main() -> t.NoReturn:
     if timeout:
         setdefaulttimeout(timeout)
 
-    if ca_cert:
-        if not isfile(ca_cert):
-            module.fail_json(msg="ca_cert file does not exist")
+    if ca_cert and not isfile(ca_cert):
+        module.fail_json(msg="ca_cert file does not exist")
 
     verified_chain = None
     unverified_chain = None

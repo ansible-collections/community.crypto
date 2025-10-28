@@ -200,13 +200,10 @@ class SignatureCryptography(SignatureBase):
 
             elif isinstance(
                 private_key,
-                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
-            ):
-                signature = private_key.sign(_in)
-
-            elif isinstance(
-                private_key,
-                cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+                (
+                    cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+                    cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+                ),
             ):
                 signature = private_key.sign(_in)
 

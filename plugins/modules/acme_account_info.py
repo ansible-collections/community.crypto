@@ -227,6 +227,17 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
 
+def _collect_next(info: dict[str, t.Any]) -> list[str]:
+    result: list[str] = []
+
+    def f(link: str, relation: str) -> None:
+        if relation == "next":
+            result.append(link)
+
+    process_links(info=info, callback=f)
+    return result
+
+
 def get_orders_list(
     module: AnsibleModule, client: ACMEClient, orders_url: str
 ) -> list[str]:
@@ -257,12 +268,7 @@ def get_orders_list(
         orders.extend(res["orders"])
         # Extract URL of next part of results list
         new_orders_url: list[str | None] = []
-
-        def f(link: str, relation: str) -> None:
-            if relation == "next":
-                new_orders_url.append(link)
-
-        process_links(info=info, callback=f)
+        new_orders_url.extend(_collect_next(info))
         new_orders_url.append(None)
         previous_orders_url, next_orders_url = next_orders_url, new_orders_url.pop(0)
         if next_orders_url == previous_orders_url:

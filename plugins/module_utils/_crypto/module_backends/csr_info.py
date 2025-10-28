@@ -35,7 +35,6 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
     from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificatePublicKeyTypes,
-        PrivateKeyTypes,
     )
 
     from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
@@ -45,7 +44,7 @@ if t.TYPE_CHECKING:
         FilterModuleMock,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
     ]  # pragma: no cover
 

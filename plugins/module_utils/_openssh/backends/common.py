@@ -21,10 +21,6 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.utils im
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
-        CertificateIssuerPrivateKeyTypes,
-        PrivateKeyTypes,
-    )
 
     from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (  # pragma: no cover
         OpensshCertificateTimeParameters,
@@ -96,7 +92,7 @@ def _restore_all_on_failure(
                     os.path.abspath(backup), os.path.abspath(destination)
                 )
             raise
-        for destination, backup in backups:
+        for dummy_destination, backup in backups:
             self.module.add_cleanup_file(backup)
 
     return backup_and_restore
@@ -373,7 +369,9 @@ class PrivateKey:
         return self._format
 
     @classmethod
-    def from_string(cls: t.Type[_PrivateKey], string: str) -> _PrivateKey:
+    def from_string(
+        cls: t.Type[_PrivateKey], string: str  # noqa: UP006
+    ) -> _PrivateKey:
         properties = string.split()
 
         return cls(
@@ -439,7 +437,7 @@ class PublicKey:
         return self._type_string
 
     @classmethod
-    def from_string(cls: t.Type[_PublicKey], string: str) -> _PublicKey:
+    def from_string(cls: type[_PublicKey], string: str) -> _PublicKey:
         properties = string.strip("\n").split(" ", 2)
 
         return cls(
@@ -449,7 +447,7 @@ class PublicKey:
         )
 
     @classmethod
-    def load(cls: t.Type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
+    def load(cls: type[_PublicKey], path: str | os.PathLike) -> _PublicKey | None:
         with open(path, "r", encoding="utf-8") as f:
             properties = f.read().strip(" \n").split(" ", 2)
 

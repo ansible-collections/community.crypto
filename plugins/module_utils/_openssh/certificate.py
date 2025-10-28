@@ -312,7 +312,7 @@ class OpensshCertificateOption:
 
     @classmethod
     def from_string(
-        cls: t.Type[_OpensshCertificateOption], option_string: str
+        cls: t.Type[_OpensshCertificateOption], option_string: str  # noqa: UP006
     ) -> _OpensshCertificateOption:
         if not isinstance(option_string, str):
             raise ValueError(
@@ -573,7 +573,7 @@ class OpensshCertificate:
 
     @classmethod
     def load(
-        cls: t.Type[_OpensshCertificate], path: str | os.PathLike
+        cls: t.Type[_OpensshCertificate], path: str | os.PathLike  # noqa: UP006
     ) -> _OpensshCertificate:
         if not os.path.exists(path):
             raise ValueError(f"{path} is not a valid path.")

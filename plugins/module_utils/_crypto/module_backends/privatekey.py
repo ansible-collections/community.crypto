@@ -47,7 +47,7 @@ if t.TYPE_CHECKING:
         AnsibleActionModule,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule
     ]  # pragma: no cover
 
@@ -495,26 +495,28 @@ class PrivateKeyBackend:
                 " set to `full_idempotence` or `always`, or with `force=true`."
             )
         self._ensure_existing_private_key_loaded()
-        if self.regenerate != "never":
-            if not self._check_size_and_type():
-                if self.regenerate in ("partial_idempotence", "full_idempotence"):
-                    return True
-                self.module.fail_json(
-                    msg="Key has wrong type and/or size."
-                    " Will not proceed. To force regeneration, call the module with `generate`"
-                    " set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
-                )
+        if self.regenerate != "never" and not self._check_size_and_type():
+            if self.regenerate in ("partial_idempotence", "full_idempotence"):
+                return True
+            self.module.fail_json(
+                msg="Key has wrong type and/or size."
+                " Will not proceed. To force regeneration, call the module with `generate`"
+                " set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
+            )
         # During generation step, regenerate if format does not match and format_mismatch == 'regenerate'
-        if self.format_mismatch == "regenerate" and self.regenerate != "never":
-            if not self._check_format():
-                if self.regenerate in ("partial_idempotence", "full_idempotence"):
-                    return True
-                self.module.fail_json(
-                    msg="Key has wrong format."
-                    " Will not proceed. To force regeneration, call the module with `generate`"
-                    " set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
-                    " To convert the key, set `format_mismatch` to `convert`."
-                )
+        if (
+            self.format_mismatch == "regenerate"
+            and self.regenerate != "never"
+            and not self._check_format()
+        ):
+            if self.regenerate in ("partial_idempotence", "full_idempotence"):
+                return True
+            self.module.fail_json(
+                msg="Key has wrong format."
+                " Will not proceed. To force regeneration, call the module with `generate`"
+                " set to `partial_idempotence`, `full_idempotence` or `always`, or with `force=true`."
+                " To convert the key, set `format_mismatch` to `convert`."
+            )
         return False
 
     def needs_conversion(self) -> bool:

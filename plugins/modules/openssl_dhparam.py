@@ -391,7 +391,7 @@ def main() -> t.NoReturn:
             # Detection what is possible
             can_use_cryptography = (
                 CRYPTOGRAPHY_FOUND
-                and CRYPTOGRAPHY_VERSION >= LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION)
+                and LooseVersion(MINIMAL_CRYPTOGRAPHY_VERSION) <= CRYPTOGRAPHY_VERSION
             )
             can_use_openssl = module.get_bin_path("openssl", False) is not None
 

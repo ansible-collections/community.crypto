@@ -79,13 +79,13 @@ if t.TYPE_CHECKING:
     KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]  # pragma: no cover
     KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]  # pragma: no cover
 
-    PrivateKeyTypes = t.Union[
+    PrivateKeyTypes = t.Union[  # noqa: UP007
         rsa.RSAPrivateKey,
         dsa.DSAPrivateKey,
         ec.EllipticCurvePrivateKey,
         Ed25519PrivateKey,
     ]  # pragma: no cover
-    PublicKeyTypes = t.Union[
+    PublicKeyTypes = t.Union[  # noqa: UP007
         rsa.RSAPublicKey, dsa.DSAPublicKey, ec.EllipticCurvePublicKey, Ed25519PublicKey
     ]  # pragma: no cover
 
@@ -149,7 +149,7 @@ class AsymmetricKeypair:
 
     @classmethod
     def generate(
-        cls: t.Type[_AsymmetricKeypair],
+        cls: type[_AsymmetricKeypair],
         *,
         keytype: KeyType = "rsa",
         size: int | None = None,
@@ -213,7 +213,7 @@ class AsymmetricKeypair:
 
     @classmethod
     def load(
-        cls: t.Type[_AsymmetricKeypair],
+        cls: type[_AsymmetricKeypair],
         *,
         path: str | os.PathLike,
         passphrase: bytes | None = None,
@@ -412,7 +412,7 @@ class OpensshKeypair:
 
     @classmethod
     def generate(
-        cls: t.Type[_OpensshKeypair],
+        cls: type[_OpensshKeypair],
         *,
         keytype: KeyType = "rsa",
         size: int | None = None,
@@ -451,7 +451,7 @@ class OpensshKeypair:
 
     @classmethod
     def load(
-        cls: t.Type[_OpensshKeypair],
+        cls: type[_OpensshKeypair],
         *,
         path: str | os.PathLike,
         passphrase: bytes | None = None,

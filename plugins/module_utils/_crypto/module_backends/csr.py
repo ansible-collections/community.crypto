@@ -52,11 +52,6 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
     from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
         CertificateIssuerPrivateKeyTypes,
-        PrivateKeyTypes,
-    )
-
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
-        CertificatePrivateKeyTypes,
     )
 
     _ET = t.TypeVar("_ET", bound="cryptography.x509.ExtensionType")  # pragma: no cover
@@ -533,10 +528,11 @@ class CertificateSigningRequestBackend:
             )
             if set(altnames) != set(current_altnames):
                 return False
-            if altnames and current_altnames_ext:
-                if current_altnames_ext.critical != self.subject_alt_name_critical:
-                    return False
-            return True
+            return not (
+                altnames
+                and current_altnames_ext
+                and current_altnames_ext.critical != self.subject_alt_name_critical
+            )
 
         def _check_key_usage(extensions: cryptography.x509.Extensions) -> bool:
             current_keyusage_ext = _find_extension(
@@ -578,10 +574,11 @@ class CertificateSigningRequestBackend:
             )
             if set(current_usages) != set(usages):
                 return False
-            if usages and current_usages_ext:
-                if current_usages_ext.critical != self.extended_key_usage_critical:
-                    return False
-            return True
+            return not (
+                usages
+                and current_usages_ext
+                and current_usages_ext.critical != self.extended_key_usage_critical
+            )
 
         def _check_basic_constraints(extensions: cryptography.x509.Extensions) -> bool:
             bc_ext = _find_extension(extensions, cryptography.x509.BasicConstraints)
@@ -652,10 +649,11 @@ class CertificateSigningRequestBackend:
                 current_nc_excl
             ):
                 return False
-            if (nc_perm or nc_excl) and current_nc_ext:
-                if current_nc_ext.critical != self.name_constraints_critical:
-                    return False
-            return True
+            return not (
+                (nc_perm or nc_excl)
+                and current_nc_ext
+                and current_nc_ext.critical != self.name_constraints_critical
+            )
 
         def _check_subject_key_identifier(
             extensions: cryptography.x509.Extensions,

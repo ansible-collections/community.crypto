@@ -35,7 +35,7 @@ if t.TYPE_CHECKING:
         FilterModuleMock,
     )
 
-    GeneralAnsibleModule = t.Union[
+    GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
     ]  # pragma: no cover
 

@@ -440,9 +440,8 @@ def main() -> t.NoReturn:
                 module.params["deactivate_authzs"] == "always"
                 or (module.params["deactivate_authzs"] == "on_success" and done)
                 or (module.params["deactivate_authzs"] == "on_error" and not done)
-            ):
-                if order:
-                    client.deactivate_authzs(order)
+            ) and order:
+                client.deactivate_authzs(order)
         module.exit_json(
             changed=changed,
             account_uri=client.client.account_uri,

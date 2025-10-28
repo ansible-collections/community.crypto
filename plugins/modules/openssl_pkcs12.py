@@ -342,10 +342,10 @@ if t.TYPE_CHECKING:
     )
 
     PKCS12 = tuple[
-        t.Union[CertificateIssuerPrivateKeyTypes, None],
-        t.Union[cryptography.x509.Certificate, None],
+        t.Union[CertificateIssuerPrivateKeyTypes, None],  # noqa: UP007
+        t.Union[cryptography.x509.Certificate, None],  # noqa: UP007
         list[cryptography.x509.Certificate],
-        t.Union[bytes, None],
+        t.Union[bytes, None],  # noqa: UP007
     ]  # pragma: no cover
 
 
@@ -823,9 +823,9 @@ def main() -> t.NoReturn:
                     changed = True
 
             file_args = module.load_file_common_arguments(module.params)
-            if module.check_file_absent_if_check_mode(file_args["path"]):
-                changed = True
-            elif module.set_fs_attributes_if_different(file_args, changed):
+            if module.check_file_absent_if_check_mode(
+                file_args["path"]
+            ) or module.set_fs_attributes_if_different(file_args, changed):
                 changed = True
         else:
             if module.check_mode:
