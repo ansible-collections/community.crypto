@@ -125,7 +125,7 @@ options:
 
   acme_directory:
     description:
-      - "The ACME directory to use. You can use any directory that supports the ACME protocol, such as Buypass or Let's Encrypt."
+      - "The ACME directory to use. You can use any directory that supports the ACME protocol, such as Let's Encrypt."
       - "Let's Encrypt recommends using their staging server while developing jobs. U(https://letsencrypt.org/docs/staging-environment/)."
     type: str
     default: https://acme-v02.api.letsencrypt.org/directory
