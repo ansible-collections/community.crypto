@@ -1706,3 +1706,9 @@ releases:
       - 947-acme-retry.yml
       - 949-acme-retry.yml
     release_date: '2025-08-04'
+  2.26.6:
+    changes:
+      release_summary: Maintenance release.
+    fragments:
+      - 2.26.6.yml
+    release_date: '2025-10-29'

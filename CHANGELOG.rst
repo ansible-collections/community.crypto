@@ -4,6 +4,14 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.6
+=======
+
+Release Summary
+---------------
+
+Maintenance release.
+
 v2.26.5
 =======
 
