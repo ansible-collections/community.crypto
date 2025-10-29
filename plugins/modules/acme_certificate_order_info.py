@@ -20,9 +20,8 @@ description:
   - Obtain information for an ACME v2 order.
     This can be used during the process of obtaining a new certificate with the
     L(ACME protocol,https://tools.ietf.org/html/rfc8555) from a Certificate
-    Authority such as L(Let's Encrypt,https://letsencrypt.org/) or
-    L(Buypass,https://www.buypass.com/). This module does not support ACME v1, the
-    original version of the ACME protocol before standardization.
+    Authority such as L(Let's Encrypt,https://letsencrypt.org/).
+    This module does not support ACME v1, the original version of the ACME protocol before standardization.
   - This module needs to be used in conjunction with the
     M(community.crypto.acme_certificate_order_create),
     M(community.crypto.acme_certificate_order_validate), and

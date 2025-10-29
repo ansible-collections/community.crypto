@@ -117,11 +117,12 @@ options:
     BASIC = r"""
 notes:
   - Although the defaults are chosen so that the module can be used with the L(Let's Encrypt,https://letsencrypt.org/) CA,
-    the module can in principle be used with any CA providing an ACME endpoint, such as L(Buypass Go SSL,https://www.buypass.com/ssl/products/acme).
-  - So far, the ACME modules have only been tested by the developers against Let's Encrypt (staging and production), Buypass
-    (staging and production), ZeroSSL (production), and L(Pebble testing server,https://github.com/letsencrypt/Pebble). We
-    have got community feedback that they also work with Sectigo ACME Service for InCommon and with HARICA. If you experience problems with
-    another ACME server, please L(create an issue,https://github.com/ansible-collections/community.crypto/issues/new/choose)
+    the module can in principle be used with any CA providing an ACME endpoint.
+  - So far, the ACME modules have only been tested by the developers against Let's Encrypt (staging and production),
+    ZeroSSL (production), and L(Pebble testing server,https://github.com/letsencrypt/Pebble).
+    We have got community feedback that they also work with Sectigo ACME Service for InCommon and with HARICA.
+    If you experience problems with another ACME server, please
+    L(create an issue, https://github.com/ansible-collections/community.crypto/issues/new/choose)
     to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.
 requirements:
   - either openssl or L(cryptography,https://cryptography.io/) >= 1.5
@@ -140,10 +141,8 @@ options:
       - The ACME directory to use. This is the entry point URL to access the ACME CA server API.
       - For safety reasons the default is set to the Let's Encrypt staging server (for the ACME v1 protocol). This will create
         technically correct, but untrusted certificates.
-      - "For Let's Encrypt, all staging endpoints can be found here: U(https://letsencrypt.org/docs/staging-environment/).
-        For Buypass, all endpoints can be found here: U(https://community.buypass.com/t/63d4ay/buypass-go-ssl-endpoints)."
+      - "For Let's Encrypt, all staging endpoints can be found here: U(https://letsencrypt.org/docs/staging-environment/)."
       - For B(Let's Encrypt), the production directory URL for ACME v2 is U(https://acme-v02.api.letsencrypt.org/directory).
-      - For B(Buypass), the production directory URL for ACME v2 and v1 is U(https://api.buypass.com/acme/directory).
       - For B(ZeroSSL), the production directory URL for ACME v2 is U(https://acme.zerossl.com/v2/DV90).
       - For B(Sectigo), the production directory URL for ACME v2 is U(https://acme-qa.secure.trust-provider.com/v2/DV).
       - For B(HARICA), the production directory URL for ACME v2 is U(https://acme.harica.gr/XXX/directory) with XXX being specific to your account.
