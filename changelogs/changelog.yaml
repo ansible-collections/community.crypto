@@ -1877,3 +1877,12 @@ releases:
       - 3.0.4.yml
       - 953-deprecations.yml
     release_date: '2025-10-01'
+  3.0.5:
+    changes:
+      bugfixes:
+        - Smaller code cleanup (https://github.com/ansible-collections/community.crypto/pull/963).
+      release_summary: Maintenance release.
+    fragments:
+      - 3.0.5.yml
+      - 963-ruff.yml
+    release_date: '2025-10-29'

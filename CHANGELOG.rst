@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.0.5
+======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+Bugfixes
+--------
+
+- Smaller code cleanup (https://github.com/ansible-collections/community.crypto/pull/963).
+
 v3.0.4
 ======
 
