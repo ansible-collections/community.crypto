@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="2.21.0" name="antsibull-docs" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>community.crypto.acme_certificate_order_create module – Create an ACME v2 order &mdash; Community.Crypto Collection  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=c5b67dd2" />
+      <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order" href="acme_certificate_order_finalize_module.html" />
+    <link rel="prev" title="community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order" href="acme_certificate_deactivate_authz_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="https://ansible-collections.github.io/community.crypto/branch/main/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Community.Crypto Collection Docs</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Community.Crypto Collection
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Community.Crypto Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_selfsigned.html">How to create self-signed certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_ownca.html">How to create a small CA</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_ari_info_module.html">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_deactivate_authz_module.html">community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.acme_certificate_order_create module – Create an ACME v2 order</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_finalize_module.html">community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_info_module.html">community.crypto.acme_certificate_order_info module – Obtain information for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_validate_module.html">community.crypto.acme_certificate_order_validate module – Validate authorizations of an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_renewal_info_module.html">community.crypto.acme_certificate_renewal_info module – Determine whether a certificate should be renewed or not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_pipe_module.html">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_dhparam_module.html">community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_module.html">community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_module.html">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_module.html">community.crypto.x509_certificate module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_convert_module.html">community.crypto.x509_certificate_convert module – Convert X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_module.html">community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_pipe_module.html">community.crypto.x509_certificate_pipe module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_module.html">community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_lookup.html">community.crypto.gpg_fingerprint lookup – Retrieve a GPG fingerprint from a GPG public or private key file</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Community.Crypto Collection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">community.crypto.acme_certificate_order_create module – Create an ACME v2 order</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/acme_certificate_order_create.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-community-crypto-acme-certificate-order-create-module"></span><section id="community-crypto-acme-certificate-order-create-module-create-an-acme-v2-order">
+<h1>community.crypto.acme_certificate_order_create module – Create an ACME v2 order<a class="headerlink" href="#community-crypto-acme-certificate-order-create-module-create-an-acme-v2-order" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.0.5).</p>
+<p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
+To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
+<p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
+You need further requirements to be able to use this module,
+see <a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.acme_certificate_order_create</span></code>.</p>
+</div>
+<p class="ansible-version-added">New in community.crypto 2.24.0</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id3">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#attributes" id="id4">Attributes</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id5">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id6">See Also</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id7">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id8">Return Values</a></p></li>
+</ul>
+</nav>
+<section id="synopsis">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Creates an ACME v2 order. This is the first step of obtaining a new certificate with the <a class="reference external" href="https://tools.ietf.org/html/rfc8555">ACME protocol</a> from a Certificate Authority such as <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a>. This module does not support ACME v1, the original version of the ACME protocol before standardization.</p></li>
+<li><p>The current implementation supports the <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges.</p></li>
+<li><p>This module needs to be used in conjunction with the <a class="reference internal" href="acme_certificate_order_validate_module.html#ansible-collections-community-crypto-acme-certificate-order-validate-module"><span class="std std-ref">community.crypto.acme_certificate_order_validate</span></a> and. <a class="reference internal" href="acme_certificate_order_finalize_module.html#ansible-collections-community-crypto-acme-certificate-order-finalize-module"><span class="std std-ref">community.crypto.acme_certificate_order_finalize</span></a> module. An order can be effectively deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module. Note that both modules require the output <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-order-uri"><span class="std std-ref"><span class="pre">order_uri</span></span></a></code> of this module.</p></li>
+<li><p>To create or modify ACME accounts, use the <a class="reference internal" href="acme_account_module.html#ansible-collections-community-crypto-acme-account-module"><span class="std std-ref">community.crypto.acme_account</span></a> module. This module will <em>not</em> create or update ACME accounts.</p></li>
+<li><p>Between the call of this module and <a class="reference internal" href="acme_certificate_order_finalize_module.html#ansible-collections-community-crypto-acme-certificate-order-finalize-module"><span class="std std-ref">community.crypto.acme_certificate_order_finalize</span></a>, you have to fulfill the required steps for the chosen challenge by whatever means necessary. For <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code> that means creating the necessary challenge file on the destination webserver. For <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> the necessary dns record has to be created. For <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> the necessary certificate has to be created and served. It is <em>not</em> the responsibility of this module to perform these steps.</p></li>
+<li><p>For details on how to fulfill these challenges, you might have to read through <a class="reference external" href="https://tools.ietf.org/html/rfc8555#section-8">the main ACME specification</a> and the <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">TLS-ALPN-01 specification</a>. Also, consider the examples provided for this module.</p></li>
+<li><p>The module includes support for IP identifiers according to the <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8738.html">RFC 8738</a> ACME extension.</p></li>
+</ul>
+</section>
+<section id="requirements">
+<span id="ansible-collections-community-crypto-acme-certificate-order-create-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>The below requirements are needed on the host that executes this module.</p>
+<ul class="simple">
+<li><p>either <code class="docutils literal notranslate"><span class="pre">openssl</span></code></p></li>
+<li><p>or <a class="reference external" href="https://cryptography.io/">cryptography</a> &gt;= 3.3</p></li>
+</ul>
+</section>
+<section id="parameters">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-account_key_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-content"><strong>account_key_content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-account_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Content of the ACME account RSA or Elliptic Curve key.</p>
+<p>For Elliptic Curve keys only the following curves are supported: <code class="ansible-value docutils literal notranslate"><span class="pre">secp256r1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">secp384r1</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">secp521r1</span></code>.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>.</p>
+<p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code> is not used.</p>
+<p><strong>Warning:</strong> the content will be written into a temporary file, which will be deleted by Ansible when the module completes. Since this is an important private key — it can be used to change the account key, or to revoke your certificates without knowing their private keys —, this might not be acceptable.</p>
+<p>In case <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> is used, the content is not written into a temporary file. It can still happen that it is written to disk by Ansible in the process of moving the module with its argument to the node where it is executed.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-account_key_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-passphrase"><strong>account_key_passphrase</strong></p>
+<a class="ansibleOptionLink" href="#parameter-account_key_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.6.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Phassphrase to use to decode the account key.</p>
+<p><strong>Note:</strong> this is not supported by the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> backend, only by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-account_key_src"></div>
+<div class="ansibleOptionAnchor" id="parameter-account_key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-src"><span id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key"></span><strong>account_key_src</strong></p>
+<a class="ansibleOptionLink" href="#parameter-account_key_src" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: account_key</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to a file containing the ACME account RSA or Elliptic Curve key.</p>
+<p>For Elliptic Curve keys only the following curves are supported: <code class="ansible-value docutils literal notranslate"><span class="pre">secp256r1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">secp384r1</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">secp521r1</span></code>.</p>
+<p>Private keys can be created with the <a class="reference internal" href="openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey</span></a> or <a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a> modules. If the requisite (cryptography) is not available, keys can also be created directly with the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> command line tool: RSA keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">genrsa</span> <span class="pre">...</span></code>. Elliptic curve keys can be created with <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">ecparam</span> <span class="pre">-genkey</span> <span class="pre">...</span></code>. Any other tool creating private keys in PEM format can be used as well.</p>
+<p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>.</p>
+<p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code> is not used.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-account_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-uri"><strong>account_uri</strong></p>
+<a class="ansibleOptionLink" href="#parameter-account_uri" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>If specified, assumes that the account URI is as given. If the account key does not match this account, or an account with this URI does not exist, the module fails.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-acme_directory"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-acme-directory"><strong>acme_directory</strong></p>
+<a class="ansibleOptionLink" href="#parameter-acme_directory" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The ACME directory to use. This is the entry point URL to access the ACME CA server API.</p>
+<p>For safety reasons the default is set to the Let’s Encrypt staging server (for the ACME v1 protocol). This will create technically correct, but untrusted certificates.</p>
+<p>For Let’s Encrypt, all staging endpoints can be found here: <a class="reference external" href="https://letsencrypt.org/docs/staging-environment/">https://letsencrypt.org/docs/staging-environment/</a>.</p>
+<p>For <strong>Let’s Encrypt</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme-v02.api.letsencrypt.org/directory">https://acme-v02.api.letsencrypt.org/directory</a>.</p>
+<p>For <strong>ZeroSSL</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme.zerossl.com/v2/DV90">https://acme.zerossl.com/v2/DV90</a>.</p>
+<p>For <strong>Sectigo</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme-qa.secure.trust-provider.com/v2/DV">https://acme-qa.secure.trust-provider.com/v2/DV</a>.</p>
+<p>For <strong>HARICA</strong>, the production directory URL for ACME v2 is <a class="reference external" href="https://acme.harica.gr/XXX/directory">https://acme.harica.gr/XXX/directory</a> with XXX being specific to your account.</p>
+<p>The notes for this module contain a list of ACME services this module has been tested against.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-acme_version"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-acme-version"><strong>acme_version</strong></p>
+<a class="ansibleOptionLink" href="#parameter-acme_version" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The ACME version of the endpoint.</p>
+<p>Must be <code class="ansible-value docutils literal notranslate"><span class="pre">2</span></code> for standardized ACME v2 endpoints.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code> is no longer supported since community.crypto 3.0.0.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">2</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-csr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr"><strong>csr</strong></p>
+<a class="ansibleOptionLink" href="#parameter-csr" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>File containing the CSR for the new certificate.</p>
+<p>Can be created with <a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a>.</p>
+<p>The CSR may contain multiple Subject Alternate Names, but each one will lead to an individual challenge that must be fulfilled for the CSR to be signed.</p>
+<p><strong>Note</strong>: the private key used to create the CSR <strong>must not</strong> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
+<p>Precisely one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr-content"><span class="std std-ref"><span class="pre">csr_content</span></span></a></strong></code> must be specified.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-csr_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr-content"><strong>csr_content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-csr_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Content of the CSR for the new certificate.</p>
+<p>Can be created with <a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a>.</p>
+<p>The CSR may contain multiple Subject Alternate Names, but each one will lead to an individual challenge that must be fulfilled for the CSR to be signed.</p>
+<p><strong>Note</strong>: the private key used to create the CSR <strong>must not</strong> be the account key. This is a bad idea from a security point of view, and the CA should not accept the CSR. The ACME server should return an error in this case.</p>
+<p>Precisely one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr"><span class="std std-ref"><span class="pre">csr</span></span></a></strong></code> or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-csr-content"><span class="std std-ref"><span class="pre">csr_content</span></span></a></strong></code> must be specified.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-deactivate_authzs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-deactivate-authzs"><strong>deactivate_authzs</strong></p>
+<a class="ansibleOptionLink" href="#parameter-deactivate_authzs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Deactivate authentication objects (authz) when issuing the certificate failed.</p>
+<p>Authentication objects are bound to an account key and remain valid for a certain amount of time, and can be used to issue certificates without having to re-authenticate the domain. This can be a security concern.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-order_creation_error_strategy"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><strong>order_creation_error_strategy</strong></p>
+<a class="ansibleOptionLink" href="#parameter-order_creation_error_strategy" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Selects the error handling strategy for ACME protocol errors if creating a new ACME order fails.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code>:
+Always retry, until the limit in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-max-retries"><span class="std std-ref"><span class="pre">order_creation_max_retries</span></span></a></strong></code> has been reached.</p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">(default)</span>:
+An unspecified algorithm that tries to be clever.</p>
+<p>Right now identical to <code class="ansible-value docutils literal notranslate"><span class="pre">retry_without_replaces_cert_id</span></code>.</p>
+</li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;fail&quot;</span></code>:
+Simply fail in case of errors. Do not attempt to retry.</p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;retry_without_replaces_cert_id&quot;</span></code>:
+If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-replaces-cert-id"><span class="std std-ref"><span class="pre">replaces_cert_id</span></span></a></strong></code> is present, creating the order will be tried again without <code class="docutils literal notranslate"><span class="pre">replaces</span></code>.</p>
+<p>The only exception is an error of type <code class="docutils literal notranslate"><span class="pre">urn:ietf:params:acme:error:alreadyReplaced</span></code>, that indicates that the certificate was already replaced. This usually means something went wrong and the user should investigate.</p>
+</li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-order_creation_max_retries"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-max-retries"><strong>order_creation_max_retries</strong></p>
+<a class="ansibleOptionLink" href="#parameter-order_creation_max_retries" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Depending on the strategy selected in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy</span></span></a></strong></code>, will retry creating new orders for at most the specified amount of times.</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">3</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-profile"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-profile"><strong>profile</strong></p>
+<a class="ansibleOptionLink" href="#parameter-profile" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Chose a specific profile for certificate selection. The available profiles depend on the CA.</p>
+<p>See <a class="reference external" href="https://letsencrypt.org/2025/01/09/acme-profiles/">a blog post by Let’s Encrypt</a> and <a class="reference external" href="https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/">draft-aaron-acme-profiles-00</a> for more information.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-replaces_cert_id"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-replaces-cert-id"><strong>replaces_cert_id</strong></p>
+<a class="ansibleOptionLink" href="#parameter-replaces_cert_id" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>If provided, will request the order to replace the certificate identified by this certificate ID according to <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9773.html#section-5">Section 5 of RFC 9773</a>.</p>
+<p>This certificate ID must be computed as specified in <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9773.html#section-4.1">Section 4.1 of RFC 9773</a>. It is returned as return value <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="acme_certificate_renewal_info_module.html#ansible-collections-community-crypto-acme-certificate-renewal-info-module-return-cert-id"><span class="std std-ref"><span class="pre">cert_id</span></span></a></code> of the <a class="reference internal" href="acme_certificate_renewal_info_module.html#ansible-collections-community-crypto-acme-certificate-renewal-info-module"><span class="std std-ref">community.crypto.acme_certificate_renewal_info</span></a> module.</p>
+<p>ACME servers might refuse to create new orders that indicate to replace a certificate for which an active replacement order already exists. This can happen if this module is used to create an order, and then the playbook/role fails in case the challenges cannot be set up. If the playbook/role does not record the order data to continue with the existing order, but tries to create a new one on the next run, creating the new order might fail. If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=fail</span></span></a></code> this will make the module fail. <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=auto</span></span></a></code> and <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=retry_without_replaces_cert_id</span></span></a></code> will avoid this by leaving away <code class="docutils literal notranslate"><span class="pre">replaces</span></code> on retries.</p>
+<p>If <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-order-creation-error-strategy"><span class="std std-ref"><span class="pre">order_creation_error_strategy=fail</span></span></a></code>, for the above reason, this option should only be used if the role/playbook using it keeps track of order data accross restarts, or if it takes care to deactivate orders whose processing is aborted. Orders can be deactivated with the <a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a> module.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-request-timeout"><strong>request_timeout</strong></p>
+<a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The time Ansible should wait for a response from the ACME API.</p>
+<p>This timeout is applied to all HTTP(S) requests (HEAD, GET, POST).</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
+<a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cryptography&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;openssl&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-validate-certs"><strong>validate_certs</strong></p>
+<a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Whether calls to the ACME directory will validate TLS certificates.</p>
+<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">true</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Attributes</a><a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Support</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-action_group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-attribute-action-group"><strong>action_group</strong></p>
+<a class="ansibleOptionLink" href="#attribute-action_group" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-property">Action groups:</strong> <strong class="ansible-attribute-support-full">community.crypto.acme</strong>, <strong class="ansible-attribute-support-full">acme</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Use <code class="docutils literal notranslate"><span class="pre">group/acme</span></code> or <code class="docutils literal notranslate"><span class="pre">group/community.crypto.acme</span></code> in <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code> to set defaults for this module.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-check_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-attribute-check-mode"><strong>check_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-check_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Can run in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code> and return changed status prediction without modifying target.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-diff_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-attribute-diff-mode"><strong>diff_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-diff_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-none">none</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Although the defaults are chosen so that the module can be used with the <a class="reference external" href="https://letsencrypt.org/">Let’s Encrypt</a> CA, the module can in principle be used with any CA providing an ACME endpoint.</p></li>
+<li><p>So far, the ACME modules have only been tested by the developers against Let’s Encrypt (staging and production), ZeroSSL (production), and <a class="reference external" href="https://github.com/letsencrypt/Pebble">Pebble testing server</a>. We have got community feedback that they also work with Sectigo ACME Service for InCommon and with HARICA. If you experience problems with another ACME server, please <a class="reference external" href="https://github.com/ansible-collections/community.crypto/issues/new/choose">create an issue</a> to help us supporting it. Feedback that an ACME server not mentioned does work is also appreciated.</p></li>
+<li><p>If a new enough version of the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library is available (see Requirements for details), it will be used instead of the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary. This can be explicitly disabled or enabled with the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-select-crypto-backend"><span class="std std-ref"><span class="pre">select_crypto_backend</span></span></a></strong></code> option. Note that using the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> binary will be slower and less secure, as private key contents always have to be stored on disk (see <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>).</p></li>
+</ul>
+</div>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="acme_certificate_order_validate_module.html#ansible-collections-community-crypto-acme-certificate-order-validate-module"><span class="std std-ref">community.crypto.acme_certificate_order_validate</span></a></dt><dd><p>Validate pending authorizations of an ACME order.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_order_finalize_module.html#ansible-collections-community-crypto-acme-certificate-order-finalize-module"><span class="std std-ref">community.crypto.acme_certificate_order_finalize</span></a></dt><dd><p>Finalize an ACME order after satisfying the challenges.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_order_info_module.html#ansible-collections-community-crypto-acme-certificate-order-info-module"><span class="std std-ref">community.crypto.acme_certificate_order_info</span></a></dt><dd><p>Obtain information for an ACME order.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_deactivate_authz_module.html#ansible-collections-community-crypto-acme-certificate-deactivate-authz-module"><span class="std std-ref">community.crypto.acme_certificate_deactivate_authz</span></a></dt><dd><p>Deactivate all authorizations (authz) of an ACME order, effectively deactivating the order itself.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_renewal_info_module.html#ansible-collections-community-crypto-acme-certificate-renewal-info-module"><span class="std std-ref">community.crypto.acme_certificate_renewal_info</span></a></dt><dd><p>Determine whether a certificate should be renewed.</p>
+</dd>
+<dt><a class="reference external" href="https://letsencrypt.org/docs/">The Let’s Encrypt documentation</a></dt><dd><p>Documentation for the Let’s Encrypt Certification Authority. Provides useful information for example on rate limits.</p>
+</dd>
+<dt><a class="reference external" href="https://tools.ietf.org/html/rfc8555">Automatic Certificate Management Environment (ACME)</a></dt><dd><p>The specification of the ACME protocol (RFC 8555).</p>
+</dd>
+<dt><a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html">ACME TLS ALPN Challenge Extension</a></dt><dd><p>The specification of the <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenge (RFC 8737).</p>
+</dd>
+<dt><a class="reference internal" href="acme_challenge_cert_helper_module.html#ansible-collections-community-crypto-acme-challenge-cert-helper-module"><span class="std std-ref">community.crypto.acme_challenge_cert_helper</span></a></dt><dd><p>Helps preparing <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> challenges.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey</span></a></dt><dd><p>Can be used to create private keys (both for certificates and accounts).</p>
+</dd>
+<dt><a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a></dt><dd><p>Can be used to create private keys without writing it to disk (both for certificates and accounts).</p>
+</dd>
+<dt><a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a></dt><dd><p>Can be used to create a Certificate Signing Request (CSR).</p>
+</dd>
+<dt><a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a></dt><dd><p>Can be used to create a Certificate Signing Request (CSR) without writing it to disk.</p>
+</dd>
+<dt><a class="reference internal" href="acme_account_module.html#ansible-collections-community-crypto-acme-account-module"><span class="std std-ref">community.crypto.acme_account</span></a></dt><dd><p>Allows to create, modify or delete an ACME account.</p>
+</dd>
+<dt><a class="reference internal" href="acme_inspect_module.html#ansible-collections-community-crypto-acme-inspect-module"><span class="std std-ref">community.crypto.acme_inspect</span></a></dt><dd><p>Allows to debug problems.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="c1">### Example with HTTP-01 challenge ###</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from a variable</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
+
+<span class="c1"># Alternative first step:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from Hashi Vault</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.hashi_vault.hashi_vault&#39;</span><span class="o">,</span> <span class="s1">&#39;secret=secret/account_private_key:value&#39;</span><span class="o">)</span> <span class="cp">}}</span>
+<span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
+
+<span class="c1"># Alternative first step:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key file</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/pki/cert/csr/sample.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
+
+<span class="c1"># Perform the necessary steps to fulfill the challenge. For example:</span>
+<span class="c1">#</span>
+<span class="c1"># - name: Copy http-01 challenges</span>
+<span class="c1">#   ansible.builtin.copy:</span>
+<span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.identifier</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">]</span><span class="nv">.resource</span> <span class="cp">}}</span>
+<span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#   when: &quot;&#39;http-01&#39; in item.challenges&quot;</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_validate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http-01</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retrieve the cert and intermediate certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_finalize</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">cert_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
+<span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
+
+<span class="nn">---</span>
+<span class="c1">### Example with DNS challenge against production ACME server ###</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key file.</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
+
+<span class="c1"># Perform the necessary steps to fulfill the challenge. For example:</span>
+<span class="c1">#</span>
+<span class="c1"># - name: Create DNS records for dns-01 challenges</span>
+<span class="c1">#   community.aws.route53:</span>
+<span class="c1">#     zone: sample.com</span>
+<span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     type: TXT</span>
+<span class="c1">#     ttl: 60</span>
+<span class="c1">#     state: present</span>
+<span class="c1">#     wait: true</span>
+<span class="c1">#     # Note: item.value is a list of TXT entries, and route53</span>
+<span class="c1">#     # requires every entry to be enclosed in quotes</span>
+<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;community.dns.quote_txt&#39;</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_validate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dns-01</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retrieve the cert and intermediate certificate</span>
+<span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_finalize</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
+<span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
+<span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">cert_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
+<span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
+<span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
+</pre></div>
+</div>
+</section>
+<section id="return-values">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
+<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-account_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-account-uri"><strong>account_uri</strong></p>
+<a class="ansibleOptionLink" href="#return-account_uri" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>ACME account URI.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data"><strong>challenge_data</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>For every identifier, provides the challenge information.</p>
+<p>Only challenges which are not yet valid are returned.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges"><strong>challenges</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Information for different challenge types supported for this identifier.</p>
+<p>Note that the keys are not valid Jinja2 identifiers.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/dns-01"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01"><strong>dns-01</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/dns-01" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Information for <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> authorization.</p>
+<p>A DNS TXT record needs to be created with the record name <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01-record"><span class="std std-ref"><span class="pre">challenge_data[].challenges.dns-01.record</span></span></a></code> and value <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01-resource-value"><span class="std std-ref"><span class="pre">challenge_data[].challenges.dns-01.resource_value</span></span></a></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> if the identifier supports <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> authorization</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/dns-01/record"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01-record"><strong>record</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/dns-01/record" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The full DNS record’s name for the challenge.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;_acme-challenge.example.com&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/dns-01/resource"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01-resource"><strong>resource</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/dns-01/resource" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Always contains the string <code class="ansible-value docutils literal notranslate"><span class="pre">_acme-challenge</span></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;_acme-challenge&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/dns-01/resource_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-dns-01-resource-value"><strong>resource_value</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/dns-01/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/http-01"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-http-01"><strong>http-01</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/http-01" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Information for <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code> authorization.</p>
+<p>The server needs to make the path <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-http-01-resource"><span class="std std-ref"><span class="pre">challenge_data[].challenges.http-01.resource</span></span></a></code> accessible via HTTP (which might redirect to HTTPS). A <code class="docutils literal notranslate"><span class="pre">GET</span></code> operation to this path needs to provide the value from <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-http-01-resource-value"><span class="std std-ref"><span class="pre">challenge_data[].challenges.http-01.resource_value</span></span></a></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> if the identifier supports <code class="ansible-value docutils literal notranslate"><span class="pre">http-01</span></code> authorization</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/http-01/resource"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-http-01-resource"><strong>resource</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/http-01/resource" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The path the value has to be provided under.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;.well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/http-01/resource_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-http-01-resource-value"><strong>resource_value</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/http-01/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/tls-alpn-01"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01"><strong>tls-alpn-01</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/tls-alpn-01" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Information for <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> authorization.</p>
+<p>A certificate needs to be created for the DNS name <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource"><span class="std std-ref"><span class="pre">challenge_data[].challenges.tls-alpn-01.resource</span></span></a></code> with acmeValidation X.509 extension of value <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource-value"><span class="std std-ref"><span class="pre">challenge_data[].challenges.tls-alpn-01.resource_value</span></span></a></code>. This certificate needs to be served when the application-layer protocol <code class="docutils literal notranslate"><span class="pre">acme-tls/1</span></code> is negotiated for a HTTPS connection to port 443 with the SNI extension for the domain name (<code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource-original"><span class="std std-ref"><span class="pre">challenge_data[].challenges.tls-alpn-01.resource_original</span></span></a></code>) being validated.</p>
+<p>See <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">https://www.rfc-editor.org/rfc/rfc8737.html#section-3</a> for details.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> if the identifier supports <code class="ansible-value docutils literal notranslate"><span class="pre">tls-alpn-01</span></code> authorization</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/tls-alpn-01/resource"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource"><strong>resource</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/tls-alpn-01/resource" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The DNS name for DNS identifiers, and the reverse DNS mapping (RFC1034, RFC3596) for IP addresses.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;example.com&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/tls-alpn-01/resource_original"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource-original"><strong>resource_original</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/tls-alpn-01/resource_original" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The original identifier including type identifier.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;dns:example.com&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/challenges/tls-alpn-01/resource_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-challenges-tls-alpn-01-resource-value"><strong>resource_value</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/challenges/tls-alpn-01/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
+<p><strong>Note:</strong> this return value contains a Base64 encoded version of the correct binary blob which has to be put into the acmeValidation X.509 extension; see <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">https://www.rfc-editor.org/rfc/rfc8737.html#section-3</a> for details. To do this, you might need the <a class="reference external" href="https://docs.ansible.com/ansible/devel/collections/ansible/builtin/b64decode_filter.html#ansible-collections-ansible-builtin-b64decode-filter" title="(in Ansible vdevel)"><span class="xref std std-ref">ansible.builtin.b64decode</span></a> Jinja filter to extract the binary blob from this return value.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;AAb=&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-identifier"><strong>identifier</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The identifier for this challenge.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;example.com&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data/identifier_type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-identifier-type"><strong>identifier_type</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data/identifier_type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The identifier’s type.</p>
+<p><code class="ansible-value docutils literal notranslate"><span class="pre">dns</span></code> for DNS names, and <code class="ansible-value docutils literal notranslate"><span class="pre">ip</span></code> for IP addresses.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Can only return:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ip&quot;</span></code></p></li>
+</ul>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;dns&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-challenge_data_dns"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-challenge-data-dns"><strong>challenge_data_dns</strong></p>
+<a class="ansibleOptionLink" href="#return-challenge_data_dns" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>List of TXT values per DNS record for <code class="ansible-value docutils literal notranslate"><span class="pre">dns-01</span></code> challenges.</p>
+<p>Only challenges which are not yet valid are returned.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-order_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-order-create-module-return-order-uri"><strong>order_uri</strong></p>
+<a class="ansibleOptionLink" href="#return-order_uri" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>ACME order URI.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Felix Fontein (&#64;felixfontein)</p></li>
+</ul>
+</section>
+<section id="collection-links">
+<h3>Collection links<a class="headerlink" href="#collection-links" title="Link to this heading"></a></h3>
+<ul class="ansible-links">
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
+<li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="acme_certificate_deactivate_authz_module.html" class="btn btn-neutral float-left" title="community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acme_certificate_order_finalize_module.html" class="btn btn-neutral float-right" title="community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Community.Crypto Contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
