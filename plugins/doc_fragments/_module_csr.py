@@ -329,7 +329,7 @@ options:
   custom_extensions:
     description:
       - Allows to specify one or multiple custom extensions.
-      - The extension value must not be empty, unless O(custom_extension[].skip_if_empty) is specified.
+      - The extension value must not be empty, unless O(custom_extensions[].skip_if_empty) is specified.
       - In such case the extension will be skipped instead of throwing an error.
     type: list
     elements: dict
@@ -352,7 +352,7 @@ options:
       value_type:
         description:
           - The type of the value. Only valid if O(custom_extensions[].value) is specified.
-          - Supported data types are: V(str), V(bool), V(int), V(real).
+          - 'Supported data types are: V(str), V(bool), V(int), V(real).'
         type: str
         default: str
       value:

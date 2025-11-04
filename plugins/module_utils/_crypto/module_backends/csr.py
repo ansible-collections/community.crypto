@@ -74,6 +74,7 @@ import base64
 from pyasn1.type import univ, char
 from pyasn1.codec.der import encoder
 
+
 class CertificateSigningRequestError(OpenSSLObjectError):
     pass
 
@@ -146,7 +147,7 @@ def parse_custom_extensions(
             oid = custom_extension["oid"]
 
             critical = custom_extension.get("critical", False)
-            if type(critical) is not bool:
+            if not isinstance(critical, bool):
                 raise OpenSSLObjectError(f"critical must be boolean (oid {oid})")
 
             value = custom_extension.get("value")
