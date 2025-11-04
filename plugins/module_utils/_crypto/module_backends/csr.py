@@ -12,7 +12,6 @@ import binascii
 import typing as t
 
 from ansible.module_utils.common.text.converters import to_text
-
 from ansible_collections.community.crypto.plugins.module_utils._argspec import (
     ArgumentSpec,
 )
@@ -72,9 +71,10 @@ except ImportError:
 
 import base64
 
+
 try:
-    from pyasn1.type import univ, char
     from pyasn1.codec.der import encoder
+    from pyasn1.type import char, univ
 except ImportError:
     pass
 
@@ -142,7 +142,7 @@ def parse_crl_distribution_points(
 
 def parse_custom_extensions(
         *, module: AnsibleModule, custom_extensions: list[dict[str, t.Any]]
-) -> list[tuple(cryptography.x509.UnrecognizedExtension, bool)]:
+) -> list[tuple[cryptography.x509.UnrecognizedExtension, bool]]:
     result = []
     for index, custom_extension in enumerate(custom_extensions):
         try:
@@ -154,10 +154,10 @@ def parse_custom_extensions(
             if not isinstance(critical, bool):
                 raise OpenSSLObjectError(f"critical must be boolean (oid {oid})")
 
-            value = custom_extension.get("value")
+            value = custom_extension.get("value", "")
             value_type = custom_extension.get("value_type", "str")
-            value_raw = custom_extension.get("value_raw")
-            value_b64 = custom_extension.get("value_b64")
+            value_raw = custom_extension.get("value_raw", "")
+            value_b64 = custom_extension.get("value_b64", "")
 
             if not value and not value_raw and not value_b64:
                 if custom_extension.get("skip_if_empty"):
@@ -251,7 +251,7 @@ class CertificateSigningRequestBackend:
             list[cryptography.x509.DistributionPoint] | None
         ) = None
         self.custom_extensions: (
-            list[tuple(cryptography.x509.UnrecognizedExtension, bool)] | None
+            list[tuple[cryptography.x509.UnrecognizedExtension, bool]] | None
         ) = None
 
         self.csr: cryptography.x509.CertificateSigningRequest | None = None

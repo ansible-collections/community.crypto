@@ -27,6 +27,7 @@ def create_certificates(session: nox.Session) -> None:
     Regenerate some vendored certificates.
     """
     session.install("cryptography<39.0.0")  # we want support for SHA1 signatures
+    session.install("pyasn1>=0.4.8")
     session.run("python", "tests/create-certificates.py")
     session.warn(
         "Note that you need to modify some values in tests/integration/targets/x509_certificate_info/tasks/impl.yml"

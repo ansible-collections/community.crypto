@@ -338,7 +338,7 @@ options:
         description:
           - Set the critical flag.
         type: bool
-        default: False
+        default: false
       oid:
         description:
           - The OID of the custom extension
@@ -348,7 +348,7 @@ options:
         description:
           - Allow empty value to be specified. In such case the extension will be skipped when processing.
         type: bool
-        default: False
+        default: false
       value_type:
         description:
           - The type of the value. Only valid if O(custom_extensions[].value) is specified.
