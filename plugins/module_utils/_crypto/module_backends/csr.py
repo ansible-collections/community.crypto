@@ -1000,7 +1000,7 @@ def get_csr_argument_spec() -> ArgumentSpec:
                     "value_b64": {"type": "str"},
                 },
                 "mutually_exclusive": [("value", "value_raw", "value_b64")],
-                "required_one_of": [("oid")],
+                "required_one_of": [("value", "value_raw", "value_b64")],
             },
             "select_crypto_backend": {
                 "type": "str",

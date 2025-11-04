@@ -371,7 +371,7 @@ options:
           - The raw value of the custom extension, base64 encoded. Will be decoded, then copied to the extension as-is.
           - Mutually exclusive with O(custom_extensions[].value) and O(custom_extensions[].value_raw).
         type: str
-    version_added: 3.1.1
+    version_added: 3.1.0
 notes:
   - If the certificate signing request already exists it will be checked whether subjectAltName, keyUsage, extendedKeyUsage
     and basicConstraints only contain the requested values, whether OCSP Must Staple is as requested, and if the request was
