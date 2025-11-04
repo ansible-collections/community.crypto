@@ -331,6 +331,7 @@ options:
       - Allows to specify one or multiple custom extensions.
       - The extension value must not be empty, unless O(custom_extensions[].skip_if_empty) is specified.
       - In such case the extension will be skipped instead of throwing an error.
+      - Custom extensions require the V(pyasn1) Python package to be installed in the environment where the code is run.
     type: list
     elements: dict
     suboptions:
