@@ -6,3 +6,5 @@
 openssl_package_name: openssl
 cryptography_package_name: python-cryptography
 cryptography_package_name_python3: python3-cryptography
+pyasn1_package_name:
+pyasn1_package_name_python3:

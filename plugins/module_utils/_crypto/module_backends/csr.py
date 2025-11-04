@@ -70,6 +70,9 @@ try:
 except ImportError:
     pass
 
+import base64
+from pyasn1.type import univ, char
+from pyasn1.codec.der import encoder
 
 class CertificateSigningRequestError(OpenSSLObjectError):
     pass
@@ -132,6 +135,63 @@ def parse_crl_distribution_points(
     return result
 
 
+def parse_custom_extensions(
+        *, module: AnsibleModule, custom_extensions: list[dict[str, t.Any]]
+) -> list[tuple(cryptography.x509.UnrecognizedExtension, bool)]:
+    result = []
+    for index, custom_extension in enumerate(custom_extensions):
+        try:
+            if not custom_extension.get("oid"):
+                raise OpenSSLObjectError("oid must not be empty")
+            oid = custom_extension["oid"]
+
+            critical = custom_extension.get("critical", False)
+            if not type(critical) == bool:
+                raise OpenSSLObjectError(f"critical must be boolean (oid {oid})")
+
+            value = custom_extension.get("value")
+            value_type = custom_extension.get("value_type", "str")
+            value_raw = custom_extension.get("value_raw")
+            value_b64 = custom_extension.get("value_b64")
+
+            if not value and not value_raw and not value_b64:
+                if custom_extension.get("skip_if_empty"):
+                    continue
+                raise OpenSSLObjectError(f"neither of value, value_raw, or value_b64 was specified (oid {oid})")
+
+            if sum(bool(x) for x in [value, value_raw, value_b64]) != 1:
+                raise OpenSSLObjectError(f"exactly one of value, value_raw, or value_b64 can be set (oid {oid})")
+
+            if value_raw or value_b64:
+                extension_value = value_raw.encode("UTF-8") if value_raw else base64.b64decode(value_b64)
+            else:
+                if value_type == "str":
+                    extension_value = encoder.encode(char.UTF8String(value))
+                elif value_type == "bool":
+                    value = value.strip().lower()
+                    if value not in ["true", "false"]:
+                        raise OpenSSLObjectError(f"Unexpected bool value: {value} (oid {oid})")
+                    extension_value = encoder.encode(univ.Boolean(value == "true"))
+                elif value_type == "int":
+                    extension_value = encoder.encode(univ.Integer(int(value.strip())))
+                elif value_type == "real":
+                    extension_value = encoder.encode(univ.Real(float(value.strip())))
+                else:
+                    raise OpenSSLObjectError(f"Data type of value unknown; supported types: str, bool, int, float (oid {oid}")
+
+            result.append((
+                cryptography.x509.UnrecognizedExtension(
+                    oid=cryptography.x509.ObjectIdentifier(oid),
+                    value=extension_value,
+                ), critical)
+            )
+        except (OpenSSLObjectError, ValueError) as e:
+            raise OpenSSLObjectError(
+                f"Error while parsing custom extension #{index}: {e}"
+            ) from e
+    return result
+
+
 class CertificateSigningRequestBackend:
     def __init__(self, *, module: AnsibleModule) -> None:
         self.module = module
@@ -185,6 +245,10 @@ class CertificateSigningRequestBackend:
         self.crl_distribution_points: (
             list[cryptography.x509.DistributionPoint] | None
         ) = None
+        self.custom_extensions: (
+            list[tuple(cryptography.x509.UnrecognizedExtension, bool)] | None
+        ) = None
+
         self.csr: cryptography.x509.CertificateSigningRequest | None = None
         self.privatekey: CertificateIssuerPrivateKeyTypes | None = None
 
@@ -266,6 +330,14 @@ class CertificateSigningRequestBackend:
         if crl_distribution_points:
             self.crl_distribution_points = parse_crl_distribution_points(
                 module=module, crl_distribution_points=crl_distribution_points
+            )
+
+        custom_extensions: list[dict[str, t.Any]] | None = module.params[
+            "custom_extensions"
+        ]
+        if custom_extensions:
+            self.custom_extensions = parse_custom_extensions(
+                module=module, custom_extensions=custom_extensions
             )
 
     def _get_info(self, *, data: bytes | None) -> dict[str, t.Any]:
@@ -412,6 +484,10 @@ class CertificateSigningRequestBackend:
                 cryptography.x509.CRLDistributionPoints(self.crl_distribution_points),
                 critical=False,
             )
+
+        if self.custom_extensions:
+            for custom_extension, critical in self.custom_extensions:
+                csr = csr.add_extension(custom_extension, critical=critical)
 
         # csr.sign() does not accept some digests we theoretically could have in digest.
         # For that reason we use type t.Any here. csr.sign() will complain if
@@ -905,6 +981,21 @@ def get_csr_argument_spec() -> ArgumentSpec:
                 },
                 "mutually_exclusive": [("full_name", "relative_name")],
                 "required_one_of": [("full_name", "relative_name", "crl_issuer")],
+            },
+            "custom_extensions": {
+                "type": "list",
+                "elements": "dict",
+                "options": {
+                    "critical": {"type": "bool", "default": False},
+                    "oid": {"type": "str"},
+                    "skip_if_empty": {"type": "bool", "default": False},
+                    "value_type": {"type": "str", "default": "str"},
+                    "value": {"type": "str"},
+                    "value_raw": {"type": "str"},
+                    "value_b64": {"type": "str"},
+                },
+                "mutually_exclusive": [("value", "value_raw", "value_b64")],
+                "required_one_of": [("oid")],
             },
             "select_crypto_backend": {
                 "type": "str",
