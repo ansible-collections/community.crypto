@@ -398,6 +398,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p>Allows to specify one or multiple custom extensions.</p>
 <p>The extension value must not be empty, unless <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-csr-module-parameter-custom-extensions-skip-if-empty"><span class="std std-ref"><span class="pre">custom_extensions[].skip_if_empty</span></span></a></strong></code> is specified.</p>
 <p>In such case the extension will be skipped instead of throwing an error.</p>
+<p>Custom extensions require the <code class="ansible-value docutils literal notranslate"><span class="pre">pyasn1</span></code> Python package to be installed in the environment where the code is run.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
