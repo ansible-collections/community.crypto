@@ -92,6 +92,8 @@ if [ "${script}" != "units" ] && [ "${script}" != "sanity" ] && [ "${ansible_ver
 fi
 # END: HACK
 
+# pyasn1 is needed for custom OIDs (#966)
+retry pip install 'pyasn1>=0.4.8'
 
 export PYTHONIOENCODING='utf-8'
 
