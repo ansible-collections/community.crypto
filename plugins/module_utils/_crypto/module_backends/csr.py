@@ -146,7 +146,7 @@ def parse_custom_extensions(
             oid = custom_extension["oid"]
 
             critical = custom_extension.get("critical", False)
-            if not type(critical) == bool:
+            if type(critical) is not bool:
                 raise OpenSSLObjectError(f"critical must be boolean (oid {oid})")
 
             value = custom_extension.get("value")
@@ -179,16 +179,16 @@ def parse_custom_extensions(
                 else:
                     raise OpenSSLObjectError(f"Data type of value unknown; supported types: str, bool, int, float (oid {oid}")
 
-            result.append((
-                cryptography.x509.UnrecognizedExtension(
-                    oid=cryptography.x509.ObjectIdentifier(oid),
-                    value=extension_value,
-                ), critical)
+            result.append(
+                (
+                    cryptography.x509.UnrecognizedExtension(
+                        oid=cryptography.x509.ObjectIdentifier(oid),
+                        value=extension_value,
+                    ), critical
+                )
             )
         except (OpenSSLObjectError, ValueError) as e:
-            raise OpenSSLObjectError(
-                f"Error while parsing custom extension #{index}: {e}"
-            ) from e
+            raise OpenSSLObjectError(f"Error while parsing custom extension #{index}: {e}") from e
     return result
 
 
