@@ -771,6 +771,36 @@
     authority_cert_issuer: '{{ value_for_authority_cert_issuer }}'
     authority_cert_serial_number: 12345
     select_crypto_backend: '{{ select_crypto_backend }}'
+    custom_extensions:
+      - oid: 1.3.6.1.4.1.34380.1.2.1
+        value: "DE"  # stored as an UTF8String
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.2
+        value: ""
+        critical: false
+        skip_if_empty: true  # will not be stored to the CSR
+      - oid: 1.3.6.1.4.1.34380.1.2.3
+        value: 17
+        value_type: int
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.4
+        value: 3.14
+        value_type: real
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.5
+        value: true
+        value_type: bool
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.6
+        value: false
+        value_type: bool
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.7
+        value_raw: "DE"  # stored as an OctetString (raw)
+        critical: false
+      - oid: 1.3.6.1.4.1.34380.1.2.8
+        value_b64: "REU="  # DE, base64 encoded, stored as an OctetString (raw)
+        critical: false
   vars:
     value_for_extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
@@ -886,7 +916,7 @@
         critical: false
       - oid: 1.3.6.1.4.1.34380.1.2.8
         value_b64: "REU="  # DE, base64 encoded, stored as an OctetString (raw)
-        critical: true
+        critical: false
   vars:
     value_for_extended_key_usage:
       - serverAuth  # the same as "TLS Web Server Authentication"
