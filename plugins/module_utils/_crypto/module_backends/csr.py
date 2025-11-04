@@ -140,7 +140,7 @@ def parse_crl_distribution_points(
 
 
 def parse_custom_extensions(
-        *, module: AnsibleModule, custom_extensions: list[dict[str, t.Any]]
+    *, module: AnsibleModule, custom_extensions: list[dict[str, t.Any]]
 ) -> list[tuple[cryptography.x509.UnrecognizedExtension, bool]]:
     result = []
     for index, custom_extension in enumerate(custom_extensions):
@@ -161,38 +161,53 @@ def parse_custom_extensions(
             if not value and not value_raw and not value_b64:
                 if custom_extension.get("skip_if_empty"):
                     continue
-                raise OpenSSLObjectError(f"neither of value, value_raw, or value_b64 was specified (oid {oid})")
+                raise OpenSSLObjectError(
+                    f"neither of value, value_raw, or value_b64 was specified (oid {oid})"
+                )
 
             if sum(bool(x) for x in [value, value_raw, value_b64]) != 1:
-                raise OpenSSLObjectError(f"exactly one of value, value_raw, or value_b64 can be set (oid {oid})")
+                raise OpenSSLObjectError(
+                    f"exactly one of value, value_raw, or value_b64 can be set (oid {oid})"
+                )
 
             if value_raw or value_b64:
-                extension_value = value_raw.encode("UTF-8") if value_raw else base64.b64decode(value_b64)
+                extension_value = (
+                    value_raw.encode("UTF-8")
+                    if value_raw
+                    else base64.b64decode(value_b64)
+                )
             else:
                 if value_type == "str":
                     extension_value = encoder.encode(char.UTF8String(value))
                 elif value_type == "bool":
                     value = value.strip().lower()
                     if value not in ["true", "false"]:
-                        raise OpenSSLObjectError(f"Unexpected bool value: {value} (oid {oid})")
+                        raise OpenSSLObjectError(
+                            f"Unexpected bool value: {value} (oid {oid})"
+                        )
                     extension_value = encoder.encode(univ.Boolean(value == "true"))
                 elif value_type == "int":
                     extension_value = encoder.encode(univ.Integer(int(value.strip())))
                 elif value_type == "real":
                     extension_value = encoder.encode(univ.Real(float(value.strip())))
                 else:
-                    raise OpenSSLObjectError(f"Data type of value unknown; supported types: str, bool, int, float (oid {oid}")
+                    raise OpenSSLObjectError(
+                        f"Data type of value unknown; supported types: str, bool, int, float (oid {oid}"
+                    )
 
             result.append(
                 (
                     cryptography.x509.UnrecognizedExtension(
                         oid=cryptography.x509.ObjectIdentifier(oid),
                         value=extension_value,
-                    ), critical
+                    ),
+                    critical,
                 )
             )
         except (OpenSSLObjectError, ValueError) as e:
-            raise OpenSSLObjectError(f"Error while parsing custom extension #{index}: {e}") from e
+            raise OpenSSLObjectError(
+                f"Error while parsing custom extension #{index}: {e}"
+            ) from e
     return result
 
 
