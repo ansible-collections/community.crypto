@@ -71,8 +71,12 @@ except ImportError:
     pass
 
 import base64
-from pyasn1.type import univ, char
-from pyasn1.codec.der import encoder
+
+try:
+    from pyasn1.type import univ, char
+    from pyasn1.codec.der import encoder
+except ImportError:
+    pass
 
 
 class CertificateSigningRequestError(OpenSSLObjectError):
