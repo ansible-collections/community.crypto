@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import base64
 import binascii
 import typing as t
 
@@ -68,9 +69,6 @@ try:
     import cryptography.x509.oid
 except ImportError:
     pass
-
-import base64
-
 
 try:
     from pyasn1.codec.der import encoder
