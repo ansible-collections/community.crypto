@@ -36,6 +36,7 @@ mypy_extra_deps = [
     "pyasn1",
     "types-mock",
     "types-PyYAML",
+    "types-pyasn1",
 ]
 
 [sessions.docs_check]
