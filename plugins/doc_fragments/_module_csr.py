@@ -21,7 +21,7 @@ attributes:
     support: full
 requirements:
   - cryptography >= 3.3
-  - pyasn1 >= 0.4.8 (only if `custom_extensions` are specified)
+  - pyasn1 >= 0.4.8 (only if O(custom_extensions) are specified)
 options:
   digest:
     description:
