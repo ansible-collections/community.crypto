@@ -72,17 +72,6 @@ stages:
               test: '2.18/sanity/1'
             - name: Units
               test: '2.18/units/1'
-  - stage: Ansible_2_17
-    displayName: Sanity & Units 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.17/sanity/1'
-            - name: Units
-              test: '2.17/units/1'
 ### Docker
   - stage: Docker_2_19
     displayName: Docker 2.19
@@ -115,23 +104,6 @@ stages:
               test: ubuntu2404
             - name: Alpine 3.20
               test: alpine320
-          groups:
-            - 1
-            - 2
-  - stage: Docker_2_17
-    displayName: Docker 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.17/linux/{0}
-          targets:
-            - name: Fedora 39
-              test: fedora39
-            - name: Ubuntu 22.04
-              test: ubuntu2204
-            - name: Alpine 3.19
-              test: alpine319
           groups:
             - 1
             - 2
@@ -212,21 +184,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Remote_2_17
-    displayName: Remote 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.17/{0}
-          targets:
-            - name: RHEL 9.3
-              test: rhel/9.3
-            - name: FreeBSD 13.5
-              test: freebsd/13.5
-          groups:
-            - 1
-            - 2
 ### Generic
   - stage: Generic_2_19
     displayName: Generic 2.19
@@ -259,20 +216,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Generic_2_17
-    displayName: Generic 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.17/generic/{0}
-          targets:
-            - test: "3.7"
-            - test: "3.12"
-          groups:
-            - 1
-            - 2
 
   ## Finally
 
@@ -281,17 +224,13 @@ stages:
     dependsOn:
       - Ansible_2_19
       - Ansible_2_18
-      - Ansible_2_17
       - Remote_2_19_extra_vms
       - Remote_2_19
       - Remote_2_18
-      - Remote_2_17
       - Docker_2_19
       - Docker_2_18
-      - Docker_2_17
       - Docker_community_2_19
       - Generic_2_19
       - Generic_2_18
-      - Generic_2_17
     jobs:
       - template: templates/coverage.yml
