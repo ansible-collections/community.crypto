@@ -298,21 +298,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Remote_2_17
-    displayName: Remote 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.17/{0}
-          targets:
-            - name: RHEL 9.3
-              test: rhel/9.3
-            - name: FreeBSD 13.5
-              test: freebsd/13.5
-          groups:
-            - 1
-            - 2
 ### Generic
   - stage: Generic_devel
     displayName: Generic devel
@@ -403,7 +388,6 @@ stages:
       - Remote_2_20
       - Remote_2_19
       - Remote_2_18
-      - Remote_2_17
       - Docker_devel
       - Docker_2_20
       - Docker_2_19
