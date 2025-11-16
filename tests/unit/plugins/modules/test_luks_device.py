@@ -98,7 +98,6 @@ LUKS_CREATE_DATA: list[
     ("dummy", "key", None, "present", False, None, "dummy", "dummy", True),
     (None, "key", None, "present", False, None, "dummy", "dummy", False),
     (None, "key", None, "present", False, "labelName", "dummy", "dummy", True),
-    ("dummy", None, None, "present", False, None, "dummy", "dummy", False),
     ("dummy", "key", None, "absent", False, None, "dummy", "dummy", False),
     ("dummy", "key", None, "opened", True, None, "dummy", "dummy", False),
     ("dummy", "key", None, "closed", True, None, "dummy", "dummy", False),
@@ -106,7 +105,6 @@ LUKS_CREATE_DATA: list[
     ("dummy", None, "foo", "present", False, None, "dummy", "dummy", True),
     (None, None, "bar", "present", False, None, "dummy", "dummy", False),
     (None, None, "baz", "present", False, "labelName", "dummy", "dummy", True),
-    ("dummy", None, None, "present", False, None, "dummy", "dummy", False),
     ("dummy", None, "quz", "absent", False, None, "dummy", "dummy", False),
     ("dummy", None, "qux", "opened", True, None, "dummy", "dummy", False),
     ("dummy", None, "quux", "closed", True, None, "dummy", "dummy", False),
@@ -114,6 +112,11 @@ LUKS_CREATE_DATA: list[
     ("dummy", "key", None, "present", False, None, None, None, True),
     ("dummy", "key", None, "present", False, None, None, "dummy", True),
     ("dummy", "key", None, "present", False, None, "dummy", None, True),
+    ("dummy", None, None, "present", False, None, "dummy", None, "exception"),
+    ("dummy", None, None, "opened", False, None, "dummy", None, "exception"),
+    ("dummy", None, None, "closed", False, None, "dummy", None, "exception"),
+    ("dummy", None, None, "absent", False, None, "dummy", None, False),
+    ("dummy", None, None, "opened", True, None, "dummy", None, False),
 ]
 
 # device, state, is_luks, expected
@@ -131,9 +134,11 @@ LUKS_REMOVE_DATA: list[
     ("dummy", "absent", False, False),
 ]
 
-# device, key, passphrase, state, name, name_by_dev, expected
+# device, key, passphrase, tpm2_device, fido2_device, state, name, name_by_dev, expected
 LUKS_OPEN_DATA: list[
     tuple[
+        str | None,
+        str | None,
         str | None,
         str | None,
         str | None,
@@ -143,22 +148,23 @@ LUKS_OPEN_DATA: list[
         bool | t.Literal["exception"],
     ]
 ] = [
-    ("dummy", "key", None, "present", "name", None, False),
-    ("dummy", "key", None, "absent", "name", None, False),
-    ("dummy", "key", None, "closed", "name", None, False),
-    ("dummy", "key", None, "opened", "name", None, True),
-    (None, "key", None, "opened", "name", None, False),
-    ("dummy", None, None, "opened", "name", None, False),
-    ("dummy", "key", None, "opened", "name", "name", False),
-    ("dummy", "key", None, "opened", "beer", "name", "exception"),
-    ("dummy", None, "foo", "present", "name", None, False),
-    ("dummy", None, "bar", "absent", "name", None, False),
-    ("dummy", None, "baz", "closed", "name", None, False),
-    ("dummy", None, "qux", "opened", "name", None, True),
-    (None, None, "quux", "opened", "name", None, False),
-    ("dummy", None, None, "opened", "name", None, False),
-    ("dummy", None, "quuz", "opened", "name", "name", False),
-    ("dummy", None, "corge", "opened", "beer", "name", "exception"),
+    ("dummy", "key", None, None, None, "present", "name", None, False),
+    ("dummy", "key", None, None, None, "absent", "name", None, False),
+    ("dummy", "key", None, None, None, "closed", "name", None, False),
+    ("dummy", "key", None, None, None, "opened", "name", None, True),
+    (None, "key", None, None, None, "opened", "name", None, False),
+    ("dummy", "key", None, None, None, "opened", "name", "name", False),
+    ("dummy", "key", None, None, None, "opened", "beer", "name", "exception"),
+    ("dummy", None, "foo", None, None, "present", "name", None, False),
+    ("dummy", None, "bar", None, None, "absent", "name", None, False),
+    ("dummy", None, "baz", None, None, "closed", "name", None, False),
+    ("dummy", None, "qux", None, None, "opened", "name", None, True),
+    (None, None, "quux", None, None, "opened", "name", None, False),
+    ("dummy", None, "quuz", None, None, "opened", "name", "name", False),
+    ("dummy", None, "corge", None, None, "opened", "beer", "name", "exception"),
+    ("dummy", None, None, None, None, "opened", "name", None, "exception"),
+    ("dummy", None, None, "auto", None, "opened", "name", None, True),
+    ("dummy", None, None, None, "auto", "opened", "name", None, True),
 ]
 
 # device, dev_by_name, name, name_by_dev, state, label, expected
@@ -237,6 +243,26 @@ LUKS_REMOVE_KEY_DATA: list[
     ("dummy", None, "foo", None, "absent", None, "exception"),
 ]
 
+# device, new_tpm2, new_tpm2_pcrs, new_fido2, remove_tpm2, remove_fido2, expected
+SYSTEMD_CRYPTENROLL_DATA: list[
+    tuple[
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        bool,
+        bool,
+        bool | t.Literal["exception"],
+    ]
+] = [
+    ("dummy", None, None, None, False, False, False),
+    ("dummy", None, None, None, True, False, True),
+    ("dummy", None, None, None, False, True, True),
+    ("dummy", None, None, "auto", False, True, True),
+    ("dummy", "auto", "0+1", None, False, False, True),
+    ("dummy", "auto", None, None, False, False, "exception"),
+]
+
 
 @pytest.mark.parametrize(
     "device, keyfile, passphrase, state, is_luks, " + "label, cipher, hash_, expected",
@@ -307,13 +333,15 @@ def test_luks_remove(
 
 
 @pytest.mark.parametrize(
-    "device, keyfile, passphrase, state, name, name_by_dev, expected",
-    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in LUKS_OPEN_DATA),
+    "device, keyfile, passphrase, tpm2_device, fido2_device, state, name, name_by_dev, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8]) for d in LUKS_OPEN_DATA),
 )
 def test_luks_open(
     device: str | None,
     keyfile: str | None,
     passphrase: str | None,
+    tpm2_device: str | None,
+    fido2_device: str | None,
     state: t.Literal["present", "absent", "opened", "closed"],
     name: str | None,
     name_by_dev: str | None,
@@ -324,6 +352,8 @@ def test_luks_open(
     module.params["device"] = device
     module.params["keyfile"] = keyfile
     module.params["passphrase"] = passphrase
+    module.params["tpm2_device"] = tpm2_device
+    module.params["fido2_device"] = fido2_device
     module.params["passphrase_encoding"] = "text"
     module.params["state"] = state
     module.params["name"] = name
@@ -466,5 +496,36 @@ def test_luks_remove_key(
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.luks_remove_key() == expected
+    except ValueError:
+        assert expected == "exception"
+
+
+@pytest.mark.parametrize(
+    "device, new_tpm2, new_tpm2_pcrs, new_fido2, remove_tpm2, remove_fido2, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in SYSTEMD_CRYPTENROLL_DATA),
+)
+def test_systemd_cryptenroll(
+    device: str | None,
+    new_tpm2: str | None,
+    new_tpm2_pcrs: str | None,
+    new_fido2: str | None,
+    remove_tpm2: bool,
+    remove_fido2: bool,
+    expected: bool | t.Literal["exception"],
+) -> None:
+    module = DummyModule()
+
+    module.params["device"] = device
+    module.params["passphrase_encoding"] = "text"
+    module.params["new_tpm2"] = new_tpm2
+    module.params["new_tpm2_pcrs"] = new_tpm2_pcrs
+    module.params["new_fido2"] = new_fido2
+    module.params["remove_tpm2"] = remove_tpm2
+    module.params["remove_fido2"] = remove_fido2
+
+    crypt = luks_device.CryptHandler(module)  # type: ignore
+    try:
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
+        assert conditions.systemd_cryptenroll() == expected
     except ValueError:
         assert expected == "exception"
