@@ -4,7 +4,7 @@
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="2.21.0" name="antsibull-docs" />
+<meta content="2.23.0" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>community.crypto.acme_certificate_order_create module – Create an ACME v2 order &mdash; Community.Crypto Collection  documentation</title>
@@ -621,7 +621,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 </section>
 <section id="return-values">
 <h2><a class="toc-backref" href="#id8" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
-<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
+<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible vdevel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
 <table class="longtable ansible-option-table docutils align-default" style="width: 100%">
 <thead>
 <tr class="row-odd"><th class="head"><p>Key</p></th>
@@ -751,7 +751,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <a class="ansibleOptionLink" href="#return-challenge_data/challenges/tls-alpn-01/resource_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The value the resource has to produce for the validation.</p>
-<p><strong>Note:</strong> this return value contains a Base64 encoded version of the correct binary blob which has to be put into the acmeValidation X.509 extension; see <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">https://www.rfc-editor.org/rfc/rfc8737.html#section-3</a> for details. To do this, you might need the <a class="reference external" href="https://docs.ansible.com/ansible/devel/collections/ansible/builtin/b64decode_filter.html#ansible-collections-ansible-builtin-b64decode-filter" title="(in Ansible vdevel)"><span class="xref std std-ref">ansible.builtin.b64decode</span></a> Jinja filter to extract the binary blob from this return value.</p>
+<p><strong>Note:</strong> this return value contains a Base64 encoded version of the correct binary blob which has to be put into the acmeValidation X.509 extension; see <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8737.html#section-3">https://www.rfc-editor.org/rfc/rfc8737.html#section-3</a> for details. To do this, you might need the <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/collections/ansible/builtin/b64decode_filter.html#ansible-collections-ansible-builtin-b64decode-filter" title="(in Ansible vdevel)"><span class="xref std std-ref">ansible.builtin.b64decode</span></a> Jinja filter to extract the binary blob from this return value.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 <p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;AAb=&quot;</span></code></p>
 </div></td>
