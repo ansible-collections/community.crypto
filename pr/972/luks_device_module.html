@@ -262,6 +262,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <td><div class="ansible-option-cell"><p>Used to unlock the container, but can not be used for container creation. A hidraw device referring to the FIDO2 device (for example <code class="ansible-value docutils literal notranslate"><span class="pre">/dev/hidraw1</span></code>). Alternatively the special value <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> may be specified, in order to automatically determine the device node of a currently currently plugged in security token (of which there must be exactly one).</p>
 <p><strong>Note</strong> that only LUKS2 containers are supported</p>
 <p><strong>Note</strong> that systemd-cryptsetup (v253 or newer) is required.</p>
+<p><strong>Note</strong> that user presence confirmation (e.g. touching the security token) may be required.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -336,6 +337,8 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-lu
 <td><div class="ansible-option-cell"><p>Adds a FIDO2 security token that implements the “hmac-secret” extension (e.g. a YubiKey) to given container on <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-device"><span class="std std-ref"><span class="pre">device</span></span></a></strong></code>. Expects a hidraw device referring to the FIDO2 device (e.g. <code class="ansible-value docutils literal notranslate"><span class="pre">/dev/hidraw1</span></code>). Alternatively the special value <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> may be specified, in order to automatically determine the device node of a currently plugged in security token (of which there must be exactly one).</p>
 <p><strong>Note</strong> that <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-luks-device-module-parameter-new-keyslot"><span class="std std-ref"><span class="pre">new_keyslot</span></span></a></strong></code> does not affect the keyslot for fido2 enrollment.</p>
 <p><strong>Note</strong> that systemd-cryptsetup (v248 or newer) is required.</p>
+<p><strong>Note</strong> that user presence confirmation (e.g. touching the security token) may be required.</p>
+<p><strong>Note</strong> that the enrollment operation is NOT idempotent (because systemd-cryptenroll does not support idempotency).</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
