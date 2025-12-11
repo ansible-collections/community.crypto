@@ -38,7 +38,7 @@ options:
       - V(present) will create LUKS container unless already present. Requires O(device) and either O(keyfile) or O(passphrase)
         options to be provided.
       - V(absent) will remove existing LUKS container if it exists. Requires O(device) or O(name) to be specified.
-      - V(opened) will unlock the LUKS container. Requires O(device) and O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) to be specified.
+      - V(opened) will unlock the LUKS container. Requires O(device) and one of O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) to be specified.
         If the container does not exist it will be created first, however O(tpm2_device) and O(fido2_device) can not be used for creation.
         Use the O(name) option to set the name of the opened container. Otherwise the name will be generated automatically and returned as a part of the result.
       - V(closed) will lock the LUKS container. However if the container does not exist it will be created. Requires O(device)
@@ -82,7 +82,7 @@ options:
         currently plugged in security token (of which there must be exactly one).
       - B(Note) that only LUKS2 containers are supported
       - B(Note) that systemd-cryptsetup (v253 or newer) is required.
-      - B(Note) that user presence confirmation (e.g. touching the security token) may be required.
+      - B(Note) that user presence confirmation (for example touching the security token) may be required.
     type: str
     version_added: '3.1.0'
   passphrase_encoding:
@@ -142,26 +142,26 @@ options:
       - Adds a TPM2 security chip to given container on O(device). Expects a device node path referring to the TPM2 chip (e.g. V(/dev/tpmrm0)).
         Alternatively the special value V(auto) may be specified, in order to automatically determine the device node of a currently
         discovered TPM2 device (of which there must be exactly one). Requires O(new_tpm2_pcrs).
-      - B(Note) that O(new_keyslot) does not affect the keyslot for tpm2 enrollment.
+      - B(Note) that O(new_keyslot) does not affect the keyslot for TPM2 enrollment.
       - B(Note) that only LUKS2 containers are supported.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
     type: str
     version_added: '3.1.0'
   new_tpm2_pcrs:
     description:
-      - TPM2 PCRs (Platform Configuration Registers) to bind to. See systemd-cryptenroll documentation for details (--tpm2-pcrs argument).
+      - TPM2 PCRs (Platform Configuration Registers) to bind to. See systemd-cryptenroll documentation for details (C(--tpm2-pcrs) argument).
     type: str
     version_added: '3.1.0'
   new_fido2:
     description:
-      - Adds a FIDO2 security token that implements the "hmac-secret" extension (e.g. a YubiKey) to given container on O(device).
+      - Adds a FIDO2 security token that implements the C(hmac-secret) extension (for example a YubiKey) to given container on O(device).
         Expects a hidraw device referring to the FIDO2 device (e.g. V(/dev/hidraw1)).
         Alternatively the special value V(auto) may be specified, in order to automatically determine the device node of a currently
         plugged in security token (of which there must be exactly one).
-      - B(Note) that O(new_keyslot) does not affect the keyslot for fido2 enrollment.
+      - B(Note) that O(new_keyslot) does not affect the keyslot for FIDO2 enrollment.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
-      - B(Note) that user presence confirmation (e.g. touching the security token) may be required.
-      - B(Note) that the enrollment operation is NOT idempotent (because systemd-cryptenroll does not support idempotency).
+      - B(Note) that user presence confirmation (for example touching the security token) may be required.
+      - B(Note) that the enrollment operation is B(NOT idempotent) (because systemd-cryptenroll does not support idempotency).
     type: str
     version_added: '3.1.0'
   remove_keyfile:
@@ -185,7 +185,7 @@ options:
     version_added: '1.0.0'
   remove_tpm2:
     description:
-      - Removes B(all) key slots on O(device) that are unlocked by a tpm2 device.
+      - Removes B(all) key slots on O(device) that are unlocked by a TPM2 device.
         Needs O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) for authorization.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
     type: bool
@@ -193,7 +193,7 @@ options:
     version_added: '3.1.0'
   remove_fido2:
     description:
-      - Removes B(all) key slots on O(device) that are unlocked by a fido2 device.
+      - Removes B(all) key slots on O(device) that are unlocked by a FIDO2 device.
         Needs O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) for authorization.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
     type: bool
@@ -346,7 +346,7 @@ requirements:
   - "wipefs (when O(state) is V(absent))"
   - "lsblk"
   - "blkid (when O(label) or O(uuid) options are used)"
-  - "systemd-cryptsetup (for tpm2 and fido2 only)"
+  - "systemd-cryptsetup (for TPM2 and FIDO2 only)"
 
 author: Jan Pokorny (@japokorn)
 """
@@ -471,18 +471,18 @@ EXAMPLES = r"""
     keyfile: "/vault/keyfile"
     remove_keyslot: 4
 
-- name: Enroll a tpm2 device using a keyfile to unlock the container
+- name: Enroll a TPM2 device using a keyfile to unlock the container
   community.crypto.luks_device:
     keyfile: "/vault/keyfile"
     new_tpm2: "auto"
     new_tpm2_pcrs: "1+3+5+7+11+12+14"
 
-- name: Enroll a fido2 device using a tpm2 device to unlock the container
+- name: Enroll a fido2 device using a TPM2 device to unlock the container
   community.crypto.luks_device:
     tpm2_device: "auto"
     new_fido2: "auto"
 
-- name: Remove all enrolled tpm2 devices
+- name: Remove all enrolled TPM2 devices
   community.crypto.luks_device:
     tpm2_device: "auto"
     remove_tpm2: true
