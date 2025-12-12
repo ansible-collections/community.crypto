@@ -2,8 +2,9 @@
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 from __future__ import annotations
+
+import json
 
 
 DOCUMENTATION = r"""
@@ -101,6 +102,7 @@ options:
     description:
       - Adds the O(keyfile) or O(passphrase) to a specific keyslot when creating a new container on O(device). Parameter value
         is the number of the keyslot.
+      - Defines the keyslot whose priority will be changed by O(keyslot_priority)
       - B(Note) that a device of O(type=luks1) supports the keyslot numbers V(0)-V(7) and a device of O(type=luks2) supports
         the keyslot numbers V(0)-V(31). In order to use the keyslots V(8)-V(31) when creating a new container, setting O(type)
         to V(luks2) is required.
@@ -207,6 +209,13 @@ options:
       - B(Note) that the given O(keyfile) or O(passphrase) must not be in the slot to be removed.
     type: int
     version_added: '2.16.0'
+  keyslot_priority:
+    description:
+      - Sets the keyslot priority for the keyslot specified by O(keyslot).
+      - B(Note) that keyslot priority is only supported for LUKS2 containers.
+    type: str
+    choices: [prefer, normal, ignore]
+    version_added: '3.1.0'
   force_remove_last_key:
     description:
       - If set to V(true), allows removing the last key from a container.
@@ -938,6 +947,38 @@ class CryptHandler(Handler):
             f"Error while testing whether keyslot exists on {device}: {stderr}"
         )
 
+    def luks_dump_json_metadata(self, device: str) -> dict:
+        """Dump LUKS metadata in JSON format.
+        Raises ValueError when command fails.
+        """
+        rc, stdout, stderr = self._run_command(
+            [self._cryptsetup_bin, "luksDump", "--dump-json-metadata", device]
+        )
+        if rc != 0:
+            raise ValueError(
+                f"Error while dumping LUKS JSON metadata from {device}: {stderr}"
+            )
+
+        return json.loads(stdout)
+
+    def run_config(self, device: str, keyslot: int, keyslot_priority: str) -> None:
+        """Configure LUKS keyslot priority.
+        Raises ValueError when command fails.
+        """
+        rc, dummy, stderr = self._run_command(
+            [
+                self._cryptsetup_bin,
+                "config",
+                f"--key-slot={keyslot}",
+                f"--priority={keyslot_priority}",
+                device,
+            ]
+        )
+        if rc != 0:
+            raise ValueError(
+                f"Error while configuring LUKS keyslot {keyslot} on {device}: {stderr}"
+            )
+
     def run_systemd_cryptsetup_attach(
         self,
         device: str,
@@ -1241,6 +1282,25 @@ class ConditionsHandler(Handler):
             and self._crypthandler.is_luks(self.device)
         )
 
+    def luks_config(self) -> bool:
+        if self.device is None or self._module.params["keyslot_priority"] is None:
+            return False
+
+        if self._module.params["keyslot"] is None:
+            self._module.fail_json(
+                msg="keyslot_priority was specified but keyslot was not."
+            )
+
+        json_metadata = self._crypthandler.luks_dump_json_metadata(self.device)
+        slot_priority = (
+            json_metadata.get("keyslots", {})
+            .get(str(self._module.params["keyslot"]), {})
+            .get("priority", None)
+        )
+
+        priority_map = {"prefer": 2, "normal": None, "ignore": 0}
+        return slot_priority != priority_map[self._module.params["keyslot_priority"]]
+
     def validate_keyslot(
         self, param: str, luks_type: t.Literal["luks1", "luks2"] | None
     ) -> None:
@@ -1281,7 +1341,7 @@ class ConditionsHandler(Handler):
         )
 
 
-def run_module() -> t.NoReturn:
+def run_module() -> t.NoReturn:  # noqa: C901
     # available arguments/parameters that a user can pass
     module_args = {
         "state": {
@@ -1311,6 +1371,11 @@ def run_module() -> t.NoReturn:
             "no_log": False,
         },
         "keyslot": {"type": "int", "no_log": False},
+        "keyslot_priority": {
+            "type": "str",
+            "no_log": False,
+            "choices": ["prefer", "normal", "ignore"],
+        },
         "new_keyslot": {"type": "int", "no_log": False},
         "remove_keyslot": {"type": "int", "no_log": False},
         "force_remove_last_key": {"type": "bool", "default": False},
@@ -1576,6 +1641,21 @@ def run_module() -> t.NoReturn:
             except ValueError as e:
                 module.fail_json(msg=f"luks_device error: {e}")
             result["changed"] |= changed
+        if module.check_mode:
+            module.exit_json(**result)
+
+    if conditions.luks_config():
+        assert conditions.device  # ensured in conditions.luks_config()
+        if not module.check_mode:
+            try:
+                crypt.run_config(
+                    conditions.device,
+                    module.params["keyslot"],
+                    module.params["keyslot_priority"],
+                )
+            except ValueError as e:
+                module.fail_json(msg=f"luks_device error: {e}")
+        result["changed"] = True
         if module.check_mode:
             module.exit_json(**result)
 

@@ -263,6 +263,22 @@ SYSTEMD_CRYPTENROLL_DATA: list[
     ("dummy", "auto", None, None, False, False, "exception"),
 ]
 
+# device, keyslot_priority, existing_priority, expected
+LUKS_CONFIG_DATA: list[
+    tuple[str | None, str | None, int | None, bool | t.Literal["exception"]]
+] = [
+    ("dummy", "prefer", 0, True),
+    ("dummy", "prefer", None, True),
+    ("dummy", "prefer", 2, False),
+    ("dummy", "normal", 0, True),
+    ("dummy", "normal", None, False),
+    ("dummy", "normal", 2, True),
+    ("dummy", "ignore", 0, False),
+    ("dummy", "ignore", None, True),
+    ("dummy", "ignore", 2, True),
+    (None, "prefer", 0, "exception"),
+]
+
 
 @pytest.mark.parametrize(
     "device, keyfile, passphrase, state, is_luks, " + "label, cipher, hash_, expected",
@@ -527,5 +543,42 @@ def test_systemd_cryptenroll(
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.systemd_cryptenroll() == expected
+    except ValueError:
+        assert expected == "exception"
+
+
+@pytest.mark.paramtrize(
+    "device, keyslot_priority, existing_priority, expected",
+    ((d[0], d[1], d[2], d[3]) for d in LUKS_CONFIG_DATA),
+)
+def test_luks_config(
+    device: str | None,
+    keyslot_priority: str | None,
+    existing_priority: int | None,
+    expected: bool | t.Literal["exception"],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = DummyModule()
+
+    module.params["device"] = device
+    module.params["keyslot"] = 1
+    module.params["keyslot_priority"] = keyslot_priority
+
+    crypt = luks_device.CryptHandler(module)  # type: ignore
+
+    def mock_luks_dump_json_metadata(
+        self: luks_device.CryptHandler, device: str
+    ) -> dict[str, t.Any]:
+        return {"keyslots": {"1": {"priority": existing_priority}}}
+
+    monkeypatch.setattr(
+        luks_device.CryptHandler,
+        "luks_dump_json_metadata",
+        mock_luks_dump_json_metadata,
+    )
+
+    try:
+        conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
+        assert conditions.luks_config() == expected
     except ValueError:
         assert expected == "exception"
