@@ -39,8 +39,8 @@ options:
       - V(present) will create LUKS container unless already present. Requires O(device) and either O(keyfile) or O(passphrase)
         options to be provided.
       - V(absent) will remove existing LUKS container if it exists. Requires O(device) or O(name) to be specified.
-      - V(opened) will unlock the LUKS container. Requires O(device) and one of O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) to be specified.
-        If the container does not exist it will be created first, however O(tpm2_device) and O(fido2_device) can not be used for creation.
+      - V(opened) will unlock the LUKS container. Requires O(device) and one of O(keyfile), O(passphrase), O(tpm2_device) to be specified.
+        If the container does not exist it will be created first, however O(tpm2_device) can not be used for creation.
         Use the O(name) option to set the name of the opened container. Otherwise the name will be generated automatically and returned as a part of the result.
       - V(closed) will lock the LUKS container. However if the container does not exist it will be created. Requires O(device)
         and either O(keyfile) or O(passphrase) options to be provided. If container does already exist O(device) or O(name)
@@ -74,16 +74,6 @@ options:
         discovered TPM2 device (of which there must be exactly one).
       - B(Note) that only LUKS2 containers are supported
       - B(Note) that systemd-cryptsetup (v256 or newer) is required.
-    type: str
-    version_added: '3.1.0'
-  fido2_device:
-    description:
-      - Used to unlock the container, but can not be used for container creation. A hidraw device referring to the FIDO2 device (for example V(/dev/hidraw1)).
-        Alternatively the special value V(auto) may be specified, in order to automatically determine the device node of a currently
-        currently plugged in security token (of which there must be exactly one).
-      - B(Note) that only LUKS2 containers are supported
-      - B(Note) that systemd-cryptsetup (v253 or newer) is required.
-      - B(Note) that user presence confirmation (for example touching the security token) may be required.
     type: str
     version_added: '3.1.0'
   passphrase_encoding:
@@ -154,18 +144,6 @@ options:
       - TPM2 PCRs (Platform Configuration Registers) to bind to. See systemd-cryptenroll documentation for details (C(--tpm2-pcrs) argument).
     type: str
     version_added: '3.1.0'
-  new_fido2:
-    description:
-      - Adds a FIDO2 security token that implements the C(hmac-secret) extension (for example a YubiKey) to given container on O(device).
-        Expects a hidraw device referring to the FIDO2 device (e.g. V(/dev/hidraw1)).
-        Alternatively the special value V(auto) may be specified, in order to automatically determine the device node of a currently
-        plugged in security token (of which there must be exactly one).
-      - B(Note) that O(new_keyslot) does not affect the keyslot for FIDO2 enrollment.
-      - B(Note) that systemd-cryptsetup (v248 or newer) is required.
-      - B(Note) that user presence confirmation (for example touching the security token) may be required.
-      - B(Note) that the enrollment operation is B(NOT idempotent) (because systemd-cryptenroll does not support idempotency).
-    type: str
-    version_added: '3.1.0'
   remove_keyfile:
     description:
       - Removes given key from the container on O(device). Does not remove the keyfile from filesystem. Parameter value is
@@ -188,15 +166,7 @@ options:
   remove_tpm2:
     description:
       - Removes B(all) key slots on O(device) that are unlocked by a TPM2 device.
-        Needs O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) for authorization.
-      - B(Note) that systemd-cryptsetup (v248 or newer) is required.
-    type: bool
-    default: false
-    version_added: '3.1.0'
-  remove_fido2:
-    description:
-      - Removes B(all) key slots on O(device) that are unlocked by a FIDO2 device.
-        Needs O(keyfile), O(passphrase), O(tpm2_device), or O(fido2_device) for authorization.
+        Needs O(keyfile), O(passphrase), or O(tpm2_device) for authorization.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
     type: bool
     default: false
@@ -355,7 +325,7 @@ requirements:
   - "wipefs (when O(state) is V(absent))"
   - "lsblk"
   - "blkid (when O(label) or O(uuid) options are used)"
-  - "systemd-cryptsetup (for TPM2 and FIDO2 only)"
+  - "systemd-cryptsetup (for TPM2 only)"
 
 author: Jan Pokorny (@japokorn)
 """
@@ -486,15 +456,16 @@ EXAMPLES = r"""
     new_tpm2: "auto"
     new_tpm2_pcrs: "1+3+5+7+11+12+14"
 
-- name: Enroll a fido2 device using a TPM2 device to unlock the container
-  community.crypto.luks_device:
-    tpm2_device: "auto"
-    new_fido2: "auto"
-
 - name: Remove all enrolled TPM2 devices
   community.crypto.luks_device:
     tpm2_device: "auto"
     remove_tpm2: true
+
+- name: Set the priority of keyslot 0 to 'prefer'
+  community.crypto.luks_device:
+    device: "/dev/loop0"
+    keyslot: 0
+    keyslot_priority: prefer
 """
 
 RETURN = r"""
@@ -983,7 +954,6 @@ class CryptHandler(Handler):
         self,
         device: str,
         tpm2_device: str | None,
-        fido2_device: str | None,
         perf_same_cpu_crypt: bool,
         perf_submit_from_crypt_cpus: bool,
         perf_no_read_workqueue: bool,
@@ -997,9 +967,6 @@ class CryptHandler(Handler):
 
         if tpm2_device is not None:
             options.append(f"tpm2-device={tpm2_device}")
-
-        if fido2_device is not None:
-            options.append(f"fido2-device={fido2_device}")
 
         if perf_same_cpu_crypt:
             options.append("same-cpu-crypt")
@@ -1029,12 +996,9 @@ class CryptHandler(Handler):
         keyfile: str | None,
         passphrase: bytes | None,
         tpm2_device: str | None,
-        fido2_device: str | None,
         new_tpm2: str | None,
         new_tpm2_pcrs: str | None,
-        new_fido2: str | None,
         remove_tpm2: bool,
-        remove_fido2: bool,
     ) -> bool:
         systemd_cryptenroll_bin = self._module.get_bin_path("systemd-cryptenroll", True)
         args = [systemd_cryptenroll_bin]
@@ -1045,20 +1009,11 @@ class CryptHandler(Handler):
         if tpm2_device:
             args.append(f"--unlock-tpm2-device={tpm2_device}")
 
-        if fido2_device:
-            args.append(f"--unlock-fido2-device={fido2_device}")
-
         if new_tpm2:
             args.extend([f"--tpm2-device={new_tpm2}", f"--tpm2-pcrs={new_tpm2_pcrs}"])
 
-        if new_fido2:
-            args.append(f"--fido2-device={new_fido2}")
-
         if remove_tpm2:
             args.append("--wipe-slot=tpm2")
-
-        if remove_fido2:
-            args.append("--wipe-slot=fido2")
 
         if passphrase:
             # --unlock-key-file is needed both so a newline isnt required at the end of stdin
@@ -1075,9 +1030,11 @@ class CryptHandler(Handler):
                 f"Error while adding key to {device} with {args}: {stderr}"
             )
 
-        # This is fragile, but simple
-        # The more robust but complex way would be to parse the JSON output of `cryptsetup luksDump --dump-json-metadata`
-        # but then we'd also have to parse the new_tpm2_pcrs parameter which can be a lot more than just register numbers
+        # systemd-cryptenroll stores a policy hash in the LUKS metadata which is used to
+        # detect if a TPM2 device and PCR set are already enrolled. Computing it
+        # is very complicated, however, so rather than duplicating all of that here,
+        # we rely on the command's output which hopefully won't change.
+        # See: https://github.com/systemd/systemd/blob/7524671f74c9b0ea858a077ae9b1af3fe574d57e/src/cryptenroll/cryptenroll-tpm2.c#L529-L541
         return "This PCR set is already enrolled, executing no operation." not in stderr
 
 
@@ -1161,10 +1118,9 @@ class ConditionsHandler(Handler):
             self._module.params["keyfile"] is None
             and self._module.params["passphrase"] is None
             and self._module.params["tpm2_device"] is None
-            and self._module.params["fido2_device"] is None
         ):
             self._module.fail_json(
-                msg="state=opened was specified but none of keyfile, passphrase, tpm2_device, or fido2_device were given"
+                msg="state=opened was specified but none of keyfile, passphrase, or tpm2_device were given"
             )
 
         name = self.opened_luks_name(self.device)
@@ -1333,12 +1289,16 @@ class ConditionsHandler(Handler):
             and self._module.params["new_tpm2_pcrs"] is None
         ):
             self._module.fail_json(msg="new_tpm2_pcrs must be specified with new_tpm2")
-        return (
-            self._module.params["new_tpm2"] is not None
-            or self._module.params["new_fido2"] is not None
-            or self._module.params["remove_tpm2"]
-            or self._module.params["remove_fido2"]
-        )
+
+        if self._module.params["remove_tpm2"]:
+            json_metadata = self._crypthandler.luks_dump_json_metadata(self.device)
+            tokens = json_metadata.get("tokens", {})
+            tpm2_enrolled = any(
+                token.get("type") == "systemd-tpm2" for token in tokens.values()
+            )
+            return tpm2_enrolled or self._module.params["new_tpm2"] is not None
+
+        return self._module.params["new_tpm2"] is not None
 
 
 def run_module() -> t.NoReturn:  # noqa: C901
@@ -1361,9 +1321,6 @@ def run_module() -> t.NoReturn:  # noqa: C901
         "new_tpm2": {"type": "str"},
         "new_tpm2_pcrs": {"type": "str"},
         "remove_tpm2": {"type": "bool", "default": False},
-        "fido2_device": {"type": "str"},
-        "new_fido2": {"type": "str"},
-        "remove_fido2": {"type": "bool", "default": False},
         "passphrase_encoding": {
             "type": "str",
             "default": "text",
@@ -1409,7 +1366,7 @@ def run_module() -> t.NoReturn:  # noqa: C901
     }
 
     mutually_exclusive = [
-        ("keyfile", "passphrase", "tpm2_device", "fido2_device"),
+        ("keyfile", "passphrase", "tpm2_device"),
         ("new_keyfile", "new_passphrase"),
         ("remove_keyfile", "remove_passphrase", "remove_keyslot"),
     ]
@@ -1535,7 +1492,6 @@ def run_module() -> t.NoReturn:  # noqa: C901
                     crypt.run_systemd_cryptsetup_attach(
                         conditions.device,
                         module.params["tpm2_device"],
-                        module.params["fido2_device"],
                         module.params["perf_same_cpu_crypt"],
                         module.params["perf_submit_from_crypt_cpus"],
                         module.params["perf_no_read_workqueue"],
@@ -1631,12 +1587,9 @@ def run_module() -> t.NoReturn:  # noqa: C901
                     module.params["keyfile"],
                     conditions.get_passphrase_from_module_params("passphrase"),
                     module.params["tpm2_device"],
-                    module.params["fido2_device"],
                     module.params["new_tpm2"],
                     module.params["new_tpm2_pcrs"],
-                    module.params["new_fido2"],
                     module.params["remove_tpm2"],
-                    module.params["remove_fido2"],
                 )
             except ValueError as e:
                 module.fail_json(msg=f"luks_device error: {e}")
