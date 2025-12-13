@@ -1,0 +1,3 @@
+minor_changes:
+  - luks_device - add support for tpm2 and fido2 enrollment using systemd-cryptsetup.
+  - luks_device - add support for keyslot priority.
