@@ -241,21 +241,24 @@ LUKS_REMOVE_KEY_DATA: list[
     ("dummy", None, "foo", None, "absent", None, "exception"),
 ]
 
-# device, new_tpm2, new_tpm2_pcrs, remove_tpm2, expected
+# device, new_tpm2, new_tpm2_pcrs, remove_tpm2, existing_tpm2, expected
 SYSTEMD_CRYPTENROLL_DATA: list[
     tuple[
         str | None,
         str | None,
         str | None,
         bool,
+        bool,
         bool | t.Literal["exception"],
     ]
 ] = [
-    ("dummy", None, None, False, False),
-    ("dummy", None, None, True, True),
-    ("dummy", "auto", "0+1", False, True),
-    ("dummy", "auto", "0+1", True, True),
-    ("dummy", "auto", None, False, "exception"),
+    ("dummy", None, None, False, False, False),
+    ("dummy", None, None, False, True, False),
+    ("dummy", None, None, True, False, False),
+    ("dummy", None, None, True, True, True),
+    ("dummy", "auto", "0+1", False, False, True),
+    ("dummy", "auto", "0+1", True, False, True),
+    ("dummy", "auto", None, False, False, "exception"),
 ]
 
 # device, keyslot_priority, existing_priority, expected
@@ -271,7 +274,7 @@ LUKS_CONFIG_DATA: list[
     ("dummy", "ignore", 0, False),
     ("dummy", "ignore", None, True),
     ("dummy", "ignore", 2, True),
-    (None, "prefer", 0, "exception"),
+    (None, "normal", 0, False),
 ]
 
 
@@ -510,15 +513,17 @@ def test_luks_remove_key(
 
 
 @pytest.mark.parametrize(
-    "device, new_tpm2, new_tpm2_pcrs, remove_tpm2, expected",
-    ((d[0], d[1], d[2], d[3], d[4]) for d in SYSTEMD_CRYPTENROLL_DATA),
+    "device, new_tpm2, new_tpm2_pcrs, remove_tpm2, existing_tpm2, expected",
+    ((d[0], d[1], d[2], d[3], d[4], d[5]) for d in SYSTEMD_CRYPTENROLL_DATA),
 )
 def test_systemd_cryptenroll(
     device: str | None,
     new_tpm2: str | None,
     new_tpm2_pcrs: str | None,
     remove_tpm2: bool,
+    existing_tpm2: bool,
     expected: bool | t.Literal["exception"],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = DummyModule()
 
@@ -529,6 +534,18 @@ def test_systemd_cryptenroll(
     module.params["remove_tpm2"] = remove_tpm2
 
     crypt = luks_device.CryptHandler(module)  # type: ignore
+
+    def mock_luks_dump_json_metadata(
+        self: luks_device.CryptHandler, device: str
+    ) -> dict[str, t.Any]:
+        return {"tokens": {"0": {"type": "systemd-tpm2"}}} if existing_tpm2 else {"tokens": {}}
+
+    monkeypatch.setattr(
+        luks_device.CryptHandler,
+        "luks_dump_json_metadata",
+        mock_luks_dump_json_metadata,
+    )
+
     try:
         conditions = luks_device.ConditionsHandler(module, crypt)  # type: ignore
         assert conditions.systemd_cryptenroll() == expected
@@ -550,6 +567,7 @@ def test_luks_config(
     module = DummyModule()
 
     module.params["device"] = device
+    module.params["passphrase_encoding"] = "text"
     module.params["keyslot"] = 1
     module.params["keyslot_priority"] = keyslot_priority
 
