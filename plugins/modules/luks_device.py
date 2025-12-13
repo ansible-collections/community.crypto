@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-import json
-
-
 DOCUMENTATION = r"""
 module: luks_device
 
@@ -476,6 +473,7 @@ name:
   sample: "luks-c1da9a58-2fde-4256-9d9f-6ab008b4dd1b"
 """
 
+import json
 import os
 import re
 import stat

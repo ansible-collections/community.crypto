@@ -536,7 +536,7 @@ def test_systemd_cryptenroll(
         assert expected == "exception"
 
 
-@pytest.mark.paramatrize(
+@pytest.mark.parametrize(
     "device, keyslot_priority, existing_priority, expected",
     ((d[0], d[1], d[2], d[3]) for d in LUKS_CONFIG_DATA),
 )
