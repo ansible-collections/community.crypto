@@ -538,7 +538,11 @@ def test_systemd_cryptenroll(
     def mock_luks_dump_json_metadata(
         self: luks_device.CryptHandler, device: str
     ) -> dict[str, t.Any]:
-        return {"tokens": {"0": {"type": "systemd-tpm2"}}} if existing_tpm2 else {"tokens": {}}
+        return (
+            {"tokens": {"0": {"type": "systemd-tpm2"}}}
+            if existing_tpm2
+            else {"tokens": {}}
+        )
 
     monkeypatch.setattr(
         luks_device.CryptHandler,
