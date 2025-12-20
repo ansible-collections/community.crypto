@@ -166,7 +166,6 @@ options:
       - Removes B(all) key slots on O(device) that are unlocked by a TPM2 device.
         Needs O(keyfile), O(passphrase), or O(tpm2_device) for authorization.
       - B(Note) that systemd-cryptsetup (v248 or newer) is required.
-      - B(Note) that you should avoid using O(tpm2_device) to authorize removal of all TPM2 slots to ensure that you can still access the container afterwards.
     type: bool
     default: false
     version_added: '3.1.0'
@@ -961,7 +960,7 @@ class CryptHandler(Handler):
         allow_discards: bool,
         name: str,
     ) -> None:
-        systemd_cryptsetup_bin = self._module.get_bin_path("systemd-cryptsetup", required=True)
+        systemd_cryptsetup_bin = self._module.get_bin_path("systemd-cryptsetup", True)
         args = [systemd_cryptsetup_bin, name, device, "none"]
         options = []
 
@@ -1000,10 +999,10 @@ class CryptHandler(Handler):
         new_tpm2_pcrs: str | None,
         remove_tpm2: bool,
     ) -> bool:
-        systemd_cryptenroll_bin = self._module.get_bin_path("systemd-cryptenroll", required=True)
+        systemd_cryptenroll_bin = self._module.get_bin_path("systemd-cryptenroll", True)
         args = [systemd_cryptenroll_bin]
 
-        if keyfile is not None:
+        if keyfile:
             args.append(f"--unlock-key-file={keyfile}")
 
         if tpm2_device:
@@ -1371,6 +1370,10 @@ def run_module() -> t.NoReturn:  # noqa: C901
         ("remove_keyfile", "remove_passphrase", "remove_keyslot"),
     ]
 
+    required_by = {
+        "new_tpm2": ["new_tpm2_pcrs"],
+    }
+
     # seed the result dict in the object
     result: dict[str, t.Any] = {"changed": False, "name": None}
 
@@ -1378,6 +1381,7 @@ def run_module() -> t.NoReturn:  # noqa: C901
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=mutually_exclusive,
+        required_by=required_by,
     )
     module.run_command_environ_update = {
         "LANG": "C",
