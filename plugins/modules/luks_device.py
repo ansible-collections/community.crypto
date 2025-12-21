@@ -2,6 +2,7 @@
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import annotations
 
 
@@ -1377,6 +1378,7 @@ def run_module() -> t.NoReturn:  # noqa: C901
 
     required_by = {
         "new_tpm2": ["new_tpm2_pcrs"],
+        "keyslot_priority": ["keyslot"],
     }
 
     # seed the result dict in the object
@@ -1588,7 +1590,7 @@ def run_module() -> t.NoReturn:  # noqa: C901
             module.exit_json(**result)
 
     if conditions.systemd_cryptenroll():
-        assert conditions.device
+        assert conditions.device is not None
         if not module.check_mode:
             try:
                 changed = crypt.run_systemd_cryptenroll(
@@ -1607,7 +1609,7 @@ def run_module() -> t.NoReturn:  # noqa: C901
             module.exit_json(**result)
 
     if conditions.luks_config():
-        assert conditions.device  # ensured in conditions.luks_config()
+        assert conditions.device is not None  # ensured in conditions.luks_config()
         if not module.check_mode:
             try:
                 crypt.run_config(
