@@ -8,3 +8,5 @@
 aec1826c34051b9e7f8af7950489915b661e320b
 # Reformat with black another time, this time without Python 2 compatibility
 797bd8a6e2a6f4a37a89ecb15ca34ec88b33258d
+# Reformat with ruff check --fix instead of isort
+d1f3518d51bc3efd6dc1d2166b7b410702bd58d5
