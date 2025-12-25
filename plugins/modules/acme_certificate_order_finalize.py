@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = """
 module: acme_certificate_order_finalize
 author: Felix Fontein (@felixfontein)
@@ -324,7 +323,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.certificate
 from ansible_collections.community.crypto.plugins.module_utils._acme.errors import (
     ModuleFailException,
 )
-
 
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (  # pragma: no cover

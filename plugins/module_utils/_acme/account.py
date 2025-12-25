@@ -16,7 +16,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
     ModuleFailException,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (  # pragma: no cover
         ACMEClient,

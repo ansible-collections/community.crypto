@@ -14,7 +14,6 @@ import typing as t
 from contextlib import contextmanager
 from struct import Struct
 
-
 # Protocol References
 # -------------------
 # https://datatracker.ietf.org/doc/html/rfc4251
@@ -351,10 +350,10 @@ class _OpensshWriter:
 
 
 __all__ = (
+    "OpensshParser",
     "any_in",
     "file_mode",
     "parse_openssh_version",
     "secure_open",
     "secure_write",
-    "OpensshParser",
 )

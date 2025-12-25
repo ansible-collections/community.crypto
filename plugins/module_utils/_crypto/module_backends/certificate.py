@@ -36,7 +36,6 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
     assert_required_cryptography_version,
 )
 
-
 if t.TYPE_CHECKING:
     import datetime  # pragma: no cover
 
@@ -416,8 +415,8 @@ def get_certificate_argument_spec() -> ArgumentSpec:
 
 
 __all__ = (
-    "CertificateError",
     "CertificateBackend",
+    "CertificateError",
     "CertificateProvider",
     "get_certificate_argument_spec",
 )

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: acme_certificate_deactivate_authz
 author: "Felix Fontein (@felixfontein)"

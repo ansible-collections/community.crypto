@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: openssl_publickey_info
 short_description: Retrieve information from OpenSSL public keys in PEM format

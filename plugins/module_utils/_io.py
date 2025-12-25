@@ -12,7 +12,6 @@ import os
 import tempfile
 import typing as t
 
-
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 

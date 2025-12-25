@@ -13,7 +13,6 @@ from http.client import responses as http_responses
 
 from ansible.module_utils.common.text.converters import to_text
 
-
 if t.TYPE_CHECKING:
     import http.client  # pragma: no cover
     import urllib.error  # pragma: no cover
@@ -185,11 +184,11 @@ class KeyParsingError(ModuleFailException):
 
 
 __all__ = (
-    "format_http_status",
-    "format_error_problem",
-    "ModuleFailException",
     "ACMEProtocolException",
     "BackendException",
-    "NetworkException",
     "KeyParsingError",
+    "ModuleFailException",
+    "NetworkException",
+    "format_error_problem",
+    "format_http_status",
 )

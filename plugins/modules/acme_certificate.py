@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: acme_certificate
 author: "Michael Gruener (@mgruener)"
@@ -595,7 +594,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
     compute_cert_id,
     pem_to_der,
 )
-
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: acme_account_info
 author: "Felix Fontein (@felixfontein)"
@@ -221,7 +220,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     process_links,
 )
-
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover

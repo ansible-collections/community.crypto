@@ -14,7 +14,6 @@ import typing as t
 from ansible.errors import AnsibleFilterError
 from ansible.utils.display import Display
 
-
 _display = Display()
 
 

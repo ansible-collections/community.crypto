@@ -33,7 +33,6 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
     assert_required_cryptography_version,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
     from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
@@ -336,8 +335,8 @@ def select_backend(
 
 __all__ = (
     "PrivateKeyConsistencyError",
-    "PrivateKeyParseError",
     "PrivateKeyInfoRetrieval",
+    "PrivateKeyParseError",
     "get_privatekey_info",
     "select_backend",
 )

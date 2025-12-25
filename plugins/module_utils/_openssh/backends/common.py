@@ -18,7 +18,6 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.utils im
     parse_openssh_version,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
@@ -485,11 +484,11 @@ def parse_private_key_format(
 
 
 __all__ = (
-    "restore_on_failure",
-    "safe_atomic_move",
-    "OpensshModule",
     "KeygenCommand",
+    "OpensshModule",
     "PrivateKey",
     "PublicKey",
     "parse_private_key_format",
+    "restore_on_failure",
+    "safe_atomic_move",
 )

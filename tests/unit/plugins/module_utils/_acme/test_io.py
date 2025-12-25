@@ -14,7 +14,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.io import (
     write_file,
 )
 
-
 TEST_TEXT = r"""1234
 5678"""
 

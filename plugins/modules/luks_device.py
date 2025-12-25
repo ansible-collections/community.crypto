@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: luks_device
 
@@ -485,7 +484,6 @@ from base64 import b64decode
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
-
 
 # used to get <luks-name> out of lsblk output in format 'crypt <luks-name>'
 # regex takes care of any possible blank characters

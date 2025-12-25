@@ -20,7 +20,6 @@ from ansible_collections.community.crypto.plugins.plugin_utils._action_module im
     ActionModuleBase,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._argspec import (  # pragma: no cover
         ArgumentSpec,

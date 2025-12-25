@@ -29,7 +29,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     remove_timezone,
 )
 
-
 if t.TYPE_CHECKING:
     import os  # pragma: no cover
 

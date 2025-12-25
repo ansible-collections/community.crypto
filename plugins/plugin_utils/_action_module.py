@@ -26,7 +26,6 @@ from ansible.module_utils.common.arg_spec import ArgumentSpecValidator
 from ansible.module_utils.errors import UnsupportedError
 from ansible.plugins.action import ActionBase
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._argspec import (
         ArgumentSpec,
@@ -223,4 +222,4 @@ class ActionModuleBase(ActionBase, metaclass=abc.ABCMeta):
             return result
 
 
-__all__ = ("AnsibleActionModule", "ActionModuleBase")
+__all__ = ("ActionModuleBase", "AnsibleActionModule")

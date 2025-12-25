@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssh_keypair
 author: "David Kainz (@lolcube)"

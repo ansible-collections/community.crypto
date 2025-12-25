@@ -22,7 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
     split_pem_list,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (  # pragma: no cover
         ACMEClient,
@@ -129,4 +128,4 @@ class ChainMatcher(metaclass=abc.ABCMeta):
         """
 
 
-__all__ = ("CertificateChain", "Criterium", "ChainMatcher")
+__all__ = ("CertificateChain", "ChainMatcher", "Criterium")

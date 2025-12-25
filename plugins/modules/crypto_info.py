@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: crypto_info
 author: "Felix Fontein (@felixfontein)"
@@ -155,7 +154,6 @@ import traceback
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 CRYPTOGRAPHY_VERSION: str | None
 CRYPTOGRAPHY_IMP_ERR: str | None

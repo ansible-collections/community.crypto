@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: get_certificate
 author: "John Westcott IV (@john-westcott-iv)"
@@ -295,7 +294,6 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
-
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 

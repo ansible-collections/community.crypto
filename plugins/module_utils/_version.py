@@ -11,5 +11,4 @@ from __future__ import annotations
 
 from ansible.module_utils.compat.version import LooseVersion
 
-
 __all__ = ("LooseVersion",)

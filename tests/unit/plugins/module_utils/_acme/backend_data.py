@@ -19,7 +19,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 
 from ..test__time import TIMEZONES, cartesian_product
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         Criterium,

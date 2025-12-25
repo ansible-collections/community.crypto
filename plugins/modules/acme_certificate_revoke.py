@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: acme_certificate_revoke
 author: "Felix Fontein (@felixfontein)"

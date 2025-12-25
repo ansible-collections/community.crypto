@@ -37,7 +37,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 
-
 if t.TYPE_CHECKING:
     import datetime  # pragma: no cover
 

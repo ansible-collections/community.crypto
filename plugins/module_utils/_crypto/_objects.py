@@ -11,7 +11,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto._objects_
     OID_MAP,
 )
 
-
 OID_LOOKUP: dict[str, str] = {}
 NORMALIZE_NAMES: dict[str, str] = {}
 NORMALIZE_NAMES_SHORT: dict[str, str] = {}
@@ -35,4 +34,4 @@ for alias, original in [("userID", "userId")]:
     OID_LOOKUP[alias] = OID_LOOKUP[original]
 
 
-__all__ = ("OID_LOOKUP", "NORMALIZE_NAMES", "NORMALIZE_NAMES_SHORT")
+__all__ = ("NORMALIZE_NAMES", "NORMALIZE_NAMES_SHORT", "OID_LOOKUP")

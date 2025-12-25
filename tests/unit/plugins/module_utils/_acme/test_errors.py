@@ -17,7 +17,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
     format_error_problem,
 )
 
-
 TEST_FORMAT_ERROR_PROBLEM: list[tuple[dict[str, t.Any], str, str]] = [
     (
         {

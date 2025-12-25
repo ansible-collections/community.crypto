@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: certificate_complete_chain
 author: "Felix Fontein (@felixfontein)"
@@ -133,7 +132,6 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
-
 
 try:
     import cryptography
