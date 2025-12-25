@@ -48,7 +48,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 
-
 if t.TYPE_CHECKING:
     import http.client  # pragma: no cover
     import os  # pragma: no cover
@@ -810,8 +809,8 @@ def create_backend(
 
 
 __all__ = (
-    "ACMEDirectory",
     "ACMEClient",
-    "create_default_argspec",
+    "ACMEDirectory",
     "create_backend",
+    "create_default_argspec",
 )

@@ -15,7 +15,6 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.certific
     parse_option_list,
 )
 
-
 # Type: ssh-rsa-cert-v01@openssh.com user certificate
 # Public key: RSA-CERT SHA256:SvUwwUer4AwsdePYseJR3LcZS8lnKi6BqiL51Dop030
 # Signing CA: DSA SHA256:YCdJ2lYU+FSkWUud7zg1SJszprXoRGNU/GVcqXUjgC8

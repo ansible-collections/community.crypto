@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: split_pem
 short_description: Split PEM file contents into multiple objects

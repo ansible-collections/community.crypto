@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = """
 module: acme_certificate_order_create
 author: Felix Fontein (@felixfontein)

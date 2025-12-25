@@ -27,7 +27,6 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
     nopad_b64,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
 
@@ -429,11 +428,11 @@ def wait_for_validation(
 
 
 __all__ = (
-    "create_key_authorization",
+    "Authorization",
+    "Challenge",
     "combine_identifier",
+    "create_key_authorization",
     "normalize_combined_identifier",
     "split_identifier",
-    "Challenge",
-    "Authorization",
     "wait_for_validation",
 )

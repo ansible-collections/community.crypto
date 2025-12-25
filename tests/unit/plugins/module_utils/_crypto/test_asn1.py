@@ -15,7 +15,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto._asn1 imp
     serialize_asn1_string_as_der,
 )
 
-
 TEST_CASES: list[tuple[str, bytes]] = [
     ("UTF8:Hello World", b"\x0c\x0b\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64"),
     (

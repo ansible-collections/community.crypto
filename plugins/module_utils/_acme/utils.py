@@ -28,7 +28,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
         CertificateInformation,
@@ -165,10 +164,10 @@ def compute_cert_id(
 
 
 __all__ = (
-    "nopad_b64",
+    "compute_cert_id",
     "der_to_pem",
+    "nopad_b64",
+    "parse_retry_after",
     "pem_to_der",
     "process_links",
-    "parse_retry_after",
-    "compute_cert_id",
 )

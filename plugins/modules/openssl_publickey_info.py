@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssl_publickey_info
 short_description: Provide information for OpenSSL public keys

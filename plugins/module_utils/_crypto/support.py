@@ -23,7 +23,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
     identify_pem_format,
 )
 
-
 try:
     from cryptography import x509
     from cryptography.exceptions import UnsupportedAlgorithm
@@ -37,7 +36,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.basic imp
     OpenSSLBadPassphraseError,
     OpenSSLObjectError,
 )
-
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
@@ -467,17 +465,17 @@ class OpenSSLObject(metaclass=abc.ABCMeta):
 
 
 __all__ = (
+    "OpenSSLObject",
+    "get_fingerprint",
     "get_fingerprint_of_bytes",
     "get_fingerprint_of_privatekey",
-    "get_fingerprint",
-    "load_privatekey",
-    "load_certificate_privatekey",
-    "load_certificate_issuer_privatekey",
-    "load_publickey",
     "load_certificate",
+    "load_certificate_issuer_privatekey",
+    "load_certificate_privatekey",
     "load_certificate_request",
+    "load_privatekey",
+    "load_publickey",
     "parse_name_field",
     "parse_ordered_name_field",
     "select_message_digest",
-    "OpenSSLObject",
 )

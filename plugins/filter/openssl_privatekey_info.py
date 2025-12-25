@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: openssl_privatekey_info
 short_description: Retrieve information from OpenSSL private keys

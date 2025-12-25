@@ -15,7 +15,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.pem impor
     split_pem_list,
 )
 
-
 PEM_TEST_CASES: list[
     tuple[bytes, list[str], bool, t.Literal["raw", "pkcs1", "pkcs8", "unknown-pem"]]
 ] = [

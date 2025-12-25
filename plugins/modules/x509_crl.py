@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: x509_crl
 version_added: '1.0.0'
@@ -481,7 +480,6 @@ from ansible_collections.community.crypto.plugins.module_utils._serial import (
 from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_relative_time_option,
 )
-
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 

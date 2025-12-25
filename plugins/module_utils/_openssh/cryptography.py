@@ -13,7 +13,6 @@ from base64 import b64decode, b64encode
 from getpass import getuser
 from socket import gethostname
 
-
 try:
     from cryptography import __version__ as CRYPTOGRAPHY_VERSION
     from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
@@ -72,7 +71,6 @@ except ImportError:
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     is_potential_certificate_issuer_private_key,
 )
-
 
 if t.TYPE_CHECKING:
     KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]  # pragma: no cover
@@ -815,27 +813,27 @@ def calculate_fingerprint(openssh_publickey: bytes) -> str:
 
 
 __all__ = (
-    "HAS_OPENSSH_SUPPORT",
     "CRYPTOGRAPHY_VERSION",
-    "OpenSSHError",
+    "HAS_OPENSSH_SUPPORT",
+    "AsymmetricKeypair",
     "InvalidAlgorithmError",
     "InvalidCommentError",
     "InvalidDataError",
-    "InvalidPrivateKeyFileError",
-    "InvalidPublicKeyFileError",
     "InvalidKeyFormatError",
     "InvalidKeySizeError",
     "InvalidKeyTypeError",
     "InvalidPassphraseError",
+    "InvalidPrivateKeyFileError",
+    "InvalidPublicKeyFileError",
     "InvalidSignatureError",
-    "AsymmetricKeypair",
+    "OpenSSHError",
     "OpensshKeypair",
+    "calculate_fingerprint",
+    "compare_encryption_algorithms",
+    "compare_publickeys",
+    "extract_comment",
+    "get_encryption_algorithm",
     "load_privatekey",
     "load_publickey",
-    "compare_publickeys",
-    "compare_encryption_algorithms",
-    "get_encryption_algorithm",
     "validate_comment",
-    "extract_comment",
-    "calculate_fingerprint",
 )

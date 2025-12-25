@@ -12,7 +12,6 @@ import re
 
 from ansible.module_utils.common.text.converters import to_bytes
 
-
 # An ASN.1 serialized as a string in the OpenSSL format:
 #     [modifier,]type[:value]
 #
@@ -173,4 +172,4 @@ def pack_asn1(
     return bytes(b_asn1_data) + b_data
 
 
-__all__ = ("TagClass", "TagNumber", "serialize_asn1_string_as_der", "pack_asn1")
+__all__ = ("TagClass", "TagNumber", "pack_asn1", "serialize_asn1_string_as_der")

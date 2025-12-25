@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssh_cert
 author: "David Kainz (@lolcube)"

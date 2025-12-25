@@ -33,7 +33,6 @@ from __future__ import annotations
 
 import typing as t
 
-
 # WARNING: this function no longer works with cryptography 35.0.0 and newer!
 #          It must **ONLY** be used in compatibility code for older
 #          cryptography versions!

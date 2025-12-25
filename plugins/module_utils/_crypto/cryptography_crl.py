@@ -13,7 +13,6 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion as _LooseVersion,
 )
 
-
 try:
     import cryptography
     from cryptography import x509
@@ -31,7 +30,6 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
     CRYPTOGRAPHY_TIMEZONE,
     cryptography_decode_name,
 )
-
 
 if t.TYPE_CHECKING:
     import datetime  # pragma: no cover
@@ -200,11 +198,11 @@ __all__ = (
     "cryptography_decode_revoked_certificate",
     "cryptography_dump_revoked",
     "cryptography_get_signature_algorithm_oid_from_crl",
-    "get_next_update",
-    "get_last_update",
-    "get_revocation_date",
     "get_invalidity_date",
-    "set_next_update",
+    "get_last_update",
+    "get_next_update",
+    "get_revocation_date",
     "set_last_update",
+    "set_next_update",
     "set_revocation_date",
 )

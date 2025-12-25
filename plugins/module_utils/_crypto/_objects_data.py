@@ -19,7 +19,6 @@
 
 from __future__ import annotations
 
-
 OID_MAP = {
     "0": ("itu-t", "ITU-T", "ccitt"),
     "0.3.4401.5": ("ntt-ds",),

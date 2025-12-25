@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssl_dhparam
 short_description: Generate OpenSSL Diffie-Hellman Parameters
@@ -151,7 +150,6 @@ from ansible_collections.community.crypto.plugins.module_utils._io import (
 from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
-
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 

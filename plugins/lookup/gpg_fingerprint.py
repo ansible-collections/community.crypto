@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: gpg_fingerprint
 short_description: Retrieve a GPG fingerprint from a GPG public or private key file

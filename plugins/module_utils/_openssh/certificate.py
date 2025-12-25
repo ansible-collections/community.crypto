@@ -30,7 +30,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     convert_relative_to_datetime,
 )
 
-
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
         KeyType,
@@ -840,14 +839,14 @@ def parse_option_list(
 
 
 __all__ = (
-    "OpensshCertificateTimeParameters",
-    "OpensshCertificateOption",
+    "OpensshCertificate",
     "OpensshCertificateInfo",
-    "OpensshRSACertificateInfo",
+    "OpensshCertificateOption",
+    "OpensshCertificateTimeParameters",
     "OpensshDSACertificateInfo",
     "OpensshECDSACertificateInfo",
     "OpensshED25519CertificateInfo",
-    "OpensshCertificate",
+    "OpensshRSACertificateInfo",
     "apply_directives",
     "default_options",
     "fingerprint",

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssl_privatekey_pipe
 short_description: Generate OpenSSL private keys without disk access

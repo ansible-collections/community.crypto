@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 try:
     import cryptography  # noqa: F401, pylint: disable=unused-import
 
@@ -26,4 +25,4 @@ class OpenSSLBadPassphraseError(OpenSSLObjectError):
     pass
 
 
-__all__ = ("HAS_CRYPTOGRAPHY", "OpenSSLObjectError", "OpenSSLBadPassphraseError")
+__all__ = ("HAS_CRYPTOGRAPHY", "OpenSSLBadPassphraseError", "OpenSSLObjectError")

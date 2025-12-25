@@ -22,7 +22,6 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     remove_timezone,
 )
 
-
 TIMEZONES = [
     datetime.timedelta(hours=0),
     datetime.timedelta(hours=1),

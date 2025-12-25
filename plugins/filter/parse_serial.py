@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: parse_serial
 short_description: Convert a serial number as a colon-separated list of hex numbers to an integer

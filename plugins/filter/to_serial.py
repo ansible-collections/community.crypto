@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: to_serial
 short_description: Convert an integer to a colon-separated list of hex numbers

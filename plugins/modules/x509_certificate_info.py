@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: x509_certificate_info
 short_description: Provide information of OpenSSL X.509 certificates

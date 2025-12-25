@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: x509_crl_info
 short_description: Retrieve information from X.509 CRLs in PEM format

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openssl_signature
 version_added: 1.1.0
@@ -108,7 +107,6 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
-
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
 

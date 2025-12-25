@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import typing as t
 
-
 PEM_START = "-----BEGIN "
 PEM_END_START = "-----END "
 PEM_END = "-----"
@@ -128,14 +127,14 @@ def extract_pem(content: str, *, strict: bool = False) -> tuple[str, str]:
 
 
 __all__ = (
-    "PEM_START",
-    "PEM_END_START",
     "PEM_END",
-    "PKCS8_PRIVATEKEY_NAMES",
+    "PEM_END_START",
+    "PEM_START",
     "PKCS1_PRIVATEKEY_SUFFIX",
+    "PKCS8_PRIVATEKEY_NAMES",
+    "extract_first_pem",
+    "extract_pem",
     "identify_pem_format",
     "identify_private_key_format",
     "split_pem_list",
-    "extract_first_pem",
-    "extract_pem",
 )

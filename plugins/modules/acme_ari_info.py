@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: acme_ari_info
 author: "Felix Fontein (@felixfontein)"

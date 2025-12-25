@@ -54,7 +54,6 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
 
-
 CRYPTOGRAPHY_MINIMAL_VERSION = "1.5"
 
 CRYPTOGRAPHY_ERROR: None | str
@@ -539,9 +538,9 @@ class CryptographyBackend(CryptoBackend):
 
 
 __all__ = (
+    "CRYPTOGRAPHY_ERROR",
+    "CRYPTOGRAPHY_ERROR",
     "CRYPTOGRAPHY_MINIMAL_VERSION",
-    "CRYPTOGRAPHY_ERROR",
     "CRYPTOGRAPHY_VERSION",
-    "CRYPTOGRAPHY_ERROR",
     "CryptographyBackend",
 )
