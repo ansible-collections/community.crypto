@@ -1886,3 +1886,15 @@ releases:
       - 3.0.5.yml
       - 963-ruff.yml
     release_date: '2025-10-29'
+  3.1.0:
+    changes:
+      minor_changes:
+        - luks_device - add support for TPM2 enrollment using ``systemd-cryptsetup``
+          (https://github.com/ansible-collections/community.crypto/issues/850, https://github.com/ansible-collections/community.crypto/pull/972).
+        - luks_device - add support for keyslot priority (https://github.com/ansible-collections/community.crypto/issues/850,
+          https://github.com/ansible-collections/community.crypto/pull/972).
+      release_summary: Feature release.
+    fragments:
+      - 3.1.0.yml
+      - 964-luks-device-tpm2-priority.yml
+    release_date: '2025-12-29'
