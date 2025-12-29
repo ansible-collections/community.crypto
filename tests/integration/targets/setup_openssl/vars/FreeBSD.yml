@@ -6,3 +6,5 @@
 openssl_package_name: openssl
 cryptography_package_name: py27-cryptography
 cryptography_package_name_python3: "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-cryptography"
+pyasn1_package_name: py27-pyasn1
+pyasn1_package_name_python3: "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pyasn1"
