@@ -114,12 +114,12 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: Fedora 42
-              test: fedora42
+            - name: Fedora 43
+              test: fedora43
             - name: Ubuntu 24.04
               test: ubuntu2404
-            - name: Alpine 3.22
-              test: alpine322
+            - name: Alpine 3.23
+              test: alpine323
           groups:
             - 1
             - 2
@@ -218,10 +218,10 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: Alpine 3.22
-              test: alpine/3.22
-            - name: Fedora 42
-              test: fedora/42
+            - name: Alpine 3.23
+              test: alpine/3.23
+            - name: Fedora 43
+              test: fedora/43
             - name: Ubuntu 22.04
               test: ubuntu/22.04
             - name: Ubuntu 24.04
@@ -238,14 +238,14 @@ stages:
           targets:
             - name: macOS 15.3
               test: macos/15.3
-            - name: RHEL 10.0
-              test: rhel/10.0
+            - name: RHEL 10.1
+              test: rhel/10.1
             - name: RHEL 9.7
               test: rhel/9.7
+            - name: FreeBSD 15.0
+              test: freebsd/15.0
             - name: FreeBSD 14.3
               test: freebsd/14.3
-            - name: FreeBSD 13.5
-              test: freebsd/13.5
           groups:
             - 1
             - 2
@@ -272,8 +272,8 @@ stages:
         parameters:
           testFormat: 2.19/{0}
           targets:
-            - name: RHEL 10.0
-              test: rhel/10.0
+            - name: RHEL 10.1
+              test: rhel/10.1
             - name: FreeBSD 14.2
               test: freebsd/14.2
           groups:
