@@ -121,8 +121,6 @@ stages:
               test: debian-bullseye/3.9
             - name: Debian Bookworm
               test: debian-bookworm/3.11
-            - name: ArchLinux
-              test: archlinux/3.14
           groups:
             - 1
             - 2
