@@ -304,6 +304,29 @@
           "IP:1.2.3.0/24",
           "IP:::1:0:0/112",
         ]
+      - '"1.3.6.1.4.1.34380.1.2.1" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.2" not in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.3" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.4" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.5" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.6" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.7" in everything_info.extensions_by_oid'
+      - '"1.3.6.1.4.1.34380.1.2.8" in everything_info.extensions_by_oid'
+      # values provided by csr_info are always base64 encoded
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.1"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.1"].value == "DAJERQ=="
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.3"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.3"].value == "AgER"
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.4"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.4"].value == "CQcDMzE0RS0y"
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.5"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.5"].value == "AQH/"
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.6"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.6"].value == "AQEA"
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.7"].critical == false
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.7"].value == "REU="
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.8"].critical == true
+      - everything_info.extensions_by_oid["1.3.6.1.4.1.34380.1.2.8"].value == "REU="
 
 - name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests"
   ansible.builtin.assert:

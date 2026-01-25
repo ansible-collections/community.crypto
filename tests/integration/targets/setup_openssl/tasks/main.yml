@@ -102,10 +102,22 @@
             name: '{{ cryptography_package_name_python3 }}'
           when: ansible_python_version is version('3.0', '>=')
 
+        - name: Install pyasn1 (Python 3 from system packages)
+          become: true
+          ansible.builtin.package:
+            name: '{{ pyasn1_package_name_python3 }}'
+          when: ansible_python_version is version('3.0', '>=')
+
         - name: Install cryptography (Python 2 from system packages)
           become: true
           ansible.builtin.package:
             name: '{{ cryptography_package_name }}'
+          when: ansible_python_version is version('3.0', '<')
+
+        - name: Install pyasn1 (Python 2 from system packages)
+          become: true
+          ansible.builtin.package:
+            name: '{{ pyasn1_package_name }}'
           when: ansible_python_version is version('3.0', '<')
 
     - name: Install from PyPi

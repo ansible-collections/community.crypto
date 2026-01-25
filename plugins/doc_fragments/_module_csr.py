@@ -21,6 +21,7 @@ attributes:
     support: full
 requirements:
   - cryptography >= 3.3
+  - pyasn1 >= 0.4.8 (only if O(custom_extensions) are specified)
 options:
   digest:
     description:
@@ -325,6 +326,53 @@ options:
           - privilege_withdrawn
           - aa_compromise
     version_added: 1.4.0
+  custom_extensions:
+    description:
+      - Allows to specify one or multiple custom extensions.
+      - The extension value must not be empty, unless O(custom_extensions[].skip_if_empty) is specified.
+      - In such case the extension will be skipped instead of throwing an error.
+      - Custom extensions require the V(pyasn1) Python package to be installed in the environment where the code is run.
+    type: list
+    elements: dict
+    suboptions:
+      critical:
+        description:
+          - Set the critical flag.
+        type: bool
+        default: false
+      oid:
+        description:
+          - The OID of the custom extension
+          - 'Example: V(1.3.6.1.4.1.34380.1.1.25).'
+        type: str
+      skip_if_empty:
+        description:
+          - Allow empty value to be specified. In such case the extension will be skipped when processing.
+        type: bool
+        default: false
+      value_type:
+        description:
+          - The type of the value. Only valid if O(custom_extensions[].value) is specified.
+          - 'Supported data types are: V(str), V(bool), V(int), V(real).'
+        type: str
+        default: str
+      value:
+        description:
+          - The value of the custom extension.
+          - Mutually exclusive with O(custom_extensions[].value_raw) and O(custom_extensions[].value_b64).
+        type: str
+      value_raw:
+        description:
+          - The raw value of the custom extension. Will be copied to the extension as-is.
+          - The value is always assumed to be an UTF8String
+          - Mutually exclusive with O(custom_extensions[].value) and O(custom_extensions[].value_b64).
+        type: str
+      value_b64:
+        description:
+          - The raw value of the custom extension, base64 encoded. Will be decoded, then copied to the extension as-is.
+          - Mutually exclusive with O(custom_extensions[].value) and O(custom_extensions[].value_raw).
+        type: str
+    version_added: 3.1.0
 notes:
   - If the certificate signing request already exists it will be checked whether subjectAltName, keyUsage, extendedKeyUsage
     and basicConstraints only contain the requested values, whether OCSP Must Staple is as requested, and if the request was
