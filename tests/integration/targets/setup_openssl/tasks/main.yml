@@ -9,7 +9,7 @@
 ####################################################################
 
 - name: Register system environment
-  ansible.builtin.command: "{{ ansible_python.executable }} -c 'import os; print(dict(os.environ))'"
+  ansible.builtin.command: "{{ ansible_facts.python.executable }} -c 'import os; print(dict(os.environ))'"
   register: sys_environment
 
 - name: Show system environment
@@ -21,8 +21,8 @@
     openssl_binary: openssl
 
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: '{{ ansible_os_family }}.yml'
-  when: not ansible_os_family == "Darwin"
+  ansible.builtin.include_vars: '{{ ansible_facts.os_family }}.yml'
+  when: not ansible_facts.os_family == "Darwin"
 
 - name: Check whether OpenSSL is there
   ansible.builtin.command: "{{ openssl_binary }} version"
@@ -33,7 +33,7 @@
   become: true
   ansible.builtin.package:
     name: '{{ openssl_package_name }}'
-  when: not ansible_os_family == 'Darwin' and openssl_version_full is failed
+  when: not ansible_facts.os_family == 'Darwin' and openssl_version_full is failed
 
 - name: Register openssl version (full)
   ansible.builtin.command: "{{ openssl_binary }} version"
@@ -43,7 +43,7 @@
   ansible.builtin.debug:
     var: openssl_version_full.stdout_lines
 
-- when: ansible_os_family == "Darwin" and "LibreSSL" in openssl_version_full.stdout
+- when: ansible_facts.os_family == "Darwin" and "LibreSSL" in openssl_version_full.stdout
   # In case LibreSSL is installed on macOS, we need to install a more modern OpenSSL
   block:
     - name: MACOS | Find brew binary
@@ -93,29 +93,29 @@
   block:
 
     - name: Install from system packages
-      when: ansible_os_family != "Darwin" and target_system_python
+      when: ansible_facts.os_family != "Darwin" and target_system_python
       block:
 
         - name: Install cryptography (Python 3 from system packages)
           become: true
           ansible.builtin.package:
             name: '{{ cryptography_package_name_python3 }}'
-          when: ansible_python_version is version('3.0', '>=')
+          when: ansible_facts.python_version is version('3.0', '>=')
 
         - name: Install cryptography (Python 2 from system packages)
           become: true
           ansible.builtin.package:
             name: '{{ cryptography_package_name }}'
-          when: ansible_python_version is version('3.0', '<')
+          when: ansible_facts.python_version is version('3.0', '<')
 
     - name: Install from PyPi
-      when: ansible_os_family == "Darwin" or not target_system_python
+      when: ansible_facts.os_family == "Darwin" or not target_system_python
       block:
 
         - name: Install cryptography (PyPi)
           become: true
           ansible.builtin.pip:
-            name: 'cryptography{% if ansible_os_family == "Darwin" %}>=3.3{% endif %}'
+            name: 'cryptography{% if ansible_facts.os_family == "Darwin" %}>=3.3{% endif %}'
             state: "{{ 'latest' if not target_system_python_cannot_upgrade_cryptography else omit }}"
             extra_args: "-c {{ remote_constraints }}"
 

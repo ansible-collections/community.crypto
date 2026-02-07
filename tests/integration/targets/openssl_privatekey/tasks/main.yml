@@ -22,7 +22,7 @@
         | map('regex_replace', '^ *([a-zA-Z0-9_-]+) *: .*$', '\1')
         | list
       }}
-  when: ansible_distribution != 'CentOS' or ansible_distribution_major_version != '6'
+  when: ansible_facts.distribution != 'CentOS' or ansible_facts.distribution_major_version != '6'
   # CentOS comes with a very old jinja2 which does not include the map() filter...
 - name: Compile list of elliptic curves supported by OpenSSL (CentOS 6)
   ansible.builtin.set_fact:
@@ -30,7 +30,7 @@
       - secp384r1
       - secp521r1
       - prime256v1
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '6'
 
 - name: List of elliptic curves supported by OpenSSL
   ansible.builtin.debug: var=openssl_ecc_list

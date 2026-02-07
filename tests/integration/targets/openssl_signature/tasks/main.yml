@@ -36,14 +36,14 @@
     key_types: "{{ key_types + [{'type': 'DSA', 'size': 2048}, {'type': 'ECC', 'curve': 'secp256r1'}] }}"
   when:
     # FreeBSD 11 fails on secp256r1 keys
-    - not ansible_os_family == 'FreeBSD'
+    - not ansible_facts.os_family == 'FreeBSD'
 
 - name: Add Ed25519 + Ed448 tests
   ansible.builtin.set_fact:
     key_types: "{{ key_types + [{'type': 'Ed25519'}, {'type': 'Ed448'}] }}"
   when:
     # FreeBSD doesn't have support for Ed448/25519
-    - not ansible_os_family == 'FreeBSD'
+    - not ansible_facts.os_family == 'FreeBSD'
 
 - name: Create all test combinations
   ansible.builtin.set_fact:

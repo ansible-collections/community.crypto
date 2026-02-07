@@ -5,4 +5,4 @@
 
 openssl_package_name: openssl
 cryptography_package_name: py27-cryptography
-cryptography_package_name_python3: "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-cryptography"
+cryptography_package_name_python3: "py{{ ansible_facts.python.version.major }}{{ ansible_facts.python.version.minor }}-cryptography"

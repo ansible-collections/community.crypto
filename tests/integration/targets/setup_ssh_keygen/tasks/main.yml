@@ -9,13 +9,13 @@
 ####################################################################
 
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: '{{ ansible_os_family }}.yml'
-  when: not ansible_os_family == "Darwin" and not ansible_os_family == "FreeBSD"
+  ansible.builtin.include_vars: '{{ ansible_facts.os_family }}.yml'
+  when: not ansible_facts.os_family == "Darwin" and not ansible_facts.os_family == "FreeBSD"
 
 - name: Install ssh-keygen
   ansible.builtin.package:
     name: '{{ openssh_client_package_name }}'
-  when: not ansible_os_family == "Darwin" and not ansible_os_family == "FreeBSD"
+  when: not ansible_facts.os_family == "Darwin" and not ansible_facts.os_family == "FreeBSD"
 
 - name: Get ssh version
   ansible.builtin.shell: ssh -Vq 2>&1|sed 's/^.*OpenSSH_\([0-9]\{1,\}\.[0-9]\{1,\}\).*$/\1/'

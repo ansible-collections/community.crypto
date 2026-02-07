@@ -17,7 +17,7 @@
     var: result
 
 - name: Register cryptography version
-  ansible.builtin.command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  ansible.builtin.command: "{{ ansible_facts.python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: local_cryptography_version
 
 - name: Set cryptography version
@@ -30,7 +30,7 @@
       {{
         local_cryptography_version is version("2.6", ">=")
         and not (
-          ansible_os_family == "FreeBSD" and
+          ansible_facts.os_family == "FreeBSD" and
           ansible_facts.distribution_version is version("12.1", ">=") and
           ansible_facts.distribution_version is version("12.2", "<")
         )
@@ -39,7 +39,7 @@
       {{
         local_cryptography_version is version("2.6", ">=")
         and not (
-          ansible_os_family == "FreeBSD" and
+          ansible_facts.os_family == "FreeBSD" and
           ansible_facts.distribution_version is version("12.1", ">=") and
           ansible_facts.distribution_version is version("12.2", "<")
         )
