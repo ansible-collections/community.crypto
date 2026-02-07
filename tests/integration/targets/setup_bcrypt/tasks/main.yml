@@ -17,7 +17,7 @@
         extra_args: "-c {{ remote_constraints }}"
 
     - name: Register bcrypt version
-      ansible.builtin.command: "{{ ansible_python.executable }} -c 'import bcrypt; print(bcrypt.__version__)'"
+      ansible.builtin.command: "{{ ansible_facts.python.executable }} -c 'import bcrypt; print(bcrypt.__version__)'"
       register: bcrypt_version
   ignore_errors: true
 

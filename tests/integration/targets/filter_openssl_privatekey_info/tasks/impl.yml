@@ -89,7 +89,7 @@
       - "result.public_data.curve is string"
       - "result.public_data.x != 0"
       - "result.public_data.y != 0"
-      - "result.public_data.exponent_size == (521 if (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6') else 256)"
+      - "result.public_data.exponent_size == (521 if (ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '6') else 256)"
       - "'private_data' in result"
       - "result.private_data.multiplier > 1024"
 

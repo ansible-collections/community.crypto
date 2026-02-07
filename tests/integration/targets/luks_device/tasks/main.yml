@@ -21,10 +21,10 @@
   vars:
     search:
       files:
-        - '{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}.yml'
-        - '{{ ansible_distribution | lower }}.yml'
-        - '{{ ansible_os_family | lower }}.yml'
+        - '{{ ansible_facts.distribution | lower }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution | lower }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution | lower }}.yml'
+        - '{{ ansible_facts.os_family | lower }}.yml'
         - default.yml
       paths:
         - vars
@@ -52,7 +52,7 @@
       {{ cryptsetup_version.stdout_lines[0] | regex_search('cryptsetup ([0-9]+\.[0-9]+\.[0-9]+)') | split | last }}
 
 - name: Create cryptfile
-  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile bs=1M count=32
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir.replace('~', ansible_facts.env.HOME) }}/cryptfile bs=1M count=32
 
 - name: Figure out next loopback device
   ansible.builtin.command: losetup -f
@@ -60,7 +60,7 @@
   register: cryptfile_device_output
 
 - name: Create lookback device
-  ansible.builtin.command: losetup -f {{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile
+  ansible.builtin.command: losetup -f {{ remote_tmp_dir.replace('~', ansible_facts.env.HOME) }}/cryptfile
   become: true
 
 - name: Store some common data for tests
@@ -87,5 +87,5 @@
       become: true
 
     - ansible.builtin.file:
-        dest: "{{ remote_tmp_dir.replace('~', ansible_env.HOME) }}/cryptfile"
+        dest: "{{ remote_tmp_dir.replace('~', ansible_facts.env.HOME) }}/cryptfile"
         state: absent

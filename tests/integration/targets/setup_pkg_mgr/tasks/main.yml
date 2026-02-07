@@ -12,10 +12,10 @@
     pkg_mgr: community.general.pkgng
     ansible_pkg_mgr: community.general.pkgng
     cacheable: true
-  when: ansible_os_family == 'FreeBSD'
+  when: ansible_facts.os_family == 'FreeBSD'
 
 - ansible.builtin.set_fact:
     pkg_mgr: community.general.zypper
     ansible_pkg_mgr: community.general.zypper
     cacheable: true
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
