@@ -350,8 +350,8 @@ def add_crypto_information(module: AnsibleModule) -> dict[str, t.Any]:
         pass
     else:
         for curve_name, constructor_name in CURVES:
-            ecclass = ec.__dict__.get(constructor_name)
-            if ecclass:
+            ecclass = getattr(ec, constructor_name, None)
+            if ecclass is not None:
                 try:
                     ec.generate_private_key(curve=ecclass())
                     curves.append(curve_name)
