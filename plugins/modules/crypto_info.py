@@ -286,10 +286,8 @@ def add_crypto_information(module):
 
         backend = cryptography.hazmat.backends.default_backend()
         for curve_name, constructor_name in CURVES:
-            ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(
-                constructor_name
-            )
-            if ecclass:
+            ecclass = getattr(cryptography.hazmat.primitives.asymmetric.ec, constructor_name, None)
+            if ecclass is not None:
                 try:
                     cryptography.hazmat.primitives.asymmetric.ec.generate_private_key(
                         curve=ecclass(), backend=backend

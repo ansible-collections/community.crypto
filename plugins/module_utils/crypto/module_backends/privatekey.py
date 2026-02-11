@@ -276,7 +276,7 @@ class PrivateKeyBackend:
 class PrivateKeyCryptographyBackend(PrivateKeyBackend):
 
     def _get_ec_class(self, ectype):
-        ecclass = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(ectype)
+        ecclass = getattr(cryptography.hazmat.primitives.asymmetric.ec, ectype, None)
         if ecclass is None:
             self.module.fail_json(
                 msg="Your cryptography version does not support {0}".format(ectype)
