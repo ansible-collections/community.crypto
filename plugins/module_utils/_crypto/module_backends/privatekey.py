@@ -98,7 +98,7 @@ class _Curve:
     ) -> type[cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve]:
         ecclass: (
             type[cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve] | None
-        ) = cryptography.hazmat.primitives.asymmetric.ec.__dict__.get(self.ectype)
+        ) = getattr(cryptography.hazmat.primitives.asymmetric.ec, self.ectype, None)
         if ecclass is None:
             module.fail_json(
                 msg=f"Your cryptography version does not support {self.ectype}"
