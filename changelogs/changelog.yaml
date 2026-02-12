@@ -1898,3 +1898,13 @@ releases:
       - 3.1.0.yml
       - 964-luks-device-tpm2-priority.yml
     release_date: '2025-12-29'
+  3.1.1:
+    changes:
+      bugfixes:
+        - crypto_info, openssl_privatekey, openssl_privatekey_pipe - fix detection
+          of EC support for cryptography 46.0.5+ (https://github.com/ansible-collections/community.crypto/pull/981).
+      release_summary: Bugfix release.
+    fragments:
+      - 3.1.1.yml
+      - 981-ec.yml
+    release_date: '2026-02-12'
