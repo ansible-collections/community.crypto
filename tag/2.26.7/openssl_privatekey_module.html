@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="2.24.0" name="antsibull-docs" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>community.crypto.openssl_privatekey module – Generate OpenSSL private keys &mdash; Community.Crypto Collection  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys" href="openssl_privatekey_convert_module.html" />
+    <link rel="prev" title="community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive" href="openssl_pkcs12_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="https://ansible-collections.github.io/community.crypto/branch/main/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Community.Crypto Collection Docs</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Community.Crypto Collection
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Community.Crypto Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_selfsigned.html">How to create self-signed certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/guide_ownca.html">How to create a small CA</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="acme_account_module.html">community.crypto.acme_account module – Create, modify or delete ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_account_info_module.html">community.crypto.acme_account_info module – Retrieves information on ACME accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_ari_info_module.html">community.crypto.acme_ari_info module – Retrieves ACME Renewal Information (ARI) for a certificate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_module.html">community.crypto.acme_certificate module – Create SSL/TLS certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_deactivate_authz_module.html">community.crypto.acme_certificate_deactivate_authz module – Deactivate all authz for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_create_module.html">community.crypto.acme_certificate_order_create module – Create an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_finalize_module.html">community.crypto.acme_certificate_order_finalize module – Finalize an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_info_module.html">community.crypto.acme_certificate_order_info module – Obtain information for an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_order_validate_module.html">community.crypto.acme_certificate_order_validate module – Validate authorizations of an ACME v2 order</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_renewal_info_module.html">community.crypto.acme_certificate_renewal_info module – Determine whether a certificate should be renewed or not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_certificate_revoke_module.html">community.crypto.acme_certificate_revoke module – Revoke certificates with the ACME protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_challenge_cert_helper_module.html">community.crypto.acme_challenge_cert_helper module – Prepare certificates required for ACME challenges such as <code class="docutils literal notranslate"><span class="pre">tls-alpn-01</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_inspect_module.html">community.crypto.acme_inspect module – Send direct requests to an ACME server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certificate_complete_chain_module.html">community.crypto.certificate_complete_chain module – Complete certificate chain given a set of untrusted and root certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto_info_module.html">community.crypto.crypto_info module – Retrieve cryptographic capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecs_certificate_module.html">community.crypto.ecs_certificate module – Request SSL/TLS certificates with the Entrust Certificate Services (ECS) API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecs_domain_module.html">community.crypto.ecs_domain module – Request validation of a domain with the Entrust Certificate Services (ECS) API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="get_certificate_module.html">community.crypto.get_certificate module – Get a certificate from a host:port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="luks_device_module.html">community.crypto.luks_device module – Manage encrypted (LUKS) devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_cert_module.html">community.crypto.openssh_cert module – Generate OpenSSH host or user certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssh_keypair_module.html">community.crypto.openssh_keypair module – Generate OpenSSH private and public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_module.html">community.crypto.openssl_csr module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_module.html">community.crypto.openssl_csr_info module – Provide information of OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_pipe_module.html">community.crypto.openssl_csr_pipe module – Generate OpenSSL Certificate Signing Request (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_dhparam_module.html">community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_module.html">community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_pipe_module.html">community.crypto.openssl_privatekey_pipe module – Generate OpenSSL private keys without disk access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_module.html">community.crypto.openssl_publickey module – Generate an OpenSSL public key from its private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_module.html">community.crypto.openssl_publickey_info module – Provide information for OpenSSL public keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_module.html">community.crypto.openssl_signature module – Sign data with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_signature_info_module.html">community.crypto.openssl_signature_info module – Verify signatures with openssl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_module.html">community.crypto.x509_certificate module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_convert_module.html">community.crypto.x509_certificate_convert module – Convert X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_module.html">community.crypto.x509_certificate_info module – Provide information of OpenSSL X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_pipe_module.html">community.crypto.x509_certificate_pipe module – Generate and/or check OpenSSL certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_module.html">community.crypto.x509_crl module – Generate Certificate Revocation Lists (CRLs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_lookup.html">community.crypto.gpg_fingerprint lookup – Retrieve a GPG fingerprint from a GPG public or private key file</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Community.Crypto Collection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/modules/openssl_privatekey.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-community-crypto-openssl-privatekey-module"></span><section id="community-crypto-openssl-privatekey-module-generate-openssl-private-keys">
+<h1>community.crypto.openssl_privatekey module – Generate OpenSSL private keys<a class="headerlink" href="#community-crypto-openssl-privatekey-module-generate-openssl-private-keys" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This module is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 2.26.7).</p>
+<p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
+To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
+<p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.
+You need further requirements to be able to use this module,
+see <a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.openssl_privatekey</span></code>.</p>
+</div>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id3">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#attributes" id="id4">Attributes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id6">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id7">Return Values</a></p></li>
+</ul>
+</nav>
+<section id="synopsis">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Keys are generated in PEM format.</p></li>
+<li><p>One can generate <a class="reference external" href="https://en.wikipedia.org/wiki/RSA_%2528cryptosystem%2529">RSA</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Digital_Signature_Algorithm">DSA</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a> or <a class="reference external" href="https://en.wikipedia.org/wiki/EdDSA">EdDSA</a> private keys.</p></li>
+<li><p>Please note that the module regenerates private keys if they do not match the module’s options. In particular, if you provide another passphrase (or specify none), change the keysize, and so on, the private key will be regenerated. If you are concerned that this could <strong>overwrite your private key</strong>, consider using the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> option.</p></li>
+<li><p>The default mode for the private key file will be <code class="ansible-value docutils literal notranslate"><span class="pre">0600</span></code> if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not explicitly set.</p></li>
+<li><p>This module allows one to (re)generate OpenSSL private keys.</p></li>
+</ul>
+</section>
+<section id="requirements">
+<span id="ansible-collections-community-crypto-openssl-privatekey-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>The below requirements are needed on the host that executes this module.</p>
+<ul class="simple">
+<li><p>cryptography &gt;= 1.2.3 (older versions might work as well)</p></li>
+</ul>
+</section>
+<section id="parameters">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-attributes"></div>
+<div class="ansibleOptionAnchor" id="parameter-attr"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-attributes"><span id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-attr"></span><strong>attributes</strong></p>
+<a class="ansibleOptionLink" href="#parameter-attributes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: attr</span></p>
+<p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The attributes the resulting filesystem object should have.</p>
+<p>To get supported flags look at the man page for <code class="docutils literal notranslate"><span class="pre">chattr</span></code> on the target system.</p>
+<p>This string should contain the attributes in the same order as the one displayed by <code class="docutils literal notranslate"><span class="pre">lsattr</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">=</span></code> operator is assumed as default, otherwise <code class="docutils literal notranslate"><span class="pre">+</span></code> or <code class="docutils literal notranslate"><span class="pre">-</span></code> operators need to be included in the string.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-backup"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-backup"><strong>backup</strong></p>
+<a class="ansibleOptionLink" href="#parameter-backup" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Create a backup file including a timestamp so you can get the original private key back if you overwrote it with a new one by accident.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-cipher"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-cipher"><strong>cipher</strong></p>
+<a class="ansibleOptionLink" href="#parameter-cipher" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The cipher to encrypt the private key. This is only used when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-passphrase"><span class="std std-ref"><span class="pre">passphrase</span></span></a></strong></code> is provided.</p>
+<p>Must be <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-curve"><strong>curve</strong></p>
+<a class="ansibleOptionLink" href="#parameter-curve" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Note that not all curves are supported by all versions of <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>.</p>
+<p>For maximal interoperability, <code class="ansible-value docutils literal notranslate"><span class="pre">secp384r1</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">secp256r1</span></code> should be used.</p>
+<p>We use the curve names as defined in the <a class="reference external" href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8">IANA registry for TLS</a>.</p>
+<p>Please note that all curves except <code class="ansible-value docutils literal notranslate"><span class="pre">secp224r1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">secp256k1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">secp256r1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">secp384r1</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">secp521r1</span></code> are discouraged for new private keys.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp224r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp256k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp256r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp384r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp521r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;secp192r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;brainpoolP256r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;brainpoolP384r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;brainpoolP512r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect163k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect163r2&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect233k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect233r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect283k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect283r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect409k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect409r1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect571k1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;sect571r1&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-force"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-force"><strong>force</strong></p>
+<a class="ansibleOptionLink" href="#parameter-force" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Should the key be regenerated even if it already exists.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-format"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-format"><strong>format</strong></p>
+<a class="ansibleOptionLink" href="#parameter-format" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines which format the private key is written in. By default, PKCS1 (traditional OpenSSL format) is used for all keys which support it. Please note that not every key can be exported in any format.</p>
+<p>The value <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code> selects a format based on the key format. The value <code class="ansible-value docutils literal notranslate"><span class="pre">auto_ignore</span></code> does the same, but for existing private key files, it will not force a regenerate when its format is not the automatically selected one for generation.</p>
+<p>Note that if the format for an existing private key mismatches, the key is <strong>regenerated</strong> by default. To change this behavior, use the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-format-mismatch"><span class="std std-ref"><span class="pre">format_mismatch</span></span></a></strong></code> option.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;pkcs1&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;pkcs8&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;raw&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto_ignore&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-format_mismatch"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-format-mismatch"><strong>format_mismatch</strong></p>
+<a class="ansibleOptionLink" href="#parameter-format_mismatch" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines behavior of the module if the format of a private key does not match the expected format, but all other parameters are as expected.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">regenerate</span></code> (default), generates a new private key.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">convert</span></code>, the key will be converted to the new format instead.</p>
+<p>Only supported by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;regenerate&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;convert&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-group"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-group"><strong>group</strong></p>
+<a class="ansibleOptionLink" href="#parameter-group" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Name of the group that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
+<p>When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><strong>mode</strong></p>
+<a class="ansibleOptionLink" href="#parameter-mode" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The permissions the resulting filesystem object should have.</p>
+<p>For those used to <code class="docutils literal notranslate"><span class="pre">/usr/bin/chmod</span></code> remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">'644'</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">'1777'</span></code>) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">0755</span></code>) works sometimes, but can fail in loops and some other circumstances.</p>
+<p>Giving Ansible a number without following either of these rules will end up with a decimal number which will have unexpected results.</p>
+<p>As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, <code class="ansible-value docutils literal notranslate"><span class="pre">u+rwx</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">u=rw,g=r,o=r</span></code>).</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does not</strong> exist, the default <code class="docutils literal notranslate"><span class="pre">umask</span></code> on the system will be used when setting the mode for the newly created filesystem object.</p>
+<p>If <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not specified and the destination filesystem object <strong>does</strong> exist, the mode of the existing filesystem object will be used.</p>
+<p>Specifying <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-owner"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-owner"><strong>owner</strong></p>
+<a class="ansibleOptionLink" href="#parameter-owner" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Name of the user that should own the filesystem object, as would be fed to <code class="docutils literal notranslate"><span class="pre">chown</span></code>.</p>
+<p>When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.</p>
+<p>Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-passphrase"><strong>passphrase</strong></p>
+<a class="ansibleOptionLink" href="#parameter-passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The passphrase for the private key.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-path"><strong>path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span> / <span class="ansible-option-required">required</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Name of the file in which the generated TLS/SSL private key will be written. It will have <code class="ansible-value docutils literal notranslate"><span class="pre">0600</span></code> mode if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-mode"><span class="std std-ref"><span class="pre">mode</span></span></a></strong></code> is not explicitly set.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-regenerate"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-regenerate"><strong>regenerate</strong></p>
+<a class="ansibleOptionLink" href="#parameter-regenerate" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Allows to configure in which situations the module is allowed to regenerate private keys. The module will always generate a new key if the destination file does not exist.</p>
+<p>By default, the key will be regenerated when it does not match the module’s options, except when the key cannot be read or the passphrase does not match. Please note that this <strong>changed</strong> for Ansible 2.10. For Ansible 2.9, the behavior was as if <code class="ansible-value docutils literal notranslate"><span class="pre">full_idempotence</span></code> is specified.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">never</span></code>, the module will fail if the key cannot be read or the passphrase is not matching, and will never regenerate an existing key.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">fail</span></code>, the module will fail if the key does not correspond to the module’s options.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">partial_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. The key is <strong>not</strong> regenerated if it cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">full_idempotence</span></code>, the key will be regenerated if it does not conform to the module’s options. This is also the case if the key cannot be read (broken file), the key is protected by an unknown passphrase, or when they key is not protected by a passphrase, but a passphrase is specified. Make sure you have a <strong>backup</strong> when using this option!</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code>, the module will always regenerate the key. This is equivalent to setting <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-force"><span class="std std-ref"><span class="pre">force</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>Note that if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-format-mismatch"><span class="std std-ref"><span class="pre">format_mismatch</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">convert</span></code> and everything matches except the format, the key will always be converted, except if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-regenerate"><span class="std std-ref"><span class="pre">regenerate</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">always</span></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;never&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;fail&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;partial_idempotence&quot;</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;full_idempotence&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;always&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-return_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-return-content"><strong>return_content</strong></p>
+<a class="ansibleOptionLink" href="#parameter-return_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, will return the (current or generated) private key’s content as <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-return-privatekey"><span class="std std-ref"><span class="pre">privatekey</span></span></a></code>.</p>
+<p>Note that especially if the private key is not encrypted, you have to make sure that the returned value is treated appropriately and not accidentally written to logs, and so on! Use with care!</p>
+<p>Use Ansible’s <code class="docutils literal notranslate"><span class="pre">no_log</span></code> task option to avoid the output being shown. See also <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook">https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-keep-secret-data-in-my-playbook</a>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
+<a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
+<p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;cryptography&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-selevel"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-selevel"><strong>selevel</strong></p>
+<a class="ansibleOptionLink" href="#parameter-selevel" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The level part of the SELinux filesystem object context.</p>
+<p>This is the MLS/MCS attribute, sometimes known as the <code class="docutils literal notranslate"><span class="pre">range</span></code>.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">level</span></code> portion of the policy if available.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-serole"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-serole"><strong>serole</strong></p>
+<a class="ansibleOptionLink" href="#parameter-serole" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The role part of the SELinux filesystem object context.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">role</span></code> portion of the policy if available.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-setype"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-setype"><strong>setype</strong></p>
+<a class="ansibleOptionLink" href="#parameter-setype" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The type part of the SELinux filesystem object context.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">type</span></code> portion of the policy if available.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-seuser"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-seuser"><strong>seuser</strong></p>
+<a class="ansibleOptionLink" href="#parameter-seuser" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The user part of the SELinux filesystem object context.</p>
+<p>By default it uses the <code class="ansible-value docutils literal notranslate"><span class="pre">system</span></code> policy, where applicable.</p>
+<p>When set to <code class="ansible-value docutils literal notranslate"><span class="pre">_default</span></code>, it will use the <code class="docutils literal notranslate"><span class="pre">user</span></code> portion of the policy if available.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-size"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-size"><strong>size</strong></p>
+<a class="ansibleOptionLink" href="#parameter-size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Size (in bits) of the TLS/SSL key to generate.</p>
+<p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">4096</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-state"><strong>state</strong></p>
+<a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Whether the private key should exist or not, taking action if the state is different from what is stated.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;absent&quot;</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;present&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-type"><strong>type</strong></p>
+<a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The algorithm used to generate the TLS/SSL private key.</p>
+<p>Note that <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code> require the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend. <code class="ansible-value docutils literal notranslate"><span class="pre">X25519</span></code> needs cryptography 2.5 or newer, while <code class="ansible-value docutils literal notranslate"><span class="pre">X448</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">Ed25519</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">Ed448</span></code> require cryptography 2.6 or newer. For <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code>, the minimal cryptography version required depends on the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-curve"><span class="std std-ref"><span class="pre">curve</span></span></a></strong></code> option.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;DSA&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ECC&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;Ed25519&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;Ed448&quot;</span></code></p></li>
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;RSA&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;X25519&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;X448&quot;</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-unsafe_writes"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-parameter-unsafe-writes"><strong>unsafe_writes</strong></p>
+<a class="ansibleOptionLink" href="#parameter-unsafe_writes" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.</p>
+<p>By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.</p>
+<p>This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).</p>
+<p>IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Attributes</a><a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Support</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-check_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-attribute-check-mode"><strong>check_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-check_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Can run in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code> and return changed status prediction without modifying target.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-diff_mode"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-attribute-diff-mode"><strong>diff_mode</strong></p>
+<a class="ansibleOptionLink" href="#attribute-diff_mode" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Will return details on what has changed (or possibly needs changing in <code class="docutils literal notranslate"><span class="pre">check_mode</span></code>), when in diff mode.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-idempotent"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-attribute-idempotent"><strong>idempotent</strong></p>
+<a class="ansibleOptionLink" href="#attribute-idempotent" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-partial">partial</strong></p>
+<p>The option <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-regenerate"><span class="std std-ref"><span class="pre">regenerate=always</span></span></a></code> generally disables idempotency.</p>
+</div></td>
+<td><div class="ansible-option-cell"><p>When run twice in a row outside check mode, with the same arguments, the second invocation indicates no change.</p>
+<p>This assumes that the system controlled/queried by the module has not changed in a relevant way.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="attribute-safe_file_operations"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-attribute-safe-file-operations"><strong>safe_file_operations</strong></p>
+<a class="ansibleOptionLink" href="#attribute-safe_file_operations" title="Permalink to this attribute"></a></div></td>
+<td><div class="ansible-option-cell"><p><strong class="ansible-attribute-support-label">Support: </strong><strong class="ansible-attribute-support-full">full</strong></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Uses Ansible’s strict file operation functions to ensure proper permissions and avoid data corruption.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="openssl_privatekey_pipe_module.html#ansible-collections-community-crypto-openssl-privatekey-pipe-module"><span class="std std-ref">community.crypto.openssl_privatekey_pipe</span></a></dt><dd><p>Generate OpenSSL private keys without disk access.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_privatekey_info_module.html#ansible-collections-community-crypto-openssl-privatekey-info-module"><span class="std std-ref">community.crypto.openssl_privatekey_info</span></a></dt><dd><p>Provide information for OpenSSL private keys.</p>
+</dd>
+<dt><a class="reference internal" href="x509_certificate_module.html#ansible-collections-community-crypto-x509-certificate-module"><span class="std std-ref">community.crypto.x509_certificate</span></a></dt><dd><p>Generate and/or check OpenSSL certificates.</p>
+</dd>
+<dt><a class="reference internal" href="x509_certificate_pipe_module.html#ansible-collections-community-crypto-x509-certificate-pipe-module"><span class="std std-ref">community.crypto.x509_certificate_pipe</span></a></dt><dd><p>Generate and/or check OpenSSL certificates.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_csr_module.html#ansible-collections-community-crypto-openssl-csr-module"><span class="std std-ref">community.crypto.openssl_csr</span></a></dt><dd><p>Generate OpenSSL Certificate Signing Request (CSR).</p>
+</dd>
+<dt><a class="reference internal" href="openssl_csr_pipe_module.html#ansible-collections-community-crypto-openssl-csr-pipe-module"><span class="std std-ref">community.crypto.openssl_csr_pipe</span></a></dt><dd><p>Generate OpenSSL Certificate Signing Request (CSR).</p>
+</dd>
+<dt><a class="reference internal" href="openssl_dhparam_module.html#ansible-collections-community-crypto-openssl-dhparam-module"><span class="std std-ref">community.crypto.openssl_dhparam</span></a></dt><dd><p>Generate OpenSSL Diffie-Hellman Parameters.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_pkcs12_module.html#ansible-collections-community-crypto-openssl-pkcs12-module"><span class="std std-ref">community.crypto.openssl_pkcs12</span></a></dt><dd><p>Generate OpenSSL PKCS#12 archive.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>Generate an OpenSSL public key from its private key.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with the default values (4096 bits, RSA)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with the default values (4096 bits, RSA) and a passphrase</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible</span>
+<span class="w">    </span><span class="nt">cipher</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with a different size (2048 bits)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Force regenerate an OpenSSL private key if it already exists</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with a different algorithm (DSA)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DSA</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL private key with elliptic curve cryptography (ECC)</span>
+<span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECC</span>
+<span class="w">    </span><span class="nt">curve</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">secp256r1</span>
+</pre></div>
+</div>
+</section>
+<section id="return-values">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
+<p>Common return values are documented <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/reference_appendices/common_return_values.html#common-return-values" title="(in Ansible devel)"><span class="xref std std-ref">here</span></a>, the following are the fields unique to this module:</p>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-backup_file"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-backup-file"><strong>backup_file</strong></p>
+<a class="ansibleOptionLink" href="#return-backup_file" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Name of backup file created.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed and if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-backup"><span class="std std-ref"><span class="pre">backup</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/path/to/privatekey.pem.2019-03-09&#64;11:22~&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-curve"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-curve"><strong>curve</strong></p>
+<a class="ansibleOptionLink" href="#return-curve" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Elliptic curve used to generate the TLS/SSL private key.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success, and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-type"><span class="std std-ref"><span class="pre">type</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">ECC</span></code></p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;secp256r1&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-filename"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-filename"><strong>filename</strong></p>
+<a class="ansibleOptionLink" href="#return-filename" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to the generated TLS/SSL private key file.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;/etc/ssl/private/ansible.com.pem&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-fingerprint"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-fingerprint"><strong>fingerprint</strong></p>
+<a class="ansibleOptionLink" href="#return-fingerprint" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The fingerprint of the public key. Fingerprint will be generated for each <code class="docutils literal notranslate"><span class="pre">hashlib.algorithms</span></code> available.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">{&quot;md5&quot;:</span> <span class="pre">&quot;84:75:71:72:8d:04:b5:6c:4d:37:6d:66:83:f5:4c:29&quot;,</span> <span class="pre">&quot;sha1&quot;:</span> <span class="pre">&quot;51:cc:7c:68:5d:eb:41:43:88:7e:1a:ae:c7:f8:24:72:ee:71:f6:10&quot;,</span> <span class="pre">&quot;sha224&quot;:</span> <span class="pre">&quot;b1:19:a6:6c:14:ac:33:1d:ed:18:50:d3:06:5c:b2:32:91:f1:f1:52:8c:cb:d5:75:e9:f5:9b:46&quot;,</span> <span class="pre">&quot;sha256&quot;:</span> <span class="pre">&quot;41:ab:c7:cb:d5:5f:30:60:46:99:ac:d4:00:70:cf:a1:76:4f:24:5d:10:24:57:5d:51:6e:09:97:df:2f:de:c7&quot;,</span> <span class="pre">&quot;sha384&quot;:</span> <span class="pre">&quot;85:39:50:4e:de:d9:19:33:40:70:ae:10:ab:59:24:19:51:c3:a2:e4:0b:1c:b1:6e:dd:b3:0c:d9:9e:6a:46:af:da:18:f8:ef:ae:2e:c0:9a:75:2c:9b:b3:0f:3a:5f:3d&quot;,</span> <span class="pre">&quot;sha512&quot;:</span> <span class="pre">&quot;fd:ed:5e:39:48:5f:9f:fe:7f:25:06:3f:79:08:cd:ee:a5:e7:b3:3d:13:82:87:1f:84:e1:f5:c7:28:77:53:94:86:56:38:69:f0:d9:35:22:01:1e:a6:60:...:0f:9b&quot;}</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-privatekey"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-privatekey"><strong>privatekey</strong></p>
+<a class="ansibleOptionLink" href="#return-privatekey" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 1.0.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The (current or generated) private key’s content.</p>
+<p>Will be Base64-encoded if the key is in raw format.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">present</span></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-module-parameter-return-content"><span class="std std-ref"><span class="pre">return_content</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-size"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-size"><strong>size</strong></p>
+<a class="ansibleOptionLink" href="#return-size" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Size (in bits) of the TLS/SSL private key.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">4096</span></code></p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-type"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssl-privatekey-module-return-type"><strong>type</strong></p>
+<a class="ansibleOptionLink" href="#return-type" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Algorithm used to generate the TLS/SSL private key.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed or success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;RSA&quot;</span></code></p>
+</div></td>
+</tr>
+</tbody>
+</table>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Yanis Guenane (&#64;Spredzy)</p></li>
+<li><p>Felix Fontein (&#64;felixfontein)</p></li>
+</ul>
+</section>
+<section id="collection-links">
+<h3>Collection links<a class="headerlink" href="#collection-links" title="Link to this heading"></a></h3>
+<ul class="ansible-links">
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/crypto" rel="noopener external" target="_blank">Ask for help (crypto)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://forum.ansible.com/tags/c/help/6/none/acme" rel="noopener external" target="_blank">Ask for help (ACME)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=bug_report.md" rel="noopener external" target="_blank">Submit a bug report</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/ansible-collections/community.crypto/issues/new?assignees=&amp;labels=&amp;template=feature_request.md" rel="noopener external" target="_blank">Request a feature</a></span></li>
+<li><span><a class="reference internal" href="index.html#communication-for-community-crypto"><span class="std std-ref">Communication</span></a></span></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="openssl_pkcs12_module.html" class="btn btn-neutral float-left" title="community.crypto.openssl_pkcs12 module – Generate OpenSSL PKCS#12 archive" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="openssl_privatekey_convert_module.html" class="btn btn-neutral float-right" title="community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Community.Crypto Contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
