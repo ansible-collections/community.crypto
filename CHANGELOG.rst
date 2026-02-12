@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.7
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- crypto_info, openssl_privatekey, openssl_privatekey_pipe - fix detection of EC support for cryptography 46.0.5+ (https://github.com/ansible-collections/community.crypto/pull/981).
+
 v2.26.6
 =======
 
