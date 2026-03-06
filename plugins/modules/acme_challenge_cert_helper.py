@@ -63,7 +63,7 @@ options:
     type: str
   private_key_passphrase:
     description:
-      - Phassphrase to use to decode the private key.
+      - Passphrase to use to decode the private key.
     type: str
     version_added: 1.6.0
 """
