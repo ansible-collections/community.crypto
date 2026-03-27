@@ -140,7 +140,7 @@
     account_key_content: "{{ slurp_account_key.content | b64decode }}"
     challenge: dns-01
     modify_account: false
-    deactivate_authzs: false
+    deactivate_authzs: true
     force: false
     remaining_days: 1
     terms_agreed: false
@@ -167,7 +167,7 @@
     account_key: account-rsa
     challenge: http-01
     modify_account: false
-    deactivate_authzs: true
+    deactivate_authzs: false
     force: true
     remaining_days: 1
     terms_agreed: false
@@ -488,7 +488,7 @@
 - name: Retrieve orders as URL list (2/2)
   community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
@@ -506,7 +506,7 @@
 - name: Retrieve orders as object list (2/2)
   community.crypto.acme_account_info:
     select_crypto_backend: "{{ select_crypto_backend }}"
-    account_key_src: "{{ remote_tmp_dir }}/account-ec384.pem"
+    account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
     validate_certs: false
