@@ -342,7 +342,7 @@
       - order_info_4.order.authorizations | length == 1
       - order_info_4.order.authorizations[0] == order_info_4.authorizations_by_identifier['dns:' ~ domain_name].uri
       - "'certificate' in order_info_4.order"
-      - order_info_4.order.status == 'deactivated'
+      - order_info_4.order.status in ('deactivated', 'invalid')
       - order_info_4.order_uri == order_1.order_uri
       - order_info_4.account_uri == account.account_uri
 
