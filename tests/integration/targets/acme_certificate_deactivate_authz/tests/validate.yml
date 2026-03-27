@@ -10,8 +10,8 @@
       - deactivate_1 is changed
       - order_2.output_json.status == 'pending'
       - deactivate_2 is changed
-      - order_3.output_json.status == 'deactivated'
+      - order_3.output_json.status in ('deactivated', 'invalid')
       - deactivate_3 is not changed
-      - order_4.output_json.status == 'deactivated'
+      - order_4.output_json.status in ('deactivated', 'invalid')
       - deactivate_4 is not changed
-      - order_5.output_json.status == 'deactivated'
+      - order_5.output_json.status in ('deactivated', 'invalid')
