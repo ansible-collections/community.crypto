@@ -627,9 +627,7 @@
 
         # Only the latest Pebble returns the correct error message, which makes the above fail
         - name: "({{ select_crypto_backend }}) Check that replacement order 5 worked"
-          when: false
-          # TODO: use the following once Pebble is updated
-          # when: ansible_version.full is version('2.21', '>=')
+          when: ansible_version.full is version('2.21', '>=')
           ansible.builtin.assert:
             that:
               - replacement_order_5 is failed
