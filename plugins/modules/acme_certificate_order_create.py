@@ -124,7 +124,7 @@ options:
     description:
       - Chose a specific profile for certificate selection. The available profiles depend on the CA.
       - See L(a blog post by Let's Encrypt, https://letsencrypt.org/2025/01/09/acme-profiles/) and
-        L(draft-aaron-acme-profiles-00, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
+        L(draft-aaron-acme-profiles-01, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
         for more information.
     type: str
   order_creation_error_strategy:
