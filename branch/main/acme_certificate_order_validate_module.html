@@ -301,10 +301,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <td><div class="ansible-option-cell"><p>The challenge to be performed for every pending authorization.</p>
 <p>Must be provided if there is at least one pending authorization.</p>
 <p>In case of authorization reuse, or in case of CAs which use External Account Binding and other means of validating certificate assurance, it might not be necessary to provide this option.</p>
+<p>Support for <code class="ansible-value docutils literal notranslate"><span class="pre">dns-account-01</span></code> has been added in community.crypto 3.2.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;http-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-01&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-account-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;tls-alpn-01&quot;</span></code></p></li>
 </ul>
 </div></td>
