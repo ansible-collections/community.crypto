@@ -40,6 +40,8 @@ description:
     L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html) ACME extension.
   - The module supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
+    Note that the supported draft version can change at any time,
+    and changes will only be considered breaking once the draft reached RFC status.
 seealso:
   - module: community.crypto.acme_certificate_order_validate
     description: Validate pending authorizations of an ACME order.

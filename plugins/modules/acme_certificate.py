@@ -25,6 +25,8 @@ description:
   - The module support for IP identifiers according to L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html).
   - The module supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
+    Note that the supported draft version can change at any time,
+    and changes will only be considered breaking once the draft reached RFC status.
 notes:
   - At least one of O(dest) and O(fullchain_dest) must be specified.
   - This module includes basic account management functionality. If you want to have more control over your ACME account,
