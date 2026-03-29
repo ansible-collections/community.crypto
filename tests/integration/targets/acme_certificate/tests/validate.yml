@@ -160,6 +160,19 @@
         that:
           - "'IP Address:127.0.0.1' in cert_8_text.stdout or 'IP:127.0.0.1' in cert_8_text.stdout"
 
+- when: ansible_version.full is version('2.19', '>=')
+  block:
+    - name: Check that certificate 9 is valid
+      ansible.builtin.assert:
+        that:
+          - cert_9_valid is not failed
+    - name: Check that certificate 9 contains correct SANs
+      ansible.builtin.assert:
+        that:
+          - "'DNS:*.example.com' in cert_9_text.stdout"
+          - "'DNS:example.org' in cert_9_text.stdout"
+          - "'DNS:t1.example.com' in cert_9_text.stdout"
+
 - name: Validate that orders were not retrieved
   ansible.builtin.assert:
     that:

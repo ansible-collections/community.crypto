@@ -149,9 +149,23 @@ class ACMECertificateClient:
         order.load_authorizations(client=self.client)
         return order
 
+    @staticmethod
+    def _update_dns_data(
+        data_dns: dict[str, list[str]],
+        dns_challenge_type: str,
+        challenge_data: dict[str, t.Any],
+    ) -> None:
+        dns_challenge = challenge_data.get(dns_challenge_type)
+        if dns_challenge:
+            values = data_dns.get(dns_challenge["record"])
+            if values is None:
+                values = []
+                data_dns[dns_challenge["record"]] = values
+            values.append(dns_challenge["resource_value"])
+
     def get_challenges_data(
         self, order: Order
-    ) -> tuple[list[dict[str, t.Any]], dict[str, list[str]]]:
+    ) -> tuple[list[dict[str, t.Any]], dict[str, list[str]], dict[str, list[str]]]:
         """
         Get challenge details.
 
@@ -159,7 +173,9 @@ class ACMECertificateClient:
         """
         data: list[dict[str, t.Any]] = []
         data_dns: dict[str, list[str]] = {}
+        data_dns_account: dict[str, list[str]] = {}
         dns_challenge_type = "dns-01"
+        dns_account_challenge_type = "dns-account-01"
         for authz in order.authorizations.values():
             # Skip valid authentications: their challenges are already valid
             # and do not need to be returned
@@ -173,14 +189,11 @@ class ACMECertificateClient:
                     "challenges": challenge_data,
                 }
             )
-            dns_challenge = challenge_data.get(dns_challenge_type)
-            if dns_challenge:
-                values = data_dns.get(dns_challenge["record"])
-                if values is None:
-                    values = []
-                    data_dns[dns_challenge["record"]] = values
-                values.append(dns_challenge["resource_value"])
-        return data, data_dns
+            self._update_dns_data(data_dns, dns_challenge_type, challenge_data)
+            self._update_dns_data(
+                data_dns_account, dns_account_challenge_type, challenge_data
+            )
+        return data, data_dns, data_dns_account
 
     def check_that_authorizations_can_be_used(self, order: Order) -> None:
         bad_authzs = []

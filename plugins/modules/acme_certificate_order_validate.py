@@ -65,11 +65,13 @@ options:
       - In case of authorization reuse, or in case of CAs which use External Account Binding
         and other means of validating certificate assurance, it might not be necessary
         to provide this option.
+      - Support for V(dns-account-01) has been added in community.crypto 3.2.0.
     type: str
     choices:
-      - 'http-01'
-      - 'dns-01'
-      - 'tls-alpn-01'
+      - http-01
+      - dns-01
+      - dns-account-01
+      - tls-alpn-01
   order_uri:
     description:
       - The order URI provided by RV(community.crypto.acme_certificate_order_create#module:order_uri).
@@ -246,7 +248,10 @@ def main() -> t.NoReturn:
     argument_spec = create_default_argspec(with_certificate=False)
     argument_spec.update_argspec(
         order_uri={"type": "str", "required": True},
-        challenge={"type": "str", "choices": ["http-01", "dns-01", "tls-alpn-01"]},
+        challenge={
+            "type": "str",
+            "choices": ["http-01", "dns-01", "dns-account-01", "tls-alpn-01"],
+        },
         deactivate_authzs={"type": "bool", "default": True},
     )
     module = argument_spec.create_ansible_module()
