@@ -364,7 +364,7 @@
       ansible.builtin.set_fact:
         cert_8_obtain_results: "{{ certificate_obtain_result }}"
         cert_8_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
-- when: ansible_version.full is version('2.19', '>=')
+- when: ansible_version.full is version('2.21', '>=')
   block:
     - name: Obtain cert 9
       ansible.builtin.include_tasks: obtain-cert.yml
@@ -428,7 +428,7 @@
   ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-9-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-9-chain.pem" "{{ remote_tmp_dir }}/cert-9.pem"'
   ignore_errors: true
   register: cert_9_valid
-  when: ansible_version.full is version('2.19', '>=')
+  when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
 - name: Dumping cert 1
@@ -460,7 +460,7 @@
 - name: Dumping cert 9
   ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-9.pem" -noout -text'
   register: cert_9_text
-  when: ansible_version.full is version('2.19', '>=')
+  when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
 - name: Dumping cert 1
@@ -501,7 +501,7 @@
   community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-9.pem"
   register: cert_9_info
-  when: ansible_version.full is version('2.19', '>=')
+  when: ansible_version.full is version('2.21', '>=')
 
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders

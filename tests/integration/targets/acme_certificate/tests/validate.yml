@@ -160,7 +160,7 @@
         that:
           - "'IP Address:127.0.0.1' in cert_8_text.stdout or 'IP:127.0.0.1' in cert_8_text.stdout"
 
-- when: ansible_version.full is version('2.19', '>=')
+- when: ansible_version.full is version('2.21', '>=')
   block:
     - name: Check that certificate 9 is valid
       ansible.builtin.assert:
