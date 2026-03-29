@@ -130,6 +130,26 @@ class Challenge:
                 "record": record,
             }
 
+        if self.type == "dns-account-01":
+            if identifier_type != "dns" or client.account_uri is None:
+                return None
+            # https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02#section-3.2
+            prefix = (
+                base64.b32encode(
+                    hashlib.sha256(client.account_uri.encode("utf8")).digest()[:10]
+                )
+                .decode("ascii")
+                .lower()
+            )
+            resource = f"_{prefix}._acme-challenge"
+            value = nopad_b64(hashlib.sha256(to_bytes(key_authorization)).digest())
+            record = f"{resource}.{identifier[2:] if identifier.startswith('*.') else identifier}"
+            return {
+                "resource": resource,
+                "resource_value": value,
+                "record": record,
+            }
+
         if self.type == "tls-alpn-01":
             # https://www.rfc-editor.org/rfc/rfc8737.html#section-3
             if identifier_type == "ip":

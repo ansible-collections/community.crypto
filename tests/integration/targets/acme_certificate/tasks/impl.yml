@@ -364,6 +364,29 @@
       ansible.builtin.set_fact:
         cert_8_obtain_results: "{{ certificate_obtain_result }}"
         cert_8_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+- when: ansible_version.full is version('2.21', '>=')
+  block:
+    - name: Obtain cert 9
+      ansible.builtin.include_tasks: obtain-cert.yml
+      vars:
+        certgen_title: Certificate 9
+        certificate_name: cert-9
+        key_type: ec256
+        subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
+        subject_alt_name_critical: false
+        account_key: account-ec256
+        challenge: dns-account-01
+        modify_account: true
+        deactivate_authzs: false
+        force: false
+        remaining_days: 1
+        terms_agreed: true
+        account_email: "example@example.org"
+        use_csr_content: true
+    - name: Store obtain results for cert 9
+      ansible.builtin.set_fact:
+        cert_9_obtain_results: "{{ certificate_obtain_result }}"
+        cert_9_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
 
 ## DISSECT CERTIFICATES #######################################################################
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
@@ -401,6 +424,11 @@
   ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-8-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-8-chain.pem" "{{ remote_tmp_dir }}/cert-8.pem"'
   ignore_errors: true
   register: cert_8_valid
+- name: Verifying cert 9
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-9-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-9-chain.pem" "{{ remote_tmp_dir }}/cert-9.pem"'
+  ignore_errors: true
+  register: cert_9_valid
+  when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
 - name: Dumping cert 1
@@ -429,6 +457,10 @@
 - name: Dumping cert 8
   ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-8.pem" -noout -text'
   register: cert_8_text
+- name: Dumping cert 9
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-9.pem" -noout -text'
+  register: cert_9_text
+  when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
 - name: Dumping cert 1
@@ -465,6 +497,11 @@
   community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-8.pem"
   register: cert_8_info
+- name: Dumping cert 9
+  community.crypto.x509_certificate_info:
+    path: "{{ remote_tmp_dir }}/cert-9.pem"
+  register: cert_9_info
+  when: ansible_version.full is version('2.21', '>=')
 
 ## GET ACCOUNT ORDERS #########################################################################
 - name: Don't retrieve orders

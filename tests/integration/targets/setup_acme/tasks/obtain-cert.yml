@@ -72,7 +72,7 @@
     body_format: json
     body: "{{ item.value }}"
   with_dict: "{{ challenge_data.challenge_data_dns }}"
-  when: "challenge_data is changed and challenge == 'dns-01'"
+  when: "challenge_data is changed and challenge in ['dns-01', 'dns-account-01']"
 - name: ({{ certgen_title }}) Create TLS ALPN challenges (acme_challenge_cert_helper)
   community.crypto.acme_challenge_cert_helper:
     challenge: tls-alpn-01
@@ -146,7 +146,7 @@
     url: "http://{{ acme_host }}:5000/dns/{{ item.key }}"
     method: DELETE
   with_dict: "{{ challenge_data.challenge_data_dns }}"
-  when: "challenge_data is changed and challenge == 'dns-01'"
+  when: "challenge_data is changed and challenge in ['dns-01', 'dns-account-01']"
 - name: ({{ certgen_title }}) Deleting TLS ALPN challenges
   ansible.builtin.uri:
     url: "http://{{ acme_host }}:5000/tls-alpn/{{ item.value['tls-alpn-01'].resource }}"

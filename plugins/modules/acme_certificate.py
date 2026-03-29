@@ -12,17 +12,19 @@ short_description: Create SSL/TLS certificates with the ACME protocol
 description:
   - Create and renew SSL/TLS certificates with a CA supporting the L(ACME protocol,https://tools.ietf.org/html/rfc8555), such
     as L(Let's Encrypt,https://letsencrypt.org/).
-    The current implementation supports the V(http-01), V(dns-01) and V(tls-alpn-01) challenges.
+    The current implementation supports the V(http-01), V(dns-01), V(dns-account-01) and V(tls-alpn-01) challenges.
   - To use this module, it has to be executed twice. Either as two different tasks in the same run or during two runs. Note
     that the output of the first run needs to be recorded and passed to the second run as the module argument O(data).
   - Between these two tasks you have to fulfill the required steps for the chosen challenge by whatever means necessary. For
-    V(http-01) that means creating the necessary challenge file on the destination webserver. For V(dns-01) the necessary
-    DNS record has to be created. For V(tls-alpn-01) the necessary certificate has to be created and served. It is I(not)
-    the responsibility of this module to perform these steps.
+    V(http-01) that means creating the necessary challenge file on the destination webserver. For V(dns-01) and V(dns-account-01)
+    the necessary DNS records have to be created. For V(tls-alpn-01) the necessary certificate has to be created and served.
+    It is I(not) the responsibility of this module to perform these steps.
   - For details on how to fulfill these challenges, you might have to read through L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3). Also, consider the examples
     provided for this module.
-  - The module includes experimental support for IP identifiers according to the L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html).
+  - The module support for IP identifiers according to L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html).
+  - The module supports the V(dns-account-01) challenge type according to
+    L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
 notes:
   - At least one of O(dest) and O(fullchain_dest) must be specified.
   - This module includes basic account management functionality. If you want to have more control over your ACME account,
@@ -115,13 +117,15 @@ options:
       - If set to V(no challenge), no challenge will be used. This is necessary for some private CAs which use External Account
         Binding and other means of validating certificate assurance. For example, an account could be allowed to issue certificates
         for C(foo.example.com) without any further validation for a certain period of time.
+      - Support for V(dns-account-01) has been added in community.crypto 3.2.0.
     type: str
-    default: 'http-01'
+    default: http-01
     choices:
-      - 'http-01'
-      - 'dns-01'
-      - 'tls-alpn-01'
-      - 'no challenge'
+      - http-01
+      - dns-01
+      - dns-account-01
+      - tls-alpn-01
+      - no challenge
   csr:
     aliases: ['src']
   csr_content:
@@ -261,7 +265,7 @@ options:
     description:
       - Chose a specific profile for certificate selection. The available profiles depend on the CA.
       - See L(a blog post by Let's Encrypt, https://letsencrypt.org/2025/01/09/acme-profiles/) and
-        L(draft-aaron-acme-profiles-00, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
+        L(draft-aaron-acme-profiles-01, https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/)
         for more information.
     type: str
     version_added: 2.24.0
@@ -467,7 +471,7 @@ challenge_data:
           description:
             - Data for every challenge type.
             - The keys in this dictionary are the challenge types. C(challenge-type) is a placeholder used in the documentation.
-              Possible keys are V(http-01), V(dns-01), and V(tls-alpn-01).
+              Possible keys are V(http-01), V(dns-01), V(dns-account-01), and V(tls-alpn-01).
             - Note that the keys are not valid Jinja2 identifiers.
           returned: changed
           type: dict
@@ -486,7 +490,7 @@ challenge_data:
             resource_value:
               description:
                 - The value the resource has to produce for the validation.
-                - For V(http-01) and V(dns-01) challenges, the value can be used as-is.
+                - For V(http-01), V(dns-01), and V(dns-account-01) challenges, the value can be used as-is.
                 - For V(tls-alpn-01) challenges, note that this return value contains a Base64 encoded version of the correct
                   binary blob which has to be put into the acmeValidation x509 extension; see U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
                   for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter to extract
@@ -496,12 +500,12 @@ challenge_data:
               sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
             record:
               description: The full DNS record's name for the challenge.
-              returned: changed and challenge is V(dns-01)
+              returned: changed and challenge is V(dns-01) or V(dns-account-01)
               type: str
               sample: _acme-challenge.example.com
 challenge_data_dns:
   description:
-    - List of TXT values per DNS record, in case challenge is V(dns-01).
+    - List of TXT values per DNS record, in case challenge is V(dns-01) or V(dns-account-01).
     - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
   returned: changed
   type: dict
@@ -790,7 +794,10 @@ class ACMECertificateClient:
                 raise ModuleFailException(
                     f"Found no challenge of type '{self.challenge}' for identifier {type_identifier}!"
                 )
-            if self.challenge == "dns-01" and self.challenge in challenges:
+            if (
+                self.challenge in ("dns-01", "dns-account-01")
+                and self.challenge in challenges
+            ):
                 values = data_dns.get(challenges[self.challenge]["record"])
                 if values is None:
                     values = []
@@ -974,7 +981,13 @@ def main() -> t.NoReturn:
         challenge={
             "type": "str",
             "default": "http-01",
-            "choices": ["http-01", "dns-01", "tls-alpn-01", NO_CHALLENGE],
+            "choices": [
+                "http-01",
+                "dns-01",
+                "dns-account-01",
+                "tls-alpn-01",
+                NO_CHALLENGE,
+            ],
         },
         data={"type": "dict"},
         dest={"type": "path", "aliases": ["cert"]},
