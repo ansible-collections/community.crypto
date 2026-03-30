@@ -1,0 +1,44 @@
+---
+- name: Basic tests
+  ansible.builtin.assert:
+    that:
+      - >-
+        "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234"
+        | community.crypto.acme_dns_persist_record_parse
+        == {
+          "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/1234",
+          "issuer_domain_name": "letsencrypt.org",
+          "persist_until": None,
+          "persist_until_str": None,
+          "policy": None,
+        }
+      - >-
+        "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; policy=wildcard"
+        | community.crypto.acme_dns_persist_record_parse
+        == {
+          "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/1234",
+          "issuer_domain_name": "letsencrypt.org",
+          "persist_until": None,
+          "persist_until_str": None,
+          "policy": "wildcard",
+        }
+      - >-
+        "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; persistUntil=1234"
+        | community.crypto.acme_dns_persist_record_parse
+        == {
+          "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/1234",
+          "issuer_domain_name": "letsencrypt.org",
+          "persist_until": 1234,
+          "persist_until_str": "19700101002034Z",
+          "policy": None,
+        }
+      - >-
+        "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; policy=wildcard; persistUntil=1234"
+        | community.crypto.acme_dns_persist_record_parse
+        == {
+          "account_uri": "https://acme-v02.api.letsencrypt.org/acme/acct/1234",
+          "issuer_domain_name": "letsencrypt.org",
+          "persist_until": 1234,
+          "persist_until_str": "19700101002034Z",
+          "policy": "wildcard",
+        }

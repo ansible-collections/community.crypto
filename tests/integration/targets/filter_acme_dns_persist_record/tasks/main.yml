@@ -1,0 +1,28 @@
+---
+- name: Basic tests
+  ansible.builtin.assert:
+    that:
+      - >-
+        'letsencrypt.org' | community.crypto.acme_dns_persist_record(
+          account_uri='https://acme-v02.api.letsencrypt.org/acme/acct/1234',
+        )
+        == "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234"
+      - >-
+        'letsencrypt.org' | community.crypto.acme_dns_persist_record(
+          account_uri='https://acme-v02.api.letsencrypt.org/acme/acct/1234',
+          persist_until=1234,
+        )
+        == "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; persistUntil=1234"
+      - >-
+        'letsencrypt.org' | community.crypto.acme_dns_persist_record(
+          account_uri='https://acme-v02.api.letsencrypt.org/acme/acct/1234',
+          policy='wildcard',
+        )
+        == "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; policy=wildcard"
+      - >-
+        'letsencrypt.org' | community.crypto.acme_dns_persist_record(
+          account_uri='https://acme-v02.api.letsencrypt.org/acme/acct/1234',
+          policy='wildcard',
+          persist_until=1234,
+        )
+        == "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; policy=wildcard; persistUntil=1234"
