@@ -85,61 +85,19 @@ _value:
       type: string
 """
 
-import re
 import typing as t
 from collections.abc import Callable
 
 from ansible.errors import AnsibleFilterError
 
+from ansible_collections.community.crypto.plugins.module_utils._caa import (
+    parse_issue_value,
+)
 from ansible_collections.community.crypto.plugins.module_utils._time import (
     from_epoch_seconds,
 )
 
-_VALUE_RE = re.compile("^[0-9a-zA-Z][0-9a-zA-Z-]*$")
-_LABEL_RE = re.compile("^[\x21-\x3a\x3c-\x7e]*$")
-
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%SZ"
-
-
-def _check_value(label: str) -> None:
-    pass
-
-
-def _check_label(label: str, what: str) -> None:
-    if not _LABEL_RE.match(label):
-        raise ValueError(f"Invalid {what} {label!r}")
-
-
-def _check_domain_name(value: str) -> None:
-    for p in value.split("."):
-        _check_label(p, "label")
-
-
-def parse_issue_value(
-    value: str, *, check_for_duplicates: bool = True, strict: bool = True
-) -> tuple[str | None, list[tuple[str, str]]]:
-    parts = [v.strip(" \t") for v in value.split(";")]
-    if len(parts) > 1 and not parts[-1]:
-        del parts[-1]
-    domain_name = parts[0] or None
-    if domain_name is not None and strict:
-        _check_domain_name(domain_name)
-    pairs = []
-    previous_tags: set[str] = set()
-    for part in parts[1:]:
-        pieces = part.split("=", 1)
-        if len(pieces) != 2:
-            raise ValueError(f"{part!r} is not of the form tag=value")
-        tag, value = pieces[0].rstrip(" \t"), pieces[1].lstrip(" \t")
-        if strict:
-            _check_label(tag, "tag")
-            _check_value(value)
-        pairs.append((tag, value))
-        if check_for_duplicates:
-            if tag in previous_tags:
-                raise ValueError(f"Tag {tag!r} appears multiple times")
-            previous_tags.add(tag)
-    return domain_name, pairs
 
 
 def acme_dns_persist_record_parse(

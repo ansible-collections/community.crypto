@@ -93,6 +93,9 @@ from collections.abc import Callable
 
 from ansible.errors import AnsibleFilterError
 
+from ansible_collections.community.crypto.plugins.module_utils._caa import (
+    join_issue_value,
+)
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
@@ -151,15 +154,18 @@ def acme_dns_persist_record(
                 f" must be an integer, a string, or a datetime object; got {type(persist_until)} instead"
             )
 
-    parts = [
-        domain_issuer_name,
-        f"accounturi={account_uri}",
-    ]
+    parts = [("accounturi", account_uri)]
     if policy is not None:
-        parts.append(f"policy={policy}")
+        parts.append(("policy", policy))
     if persist_until is not None:
-        parts.append(f"persistUntil={persist_until}")
-    return "; ".join(parts)
+        parts.append(("persistUntil", str(persist_until)))
+    try:
+        return join_issue_value(domain_issuer_name, parts)
+    except ValueError as exc:
+        raise AnsibleFilterError(
+            "Error composing result for the community.crypto.acme_dns_persist_record filter:"
+            f" {exc}"
+        ) from exc
 
 
 class FilterModule:
