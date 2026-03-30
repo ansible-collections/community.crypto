@@ -144,7 +144,7 @@ def acme_dns_persist_record(
                     "Error parsing persist_until parameter for the community.crypto.acme_dns_persist_record filter:"
                     f" {exc}"
                 ) from None
-        if isinstance(persist_until, int):
+        if isinstance(persist_until, int) and not isinstance(persist_until, bool):
             pass
         elif isinstance(persist_until, datetime.datetime):
             persist_until = int(get_epoch_seconds(persist_until))

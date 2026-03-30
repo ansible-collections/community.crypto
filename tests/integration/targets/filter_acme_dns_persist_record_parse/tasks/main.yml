@@ -1,4 +1,8 @@
 ---
+# Copyright (c) 2026 Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Basic tests
   ansible.builtin.assert:
     that:
@@ -42,3 +46,68 @@
           "persist_until_str": "19700101002034Z",
           "policy": "wildcard",
         }
+
+- name: Test error (1/N)
+  ansible.builtin.debug:
+    msg: "{{ 42 | community.crypto.acme_dns_persist_record_parse }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (1/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "The input for the community.crypto.acme_dns_persist_record_parse filter must be a string; got <class 'int'> instead" in result.msg
+
+- name: Test error (2/N)
+  ansible.builtin.debug:
+    msg: "{{ ';' | community.crypto.acme_dns_persist_record_parse }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (2/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "community.crypto.acme_dns_persist_record_parse filter: domain name not present" in result.msg
+
+- name: Test error (3/N)
+  ansible.builtin.debug:
+    msg: "{{ 'lets.encrypt; foo=bar' | community.crypto.acme_dns_persist_record_parse }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (3/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "community.crypto.acme_dns_persist_record_parse filter: cannot find account URI" in result.msg
+
+- name: Test error (4/N)
+  ansible.builtin.debug:
+    msg: "{{ 'lets.encrypt; accounturi=foo; persistUntil=a' | community.crypto.acme_dns_persist_record_parse }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (4/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "community.crypto.acme_dns_persist_record_parse filter: error when parsing persistUntil: invalid literal for int() with base 10: 'a'" in result.msg
+
+- name: Test error (1/N)
+  ansible.builtin.debug:
+    msg: "{{ 'a; b' | community.crypto.acme_dns_persist_record_parse }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (1/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "community.crypto.acme_dns_persist_record_parse filter could not parse value: 'b' is not of the form tag=value" in result.msg

@@ -1,4 +1,8 @@
 ---
+# Copyright (c) 2026 Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Basic tests
   ansible.builtin.assert:
     that:
@@ -26,3 +30,81 @@
           persist_until=1234,
         )
         == "letsencrypt.org; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234; policy=wildcard; persistUntil=1234"
+
+- name: Test error (1/N)
+  ansible.builtin.debug:
+    msg: "{{ 42 | community.crypto.acme_dns_persist_record(account_uri='') }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (1/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "The input for the community.crypto.acme_dns_persist_record filter must be a string; got <class 'int'> instead" in result.msg
+
+- name: Test error (2/N)
+  ansible.builtin.debug:
+    msg: "{{ '' | community.crypto.acme_dns_persist_record(account_uri=42) }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (2/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "The account_uri parameter for the community.crypto.acme_dns_persist_record filter must be a string; got <class 'int'> instead" in result.msg
+
+- name: Test error (3/N)
+  ansible.builtin.debug:
+    msg: "{{ '' | community.crypto.acme_dns_persist_record(account_uri='', policy=42) }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (3/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        'The policy parameter for the community.crypto.acme_dns_persist_record filter must be one of "wildcard"; got 42 instead' in result.msg
+
+- name: Test error (4/N)
+  ansible.builtin.debug:
+    msg: "{{ '' | community.crypto.acme_dns_persist_record(account_uri='') }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (4/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "Error composing result for the community.crypto.acme_dns_persist_record filter: Invalid label ''" in result.msg
+
+- name: Test error (5/N)
+  ansible.builtin.debug:
+    msg: "{{ '' | community.crypto.acme_dns_persist_record(account_uri='', persist_until=true) }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (5/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "The persist_until parameter for the community.crypto.acme_dns_persist_record filter must be an integer, a string, or a datetime object; got <class 'bool'> instead" in result.msg
+
+- name: Test error (6/N)
+  ansible.builtin.debug:
+    msg: "{{ '' | community.crypto.acme_dns_persist_record(account_uri='', persist_until='foo bar') }}"
+  ignore_errors: true
+  register: result
+
+- name: Check error (6/N)
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        'Error parsing persist_until parameter for the community.crypto.acme_dns_persist_record filter: The time spec "foo bar" for persist_until is invalid' in result.msg
