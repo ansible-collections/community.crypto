@@ -65,12 +65,13 @@ options:
       - In case of authorization reuse, or in case of CAs which use External Account Binding
         and other means of validating certificate assurance, it might not be necessary
         to provide this option.
-      - Support for V(dns-account-01) has been added in community.crypto 3.2.0.
+      - Support for V(dns-account-01) and V(dns-persist-01) has been added in community.crypto 3.2.0.
     type: str
     choices:
       - http-01
       - dns-01
       - dns-account-01
+      - dns-persist-01
       - tls-alpn-01
   order_uri:
     description:
@@ -250,7 +251,13 @@ def main() -> t.NoReturn:
         order_uri={"type": "str", "required": True},
         challenge={
             "type": "str",
-            "choices": ["http-01", "dns-01", "dns-account-01", "tls-alpn-01"],
+            "choices": [
+                "http-01",
+                "dns-01",
+                "dns-account-01",
+                "dns-persist-01",
+                "tls-alpn-01",
+            ],
         },
         deactivate_authzs={"type": "bool", "default": True},
     )

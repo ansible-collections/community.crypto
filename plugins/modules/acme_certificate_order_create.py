@@ -16,7 +16,7 @@ description:
     Authority such as L(Let's Encrypt,https://letsencrypt.org/).
     This module does not support ACME v1, the original version of the ACME protocol
     before standardization.
-  - The current implementation supports the V(http-01), V(dns-01), V(dns-account-01),
+  - The current implementation supports the V(http-01), V(dns-01), V(dns-account-01), V(dns-persist-01),
     and V(tls-alpn-01) challenges.
   - This module needs to be used in conjunction with the
     M(community.crypto.acme_certificate_order_validate) and.
@@ -29,9 +29,9 @@ description:
   - Between the call of this module and M(community.crypto.acme_certificate_order_finalize),
     you have to fulfill the required steps for the chosen challenge by whatever means necessary.
     For V(http-01) that means creating the necessary challenge file on the destination webserver.
-    For V(dns-01) and V(dns-account-01) the necessary DNS records have to be created. For V(tls-alpn-01) the necessary
-    certificate has to be created and served. It is I(not) the responsibility of this module to
-    perform these steps.
+    For V(dns-01), V(dns-account-01), and V(dns-persist-01) the necessary DNS records have to be created.
+    For V(tls-alpn-01) the necessary certificate has to be created and served.
+    It is I(not) the responsibility of this module to perform these steps.
   - For details on how to fulfill these challenges, you might have to read through
     L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3).
@@ -40,6 +40,10 @@ description:
     L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html) ACME extension.
   - The module supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
+    Note that the supported draft version can change at any time,
+    and changes will only be considered breaking once the draft reached RFC status.
+  - The module supports the V(dns-persist-01) challenge type according to
+    L(acme-dns-persist draft 01, https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
 seealso:
@@ -307,6 +311,7 @@ challenge_data:
             resource:
               description:
                 - Always contains the string V(_acme-challenge).
+              returned: success
               type: str
               sample: _acme-challenge
             resource_value:
@@ -332,6 +337,7 @@ challenge_data:
             resource:
               description:
                 - Always ends with the string V(._acme-challenge).
+              returned: success
               type: str
               sample: _ujmmovf2vn55tgye._acme-challenge
             resource_value:
@@ -345,6 +351,29 @@ challenge_data:
               returned: success
               type: str
               sample: _ujmmovf2vn55tgye._acme-challenge.example.com
+        dns-persist-01:
+          description:
+            - Information for V(dns-persist-01) authorization.
+            - A DNS TXT record needs to be created with the record name V(_validation-persist.<domain>).
+              See the P(community.crypto.acme_dns_persist_record#filter) for how to create the record's content.
+          returned: if the identifier supports V(dns-persist-01) authorization
+          version_added: 3.2.0
+          type: dict
+          contains:
+            account_uri:
+              description:
+                - The account URI that must be mentioned in the DNS TXT record.
+              returned: success
+              type: str
+              sample: https://ca.example/acct/123
+            issuer_domain_names:
+              description:
+                - One of the issuer domain names must be mentioned in the DNS TXT record.
+              returned: success
+              type: list
+              elements: str
+              sample:
+                - letsencrypt.org
         tls-alpn-01:
           description:
             - Information for V(tls-alpn-01) authorization.

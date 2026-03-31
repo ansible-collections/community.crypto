@@ -12,12 +12,13 @@ short_description: Create SSL/TLS certificates with the ACME protocol
 description:
   - Create and renew SSL/TLS certificates with a CA supporting the L(ACME protocol,https://tools.ietf.org/html/rfc8555), such
     as L(Let's Encrypt,https://letsencrypt.org/).
-    The current implementation supports the V(http-01), V(dns-01), V(dns-account-01) and V(tls-alpn-01) challenges.
+    The current implementation supports the V(http-01), V(dns-01), V(dns-account-01), V(dns-persist-01), and V(tls-alpn-01) challenges.
   - To use this module, it has to be executed twice. Either as two different tasks in the same run or during two runs. Note
     that the output of the first run needs to be recorded and passed to the second run as the module argument O(data).
-  - Between these two tasks you have to fulfill the required steps for the chosen challenge by whatever means necessary. For
-    V(http-01) that means creating the necessary challenge file on the destination webserver. For V(dns-01) and V(dns-account-01)
-    the necessary DNS records have to be created. For V(tls-alpn-01) the necessary certificate has to be created and served.
+  - Between these two tasks you have to fulfill the required steps for the chosen challenge by whatever means necessary.
+    For V(http-01) that means creating the necessary challenge file on the destination webserver.
+    For V(dns-01), V(dns-account-01), and V(dns-persist-01) the necessary DNS records have to be created.
+    For V(tls-alpn-01) the necessary certificate has to be created and served.
     It is I(not) the responsibility of this module to perform these steps.
   - For details on how to fulfill these challenges, you might have to read through L(the main ACME specification,https://tools.ietf.org/html/rfc8555#section-8)
     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3). Also, consider the examples
@@ -25,6 +26,10 @@ description:
   - The module support for IP identifiers according to L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html).
   - The module supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
+    Note that the supported draft version can change at any time,
+    and changes will only be considered breaking once the draft reached RFC status.
+  - The module supports the V(dns-persist-01) challenge type according to
+    L(acme-dns-persist draft 01, https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
 notes:
@@ -119,13 +124,14 @@ options:
       - If set to V(no challenge), no challenge will be used. This is necessary for some private CAs which use External Account
         Binding and other means of validating certificate assurance. For example, an account could be allowed to issue certificates
         for C(foo.example.com) without any further validation for a certain period of time.
-      - Support for V(dns-account-01) has been added in community.crypto 3.2.0.
+      - Support for V(dns-account-01) and V(dns-persist-01) has been added in community.crypto 3.2.0.
     type: str
     default: http-01
     choices:
       - http-01
       - dns-01
       - dns-account-01
+      - dns-persist-01
       - tls-alpn-01
       - no challenge
   csr:
@@ -473,14 +479,14 @@ challenge_data:
           description:
             - Data for every challenge type.
             - The keys in this dictionary are the challenge types. C(challenge-type) is a placeholder used in the documentation.
-              Possible keys are V(http-01), V(dns-01), V(dns-account-01), and V(tls-alpn-01).
+              Possible keys are V(http-01), V(dns-01), V(dns-account-01), V(dns-persist-01), and V(tls-alpn-01).
             - Note that the keys are not valid Jinja2 identifiers.
           returned: changed
           type: dict
           contains:
             resource:
               description: The challenge resource that must be created for validation.
-              returned: changed
+              returned: changed and challenge is not V(dns-persist-01)
               type: str
               sample: .well-known/acme-challenge/evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA
             resource_original:
@@ -497,7 +503,7 @@ challenge_data:
                   binary blob which has to be put into the acmeValidation x509 extension; see U(https://www.rfc-editor.org/rfc/rfc8737.html#section-3)
                   for details. To do this, you might need the P(ansible.builtin.b64decode#filter) Jinja filter to extract
                   the binary blob from this return value.
-              returned: changed
+              returned: changed and challenge is not V(dns-persist-01)
               type: str
               sample: IlirfxKKXA...17Dt3juxGJ-PCt92wr-oA
             record:
@@ -505,6 +511,20 @@ challenge_data:
               returned: changed and challenge is V(dns-01) or V(dns-account-01)
               type: str
               sample: _acme-challenge.example.com
+            account_uri:
+              description:
+                - The account URI that must be mentioned in the DNS TXT record.
+              returned: changed and challenge is V(dns-persist-01)
+              type: str
+              sample: https://ca.example/acct/123
+            issuer_domain_names:
+              description:
+                - One of the issuer domain names must be mentioned in the DNS TXT record.
+              returned: changed and challenge is V(dns-persist-01)
+              type: list
+              elements: str
+              sample:
+                - letsencrypt.org
 challenge_data_dns:
   description:
     - List of TXT values per DNS record, in case challenge is V(dns-01) or V(dns-account-01).
@@ -987,6 +1007,7 @@ def main() -> t.NoReturn:
                 "http-01",
                 "dns-01",
                 "dns-account-01",
+                "dns-persist-01",
                 "tls-alpn-01",
                 NO_CHALLENGE,
             ],

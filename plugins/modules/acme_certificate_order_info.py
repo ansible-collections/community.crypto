@@ -24,6 +24,10 @@ description:
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
+  - The module supports the V(dns-persist-01) challenge type according to
+    L(acme-dns-persist draft 01, https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html).
+    Note that the supported draft version can change at any time,
+    and changes will only be considered breaking once the draft reached RFC status.
 seealso:
   - module: community.crypto.acme_certificate_order_create
     description: Create an ACME order.
@@ -260,13 +264,14 @@ authorizations_by_identifier:
             type:
               description:
                 - The type of challenge encoded in the object.
-                - Support for V(dns-account-01) has been added in community.crypto 3.2.0.
+                - Support for V(dns-account-01) and V(dns-persist-01) has been added in community.crypto 3.2.0.
               type: str
               returned: always
               choices:
                 - http-01
                 - dns-01
                 - dns-account-01
+                - dns-persist-01
                 - tls-alpn-01
             url:
               description:
