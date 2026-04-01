@@ -26,6 +26,9 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 from ansible_collections.community.crypto.plugins.module_utils._acme.utils import (
     nopad_b64,
 )
+from ansible_collections.community.crypto.plugins.module_utils._caa import (
+    _check_domain_name,
+)
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
@@ -104,6 +107,52 @@ class Challenge:
     def get_validation_data(
         self, *, client: ACMEClient, identifier_type: str, identifier: str
     ) -> dict[str, t.Any] | None:
+        if self.type == "dns-persist-01":
+            # https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html#section-3.1
+            account_uri = self.data.get("accounturi")
+            issuer_domain_names = self.data.get("issuer-domain-names")
+            if account_uri is None:
+                # In version 00 of the draft, accounturi isn't present.
+                # Since that's what Pebble currently implements,
+                # let's fake the value if we have it.
+                # (https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-00.html#section-6)
+                account_uri = client.account_uri
+            if (
+                not isinstance(account_uri, str)
+                or not isinstance(issuer_domain_names, list)
+                or not all(isinstance(idn, str) for idn in issuer_domain_names)
+            ):
+                return None
+            if client.account_uri is not None and account_uri != client.account_uri:
+                # While the RFC doesn't demand this, I think it's a bad sign if the account URIs disagree.
+                # Better err on the side of caution...
+                client.module.warn(
+                    f"The dns-persist-01 challenge for DNS:{identifier} has account URI {account_uri!r},"
+                    f" while the client is has account URI {client.account_uri}. Ignoring malformed challenge."
+                )
+                return None
+            if not (1 <= len(issuer_domain_names) <= 10):
+                client.module.warn(
+                    f"The dns-persist-01 challenge for DNS:{identifier} has {len(issuer_domain_names)}"
+                    " issuer domain names, which is not in [1, 10]. Ignoring malformed challenge."
+                )
+                return None
+            for idn in issuer_domain_names:
+                try:
+                    _check_domain_name(idn)
+                    if idn != idn.lower() or len(idn) > 253:
+                        raise ValueError()
+                except ValueError:
+                    client.module.warn(
+                        f"The dns-persist-01 challenge for DNS:{identifier} has an invalid"
+                        f" issuer domain name {idn!r}. Ignoring malformed challenge."
+                    )
+                    return None
+            return {
+                "account_uri": account_uri,
+                "issuer_domain_names": issuer_domain_names,
+            }
+
         if self.token is None:
             return None
 

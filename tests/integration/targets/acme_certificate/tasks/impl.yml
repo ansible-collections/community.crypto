@@ -387,6 +387,66 @@
       ansible.builtin.set_fact:
         cert_9_obtain_results: "{{ certificate_obtain_result }}"
         cert_9_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+- when: ansible_version.full is version('2.21', '>=')
+  vars:
+    validation_record_domains:
+      - name: example.com
+        wildcard: true
+      - name: example.org
+        persist_until: "+5m"
+      - name: t1.example.com
+    issuer_domain_name: pebble.letsencrypt.org
+  block:
+    - name: Obtain ACME account
+      community.crypto.acme_account_info:
+        acme_directory: "{{ acme_directory_url }}"
+        acme_version: 2
+        validate_certs: false
+        account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
+        select_crypto_backend: "{{ select_crypto_backend }}"
+      register: account_info
+    - name: Create dns-persist-01 DNS entries
+      ansible.builtin.uri:
+        url: "http://{{ acme_host }}:5000/dns/_validation-persist.{{ item.name }}"
+        method: PUT
+        body_format: json
+        body:
+          - >-
+            {{
+              issuer_domain_name
+              | community.crypto.acme_dns_persist_record(
+                account_uri=account_info.account_uri,
+                policy='wildcard' if item.wildcard | default(false) else none,
+                persist_until=item.persist_until | default(none),
+              )
+            }}
+      loop: "{{ validation_record_domains }}"
+    - name: Obtain cert 10
+      ansible.builtin.include_tasks: obtain-cert.yml
+      vars:
+        certgen_title: Certificate 10
+        certificate_name: cert-10
+        key_type: ec256
+        subject_alt_name: "DNS:*.example.com,DNS:example.org,DNS:t1.example.com"
+        subject_alt_name_critical: false
+        account_key: account-ec256
+        challenge: dns-persist-01
+        modify_account: true
+        deactivate_authzs: false
+        force: false
+        remaining_days: 1
+        terms_agreed: true
+        account_email: "example@example.org"
+        use_csr_content: true
+    - name: Store obtain results for cert 10
+      ansible.builtin.set_fact:
+        cert_10_obtain_results: "{{ certificate_obtain_result }}"
+        cert_10_alternate: "{{ 0 if select_crypto_backend == 'cryptography' else 0 }}"
+    - name: Remove dns-persist-01 DNS entries
+      ansible.builtin.uri:
+        url: "http://{{ acme_host }}:5000/dns/_validation-persist.{{ item.name }}"
+        method: DELETE
+      loop: "{{ validation_record_domains }}"
 
 ## DISSECT CERTIFICATES #######################################################################
 # Make sure certificates are valid. Root certificate for Pebble equals the chain certificate.
@@ -429,6 +489,11 @@
   ignore_errors: true
   register: cert_9_valid
   when: ansible_version.full is version('2.21', '>=')
+- name: Verifying cert 10
+  ansible.builtin.command: '{{ openssl_binary }} verify -CAfile "{{ remote_tmp_dir }}/cert-10-root.pem" -untrusted "{{ remote_tmp_dir }}/cert-10-chain.pem" "{{ remote_tmp_dir }}/cert-10.pem"'
+  ignore_errors: true
+  register: cert_10_valid
+  when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
 - name: Dumping cert 1
@@ -460,6 +525,10 @@
 - name: Dumping cert 9
   ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-9.pem" -noout -text'
   register: cert_9_text
+  when: ansible_version.full is version('2.21', '>=')
+- name: Dumping cert 10
+  ansible.builtin.command: '{{ openssl_binary }} x509 -in "{{ remote_tmp_dir }}/cert-10.pem" -noout -text'
+  register: cert_10_text
   when: ansible_version.full is version('2.21', '>=')
 
 # Dump certificate info
@@ -501,6 +570,11 @@
   community.crypto.x509_certificate_info:
     path: "{{ remote_tmp_dir }}/cert-9.pem"
   register: cert_9_info
+  when: ansible_version.full is version('2.21', '>=')
+- name: Dumping cert 10
+  community.crypto.x509_certificate_info:
+    path: "{{ remote_tmp_dir }}/cert-10.pem"
+  register: cert_10_info
   when: ansible_version.full is version('2.21', '>=')
 
 ## GET ACCOUNT ORDERS #########################################################################

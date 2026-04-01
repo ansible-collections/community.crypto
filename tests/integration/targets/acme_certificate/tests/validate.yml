@@ -173,6 +173,19 @@
           - "'DNS:example.org' in cert_9_text.stdout"
           - "'DNS:t1.example.com' in cert_9_text.stdout"
 
+- when: ansible_version.full is version('2.21', '>=')
+  block:
+    - name: Check that certificate 10 is valid
+      ansible.builtin.assert:
+        that:
+          - cert_10_valid is not failed
+    - name: Check that certificate 10 contains correct SANs
+      ansible.builtin.assert:
+        that:
+          - "'DNS:*.example.com' in cert_10_text.stdout"
+          - "'DNS:example.org' in cert_10_text.stdout"
+          - "'DNS:t1.example.com' in cert_10_text.stdout"
+
 - name: Validate that orders were not retrieved
   ansible.builtin.assert:
     that:
