@@ -32,14 +32,12 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 
 if t.TYPE_CHECKING:
     from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
-        KeyType,
+        PubKeyType,
     )
 
     DateFormat = t.Literal["human_readable", "openssh", "timestamp"]  # pragma: no cover
     DateFormatStr = t.Literal["human_readable", "openssh"]  # pragma: no cover
     DateFormatInt = t.Literal["timestamp"]  # pragma: no cover
-else:
-    KeyType = None  # pylint: disable=invalid-name
 
 
 # Protocol References
@@ -60,7 +58,7 @@ else:
 _USER_TYPE = 1
 _HOST_TYPE = 2
 
-_SSH_TYPE_STRINGS: dict[KeyType | str, bytes] = {
+_SSH_TYPE_STRINGS: dict[PubKeyType, bytes] = {
     "rsa": b"ssh-rsa",
     "dsa": b"ssh-dss",
     "ecdsa-nistp256": b"ecdsa-sha2-nistp256",
@@ -76,7 +74,7 @@ _ECDSA_CURVE_IDENTIFIERS = {
     "ecdsa-nistp384": b"nistp384",
     "ecdsa-nistp521": b"nistp521",
 }
-_ECDSA_CURVE_IDENTIFIERS_LOOKUP = {
+_ECDSA_CURVE_IDENTIFIERS_LOOKUP: dict[bytes, PubKeyType] = {
     b"nistp256": "ecdsa-nistp256",
     b"nistp384": "ecdsa-nistp384",
     b"nistp521": "ecdsa-nistp521",
@@ -591,7 +589,7 @@ class OpensshCertificate:
 
         for key_type, string in _SSH_TYPE_STRINGS.items():
             if format_identifier == string + _CERT_SUFFIX_V01:
-                pub_key_type = t.cast(KeyType, key_type)
+                pub_key_type = key_type
                 break
         else:
             raise ValueError(
@@ -707,7 +705,7 @@ class OpensshCertificate:
 
     @staticmethod
     def _parse_cert_info(
-        pub_key_type: KeyType, parser: OpensshParser
+        pub_key_type: PubKeyType, parser: OpensshParser
     ) -> OpensshCertificateInfo:
         cert_info = get_cert_info_object(pub_key_type)
         cert_info.nonce = parser.string()
@@ -792,7 +790,7 @@ def fingerprint(public_key: bytes) -> bytes:
     return b"SHA256:" + b64encode(h.digest()).rstrip(b"=")
 
 
-def get_cert_info_object(key_type: KeyType) -> OpensshCertificateInfo:
+def get_cert_info_object(key_type: PubKeyType) -> OpensshCertificateInfo:
     if key_type == "rsa":
         return OpensshRSACertificateInfo()
     if key_type == "dsa":

@@ -76,6 +76,9 @@ if t.TYPE_CHECKING:
     KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]  # pragma: no cover
     KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]  # pragma: no cover
     KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]  # pragma: no cover
+    PubKeyType = t.Literal[
+        "rsa", "dsa", "ed25519", "ecdsa-nistp256", "ecdsa-nistp384", "ecdsa-nistp521"
+    ]  # pragma: no cover
 
     PrivateKeyTypes = t.Union[  # noqa: UP007
         rsa.RSAPrivateKey,
