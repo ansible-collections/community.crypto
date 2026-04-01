@@ -7,7 +7,7 @@
 <meta content="2.24.0" name="antsibull-docs" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers &mdash; Community.Crypto Collection  documentation</title>
+  <title>community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME dns-persist-01 challenges &mdash; Community.Crypto Collection  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
       <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=b54c304f" />
       <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
@@ -22,8 +22,8 @@
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format" href="x509_certificate_info_filter.html" />
-    <link rel="prev" title="community.crypto.split_pem filter – Split PEM file contents into multiple objects" href="split_pem_filter.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+    <link rel="next" title="community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key" href="gpg_fingerprint_filter.html" />
+    <link rel="prev" title="community.crypto.acme_dns_persist_record filter – Craft a DNS record for ACME dns-persist-01 challenges" href="acme_dns_persist_record_filter.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
 
 
 
@@ -122,14 +122,7 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="acme_dns_persist_record_filter.html">community.crypto.acme_dns_persist_record filter – Craft a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acme_dns_persist_record_parse_filter.html">community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#input">Input</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -141,6 +134,13 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_publickey_info_filter.html">community.crypto.openssl_publickey_info filter – Retrieve information from OpenSSL public keys in PEM format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parse_serial_filter.html">community.crypto.parse_serial filter – Convert a serial number as a colon-separated list of hex numbers to an integer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_pem_filter.html">community.crypto.split_pem filter – Split PEM file contents into multiple objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="to_serial_filter.html">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_certificate_info_filter.html">community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="x509_crl_info_filter.html">community.crypto.x509_crl_info filter – Retrieve information from X.509 CRLs in PEM format</a></li>
 </ul>
@@ -163,10 +163,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers</li>
+      <li class="breadcrumb-item active">community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/filter/to_serial.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/ansible-collections/community.crypto/edit/main/plugins/filter/acme_dns_persist_record_parse.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -176,17 +176,17 @@
   
            <div itemprop="articleBody">
              
-  <span class="target" id="ansible-collections-community-crypto-to-serial-filter"></span><section id="community-crypto-to-serial-filter-convert-an-integer-to-a-colon-separated-list-of-hex-numbers">
-<h1>community.crypto.to_serial filter – Convert an integer to a colon-separated list of hex numbers<a class="headerlink" href="#community-crypto-to-serial-filter-convert-an-integer-to-a-colon-separated-list-of-hex-numbers" title="Link to this heading"></a></h1>
+  <span class="target" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter"></span><section id="community-crypto-acme-dns-persist-record-parse-filter-parse-a-dns-record-for-acme-dns-persist-01-challenges">
+<h1>community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges<a class="headerlink" href="#community-crypto-acme-dns-persist-record-parse-filter-parse-a-dns-record-for-acme-dns-persist-01-challenges" title="Link to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This filter plugin is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/community/crypto/">community.crypto collection</a> (version 3.2.0).</p>
 <p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
 To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
 <p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">community.crypto</span></code>.</p>
-<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.to_serial</span></code>.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">community.crypto.acme_dns_persist_record_parse</span></code>.</p>
 </div>
-<p class="ansible-version-added">New in community.crypto 2.18.0</p>
+<p class="ansible-version-added">New in community.crypto 3.2.0</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -199,12 +199,13 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Converts an integer to a colon-separated list of hex numbers of the form <code class="docutils literal notranslate"><span class="pre">00:11:22:33</span></code>.</p></li>
+<li><p>Parse the content for a ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> DNS TXT record <code class="ansible-value docutils literal notranslate"><span class="pre">_validation-persist.&lt;domain&gt;</span></code>.</p></li>
+<li><p>This filter conforms to the <a class="reference external" href="https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html">acme-dns-persist draft 01</a>. Note that the supported draft version can change at any time, and changes will only be considered breaking once the draft reached RFC status.</p></li>
 </ul>
 </section>
 <section id="input">
 <h2><a class="toc-backref" href="#id2" role="doc-backlink">Input</a><a class="headerlink" href="#input" title="Link to this heading"></a></h2>
-<p>This describes the input of the filter, the value before <code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">community.crypto.to_serial</span></code>.</p>
+<p>This describes the input of the filter, the value before <code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">community.crypto.acme_dns_persist_record_parse</span></code>.</p>
 <table class="longtable ansible-option-table docutils align-default" style="width: 100%">
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
@@ -213,10 +214,10 @@ To check whether it is installed, run <code class="code docutils literal notrans
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="parameter-_input"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-to-serial-filter-parameter-input"><strong>Input</strong></p>
-<a class="ansibleOptionLink" href="#parameter-_input" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span> / <span class="ansible-option-required">required</span></p>
+<div class="ansibleOptionAnchor" id="parameter-_input"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-parameter-input"><strong>Input</strong></p>
+<a class="ansibleOptionLink" href="#parameter-_input" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>The non-negative integer to convert.</p>
+<td><div class="ansible-option-cell"><p>The DNS TXT record entry.</p>
 </div></td>
 </tr>
 </tbody>
@@ -227,7 +228,11 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#ansible-collections-community-crypto-to-serial-filter"><span class="std std-ref">community.crypto.to_serial</span></a> filter plugin</dt><dd><p>Convert an integer to a colon-separated list of hex numbers.</p>
+<dt><a class="reference internal" href="acme_certificate_module.html#ansible-collections-community-crypto-acme-certificate-module"><span class="std std-ref">community.crypto.acme_certificate</span></a></dt><dd><p>Create SSL/TLS certificates with the ACME protocol.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_order_create_module.html#ansible-collections-community-crypto-acme-certificate-order-create-module"><span class="std std-ref">community.crypto.acme_certificate_order_create</span></a></dt><dd><p>Create an ACME v2 order.</p>
+</dd>
+<dt><a class="reference internal" href="acme_certificate_order_validate_module.html#ansible-collections-community-crypto-acme-certificate-order-validate-module"><span class="std std-ref">community.crypto.acme_certificate_order_validate</span></a></dt><dd><p>Validate authorizations of an ACME v2 order.</p>
 </dd>
 </dl>
 </div>
@@ -235,9 +240,28 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <section id="examples">
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Convert integer to serial number</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create _validation-persist.&lt;domain&gt; TXT record contents</span>
 <span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="m">1234567</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.to_serial</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">record</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record_parse</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">  </span><span class="nt">var</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">      </span><span class="no">letsencrypt.org;</span>
+<span class="w">      </span><span class="no">accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234;</span>
+<span class="w">      </span><span class="no">policy=wildcard;</span>
+<span class="w">      </span><span class="no">persistUntil=1774813004</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create _validation-persist.&lt;domain&gt; TXT record for example.com</span>
+<span class="w">  </span><span class="nt">community.dns.hetzner_dns_record_set</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">_validation-persist</span>
+<span class="w">    </span><span class="nt">zone_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example.com</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">        </span><span class="cp">{{</span>
+          <span class="s1">&#39;letsencrypt.org&#39;</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
+            <span class="nv">account_uri</span><span class="o">=</span><span class="s1">&#39;https://acme-v02.api.letsencrypt.org/acme/acct/4321&#39;</span><span class="o">,</span>
+            <span class="nv">persist_until</span><span class="o">=</span><span class="s1">&#39;20190331202428Z&#39;</span><span class="o">,</span>
+          <span class="o">)</span>
+        <span class="cp">}}</span>
 </pre></div>
 </div>
 </section>
@@ -251,12 +275,55 @@ To check whether it is installed, run <code class="code docutils literal notrans
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="ansible-option-cell">
-<div class="ansibleOptionAnchor" id="return-_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-to-serial-filter-return-value"><strong>Return value</strong></p>
-<a class="ansibleOptionLink" href="#return-_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+<div class="ansibleOptionAnchor" id="return-_value"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value"><strong>Return value</strong></p>
+<a class="ansibleOptionLink" href="#return-_value" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>A colon-separated list of hexadecimal numbers.</p>
-<p>Letters are upper-case, and all numbers have exactly two digits.</p>
-<p>The string is never empty. The representation of <code class="docutils literal notranslate"><span class="pre">0</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;00&quot;</span></code>.</p>
+<td><div class="ansible-option-cell"><p>The content for the <code class="ansible-value docutils literal notranslate"><span class="pre">_validation-persist.&lt;domain&gt;</span></code> TXT record.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value/account_uri"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-account-uri"><strong>account_uri</strong></p>
+<a class="ansibleOptionLink" href="#return-_value/account_uri" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The ACME account URI.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value/issuer_domain_name"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-issuer-domain-name"><strong>issuer_domain_name</strong></p>
+<a class="ansibleOptionLink" href="#return-_value/issuer_domain_name" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The issuer domain name.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+<p class="ansible-option-line ansible-option-sample"><strong class="ansible-option-sample-bold">Sample:</strong> <code class="ansible-option-sample docutils literal notranslate"><span class="pre">&quot;letsencrypt.org&quot;</span></code></p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value/persist_until"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-persist-until"><strong>persist_until</strong></p>
+<a class="ansibleOptionLink" href="#return-_value/persist_until" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>Until when the record is valid.</p>
+<p>This is a UNIX timestamp, that is the number of seconds since January 1st, 1970, in UTC.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">null</span></code> if <code class="ansible-value docutils literal notranslate"><span class="pre">persistUntil</span></code> is not present.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value/persist_until_str"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-persist-until-str"><strong>persist_until_str</strong></p>
+<a class="ansibleOptionLink" href="#return-_value/persist_until_str" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>A ASN.1 string representation of <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-persist-until"><span class="std std-ref"><span class="pre">_value.persist_until</span></span></a></code>.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">null</span></code> if <code class="ansible-value docutils literal notranslate"><span class="pre">persistUntil</span></code> is not present.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_value/policy"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-dns-persist-record-parse-filter-return-value-policy"><strong>policy</strong></p>
+<a class="ansibleOptionLink" href="#return-_value/policy" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The validation scope.</p>
+<p>Is <code class="ansible-value docutils literal notranslate"><span class="pre">null</span></code> if not present.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
 </div></td>
 </tr>
@@ -289,8 +356,8 @@ To check whether it is installed, run <code class="code docutils literal notrans
           
 
 <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="split_pem_filter.html" class="btn btn-neutral float-left" title="community.crypto.split_pem filter – Split PEM file contents into multiple objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="x509_certificate_info_filter.html" class="btn btn-neutral float-right" title="community.crypto.x509_certificate_info filter – Retrieve information from X.509 certificates in PEM format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="acme_dns_persist_record_filter.html" class="btn btn-neutral float-left" title="community.crypto.acme_dns_persist_record filter – Craft a DNS record for ACME dns-persist-01 challenges" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gpg_fingerprint_filter.html" class="btn btn-neutral float-right" title="community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

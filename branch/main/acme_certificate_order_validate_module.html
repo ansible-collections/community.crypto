@@ -135,6 +135,8 @@
 <li class="toctree-l1"><a class="reference internal" href="x509_crl_info_module.html">community.crypto.x509_crl_info module – Retrieve information on Certificate Revocation Lists (CRLs)</a></li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="acme_dns_persist_record_filter.html">community.crypto.acme_dns_persist_record filter – Craft a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acme_dns_persist_record_parse_filter.html">community.crypto.acme_dns_persist_record_parse filter – Parse a DNS record for ACME <code class="docutils literal notranslate"><span class="pre">dns-persist-01</span></code> challenges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gpg_fingerprint_filter.html">community.crypto.gpg_fingerprint filter – Retrieve a GPG fingerprint from a GPG public or private key</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_csr_info_filter.html">community.crypto.openssl_csr_info filter – Retrieve information from OpenSSL Certificate Signing Requests (CSR)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_filter.html">community.crypto.openssl_privatekey_info filter – Retrieve information from OpenSSL private keys</a></li>
@@ -301,12 +303,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <td><div class="ansible-option-cell"><p>The challenge to be performed for every pending authorization.</p>
 <p>Must be provided if there is at least one pending authorization.</p>
 <p>In case of authorization reuse, or in case of CAs which use External Account Binding and other means of validating certificate assurance, it might not be necessary to provide this option.</p>
-<p>Support for <code class="ansible-value docutils literal notranslate"><span class="pre">dns-account-01</span></code> has been added in community.crypto 3.2.0.</p>
+<p>Support for <code class="ansible-value docutils literal notranslate"><span class="pre">dns-account-01</span></code> and <code class="ansible-value docutils literal notranslate"><span class="pre">dns-persist-01</span></code> has been added in community.crypto 3.2.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;http-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-account-01&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;dns-persist-01&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;tls-alpn-01&quot;</span></code></p></li>
 </ul>
 </div></td>
