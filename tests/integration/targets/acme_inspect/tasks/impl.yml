@@ -131,6 +131,19 @@
   register: authz
 - ansible.builtin.debug: var=authz
 
+- name: Get HTTP-01 challenge URLs
+  ansible.builtin.set_fact:
+    http01challenge_urls: >-
+      {{
+        authz.results
+        | map(attribute='output_json')
+        | map(attribute='challenges')
+        | map('selectattr', 'type', 'equalto', 'http-01')
+        | map('first')
+        | map(attribute='url')
+        | list
+      }}
+
 - name: Get HTTP-01 challenge for authz
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
@@ -138,12 +151,22 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
-    url: "{{ (item.challenges | selectattr('type', 'equalto', 'http-01') | list)[0].url }}"
+    url: "{{ item }}"
     method: get
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: http01challenge
-  loop: "{{ authz.results | map(attribute='output_json') | list }}"
+  loop: "{{ http01challenge_urls }}"
 - ansible.builtin.debug: var=http01challenge
+
+- name: Get HTTP-01 activation URLs
+  ansible.builtin.set_fact:
+    activation_urls: >-
+      {{
+        http01challenge.results
+        | map(attribute='output_json')
+        | map(attribute='url')
+        | list
+      }}
 
 - name: Activate HTTP-01 challenge manually
   community.crypto.acme_inspect:
@@ -152,12 +175,12 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
-    url: "{{ item.url }}"
+    url: "{{ item }}"
     method: post
     content: '{}'
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: activation
-  loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
+  loop: "{{ activation_urls }}"
 - ansible.builtin.debug: var=activation
 
 - name: Get HTTP-01 challenge results
@@ -167,11 +190,11 @@
     validate_certs: false
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     account_uri: "{{ account_creation.headers.location }}"
-    url: "{{ item.url }}"
+    url: "{{ item }}"
     method: get
     select_crypto_backend: "{{ select_crypto_backend }}"
   register: validation_result
-  loop: "{{ http01challenge.results | map(attribute='output_json') | list }}"
+  loop: "{{ http01challenge_urls }}"
   until: "validation_result.output_json.status not in ['pending', 'processing']"
   retries: 20
   delay: 1
