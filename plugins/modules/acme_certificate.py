@@ -982,7 +982,7 @@ class ACMECertificateClient:
             except Exception:
                 # ignore errors
                 pass
-            if authz.status != "deactivated":
+            if not authz.is_in_final_state(allow_valid=False):
                 self.module.warn(
                     warning=f"Could not deactivate authz object {authz.url}."
                 )
