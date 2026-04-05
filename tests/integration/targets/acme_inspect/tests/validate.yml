@@ -92,44 +92,44 @@
 - name: Check get challenge output
   ansible.builtin.assert:
     that:
-      - item is not changed
-      - "'directory' in item"
-      - "'headers' in item"
-      - "'output_text' in item"
-      - "'output_json' in item"
-      - item.output_json.status == 'pending'
-      - item.output_json.type == 'http-01'
-      - item.output_json.url == item.invocation.module_args.url
-      - "'token' in item.output_json"
-  loop: "{{ http01challenge.results }}"
+      - item.0 is not changed
+      - "'directory' in item.0"
+      - "'headers' in item.0"
+      - "'output_text' in item.0"
+      - "'output_json' in item.0"
+      - item.0.output_json.status == 'pending'
+      - item.0.output_json.type == 'http-01'
+      - item.0.output_json.url == item.1
+      - "'token' in item.0.output_json"
+  loop: "{{ http01challenge.results | zip(http01challenge_urls) }}"
 
 - name: Check challenge activation output
   ansible.builtin.assert:
     that:
-      - item is changed
-      - "'directory' in item"
-      - "'headers' in item"
-      - "'output_text' in item"
-      - "'output_json' in item"
-      - item.output_json.status in ['pending', 'processing']
-      - item.output_json.type == 'http-01'
-      - item.output_json.url == item.invocation.module_args.url
-      - "'token' in item.output_json"
-  loop: "{{ activation.results }}"
+      - item.0 is changed
+      - "'directory' in item.0"
+      - "'headers' in item.0"
+      - "'output_text' in item.0"
+      - "'output_json' in item.0"
+      - item.0.output_json.status in ['pending', 'processing']
+      - item.0.output_json.type == 'http-01'
+      - item.0.output_json.url == item.1
+      - "'token' in item.0.output_json"
+  loop: "{{ activation.results | zip(activation_urls) }}"
 
 - name: Check validation result
   ansible.builtin.assert:
     that:
-      - item is not changed
-      - "'directory' in item"
-      - "'headers' in item"
-      - "'output_text' in item"
-      - "'output_json' in item"
-      - item.output_json.status == 'invalid'
-      - item.output_json.type == 'http-01'
-      - item.output_json.url == item.invocation.module_args.url
-      - "'token' in item.output_json"
-      - "'validated' in item.output_json"
-      - "'error' in item.output_json"
-      - item.output_json.error.type == 'urn:ietf:params:acme:error:unauthorized'
-  loop: "{{ validation_result.results }}"
+      - item.0 is not changed
+      - "'directory' in item.0"
+      - "'headers' in item.0"
+      - "'output_text' in item.0"
+      - "'output_json' in item.0"
+      - item.0.output_json.status == 'invalid'
+      - item.0.output_json.type == 'http-01'
+      - item.0.output_json.url == item.1
+      - "'token' in item.0.output_json"
+      - "'validated' in item.0.output_json"
+      - "'error' in item.0.output_json"
+      - item.0.output_json.error.type == 'urn:ietf:params:acme:error:unauthorized'
+  loop: "{{ validation_result.results | zip(http01challenge_urls) }}"
