@@ -199,8 +199,10 @@ class ACMECertificateClient:
         bad_authzs = []
         for authz in order.authorizations.values():
             if authz.status not in ("valid", "pending"):
+                error_details = authz.get_error_details()
+                error = f"; {error_details}" if error_details else ""
                 bad_authzs.append(
-                    f"{authz.combined_identifier} (status={authz.status!r})"
+                    f"{authz.combined_identifier} (status={authz.status!r}{error})"
                 )
         if bad_authzs:
             bad_authzs_str = ", ".join(sorted(bad_authzs))
@@ -412,7 +414,7 @@ class ACMECertificateClient:
                 except Exception:
                     # ignore errors
                     pass
-                if authz is None or authz.status != "deactivated":
+                if authz is None or not authz.is_in_final_state(allow_valid=False):
                     self.module.warn(
                         warning=f"Could not deactivate authz object {authz_uri}."
                     )
@@ -423,7 +425,7 @@ class ACMECertificateClient:
                 except Exception:
                     # ignore errors
                     pass
-                if authz.status != "deactivated":
+                if not authz.is_in_final_state(allow_valid=False):
                     self.module.warn(
                         warning=f"Could not deactivate authz object {authz.url}."
                     )
