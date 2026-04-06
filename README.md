@@ -39,7 +39,7 @@ For more information about communication, see the [Ansible communication guide](
 
 ## Tested with Ansible
 
-Tested with the current ansible-core-2.17, ansible-core 2.18, and ansible-core 2.19 releases and the current development version of ansible-core. Ansible-core versions before 2.17 are not supported; please use community.crypto 2.x.y with these.
+Tested with the current ansible-core-2.17, ansible-core 2.18, ansible-core 2.19, ansible-core 2.20, ansible-core 2.21 releases and the current development version of ansible-core. Ansible-core versions before 2.17 are not supported; please use community.crypto 2.x.y with these.
 
 ## External requirements
 
