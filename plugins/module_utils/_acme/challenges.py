@@ -123,14 +123,6 @@ class Challenge:
                 or not all(isinstance(idn, str) for idn in issuer_domain_names)
             ):
                 return None
-            if client.account_uri is not None and account_uri != client.account_uri:
-                # While the RFC doesn't demand this, I think it's a bad sign if the account URIs disagree.
-                # Better err on the side of caution...
-                client.module.warn(
-                    f"The dns-persist-01 challenge for DNS:{identifier} has account URI {account_uri!r},"
-                    f" while the client is has account URI {client.account_uri}. Ignoring malformed challenge."
-                )
-                return None
             if not (1 <= len(issuer_domain_names) <= 10):
                 client.module.warn(
                     f"The dns-persist-01 challenge for DNS:{identifier} has {len(issuer_domain_names)}"
