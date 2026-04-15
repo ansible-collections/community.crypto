@@ -38,11 +38,11 @@ description:
     Also, consider the examples provided for this module.
   - The module includes support for IP identifiers according to
     L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html) ACME extension.
-  - The module supports the V(dns-account-01) challenge type according to
+  - The module B(experimentally) supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
-  - The module supports the V(dns-persist-01) challenge type according to
+  - The module B(experimentally) supports the V(dns-persist-01) challenge type according to
     L(acme-dns-persist draft 01, https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
@@ -330,6 +330,8 @@ challenge_data:
             - Information for V(dns-account-01) authorization.
             - A DNS TXT record needs to be created with the record name RV(challenge_data[].challenges.dns-01.record)
               and value RV(challenge_data[].challenges.dns-01.resource_value).
+            - B(Note) that this return value is B(experimental) and can change in a breaking way also in minor releases,
+              until the acme-dns-account-label draft is in a more stable state.
           returned: if the identifier supports V(dns-account-01) authorization
           version_added: 3.2.0
           type: dict
@@ -356,6 +358,8 @@ challenge_data:
             - Information for V(dns-persist-01) authorization.
             - A DNS TXT record needs to be created with the record name V(_validation-persist.<domain>).
               See the P(community.crypto.acme_dns_persist_record#filter) for how to create the record's content.
+            - B(Note) that this return value is B(experimental) and can change in a breaking way also in minor releases,
+              until the acme-dns-persist draft is in a more stable state.
           returned: if the identifier supports V(dns-persist-01) authorization
           version_added: 3.2.0
           type: dict
@@ -363,6 +367,9 @@ challenge_data:
             account_uri:
               description:
                 - The account URI that must be mentioned in the DNS TXT record.
+                - B(Note) that the type of this return value might change in a breaking way also in minor releases,
+                  until the acme-dns-persist draft is in a more stable state.
+                  This challenge field is currently under discussion in the ACME WG.
               returned: success
               type: str
               sample: https://ca.example/acct/123

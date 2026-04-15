@@ -24,11 +24,11 @@ description:
     and the L(TLS-ALPN-01 specification,https://www.rfc-editor.org/rfc/rfc8737.html#section-3). Also, consider the examples
     provided for this module.
   - The module support for IP identifiers according to L(RFC 8738,https://www.rfc-editor.org/rfc/rfc8738.html).
-  - The module supports the V(dns-account-01) challenge type according to
+  - The module B(experimentally) supports the V(dns-account-01) challenge type according to
     L(acme-dns-account-label draft 02, https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
-  - The module supports the V(dns-persist-01) challenge type according to
+  - The module B(experimentally) supports the V(dns-persist-01) challenge type according to
     L(acme-dns-persist draft 01, https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html).
     Note that the supported draft version can change at any time,
     and changes will only be considered breaking once the draft reached RFC status.
@@ -481,6 +481,9 @@ challenge_data:
             - The keys in this dictionary are the challenge types. C(challenge-type) is a placeholder used in the documentation.
               Possible keys are V(http-01), V(dns-01), V(dns-account-01), V(dns-persist-01), and V(tls-alpn-01).
             - Note that the keys are not valid Jinja2 identifiers.
+            - B(Note) that this return value for V(dns-account-01) and V(dns-persist-01) challenges is B(experimental)
+              and can change in a breaking way also in minor releases, until the acme-dns-account-label respectively
+              the acme-dns-persist draft is in a more stable state.
           returned: changed
           type: dict
           contains:
@@ -514,6 +517,9 @@ challenge_data:
             account_uri:
               description:
                 - The account URI that must be mentioned in the DNS TXT record.
+                - B(Note) that the type of this return value might change in a breaking way also in minor releases,
+                  until the acme-dns-persist draft is in a more stable state.
+                  This challenge field is currently under discussion in the ACME WG.
               returned: changed and challenge is V(dns-persist-01)
               type: str
               sample: https://ca.example/acct/123
