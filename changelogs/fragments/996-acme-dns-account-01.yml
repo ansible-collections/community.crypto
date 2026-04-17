@@ -1,4 +1,5 @@
 minor_changes:
-  - acme_* modules - support ``dns-account-01`` challenge type according to
-    `acme-dns-account-label draft 02 <https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02>`__
+  - acme_* modules - experimentally support ``dns-account-01`` challenge type according to
+    `acme-dns-account-label draft 02 <https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02>`__.
+    Note that breaking changes to this challenge type can also happen in minor releases until the acme-dns-account-label draft has been finalized as an RFC
     (https://github.com/ansible-collections/community.crypto/pull/996).

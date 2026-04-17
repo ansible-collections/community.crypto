@@ -1,4 +1,5 @@
 minor_changes:
-  - acme_* modules - support ``dns-persist-01`` challenge type according to
-    `acme-dns-persist draft 01 <https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html>`__
+  - acme_* modules - experimentally support ``dns-persist-01`` challenge type according to
+    `acme-dns-persist draft 01 <https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html>`__.
+    Note that breaking changes to this challenge type can also happen in minor releases until the acme-dns-persist draft has been finalized as an RFC
     (https://github.com/ansible-collections/community.crypto/pull/997).
