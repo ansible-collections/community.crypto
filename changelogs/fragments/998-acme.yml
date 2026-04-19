@@ -1,2 +1,0 @@
-bugfixes:
-  - "acme_* modules - improve handling of authz deactivation, and improve error message in case of bad authz states (https://github.com/ansible-collections/community.crypto/pull/998)."

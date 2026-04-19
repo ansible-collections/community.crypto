@@ -4,6 +4,36 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.2.0
+======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+
+This release is dedicated to the memory of `Michael O. Rabin <https://en.wikipedia.org/wiki/Michael_O._Rabin>`__, who passed away a few days before this release.
+
+Minor Changes
+-------------
+
+- acme_* modules - experimentally support ``dns-account-01`` challenge type according to `acme-dns-account-label draft 02 <https://datatracker.ietf.org/doc/html/draft-ietf-acme-dns-account-label-02>`__. Note that breaking changes to this challenge type can also happen in minor releases until the acme-dns-account-label draft has been finalized as an RFC (https://github.com/ansible-collections/community.crypto/pull/996).
+- acme_* modules - experimentally support ``dns-persist-01`` challenge type according to `acme-dns-persist draft 01 <https://www.ietf.org/archive/id/draft-ietf-acme-dns-persist-01.html>`__. Note that breaking changes to this challenge type can also happen in minor releases until the acme-dns-persist draft has been finalized as an RFC (https://github.com/ansible-collections/community.crypto/pull/997).
+
+Bugfixes
+--------
+
+- acme_* modules - improve handling of authz deactivation, and improve error message in case of bad authz states (https://github.com/ansible-collections/community.crypto/pull/998).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- community.crypto.acme_dns_persist_record - Craft a DNS record for ACME :literal:`dns\-persist\-01` challenges.
+- community.crypto.acme_dns_persist_record_parse - Parse a DNS record for ACME :literal:`dns\-persist\-01` challenges.
+
 v3.1.1
 ======
 
