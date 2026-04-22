@@ -16,6 +16,7 @@ from freezegun import freeze_time
 
 from ansible_collections.community.crypto.plugins.module_utils._acme.backend_openssl_cli import (
     OpenSSLCLIBackend,
+    _extract_rsa_key,
 )
 from ansible_collections.community.crypto.plugins.module_utils._time import (
     UTC,
@@ -31,6 +32,7 @@ from .backend_data import (
     TEST_INTERPOLATE_TIMESTAMP,
     TEST_KEYS,
     TEST_PARSE_ACME_TIMESTAMP,
+    load_fixture,
 )
 
 if t.TYPE_CHECKING:
@@ -180,3 +182,36 @@ def test_interpolate_timestamp(
             ts_start, ts_end, percentage=percentage
         )
         assert ts_expected == timestamp
+
+
+def test_openssl400() -> None:
+    expected = {
+        "key_file": None,
+        "type": "rsa",
+        "alg": "RS256",
+        "jwk": {
+            "kty": "RSA",
+            "e": "AQAB",
+            "n": (
+                "6BmwR60bTQqo7-zlFBz6GJwnL5LhXNVcI_1eRF-_oKIfdQw-w3Ze-RUBNk5skJx3qDzdn"
+                "09RXA3XT7XUzdS2HoObcPyQNL996Gag9Vf7JYw9pWf_2jvPVqT349QAG2KyNpARDlFxwR"
+                "g2DE6vi4I1XS9dLj4p7Jl265gc96y9cd7XcIw-hqvQ6Cx4HNptbp4TPi_NSt4yMudSF1U"
+                "NQvpRRHztBkaeUBhFpfhcXmlmX3h_Wwqu2gqUyzclnWTTU79SQMBNrIzw9Dpa66_X49nJ"
+                "o1ZHPu6U-uEnfcBa12Xt07fV3tnHxxKR--kiU38hhH-JcrqeZT7kxRQHEmKlNmo7fT2E3"
+                "gcbBrsuWN5eUJc56PYBs4nf3wrxYspKpmc37Yp3ifat9VTzQVnBXLG87XgHlkQcPd1BdE"
+                "V8-Hexc3GNMCLnj1e87rDGiQaH55vK6aabS5ci9gq6FgEcJpfrV00pHao0ne66JIO2tck"
+                "5Nw1pUk4lfZJ2mezmOa3FvnbuTwnpT2oUY4BiHu0HDuWrYH08z07XyNH8Rdr88PE8SW5M"
+                "ciOta4SyLR2bxazM9NgvVKoKCunDVTV-EcfeV9CN_jJQaHu-r9F7euCuUuFAZLFvG5Glc"
+                "AiKgZcZSaLBRPk54Qz4lK-KEvkKlnw3mHPcX98y9Vg9v-rMw20O6C_KQJaYGvU"
+            ),
+        },
+        "hash": "sha256",
+    }
+    pk1 = load_fixture("privatekey_2-3.6.2.txt")
+    pk1parsed = _extract_rsa_key(pk1)
+    print(repr(pk1parsed))
+    assert pk1parsed == expected
+    pk2 = load_fixture("privatekey_2-4.0.0.txt")
+    pk2parsed = _extract_rsa_key(pk2)
+    print(repr(pk2parsed))
+    assert pk2parsed == expected
