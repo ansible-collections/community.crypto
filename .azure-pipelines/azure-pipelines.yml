@@ -360,6 +360,7 @@ stages:
             - test: "3.11"
             - test: "3.13"
             - test: "3.14"
+            - test: "3.15"
           groups:
             - 1
             - 2
