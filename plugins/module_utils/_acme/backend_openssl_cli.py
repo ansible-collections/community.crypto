@@ -205,7 +205,7 @@ class OpenSSLCLIBackend(CryptoBackend):
 
         if account_key_type == "rsa":
             matcher = re.search(
-                r"modulus:\n\s+00:([a-f0-9\:\s]+?)\npublicExponent",
+                r"modulus:\n\s+(?:00:)?([a-f0-9\:\s]+?)\npublicExponent",
                 out_text,
                 re.MULTILINE | re.DOTALL,
             )
