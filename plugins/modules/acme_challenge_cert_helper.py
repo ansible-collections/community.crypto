@@ -175,13 +175,13 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
 try:
     import cryptography
     import cryptography.hazmat.backends
-    import cryptography.hazmat.primitives.asymmetric.dh
+    import cryptography.hazmat.primitives.asymmetric.dsa
     import cryptography.hazmat.primitives.asymmetric.ec
+    import cryptography.hazmat.primitives.asymmetric.ed25519
+    import cryptography.hazmat.primitives.asymmetric.ed448
     import cryptography.hazmat.primitives.asymmetric.padding
     import cryptography.hazmat.primitives.asymmetric.rsa
     import cryptography.hazmat.primitives.asymmetric.utils
-    import cryptography.hazmat.primitives.asymmetric.x448
-    import cryptography.hazmat.primitives.asymmetric.x25519
     import cryptography.hazmat.primitives.hashes
     import cryptography.hazmat.primitives.serialization
     import cryptography.x509
@@ -241,12 +241,14 @@ def main() -> t.NoReturn:
             )
         except Exception as e:
             raise ModuleFailException(f"Error while loading private key: {e}") from e
-        if isinstance(
+        if not isinstance(
             private_key,
             (
-                cryptography.hazmat.primitives.asymmetric.dh.DHPrivateKey,
-                cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
-                cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
+                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+                cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+                cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey,
+                cryptography.hazmat.primitives.asymmetric.dsa.DSAPrivateKey,
+                cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey,
             ),
         ):
             raise ModuleFailException(
