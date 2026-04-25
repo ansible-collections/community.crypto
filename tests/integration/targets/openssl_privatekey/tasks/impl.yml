@@ -123,33 +123,43 @@
       - curve: sect571k1
         openssl_name: sect571k1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect409k1
         openssl_name: sect409k1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect283k1
         openssl_name: sect283k1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect233k1
         openssl_name: sect233k1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect163k1
         openssl_name: sect163k1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect571r1
         openssl_name: sect571r1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect409r1
         openssl_name: sect409r1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect283r1
         openssl_name: sect283r1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect233r1
         openssl_name: sect233r1
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
       - curve: sect163r2
         openssl_name: sect163r2
         min_cryptography_version: "0.5"
+        max_cryptography_version: "46.9.99"
 
 - name: "({{ select_crypto_backend }}) Test ECC key generation"
   community.crypto.openssl_privatekey:
@@ -159,6 +169,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   when: |
     cryptography_version.stdout is version(item.min_cryptography_version, '>=') and
+    cryptography_version.stdout is version(item.max_cryptography_version | default('999.9.9'), '<=') and
     item.openssl_name in openssl_ecc_list
   loop: "{{ ecc_types }}"
   loop_control:
@@ -173,6 +184,7 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   when: |
     cryptography_version.stdout is version(item.min_cryptography_version, '>=') and
+    cryptography_version.stdout is version(item.max_cryptography_version | default('999.9.9'), '<=') and
     item.openssl_name in openssl_ecc_list
   loop: "{{ ecc_types }}"
   loop_control:
