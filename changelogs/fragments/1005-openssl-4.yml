@@ -1,0 +1,2 @@
+bugfixes:
+  - "acme_* modules - adjust OpenSSL RSA private key output parsing to OpenSSL 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1005)."
