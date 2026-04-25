@@ -120,6 +120,94 @@ def _extract_octets(
     raise BackendException(f"No '{name}' octet string found")
 
 
+def _extract_rsa_key(out_text: str, *, key_file: str | None = None) -> dict[str, t.Any]:
+    matcher = re.search(
+        r"modulus:\n\s+(?:00:)?([a-f0-9\:\s]+?)\npublicExponent",
+        out_text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if matcher is None:
+        raise KeyParsingError("cannot parse RSA key: modulus not found")
+    pub_hex = matcher.group(1)
+
+    matcher = re.search(
+        r"\npublicExponent: ([0-9]+)", out_text, re.MULTILINE | re.DOTALL
+    )
+    if matcher is None:
+        raise KeyParsingError("cannot parse RSA key: public exponent not found")
+    pub_exp = matcher.group(1)
+    pub_exp = f"{int(pub_exp):x}"
+    if len(pub_exp) % 2:
+        pub_exp = f"0{pub_exp}"
+
+    return {
+        "key_file": key_file,
+        "type": "rsa",
+        "alg": "RS256",
+        "jwk": {
+            "kty": "RSA",
+            "e": nopad_b64(binascii.unhexlify(pub_exp.encode("utf-8"))),
+            "n": nopad_b64(_decode_octets(pub_hex)),
+        },
+        "hash": "sha256",
+    }
+
+
+def _extract_ec_key(out_text: str, *, key_file: str | None = None) -> dict[str, t.Any]:
+    pub_data = re.search(
+        r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
+        out_text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if pub_data is None:
+        raise KeyParsingError("cannot parse elliptic curve key")
+    pub_hex = _decode_octets(pub_data.group(1))
+    asn1_oid_curve = pub_data.group(2).lower()
+    nist_curve = pub_data.group(3).lower() if pub_data.group(3) else None
+    if asn1_oid_curve == "prime256v1" or nist_curve == "p-256":
+        bits = 256
+        alg = "ES256"
+        hashalg = "sha256"
+        point_size = 32
+        curve = "P-256"
+    elif asn1_oid_curve == "secp384r1" or nist_curve == "p-384":
+        bits = 384
+        alg = "ES384"
+        hashalg = "sha384"
+        point_size = 48
+        curve = "P-384"
+    elif asn1_oid_curve == "secp521r1" or nist_curve == "p-521":
+        # Not yet supported on Let's Encrypt side, see
+        # https://github.com/letsencrypt/boulder/issues/2217
+        bits = 521
+        alg = "ES512"
+        hashalg = "sha512"
+        point_size = 66
+        curve = "P-521"
+    else:
+        raise KeyParsingError(
+            f"unknown elliptic curve: {asn1_oid_curve} / {nist_curve}"
+        )
+    num_bytes = (bits + 7) // 8
+    if len(pub_hex) != 2 * num_bytes:
+        raise KeyParsingError(
+            f"bad elliptic curve point ({asn1_oid_curve} / {nist_curve})"
+        )
+    return {
+        "key_file": key_file,
+        "type": "ec",
+        "alg": alg,
+        "jwk": {
+            "kty": "EC",
+            "crv": curve,
+            "x": nopad_b64(pub_hex[:num_bytes]),
+            "y": nopad_b64(pub_hex[num_bytes:]),
+        },
+        "hash": hashalg,
+        "point_size": point_size,
+    }
+
+
 class OpenSSLCLIBackend(CryptoBackend):
     def __init__(
         self, *, module: AnsibleModule, openssl_binary: str | None = None
@@ -204,89 +292,13 @@ class OpenSSLCLIBackend(CryptoBackend):
         out_text = to_text(out, errors="surrogate_or_strict")
 
         if account_key_type == "rsa":
-            matcher = re.search(
-                r"modulus:\n\s+00:([a-f0-9\:\s]+?)\npublicExponent",
-                out_text,
-                re.MULTILINE | re.DOTALL,
+            return _extract_rsa_key(
+                out_text, key_file=str(key_file) if key_file is not None else None
             )
-            if matcher is None:
-                raise KeyParsingError("cannot parse RSA key: modulus not found")
-            pub_hex = matcher.group(1)
-
-            matcher = re.search(
-                r"\npublicExponent: ([0-9]+)", out_text, re.MULTILINE | re.DOTALL
-            )
-            if matcher is None:
-                raise KeyParsingError("cannot parse RSA key: public exponent not found")
-            pub_exp = matcher.group(1)
-            pub_exp = f"{int(pub_exp):x}"
-            if len(pub_exp) % 2:
-                pub_exp = f"0{pub_exp}"
-
-            return {
-                "key_file": str(key_file),
-                "type": "rsa",
-                "alg": "RS256",
-                "jwk": {
-                    "kty": "RSA",
-                    "e": nopad_b64(binascii.unhexlify(pub_exp.encode("utf-8"))),
-                    "n": nopad_b64(_decode_octets(pub_hex)),
-                },
-                "hash": "sha256",
-            }
         if account_key_type == "ec":
-            pub_data = re.search(
-                r"pub:\s*\n\s+04:([a-f0-9\:\s]+?)\nASN1 OID: (\S+)(?:\nNIST CURVE: (\S+))?",
-                out_text,
-                re.MULTILINE | re.DOTALL,
+            return _extract_ec_key(
+                out_text, key_file=str(key_file) if key_file is not None else None
             )
-            if pub_data is None:
-                raise KeyParsingError("cannot parse elliptic curve key")
-            pub_hex = _decode_octets(pub_data.group(1))
-            asn1_oid_curve = pub_data.group(2).lower()
-            nist_curve = pub_data.group(3).lower() if pub_data.group(3) else None
-            if asn1_oid_curve == "prime256v1" or nist_curve == "p-256":
-                bits = 256
-                alg = "ES256"
-                hashalg = "sha256"
-                point_size = 32
-                curve = "P-256"
-            elif asn1_oid_curve == "secp384r1" or nist_curve == "p-384":
-                bits = 384
-                alg = "ES384"
-                hashalg = "sha384"
-                point_size = 48
-                curve = "P-384"
-            elif asn1_oid_curve == "secp521r1" or nist_curve == "p-521":
-                # Not yet supported on Let's Encrypt side, see
-                # https://github.com/letsencrypt/boulder/issues/2217
-                bits = 521
-                alg = "ES512"
-                hashalg = "sha512"
-                point_size = 66
-                curve = "P-521"
-            else:
-                raise KeyParsingError(
-                    f"unknown elliptic curve: {asn1_oid_curve} / {nist_curve}"
-                )
-            num_bytes = (bits + 7) // 8
-            if len(pub_hex) != 2 * num_bytes:
-                raise KeyParsingError(
-                    f"bad elliptic curve point ({asn1_oid_curve} / {nist_curve})"
-                )
-            return {
-                "key_file": key_file,
-                "type": "ec",
-                "alg": alg,
-                "jwk": {
-                    "kty": "EC",
-                    "crv": curve,
-                    "x": nopad_b64(pub_hex[:num_bytes]),
-                    "y": nopad_b64(pub_hex[num_bytes:]),
-                },
-                "hash": hashalg,
-                "point_size": point_size,
-            }
         raise KeyParsingError(
             f"Internal error: unexpected account_key_type = {account_key_type!r}"
         )
