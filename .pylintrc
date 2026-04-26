@@ -118,7 +118,7 @@ good-names=i,
 good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
-include-naming-hint=no
+include-naming-hint=yes
 
 # Naming style matching correct inline iteration names.
 inlinevar-naming-style=any
@@ -157,7 +157,7 @@ property-classes=abc.abstractproperty
 
 # Regular expression matching correct type alias names. If left empty, type
 # alias names will be checked with the set naming style.
-#typealias-rgx=
+typealias-rgx = ^_{0,2}(?!T[A-Z]|Type)[A-Z]+[a-z0-9]+(?:[A-Z][a-z0-9]+)*T?$
 
 # Regular expression matching correct type variable names. If left empty, type
 # variable names will be checked with the set naming style.

@@ -243,7 +243,7 @@ class SelfSignedCertificateProvider(CertificateProvider):
 
 
 def add_selfsigned_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
-    argument_spec.argument_spec["provider"]["choices"].append("selfsigned")
+    argument_spec.argument_spec["provider"]["choices"].append("selfsigned")  # type: ignore
     argument_spec.argument_spec.update(
         {
             "selfsigned_version": {

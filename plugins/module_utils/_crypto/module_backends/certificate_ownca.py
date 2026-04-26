@@ -340,7 +340,7 @@ class OwnCACertificateProvider(CertificateProvider):
 
 
 def add_ownca_provider_to_argument_spec(argument_spec: ArgumentSpec) -> None:
-    argument_spec.argument_spec["provider"]["choices"].append("ownca")
+    argument_spec.argument_spec["provider"]["choices"].append("ownca")  # type: ignore
     argument_spec.argument_spec.update(
         {
             "ownca_path": {"type": "path"},
