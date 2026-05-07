@@ -47,7 +47,7 @@ options:
   ari_algorithm:
     description:
       - If ARI information is used, selects which algorithm is used to determine whether to renew now.
-      - V(standard) selects the L(algorithm provided in the the ARI specification,
+      - V(standard) selects the L(algorithm provided in the ARI specification,
         https://www.rfc-editor.org/rfc/rfc9773.html#section-4.2).
       - V(start) returns RV(should_renew=true) once the start of the renewal interval has been reached.
     type: str
@@ -289,7 +289,7 @@ def main() -> t.NoReturn:
                 if now > random_time:
                     complete(
                         True,
-                        msg=f"The picked random renewal time {random_time} in sugested renewal internal provided by ARI is in the past{msg_append}",
+                        msg=f"The picked random renewal time {random_time} in suggested renewal interval provided by ARI is in the past{msg_append}",
                     )
 
         if module.params["remaining_days"] is not None:
