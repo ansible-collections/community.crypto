@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.8
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- acme_* modules - adjust OpenSSL RSA private key output parsing to OpenSSL 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1005).
+
 v2.26.7
 =======
 

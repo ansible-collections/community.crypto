@@ -1722,3 +1722,13 @@ releases:
       - 2.26.7.yml
       - 981-ec.yml
     release_date: '2026-02-12'
+  2.26.8:
+    changes:
+      bugfixes:
+        - acme_* modules - adjust OpenSSL RSA private key output parsing to OpenSSL
+          4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1005).
+      release_summary: Bugfix release.
+    fragments:
+      - 1005-openssl-4.yml
+      - 2.26.8.yml
+    release_date: '2026-05-14'
