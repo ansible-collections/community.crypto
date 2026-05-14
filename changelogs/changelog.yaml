@@ -1942,3 +1942,16 @@ releases:
           name: acme_dns_persist_record_parse
           namespace: null
     release_date: '2026-04-19'
+  3.2.1:
+    changes:
+      bugfixes:
+        - acme_* modules - adjust OpenSSL RSA private key output parsing to OpenSSL
+          4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1005).
+        - acme_challenge_cert_helper - adjust private key check for new private key
+          types in cryptography 47.0.0 (https://github.com/ansible-collections/community.crypto/pull/1007).
+      release_summary: Bugfix release.
+    fragments:
+      - 1005-openssl-4.yml
+      - 1007-cryptography-47.yml
+      - 3.2.1.yml
+    release_date: '2026-05-14'
