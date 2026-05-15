@@ -127,8 +127,8 @@ stages:
           targets:
             - name: Fedora 44
               test: fedora44
-            - name: Ubuntu 24.04
-              test: ubuntu2404
+            - name: Ubuntu 26.04
+              test: ubuntu2604
             - name: Alpine 3.23
               test: alpine323
           groups:
@@ -161,6 +161,8 @@ stages:
           targets:
             - name: Fedora 42
               test: fedora42
+            - name: Ubuntu 22.04
+              test: ubuntu2204
             - name: Alpine 3.22
               test: alpine322
           groups:
@@ -208,8 +210,6 @@ stages:
           targets:
             - name: Fedora 39
               test: fedora39
-            - name: Ubuntu 22.04
-              test: ubuntu2204
             - name: Alpine 3.19
               test: alpine319
           groups:
@@ -250,8 +250,8 @@ stages:
               test: alpine/3.23
             - name: Fedora 44
               test: fedora/44
-            - name: Ubuntu 22.04
-              test: ubuntu/22.04
+            - name: Ubuntu 26.04
+              test: ubuntu/26.04
             - name: Ubuntu 24.04
               test: ubuntu/24.04
           groups:
