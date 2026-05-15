@@ -1,0 +1,3 @@
+minor_changes:
+  - "Add ``python3-bcrypt`` OS package dependency for RPM and DPKG based systems to Execution Environment dependencies
+     (https://github.com/ansible-collections/community.crypto/pull/990, https://github.com/ansible-collections/community.crypto/issues/988)."
