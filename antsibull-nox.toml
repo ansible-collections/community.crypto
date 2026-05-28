@@ -6,6 +6,34 @@
 "community.general" = "git+https://github.com/ansible-collections/community.general.git,main"
 "community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
 
+[collection_sources_per_ansible.'2.17']
+# community.general's main branch needs ansible-core >= 2.18
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-12"
+
+[collection_sources_per_ansible.'2.16']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-11"
+
+[collection_sources_per_ansible.'2.15']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-10"
+
+[collection_sources_per_ansible.'2.14']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-9"
+
+[collection_sources_per_ansible.'2.13']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-9"
+
+[collection_sources_per_ansible.'2.12']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-7"
+
+[collection_sources_per_ansible.'2.11']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-7"
+
+[collection_sources_per_ansible.'2.10']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-4"
+
+[collection_sources_per_ansible.'2.9']
+"community.general" = "git+https://github.com/ansible-collections/community.general.git,stable-4"
+
 [vcs]
 vcs = "git"
 development_branch = "main"
@@ -51,6 +79,254 @@ doc_fragment = "community.crypto.attributes.actiongroup_acme"
 
 [sessions.build_import_check]
 run_galaxy_importer = true
+
+[sessions.ansible_test_sanity]
+include_devel = false
+max_version = "2.19"
+
+[sessions.ansible_test_units]
+include_devel = false
+max_version = "2.19"
+
+[sessions.ansible_test_integration]
+session_name_template = "ansible-test-integration-{ansible_core}{dash_docker_short}{dash_remote}{dash_python_version}{dash_target_dashized}"
+display_name_template = "Ⓐ{ansible_core}{plus_docker_short}{plus_remote}{plus_py_python_version}{plus_target}"
+description_template = "Run integration tests with ansible-core {ansible_core}{comma_docker_short}{comma_remote}{comma_py_python_version}{comma_target}"
+
+##################################################################################################
+
+# Ansible 2.9:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.9"
+description = "Meta session for running all ansible-test-integration-2.9-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.9"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "ubuntu1804" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.9"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "2.7" ]
+
+# Ansible-base 2.10:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.10"
+description = "Meta session for running all ansible-test-integration-2.10-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.10"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "centos6" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.10"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.6" ]
+
+# Ansible-core 2.11:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.11"
+description = "Meta session for running all ansible-test-integration-2.11-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.11"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "alpine3" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.11"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.8" ]
+
+# Ansible-core 2.12:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.12"
+description = "Meta session for running all ansible-test-integration-2.12-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.12"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "centos6", "fedora33" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.12"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "2.6", "3.9" ]
+
+# Ansible-core 2.13:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.13"
+description = "Meta session for running all ansible-test-integration-2.13-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.13"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "opensuse15py2", "fedora35", "fedora34", "ubuntu1804", "alpine3" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.13"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.8" ]
+
+# Ansible-core 2.14:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.14"
+description = "Meta session for running all ansible-test-integration-2.14-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.14"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "ubuntu2004" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.14"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.9" ]
+
+# Ansible-core 2.15:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.15"
+description = "Meta session for running all ansible-test-integration-2.15-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.15"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "fedora37" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.15"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.5", "3.10" ]
+
+# Ansible-core 2.16:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.16"
+description = "Meta session for running all ansible-test-integration-2.16-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.16"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "fedora38", "opensuse15", "alpine3" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.16"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "2.7", "3.6", "3.11" ]
+
+# Ansible-core 2.17:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.17"
+description = "Meta session for running all ansible-test-integration-2.17-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.17"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "fedora39", "ubuntu2204", "alpine319" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.17"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.7", "3.12" ]
+
+# Ansible-core 2.18:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.18"
+description = "Meta session for running all ansible-test-integration-2.18-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [ "fedora40", "ubuntu2404", "alpine320" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.8", "3.13" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+remote = [
+    "macos/14.3",
+    "freebsd/14.1"
+]
+
+# Ansible-core 2.19:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.19"
+description = "Meta session for running all ansible-test-integration-2.19-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+docker = [
+    "fedora41",
+    "ubuntu2404",
+    "alpine321",
+]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/generic/1/", "azp/generic/2/" ]
+docker = [ "default" ]
+python_version = [ "3.8", "3.11", "3.13" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+python_version = "3.9"
+docker = "quay.io/ansible-community/test-image:debian-bullseye"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+python_version = "3.11"
+docker = "quay.io/ansible-community/test-image:debian-bookworm"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/vm/" ]
+remote = [
+    "alpine/3.21",
+    "fedora/41",
+    "ubuntu/22.04",
+    "ubuntu/24.04",
+]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/" ]
+remote = [
+    "rhel/10.1",
+    "rhel/9.7",
+    "freebsd/14.2",
+    "freebsd/13.5",
+]
+
+##################################################################################################
 
 # [sessions.ansible_lint]
 
