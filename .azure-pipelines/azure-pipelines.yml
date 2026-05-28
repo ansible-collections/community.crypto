@@ -105,17 +105,6 @@ stages:
               test: '2.18/sanity/1'
             - name: Units
               test: '2.18/units/1'
-  - stage: Ansible_2_17
-    displayName: Sanity & Units 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          targets:
-            - name: Sanity
-              test: '2.17/sanity/1'
-            - name: Units
-              test: '2.17/units/1'
 ### Docker
   - stage: Docker_devel
     displayName: Docker devel
@@ -197,21 +186,6 @@ stages:
               test: ubuntu2404
             - name: Alpine 3.20
               test: alpine320
-          groups:
-            - 1
-            - 2
-  - stage: Docker_2_17
-    displayName: Docker 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.17/linux/{0}
-          targets:
-            - name: Fedora 39
-              test: fedora39
-            - name: Alpine 3.19
-              test: alpine319
           groups:
             - 1
             - 2
@@ -420,20 +394,6 @@ stages:
           groups:
             - 1
             - 2
-  - stage: Generic_2_17
-    displayName: Generic 2.17
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.17/generic/{0}
-          targets:
-            - test: "3.7"
-            - test: "3.12"
-          groups:
-            - 1
-            - 2
 
   ## Finally
 
@@ -445,7 +405,6 @@ stages:
       - Ansible_2_20
       - Ansible_2_19
       - Ansible_2_18
-      - Ansible_2_17
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_21
@@ -457,13 +416,11 @@ stages:
       - Docker_2_20
       - Docker_2_19
       - Docker_2_18
-      - Docker_2_17
       - Docker_community_devel
       - Generic_devel
       - Generic_2_21
       - Generic_2_20
       - Generic_2_19
       - Generic_2_18
-      - Generic_2_17
     jobs:
       - template: templates/coverage.yml
