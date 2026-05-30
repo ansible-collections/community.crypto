@@ -11,6 +11,7 @@ acme_certificate_order_validate
 azp/generic/1
 azp/posix/1
 cloud/acme
+destructive
 
 # For some reason connecting to helper containers does not work on the Alpine VMs
 skip/alpine
