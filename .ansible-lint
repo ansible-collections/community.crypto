@@ -27,3 +27,18 @@ skip_list:
   - var-naming[no-role-prefix]
   - var-naming[pattern]
   - var-naming[read-only]
+
+exclude_paths:
+  # Ansible-lint uses "ansible-playbook --syntax-check" as its "syntax check",
+  # which bails out on roles it cannot find. The following playbooks are 100% valid,
+  # but we need to skip them due to ansible-lint's syntax check's deficiencies...
+  - tests/integration/targets/filter_openssl_csr_info/runme.yml
+  - tests/integration/targets/filter_openssl_csr_info/setup.yml
+  - tests/integration/targets/filter_openssl_privatekey_info/runme.yml
+  - tests/integration/targets/filter_openssl_privatekey_info/setup.yml
+  - tests/integration/targets/filter_openssl_publickey_info/runme.yml
+  - tests/integration/targets/filter_openssl_publickey_info/setup.yml
+  - tests/integration/targets/filter_x509_certificate_info/runme.yml
+  - tests/integration/targets/filter_x509_certificate_info/setup.yml
+  - tests/integration/targets/filter_x509_crl_info/runme.yml
+  - tests/integration/targets/filter_x509_crl_info/setup.yml
