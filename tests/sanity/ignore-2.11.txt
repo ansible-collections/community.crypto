@@ -6,6 +6,7 @@
 .azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
 noxfile.py compile-2.6!skip # Uses Python 3.6+ syntax
 noxfile.py compile-2.7!skip # Uses Python 3.6+ syntax
+noxfile.py compile-3.5!skip # Uses Python 3.6+ syntax
 noxfile.py future-import-boilerplate
 noxfile.py metaclass-boilerplate
 plugins/module_utils/crypto/cryptography_support.py pep8:E203
