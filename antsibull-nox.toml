@@ -92,6 +92,7 @@ max_version = "2.19"
 session_name_template = "ansible-test-integration-{ansible_core}{dash_docker_short}{dash_remote}{dash_python_version}{dash_target_dashized}"
 display_name_template = "Ⓐ{ansible_core}{plus_docker_short}{plus_remote}{plus_py_python_version}{plus_target}"
 description_template = "Run integration tests with ansible-core {ansible_core}{comma_docker_short}{comma_remote}{comma_py_python_version}{comma_target}"
+retry_on_error = "in-ci"
 
 ##################################################################################################
 
