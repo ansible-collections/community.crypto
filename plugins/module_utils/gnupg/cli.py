@@ -59,6 +59,7 @@ def get_fingerprint_from_file(gpg_runner, path):
     stdout = gpg_runner.run_command(
         [
             "--no-keyring",
+            "--no-autostart",  # --no-use-agent doesn't do anything, this is the second-best
             "--with-colons",
             "--import-options",
             "show-only",
@@ -74,6 +75,7 @@ def get_fingerprint_from_bytes(gpg_runner, content):
     stdout = gpg_runner.run_command(
         [
             "--no-keyring",
+            "--no-autostart",  # --no-use-agent doesn't do anything, this is the second-best
             "--with-colons",
             "--import-options",
             "show-only",
