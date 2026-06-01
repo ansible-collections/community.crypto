@@ -77,4 +77,4 @@
           - >-
             'Running ' in result.msg
           - >-
-            ('/gpg --no-keyring --with-colons --import-options show-only --import /dev/stdin yielded return code ') in result.msg
+            ('/gpg --no-keyring --no-autostart --with-colons --import-options show-only --import /dev/stdin yielded return code ') in result.msg
