@@ -98,25 +98,25 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: alpine320 + azp/posix/1/
+            - name: Alpine 3.20 + group 1
               test: ansible-test-integration-2.18-alpine320-azp-posix-1
-            - name: alpine320 + azp/posix/2/
+            - name: Alpine 3.20 + group 2
               test: ansible-test-integration-2.18-alpine320-azp-posix-2
-            - name: default + py3.13 + azp/generic/1/
+            - name: Generic + py3.13 + group 1
               test: ansible-test-integration-2.18-default-3.13-azp-generic-1
-            - name: default + py3.13 + azp/generic/2/
+            - name: Generic + py3.13 + group 2
               test: ansible-test-integration-2.18-default-3.13-azp-generic-2
-            - name: default + py3.8 + azp/generic/1/
+            - name: Generic + py3.8 + group 1
               test: ansible-test-integration-2.18-default-3.8-azp-generic-1
-            - name: default + py3.8 + azp/generic/2/
+            - name: Generic + py3.8 + group 2
               test: ansible-test-integration-2.18-default-3.8-azp-generic-2
-            - name: fedora40 + azp/posix/1/
+            - name: Fedora 40 + group 1
               test: ansible-test-integration-2.18-fedora40-azp-posix-1
-            - name: fedora40 + azp/posix/2/
+            - name: Fedora 40 + group 2
               test: ansible-test-integration-2.18-fedora40-azp-posix-2
-            - name: ubuntu2204 + azp/posix/1/
+            - name: Ubuntu 22.04 + group 1
               test: ansible-test-integration-2.18-ubuntu2204-azp-posix-1
-            - name: ubuntu2204 + azp/posix/2/
+            - name: Ubuntu 22.04 + group 2
               test: ansible-test-integration-2.18-ubuntu2204-azp-posix-2
 
   - stage: docker_2_19
@@ -128,21 +128,21 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: alpine321 + azp/posix/1/
+            - name: Alpine 3.21 + group 1
               test: ansible-test-integration-2.19-alpine321-azp-posix-1
-            - name: alpine321 + azp/posix/2/
+            - name: Alpine 3.21 + group 2
               test: ansible-test-integration-2.19-alpine321-azp-posix-2
-            - name: default + py3.13 + azp/generic/1/
+            - name: Generic + py3.13 + group 1
               test: ansible-test-integration-2.19-default-3.13-azp-generic-1
-            - name: default + py3.13 + azp/generic/2/
+            - name: Generic + py3.13 + group 2
               test: ansible-test-integration-2.19-default-3.13-azp-generic-2
-            - name: default + py3.9 + azp/generic/1/
+            - name: Generic + py3.9 + group 1
               test: ansible-test-integration-2.19-default-3.9-azp-generic-1
-            - name: default + py3.9 + azp/generic/2/
+            - name: Generic + py3.9 + group 2
               test: ansible-test-integration-2.19-default-3.9-azp-generic-2
-            - name: fedora41 + azp/posix/1/
+            - name: Fedora 41 + group 1
               test: ansible-test-integration-2.19-fedora41-azp-posix-1
-            - name: fedora41 + azp/posix/2/
+            - name: Fedora 41 + group 2
               test: ansible-test-integration-2.19-fedora41-azp-posix-2
 
   - stage: docker_2_20
@@ -154,25 +154,25 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: alpine322 + azp/posix/1/
+            - name: Alpine 3.22 + group 1
               test: ansible-test-integration-2.20-alpine322-azp-posix-1
-            - name: alpine322 + azp/posix/2/
+            - name: Alpine 3.22 + group 2
               test: ansible-test-integration-2.20-alpine322-azp-posix-2
-            - name: default + py3.10 + azp/generic/1/
+            - name: Generic + py3.10 + group 1
               test: ansible-test-integration-2.20-default-3.10-azp-generic-1
-            - name: default + py3.10 + azp/generic/2/
+            - name: Generic + py3.10 + group 2
               test: ansible-test-integration-2.20-default-3.10-azp-generic-2
-            - name: default + py3.14 + azp/generic/1/
+            - name: Generic + py3.14 + group 1
               test: ansible-test-integration-2.20-default-3.14-azp-generic-1
-            - name: default + py3.14 + azp/generic/2/
+            - name: Generic + py3.14 + group 2
               test: ansible-test-integration-2.20-default-3.14-azp-generic-2
-            - name: fedora42 + azp/posix/1/
+            - name: Fedora 42 + group 1
               test: ansible-test-integration-2.20-fedora42-azp-posix-1
-            - name: fedora42 + azp/posix/2/
+            - name: Fedora 42 + group 2
               test: ansible-test-integration-2.20-fedora42-azp-posix-2
-            - name: ubuntu2204 + azp/posix/1/
+            - name: Ubuntu 22.04 + group 1
               test: ansible-test-integration-2.20-ubuntu2204-azp-posix-1
-            - name: ubuntu2204 + azp/posix/2/
+            - name: Ubuntu 22.04 + group 2
               test: ansible-test-integration-2.20-ubuntu2204-azp-posix-2
 
   - stage: docker_2_21
@@ -184,21 +184,21 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: default + py3.11 + azp/generic/1/
+            - name: Generic + py3.11 + group 1
               test: ansible-test-integration-2.21-default-3.11-azp-generic-1
-            - name: default + py3.11 + azp/generic/2/
+            - name: Generic + py3.11 + group 2
               test: ansible-test-integration-2.21-default-3.11-azp-generic-2
-            - name: default + py3.14 + azp/generic/1/
+            - name: Generic + py3.14 + group 1
               test: ansible-test-integration-2.21-default-3.14-azp-generic-1
-            - name: default + py3.14 + azp/generic/2/
+            - name: Generic + py3.14 + group 2
               test: ansible-test-integration-2.21-default-3.14-azp-generic-2
-            - name: fedora43 + azp/posix/1/
+            - name: Fedora 43 + group 1
               test: ansible-test-integration-2.21-fedora43-azp-posix-1
-            - name: fedora43 + azp/posix/2/
+            - name: Fedora 43 + group 2
               test: ansible-test-integration-2.21-fedora43-azp-posix-2
-            - name: ubuntu2404 + azp/posix/1/
+            - name: Ubuntu 24.04 + group 1
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-1
-            - name: ubuntu2404 + azp/posix/2/
+            - name: Ubuntu 24.04 + group 2
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-2
 
   - stage: docker_devel
@@ -210,41 +210,41 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: alpine323 + azp/posix/1/
+            - name: Alpine 3.23 + group 1
               test: ansible-test-integration-devel-alpine323-azp-posix-1
-            - name: alpine323 + azp/posix/2/
+            - name: Alpine 3.23 + group 2
               test: ansible-test-integration-devel-alpine323-azp-posix-2
-            - name: archlinux + py3.14 + azp/posix/1/
+            - name: Arch Linux + py3.14 + group 1
               test: ansible-test-integration-devel-archlinux-3.14-azp-posix-1
-            - name: archlinux + py3.14 + azp/posix/2/
+            - name: Arch Linux + py3.14 + group 2
               test: ansible-test-integration-devel-archlinux-3.14-azp-posix-2
-            - name: debian-13-trixie + py3.13 + azp/posix/1/
+            - name: Debian 13 + py3.13 + group 1
               test: ansible-test-integration-devel-debian-13-trixie-3.13-azp-posix-1
-            - name: debian-13-trixie + py3.13 + azp/posix/2/
+            - name: Debian 13 + py3.13 + group 2
               test: ansible-test-integration-devel-debian-13-trixie-3.13-azp-posix-2
-            - name: debian-bookworm + py3.11 + azp/posix/1/
+            - name: Debian 12 + py3.11 + group 1
               test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-1
-            - name: debian-bookworm + py3.11 + azp/posix/2/
+            - name: Debian 12 + py3.11 + group 2
               test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-2
-            - name: debian-bullseye + py3.9 + azp/posix/1/
+            - name: Debian 11 + py3.9 + group 1
               test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-1
-            - name: debian-bullseye + py3.9 + azp/posix/2/
+            - name: Debian 11 + py3.9 + group 2
               test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-2
-            - name: default + py3.12 + azp/generic/1/
+            - name: Generic + py3.12 + group 1
               test: ansible-test-integration-devel-default-3.12-azp-generic-1
-            - name: default + py3.12 + azp/generic/2/
+            - name: Generic + py3.12 + group 2
               test: ansible-test-integration-devel-default-3.12-azp-generic-2
-            - name: default + py3.15 + azp/generic/1/
+            - name: Generic + py3.15 + group 1
               test: ansible-test-integration-devel-default-3.15-azp-generic-1
-            - name: default + py3.15 + azp/generic/2/
+            - name: Generic + py3.15 + group 2
               test: ansible-test-integration-devel-default-3.15-azp-generic-2
-            - name: fedora44 + azp/posix/1/
+            - name: Fedora 44 + group 1
               test: ansible-test-integration-devel-fedora44-azp-posix-1
-            - name: fedora44 + azp/posix/2/
+            - name: Fedora 44 + group 2
               test: ansible-test-integration-devel-fedora44-azp-posix-2
-            - name: ubuntu2604 + azp/posix/1/
+            - name: Ubuntu 26.04 + group 1
               test: ansible-test-integration-devel-ubuntu2604-azp-posix-1
-            - name: ubuntu2604 + azp/posix/2/
+            - name: Ubuntu 26.04 + group 2
               test: ansible-test-integration-devel-ubuntu2604-azp-posix-2
 
   - stage: remote_2_18
@@ -256,9 +256,9 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: freebsd/14.1 + azp/posix/1/
+            - name: FreeBSD 14.1 + group 1
               test: ansible-test-integration-2.18-freebsd-14.1-azp-posix-1
-            - name: freebsd/14.1 + azp/posix/2/
+            - name: FreeBSD 14.1 + group 2
               test: ansible-test-integration-2.18-freebsd-14.1-azp-posix-2
 
   - stage: remote_2_19
@@ -270,13 +270,13 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: freebsd/14.2 + azp/posix/1/
+            - name: FreeBSD 14.2 + group 1
               test: ansible-test-integration-2.19-freebsd-14.2-azp-posix-1
-            - name: freebsd/14.2 + azp/posix/2/
+            - name: FreeBSD 14.2 + group 2
               test: ansible-test-integration-2.19-freebsd-14.2-azp-posix-2
-            - name: rhel/10.1 + azp/posix/1/
+            - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.19-rhel-10.1-azp-posix-1
-            - name: rhel/10.1 + azp/posix/2/
+            - name: RHEL 10.1 + group 2
               test: ansible-test-integration-2.19-rhel-10.1-azp-posix-2
 
   - stage: remote_2_20
@@ -288,17 +288,17 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: freebsd/14.3 + azp/posix/1/
+            - name: FreeBSD 14.3 + group 1
               test: ansible-test-integration-2.20-freebsd-14.3-azp-posix-1
-            - name: freebsd/14.3 + azp/posix/2/
+            - name: FreeBSD 14.3 + group 2
               test: ansible-test-integration-2.20-freebsd-14.3-azp-posix-2
-            - name: macos/15.3 + azp/posix/1/
+            - name: macOS 15.3 + group 1
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-1
-            - name: macos/15.3 + azp/posix/2/
+            - name: macOS 15.3 + group 2
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-2
-            - name: rhel/9.7 + azp/posix/1/
+            - name: RHEL 9.7 + group 1
               test: ansible-test-integration-2.20-rhel-9.7-azp-posix-1
-            - name: rhel/9.7 + azp/posix/2/
+            - name: RHEL 9.7 + group 2
               test: ansible-test-integration-2.20-rhel-9.7-azp-posix-2
 
   - stage: remote_2_21
@@ -310,9 +310,9 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: rhel/10.1 + azp/posix/1/
+            - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
-            - name: rhel/10.1 + azp/posix/2/
+            - name: RHEL 10.1 + group 2
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
 
   - stage: remote_devel
@@ -324,33 +324,33 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: alpine/3.23 + azp/posix/vm/
+            - name: Alpine 3.23 + extra VMs
               test: ansible-test-integration-devel-alpine-3.23-azp-posix-vm
-            - name: fedora/44 + azp/posix/vm/
+            - name: Fedora 44 + extra VMs
               test: ansible-test-integration-devel-fedora-44-azp-posix-vm
-            - name: freebsd/14.4 + azp/posix/1/
+            - name: FreeBSD 14.4 + group 1
               test: ansible-test-integration-devel-freebsd-14.4-azp-posix-1
-            - name: freebsd/14.4 + azp/posix/2/
+            - name: FreeBSD 14.4 + group 2
               test: ansible-test-integration-devel-freebsd-14.4-azp-posix-2
-            - name: freebsd/15.0 + azp/posix/1/
+            - name: FreeBSD 15.0 + group 1
               test: ansible-test-integration-devel-freebsd-15.0-azp-posix-1
-            - name: freebsd/15.0 + azp/posix/2/
+            - name: FreeBSD 15.0 + group 2
               test: ansible-test-integration-devel-freebsd-15.0-azp-posix-2
-            - name: macos/26.3 + azp/posix/1/
+            - name: macOS 26.3 + group 1
               test: ansible-test-integration-devel-macos-26.3-azp-posix-1
-            - name: macos/26.3 + azp/posix/2/
+            - name: macOS 26.3 + group 2
               test: ansible-test-integration-devel-macos-26.3-azp-posix-2
-            - name: rhel/10.1 + azp/posix/1/
+            - name: RHEL 10.1 + group 1
               test: ansible-test-integration-devel-rhel-10.1-azp-posix-1
-            - name: rhel/10.1 + azp/posix/2/
+            - name: RHEL 10.1 + group 2
               test: ansible-test-integration-devel-rhel-10.1-azp-posix-2
-            - name: rhel/9.7 + azp/posix/1/
+            - name: RHEL 9.7 + group 1
               test: ansible-test-integration-devel-rhel-9.7-azp-posix-1
-            - name: rhel/9.7 + azp/posix/2/
+            - name: RHEL 9.7 + group 2
               test: ansible-test-integration-devel-rhel-9.7-azp-posix-2
-            - name: ubuntu/24.04 + azp/posix/vm/
+            - name: Ubuntu 24.04 + extra VMs
               test: ansible-test-integration-devel-ubuntu-24.04-azp-posix-vm
-            - name: ubuntu/26.04 + azp/posix/vm/
+            - name: Ubuntu 26.04 + extra VMs
               test: ansible-test-integration-devel-ubuntu-26.04-azp-posix-vm
 
   - stage: Summary
