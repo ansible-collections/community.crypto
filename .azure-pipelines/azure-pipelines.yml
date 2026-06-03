@@ -58,15 +58,15 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: "2.18"
+            - name: ansible-core 2.18
               test: ansible-test-sanity-2.18
-            - name: "2.19"
+            - name: ansible-core 2.19
               test: ansible-test-sanity-2.19
-            - name: "2.20"
+            - name: ansible-core 2.20
               test: ansible-test-sanity-2.20
-            - name: "2.21"
+            - name: ansible-core 2.21
               test: ansible-test-sanity-2.21
-            - name: devel
+            - name: ansible-core devel
               test: ansible-test-sanity-devel
 
   - stage: units
@@ -78,15 +78,15 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: "2.18"
+            - name: ansible-core 2.18
               test: ansible-test-units-2.18
-            - name: "2.19"
+            - name: ansible-core 2.19
               test: ansible-test-units-2.19
-            - name: "2.20"
+            - name: ansible-core 2.20
               test: ansible-test-units-2.20
-            - name: "2.21"
+            - name: ansible-core 2.21
               test: ansible-test-units-2.21
-            - name: devel
+            - name: ansible-core devel
               test: ansible-test-units-devel
 
   - stage: docker_2_18
