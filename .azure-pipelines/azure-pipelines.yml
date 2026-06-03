@@ -58,9 +58,9 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: "2.18"
+            - name: ansible-core 2.18
               test: ansible-test-sanity-2.18
-            - name: "2.19"
+            - name: ansible-core 2.19
               test: ansible-test-sanity-2.19
 
   - stage: units
@@ -72,9 +72,9 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: "2.18"
+            - name: ansible-core 2.18
               test: ansible-test-units-2.18
-            - name: "2.19"
+            - name: ansible-core 2.19
               test: ansible-test-units-2.19
 
   - stage: docker_2_18
