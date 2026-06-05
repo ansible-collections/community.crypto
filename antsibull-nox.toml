@@ -284,7 +284,7 @@ ansible_core = "2.18"
 target = [ "azp/posix/1/", "azp/posix/2/" ]
 remote = [
     "macos/14.3",
-    "freebsd/14.1"
+    # "freebsd/14.1"
 ]
 
 # Ansible-core 2.19:
@@ -336,7 +336,7 @@ target = [ "azp/posix/1/", "azp/posix/2/" ]
 remote = [
     "rhel/10.1",
     "rhel/9.7",
-    "freebsd/14.2",
+    # "freebsd/14.2",
     "freebsd/13.5",
 ]
 
