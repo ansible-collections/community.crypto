@@ -74,7 +74,7 @@ stages:
               test: ansible-test-units-2.19
 
   - stage: docker_2_19
-    displayName: Docker ansible-core 2.19
+    displayName: Docker 2.19
     dependsOn: []
     variables:
       entryPoint: tests/utils/shippable/nox.sh
@@ -116,7 +116,7 @@ stages:
               test: ansible-test-integration-2.19-ubuntu2404-azp-posix-2
 
   - stage: remote_2_19
-    displayName: Remote ansible-core 2.19
+    displayName: Remote 2.19
     dependsOn: []
     variables:
       entryPoint: tests/utils/shippable/nox.sh
