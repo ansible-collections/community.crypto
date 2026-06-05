@@ -35,4 +35,5 @@ jobs:
       upload-codecov-pr: false
       upload-codecov-push: false
       upload-codecov-schedule: true
+      allow-coverage-cd-override: true
       max-ansible-core: "2.17"
