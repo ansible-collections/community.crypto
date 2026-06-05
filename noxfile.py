@@ -40,7 +40,7 @@ def update_azp_config(session: nox.Session) -> None:
         "antsibull-nox",
         "update-azp-config",
         "--min-ansible-core",
-        "2.18",
+        "2.19",
     ]
     if antsibull_nox.IN_CI:
         command.append("--fail-on-change")
