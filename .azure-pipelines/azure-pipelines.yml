@@ -132,10 +132,6 @@ stages:
               test: ansible-test-integration-2.19-freebsd-13.5-azp-posix-1
             - name: FreeBSD 13.5 + group 2
               test: ansible-test-integration-2.19-freebsd-13.5-azp-posix-2
-            - name: FreeBSD 14.2 + group 1
-              test: ansible-test-integration-2.19-freebsd-14.2-azp-posix-1
-            - name: FreeBSD 14.2 + group 2
-              test: ansible-test-integration-2.19-freebsd-14.2-azp-posix-2
             - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.19-rhel-10.1-azp-posix-1
             - name: RHEL 10.1 + group 2
