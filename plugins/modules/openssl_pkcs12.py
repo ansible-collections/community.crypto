@@ -316,6 +316,27 @@ try:
 except ImportError:
     pass
 
+try:
+    from cryptography.hazmat.primitives.asymmetric.mldsa import (
+        MLDSA44PrivateKey,
+        MLDSA65PrivateKey,
+        MLDSA87PrivateKey,
+    )
+
+    HAS_MLDSA_SUPPORT = True
+except ImportError:  # pragma: no cover
+
+    class MLDSA44PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    class MLDSA65PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    class MLDSA87PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    HAS_MLDSA_SUPPORT = False
+
 CRYPTOGRAPHY_COMPATIBILITY2022_ERR: str | None
 try:
     import cryptography.x509
@@ -334,13 +355,13 @@ else:
     CRYPTOGRAPHY_COMPATIBILITY2022_ERR = None  # pylint: disable=invalid-name
     CRYPTOGRAPHY_HAS_COMPATIBILITY2022 = True
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
-        CertificateIssuerPrivateKeyTypes,
+if t.TYPE_CHECKING:  # pragma: no cover
+    from cryptography.hazmat.primitives.serialization.pkcs12 import (
+        PKCS12PrivateKeyTypes,
     )
 
     PKCS12 = tuple[
-        t.Union[CertificateIssuerPrivateKeyTypes, None],  # noqa: UP007
+        t.Union[PKCS12PrivateKeyTypes, None],  # noqa: UP007
         t.Union[cryptography.x509.Certificate, None],  # noqa: UP007
         list[cryptography.x509.Certificate],
         t.Union[bytes, None],  # noqa: UP007
@@ -463,15 +484,27 @@ class Pkcs(OpenSSLObject):
 
     def generate_bytes(self, module: AnsibleModule) -> bytes:
         """Generate PKCS#12 file archive."""
-        pkey = None
+        pkey: PKCS12PrivateKeyTypes | None = None
         if self.privatekey_content:
             try:
-                pkey = load_certificate_issuer_privatekey(
+                private_key = load_certificate_issuer_privatekey(
                     content=self.privatekey_content,
                     passphrase=self.privatekey_passphrase,
                 )
             except OpenSSLBadPassphraseError as exc:
                 raise PkcsError(exc) from exc
+
+            if isinstance(
+                private_key,
+                (
+                    MLDSA44PrivateKey,
+                    MLDSA65PrivateKey,
+                    MLDSA87PrivateKey,
+                ),
+            ):
+                raise PkcsError(f"{private_key} is not a supported private key type")
+
+            pkey = private_key
 
         cert = None
         if self.certificate_content:

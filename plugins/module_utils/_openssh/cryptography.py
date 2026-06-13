@@ -68,11 +68,32 @@ except ImportError:
     CRYPTOGRAPHY_VERSION = "0.0"
     _ALGORITHM_PARAMETERS = {}
 
+try:
+    from cryptography.hazmat.primitives.asymmetric.mldsa import (
+        MLDSA44PrivateKey,
+        MLDSA65PrivateKey,
+        MLDSA87PrivateKey,
+    )
+
+    HAS_MLDSA_SUPPORT = True
+except ImportError:  # pragma: no cover
+
+    class MLDSA44PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    class MLDSA65PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    class MLDSA87PrivateKey:  # type: ignore[no-redef]
+        pass
+
+    HAS_MLDSA_SUPPORT = False
+
 from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
     is_potential_certificate_issuer_private_key,
 )
 
-if t.TYPE_CHECKING:
+if t.TYPE_CHECKING:  # pragma: no cover
     KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]  # pragma: no cover
     KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]  # pragma: no cover
     KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]  # pragma: no cover
@@ -703,6 +724,17 @@ def load_privatekey(
 
     if not is_potential_certificate_issuer_private_key(privatekey) or isinstance(
         privatekey, Ed448PrivateKey
+    ):
+        raise InvalidPrivateKeyFileError(
+            f"{privatekey} is not a supported private key type"
+        )
+    if isinstance(
+        privatekey,
+        (
+            MLDSA44PrivateKey,
+            MLDSA65PrivateKey,
+            MLDSA87PrivateKey,
+        ),
     ):
         raise InvalidPrivateKeyFileError(
             f"{privatekey} is not a supported private key type"
