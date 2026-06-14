@@ -4,6 +4,21 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.2.2
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- gpg_fingerprint lookup plugin, gpg_fingerprint filter plugin - prevent GnuPG from unnecessarily starting gpg-agent (https://github.com/ansible-collections/community.crypto/issues/1026, https://github.com/ansible-collections/community.crypto/pull/1029).
+- openssh_* modules - prevent use of currently unsupported MLDSA private keys in the cryptography backend (https://github.com/ansible-collections/community.crypto/pull/1044).
+- openssl_pkcs12 - prevent use of MLDSA private keys, which are not supported by PKCS#12, or at least cryptography's implementation (https://github.com/ansible-collections/community.crypto/pull/1044).
+
 v3.2.1
 ======
 

@@ -1,3 +1,0 @@
-bugfixes:
-  - "openssh_* modules - prevent use of currently unsupported MLDSA private keys in the cryptography backend (https://github.com/ansible-collections/community.crypto/pull/1044)."
-  - "openssl_pkcs12 - prevent use of MLDSA private keys, which are not supported by PKCS#12, or at least cryptography's implementation (https://github.com/ansible-collections/community.crypto/pull/1044)."

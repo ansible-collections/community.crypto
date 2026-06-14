@@ -1955,3 +1955,19 @@ releases:
       - 1007-cryptography-47.yml
       - 3.2.1.yml
     release_date: '2026-05-14'
+  3.2.2:
+    changes:
+      bugfixes:
+        - gpg_fingerprint lookup plugin, gpg_fingerprint filter plugin - prevent GnuPG
+          from unnecessarily starting gpg-agent (https://github.com/ansible-collections/community.crypto/issues/1026,
+          https://github.com/ansible-collections/community.crypto/pull/1029).
+        - openssh_* modules - prevent use of currently unsupported MLDSA private keys
+          in the cryptography backend (https://github.com/ansible-collections/community.crypto/pull/1044).
+        - openssl_pkcs12 - prevent use of MLDSA private keys, which are not supported
+          by PKCS#12, or at least cryptography's implementation (https://github.com/ansible-collections/community.crypto/pull/1044).
+      release_summary: Bugfix release.
+    fragments:
+      - 1029-gnupg.yml
+      - 1044-pqc.yml
+      - 3.2.2.yml
+    release_date: '2026-06-14'
