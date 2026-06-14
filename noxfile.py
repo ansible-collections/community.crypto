@@ -41,9 +41,11 @@ def update_azp_config(session: nox.Session) -> None:
         "update-azp-config",
         "--min-ansible-core",
         "2.19",
+        "--extra-session",
+        '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
     ]
     if antsibull_nox.IN_CI:
-        command.append("--fail-on-change")
+        command.extend(["--show-diff", "--fail-on-change"])
     session.debug(" ".join(command))
     result = run_antsibull_nox(command)
     if result != 0:
