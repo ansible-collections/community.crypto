@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v2.26.9
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- gpg_fingerprint lookup plugin, gpg_fingerprint filter plugin - prevent GnuPG from unnecessarily starting gpg-agent (https://github.com/ansible-collections/community.crypto/issues/1026, https://github.com/ansible-collections/community.crypto/pull/1029).
+
 v2.26.8
 =======
 

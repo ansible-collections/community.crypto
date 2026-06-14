@@ -1732,3 +1732,14 @@ releases:
       - 1005-openssl-4.yml
       - 2.26.8.yml
     release_date: '2026-05-14'
+  2.26.9:
+    changes:
+      bugfixes:
+        - gpg_fingerprint lookup plugin, gpg_fingerprint filter plugin - prevent GnuPG
+          from unnecessarily starting gpg-agent (https://github.com/ansible-collections/community.crypto/issues/1026,
+          https://github.com/ansible-collections/community.crypto/pull/1029).
+      release_summary: Bugfix release.
+    fragments:
+      - 1029-gnupg.yml
+      - 2.26.9.yml
+    release_date: '2026-06-14'
