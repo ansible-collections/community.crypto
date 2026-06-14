@@ -60,6 +60,8 @@ stages:
           targets:
             - name: ansible-core 2.19
               test: ansible-test-sanity-2.19
+            - name: Extra sanity tests
+              test: extra-sanity-tests
 
   - stage: units
     displayName: Unit tests
