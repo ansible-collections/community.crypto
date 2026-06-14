@@ -91,4 +91,8 @@ export ANTSIBULL_NOX_COVERAGE_DESTINATION="${COVERAGE_DESTINATION_DIRECTORY}"
 export ANTSIBULL_NOX_COVERAGE_ANALYSIS_FILE="${COVERAGE_DESTINATION_DIRECTORY}/coverage-analyze-targets.json"
 export ANTSIBULL_NOX_COVERAGE_NO_XML="true"
 
-nox -e "${nox_session}" -- ${COVERAGE}
+if [ "${nox_session}" == "extra-sanity-tests" ]; then
+    nox
+else
+    nox -e "${nox_session}" -- ${COVERAGE}
+fi
