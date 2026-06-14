@@ -66,6 +66,8 @@ stages:
               test: ansible-test-sanity-2.21
             - name: ansible-core devel
               test: ansible-test-sanity-devel
+            - name: extra sanity tests
+              test: extra-sanity-tests
 
   - stage: units
     displayName: Unit tests
