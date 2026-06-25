@@ -310,8 +310,8 @@ ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/" ]
 remote = [
     "macos/26.3",
-    "rhel/10.1",
-    "rhel/9.7",
+    "rhel/10.2",
+    "rhel/9.8",
     "freebsd/15.0",
     "freebsd/14.4",
 ]
