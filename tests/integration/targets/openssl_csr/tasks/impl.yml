@@ -899,49 +899,59 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: everything_info
 
-- name: "({{ select_crypto_backend }}) Ed25519 and Ed448 tests"
+- name: "({{ select_crypto_backend }}) Other private key type tests"
+  when: select_crypto_backend == 'cryptography'
+  vars:
+    types:
+      - type: Ed25519
+        min_version: '2.6'
+      - type: Ed448
+        min_version: '2.6'
+      - type: ML-DSA-44
+        min_version: '49.0.0'
+      - type: ML-DSA-65
+        min_version: '49.0.0'
+      - type: ML-DSA-87
+        min_version: '49.0.0'
   block:
-    - name: "({{ select_crypto_backend }}) Generate privatekeys"
+    - name: "({{ select_crypto_backend }}) Generate private keys"
       community.crypto.openssl_privatekey:
-        path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
-        type: '{{ item }}'
-      loop:
-        - Ed25519
-        - Ed448
-      register: generate_csr_ed25519_ed448_privatekey
+        path: '{{ remote_tmp_dir }}/privatekey_{{ item.type }}.pem'
+        type: '{{ item.type }}'
+      when: cryptography_version is version(item.min_version, '>=')
+      loop: "{{ types }}"
+      loop_control:
+        label: "{{ item.type }}"
+      register: generate_other_keys
       ignore_errors: true
 
-    - name: "({{ select_crypto_backend }}) Generate CSR if private key generation succeeded"
-      when: generate_csr_ed25519_ed448_privatekey is not failed
-      block:
+    - name: "({{ select_crypto_backend }}) Generate CSR"
+      community.crypto.openssl_csr:
+        path: '{{ remote_tmp_dir }}/csr_{{ item.0.type }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item.0.type }}.pem'
+        subject:
+          commonName: www.ansible.com
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: generate_other_csrs
+      ignore_errors: true
 
-        - name: "({{ select_crypto_backend }}) Generate CSR"
-          community.crypto.openssl_csr:
-            path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
-            subject:
-              commonName: www.ansible.com
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: generate_csr_ed25519_ed448
-          ignore_errors: true
-
-        - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
-          community.crypto.openssl_csr:
-            path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
-            subject:
-              commonName: www.ansible.com
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: generate_csr_ed25519_ed448_idempotent
-          ignore_errors: true
-
-  when: select_crypto_backend == 'cryptography'
+    - name: "({{ select_crypto_backend }}) Generate CSR (idempotent)"
+      community.crypto.openssl_csr:
+        path: '{{ remote_tmp_dir }}/csr_{{ item.0.type }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item.0.type }}.pem'
+        subject:
+          commonName: www.ansible.com
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: generate_other_csrs_idempotent
+      ignore_errors: true
 
 - name: "({{ select_crypto_backend }}) CRL distribution endpoints"
   block:

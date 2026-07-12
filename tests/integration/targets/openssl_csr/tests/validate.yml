@@ -305,16 +305,19 @@
           "IP:::1:0:0/112",
         ]
 
-- name: "({{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests"
+- name: "({{ select_crypto_backend }}) Verify other key type tests"
   ansible.builtin.assert:
     that:
-      - generate_csr_ed25519_ed448 is succeeded
-      - generate_csr_ed25519_ed448.results[0] is changed
-      - generate_csr_ed25519_ed448.results[1] is changed
-      - generate_csr_ed25519_ed448_idempotent is succeeded
-      - generate_csr_ed25519_ed448_idempotent.results[0] is not changed
-      - generate_csr_ed25519_ed448_idempotent.results[1] is not changed
-  when: select_crypto_backend == 'cryptography' and generate_csr_ed25519_ed448_privatekey is not failed
+      # item.1 is CSR generation
+      - item.1 is succeeded
+      - item.1 is changed
+      # item.2 is CSR generation idempotence
+      - item.2 is succeeded
+      - item.2 is not changed
+  when: select_crypto_backend == 'cryptography' and item.0 is not skipped and item.0 is succeeded
+  loop: "{{ generate_other_keys.results | zip(generate_other_csrs.results, generate_other_csrs_idempotent.results) | list }}"
+  loop_control:
+    label: "{{ item.0.item.type }}"
 
 - name: "({{ select_crypto_backend }}) Verify CRL distribution endpoints"
   ansible.builtin.assert:

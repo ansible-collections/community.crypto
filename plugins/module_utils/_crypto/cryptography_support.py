@@ -738,14 +738,20 @@ def cryptography_key_needs_digest_for_signing(
 ) -> bool:
     """Tests whether the given private key requires a digest algorithm for signing.
 
-    Ed25519 and Ed448 keys do not; they need None to be passed as the digest algorithm.
+    Ed25519 and Ed448 and ML-DSA-xx keys do not; they need None to be passed as the digest algorithm.
     """
-    if isinstance(
-        key, cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey
-    ):
+    if HAS_MLDSA44 and isinstance(key, MLDSA44PrivateKey):
+        return False
+    if HAS_MLDSA65 and isinstance(key, MLDSA65PrivateKey):
+        return False
+    if HAS_MLDSA87 and isinstance(key, MLDSA87PrivateKey):
         return False
     return not isinstance(
-        key, cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey
+        key,
+        (
+            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey,
+            cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey,
+        ),
     )
 
 
@@ -772,7 +778,7 @@ def cryptography_compare_public_keys(
 ) -> bool:
     """Tests whether two public keys are the same.
 
-    Needs special logic for Ed25519 and Ed448 keys, since they do not have public_numbers().
+    Needs special logic for Ed25519 and Ed448 and ML-DSA-xx keys, since they do not have public_numbers().
     """
     res = _compare_public_keys(
         key1,
