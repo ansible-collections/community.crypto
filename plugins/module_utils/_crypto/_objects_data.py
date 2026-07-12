@@ -19,7 +19,7 @@
 
 from __future__ import annotations
 
-OID_MAP = {
+OID_MAP: dict[str, tuple[str, ...] | list[tuple[str, ...]]] = {
     "0": ("itu-t", "ITU-T", "ccitt"),
     "0.3.4401.5": ("ntt-ds",),
     "0.3.4401.5.3.1.9": ("camellia",),

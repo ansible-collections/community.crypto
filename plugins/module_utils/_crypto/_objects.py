@@ -11,19 +11,28 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto._objects_
     OID_MAP,
 )
 
+DOTTED_LOOKUP: dict[str, str] = {}
 OID_LOOKUP: dict[str, str] = {}
 NORMALIZE_NAMES: dict[str, str] = {}
 NORMALIZE_NAMES_SHORT: dict[str, str] = {}
 
-for dotted, names in OID_MAP.items():
-    for name in names:
-        if name in NORMALIZE_NAMES and OID_LOOKUP[name] != dotted:
-            raise AssertionError(  # pragma: no cover
-                f'Name collision during setup: "{name}" for OIDs {dotted} and {OID_LOOKUP[name]}'
-            )
-        NORMALIZE_NAMES[name] = names[0]
-        NORMALIZE_NAMES_SHORT[name] = names[-1]
-        OID_LOOKUP[name] = dotted
+for dotted, names_or_names_list in OID_MAP.items():
+    names_list: list[tuple[str, ...]] = (
+        names_or_names_list
+        if isinstance(names_or_names_list, list)
+        else [names_or_names_list]
+    )
+    primary_names = names_list[0]
+    DOTTED_LOOKUP[dotted] = primary_names[0]
+    for names in names_list:
+        for name in names:
+            if name in NORMALIZE_NAMES and OID_LOOKUP[name] != dotted:
+                raise AssertionError(  # pragma: no cover
+                    f'Name collision during setup: "{name}" for OIDs {dotted} and {OID_LOOKUP[name]}'
+                )
+            NORMALIZE_NAMES[name] = primary_names[0]
+            NORMALIZE_NAMES_SHORT[name] = primary_names[-1]
+            OID_LOOKUP[name] = dotted
 for alias, original in [("userID", "userId")]:
     if alias in NORMALIZE_NAMES:
         raise AssertionError(  # pragma: no cover

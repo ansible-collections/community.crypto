@@ -76,10 +76,10 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto._obj2txt 
     obj2txt,
 )
 from ansible_collections.community.crypto.plugins.module_utils._crypto._objects import (
+    DOTTED_LOOKUP,
     NORMALIZE_NAMES,
     NORMALIZE_NAMES_SHORT,
     OID_LOOKUP,
-    OID_MAP,
 )
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
@@ -271,10 +271,8 @@ def cryptography_oid_to_name(
     oid: x509.oid.ObjectIdentifier, *, short: bool = False
 ) -> str:
     dotted_string = oid.dotted_string
-    names = OID_MAP.get(dotted_string)
-    if names:
-        name = names[0]
-    else:
+    name: str | None = DOTTED_LOOKUP.get(dotted_string)
+    if name is None:
         try:
             name = oid._name  # pylint: disable=protected-access
             if name == "Unknown OID":
