@@ -7,6 +7,8 @@
 # This has been extracted from the OpenSSL project's objects.txt:
 #     https://github.com/openssl/openssl/blob/9bd2f96139a3fd0efa0130ddaee3ef296fa0b633/crypto/objects/objects.txt
 # Extracted with https://gist.github.com/felixfontein/376748017ad65ead093d56a45a5bf376
+# It was manually augmented with aliases from the previous list extracted from:
+#     https://github.com/openssl/openssl/blob/9537fe5757bb07761fa275d779bbd40bcf5530e4/crypto/objects/objects.txt
 
 # In case the following data structure has any copyrightable content, note that it is licensed as follows:
 # Copyright (c) the OpenSSL contributors
@@ -280,17 +282,35 @@ OID_MAP: dict[str, tuple[str, ...] | list[tuple[str, ...]]] = {
     ),
     "1.2.643.7.1.1.5": ("id-tc26-cipher",),
     "1.2.643.7.1.1.5.1": ("id-tc26-cipher-gostr3412-2015-magma",),
-    "1.2.643.7.1.1.5.1.1": ("magma-ctr-acpkm",),
-    "1.2.643.7.1.1.5.1.2": ("magma-ctr-acpkm-omac",),
+    "1.2.643.7.1.1.5.1.1": [
+        ("magma-ctr-acpkm",),
+        ("id-tc26-cipher-gostr3412-2015-magma-ctracpkm",),
+    ],
+    "1.2.643.7.1.1.5.1.2": [
+        ("magma-ctr-acpkm-omac",),
+        ("id-tc26-cipher-gostr3412-2015-magma-ctracpkm-omac",),
+    ],
     "1.2.643.7.1.1.5.2": ("id-tc26-cipher-gostr3412-2015-kuznyechik",),
-    "1.2.643.7.1.1.5.2.1": ("kuznyechik-ctr-acpkm",),
-    "1.2.643.7.1.1.5.2.2": ("kuznyechik-ctr-acpkm-omac",),
+    "1.2.643.7.1.1.5.2.1": [
+        ("kuznyechik-ctr-acpkm",),
+        ("id-tc26-cipher-gostr3412-2015-kuznyechik-ctracpkm",),
+    ],
+    "1.2.643.7.1.1.5.2.2": [
+        ("kuznyechik-ctr-acpkm-omac",),
+        ("id-tc26-cipher-gostr3412-2015-kuznyechik-ctracpkm-omac",),
+    ],
     "1.2.643.7.1.1.6": ("id-tc26-agreement",),
     "1.2.643.7.1.1.6.1": ("id-tc26-agreement-gost-3410-2012-256",),
     "1.2.643.7.1.1.6.2": ("id-tc26-agreement-gost-3410-2012-512",),
     "1.2.643.7.1.1.7": ("id-tc26-wrap",),
     "1.2.643.7.1.1.7.1": ("id-tc26-wrap-gostr3412-2015-magma",),
-    "1.2.643.7.1.1.7.1.1": ("magma-kexp15",),
+    "1.2.643.7.1.1.7.1.1": [
+        ("magma-kexp15",),
+        (
+            "id-tc26-wrap-gostr3412-2015-magma-kexp15",
+            "id-tc26-wrap-gostr3412-2015-kuznyechik-kexp15",
+        ),
+    ],
     "1.2.643.7.1.1.7.2": ("id-tc26-wrap-gostr3412-2015-kuznyechik",),
     "1.2.643.7.1.1.7.2.1": ("kuznyechik-kexp15",),
     "1.2.643.7.1.2": ("id-tc26-constants",),
@@ -633,8 +653,14 @@ OID_MAP: dict[str, tuple[str, ...] | list[tuple[str, ...]]] = {
     "1.3.6.1.4.1.311.10.3.4": ("Microsoft Encrypted File System", "msEFS"),
     "1.3.6.1.4.1.311.17.1": ("Microsoft CSP Name", "CSPName"),
     "1.3.6.1.4.1.311.17.2": ("Microsoft Local Key set", "LocalKeySet"),
-    "1.3.6.1.4.1.311.20.2.2": ("Microsoft Smartcard Login", "msSmartcardLogin"),
-    "1.3.6.1.4.1.311.20.2.3": ("Microsoft User Principal Name", "msUPN"),
+    "1.3.6.1.4.1.311.20.2.2": [
+        ("Microsoft Smartcard Login", "msSmartcardLogin"),
+        ("Microsoft Smartcardlogin",),
+    ],
+    "1.3.6.1.4.1.311.20.2.3": [
+        ("Microsoft User Principal Name", "msUPN"),
+        ("Microsoft Universal Principal Name",),
+    ],
     "1.3.6.1.4.1.311.21.7": ("Microsoft certificate template", "ms-cert-templ"),
     "1.3.6.1.4.1.311.21.10": (
         "Microsoft Application Policies Extension",
