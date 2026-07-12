@@ -188,7 +188,7 @@ def _is_cryptography_key_consistent(
             return True
         except cryptography.exceptions.InvalidSignature:
             return False
-    # For X25519 and X448, there's no test yet.
+    # For X25519 and X448 and ML-DSA-xx, there's no test yet.
     if warn_func is not None:
         warn_func(f"Cannot determine consistency for key of type {type(key)}")
     return None

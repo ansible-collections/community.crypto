@@ -227,6 +227,12 @@
         min_version: '2.6'
       - type: X448
         min_version: '2.6'
+      - type: ML-DSA-44
+        min_version: '47.0.0'
+      - type: ML-DSA-65
+        min_version: '47.0.0'
+      - type: ML-DSA-87
+        min_version: '47.0.0'
 
 - name: "({{ select_crypto_backend }}) Generate privatekey with passphrase"
   community.crypto.openssl_privatekey:

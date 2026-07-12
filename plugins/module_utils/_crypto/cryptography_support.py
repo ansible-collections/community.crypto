@@ -85,27 +85,46 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.basic imp
     OpenSSLObjectError,
 )
 
-if t.TYPE_CHECKING:
-    import datetime  # pragma: no cover
+try:
+    # cryptography 47.0.0+:
+    from cryptography.hazmat.primitives.asymmetric.mldsa import (
+        MLDSA44PrivateKey,
+        MLDSA44PublicKey,
+        MLDSA65PrivateKey,
+        MLDSA65PublicKey,
+        MLDSA87PrivateKey,
+        MLDSA87PublicKey,
+    )
+except ImportError:
+    HAS_MLDSA44 = False
+    HAS_MLDSA65 = False
+    HAS_MLDSA87 = False
+else:
+    HAS_MLDSA44 = True
+    HAS_MLDSA65 = True
+    HAS_MLDSA87 = True
 
-    from cryptography.hazmat.primitives import hashes  # pragma: no cover
-    from cryptography.hazmat.primitives.asymmetric.dh import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pramga: no cover
+    import datetime
+
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.asymmetric.dh import (
         DHPrivateKey,
         DHPublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.dsa import (  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.dsa import (
         DSAPrivateKey,
         DSAPublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.ec import (  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.ec import (
         EllipticCurvePrivateKey,
         EllipticCurvePublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.rsa import (  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.rsa import (
         RSAPrivateKey,
         RSAPublicKey,
     )
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
         CertificateIssuerPublicKeyTypes,
         CertificatePublicKeyTypes,
@@ -117,16 +136,21 @@ if t.TYPE_CHECKING:
         CertificateIssuerPrivateKeyTypes,
         cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey,
         cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey,
-    ]  # pragma: no cover
-    PublicKeyTypesWOEdwards = t.Union[  # noqa: UP007 # pylint: disable=invalid-name
+    ]
+    # pylint: disable-next=invalid-name
+    PublicKeyTypesWOEdwardsAndMLKem = t.Union[  # noqa: UP007
         DHPublicKey, DSAPublicKey, EllipticCurvePublicKey, RSAPublicKey
-    ]  # pragma: no cover
-    PrivateKeyTypesWOEdwards = t.Union[  # noqa: UP007 # pylint: disable=invalid-name
-        DHPrivateKey, DSAPrivateKey, EllipticCurvePrivateKey, RSAPrivateKey
-    ]  # pragma: no cover
+    ]
+    # pylint: disable-next=invalid-name
+    PrivateKeyTypesWOEdwardsAndMLKem = t.Union[  # noqa: UP007
+        DHPrivateKey,
+        DSAPrivateKey,
+        EllipticCurvePrivateKey,
+        RSAPrivateKey,
+    ]
 else:
-    PublicKeyTypesWOEdwards = None  # pylint: disable=invalid-name
-    PrivateKeyTypesWOEdwards = None  # pylint: disable=invalid-name
+    PublicKeyTypesWOEdwardsAndMLKem = None  # pylint: disable=invalid-name
+    PrivateKeyTypesWOEdwardsAndMLKem = None  # pylint: disable=invalid-name
 
 
 CRYPTOGRAPHY_TIMEZONE = False  # pylint: disable=invalid-name
@@ -774,9 +798,21 @@ def cryptography_compare_public_keys(
     )
     if res is not None:
         return res
+    if HAS_MLDSA44:
+        res = _compare_public_keys(key1, key2, clazz=MLDSA44PublicKey)
+        if res is not None:
+            return res
+    if HAS_MLDSA65:
+        res = _compare_public_keys(key1, key2, clazz=MLDSA65PublicKey)
+        if res is not None:
+            return res
+    if HAS_MLDSA87:
+        res = _compare_public_keys(key1, key2, clazz=MLDSA87PublicKey)
+        if res is not None:
+            return res
     return (
-        t.cast(PublicKeyTypesWOEdwards, key1).public_numbers()
-        == t.cast(PublicKeyTypesWOEdwards, key2).public_numbers()
+        t.cast(PublicKeyTypesWOEdwardsAndMLKem, key1).public_numbers()
+        == t.cast(PublicKeyTypesWOEdwardsAndMLKem, key2).public_numbers()
     )
 
 
@@ -836,9 +872,21 @@ def cryptography_compare_private_keys(
     )
     if res is not None:
         return res
+    if HAS_MLDSA44:
+        res = _compare_private_keys(key1, key2, clazz=MLDSA44PrivateKey)
+        if res is not None:
+            return res
+    if HAS_MLDSA65:
+        res = _compare_private_keys(key1, key2, clazz=MLDSA65PrivateKey)
+        if res is not None:
+            return res
+    if HAS_MLDSA87:
+        res = _compare_private_keys(key1, key2, clazz=MLDSA87PrivateKey)
+        if res is not None:
+            return res
     return (
-        t.cast(PrivateKeyTypesWOEdwards, key1).private_numbers()
-        == t.cast(PrivateKeyTypesWOEdwards, key2).private_numbers()
+        t.cast(PrivateKeyTypesWOEdwardsAndMLKem, key1).private_numbers()
+        == t.cast(PrivateKeyTypesWOEdwardsAndMLKem, key2).private_numbers()
     )
 
 

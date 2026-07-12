@@ -139,7 +139,12 @@
   ansible.builtin.assert:
     that:
       - (item is succeeded and item is changed) or
-        (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
+        (item is failed
+            and (
+                'Cryptography backend does not support the algorithm required for ' in item.msg
+                or 'A newer cryptography version, or one built with an appropriate backend, is needed for type=' in item.msg
+            )
+            and system_potentially_has_no_algorithm_support)
   loop: "{{ privatekey_t1_generate.results }}"
   when: "'skip_reason' not in item"
   loop_control:
@@ -149,7 +154,12 @@
   ansible.builtin.assert:
     that:
       - (item is succeeded and item is not changed) or
-        (item is failed and 'Cryptography backend does not support the algorithm required for ' in item.msg and system_potentially_has_no_algorithm_support)
+        (item is failed
+            and (
+                'Cryptography backend does not support the algorithm required for ' in item.msg
+                or 'A newer cryptography version, or one built with an appropriate backend, is needed for type=' in item.msg
+            )
+            and system_potentially_has_no_algorithm_support)
   loop: "{{ privatekey_t1_idempotency.results }}"
   when: "'skip_reason' not in item"
   loop_control:

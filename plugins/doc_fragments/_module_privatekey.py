@@ -34,9 +34,21 @@ options:
   type:
     description:
       - The algorithm used to generate the TLS/SSL private key.
+      - Support for V(ML-DSA-44), V(ML-DSA-65), and V(ML-DSA-87) has been added in community.crypto 3.3.0.
+        They require cryptography 47.0.0 or later, and require support in the specific cryptographic backend used by cryptography.
     type: str
     default: RSA
-    choices: [DSA, ECC, Ed25519, Ed448, RSA, X25519, X448]
+    choices:
+      - DSA
+      - ECC
+      - Ed25519
+      - Ed448
+      - RSA
+      - X25519
+      - X448
+      - ML-DSA-44
+      - ML-DSA-65
+      - ML-DSA-87
   curve:
     description:
       - Note that not all curves are supported by all versions of C(cryptography).
