@@ -194,13 +194,14 @@
       - selfsigned_subject_key_identifier_4 is not changed
       - selfsigned_subject_key_identifier_5 is changed
 
-- name: (Selfsigned validation, {{ select_crypto_backend }}) Verify Ed25519 and Ed448 tests
+- name: (Selfsigned validation, {{ select_crypto_backend }}) Verify other key type tests
   ansible.builtin.assert:
     that:
-      - selfsigned_certificate_ed25519_ed448 is succeeded
-      - selfsigned_certificate_ed25519_ed448.results[0] is changed
-      - selfsigned_certificate_ed25519_ed448.results[1] is changed
-      - selfsigned_certificate_ed25519_ed448_idempotence is succeeded
-      - selfsigned_certificate_ed25519_ed448_idempotence.results[0] is not changed
-      - selfsigned_certificate_ed25519_ed448_idempotence.results[1] is not changed
-  when: select_crypto_backend == 'cryptography' and selfsigned_certificate_ed25519_ed448_privatekey is not failed
+      - item.1 is succeeded
+      - item.1 is changed
+      - item.2 is succeeded
+      - item.2 is not changed
+  when: select_crypto_backend == 'cryptography' and item.0 is not skipped and item.0 is succeeded
+  loop: "{{ selfsigned_generate_other_keys.results | zip(selfsigned_other_key_certificate.results, selfsigned_other_key_certificate_idempotence.results) | list }}"
+  loop_control:
+    label: "{{ item.0.item.type }}"

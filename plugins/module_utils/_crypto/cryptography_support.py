@@ -1061,14 +1061,20 @@ def cryptography_verify_signature(
             return True
         if isinstance(
             signer_public_key,
-            cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+            (
+                cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey,
+                cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
+            ),
         ):
             signer_public_key.verify(signature, data)
             return True
-        if isinstance(
-            signer_public_key,
-            cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey,
-        ):
+        if HAS_MLDSA44 and isinstance(signer_public_key, MLDSA44PublicKey):
+            signer_public_key.verify(signature, data)
+            return True
+        if HAS_MLDSA65 and isinstance(signer_public_key, MLDSA65PublicKey):
+            signer_public_key.verify(signature, data)
+            return True
+        if HAS_MLDSA87 and isinstance(signer_public_key, MLDSA87PublicKey):
             signer_public_key.verify(signature, data)
             return True
         raise OpenSSLObjectError(

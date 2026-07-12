@@ -526,138 +526,154 @@
     select_crypto_backend: '{{ select_crypto_backend }}'
   register: ownca_authority_key_identifier_5
 
-- name: (OwnCA, {{ select_crypto_backend }}) Ed25519 and Ed448 tests (for cryptography >= 2.6)
+- name: (OwnCA, {{ select_crypto_backend }}) Other key type tests
+  when: select_crypto_backend == 'cryptography'
+  vars:
+    types:
+      - type: Ed25519
+        min_version: '2.6'
+      - type: Ed448
+        min_version: '2.6'
+      - type: ML-DSA-44
+        min_version: '49.0.0'
+      - type: ML-DSA-65
+        min_version: '49.0.0'
+      - type: ML-DSA-87
+        min_version: '49.0.0'
   block:
-    - name: (OwnCA, {{ select_crypto_backend }}) Generate privatekeys
+    - name: "(OwnCA, {{ select_crypto_backend }}) Generate private keys"
       community.crypto.openssl_privatekey:
-        path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
-        type: '{{ item }}'
-      loop:
-        - Ed25519
-        - Ed448
-      register: ownca_certificate_ed25519_ed448_privatekey
+        path: '{{ remote_tmp_dir }}/privatekey_{{ item.type }}.pem'
+        type: '{{ item.type }}'
+      when: cryptography_version is version(item.min_version, '>=')
+      loop: "{{ types }}"
+      loop_control:
+        label: "{{ item.type }}"
+      register: ownca_generate_other_keys
       ignore_errors: true
 
-    - name: (OwnCA, {{ select_crypto_backend }}) Generate CSR etc. if private key generation succeeded
-      when: ownca_certificate_ed25519_ed448_privatekey is not failed
-      block:
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate CSR
+      community.crypto.openssl_csr:
+        path: '{{ remote_tmp_dir }}/csr_{{ item.0.type }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item.0.type }}.pem'
+        subject:
+          commonName: www.ansible.com
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate CSR
-          community.crypto.openssl_csr:
-            path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
-            privatekey_path: '{{ remote_tmp_dir }}/privatekey_{{ item }}.pem'
-            subject:
-              commonName: www.ansible.com
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          ignore_errors: true
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/ownca_cert_{{ item.0.type }}.pem'
+        csr_path: '{{ remote_tmp_dir }}/csr_{{ item.0.type }}.csr'
+        ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
+        ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
+        provider: ownca
+        ownca_digest: sha256
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: ownca_other_key_certificate
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate
-          community.crypto.x509_certificate:
-            path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}.pem'
-            csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
-            ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-            ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
-            provider: ownca
-            ownca_digest: sha256
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: ownca_certificate_ed25519_ed448
-          ignore_errors: true
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate (idempotent)
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/ownca_cert_{{ item.0.type }}.pem'
+        csr_path: '{{ remote_tmp_dir }}/csr_{{ item.0.type }}.csr'
+        ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
+        ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
+        provider: ownca
+        ownca_digest: sha256
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: ownca_other_key_certificate_idempotence
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate (idempotent)
-          community.crypto.x509_certificate:
-            path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}.pem'
-            csr_path: '{{ remote_tmp_dir }}/csr_{{ item }}.csr'
-            ownca_path: '{{ remote_tmp_dir }}/ca_cert.pem'
-            ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey.pem'
-            provider: ownca
-            ownca_digest: sha256
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: ownca_certificate_ed25519_ed448_idempotence
-          ignore_errors: true
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate CA privatekey
+      community.crypto.openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item.0.type }}.pem'
+        type: '{{ item.0.type }}'
+        passphrase: Test123
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate CA privatekey
-          community.crypto.openssl_privatekey:
-            path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
-            type: '{{ item }}'
-            passphrase: Test123
-          ignore_errors: true
-          loop:
-            - Ed25519
-            - Ed448
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate CA CSR
+      community.crypto.openssl_csr:
+        path: '{{ remote_tmp_dir }}/ca_csr_{{ item.0.type }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item.0.type }}.pem'
+        privatekey_passphrase: Test123
+        subject:
+          commonName: Example CA
+        useCommonNameForSAN: false
+        basic_constraints:
+          - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+          - cRLSign
+          - keyCertSign
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate CA CSR
-          community.crypto.openssl_csr:
-            path: '{{ remote_tmp_dir }}/ca_csr_{{ item }}.csr'
-            privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
-            privatekey_passphrase: Test123
-            subject:
-              commonName: Example CA
-            useCommonNameForSAN: false
-            basic_constraints:
-              - 'CA:TRUE'
-            basic_constraints_critical: true
-            key_usage:
-              - cRLSign
-              - keyCertSign
-          loop:
-            - Ed25519
-            - Ed448
-          ignore_errors: true
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate selfsigned CA certificate
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/ca_cert_{{ item.0.type }}.pem'
+        csr_path: '{{ remote_tmp_dir }}/ca_csr_{{ item.0.type }}.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item.0.type }}.pem'
+        privatekey_passphrase: Test123
+        provider: selfsigned
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate selfsigned CA certificate
-          community.crypto.x509_certificate:
-            path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'
-            csr_path: '{{ remote_tmp_dir }}/ca_csr_{{ item }}.csr'
-            privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
-            privatekey_passphrase: Test123
-            provider: selfsigned
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          ignore_errors: true
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/ownca_cert_{{ item.0.type }}_2.pem'
+        csr_path: '{{ remote_tmp_dir }}/csr.csr'
+        ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item.0.type }}.pem'
+        ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item.0.type }}.pem'
+        ownca_privatekey_passphrase: Test123
+        provider: ownca
+        ownca_digest: sha256
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: ownca_other_key_certificate_2
+      ignore_errors: true
 
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate
-          community.crypto.x509_certificate:
-            path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}_2.pem'
-            csr_path: '{{ remote_tmp_dir }}/csr.csr'
-            ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'
-            ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
-            ownca_privatekey_passphrase: Test123
-            provider: ownca
-            ownca_digest: sha256
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: ownca_certificate_ed25519_ed448_2
-          ignore_errors: true
-
-        - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate (idempotent)
-          community.crypto.x509_certificate:
-            path: '{{ remote_tmp_dir }}/ownca_cert_{{ item }}_2.pem'
-            csr_path: '{{ remote_tmp_dir }}/csr.csr'
-            ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item }}.pem'
-            ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item }}.pem'
-            ownca_privatekey_passphrase: Test123
-            provider: ownca
-            ownca_digest: sha256
-            select_crypto_backend: '{{ select_crypto_backend }}'
-          loop:
-            - Ed25519
-            - Ed448
-          register: ownca_certificate_ed25519_ed448_2_idempotence
-          ignore_errors: true
-
-  when: select_crypto_backend == 'cryptography' and cryptography_version is version('3.3', '>=')
+    - name: (OwnCA, {{ select_crypto_backend }}) Generate ownca certificate (idempotent)
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/ownca_cert_{{ item.0.type }}_2.pem'
+        csr_path: '{{ remote_tmp_dir }}/csr.csr'
+        ownca_path: '{{ remote_tmp_dir }}/ca_cert_{{ item.0.type }}.pem'
+        ownca_privatekey_path: '{{ remote_tmp_dir }}/ca_privatekey_{{ item.0.type }}.pem'
+        ownca_privatekey_passphrase: Test123
+        provider: ownca
+        ownca_digest: sha256
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped and item.1 is succeeded
+      loop: "{{ types | zip(ownca_generate_other_keys.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: ownca_other_key_certificate_2_idempotence
+      ignore_errors: true
 
 - ansible.builtin.import_tasks: ../tests/validate_ownca.yml

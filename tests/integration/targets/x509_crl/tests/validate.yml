@@ -146,13 +146,14 @@
           "URI:http://a:b@ä:1",
         ]
 
-- name: Verify Ed25519 and Ed448 tests
+- name: Verify other key tests
   ansible.builtin.assert:
     that:
-      - ed25519_ed448_crl is succeeded
-      - ed25519_ed448_crl.results[0] is changed
-      - ed25519_ed448_crl.results[1] is changed
-      - ed25519_ed448_crl_idempotence is succeeded
-      - ed25519_ed448_crl_idempotence.results[0] is not changed
-      - ed25519_ed448_crl_idempotence.results[1] is not changed
-  when: ed25519_ed448_privatekey is not failed
+      - item.1 is succeeded
+      - item.1 is changed
+      - item.2 is succeeded
+      - item.2 is not changed
+  when: item.0 is not skipped and item.0 is succeeded
+  loop: "{{ generate_other_keys.results | zip(other_key_type_crl.results, other_key_type_crl_idempotence.results) | list }}"
+  loop_control:
+    label: "{{ item.0.item.type }}"
