@@ -12,6 +12,11 @@ import typing as t
 from ansible_collections.community.crypto.plugins.module_utils._crypto.basic import (
     OpenSSLObjectError,
 )
+from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
+    HAS_MLDSA44,
+    HAS_MLDSA65,
+    HAS_MLDSA87,
+)
 from ansible_collections.community.crypto.plugins.module_utils._crypto.support import (
     get_fingerprint_of_bytes,
     load_publickey,
@@ -48,6 +53,12 @@ try:
     import cryptography.hazmat.primitives.asymmetric.x448
     import cryptography.hazmat.primitives.asymmetric.x25519
     from cryptography.hazmat.primitives import serialization
+except ImportError:
+    pass
+
+try:
+    # cryptography 37.0.0+:
+    import cryptography.hazmat.primitives.asymmetric.mldsa
 except ImportError:
     pass
 
@@ -94,6 +105,18 @@ def _get_cryptography_public_key_info(
         key_public_data["x"] = ecc_public_numbers.x
         key_public_data["y"] = ecc_public_numbers.y
         key_public_data["exponent_size"] = key.curve.key_size
+    elif HAS_MLDSA44 and isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.mldsa.MLDSA44PublicKey
+    ):
+        key_type = "ML-DSA-44"
+    elif HAS_MLDSA65 and isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.mldsa.MLDSA65PublicKey
+    ):
+        key_type = "ML-DSA-65"
+    elif HAS_MLDSA87 and isinstance(
+        key, cryptography.hazmat.primitives.asymmetric.mldsa.MLDSA87PublicKey
+    ):
+        key_type = "ML-DSA-87"
     else:
         key_type = f"unknown ({type(key)})"
     return key_type, key_public_data

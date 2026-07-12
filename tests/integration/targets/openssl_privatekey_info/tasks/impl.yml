@@ -231,3 +231,61 @@
       - "'type' not in result"
       - "'public_data' not in result"
       - "'private_data' not in result"
+
+- block:
+    - name: "({{ select_crypto_backend }}) Create other key type"
+      community.crypto.openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/privatekey-{{ item.type }}.pem'
+        type: "{{ item.type }}"
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.min_version, '>=')
+      loop: "{{ types }}"
+      loop_control:
+        label: "{{ item.type }}"
+      register: create_result
+      ignore_errors: true
+
+    - name: ({{ select_crypto_backend }}) Obtain key info
+      community.crypto.openssl_privatekey_info:
+        path: '{{ remote_tmp_dir }}/privatekey-{{ item.0.type }}.pem'
+        return_private_key_data: true
+        select_crypto_backend: '{{ select_crypto_backend }}'
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is succeeded
+      loop: "{{ types | zip(create_result.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+      register: result
+      ignore_errors: true
+
+    - name: Check that other key info is ok
+      ansible.builtin.assert:
+        that:
+          - "item.1 is succeeded"
+          - "'public_key' in item.1"
+          - "'public_key_fingerprints' in item.1"
+          - "'type' in item.1"
+          - "item.0.type == item.1.type"
+          - "'public_data' in item.1"
+          - "'private_data' in item.1"
+      when: cryptography_version is version(item.0.min_version, '>=') and item.1 is not skipped
+      loop: "{{ types | zip(result.results) | list }}"
+      loop_control:
+        label: "{{ item.0.type }}"
+
+  when: select_crypto_backend == 'cryptography'
+  vars:
+    types:
+      - type: X25519
+        min_version: '2.5'
+      - type: Ed25519
+        min_version: '2.6'
+      - type: Ed448
+        min_version: '2.6'
+      - type: X448
+        min_version: '2.6'
+      - type: ML-DSA-44
+        min_version: '47.0.0'
+      - type: ML-DSA-65
+        min_version: '47.0.0'
+      - type: ML-DSA-87
+        min_version: '47.0.0'
