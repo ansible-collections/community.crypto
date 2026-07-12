@@ -1,2 +1,3 @@
 minor_changes:
-  - "openssl_privatekey, openssl_privatekey_pipe, openssl_privatekey_info - support ML-DSA-{44,65,87} private keys (https://github.com/ansible-collections/community.crypto/issues/1056, https://github.com/ansible-collections/community.crypto/pull/1058)."
+  - >-
+    openssl_privatekey\*, openssl_publickey\*, openssl_csr\* - support ML-DSA-{44,65,87} private keys (https://github.com/ansible-collections/community.crypto/issues/1056, https://github.com/ansible-collections/community.crypto/pull/1058).
