@@ -4,7 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - ansible.builtin.set_fact:
-    system_potentially_has_no_algorithm_support: "{{ ansible_facts.os_family == 'FreeBSD' }}"
+    system_potentially_has_no_algorithm_support: >-
+      {{
+        ansible_facts.os_family == 'FreeBSD'
+        or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version | int < 26)
+      }}
 
 - name: "({{ select_crypto_backend }}) Read private key"
   ansible.builtin.slurp:
