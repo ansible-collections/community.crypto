@@ -19,12 +19,12 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
 
 from ..test__time import TIMEZONES, cartesian_product
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         Criterium,
     )
 
-    class DatetimeKwarg(t.TypedDict):  # pragma: no cover
+    class DatetimeKwarg(t.TypedDict):
         year: int
         month: int
         day: int

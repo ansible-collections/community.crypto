@@ -627,14 +627,14 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
     pem_to_der,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         CertificateInformation,
         CryptoBackend,
     )
-    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.challenges import (
         Authorization,
     )
 

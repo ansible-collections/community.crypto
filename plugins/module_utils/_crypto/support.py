@@ -37,15 +37,15 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.basic imp
     OpenSSLObjectError,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
         CertificateIssuerPrivateKeyTypes,
         PrivateKeyTypes,
         PublicKeyTypes,
     )
 
-    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptography_support import (
         CertificatePrivateKeyTypes,
     )
 

@@ -365,7 +365,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
         t.Union[cryptography.x509.Certificate, None],  # noqa: UP007
         list[cryptography.x509.Certificate],
         t.Union[bytes, None],  # noqa: UP007
-    ]  # pragma: no cover
+    ]
 
 
 def load_certificate_set(

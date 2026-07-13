@@ -80,12 +80,12 @@ else:
     )
     CRYPTOGRAPHY_ERROR = None  # pylint: disable=invalid-name
 
-if t.TYPE_CHECKING:
-    import datetime  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    import datetime
 
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.certificates import (
         CertificateChain,
         Criterium,
     )

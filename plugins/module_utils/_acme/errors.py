@@ -13,11 +13,11 @@ from http.client import responses as http_responses
 
 from ansible.module_utils.common.text.converters import to_text
 
-if t.TYPE_CHECKING:
-    import http.client  # pragma: no cover
-    import urllib.error  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    import http.client
+    import urllib.error
 
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def format_http_status(status_code: int) -> str:

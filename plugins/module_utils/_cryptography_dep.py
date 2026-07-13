@@ -22,19 +22,19 @@ from ansible_collections.community.crypto.plugins.module_utils._version import (
     LooseVersion,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.plugin_utils._action_module import (
         AnsibleActionModule,
     )
-    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.plugin_utils._filter_module import (
         FilterModuleMock,
     )
 
     GeneralAnsibleModule = t.Union[  # noqa: UP007
         AnsibleModule, AnsibleActionModule, FilterModuleMock
-    ]  # pragma: no cover
+    ]
 
 
 _CRYPTOGRAPHY_IMP_ERR: str | None = None  # pylint: disable=invalid-name

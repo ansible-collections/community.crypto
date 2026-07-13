@@ -221,8 +221,8 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.utils impor
     process_links,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def _collect_next(info: dict[str, t.Any]) -> list[str]:

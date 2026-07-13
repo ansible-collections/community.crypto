@@ -28,8 +28,8 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         CertificateInformation,
         CryptoBackend,
     )

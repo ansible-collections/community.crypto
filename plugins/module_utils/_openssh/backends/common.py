@@ -18,14 +18,14 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.utils im
     parse_openssh_version,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.certificate import (
         OpensshCertificateTimeParameters,
     )
 
-    Param = t.ParamSpec("Param")  # pragma: no cover
+    Param = t.ParamSpec("Param")
 
 
 def restore_on_failure(

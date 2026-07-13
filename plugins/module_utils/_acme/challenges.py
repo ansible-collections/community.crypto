@@ -30,10 +30,10 @@ from ansible_collections.community.crypto.plugins.module_utils._caa import (
     _check_domain_name,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.acme import (
         ACMEClient,
     )
 

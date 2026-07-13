@@ -218,8 +218,8 @@ try:
 except ImportError:
     pass
 
-if t.TYPE_CHECKING:
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from cryptography.hazmat.primitives.asymmetric.types import (
         PrivateKeyTypes,
         PublicKeyTypes,
     )

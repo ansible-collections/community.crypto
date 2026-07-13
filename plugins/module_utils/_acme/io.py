@@ -19,8 +19,8 @@ from ansible_collections.community.crypto.plugins.module_utils._acme.errors impo
     ModuleFailException,
 )
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def read_file(fn: str | os.PathLike) -> bytes:

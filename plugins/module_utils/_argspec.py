@@ -11,13 +11,13 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
-if t.TYPE_CHECKING:
-    import datetime  # pragma: no cover
-    from collections.abc import Callable, Mapping, Sequence  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    import datetime
+    from collections.abc import Callable, Mapping, Sequence
 
-    _T = t.TypeVar("_T")  # pragma: no cover
+    _T = t.TypeVar("_T")
 
-    ArgSpecType = t.Literal[  # pragma: no cover
+    ArgSpecType = t.Literal[
         "bits",
         "bool",
         "bytes",
@@ -32,38 +32,36 @@ if t.TYPE_CHECKING:
         "sid",
         "str",
     ]
-    MutuallyExclusiveT = t.Union[  # pragma: no cover  # noqa: UP007
-        Sequence[str], Sequence[Sequence[str]]
-    ]
-    MutuallyExclusiveMutT = list[Sequence[str]]  # pragma: no cover
-    RequiredTogetherT = Sequence[Sequence[str]]  # pragma: no cover
-    RequiredTogetherMutT = list[Sequence[str]]  # pragma: no cover
-    RequiredOneOfT = Sequence[Sequence[str]]  # pragma: no cover
-    RequiredOneOfMutT = list[Sequence[str]]  # pragma: no cover
-    RequiredIfT = Sequence[  # pragma: no cover
+    MutuallyExclusiveT = t.Union[Sequence[str], Sequence[Sequence[str]]]  # noqa: UP007
+    MutuallyExclusiveMutT = list[Sequence[str]]
+    RequiredTogetherT = Sequence[Sequence[str]]
+    RequiredTogetherMutT = list[Sequence[str]]
+    RequiredOneOfT = Sequence[Sequence[str]]
+    RequiredOneOfMutT = list[Sequence[str]]
+    RequiredIfT = Sequence[
         t.Union[  # noqa: UP007
             list[object],
             tuple[str, object, Sequence[str]],
             tuple[str, object, Sequence[str], bool],
         ]
     ]
-    RequiredIfMutT = list[  # pragma: no cover
+    RequiredIfMutT = list[
         t.Union[  # noqa: UP007
             list[object],
             tuple[str, object, Sequence[str]],
             tuple[str, object, Sequence[str], bool],
         ]
     ]
-    RequiredByT = Mapping[str, Sequence[str]]  # pragma: no cover
-    RequiredByMutT = dict[str, Sequence[str]]  # pragma: no cover
+    RequiredByT = Mapping[str, Sequence[str]]
+    RequiredByMutT = dict[str, Sequence[str]]
 
-    class DeprecatedAlias(t.TypedDict):  # pragma: no cover
+    class DeprecatedAlias(t.TypedDict):
         name: str
         date: t.NotRequired[datetime.date | str]
         version: t.NotRequired[str]
         collection_name: str
 
-    class OneArgumentSpecT(t.TypedDict):  # pragma: no cover
+    class OneArgumentSpecT(t.TypedDict):
         type: t.NotRequired[ArgSpecType | Callable[[object], object]]
         elements: t.NotRequired[ArgSpecType]
         default: t.NotRequired[object]
@@ -92,8 +90,8 @@ if t.TYPE_CHECKING:
         required_if: t.NotRequired[RequiredIfT]
         required_by: t.NotRequired[RequiredByT]
 
-    ArgumentSpecT = Mapping[str, OneArgumentSpecT]  # pragma: no cover
-    ArgumentSpecMutT = dict[str, OneArgumentSpecT]  # pragma: no cover
+    ArgumentSpecT = Mapping[str, OneArgumentSpecT]
+    ArgumentSpecMutT = dict[str, OneArgumentSpecT]
 
 
 class ArgumentSpec:

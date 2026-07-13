@@ -30,9 +30,9 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
 )
 from ansible_collections.community.crypto.plugins.module_utils._io import load_file
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
-    from cryptography.hazmat.primitives.asymmetric.types import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
+    from cryptography.hazmat.primitives.asymmetric.types import (
         PrivateKeyTypes,
     )
 

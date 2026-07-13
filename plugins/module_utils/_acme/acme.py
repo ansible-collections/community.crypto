@@ -48,14 +48,14 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     get_now_datetime,
 )
 
-if t.TYPE_CHECKING:
-    import http.client  # pragma: no cover
-    import os  # pragma: no cover
-    import urllib.error  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    import http.client
+    import os
+    import urllib.error
 
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         CertificateInformation,
         CryptoBackend,
     )

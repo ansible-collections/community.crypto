@@ -30,14 +30,14 @@ from ansible_collections.community.crypto.plugins.module_utils._time import (
     convert_relative_to_datetime,
 )
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (
         PubKeyType,
     )
 
-    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]  # pragma: no cover
-    DateFormatStr = t.Literal["human_readable", "openssh"]  # pragma: no cover
-    DateFormatInt = t.Literal["timestamp"]  # pragma: no cover
+    DateFormat = t.Literal["human_readable", "openssh", "timestamp"]
+    DateFormatStr = t.Literal["human_readable", "openssh"]
+    DateFormatInt = t.Literal["timestamp"]
 
 
 # Protocol References

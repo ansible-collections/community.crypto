@@ -24,8 +24,8 @@ from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptogr
     OpensshKeypair,
 )
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._openssh.cryptography import (
         KeyType,
     )
 

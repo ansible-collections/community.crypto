@@ -12,8 +12,8 @@ import os
 import tempfile
 import typing as t
 
-if t.TYPE_CHECKING:
-    from ansible.module_utils.basic import AnsibleModule  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def load_file(*, path: str | os.PathLike, module: AnsibleModule | None = None) -> bytes:

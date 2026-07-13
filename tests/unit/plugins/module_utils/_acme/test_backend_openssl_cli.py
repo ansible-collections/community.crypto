@@ -35,12 +35,12 @@ from .backend_data import (
     load_fixture,
 )
 
-if t.TYPE_CHECKING:
-    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (  # pragma: no cover
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.crypto.plugins.module_utils._acme.backends import (
         CertificateInformation,
     )
 
-    from .backend_data import DatetimeKwarg  # pragma: no cover
+    from .backend_data import DatetimeKwarg
 
 
 # from ..test_time import TIMEZONES
