@@ -395,6 +395,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The algorithm used to generate the TLS/SSL private key.</p>
+<p>Support for <code class="ansible-value docutils literal notranslate"><span class="pre">ML-DSA-44</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ML-DSA-65</span></code>, and <code class="ansible-value docutils literal notranslate"><span class="pre">ML-DSA-87</span></code> has been added in community.crypto 3.3.0. They require cryptography 47.0.0 or later, and require support in the specific cryptographic backend used by cryptography.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;DSA&quot;</span></code></p></li>
@@ -404,6 +405,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;RSA&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;X25519&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;X448&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ML-DSA-44&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ML-DSA-65&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ML-DSA-87&quot;</span></code></p></li>
 </ul>
 </div></td>
 </tr>
