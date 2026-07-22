@@ -154,6 +154,10 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
+            - name: Alpine 3.23 + group 1
+              test: ansible-test-integration-2.21-alpine323-azp-posix-1
+            - name: Alpine 3.23 + group 2
+              test: ansible-test-integration-2.21-alpine323-azp-posix-2
             - name: Generic + py3.11 + group 1
               test: ansible-test-integration-2.21-default-3.11-azp-generic-1
             - name: Generic + py3.11 + group 2
@@ -180,10 +184,10 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: Alpine 3.23 + group 1
-              test: ansible-test-integration-devel-alpine323-azp-posix-1
-            - name: Alpine 3.23 + group 2
-              test: ansible-test-integration-devel-alpine323-azp-posix-2
+            - name: Alpine 3.24 + group 1
+              test: ansible-test-integration-devel-alpine324-azp-posix-1
+            - name: Alpine 3.24 + group 2
+              test: ansible-test-integration-devel-alpine324-azp-posix-2
             - name: Arch Linux + py3.14 + group 1
               test: ansible-test-integration-devel-archlinux-3.14-azp-posix-1
             - name: Arch Linux + py3.14 + group 2
@@ -280,8 +284,8 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: Alpine 3.23 + extra VMs
-              test: ansible-test-integration-devel-alpine-3.23-azp-posix-vm
+            - name: Alpine 3.24 + extra VMs
+              test: ansible-test-integration-devel-alpine-3.24-azp-posix-vm
             - name: Fedora 44 + extra VMs
               test: ansible-test-integration-devel-fedora-44-azp-posix-vm
             - name: FreeBSD 14.4 + group 1
