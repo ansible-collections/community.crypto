@@ -69,6 +69,8 @@ options:
       - The default choice is V(auto), which tries to use C(cryptography) if available, and falls back to C(openssl).
       - If set to V(openssl), will try to use the OpenSSL C(openssl) executable.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
+        Note that cryptography deprecated the required functionality in L(cryptography 50.0.0,
+        https://cryptography.io/en/latest/changelog/#v50-0-0) and will eventually remove it.
     type: str
     default: auto
     choices: [auto, cryptography, openssl]
@@ -403,7 +405,8 @@ def main() -> t.NoReturn:
             if backend == "auto":
                 module.fail_json(
                     msg=(
-                        f"Cannot detect either the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION}) or the OpenSSL binary openssl"
+                        f"Cannot detect either the required Python library cryptography (>= {MINIMAL_CRYPTOGRAPHY_VERSION},"
+                        " where the functionality has not yet been removed) or the OpenSSL binary openssl"
                     )
                 )
 
