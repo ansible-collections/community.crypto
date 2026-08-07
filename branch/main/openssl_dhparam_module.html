@@ -322,7 +322,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p>Determines which crypto backend to use.</p>
 <p>The default choice is <code class="ansible-value docutils literal notranslate"><span class="pre">auto</span></code>, which tries to use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> if available, and falls back to <code class="docutils literal notranslate"><span class="pre">openssl</span></code>.</p>
 <p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">openssl</span></code>, will try to use the OpenSSL <code class="docutils literal notranslate"><span class="pre">openssl</span></code> executable.</p>
-<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library.</p>
+<p>If set to <code class="ansible-value docutils literal notranslate"><span class="pre">cryptography</span></code>, will try to use the <a class="reference external" href="https://cryptography.io/">cryptography</a> library. Note that cryptography deprecated the required functionality in <a class="reference external" href="https://cryptography.io/en/latest/changelog/#v50-0-0">cryptography 50.0.0</a> and will eventually remove it.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;auto&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
