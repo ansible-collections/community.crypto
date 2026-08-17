@@ -242,7 +242,7 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create _validation-persist.&lt;domain&gt; TXT record contents</span>
 <span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">record</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record_parse</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">record</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record_parse</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">var</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">      </span><span class="no">letsencrypt.org;</span>
@@ -257,9 +257,9 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <span class="w">    </span><span class="nt">value</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">        </span><span class="cp">{{</span>
-          <span class="s1">&#39;letsencrypt.org&#39;</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
-            <span class="nv">account_uri</span><span class="o">=</span><span class="s1">&#39;https://acme-v02.api.letsencrypt.org/acme/acct/4321&#39;</span><span class="o">,</span>
-            <span class="nv">persist_until</span><span class="o">=</span><span class="s1">&#39;20190331202428Z&#39;</span><span class="o">,</span>
+          <span class="s1">'letsencrypt.org'</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
+            <span class="nv">account_uri</span><span class="o">=</span><span class="s1">'https://acme-v02.api.letsencrypt.org/acme/acct/4321'</span><span class="o">,</span>
+            <span class="nv">persist_until</span><span class="o">=</span><span class="s1">'20190331202428Z'</span><span class="o">,</span>
           <span class="o">)</span>
         <span class="cp">}}</span>
 </pre></div>

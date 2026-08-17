@@ -177,16 +177,16 @@
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create private key with password protection</span>
 <span class="w">  </span><span class="nt">community.crypto.openssl_privatekey</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.key</span>
-<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create certificate signing request (CSR) for CA certificate</span>
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.key</span>
-<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ansible CA</span>
-<span class="w">    </span><span class="nt">use_common_name_for_san</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># since we do not specify SANs, don&#39;t use CN as a SAN</span>
+<span class="w">    </span><span class="nt">use_common_name_for_san</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># since we do not specify SANs, don't use CN as a SAN</span>
 <span class="w">    </span><span class="nt">basic_constraints</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;CA:TRUE&#39;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'CA:TRUE'</span>
 <span class="w">    </span><span class="nt">basic_constraints_critical</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">key_usage</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keyCertSign</span>
@@ -196,9 +196,9 @@
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create self-signed CA certificate from CSR</span>
 <span class="w">  </span><span class="nt">community.crypto.x509_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.pem</span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ca_csr.csr</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">ca_csr.csr</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.key</span>
-<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">selfsigned</span>
 </pre></div>
 </div>
@@ -217,22 +217,22 @@
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
 <span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:ansible.com&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:www.ansible.com&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:docs.ansible.com&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:ansible.com"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:www.ansible.com"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:docs.ansible.com"</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_1</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csr</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sign certificate with our CA</span>
 <span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span>
 <span class="w">    </span><span class="nt">ownca_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.pem</span>
 <span class="w">    </span><span class="nt">ownca_privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.key</span>
-<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">ownca_not_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">+365d</span><span class="w">  </span><span class="c1"># valid for one year</span>
-<span class="w">    </span><span class="nt">ownca_not_before</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-1d&quot;</span><span class="w">  </span><span class="c1"># valid since yesterday</span>
+<span class="w">    </span><span class="nt">ownca_not_before</span><span class="p">:</span><span class="w"> </span><span class="s">"-1d"</span><span class="w">  </span><span class="c1"># valid since yesterday</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_2</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certificate</span>
@@ -240,7 +240,7 @@
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write certificate file on server_1</span>
 <span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">certificate.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">certificate.certificate</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_1</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
@@ -256,9 +256,9 @@
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr_pipe</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.key</span>
 <span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:ansible.com&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:www.ansible.com&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DNS:docs.ansible.com&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:ansible.com"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:www.ansible.com"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"DNS:docs.ansible.com"</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_1</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csr</span>
@@ -280,14 +280,14 @@
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sign certificate with our CA</span>
 <span class="w">  </span><span class="nt">community.crypto.x509_certificate_pipe</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="o">(</span><span class="nv">certificate.content</span> <span class="o">|</span> <span class="nf">b64decode</span><span class="o">)</span> <span class="k">if</span> <span class="nv">certificate_exists.stat.exists</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="o">(</span><span class="nv">certificate.content</span> <span class="o">|</span> <span class="nf">b64decode</span><span class="o">)</span> <span class="k">if</span> <span class="nv">certificate_exists.stat.exists</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">"</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">csr.csr</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ownca</span>
 <span class="w">    </span><span class="nt">ownca_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.pem</span>
 <span class="w">    </span><span class="nt">ownca_privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ca-certificate.key</span>
-<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">ownca_privatekey_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">secret_ca_passphrase</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">ownca_not_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">+365d</span><span class="w">  </span><span class="c1"># valid for one year</span>
-<span class="w">    </span><span class="nt">ownca_not_before</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-1d&quot;</span><span class="w">  </span><span class="c1"># valid since yesterday</span>
+<span class="w">    </span><span class="nt">ownca_not_before</span><span class="p">:</span><span class="w"> </span><span class="s">"-1d"</span><span class="w">  </span><span class="c1"># valid since yesterday</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_2</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certificate</span>
@@ -295,7 +295,7 @@
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Write certificate file on server_1</span>
 <span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/certificate.pem</span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">certificate.certificate</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">certificate.certificate</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server_1</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certificate is changed</span>

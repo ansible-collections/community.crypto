@@ -288,10 +288,10 @@ If this value is present, the CA MAY consider this validation sufficient for iss
 <span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">      </span><span class="cp">{{</span>
-        <span class="s1">&#39;letsencrypt.org&#39;</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
-          <span class="nv">account_uri</span><span class="o">=</span><span class="s1">&#39;https://acme-v02.api.letsencrypt.org/acme/acct/1234&#39;</span><span class="o">,</span>
-          <span class="nv">policy</span><span class="o">=</span><span class="s1">&#39;wildcard&#39;</span><span class="o">,</span>
-          <span class="nv">persist_until</span><span class="o">=</span><span class="s1">&#39;+1w&#39;</span><span class="o">,</span>
+        <span class="s1">'letsencrypt.org'</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
+          <span class="nv">account_uri</span><span class="o">=</span><span class="s1">'https://acme-v02.api.letsencrypt.org/acme/acct/1234'</span><span class="o">,</span>
+          <span class="nv">policy</span><span class="o">=</span><span class="s1">'wildcard'</span><span class="o">,</span>
+          <span class="nv">persist_until</span><span class="o">=</span><span class="s1">'+1w'</span><span class="o">,</span>
         <span class="o">)</span>
       <span class="cp">}}</span>
 
@@ -302,9 +302,9 @@ If this value is present, the CA MAY consider this validation sufficient for iss
 <span class="w">    </span><span class="nt">value</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">        </span><span class="cp">{{</span>
-          <span class="s1">&#39;letsencrypt.org&#39;</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
-            <span class="nv">account_uri</span><span class="o">=</span><span class="s1">&#39;https://acme-v02.api.letsencrypt.org/acme/acct/4321&#39;</span><span class="o">,</span>
-            <span class="nv">persist_until</span><span class="o">=</span><span class="s1">&#39;20190331202428Z&#39;</span><span class="o">,</span>
+          <span class="s1">'letsencrypt.org'</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.acme_dns_persist_record</span><span class="o">(</span>
+            <span class="nv">account_uri</span><span class="o">=</span><span class="s1">'https://acme-v02.api.letsencrypt.org/acme/acct/4321'</span><span class="o">,</span>
+            <span class="nv">persist_until</span><span class="o">=</span><span class="s1">'20190331202428Z'</span><span class="o">,</span>
           <span class="o">)</span>
         <span class="cp">}}</span>
 </pre></div>
