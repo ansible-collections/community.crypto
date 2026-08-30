@@ -13,6 +13,7 @@ import nox
 try:
     import antsibull_nox
     from antsibull_nox.cli import run as run_antsibull_nox
+    from antsibull_nox.sessions import install_packages
 except ImportError:
     print("You need to install antsibull-nox in the same Python environment as nox.")
     sys.exit(1)
@@ -22,11 +23,13 @@ antsibull_nox.load_antsibull_nox_toml()
 
 
 @nox.session(name="create-certificates", default=False)
+@install_packages(
+    packages=["cryptography<39.0.0"]
+)  # we want support for SHA1 signatures
 def create_certificates(session: nox.Session) -> None:
     """
     Regenerate some vendored certificates.
     """
-    session.install("cryptography<39.0.0")  # we want support for SHA1 signatures
     session.run("python", "tests/create-certificates.py")
     session.warn(
         "Note that you need to modify some values in tests/integration/targets/x509_certificate_info/tasks/impl.yml"
