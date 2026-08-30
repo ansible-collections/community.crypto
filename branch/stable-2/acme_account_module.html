@@ -554,15 +554,15 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">contact</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mailto:me@example.com</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Change account&#39;s key to the one stored in the variable new_account_key</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Change account's key to the one stored in the variable new_account_key</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_account</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">new_account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">new_account_key</span> <span class="cp">}}</span><span class="s">&#39;</span>
+<span class="w">    </span><span class="nt">new_account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">'</span><span class="cp">{{</span> <span class="nv">new_account_key</span> <span class="cp">}}</span><span class="s">'</span>
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">changed_key</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Delete account (we have to use the new key)</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_account</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">new_account_key</span> <span class="cp">}}</span><span class="s">&#39;</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">'</span><span class="cp">{{</span> <span class="nv">new_account_key</span> <span class="cp">}}</span><span class="s">'</span>
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>

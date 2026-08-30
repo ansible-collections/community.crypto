@@ -907,7 +907,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with an inline key</span>
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
-<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">private_key_content</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">privatekey_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">private_key_content</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL Certificate Signing Request with a passphrase protected private key</span>
@@ -930,13 +930,13 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;DNS:www.ansible.com,DNS:m.ansible.com&#39;</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">'DNS:www.ansible.com,DNS:m.ansible.com'</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate an OpenSSL CSR with subjectAltName extension with dynamic list</span>
 <span class="w">  </span><span class="nt">community.crypto.openssl_csr</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/csr/www.ansible.com.csr</span>
 <span class="w">    </span><span class="nt">privatekey_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssl/private/ansible.com.pem</span>
-<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;regex_replace&#39;</span><span class="o">,</span> <span class="s1">&#39;^&#39;</span><span class="o">,</span> <span class="s1">&#39;DNS:&#39;</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">subject_alt_name</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">'regex_replace'</span><span class="o">,</span> <span class="s1">'^'</span><span class="o">,</span> <span class="s1">'DNS:'</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">with_dict</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">dns_server</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
@@ -983,9 +983,9 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <span class="w">    </span><span class="nt">common_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">www.ansible.com</span>
 <span class="w">    </span><span class="nt">crl_distribution_points</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">full_name</span><span class="p">:</span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/revocations.crl&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"URI:https://ca.example.com/revocations.crl"</span>
 <span class="w">        </span><span class="nt">crl_issuer</span><span class="p">:</span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;URI:https://ca.example.com/&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"URI:https://ca.example.com/"</span>
 <span class="w">        </span><span class="nt">reasons</span><span class="p">:</span>
 <span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_compromise</span>
 <span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ca_compromise</span>

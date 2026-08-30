@@ -579,7 +579,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from a variable</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
@@ -587,7 +587,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from Hashi Vault</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
-<span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.hashi_vault.hashi_vault&#39;</span><span class="o">,</span> <span class="s1">&#39;secret=secret/account_private_key:value&#39;</span><span class="o">)</span> <span class="cp">}}</span>
+<span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'community.hashi_vault.hashi_vault'</span><span class="o">,</span> <span class="s1">'secret=secret/account_private_key:value'</span><span class="o">)</span> <span class="cp">}}</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
@@ -595,29 +595,29 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key file</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/pki/cert/csr/sample.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'file'</span><span class="o">,</span> <span class="s1">'/etc/pki/cert/csr/sample.com.csr'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
 
 <span class="c1"># Perform the necessary steps to fulfill the challenge. For example:</span>
 <span class="c1">#</span>
 <span class="c1"># - name: Copy http-01 challenges</span>
 <span class="c1">#   ansible.builtin.copy:</span>
-<span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.identifier</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">]</span><span class="nv">.resource</span> <span class="cp">}}</span>
-<span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   when: &quot;&#39;http-01&#39; in item.challenges&quot;</span>
+<span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.identifier</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">'http-01'</span><span class="o">]</span><span class="nv">.resource</span> <span class="cp">}}</span>
+<span class="c1">#     content: "</span><span class="cp">{{</span> <span class="nv">item.challenges</span><span class="o">[</span><span class="s1">'http-01'</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   loop: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   when: "'http-01' in item.challenges"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_validate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http-01</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retrieve the cert and intermediate certificate</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_finalize</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
-<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">cert_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
@@ -638,22 +638,22 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="c1"># - name: Create DNS records for dns-01 challenges</span>
 <span class="c1">#   community.aws.route53:</span>
 <span class="c1">#     zone: sample.com</span>
-<span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     record: "</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">"</span>
 <span class="c1">#     type: TXT</span>
 <span class="c1">#     ttl: 60</span>
 <span class="c1">#     state: present</span>
 <span class="c1">#     wait: true</span>
 <span class="c1">#     # Note: item.value is a list of TXT entries, and route53</span>
 <span class="c1">#     # requires every entry to be enclosed in quotes</span>
-<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;community.dns.quote_txt&#39;</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     value: "</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">'community.dns.quote_txt'</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   loop: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_validate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="nt">acme_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dns-01</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retrieve the cert and intermediate certificate</span>
@@ -662,7 +662,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <span class="w">    </span><span class="nt">acme_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
-<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.order_uri</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">cert_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>

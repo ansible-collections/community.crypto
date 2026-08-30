@@ -629,120 +629,120 @@ The passphrase is provided as UTF-8 encoded text.</p></li>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create LUKS container (remains unchanged if it already exists)</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create LUKS container with a passphrase</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"foo"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create LUKS container with specific encryption</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">cipher</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;aes&quot;</span>
-<span class="w">    </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sha256&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">cipher</span><span class="p">:</span><span class="w"> </span><span class="s">"aes"</span>
+<span class="w">    </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="s">"sha256"</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(Create and) open the LUKS container; name it &quot;mycrypt&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(Create and) open the LUKS container; name it "mycrypt"</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;opened&quot;</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mycrypt&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"opened"</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"mycrypt"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Close the existing LUKS container &quot;mycrypt&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Close the existing LUKS container "mycrypt"</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;closed&quot;</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mycrypt&quot;</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"closed"</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"mycrypt"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Make sure LUKS container exists and is closed</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;closed&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"closed"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create container if it does not exist and add new key to it</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
-<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile2&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
+<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile2"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Add new key to the LUKS container (container has to exist)</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
-<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile2&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
+<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile2"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Add new passphrase to the LUKS container</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
-<span class="w">    </span><span class="nt">new_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
+<span class="w">    </span><span class="nt">new_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"foo"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove existing keyfile from the LUKS container</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">remove_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile2&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">remove_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile2"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove existing passphrase from the LUKS container</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">remove_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">remove_passphrase</span><span class="p">:</span><span class="w"> </span><span class="s">"foo"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Completely remove the LUKS container and its contents</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;absent&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"absent"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a container with label</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 <span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">personalLabelName</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Open the LUKS container based on label without device; name it &quot;mycrypt&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Open the LUKS container based on label without device; name it "mycrypt"</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;personalLabelName&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;opened&quot;</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mycrypt&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="s">"personalLabelName"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"opened"</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"mycrypt"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Close container based on UUID</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">uuid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">03ecd578-fad4-4e6c-9348-842e3e8fa340</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;closed&quot;</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mycrypt&quot;</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"closed"</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"mycrypt"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a container using luks2 format</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">luks2</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a container with key in slot 4</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;present&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"present"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 <span class="w">    </span><span class="nt">keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Add a new key in slot 5</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
-<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
+<span class="w">    </span><span class="nt">new_keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 <span class="w">    </span><span class="nt">new_keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Remove the key from slot 4 (given keyfile must not be slot 4)</span>
 <span class="w">  </span><span class="nt">community.crypto.luks_device</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/dev/loop0&quot;</span>
-<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/vault/keyfile&quot;</span>
+<span class="w">    </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"/dev/loop0"</span>
+<span class="w">    </span><span class="nt">keyfile</span><span class="p">:</span><span class="w"> </span><span class="s">"/vault/keyfile"</span>
 <span class="w">    </span><span class="nt">remove_keyslot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 </pre></div>
 </div>

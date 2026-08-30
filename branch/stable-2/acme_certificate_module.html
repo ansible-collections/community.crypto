@@ -750,7 +750,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from a variable.</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
@@ -759,7 +759,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from Hashi Vault.</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
-<span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;community.hashi_vault.hashi_vault&#39;</span><span class="o">,</span> <span class="s1">&#39;secret=secret/account_private_key:value&#39;</span><span class="o">)</span> <span class="cp">}}</span>
+<span class="w">      </span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'community.hashi_vault.hashi_vault'</span><span class="o">,</span> <span class="s1">'secret=secret/account_private_key:value'</span><span class="o">)</span> <span class="cp">}}</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
@@ -768,7 +768,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key file.</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;file&#39;</span><span class="o">,</span> <span class="s1">&#39;/etc/pki/cert/csr/sample.com.csr&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">csr_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'file'</span><span class="o">,</span> <span class="s1">'/etc/pki/cert/csr/sample.com.csr'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge</span>
@@ -778,17 +778,17 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="c1">#</span>
 <span class="c1"># - name: Copy http-01 challenge for sample.com</span>
 <span class="c1">#   ansible.builtin.copy:</span>
-<span class="c1">#     dest: /var/www/html/</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">&#39;challenge_data&#39;</span><span class="o">][</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource&#39;</span><span class="o">]</span> <span class="cp">}}</span>
-<span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">&#39;challenge_data&#39;</span><span class="o">][</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource_value&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   when: sample_com_challenge is changed and &#39;sample.com&#39; in sample_com_challenge[&#39;challenge_data&#39;]</span>
+<span class="c1">#     dest: /var/www/html/</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">'challenge_data'</span><span class="o">][</span><span class="s1">'sample.com'</span><span class="o">][</span><span class="s1">'http-01'</span><span class="o">][</span><span class="s1">'resource'</span><span class="o">]</span> <span class="cp">}}</span>
+<span class="c1">#     content: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span><span class="o">[</span><span class="s1">'challenge_data'</span><span class="o">][</span><span class="s1">'sample.com'</span><span class="o">][</span><span class="s1">'http-01'</span><span class="o">][</span><span class="s1">'resource_value'</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge['challenge_data']</span>
 <span class="c1">#</span>
 <span class="c1"># Alternative way:</span>
 <span class="c1">#</span>
 <span class="c1"># - name: Copy http-01 challenges</span>
 <span class="c1">#   ansible.builtin.copy:</span>
-<span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource&#39;</span><span class="o">]</span> <span class="cp">}}</span>
-<span class="c1">#     content: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">&#39;http-01&#39;</span><span class="o">][</span><span class="s1">&#39;resource_value&#39;</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     dest: /var/www/</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">/</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">'http-01'</span><span class="o">][</span><span class="s1">'resource'</span><span class="o">]</span> <span class="cp">}}</span>
+<span class="c1">#     content: "</span><span class="cp">{{</span> <span class="nv">item.value</span><span class="o">[</span><span class="s1">'http-01'</span><span class="o">][</span><span class="s1">'resource_value'</span><span class="o">]</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   loop: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">"</span>
 <span class="c1">#   when: sample_com_challenge is changed</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated and retrieve the cert and intermediate certificate</span>
@@ -798,7 +798,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com.crt</span>
 <span class="w">    </span><span class="nt">fullchain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-fullchain.crt</span>
 <span class="w">    </span><span class="nt">chain_dest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
-<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">"</span>
 
 <span class="nn">---</span>
 <span class="c1">### Example with DNS challenge against production ACME server ###</span>
@@ -821,29 +821,29 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="c1"># - name: Create DNS record for sample.com dns-01 challenge</span>
 <span class="c1">#   community.aws.route53:</span>
 <span class="c1">#     zone: sample.com</span>
-<span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;dns-01&#39;</span><span class="o">]</span><span class="nv">.record</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     record: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">'sample.com'</span><span class="o">][</span><span class="s1">'dns-01'</span><span class="o">]</span><span class="nv">.record</span> <span class="cp">}}</span><span class="c1">"</span>
 <span class="c1">#     type: TXT</span>
 <span class="c1">#     ttl: 60</span>
 <span class="c1">#     state: present</span>
 <span class="c1">#     wait: true</span>
 <span class="c1">#     # Note: route53 requires TXT entries to be enclosed in quotes</span>
-<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">&#39;sample.com&#39;</span><span class="o">][</span><span class="s1">&#39;dns-01&#39;</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.dns.quote_txt</span><span class="o">(</span><span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   when: sample_com_challenge is changed and &#39;sample.com&#39; in sample_com_challenge.challenge_data</span>
+<span class="c1">#     value: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data</span><span class="o">[</span><span class="s1">'sample.com'</span><span class="o">][</span><span class="s1">'dns-01'</span><span class="o">]</span><span class="nv">.resource_value</span> <span class="o">|</span> <span class="nf">community</span><span class="nv">.dns.quote_txt</span><span class="o">(</span><span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge.challenge_data</span>
 <span class="c1">#</span>
 <span class="c1"># Alternative way:</span>
 <span class="c1">#</span>
 <span class="c1"># - name: Create DNS records for dns-01 challenges</span>
 <span class="c1">#   community.aws.route53:</span>
 <span class="c1">#     zone: sample.com</span>
-<span class="c1">#     record: &quot;</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     record: "</span><span class="cp">{{</span> <span class="nv">item.key</span> <span class="cp">}}</span><span class="c1">"</span>
 <span class="c1">#     type: TXT</span>
 <span class="c1">#     ttl: 60</span>
 <span class="c1">#     state: present</span>
 <span class="c1">#     wait: true</span>
 <span class="c1">#     # Note: item.value is a list of TXT entries, and route53</span>
 <span class="c1">#     # requires every entry to be enclosed in quotes</span>
-<span class="c1">#     value: &quot;</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">&#39;community.dns.quote_txt&#39;</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">&quot;</span>
-<span class="c1">#   loop: &quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">&quot;</span>
+<span class="c1">#     value: "</span><span class="cp">{{</span> <span class="nv">item.value</span> <span class="o">|</span> <span class="nf">map</span><span class="o">(</span><span class="s1">'community.dns.quote_txt'</span><span class="o">,</span> <span class="nv">always_quote</span><span class="o">=</span><span class="kp">true</span><span class="o">)</span> <span class="o">|</span> <span class="nf">list</span> <span class="cp">}}</span><span class="c1">"</span>
+<span class="c1">#   loop: "</span><span class="cp">{{</span> <span class="nv">sample_com_challenge.challenge_data_dns</span> <span class="o">|</span> <span class="nf">dict2items</span> <span class="cp">}}</span><span class="c1">"</span>
 <span class="c1">#   when: sample_com_challenge is changed</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Let the challenge be validated and retrieve the cert and intermediate certificate</span>
@@ -857,7 +857,7 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dns-01</span>
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v01.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
-<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_com_challenge is changed</span>
 
 <span class="c1"># Alternative second step:</span>
@@ -871,13 +871,13 @@ If <code class="ansible-option docutils literal notranslate"><strong><a class="r
 <span class="w">    </span><span class="nt">chain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/httpd/ssl/sample.com-intermediate.crt</span>
 <span class="w">    </span><span class="nt">challenge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tls-alpn-01</span>
 <span class="w">    </span><span class="nt">remaining_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
-<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">&quot;</span>
-<span class="w">    </span><span class="c1"># We use Let&#39;s Encrypt&#39;s ACME v2 endpoint</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">sample_com_challenge</span> <span class="cp">}}</span><span class="s">"</span>
+<span class="w">    </span><span class="c1"># We use Let's Encrypt's ACME v2 endpoint</span>
 <span class="w">    </span><span class="nt">acme_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://acme-v02.api.letsencrypt.org/directory</span>
 <span class="w">    </span><span class="nt">acme_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">    </span><span class="c1"># The following makes sure that if a chain with /CN=DST Root CA X3 in its issuer is provided</span>
 <span class="w">    </span><span class="c1"># as an alternative, it will be selected. These are the roots cross-signed by IdenTrust.</span>
-<span class="w">    </span><span class="c1"># As long as Let&#39;s Encrypt provides alternate chains with the cross-signed root(s) when</span>
+<span class="w">    </span><span class="c1"># As long as Let's Encrypt provides alternate chains with the cross-signed root(s) when</span>
 <span class="w">    </span><span class="c1"># switching to their own ISRG Root X1 root, this will use the chain ending with a cross-signed</span>
 <span class="w">    </span><span class="c1"># root. This chain is more compatible with older TLS clients.</span>
 <span class="w">    </span><span class="nt">select_chain</span><span class="p">:</span>

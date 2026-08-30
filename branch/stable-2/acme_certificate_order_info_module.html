@@ -433,14 +433,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a challenge for sample.com using a account key from a variable</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_create</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">account_key_content</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">account_private_key</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">csr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/csr/sample.com.csr</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Obtain information on the order</span>
 <span class="w">  </span><span class="nt">community.crypto.acme_certificate_order_info</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">account_key_src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/pki/cert/private/account.key</span>
-<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">order.order_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">order_uri</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">order.order_uri</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order_info</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Show information</span>

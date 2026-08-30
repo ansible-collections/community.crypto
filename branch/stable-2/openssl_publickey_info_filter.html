@@ -241,7 +241,7 @@ To check whether it is installed, run <code class="code docutils literal notrans
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">      </span><span class="cp">{{</span>
         <span class="o">(</span>
-          <span class="nv">lookup</span><span class="o">(</span><span class="s1">&#39;ansible.builtin.file&#39;</span><span class="o">,</span> <span class="s1">&#39;/path/to/public-key.pem&#39;</span><span class="o">)</span>
+          <span class="nv">lookup</span><span class="o">(</span><span class="s1">'ansible.builtin.file'</span><span class="o">,</span> <span class="s1">'/path/to/public-key.pem'</span><span class="o">)</span>
           <span class="o">|</span> <span class="nf">community</span><span class="nv">.crypto.openssl_publickey_info</span>
         <span class="o">)</span><span class="nv">.type</span>
       <span class="cp">}}</span>

@@ -427,7 +427,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get the cert from an RDP port</span>
 <span class="w">  </span><span class="nt">community.crypto.get_certificate</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.2.3.4&quot;</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">"1.2.3.4"</span>
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3389</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -435,7 +435,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get a cert from an https port</span>
 <span class="w">  </span><span class="nt">community.crypto.get_certificate</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;www.google.com&quot;</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">"www.google.com"</span>
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">443</span>
 <span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
 <span class="w">  </span><span class="nt">run_once</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -443,17 +443,17 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ge
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">How many days until cert expires</span>
 <span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cert</span><span class="nv"> </span><span class="s">expires</span><span class="nv"> </span><span class="s">in:</span><span class="nv"> </span><span class="cp">{{</span> <span class="nv">expire_days</span> <span class="cp">}}</span><span class="nv"> </span><span class="s">days.&quot;</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">"cert</span><span class="nv"> </span><span class="s">expires</span><span class="nv"> </span><span class="s">in:</span><span class="nv"> </span><span class="cp">{{</span> <span class="nv">expire_days</span> <span class="cp">}}</span><span class="nv"> </span><span class="s">days."</span>
 <span class="w">  </span><span class="nt">vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">expire_days</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <span class="w">      </span><span class="cp">{{</span> <span class="o">(</span>
-        <span class="o">(</span><span class="nv">cert.not_after</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y%m%d%H%M%SZ&#39;</span><span class="o">))</span> <span class="o">-</span>
-        <span class="o">(</span><span class="nv">ansible_date_time.iso8601</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">&#39;%Y-%m-%dT%H:%M:%SZ&#39;</span><span class="o">))</span>
+        <span class="o">(</span><span class="nv">cert.not_after</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">'%Y%m%d%H%M%SZ'</span><span class="o">))</span> <span class="o">-</span>
+        <span class="o">(</span><span class="nv">ansible_date_time.iso8601</span> <span class="o">|</span> <span class="nf">ansible</span><span class="nv">.builtin.to_datetime</span><span class="o">(</span><span class="s1">'%Y-%m-%dT%H:%M:%SZ'</span><span class="o">))</span>
       <span class="o">)</span><span class="nv">.days</span> <span class="cp">}}</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Allow legacy insecure renegotiation to get a cert from a legacy device</span>
 <span class="w">  </span><span class="nt">community.crypto.get_certificate</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;legacy-device.domain.com&quot;</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">"legacy-device.domain.com"</span>
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">443</span>
 <span class="w">    </span><span class="nt">ciphers</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HIGH</span>
